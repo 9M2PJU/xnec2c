@@ -1172,17 +1172,17 @@ typedef enum
 
 /* Function prototypes produced by cproto */
 /* calculations.c */
-void qdsrc(int is, _Complex double v, _Complex double *e);
-void cabc(_Complex double *curx);
+void qdsrc(int is, complex double v, complex double *e);
+void cabc(complex double *curx);
 double db10(double x);
 double db20(double x);
-void intrp(double x, double y, _Complex double *f1, _Complex double *f2, _Complex double *f3, _Complex double *f4);
+void intrp(double x, double y, complex double *f1, complex double *f2, complex double *f3, complex double *f4);
 void intx(double el1, double el2, double b, int ij, double *sgr, double *sgi);
 int min(int a, int b);
 void test(double f1r, double f2r, double *tr, double f1i, double f2i, double *ti, double dmin);
 void trio(int j);
-double cang(_Complex double z);
-void zint(double sigl, double rolam, _Complex double *zint);
+double cang(complex double z);
+void zint(double sigl, double rolam, complex double *zint);
 /* callback_func.c */
 gboolean Save_Pixbuf(gpointer save_data);
 void Motion_Event(GdkEventMotion *event, view_t *v);
@@ -1616,12 +1616,12 @@ double Scale_Gain( double gain, int fstep, int idx );
 void efld(double xi, double yi, double zi, double ai, int ij);
 void gf(double zk, double *co, double *si);
 void gh(double zk, double *hr, double *hi);
-void gwave(_Complex double *erv, _Complex double *ezv, _Complex double *erh, _Complex double *ezh, _Complex double *eph);
-void gx(double zz, double rh, double xk, _Complex double *gz, _Complex double *gzp);
+void gwave(complex double *erv, complex double *ezv, complex double *erh, complex double *ezh, complex double *eph);
+void gx(double zz, double rh, double xk, complex double *gz, complex double *gzp);
 void hintg(double xi, double yi, double zi);
 void hsfld(double xi, double yi, double zi, double ai);
 void nfpat(int nfeh);
-void pcint(double xi, double yi, double zi, double cabi, double sabi, double salpi, _Complex double *e);
+void pcint(double xi, double yi, double zi, double cabi, double sabi, double salpi, complex double *e);
 void unere(double xob, double yob, double zob);
 /* fork.c */
 void Child_Process(int num_child);
@@ -1663,8 +1663,8 @@ void Save_Struct_Gnuplot_Data(char *filename);
 void Save_Currents_CSV(char *filename);
 void Save_Patch_Currents_CSV(char *filename);
 /* ground.c */
-void rom2(double a, double b, _Complex double *sum, double dmin);
-void sflds(double t, _Complex double *e);
+void rom2(double a, double b, complex double *sum, double dmin);
+void sflds(double t, complex double *e);
 /* input.c */
 gboolean Read_Comments(void);
 gboolean Read_Geometry(void);
@@ -1710,23 +1710,23 @@ int main(int argc, char *argv[]);
 gboolean Open_Input_File(gpointer udata);
 gboolean isChild(void);
 /* matrix.c */
-void cmset(int nrow, _Complex double *cmx, double rkhx, int iexkx);
-void cmsw(int j1, int j2, int i1, int i2, _Complex double *cmx, _Complex double *cw, int ncw, int nrow, int itrp);
-void etmns(double p1, double p2, double p3, double p4, double p5, double p6, int ipr, _Complex double *e);
-int factr(int n, _Complex double *a, int *ip, int ndim);
+void cmset(int nrow, complex double *cmx, double rkhx, int iexkx);
+void cmsw(int j1, int j2, int i1, int i2, complex double *cmx, complex double *cw, int ncw, int nrow, int itrp);
+void etmns(double p1, double p2, double p3, double p4, double p5, double p6, int ipr, complex double *e);
+int factr(int n, complex double *a, int *ip, int ndim);
 int factr_gauss_elim( int n, complex double *a, int *ip, int ndim);
-void factrs(int np, int nrow, _Complex double *a, int *ip);
+void factrs(int np, int nrow, complex double *a, int *ip);
 void fblock(int nrow, int ncol, int imax, int ipsym);
-int solve(int n, _Complex double *a, int *ip, _Complex double *b, int ndim);
+int solve(int n, complex double *a, int *ip, complex double *b, int ndim);
 int solve_gauss_elim( int n, complex double *a, int *ip, complex double *b, int ndim );
-void solves(_Complex double *a, int *ip, _Complex double *b, int neq, int nrh, int np, int n, int mp, int m);
+void solves(complex double *a, int *ip, complex double *b, int neq, int nrh, int np, int n, int mp, int m);
 /* nec2_model.c */
 void Zero_Store(GtkListStore *store, GtkTreeIter *iter, int ncols, int start_idx, int stop_idx);
 void Nec2_Input_File_Treeview(int action);
 void cell_edited_callback(GtkCellRendererText *cell, gchar *path, gchar *new_text, gpointer user_data);
 void Save_Nec2_Input_File(GtkWidget *treeview_window, char *nec2_file);
 /* network.c */
-void netwk(_Complex double *cmx, int *ip, _Complex double *einc);
+void netwk(complex double *cmx, int *ip, complex double *einc);
 void load(int *ldtyp, int *ldtag, int *ldtagf, int *ldtagt, double *zlr, double *zli, double *zlc);
 /* optimize.c */
 void Write_Optimizer_Data(void);
@@ -1748,7 +1748,7 @@ gboolean Save_Config(void);
 /* shared.c */
 /* somnec.c */
 void somnec(double epr, double sig, double fmhz);
-void fbar(_Complex double p, _Complex double *fbar);
+void fbar(complex double p, complex double *fbar);
 /* utils.c */
 void usage(void);
 int Stop(int err, const char *format, ...) __attribute__((format(printf, 2, 3)));
