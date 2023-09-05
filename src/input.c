@@ -1391,7 +1391,7 @@ Read_Commands( void )
         continue; /* continue card input loop */
 
       case NE: case NH:  /* "negcnh" cards, near field calculation parameters */
-        if( ain_num == 11 )
+        if( ain_num == NH )
           fpat.nfeh |= NEAR_HFIELD;
         else
           fpat.nfeh |= NEAR_EFIELD;
@@ -1440,7 +1440,7 @@ Read_Commands( void )
           mem_realloc( (void **)&netcx.x22i, mreq, "in input.c" );
 
           idx = netcx.nonet-1;
-          if( ain_num == 12 )
+          if( ain_num == NT )
             netcx.ntyp[idx] = 1;
           else
           {

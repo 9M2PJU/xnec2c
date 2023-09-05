@@ -34,26 +34,26 @@
 /* Command Mnemonics */
 enum CMND_MNM
 {
-  CM = 0,
-  CP,
-  EK,
-  EN,
-  EX,
-  FR,
-  GD,
-  GN,
-  KH,
-  LD,
-  NE,
-  NH,
-  NT,
-  PQ,
-  PT,
-  RP,
-  SY,
-  TL,
-  XQ,
-  ZO,
+  CM = 0, // 0
+  CP, // 1
+  EK, // 2
+  EN, // 3
+  EX, // 4
+  FR, // 5
+  GD, // 6
+  GN, // 7
+  KH, // 8
+  LD, // 9
+  NE, // 10
+  NH, // 11
+  NT, // 12
+  PQ, // 13
+  PT, // 14
+  RP, // 15
+  SY, // 16
+  TL, // 17
+  XQ, // 18
+  ZO, // 19
   NUM_CMNDS
 };
 
