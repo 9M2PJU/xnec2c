@@ -24,6 +24,7 @@
 
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"
+#include "draw_radiation.h"
 
 /* Radiation pattern OpenGL state */
 typedef struct
@@ -42,6 +43,9 @@ typedef struct
 
 /* Public API */
 GtkWidget* opengl_rdpattern_create_widget(void);
+int opengl_rdpattern_generate_triangles(point_3d_t *points, int nth, int nph,
+    double r_min, double r_range);
+void opengl_rdpattern_update_buffers(void);
 void opengl_rdpattern_cleanup(void);
 
 #endif /* HAVE_OPENGL */

@@ -30,5 +30,20 @@ typedef struct
 
 } point_3d_t;
 
+/* Radiation pattern data accessor */
+typedef struct
+{
+  point_3d_t *points;
+  int nth;
+  int nph;
+  double r_min;
+  double r_range;
+  gboolean valid;
+
+} rdpattern_data_t;
+
+unsigned int Generate_Rdpattern_Data(double *out_r_min, double *out_r_range);
+gboolean Get_Radiation_Pattern_Data(rdpattern_data_t *data);
+
 #endif
 

@@ -145,6 +145,7 @@ m4_pattern_forbid([PKG_CHECK_MODULES])dnl
 PKG_CHECK_MODULES([GMODULE], [gmodule-2.0])
 PKG_CHECK_MODULES([GTK],     [gtk+-3.0 >= 3.18.0])
 PKG_CHECK_MODULES([GSL],     [gsl])
+PKG_CHECK_MODULES([EPOXY],   [epoxy])
 
 # OpenGL support (optional)
 AC_ARG_ENABLE([opengl],
@@ -158,7 +159,19 @@ AS_IF([test "x$enable_opengl" != "xno"], [
   AC_CHECK_LIB([GL], [glEnable], [have_libgl=yes], [have_libgl=no])
 
   AS_IF([test "x$have_gl_h" = "xyes" && test "x$have_libgl" = "xyes"], [
-    PKG_CHECK_MODULES([CGLM], [cglm], [have_cglm=yes], [have_cglm=no])
+    dnl Check for CGLM via pkg-config first, then fall back to submodule
+    PKG_CHECK_MODULES([CGLM], [cglm], [have_cglm=yes], [
+      dnl Use bundled CGLM submodule
+      AS_IF([test -d "$srcdir/external/cglm"], [
+        AC_MSG_NOTICE([Using bundled CGLM from external/cglm])
+        CGLM_CFLAGS="-I\$(top_srcdir)/external/cglm/include"
+        CGLM_LIBS=""
+        have_cglm=yes
+      ], [
+        AC_MSG_WARN([CGLM not found via pkg-config and external/cglm not present])
+        have_cglm=no
+      ])
+    ])
 
     AS_IF([test "x$have_cglm" = "xyes"], [
       AC_DEFINE([HAVE_OPENGL], [1], [OpenGL support available])

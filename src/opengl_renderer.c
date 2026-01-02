@@ -142,8 +142,38 @@ arcball_init(arcball_state_t *state, float distance)
   glm_mat4_identity(state->rotation);
   state->distance = distance;
   state->zoom = 1.0f;
+  state->last_x = 0.0f;
+  state->last_y = 0.0f;
 
 } /* arcball_init() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_rotate()
+ *
+ * Apply rotation from mouse drag
+ */
+  void
+arcball_rotate(arcball_state_t *state, float dx, float dy)
+{
+  mat4 rot_x, rot_y;
+  vec3 up = {0, 1, 0};
+  vec3 right = {1, 0, 0};
+  float angle_x, angle_y;
+
+  angle_x = dx * 0.01f;
+  angle_y = dy * 0.01f;
+
+  glm_mat4_identity(rot_y);
+  glm_rotate(rot_y, angle_y, right);
+
+  glm_mat4_identity(rot_x);
+  glm_rotate(rot_x, angle_x, up);
+
+  glm_mat4_mul(rot_x, state->rotation, state->rotation);
+  glm_mat4_mul(rot_y, state->rotation, state->rotation);
+
+} /* arcball_rotate() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -155,12 +185,17 @@ arcball_init(arcball_state_t *state, float distance)
 arcball_get_mvp(arcball_state_t *state, mat4 dest,
   float aspect, float fov)
 {
-  mat4 view, proj;
+  mat4 view, proj, model;
   vec3 up = {0, 1, 0};
+
+  glm_mat4_identity(model);
+  glm_mat4_copy(state->rotation, model);
 
   glm_lookat(state->eye, state->center, up, view);
   glm_perspective(glm_rad(fov), aspect, 0.1f, 100.0f, proj);
+
   glm_mat4_mul(proj, view, dest);
+  glm_mat4_mul(dest, model, dest);
 
 } /* arcball_get_mvp() */
 

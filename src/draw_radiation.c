@@ -21,6 +21,10 @@
 #include "measurements.h"
 #include "shared.h"
 
+#ifdef HAVE_OPENGL
+#include "opengl_rdpattern.h"
+#endif
+
 /* Constants for display layout */
 #define TEXT_GRADIENT_SPACING 8  /* Spacing between text and gradient bar in pixels */
 #define LINE_WIDTH 2            /* Width of lines in pixels */
@@ -42,6 +46,15 @@ int need_rdpat_redraw = 1;
 /* Buffered points in 3d (xyz) space
  * forming the radiation pattern */
 static point_3d_t *point_3d = NULL;
+
+/* Cached radiation pattern range values */
+static double cached_r_min = 0.0;
+static double cached_r_range = 1.0;
+
+/* Generation counter for radiation pattern data
+ * Incremented each time point_3d is regenerated
+ * Allows renderers to track independently whether data has changed */
+static unsigned int rdpat_gen_counter = 0;
 
 /*-----------------------------------------------------------------------*/
 
@@ -135,6 +148,147 @@ double Scale_Gain( double gain, int fstep, int idx )
 
 /*-----------------------------------------------------------------------*/
 
+/* Generate_Rdpattern_Data()
+ *
+ * Converts spherical radiation pattern data to cartesian point_3d buffer
+ * Returns generation counter (0 if no new data generated)
+ * Always populates out_r_min and out_r_range from cache if non-NULL
+ */
+  unsigned int
+Generate_Rdpattern_Data(double *out_r_min, double *out_r_range)
+{
+  int idx, nth, nph, pts_idx, fstep, pol;
+  double theta, phi, r, r_min, r_max;
+  double dth, dph;
+  unsigned int gen_counter;
+
+  gen_counter = 0;
+  fstep = calc_data.freq_step;
+
+  if( isFlagSet(ENABLE_RDPAT) && (fstep >= 0) )
+  {
+    pol = calc_data.pol_type;
+
+    if( isFlagSet(DRAW_NEW_RDPAT) )
+    {
+      size_t mreq = ((size_t)(fpat.nth * fpat.nph)) * sizeof(point_3d_t);
+      mem_realloc( (void **)&point_3d, mreq, "in draw_radiation.c" );
+
+      idx = rad_pattern[fstep].max_gain_idx[pol];
+      r_max = Scale_Gain( rad_pattern[fstep].gtot[idx], fstep, idx);
+
+      idx = rad_pattern[fstep].min_gain_idx[pol];
+      double actual_gain = rad_pattern[fstep].gtot[idx];
+      double color_gain = (actual_gain < COLOR_MIN_GAIN) ? COLOR_MIN_GAIN : actual_gain;
+      r_min = Scale_Gain(color_gain, fstep, idx);
+
+      cached_r_min = r_min;
+      cached_r_range = r_max - r_min;
+
+      rdpattern_proj_params.r_max = r_max;
+      New_Projection_Parameters(
+          rdpattern_width,
+          rdpattern_height,
+          &rdpattern_proj_params );
+
+      dth = (double)fpat.dth * (double)TORAD;
+      dph = (double)fpat.dph * (double)TORAD;
+
+      pts_idx = 0;
+      phi = (double)(fpat.phis * TORAD);
+
+      /* Noise-mode rotation parameters: rotate display coordinates so
+       * the pattern visually tilts upward by the elevation angle while
+       * the sky/earth boundary remains at the horizontal plane. */
+      int noise_rotate = IS_NOISE_MODE(rc_config.gain_style);
+      double rot_tht_mg = 0.0, rot_phi_mg = 0.0, rot_elev = 0.0;
+      if (noise_rotate)
+      {
+        rot_tht_mg = rad_pattern[fstep].max_gain_tht[pol] * (double)TORAD;
+        rot_phi_mg = rad_pattern[fstep].max_gain_phi[pol] * (double)TORAD;
+        rot_elev   = rc_config.ant_temp_elevation * (double)TORAD;
+      }
+
+      for( nph = 0; nph < fpat.nph; nph++ )
+      {
+        theta = (double)(fpat.thets * TORAD);
+
+        for( nth = 0; nth < fpat.nth; nth++ )
+        {
+          r = Scale_Gain( rad_pattern[fstep].gtot[pts_idx], fstep, pts_idx );
+
+          point_3d[pts_idx].r = r;
+
+          /* Place cell at rotated position in noise mode so the pattern
+           * visually tilts upward; otherwise use original (θ, φ). */
+          if (noise_rotate && rot_elev != 0.0)
+          {
+            double xr, yr, zr;
+            ant_temp_rotate_point(theta, phi,
+                rot_tht_mg, rot_phi_mg, rot_elev,
+                &xr, &yr, &zr);
+            point_3d[pts_idx].x = r * xr;
+            point_3d[pts_idx].y = r * yr;
+            point_3d[pts_idx].z = r * zr;
+          }
+          else
+          {
+            point_3d[pts_idx].z = r * cos(theta);
+            double r_xy = r * sin(theta);
+            point_3d[pts_idx].x = r_xy * cos(phi);
+            point_3d[pts_idx].y = r_xy * sin(phi);
+          }
+
+          theta += dth;
+          pts_idx++;
+        }
+
+        phi += dph;
+      }
+
+      /* Noise modes: scan all cells for true scaled min/max.
+       * In noise mode Scale_Gain depends on gain, t_bright, and sin(θ),
+       * so the dBi peak index does not determine the noise density peak. */
+      if (IS_NOISE_MODE(rc_config.gain_style))
+      {
+        int total = fpat.nth * fpat.nph;
+        double nmax = point_3d[0].r;
+        double nmin = point_3d[0].r;
+        for (int i = 1; i < total; i++)
+        {
+          if (point_3d[i].r > nmax)
+            nmax = point_3d[i].r;
+          if (point_3d[i].r < nmin)
+            nmin = point_3d[i].r;
+        }
+        rad_pattern[fstep].noise_scaled_max = nmax;
+        rad_pattern[fstep].noise_scaled_min = nmin;
+        rdpattern_proj_params.r_max = nmax;
+        cached_r_min = nmin;
+        cached_r_range = nmax - nmin;
+
+        New_Projection_Parameters(
+            rdpattern_width,
+            rdpattern_height,
+            &rdpattern_proj_params);
+      }
+
+      ClearFlag( DRAW_NEW_RDPAT );
+      rdpat_gen_counter++;
+    }
+
+    gen_counter = rdpat_gen_counter;
+  }
+
+  if( out_r_min ) *out_r_min = cached_r_min;
+  if( out_r_range ) *out_r_range = cached_r_range;
+
+  return( gen_counter );
+
+} /* Generate_Rdpattern_Data() */
+
+/*-----------------------------------------------------------------------*/
+
 /* Draw_Radiation_Pattern()
  *
  * Draws the radiation pattern as a frame of line
@@ -157,16 +311,13 @@ Draw_Radiation_Pattern( cairo_t *cr )
   /* Frequency step and polarization type */
   int fstep, pol;
 
-  /* Theta and phi angles defining a rad pattern point
-   * and distance of its projection from xyz origin */
-  double theta, phi, r, r_min, r_range;
-
-  /* theta and phi step in rads */
-  double dth = (double)fpat.dth * (double)TORAD;
-  double dph = (double)fpat.dph * (double)TORAD;
+  double r_min, r_range;
 
   /* Used to set text in labels */
   gchar txt[16];
+
+  static unsigned int cairo_last_gen = 0;
+  unsigned int current_gen;
 
   /* Abort if rad pattern cannot be drawn */
   fstep = calc_data.freq_step;
@@ -175,129 +326,18 @@ Draw_Radiation_Pattern( cairo_t *cr )
 
   pol = calc_data.pol_type;
 
-  /* Change drawing if newer rad pattern data */
-  if( isFlagSet(DRAW_NEW_RDPAT) )
+  current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
+
+  if( current_gen == 0 )
+    return;
+
+  if( current_gen != cairo_last_gen )
   {
-    size_t mreq = ((size_t)(fpat.nth * fpat.nph)) * sizeof(point_3d_t);
-    mem_realloc( (void **)&point_3d, mreq, "in draw_radiation.c" );
-    mreq = (size_t)((fpat.nth-1) * fpat.nph + (fpat.nph-1) * fpat.nth);
+    size_t mreq = (size_t)((fpat.nth-1) * fpat.nph + (fpat.nph-1) * fpat.nth);
     mreq *= sizeof(double);
     mem_realloc( (void **)&red, mreq, "in draw_radiation.c" );
     mem_realloc( (void **)&grn, mreq, "in draw_radiation.c" );
     mem_realloc( (void **)&blu, mreq, "in draw_radiation.c" );
-
-    ClearFlag( DRAW_NEW_RDPAT );
-
-    /* Distance of rdpattern point furthest from xyz origin */
-    idx = rad_pattern[fstep].max_gain_idx[pol];
-    rdpattern_proj_params.r_max =
-      Scale_Gain( rad_pattern[fstep].gtot[idx], fstep, idx);
-
-    /* Get actual minimum gain for calculations and display */
-    idx = rad_pattern[fstep].min_gain_idx[pol];
-    double actual_gain = rad_pattern[fstep].gtot[idx];
-    
-    /* For color mapping, use COLOR_MIN_GAIN as the floor */
-    double color_gain = (actual_gain < COLOR_MIN_GAIN) ? COLOR_MIN_GAIN : actual_gain;
-    r_min = Scale_Gain(color_gain, fstep, idx);
-
-    /* Range of scaled rdpattern gain values */
-    r_range = rdpattern_proj_params.r_max - r_min;
-
-    /* Set radiation pattern projection parametrs */
-    New_Projection_Parameters(
-        rdpattern_width,
-        rdpattern_height,
-        &rdpattern_proj_params );
-
-    /*** Convert radiation pattern values
-     * to points in 3d space in x,y,z axis ***/
-    pts_idx = 0;
-    phi = (double)(fpat.phis * TORAD); /* In rads */
-
-    /* Noise-mode rotation parameters: rotate display coordinates so
-     * the pattern visually tilts upward by the elevation angle while
-     * the sky/earth boundary remains at the horizontal plane. */
-    int noise_rotate = IS_NOISE_MODE(rc_config.gain_style);
-    double rot_tht_mg = 0.0, rot_phi_mg = 0.0, rot_elev = 0.0;
-    if (noise_rotate)
-    {
-      rot_tht_mg = rad_pattern[fstep].max_gain_tht[pol] * (double)TORAD;
-      rot_phi_mg = rad_pattern[fstep].max_gain_phi[pol] * (double)TORAD;
-      rot_elev   = rc_config.ant_temp_elevation * (double)TORAD;
-    }
-
-    /* Step phi angle */
-    for( nph = 0; nph < fpat.nph; nph++ )
-    {
-      theta = (double)(fpat.thets * TORAD); /* In rads */
-
-      /* Step theta angle */
-      for( nth = 0; nth < fpat.nth; nth++ )
-      {
-        /* Distance of pattern point from the xyz origin */
-        r = Scale_Gain( rad_pattern[fstep].gtot[pts_idx], fstep, pts_idx );
-
-        /* Distance of pattern point from xyz origin */
-        point_3d[pts_idx].r = r;
-
-        /* Place cell at rotated position in noise mode so the pattern
-         * visually tilts upward; otherwise use original (θ, φ). */
-        if (noise_rotate && rot_elev != 0.0)
-        {
-          double xr, yr, zr;
-          ant_temp_rotate_point(theta, phi,
-              rot_tht_mg, rot_phi_mg, rot_elev,
-              &xr, &yr, &zr);
-          point_3d[pts_idx].x = r * xr;
-          point_3d[pts_idx].y = r * yr;
-          point_3d[pts_idx].z = r * zr;
-        }
-        else
-        {
-          point_3d[pts_idx].z = r * cos(theta);
-          double r_xy = r * sin(theta);
-          point_3d[pts_idx].x = r_xy * cos(phi);
-          point_3d[pts_idx].y = r_xy * sin(phi);
-        }
-
-        /* Step theta in rads */
-        theta += dth;
-
-        /* Step 3d points index */
-        pts_idx++;
-      } /* for( nth = 0; nth < fpat.nth; nth++ ) */
-
-      /* Step phi in rads */
-      phi += dph;
-    } /* for( nph = 0; nph < fpat.nph; nph++ ) */
-
-    /* Noise modes: scan all cells for true scaled min/max.
-     * In noise mode Scale_Gain depends on gain, t_bright, and sin(θ),
-     * so the dBi peak index does not determine the noise density peak. */
-    if (IS_NOISE_MODE(rc_config.gain_style))
-    {
-      int total = fpat.nth * fpat.nph;
-      double nmax = point_3d[0].r;
-      double nmin = point_3d[0].r;
-      for (int i = 1; i < total; i++)
-      {
-        if (point_3d[i].r > nmax)
-          nmax = point_3d[i].r;
-        if (point_3d[i].r < nmin)
-          nmin = point_3d[i].r;
-      }
-      rad_pattern[fstep].noise_scaled_max = nmax;
-      rad_pattern[fstep].noise_scaled_min = nmin;
-      rdpattern_proj_params.r_max = nmax;
-      r_min = nmin;
-      r_range = nmax - nmin;
-
-      New_Projection_Parameters(
-          rdpattern_width,
-          rdpattern_height,
-          &rdpattern_proj_params);
-    }
 
     /* Calculate RGB value for rad pattern seg.
      * The average gain value of the two points
@@ -356,7 +396,9 @@ Draw_Radiation_Pattern( cairo_t *cr )
             rdpattern_window_builder, "rdpattern_colorcode_minlabel")),
         txt );
 
-  } /* if( isFlagSet(DRAW_NEWRDPAT) ) ) */
+    cairo_last_gen = current_gen;
+
+  } /* if( current_gen != cairo_last_gen ) */
 
   /* Draw xyz axes to Screen */
   Draw_XYZ_Axes( cr, rdpattern_proj_params );
@@ -1706,6 +1748,38 @@ Free_Draw_Buffers( void )
   free_ptr( (void **)&red );
   free_ptr( (void **)&grn );
   free_ptr( (void **)&blu );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* Get_Radiation_Pattern_Data()
+ *
+ * Returns current radiation pattern data for OpenGL rendering
+ */
+gboolean
+Get_Radiation_Pattern_Data(rdpattern_data_t *data)
+{
+  int fstep;
+
+  if( !data )
+    return( FALSE );
+
+  fstep = calc_data.freq_step;
+
+  if( fstep < 0 || !point_3d || fpat.nth <= 0 || fpat.nph <= 0 )
+  {
+    data->valid = FALSE;
+    return( FALSE );
+  }
+
+  data->points = point_3d;
+  data->nth = fpat.nth;
+  data->nph = fpat.nph;
+  data->r_min = cached_r_min;
+  data->r_range = cached_r_range;
+  data->valid = TRUE;
+
+  return( TRUE );
 }
 
 /*-----------------------------------------------------------------------*/

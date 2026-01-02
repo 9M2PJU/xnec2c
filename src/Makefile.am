@@ -101,6 +101,9 @@ xnec2c_LDADD    += $(GMODULE_LIBS)
 xnec2c_CPPFLAGS += $(GTK_CFLAGS)
 xnec2c_LDADD    += $(GTK_LIBS)
 
+xnec2c_CPPFLAGS += $(EPOXY_CFLAGS)
+xnec2c_LDADD    += $(EPOXY_LIBS)
+
 xnec2c_LDADD    += $(INTLLIBS)
 
 xnec2c_CPPFLAGS += $(GSL_CFLAGS)

@@ -23,7 +23,7 @@
 #include "common.h"
 
 #ifdef HAVE_OPENGL
-#include <GL/gl.h>
+#include <epoxy/gl.h>
 #include <cglm/cglm.h>
 
 /* Shader container */
@@ -43,6 +43,8 @@ typedef struct
   mat4 rotation;
   float distance;
   float zoom;
+  float last_x;
+  float last_y;
 
 } arcball_state_t;
 
@@ -53,6 +55,7 @@ void gl_shader_destroy(gl_shader_t *shader);
 
 /* Arcball functions */
 void arcball_init(arcball_state_t *state, float distance);
+void arcball_rotate(arcball_state_t *state, float dx, float dy);
 void arcball_get_mvp(arcball_state_t *state, mat4 dest,
   float aspect, float fov);
 
