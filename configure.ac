@@ -146,6 +146,38 @@ PKG_CHECK_MODULES([GMODULE], [gmodule-2.0])
 PKG_CHECK_MODULES([GTK],     [gtk+-3.0 >= 3.18.0])
 PKG_CHECK_MODULES([GSL],     [gsl])
 
+# OpenGL support (optional)
+AC_ARG_ENABLE([opengl],
+  [AS_HELP_STRING([--disable-opengl],
+    [Disable OpenGL rendering support])],
+  [], [enable_opengl=yes])
+
+have_opengl=no
+AS_IF([test "x$enable_opengl" != "xno"], [
+  AC_CHECK_HEADER([GL/gl.h], [have_gl_h=yes], [have_gl_h=no])
+  AC_CHECK_LIB([GL], [glEnable], [have_libgl=yes], [have_libgl=no])
+
+  AS_IF([test "x$have_gl_h" = "xyes" && test "x$have_libgl" = "xyes"], [
+    PKG_CHECK_MODULES([CGLM], [cglm], [have_cglm=yes], [have_cglm=no])
+
+    AS_IF([test "x$have_cglm" = "xyes"], [
+      AC_DEFINE([HAVE_OPENGL], [1], [OpenGL support available])
+      GL_LIBS="-lGL"
+      AC_SUBST([GL_LIBS])
+      AC_SUBST([CGLM_CFLAGS])
+      AC_SUBST([CGLM_LIBS])
+      have_opengl=yes
+    ], [
+      AC_MSG_WARN([CGLM not found, OpenGL support disabled])
+    ])
+  ], [
+    AC_MSG_WARN([OpenGL not found, using Cairo fallback only])
+  ])
+])
+
+AM_CONDITIONAL([HAVE_OPENGL],
+  [test "x$have_opengl" = "xyes"])
+
 # GCC has atan2 as a built-in so the autoconf test casts it incorrectly and triggers a warning.
 # This causes -Werror to fail and then xnec2c does not link with -lm.  Disable built-ins
 # for this test:

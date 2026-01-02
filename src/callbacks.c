@@ -23,6 +23,10 @@
 #include "measurements.h"
 #include <pthread.h>
 
+#ifdef HAVE_OPENGL
+#include "opengl_rdpattern.h"
+#endif
+
 /* Action flag for NEC2 "card" editors */
 static int editor_action = EDITOR_NEW;
 
@@ -466,8 +470,23 @@ on_main_rdpattern_activate(
     gtk_widget_show( rdpattern_window );
     Update_Window_Titles();
 
+#ifdef HAVE_OPENGL
+    {
+      GtkWidget *box = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_box");
+      GtkWidget *old_da = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_drawingarea");
+      gtk_widget_hide(old_da);
+
+      rdpattern_drawingarea = opengl_rdpattern_create_widget();
+      gtk_box_pack_start(GTK_BOX(box), rdpattern_drawingarea, TRUE, TRUE, 0);
+      rc_config.use_opengl_renderer = 1;
+    }
+#else
     rdpattern_drawingarea = Builder_Get_Object(
         rdpattern_window_builder, "rdpattern_drawingarea" );
+    rc_config.use_opengl_renderer = 0;
+#endif
     gtk_widget_get_allocation( rdpattern_drawingarea, &alloc );
     rdpattern_width  = alloc.width;
     rdpattern_height = alloc.height;

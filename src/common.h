@@ -381,6 +381,8 @@ typedef struct
   /* Antenna temperature calculation */
   int ant_temp_env;       /* ANT_TEMP_ENV_* index from measurements.h */
   double ant_temp_elevation; /* Antenna elevation tilt (degrees), +=up */
+  /* Use OpenGL rendering for radiation patterns */
+  int use_opengl_renderer;
 } rc_config_t;
 
 typedef struct {
@@ -415,6 +417,34 @@ enum POL_TYPE
   POL_LHCP,
   NUM_POL
 };
+
+/* OpenGL types */
+#ifdef HAVE_OPENGL
+typedef struct
+{
+  float r, g, b, a;
+
+} rgba_f_t;
+
+typedef struct
+{
+  float x, y, z, r;
+
+} point_f_3d_t;
+
+typedef struct
+{
+  point_f_3d_t point;
+  rgba_f_t color;
+
+} color_point_t;
+
+typedef struct
+{
+  color_point_t cp[3];
+
+} color_triangle_t;
+#endif /* HAVE_OPENGL */
 
 /*** Structs encapsulating global ("common") variables ***/
 /* common  /crnt/ */

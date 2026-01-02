@@ -105,6 +105,14 @@ xnec2c_LDADD    += $(INTLLIBS)
 
 xnec2c_CPPFLAGS += $(GSL_CFLAGS)
 xnec2c_LDADD    += $(GSL_LIBS)
+if HAVE_OPENGL
+xnec2c_SOURCES += \
+  opengl_renderer.c opengl_renderer.h \
+  opengl_rdpattern.c opengl_rdpattern.h
+
+xnec2c_CPPFLAGS += $(CGLM_CFLAGS)
+xnec2c_LDADD    += $(GL_LIBS) $(CGLM_LIBS)
+endif
 
 
 ########################################################################

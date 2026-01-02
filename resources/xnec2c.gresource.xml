@@ -7,6 +7,8 @@
     <file>xnec2c.svg</file>
     <file>link.svg</file>
     <file>unlink.svg</file>
+    <file>gl/color-vertex.glsl</file>
+    <file>gl/color-fragment.glsl</file>
   </gresource>
 </gresources>
 
