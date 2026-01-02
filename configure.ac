@@ -346,5 +346,6 @@ AC_CONFIG_FILES([
   src/Makefile
   po/Makefile.in
   t/Makefile
+  .vscode/c_cpp_properties.json
 ])
 AC_OUTPUT
