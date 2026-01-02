@@ -40,13 +40,29 @@ typedef struct
 {
   vec3 eye;
   vec3 center;
+  vec3 up;
   mat4 rotation;
   float distance;
   float zoom;
+  vec2 pan_offset;
   float last_x;
   float last_y;
+  int drag_button;
+  float aspect;
 
 } arcball_state_t;
+
+/* Generic GL instance base */
+typedef struct
+{
+  gl_shader_t shader;
+  GLuint vao;
+  GLuint vbo;
+  GLint mvp_location;
+  arcball_state_t *arcball;
+  gboolean initialized;
+
+} gl_instance_t;
 
 /* Shader functions */
 gboolean gl_shader_load(gl_shader_t *shader,
@@ -54,10 +70,21 @@ gboolean gl_shader_load(gl_shader_t *shader,
 void gl_shader_destroy(gl_shader_t *shader);
 
 /* Arcball functions */
-void arcball_init(arcball_state_t *state, float distance);
-void arcball_rotate(arcball_state_t *state, float dx, float dy);
-void arcball_get_mvp(arcball_state_t *state, mat4 dest,
-  float aspect, float fov);
+arcball_state_t* arcball_new(float distance, float aspect);
+void arcball_free(arcball_state_t *ab);
+void arcball_set_aspect(arcball_state_t *ab, float aspect);
+void arcball_set_distance(arcball_state_t *ab, float distance);
+void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
+void arcball_drag(arcball_state_t *ab, float x, float y);
+void arcball_end_drag(arcball_state_t *ab);
+void arcball_zoom(arcball_state_t *ab, float delta);
+void arcball_pan(arcball_state_t *ab, float dx, float dy);
+void arcball_get_mvp(arcball_state_t *ab, mat4 dest, float zoom, float fov);
+
+/* GL instance functions */
+gl_instance_t* gl_instance_new(const char *vert_shader, const char *frag_shader,
+  float arcball_distance, float aspect);
+void gl_instance_free(gl_instance_t *inst);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_RENDERER_H */

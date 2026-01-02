@@ -24,14 +24,59 @@
 
 #ifdef HAVE_OPENGL
 
-static rdpattern_gl_state_t state = {0};
-
 /* Triangle buffer for radiation pattern mesh */
 static color_triangle_t *rdpat_triangles = NULL;
 static int rdpat_triangle_count = 0;
 
-/* Track last processed generation */
-static unsigned int gl_last_gen = 0;
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_state_new()
+ *
+ * Allocate and initialize radiation pattern GL state
+ */
+  rdpattern_gl_state_t*
+opengl_rdpattern_state_new(float aspect)
+{
+  rdpattern_gl_state_t *state;
+
+  state = g_new0(rdpattern_gl_state_t, 1);
+
+  state->gl = gl_instance_new("/gl/color-vertex.glsl", "/gl/color-fragment.glsl",
+    6.0f, aspect);
+
+  if( !state->gl )
+  {
+    g_free(state);
+    return( NULL );
+  }
+
+  state->position_location = glGetAttribLocation(
+    state->gl->shader.program, "position");
+  state->color_location = glGetAttribLocation(
+    state->gl->shader.program, "color");
+  state->triangle_count = 0;
+  state->gl_last_gen = 0;
+
+  return( state );
+
+} /* opengl_rdpattern_state_new() */
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_state_free()
+ *
+ * Free radiation pattern GL state
+ */
+  void
+opengl_rdpattern_state_free(rdpattern_gl_state_t *state)
+{
+  if( !state )
+    return;
+
+  gl_instance_free(state->gl);
+  g_free(state);
+
+} /* opengl_rdpattern_state_free() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -55,7 +100,7 @@ opengl_rdpattern_generate_triangles(
   /* Calculate triangle count: 2 per grid cell */
   rdpat_triangle_count = 2 * nph * (nth - 1);
 
-  pr_notice("Generating %d triangles (nth=%d, nph=%d)\n",
+  pr_debug("Generating %d triangles (nth=%d, nph=%d)\n",
     rdpat_triangle_count, nth, nph);
 
   mreq = (size_t)rdpat_triangle_count * sizeof(color_triangle_t);
@@ -155,8 +200,6 @@ opengl_rdpattern_generate_triangles(
     } /* for( nth_idx < nth - 1 ) */
   } /* for( nph_idx < nph ) */
 
-  state.triangle_count = rdpat_triangle_count;
-
   return( rdpat_triangle_count );
 
 } /* opengl_rdpattern_generate_triangles() */
@@ -168,43 +211,41 @@ opengl_rdpattern_generate_triangles(
  * Upload triangle data to GPU
  */
   void
-opengl_rdpattern_update_buffers(void)
+opengl_rdpattern_update_buffers(rdpattern_gl_state_t *state)
 {
   size_t buffer_size;
 
-  if( !state.initialized || !rdpat_triangles || rdpat_triangle_count == 0 )
-  {
-    pr_notice("Buffer update skipped: init=%d, tri=%p, count=%d\n",
-      state.initialized, rdpat_triangles, rdpat_triangle_count);
+  if( !state || !state->gl || !state->gl->initialized || !rdpat_triangles || rdpat_triangle_count == 0 )
     return;
-  }
 
-  pr_notice("Updating GL buffers with %d triangles\n", rdpat_triangle_count);
+  pr_debug("Updating GL buffers with %d triangles\n", rdpat_triangle_count);
 
-  glBindVertexArray(state.vao);
-  glBindBuffer(GL_ARRAY_BUFFER, state.vbo);
+  glBindVertexArray(state->gl->vao);
+  glBindBuffer(GL_ARRAY_BUFFER, state->gl->vbo);
 
   buffer_size = (size_t)rdpat_triangle_count * sizeof(color_triangle_t);
   glBufferData(GL_ARRAY_BUFFER, buffer_size, rdpat_triangles, GL_STATIC_DRAW);
 
   /* Position attribute */
-  glEnableVertexAttribArray(state.position_location);
+  glEnableVertexAttribArray(state->position_location);
   glVertexAttribPointer(
-      state.position_location,
+      state->position_location,
       3, GL_FLOAT, GL_FALSE,
       sizeof(color_point_t),
       (void*)0);
 
   /* Color attribute */
-  glEnableVertexAttribArray(state.color_location);
+  glEnableVertexAttribArray(state->color_location);
   glVertexAttribPointer(
-      state.color_location,
+      state->color_location,
       4, GL_FLOAT, GL_FALSE,
       sizeof(color_point_t),
       (void*)(4 * sizeof(float)));
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
+
+  state->triangle_count = rdpat_triangle_count;
 
 } /* opengl_rdpattern_update_buffers() */
 
@@ -217,7 +258,9 @@ opengl_rdpattern_update_buffers(void)
   static void
 on_realize(GtkGLArea *area)
 {
-  gboolean ok;
+  rdpattern_gl_state_t *state;
+  GtkAllocation alloc;
+  float aspect;
 
   gtk_gl_area_make_current(area);
 
@@ -227,28 +270,18 @@ on_realize(GtkGLArea *area)
     return;
   }
 
-  ok = gl_shader_load(&state.shader,
-    "/gl/color-vertex.glsl",
-    "/gl/color-fragment.glsl");
+  gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
+  aspect = (float)alloc.width / (float)alloc.height;
 
-  if( !ok )
+  state = opengl_rdpattern_state_new(aspect);
+  if( !state )
   {
-    pr_err("Shader load failed\n");
+    pr_err("Failed to create GL state\n");
     return;
   }
 
-  state.mvp_location = glGetUniformLocation(
-    state.shader.program, "mvp");
-  state.position_location = glGetAttribLocation(
-    state.shader.program, "position");
-  state.color_location = glGetAttribLocation(
-    state.shader.program, "color");
-
-  glGenVertexArrays(1, &state.vao);
-  glGenBuffers(1, &state.vbo);
-
-  arcball_init(&state.arcball, 3.0f);
-  state.initialized = TRUE;
+  g_object_set_data_full(G_OBJECT(area), "gl_state", state,
+    (GDestroyNotify)opengl_rdpattern_state_free);
 
   pr_notice("OpenGL context initialized\n");
 
@@ -263,27 +296,23 @@ on_realize(GtkGLArea *area)
   static gboolean
 on_render(GtkGLArea *area, GdkGLContext *context)
 {
+  rdpattern_gl_state_t *state;
   mat4 mvp;
-  GtkAllocation alloc;
-  float aspect;
   unsigned int current_gen;
   double r_min, r_range;
 
+  state = g_object_get_data(G_OBJECT(area), "gl_state");
+  if( !state || !state->gl || !state->gl->initialized )
+  {
+    /* GL not ready */
+    return( FALSE );
+  }
+
   current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
-
   if( current_gen == 0 )
-  {
-    pr_notice("Render skipped: no valid data\n");
     return( FALSE );
-  }
 
-  if( !state.initialized )
-  {
-    pr_notice("Render skipped: GL not initialized\n");
-    return( FALSE );
-  }
-
-  if( current_gen != gl_last_gen )
+  if( current_gen != state->gl_last_gen )
   {
     rdpattern_data_t rd_data;
     if( Get_Radiation_Pattern_Data(&rd_data) && rd_data.valid )
@@ -292,49 +321,46 @@ on_render(GtkGLArea *area, GdkGLContext *context)
           rd_data.points, rd_data.nth, rd_data.nph, r_min, r_range);
       if( tri_count > 0 )
       {
-        opengl_rdpattern_update_buffers();
-        gl_last_gen = current_gen;
+        opengl_rdpattern_update_buffers(state);
+
+        float r_max = (float)rd_data.r_max;
+        float distance = r_max * 2.165f;
+        arcball_set_distance(state->gl->arcball, distance);
+
+        state->gl_last_gen = current_gen;
       }
       else
       {
-        pr_notice("Triangle generation failed\n");
+        pr_err("Triangle generation failed\n");
         return( FALSE );
       }
     }
     else
     {
-      pr_notice("Failed to get radiation pattern data\n");
+      pr_err("Failed to get radiation pattern data\n");
       return( FALSE );
     }
   }
 
-  if( state.triangle_count == 0 )
-  {
-    pr_notice("Render skipped: no triangles\n");
+  if( state->triangle_count == 0 )
     return( FALSE );
-  }
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
-  aspect = (float)alloc.width / (float)alloc.height;
+  arcball_get_mvp(state->gl->arcball, mvp, 1.0f, 60.0f);
 
-  arcball_get_mvp(&state.arcball, mvp, aspect, 60.0f);
+  glUseProgram(state->gl->shader.program);
+  glUniformMatrix4fv(state->gl->mvp_location, 1, GL_FALSE, (float*)mvp);
 
-  glUseProgram(state.shader.program);
-  glUniformMatrix4fv(state.mvp_location, 1, GL_FALSE, (float*)mvp);
-
-  glBindVertexArray(state.vao);
+  glBindVertexArray(state->gl->vao);
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  glDrawArrays(GL_TRIANGLES, 0, state.triangle_count * 3);
+  glDrawArrays(GL_TRIANGLES, 0, state->triangle_count * 3);
 
   glBindVertexArray(0);
   glUseProgram(0);
-
-  pr_notice("Rendered %d triangles\n", state.triangle_count);
 
   return( TRUE );
 
@@ -351,14 +377,7 @@ on_unrealize(GtkGLArea *area)
 {
   gtk_gl_area_make_current(area);
 
-  if( state.vbo )
-    glDeleteBuffers(1, &state.vbo);
-  if( state.vao )
-    glDeleteVertexArrays(1, &state.vao);
-
-  gl_shader_destroy(&state.shader);
-
-  state.initialized = FALSE;
+  /* State freed automatically by GDestroyNotify */
 
 } /* on_unrealize() */
 
@@ -371,31 +390,50 @@ on_unrealize(GtkGLArea *area)
   static gboolean
 on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
-  state.arcball.last_x = event->x;
-  state.arcball.last_y = event->y;
+  rdpattern_gl_state_t *state;
+
+  state = g_object_get_data(G_OBJECT(widget), "gl_state");
+  if( !state || !state->gl )
+    return( FALSE );
+
+  arcball_begin_drag(state->gl->arcball, event->button, event->x, event->y);
+  return( TRUE );
+}
+
+/* on_button_release()
+ *
+ * Mouse button release handler
+ */
+  static gboolean
+on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+  rdpattern_gl_state_t *state;
+
+  state = g_object_get_data(G_OBJECT(widget), "gl_state");
+  if( !state || !state->gl )
+    return( FALSE );
+
+  arcball_end_drag(state->gl->arcball);
   return( TRUE );
 }
 
 /* on_motion()
  *
- * Mouse motion handler for rotation
+ * Mouse motion handler for rotation and pan
  */
   static gboolean
 on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 {
-  float dx, dy;
+  rdpattern_gl_state_t *state;
 
-  if( !(event->state & GDK_BUTTON1_MASK) )
+  state = g_object_get_data(G_OBJECT(widget), "gl_state");
+  if( !state || !state->gl )
     return( FALSE );
 
-  dx = event->x - state.arcball.last_x;
-  dy = event->y - state.arcball.last_y;
+  if( !(event->state & (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK)) )
+    return( FALSE );
 
-  arcball_rotate(&state.arcball, dx, dy);
-
-  state.arcball.last_x = event->x;
-  state.arcball.last_y = event->y;
-
+  arcball_drag(state->gl->arcball, event->x, event->y);
   gtk_widget_queue_draw(widget);
   return( TRUE );
 }
@@ -407,14 +445,21 @@ on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
   static gboolean
 on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data)
 {
+  rdpattern_gl_state_t *state;
+  float delta;
+
+  state = g_object_get_data(G_OBJECT(widget), "gl_state");
+  if( !state || !state->gl )
+    return( FALSE );
+
   if( event->direction == GDK_SCROLL_UP )
-    state.arcball.distance *= 0.9f;
+    delta = -0.3f;
   else if( event->direction == GDK_SCROLL_DOWN )
-    state.arcball.distance *= 1.1f;
+    delta = 0.3f;
+  else
+    return( FALSE );
 
-  state.arcball.distance = CLAMP(state.arcball.distance, 0.5f, 20.0f);
-  state.arcball.eye[2] = state.arcball.distance;
-
+  arcball_zoom(state->gl->arcball, delta);
   gtk_widget_queue_draw(widget);
   return( TRUE );
 }
@@ -446,6 +491,7 @@ opengl_rdpattern_create_widget(void)
   g_signal_connect(gl_area, "render", G_CALLBACK(on_render), NULL);
   g_signal_connect(gl_area, "unrealize", G_CALLBACK(on_unrealize), NULL);
   g_signal_connect(gl_area, "button-press-event", G_CALLBACK(on_button_press), NULL);
+  g_signal_connect(gl_area, "button-release-event", G_CALLBACK(on_button_release), NULL);
   g_signal_connect(gl_area, "motion-notify-event", G_CALLBACK(on_motion), NULL);
   g_signal_connect(gl_area, "scroll-event", G_CALLBACK(on_scroll), NULL);
 
@@ -466,7 +512,6 @@ opengl_rdpattern_cleanup(void)
 {
   free_ptr((void **)&rdpat_triangles);
   rdpat_triangle_count = 0;
-  state.triangle_count = 0;
 
 } /* opengl_rdpattern_cleanup() */
 

@@ -38,6 +38,7 @@ typedef struct
   int nph;
   double r_min;
   double r_range;
+  double r_max;
   gboolean valid;
 
 } rdpattern_data_t;

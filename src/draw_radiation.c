@@ -1777,6 +1777,7 @@ Get_Radiation_Pattern_Data(rdpattern_data_t *data)
   data->nph = fpat.nph;
   data->r_min = cached_r_min;
   data->r_range = cached_r_range;
+  data->r_max = rdpattern_proj_params.r_max;
   data->valid = TRUE;
 
   return( TRUE );
