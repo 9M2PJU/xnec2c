@@ -280,6 +280,8 @@ on_realize(GtkGLArea *area)
     return;
   }
 
+  arcball_set_viewport(state->gl->arcball, (float)alloc.height);
+
   g_object_set_data_full(G_OBJECT(area), "gl_state", state,
     (GDestroyNotify)opengl_rdpattern_state_free);
 
@@ -348,7 +350,7 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  arcball_get_mvp(state->gl->arcball, mvp, 1.0f, 60.0f);
+  arcball_get_mvp(state->gl->arcball, mvp, 1.0f);
 
   glUseProgram(state->gl->shader.program);
   glUniformMatrix4fv(state->gl->mvp_location, 1, GL_FALSE, (float*)mvp);
@@ -464,6 +466,26 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data)
   return( TRUE );
 }
 
+/* on_resize()
+ *
+ * Window resize handler to update viewport dimensions
+ */
+  static void
+on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
+{
+  rdpattern_gl_state_t *state;
+  float aspect;
+
+  state = g_object_get_data(G_OBJECT(widget), "gl_state");
+  if( !state || !state->gl )
+    return;
+
+  aspect = (float)allocation->width / (float)allocation->height;
+  arcball_set_aspect(state->gl->arcball, aspect);
+  arcball_set_viewport(state->gl->arcball, (float)allocation->height);
+
+} /* on_resize() */
+
 /*-----------------------------------------------------------------------*/
 
 /* opengl_rdpattern_create_widget()
@@ -494,6 +516,7 @@ opengl_rdpattern_create_widget(void)
   g_signal_connect(gl_area, "button-release-event", G_CALLBACK(on_button_release), NULL);
   g_signal_connect(gl_area, "motion-notify-event", G_CALLBACK(on_motion), NULL);
   g_signal_connect(gl_area, "scroll-event", G_CALLBACK(on_scroll), NULL);
+  g_signal_connect(gl_area, "size-allocate", G_CALLBACK(on_resize), NULL);
 
   gtk_widget_show(gl_area);
 

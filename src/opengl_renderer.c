@@ -135,7 +135,7 @@ gl_shader_destroy(gl_shader_t *shader)
  * Allocate and initialize arcball camera state
  */
   arcball_state_t*
-arcball_new(float distance, float aspect)
+arcball_new(float distance, float aspect, float fov_degrees)
 {
   arcball_state_t *ab;
 
@@ -151,6 +151,8 @@ arcball_new(float distance, float aspect)
   ab->last_y = 0.0f;
   ab->drag_button = 0;
   ab->aspect = aspect;
+  ab->viewport_height = 1.0f;
+  ab->fov_rad = glm_rad(fov_degrees);
 
   return( ab );
 
@@ -199,6 +201,20 @@ arcball_set_distance(arcball_state_t *ab, float distance)
 
 /*-----------------------------------------------------------------------*/
 
+/* arcball_set_viewport()
+ *
+ * Update viewport dimensions
+ */
+  void
+arcball_set_viewport(arcball_state_t *ab, float height)
+{
+  if( height > 0.0f )
+    ab->viewport_height = height;
+
+} /* arcball_set_viewport() */
+
+/*-----------------------------------------------------------------------*/
+
 /* arcball_rotate()
  *
  * Apply rotation from mouse drag
@@ -236,9 +252,11 @@ arcball_pan(arcball_state_t *ab, float dx, float dy)
 {
   float scale;
 
-  scale = ab->distance * 0.001f;
-  ab->pan_offset[0] -= dx * scale;
-  ab->pan_offset[1] += dy * scale;
+  /* Convert pixel delta to world coordinates at center plane distance using
+   * perspective projection: visible_height = 2 * distance * tan(fov/2) */
+  scale = 2.0f * ab->distance * tanf(ab->fov_rad / 2.0f) / ab->viewport_height;
+  ab->pan_offset[0] += dx * scale;
+  ab->pan_offset[1] -= dy * scale;
 
 } /* arcball_pan() */
 
@@ -330,22 +348,27 @@ arcball_zoom(arcball_state_t *ab, float delta)
  * Compute model-view-projection matrix
  */
   void
-arcball_get_mvp(arcball_state_t *ab, mat4 dest, float zoom, float fov)
+arcball_get_mvp(arcball_state_t *ab, mat4 dest, float zoom)
 {
-  mat4 view, proj, model;
+  mat4 view, proj, model, trans;
   vec3 eye_pos, center_pos;
 
   glm_mat4_identity(model);
   glm_mat4_copy(ab->rotation, model);
   glm_scale(model, (vec3){zoom, zoom, zoom});
 
+  /* Apply pan as model translation to avoid perspective distortion from
+   * tilting camera view direction; translates scene while keeping camera
+   * aimed at origin */
+  glm_mat4_identity(trans);
+  glm_translate(trans, (vec3){ab->pan_offset[0], ab->pan_offset[1], 0.0f});
+  glm_mat4_mul(trans, model, model);
+
   glm_vec3_copy(ab->eye, eye_pos);
   glm_vec3_copy(ab->center, center_pos);
-  center_pos[0] += ab->pan_offset[0];
-  center_pos[1] += ab->pan_offset[1];
 
   glm_lookat(eye_pos, center_pos, ab->up, view);
-  glm_perspective(glm_rad(fov), ab->aspect, 0.1f, 100.0f, proj);
+  glm_perspective(ab->fov_rad, ab->aspect, 0.1f, 100.0f, proj);
 
   glm_mat4_mul(proj, view, dest);
   glm_mat4_mul(dest, model, dest);
@@ -379,7 +402,7 @@ gl_instance_new(const char *vert_shader, const char *frag_shader,
   glGenVertexArrays(1, &inst->vao);
   glGenBuffers(1, &inst->vbo);
 
-  inst->arcball = arcball_new(arcball_distance, aspect);
+  inst->arcball = arcball_new(arcball_distance, aspect, 60.0f);
   inst->initialized = TRUE;
 
   return( inst );
