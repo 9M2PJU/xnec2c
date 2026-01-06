@@ -444,6 +444,13 @@ typedef struct
   color_point_t cp[3];
 
 } color_triangle_t;
+
+typedef struct
+{
+  float x, y, z;
+  float u, v;
+
+} text_vertex_t;
 #endif /* HAVE_OPENGL */
 
 /*** Structs encapsulating global ("common") variables ***/

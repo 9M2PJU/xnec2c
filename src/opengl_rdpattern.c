@@ -21,6 +21,7 @@
 #include "shared.h"
 #include "draw.h"
 #include "draw_radiation.h"
+#include "opengl_axes.h"
 
 #ifdef HAVE_OPENGL
 
@@ -57,6 +58,15 @@ opengl_rdpattern_state_new(float aspect)
   state->triangle_count = 0;
   state->gl_last_gen = 0;
 
+  state->axes = opengl_axes_new(&state->gl->shader);
+  if( !state->axes )
+  {
+    pr_err("Failed to create axes renderer\n");
+    gl_instance_free(state->gl);
+    g_free(state);
+    return NULL;
+  }
+
   return( state );
 
 } /* opengl_rdpattern_state_new() */
@@ -73,6 +83,7 @@ opengl_rdpattern_state_free(rdpattern_gl_state_t *state)
   if( !state )
     return;
 
+  opengl_axes_free(state->axes);
   gl_instance_free(state->gl);
   g_free(state);
 
@@ -302,6 +313,8 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   mat4 mvp;
   unsigned int current_gen;
   double r_min, r_range;
+  rdpattern_data_t rd_data;
+  float r_max;
 
   state = g_object_get_data(G_OBJECT(area), "gl_state");
   if( !state || !state->gl || !state->gl->initialized )
@@ -314,32 +327,30 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   if( current_gen == 0 )
     return( FALSE );
 
+  if( !Get_Radiation_Pattern_Data(&rd_data) || !rd_data.valid )
+  {
+    pr_err("Failed to get radiation pattern data\n");
+    return( FALSE );
+  }
+
+  r_max = (float)rd_data.r_max;
+
   if( current_gen != state->gl_last_gen )
   {
-    rdpattern_data_t rd_data;
-    if( Get_Radiation_Pattern_Data(&rd_data) && rd_data.valid )
+    int tri_count = opengl_rdpattern_generate_triangles(
+        rd_data.points, rd_data.nth, rd_data.nph, r_min, r_range);
+    if( tri_count > 0 )
     {
-      int tri_count = opengl_rdpattern_generate_triangles(
-          rd_data.points, rd_data.nth, rd_data.nph, r_min, r_range);
-      if( tri_count > 0 )
-      {
-        opengl_rdpattern_update_buffers(state);
+      opengl_rdpattern_update_buffers(state);
 
-        float r_max = (float)rd_data.r_max;
-        float distance = r_max * 2.165f;
-        arcball_set_distance(state->gl->arcball, distance);
+      float distance = r_max * 2.165f;
+      arcball_set_distance(state->gl->arcball, distance);
 
-        state->gl_last_gen = current_gen;
-      }
-      else
-      {
-        pr_err("Triangle generation failed\n");
-        return( FALSE );
-      }
+      state->gl_last_gen = current_gen;
     }
     else
     {
-      pr_err("Failed to get radiation pattern data\n");
+      pr_err("Triangle generation failed\n");
       return( FALSE );
     }
   }
@@ -362,6 +373,10 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   glDrawArrays(GL_TRIANGLES, 0, state->triangle_count * 3);
 
   glBindVertexArray(0);
+
+  opengl_axes_set_scale(state->axes, r_max);
+  opengl_axes_render(state->axes, mvp);
+
   glUseProgram(0);
 
   return( TRUE );

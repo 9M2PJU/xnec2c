@@ -9,6 +9,8 @@
     <file>unlink.svg</file>
     <file>gl/color-vertex.glsl</file>
     <file>gl/color-fragment.glsl</file>
+    <file>gl/text-vertex.glsl</file>
+    <file>gl/text-fragment.glsl</file>
   </gresource>
 </gresources>
 

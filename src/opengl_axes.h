@@ -17,36 +17,41 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef OPENGL_RDPATTERN_H
-#define OPENGL_RDPATTERN_H 1
+#ifndef OPENGL_AXES_H
+#define OPENGL_AXES_H 1
 
 #include "common.h"
 
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"
-#include "opengl_axes.h"
-#include "draw_radiation.h"
 
-/* Radiation pattern OpenGL state */
 typedef struct
 {
-  gl_instance_t *gl;
-  GLint position_location;
-  GLint color_location;
-  int triangle_count;
-  unsigned int gl_last_gen;
-  opengl_axes_t *axes;
+  GLuint lines_vao;
+  GLuint lines_vbo;
+  gl_shader_t *line_shader;
+  GLint line_mvp_loc;
+  GLint line_pos_loc;
+  GLint line_col_loc;
 
-} rdpattern_gl_state_t;
+  GLuint labels_vao;
+  GLuint labels_vbo;
+  GLuint label_texture;
+  gl_shader_t label_shader;
+  GLint label_mvp_loc;
+  GLint label_tex_loc;
+  GLint label_pos_loc;
+  GLint label_uv_loc;
 
-/* Public API */
-rdpattern_gl_state_t* opengl_rdpattern_state_new(float aspect);
-void opengl_rdpattern_state_free(rdpattern_gl_state_t *state);
-GtkWidget* opengl_rdpattern_create_widget(void);
-int opengl_rdpattern_generate_triangles(point_3d_t *points, int nth, int nph,
-    double r_min, double r_range);
-void opengl_rdpattern_update_buffers(rdpattern_gl_state_t *state);
-void opengl_rdpattern_cleanup(void);
+  float r_max;
+  gboolean initialized;
+
+} opengl_axes_t;
+
+opengl_axes_t* opengl_axes_new(gl_shader_t *line_shader);
+void opengl_axes_free(opengl_axes_t *axes);
+void opengl_axes_set_scale(opengl_axes_t *axes, float r_max);
+void opengl_axes_render(opengl_axes_t *axes, mat4 mvp);
 
 #endif /* HAVE_OPENGL */
-#endif /* OPENGL_RDPATTERN_H */
+#endif /* OPENGL_AXES_H */
