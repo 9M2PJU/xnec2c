@@ -289,6 +289,57 @@ Generate_Rdpattern_Data(double *out_r_min, double *out_r_range)
 
 /*-----------------------------------------------------------------------*/
 
+/* Update_Rdpattern_UI()
+ *
+ * Updates radiation pattern window UI elements
+ */
+  void
+Update_Rdpattern_UI(void)
+{
+  int fstep, pol;
+  gchar txt[16];
+
+  fstep = calc_data.freq_step;
+  if( fstep < 0 || !rad_pattern )
+    return;
+
+  pol = calc_data.pol_type;
+
+  if( fstep > calc_data.steps_total )
+    return;
+
+  if( !rad_pattern[fstep].max_gain || !rad_pattern[fstep].min_gain )
+    return;
+
+  /* Show max gain on color code bar */
+  snprintf( txt, sizeof(txt)-1, "%.2f", rad_pattern[fstep].max_gain[pol] );
+  gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
+          rdpattern_window_builder, "rdpattern_colorcode_maxlabel")),
+      txt );
+
+  /* Show min gain on color code bar, clamped to COLOR_MIN_GAIN */
+  double color_min_gain = rad_pattern[fstep].min_gain[pol];
+  if( color_min_gain < COLOR_MIN_GAIN )
+    color_min_gain = COLOR_MIN_GAIN;
+  snprintf( txt, sizeof(txt)-1, "%.2f", color_min_gain );
+  gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
+          rdpattern_window_builder, "rdpattern_colorcode_minlabel")),
+      txt );
+
+  /* Show gain in direction of viewer */
+  Show_Viewer_Gain(
+      rdpattern_window_builder,
+      "rdpattern_viewer_gain",
+      rdpattern_proj_params );
+
+  /* Display frequency step */
+  if( calc_data.freq_step >= 0 )
+    Display_Fstep( rdpattern_fstep_entry, calc_data.freq_step );
+
+} /* Update_Rdpattern_UI() */
+
+/*-----------------------------------------------------------------------*/
+
 /* Draw_Radiation_Pattern()
  *
  * Draws the radiation pattern as a frame of line
@@ -382,20 +433,6 @@ Draw_Radiation_Pattern( cairo_t *cr )
       } /* for( nth = 0; nth < fpat.nth; nth++ ) */
     } /* for( nph = 1; nph < fpat.nph; nph++ ) */
 
-    /* Show max gain on color code bar */
-    snprintf( txt, sizeof(txt)-1, "%.2f", rad_pattern[fstep].max_gain[pol] );
-    gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
-            rdpattern_window_builder, "rdpattern_colorcode_maxlabel")),
-        txt );
-
-    /* Show min gain on color code bar, clamped to COLOR_MIN_GAIN */
-    double color_min_gain = rad_pattern[fstep].min_gain[pol];
-    if (color_min_gain < COLOR_MIN_GAIN) color_min_gain = COLOR_MIN_GAIN;
-    snprintf( txt, sizeof(txt)-1, "%.2f", color_min_gain );
-    gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
-            rdpattern_window_builder, "rdpattern_colorcode_minlabel")),
-        txt );
-
     cairo_last_gen = current_gen;
 
   } /* if( current_gen != cairo_last_gen ) */
@@ -487,11 +524,8 @@ Draw_Radiation_Pattern( cairo_t *cr )
   /* Draw color legend overlay */
   Draw_Color_Legend_Overlay( cr );
 
-  /* Show gain in direction of viewer */
-  Show_Viewer_Gain(
-      rdpattern_window_builder,
-      "rdpattern_viewer_gain",
-      rdpattern_proj_params );
+  /* Update UI elements */
+  Update_Rdpattern_UI();
 
   /* Update T_total readout in toolbar */
   {

@@ -42,6 +42,7 @@ typedef struct
 /* Public API */
 rdpattern_gl_state_t* opengl_rdpattern_state_new(float aspect);
 void opengl_rdpattern_state_free(rdpattern_gl_state_t *state);
+rdpattern_gl_state_t* opengl_rdpattern_get_state(GtkWidget *widget);
 GtkWidget* opengl_rdpattern_create_widget(void);
 int opengl_rdpattern_generate_triangles(point_3d_t *points, int nth, int nph,
     double r_min, double r_range);

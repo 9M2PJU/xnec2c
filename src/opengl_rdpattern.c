@@ -262,6 +262,22 @@ opengl_rdpattern_update_buffers(rdpattern_gl_state_t *state)
 
 /*-----------------------------------------------------------------------*/
 
+/* opengl_rdpattern_get_state()
+ *
+ * Get radiation pattern GL state from widget
+ */
+  rdpattern_gl_state_t*
+opengl_rdpattern_get_state(GtkWidget *widget)
+{
+  if( !widget )
+    return( NULL );
+
+  return( g_object_get_data(G_OBJECT(widget), "gl_state") );
+
+} /* opengl_rdpattern_get_state() */
+
+/*-----------------------------------------------------------------------*/
+
 /* on_realize()
  *
  * GtkGLArea realize signal handler - initializes OpenGL context
@@ -378,6 +394,9 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   opengl_axes_render(state->axes, mvp);
 
   glUseProgram(0);
+
+  /* Update UI elements */
+  Update_Rdpattern_UI();
 
   return( TRUE );
 

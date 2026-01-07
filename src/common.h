@@ -1422,6 +1422,7 @@ double Polarization_Factor(int pol_type, int fstep, int idx);
 void Set_Polarization(int pol);
 void Set_Gain_Style(int gs);
 void New_Radiation_Projection_Angle(void);
+void Update_Rdpattern_UI(void);
 gboolean Redo_Radiation_Pattern(gpointer udata);
 double Viewer_Gain(projection_parameters_t proj_parameters, int fstep);
 void Rdpattern_Window_Killed(void);

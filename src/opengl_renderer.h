@@ -76,12 +76,15 @@ arcball_state_t* arcball_new(float distance, float aspect, float fov_degrees);
 void arcball_free(arcball_state_t *ab);
 void arcball_set_aspect(arcball_state_t *ab, float aspect);
 void arcball_set_distance(arcball_state_t *ab, float distance);
+void arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg);
+void arcball_set_zoom_factor(arcball_state_t *ab, float base_distance, float zoom_factor);
 void arcball_set_viewport(arcball_state_t *ab, float height);
 void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
 void arcball_drag(arcball_state_t *ab, float x, float y);
 void arcball_end_drag(arcball_state_t *ab);
 void arcball_zoom(arcball_state_t *ab, float delta);
 void arcball_pan(arcball_state_t *ab, float dx, float dy);
+void arcball_reset_pan(arcball_state_t *ab);
 void arcball_get_mvp(arcball_state_t *ab, mat4 dest, float zoom);
 
 /* GL instance functions */

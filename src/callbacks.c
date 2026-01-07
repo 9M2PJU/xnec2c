@@ -1727,9 +1727,32 @@ on_rdpattern_x_axis_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  /* Recalculate projection parameters */
-  New_Viewer_Angle( 0.0, 0.0, rotate_rdpattern,
-      incline_rdpattern, &rdpattern_proj_params );
+  rdpattern_proj_params.Wr = 0.0;
+  rdpattern_proj_params.Wi = 0.0;
+
+  /* Sync to renderer */
+  if( rc_config.use_opengl_renderer )
+  {
+#ifdef HAVE_OPENGL
+    rdpattern_gl_state_t *state;
+
+    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
+    if( state && state->gl && state->gl->arcball )
+    {
+      arcball_set_view(state->gl->arcball, 0.0f, 0.0f);
+      arcball_reset_pan(state->gl->arcball);
+      gtk_spin_button_set_value(rotate_rdpattern, 0.0);
+      gtk_spin_button_set_value(incline_rdpattern, 0.0);
+      gtk_widget_queue_draw(rdpattern_drawingarea);
+    }
+#endif
+  }
+  else
+  {
+    New_Viewer_Angle( 0.0, 0.0, rotate_rdpattern,
+        incline_rdpattern, &rdpattern_proj_params );
+  }
+
   if( isFlagSet(COMMON_PROJECTION) )
     New_Viewer_Angle( 0.0, 0.0, rotate_structure,
         incline_structure, &structure_proj_params );
@@ -1741,9 +1764,32 @@ on_rdpattern_y_axis_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  /* Recalculate projection parameters */
-  New_Viewer_Angle( 90.0, 0.0, rotate_rdpattern,
-      incline_rdpattern, &rdpattern_proj_params );
+  rdpattern_proj_params.Wr = 90.0;
+  rdpattern_proj_params.Wi = 0.0;
+
+  /* Sync to renderer */
+  if( rc_config.use_opengl_renderer )
+  {
+#ifdef HAVE_OPENGL
+    rdpattern_gl_state_t *state;
+
+    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
+    if( state && state->gl && state->gl->arcball )
+    {
+      arcball_set_view(state->gl->arcball, 90.0f, 0.0f);
+      arcball_reset_pan(state->gl->arcball);
+      gtk_spin_button_set_value(rotate_rdpattern, 90.0);
+      gtk_spin_button_set_value(incline_rdpattern, 0.0);
+      gtk_widget_queue_draw(rdpattern_drawingarea);
+    }
+#endif
+  }
+  else
+  {
+    New_Viewer_Angle( 90.0, 0.0, rotate_rdpattern,
+        incline_rdpattern, &rdpattern_proj_params );
+  }
+
   if( isFlagSet(COMMON_PROJECTION) )
     New_Viewer_Angle( 90.0, 0.0, rotate_structure,
         incline_structure, &structure_proj_params );
@@ -1755,9 +1801,32 @@ on_rdpattern_z_axis_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  /* Recalculate projection parameters */
-  New_Viewer_Angle( 0.0, 90.0, rotate_rdpattern,
-      incline_rdpattern, &rdpattern_proj_params );
+  rdpattern_proj_params.Wr = 0.0;
+  rdpattern_proj_params.Wi = 90.0;
+
+  /* Sync to renderer */
+  if( rc_config.use_opengl_renderer )
+  {
+#ifdef HAVE_OPENGL
+    rdpattern_gl_state_t *state;
+
+    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
+    if( state && state->gl && state->gl->arcball )
+    {
+      arcball_set_view(state->gl->arcball, 0.0f, 90.0f);
+      arcball_reset_pan(state->gl->arcball);
+      gtk_spin_button_set_value(rotate_rdpattern, 0.0);
+      gtk_spin_button_set_value(incline_rdpattern, 90.0);
+      gtk_widget_queue_draw(rdpattern_drawingarea);
+    }
+#endif
+  }
+  else
+  {
+    New_Viewer_Angle( 0.0, 90.0, rotate_rdpattern,
+        incline_rdpattern, &rdpattern_proj_params );
+  }
+
   if( isFlagSet(COMMON_PROJECTION) )
     New_Viewer_Angle( 0.0, 90.0, rotate_structure,
         incline_structure, &structure_proj_params );
@@ -1769,9 +1838,32 @@ on_rdpattern_default_view_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  /* Projection at 45 deg rotation and inclination */
-  New_Viewer_Angle( 45.0, 45.0, rotate_rdpattern,
-      incline_rdpattern, &rdpattern_proj_params );
+  rdpattern_proj_params.Wr = 45.0;
+  rdpattern_proj_params.Wi = 45.0;
+
+  /* Sync to renderer */
+  if( rc_config.use_opengl_renderer )
+  {
+#ifdef HAVE_OPENGL
+    rdpattern_gl_state_t *state;
+
+    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
+    if( state && state->gl && state->gl->arcball )
+    {
+      arcball_set_view(state->gl->arcball, 45.0f, 45.0f);
+      arcball_reset_pan(state->gl->arcball);
+      gtk_spin_button_set_value(rotate_rdpattern, 45.0);
+      gtk_spin_button_set_value(incline_rdpattern, 45.0);
+      gtk_widget_queue_draw(rdpattern_drawingarea);
+    }
+#endif
+  }
+  else
+  {
+    New_Viewer_Angle( 45.0, 45.0, rotate_rdpattern,
+        incline_rdpattern, &rdpattern_proj_params );
+  }
+
   if( isFlagSet(COMMON_PROJECTION) )
     New_Viewer_Angle( 45.0, 45.0, rotate_structure,
         incline_structure, &structure_proj_params );
@@ -1795,7 +1887,27 @@ on_rdpattern_rotate_spinbutton_value_changed(
     gtk_spin_button_set_value(
         rotate_structure, (gdouble)rdpattern_proj_params.Wr );
 
-  New_Radiation_Projection_Angle();
+  /* Sync to renderer */
+  if( rc_config.use_opengl_renderer )
+  {
+#ifdef HAVE_OPENGL
+    rdpattern_gl_state_t *state;
+
+    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
+    if( state && state->gl && state->gl->arcball )
+    {
+      arcball_set_view(state->gl->arcball,
+          (float)rdpattern_proj_params.Wr,
+          (float)rdpattern_proj_params.Wi);
+      gtk_widget_queue_draw(rdpattern_drawingarea);
+    }
+#endif
+  }
+  else
+  {
+    New_Radiation_Projection_Angle();
+  }
+
   gtk_spin_button_update( spinbutton );
 }
 
@@ -1817,7 +1929,27 @@ on_rdpattern_incline_spinbutton_value_changed(
     gtk_spin_button_set_value(
         incline_structure, (gdouble)rdpattern_proj_params.Wi );
 
-  New_Radiation_Projection_Angle();
+  /* Sync to renderer */
+  if( rc_config.use_opengl_renderer )
+  {
+#ifdef HAVE_OPENGL
+    rdpattern_gl_state_t *state;
+
+    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
+    if( state && state->gl && state->gl->arcball )
+    {
+      arcball_set_view(state->gl->arcball,
+          (float)rdpattern_proj_params.Wr,
+          (float)rdpattern_proj_params.Wi);
+      gtk_widget_queue_draw(rdpattern_drawingarea);
+    }
+#endif
+  }
+  else
+  {
+    New_Radiation_Projection_Angle();
+  }
+
   gtk_spin_button_update( spinbutton );
 }
 
@@ -5043,6 +5175,22 @@ on_rdpattern_zoom_spinbutton_value_changed(
   rdpattern_proj_params.xy_scale =
     rdpattern_proj_params.xy_scale1 * rdpattern_proj_params.xy_zoom;
 
+  /* Sync to OpenGL arcball distance */
+  if( rc_config.use_opengl_renderer )
+  {
+#ifdef HAVE_OPENGL
+    rdpattern_gl_state_t *state;
+
+    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
+    if( state && state->gl && state->gl->arcball )
+    {
+      float base_distance = (float)rdpattern_proj_params.r_max * 2.165f;
+      arcball_set_zoom_factor(state->gl->arcball, base_distance,
+          (float)rdpattern_proj_params.xy_zoom);
+    }
+#endif
+  }
+
   /* Trigger a redraw of structure drawingarea */
   need_rdpat_redraw = 1;
   xnec2_widget_queue_draw( rdpattern_drawingarea );
@@ -5084,10 +5232,30 @@ on_rdpattern_one_button_clicked(
   rdpattern_proj_params.reset = TRUE;
   rdpattern_proj_params.dx_center = 0.0;
   rdpattern_proj_params.dy_center = 0.0;
-  New_Projection_Parameters(
-      rdpattern_width,
-      rdpattern_height,
-      &rdpattern_proj_params );
+
+  /* Sync to OpenGL arcball */
+  if( rc_config.use_opengl_renderer )
+  {
+#ifdef HAVE_OPENGL
+    rdpattern_gl_state_t *state;
+
+    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
+    if( state && state->gl && state->gl->arcball )
+    {
+      float base_distance = (float)rdpattern_proj_params.r_max * 2.165f;
+      arcball_set_zoom_factor(state->gl->arcball, base_distance, 1.0f);
+      state->gl->arcball->pan_offset[0] = 0.0f;
+      state->gl->arcball->pan_offset[1] = 0.0f;
+    }
+#endif
+  }
+  else
+  {
+    New_Projection_Parameters(
+        rdpattern_width,
+        rdpattern_height,
+        &rdpattern_proj_params );
+  }
 
   need_rdpat_redraw = 1;
   xnec2_widget_queue_draw( rdpattern_drawingarea );

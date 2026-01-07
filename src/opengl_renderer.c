@@ -201,6 +201,59 @@ arcball_set_distance(arcball_state_t *ab, float distance)
 
 /*-----------------------------------------------------------------------*/
 
+/* arcball_set_view()
+ *
+ * Set arcball model rotation to match Cairo view angles.
+ *
+ * Coordinate system differences:
+ *   Cairo:   Z-up world, camera at spherical(Wr,Wi) looking at origin
+ *   Arcball: Y-up screen, camera fixed at +Z, model rotates instead
+ *
+ * Cairo angles:
+ *   Wr = azimuth in XY plane from +X axis (0=+X, 90=+Y)
+ *   Wi = elevation from XY plane toward +Z (0=horizontal, 90=top-down)
+ *
+ * View button mappings:
+ *   X button (Wr=0,  Wi=0):  +X toward camera, +Z up, +Y right
+ *   Y button (Wr=90, Wi=0):  +Y toward camera, +Z up, +X left
+ *   Z button (Wr=0,  Wi=90): +Z toward camera, +Y right, +X down
+ *
+ * Rotation formula: Rz(-90) * Ry(Wi-90) * Rz(-Wr)
+ *   Rz(-90):    Base alignment of Cairo X-axis reference to arcball
+ *   Ry(Wi-90):  Elevation around Y (not X) because Cairo Z is up
+ *   Rz(-Wr):    Azimuth in model space, applied first to vertices
+ */
+  void
+arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg)
+{
+  if( !ab )
+    return;
+
+  glm_mat4_identity(ab->rotation);
+  glm_rotate(ab->rotation, glm_rad(-90.0f), (vec3){0, 0, 1});
+  glm_rotate(ab->rotation, glm_rad(wi_deg - 90.0f), (vec3){0, 1, 0});
+  glm_rotate(ab->rotation, glm_rad(-wr_deg), (vec3){0, 0, 1});
+
+} /* arcball_set_view() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_set_zoom_factor()
+ *
+ * Set arcball distance from base distance and zoom factor
+ */
+  void
+arcball_set_zoom_factor(arcball_state_t *ab, float base_distance, float zoom_factor)
+{
+  if( !ab || zoom_factor <= 0.0f )
+    return;
+
+  ab->distance = base_distance / zoom_factor;
+
+} /* arcball_set_zoom_factor() */
+
+/*-----------------------------------------------------------------------*/
+
 /* arcball_set_viewport()
  *
  * Update viewport dimensions
@@ -340,6 +393,22 @@ arcball_zoom(arcball_state_t *ab, float delta)
   ab->eye[2] = ab->distance;
 
 } /* arcball_zoom() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_reset_pan()
+ *
+ * Reset pan offset to center view
+ */
+  void
+arcball_reset_pan(arcball_state_t *ab)
+{
+  if( !ab )
+    return;
+
+  glm_vec2_zero(ab->pan_offset);
+
+} /* arcball_reset_pan() */
 
 /*-----------------------------------------------------------------------*/
 
