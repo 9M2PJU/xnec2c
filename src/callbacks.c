@@ -30,6 +30,72 @@
 /* Action flag for NEC2 "card" editors */
 static int editor_action = EDITOR_NEW;
 
+/* Canonical angle ranges for wrapping
+ * Adjustments have wider bounds to allow triggering wrap detection */
+#define ROTATE_LOWER    0.0
+#define ROTATE_UPPER    360.0
+#define INCLINE_LOWER   -180.0
+#define INCLINE_UPPER   180.0
+
+/* Scroll increment for mouse wheel on rotation spinbuttons */
+#define SCROLL_ANGLE_INCREMENT  5.0
+
+/* wrap_angle()
+ *
+ * Normalize angle to canonical range by wrapping at boundaries
+ */
+  static double
+wrap_angle(double value, double canonical_lower, double canonical_upper)
+{
+  double range;
+  double wrapped;
+
+  range = canonical_upper - canonical_lower;
+  wrapped = value;
+
+  while( wrapped >= canonical_upper )
+  {
+    wrapped = wrapped - range;
+  }
+
+  while( wrapped < canonical_lower )
+  {
+    wrapped = wrapped + range;
+  }
+
+  return( wrapped );
+
+} /* wrap_angle() */
+
+/* handle_rotation_scroll()
+ *
+ * Handle mouse wheel scroll on rotation spinbuttons with 5-degree increment
+ */
+  static gboolean
+handle_rotation_scroll(GtkSpinButton *spinbutton, GdkEventScroll *event,
+    double lower, double upper)
+{
+  double current, delta, new_value, wrapped;
+
+  if( event->direction != GDK_SCROLL_UP && event->direction != GDK_SCROLL_DOWN )
+    return( FALSE );
+
+  current = gtk_spin_button_get_value(spinbutton);
+
+  if( event->direction == GDK_SCROLL_UP )
+    delta = SCROLL_ANGLE_INCREMENT;
+  else
+    delta = -SCROLL_ANGLE_INCREMENT;
+
+  new_value = current + delta;
+  wrapped = wrap_angle(new_value, lower, upper);
+
+  gtk_spin_button_set_value(spinbutton, wrapped);
+
+  return( TRUE );
+
+} /* handle_rotation_scroll() */
+
 static int saveas_width;
 static int saveas_height;
 
@@ -905,21 +971,31 @@ on_main_rotate_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  /* No redraws if new input pending */
+  double value, wrapped;
+
   if( isFlagSet(INPUT_PENDING) )
     return;
 
-  /* Get new "rotate" structure angle from spinbutton */
-  structure_proj_params.Wr = gtk_spin_button_get_value(spinbutton);
+  value = gtk_spin_button_get_value(spinbutton);
+  wrapped = wrap_angle(value, ROTATE_LOWER, ROTATE_UPPER);
 
-  /* Sync rad pattrern window spinbutton if enabled */
+  if( wrapped != value )
+  {
+    gtk_spin_button_set_value(spinbutton, wrapped);
+    return;
+  }
+
+  structure_proj_params.Wr = wrapped;
+
   if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
-    gtk_spin_button_set_value(
-        rotate_rdpattern, (gdouble)structure_proj_params.Wr );
+  {
+    gtk_spin_button_set_value(rotate_rdpattern, (gdouble)structure_proj_params.Wr);
+  }
 
   New_Structure_Projection_Angle();
-  gtk_spin_button_update( spinbutton );
-}
+  gtk_spin_button_update(spinbutton);
+
+} /* on_main_rotate_spinbutton_value_changed() */
 
 
   void
@@ -927,20 +1003,52 @@ on_main_incline_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  /* No redraws if new input pending */
+  double value, wrapped;
+
   if( isFlagSet(INPUT_PENDING) )
     return;
 
-  /* Get new "incline" structure angle from spinbutton */
-  structure_proj_params.Wi = gtk_spin_button_get_value(spinbutton);
+  value = gtk_spin_button_get_value(spinbutton);
+  wrapped = wrap_angle(value, INCLINE_LOWER, INCLINE_UPPER);
 
-  /* Sync rad pattrern window spinbutton if enabled */
+  if( wrapped != value )
+  {
+    gtk_spin_button_set_value(spinbutton, wrapped);
+    return;
+  }
+
+  structure_proj_params.Wi = wrapped;
+
   if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
-    gtk_spin_button_set_value(
-        incline_rdpattern, (gdouble)structure_proj_params.Wi );
+  {
+    gtk_spin_button_set_value(incline_rdpattern, (gdouble)structure_proj_params.Wi);
+  }
 
   New_Structure_Projection_Angle();
-  gtk_spin_button_update( spinbutton );
+  gtk_spin_button_update(spinbutton);
+
+} /* on_main_incline_spinbutton_value_changed() */
+
+
+  gboolean
+on_main_rotate_spinbutton_scroll_event(
+    GtkWidget       *widget,
+    GdkEvent        *event,
+    gpointer         user_data)
+{
+  return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
+      (GdkEventScroll *)event, ROTATE_LOWER, ROTATE_UPPER) );
+}
+
+
+  gboolean
+on_main_incline_spinbutton_scroll_event(
+    GtkWidget       *widget,
+    GdkEvent        *event,
+    gpointer         user_data)
+{
+  return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
+      (GdkEventScroll *)event, INCLINE_LOWER, INCLINE_UPPER) );
 }
 
 
@@ -1875,19 +1983,27 @@ on_rdpattern_rotate_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  /* No redraws if new input pending */
+  double value, wrapped;
+
   if( isFlagSet(INPUT_PENDING) )
     return;
 
-  /* Get new value of "rotate pattern" angle from spinbutton */
-  rdpattern_proj_params.Wr = gtk_spin_button_get_value(spinbutton);
+  value = gtk_spin_button_get_value(spinbutton);
+  wrapped = wrap_angle(value, ROTATE_LOWER, ROTATE_UPPER);
 
-  /* Sync main window rotate spinbutton */
+  if( wrapped != value )
+  {
+    gtk_spin_button_set_value(spinbutton, wrapped);
+    return;
+  }
+
+  rdpattern_proj_params.Wr = wrapped;
+
   if( isFlagSet(COMMON_PROJECTION) )
-    gtk_spin_button_set_value(
-        rotate_structure, (gdouble)rdpattern_proj_params.Wr );
+  {
+    gtk_spin_button_set_value(rotate_structure, (gdouble)rdpattern_proj_params.Wr);
+  }
 
-  /* Sync to renderer */
   if( rc_config.use_opengl_renderer )
   {
 #ifdef HAVE_OPENGL
@@ -1908,8 +2024,9 @@ on_rdpattern_rotate_spinbutton_value_changed(
     New_Radiation_Projection_Angle();
   }
 
-  gtk_spin_button_update( spinbutton );
-}
+  gtk_spin_button_update(spinbutton);
+
+} /* on_rdpattern_rotate_spinbutton_value_changed() */
 
 
   void
@@ -1917,19 +2034,27 @@ on_rdpattern_incline_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  /* No redraws if new input pending */
+  double value, wrapped;
+
   if( isFlagSet(INPUT_PENDING) )
     return;
 
-  /* Get new value of "incline pattern" angle from spinbutton */
-  rdpattern_proj_params.Wi = gtk_spin_button_get_value(spinbutton);
+  value = gtk_spin_button_get_value(spinbutton);
+  wrapped = wrap_angle(value, INCLINE_LOWER, INCLINE_UPPER);
 
-  /* Sync main window incline spinbutton */
+  if( wrapped != value )
+  {
+    gtk_spin_button_set_value(spinbutton, wrapped);
+    return;
+  }
+
+  rdpattern_proj_params.Wi = wrapped;
+
   if( isFlagSet(COMMON_PROJECTION) )
-    gtk_spin_button_set_value(
-        incline_structure, (gdouble)rdpattern_proj_params.Wi );
+  {
+    gtk_spin_button_set_value(incline_structure, (gdouble)rdpattern_proj_params.Wi);
+  }
 
-  /* Sync to renderer */
   if( rc_config.use_opengl_renderer )
   {
 #ifdef HAVE_OPENGL
@@ -1950,7 +2075,30 @@ on_rdpattern_incline_spinbutton_value_changed(
     New_Radiation_Projection_Angle();
   }
 
-  gtk_spin_button_update( spinbutton );
+  gtk_spin_button_update(spinbutton);
+
+} /* on_rdpattern_incline_spinbutton_value_changed() */
+
+
+  gboolean
+on_rdpattern_rotate_spinbutton_scroll_event(
+    GtkWidget       *widget,
+    GdkEvent        *event,
+    gpointer         user_data)
+{
+  return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
+      (GdkEventScroll *)event, ROTATE_LOWER, ROTATE_UPPER) );
+}
+
+
+  gboolean
+on_rdpattern_incline_spinbutton_scroll_event(
+    GtkWidget       *widget,
+    GdkEvent        *event,
+    gpointer         user_data)
+{
+  return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
+      (GdkEventScroll *)event, INCLINE_LOWER, INCLINE_UPPER) );
 }
 
 

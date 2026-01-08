@@ -5304,15 +5304,15 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
     <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="main_incline_adjustment">
-    <property name="lower">-180</property>
-    <property name="upper">180</property>
+    <property name="lower">-360</property>
+    <property name="upper">360</property>
     <property name="value">45</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="main_rotate_adjustment">
     <property name="lower">-360</property>
-    <property name="upper">360</property>
+    <property name="upper">720</property>
     <property name="value">45</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
@@ -9297,15 +9297,15 @@ Save NEC2 Editor data first?
     <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="rdpattern_incline_adjustment">
-    <property name="lower">-180</property>
-    <property name="upper">180</property>
+    <property name="lower">-360</property>
+    <property name="upper">360</property>
     <property name="value">45</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="rdpattern_rotate_adjustment">
     <property name="lower">-360</property>
-    <property name="upper">360</property>
+    <property name="upper">720</property>
     <property name="value">45</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
@@ -11285,9 +11285,9 @@ Save NEC2 Editor data first?
               <object class="GtkSpinButton" id="main_rotate_spinbutton">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="max-length">3</property>
-                <property name="width-chars">3</property>
-                <property name="max-width-chars">3</property>
+                <property name="max-length">4</property>
+                <property name="width-chars">4</property>
+                <property name="max-width-chars">4</property>
                 <property name="xalign">1</property>
                 <property name="shadow-type">etched-in</property>
                 <property name="input-purpose">number</property>
@@ -11296,6 +11296,7 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <signal name="value-changed" handler="on_main_rotate_spinbutton_value_changed" swapped="no"/>
+                <signal name="scroll-event" handler="on_main_rotate_spinbutton_scroll_event" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -11323,9 +11324,9 @@ Save NEC2 Editor data first?
               <object class="GtkSpinButton" id="main_incline_spinbutton">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="max-length">3</property>
-                <property name="width-chars">3</property>
-                <property name="max-width-chars">3</property>
+                <property name="max-length">4</property>
+                <property name="width-chars">4</property>
+                <property name="max-width-chars">4</property>
                 <property name="xalign">1</property>
                 <property name="shadow-type">etched-in</property>
                 <property name="input-purpose">number</property>
@@ -11334,6 +11335,7 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <signal name="value-changed" handler="on_main_incline_spinbutton_value_changed" swapped="no"/>
+                <signal name="scroll-event" handler="on_main_incline_spinbutton_scroll_event" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -12508,9 +12510,9 @@ Save NEC2 Editor data first?
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="hexpand">True</property>
-                <property name="max-length">3</property>
-                <property name="width-chars">3</property>
-                <property name="max-width-chars">3</property>
+                <property name="max-length">4</property>
+                <property name="width-chars">4</property>
+                <property name="max-width-chars">4</property>
                 <property name="xalign">1</property>
                 <property name="shadow-type">etched-in</property>
                 <property name="input-purpose">number</property>
@@ -12519,6 +12521,7 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <signal name="value-changed" handler="on_rdpattern_rotate_spinbutton_value_changed" swapped="no"/>
+                <signal name="scroll-event" handler="on_rdpattern_rotate_spinbutton_scroll_event" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -12546,9 +12549,9 @@ Save NEC2 Editor data first?
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="hexpand">True</property>
-                <property name="max-length">3</property>
-                <property name="width-chars">3</property>
-                <property name="max-width-chars">3</property>
+                <property name="max-length">4</property>
+                <property name="width-chars">4</property>
+                <property name="max-width-chars">4</property>
                 <property name="xalign">1</property>
                 <property name="shadow-type">etched-in</property>
                 <property name="input-purpose">number</property>
@@ -12557,6 +12560,7 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <signal name="value-changed" handler="on_rdpattern_incline_spinbutton_value_changed" swapped="no"/>
+                <signal name="scroll-event" handler="on_rdpattern_incline_spinbutton_scroll_event" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
