@@ -481,23 +481,18 @@ on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
   static gboolean
 on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data)
 {
-  rdpattern_gl_state_t *state;
-  float delta;
-
-  state = g_object_get_data(G_OBJECT(widget), "gl_state");
-  if( !state || !state->gl )
-    return( FALSE );
-
+  rdpattern_proj_params.xy_zoom =
+    gtk_spin_button_get_value( rdpattern_zoom );
   if( event->direction == GDK_SCROLL_UP )
-    delta = -0.3f;
+    rdpattern_proj_params.xy_zoom *= 1.1;
   else if( event->direction == GDK_SCROLL_DOWN )
-    delta = 0.3f;
+    rdpattern_proj_params.xy_zoom /= 1.1;
   else
     return( FALSE );
 
-  arcball_zoom(state->gl->arcball, delta);
-  gtk_widget_queue_draw(widget);
-  return( TRUE );
+  gtk_spin_button_set_value(
+      rdpattern_zoom, rdpattern_proj_params.xy_zoom );
+  return( FALSE );
 }
 
 /* on_resize()

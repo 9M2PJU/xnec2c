@@ -249,6 +249,7 @@ arcball_set_zoom_factor(arcball_state_t *ab, float base_distance, float zoom_fac
     return;
 
   ab->distance = base_distance / zoom_factor;
+  ab->eye[2] = ab->distance;
 
 } /* arcball_set_zoom_factor() */
 
@@ -373,26 +374,6 @@ arcball_end_drag(arcball_state_t *ab)
   ab->drag_button = 0;
 
 } /* arcball_end_drag() */
-
-/*-----------------------------------------------------------------------*/
-
-/* arcball_zoom()
- *
- * Zoom camera
- */
-  void
-arcball_zoom(arcball_state_t *ab, float delta)
-{
-  ab->distance += delta;
-
-  if( ab->distance < 0.5f )
-    ab->distance = 0.5f;
-  if( ab->distance > 20.0f )
-    ab->distance = 20.0f;
-
-  ab->eye[2] = ab->distance;
-
-} /* arcball_zoom() */
 
 /*-----------------------------------------------------------------------*/
 

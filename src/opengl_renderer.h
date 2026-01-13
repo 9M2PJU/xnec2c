@@ -82,7 +82,6 @@ void arcball_set_viewport(arcball_state_t *ab, float height);
 void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
 void arcball_drag(arcball_state_t *ab, float x, float y);
 void arcball_end_drag(arcball_state_t *ab);
-void arcball_zoom(arcball_state_t *ab, float delta);
 void arcball_pan(arcball_state_t *ab, float dx, float dy);
 void arcball_reset_pan(arcball_state_t *ab);
 void arcball_get_mvp(arcball_state_t *ab, mat4 dest, float zoom);
