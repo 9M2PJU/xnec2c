@@ -540,17 +540,22 @@ on_main_rdpattern_activate(
     {
       GtkWidget *box = Builder_Get_Object(
         rdpattern_window_builder, "rdpattern_box");
-      GtkWidget *old_da = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_drawingarea");
-      gtk_widget_hide(old_da);
 
-      rdpattern_drawingarea = opengl_rdpattern_create_widget();
-      gtk_box_pack_start(GTK_BOX(box), rdpattern_drawingarea, TRUE, TRUE, 0);
+      rdpattern_cairo_da = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_drawingarea");
+      gtk_widget_hide(rdpattern_cairo_da);
+
+      rdpattern_gl_area = opengl_rdpattern_create_widget();
+      gtk_box_pack_start(GTK_BOX(box), rdpattern_gl_area, TRUE, TRUE, 0);
+
+      rdpattern_drawingarea = rdpattern_gl_area;
       rc_config.use_opengl_renderer = 1;
     }
 #else
     rdpattern_drawingarea = Builder_Get_Object(
         rdpattern_window_builder, "rdpattern_drawingarea" );
+    rdpattern_cairo_da = NULL;
+    rdpattern_gl_area = NULL;
     rc_config.use_opengl_renderer = 0;
 #endif
     gtk_widget_get_allocation( rdpattern_drawingarea, &alloc );

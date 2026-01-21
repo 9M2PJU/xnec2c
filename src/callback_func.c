@@ -558,6 +558,17 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
           Builder_Get_Object(rdpattern_window_builder, "rdpattern_eh_togglebutton")),
         FALSE );
 
+    /* Swap to OpenGL renderer for radiation patterns */
+#ifdef HAVE_OPENGL
+    if( rdpattern_gl_area && rdpattern_cairo_da )
+    {
+      gtk_widget_hide(rdpattern_cairo_da);
+      gtk_widget_show(rdpattern_gl_area);
+      rdpattern_drawingarea = rdpattern_gl_area;
+      rc_config.use_opengl_renderer = 1;
+    }
+#endif
+
     /* Redraw radiation pattern drawingarea */
     if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
     {
@@ -602,6 +613,17 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
     ClearFlag( DRAW_GAIN );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(Builder_Get_Object(
             rdpattern_window_builder, "rdpattern_gain_togglebutton")), FALSE );
+
+    /* Swap to Cairo renderer for near field patterns */
+#ifdef HAVE_OPENGL
+    if( rdpattern_cairo_da && rdpattern_gl_area )
+    {
+      gtk_widget_hide(rdpattern_gl_area);
+      gtk_widget_show(rdpattern_cairo_da);
+      rdpattern_drawingarea = rdpattern_cairo_da;
+      rc_config.use_opengl_renderer = 0;
+    }
+#endif
 
     /* Delegate near field calculations to child
      * processes if forked and near field data valid */

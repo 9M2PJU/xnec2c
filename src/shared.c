@@ -93,7 +93,9 @@ GtkWidget
 GtkWidget
   *structure_drawingarea = NULL,
   *freqplots_drawingarea = NULL,
-  *rdpattern_drawingarea = NULL;
+  *rdpattern_drawingarea = NULL,
+  *rdpattern_gl_area = NULL,
+  *rdpattern_cairo_da = NULL;
 
 GtkWidget *saveas_drawingarea = NULL;
 
