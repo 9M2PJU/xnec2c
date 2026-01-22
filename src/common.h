@@ -1153,6 +1153,8 @@ gboolean on_rdpattern_window_key_press_event(GtkWidget *widget, GdkEventKey *eve
 void on_near_peak_value_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_near_snapshot_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_animate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
+gboolean on_animate_spinbutton_focus_out_event(GtkWidget *widget, GdkEventFocus *event, gpointer user_data);
 void on_animation_applybutton_clicked(GtkButton *button, gpointer user_data);
 void on_animation_cancelbutton_clicked(GtkButton *button, gpointer user_data);
 void on_animation_okbutton_clicked(GtkButton *button, gpointer user_data);

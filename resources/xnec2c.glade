@@ -189,6 +189,8 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                 <property name="climb-rate">0.1</property>
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
+                <signal name="value-changed" handler="on_animate_spinbutton_value_changed" swapped="no"/>
+                <signal name="focus-out-event" handler="on_animate_spinbutton_focus_out_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">0</property>
@@ -207,6 +209,8 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                 <property name="digits">1</property>
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
+                <signal name="value-changed" handler="on_animate_spinbutton_value_changed" swapped="no"/>
+                <signal name="focus-out-event" handler="on_animate_spinbutton_focus_out_event" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">1</property>

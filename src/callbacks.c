@@ -2571,17 +2571,14 @@ on_rdpattern_opengl_nearfield_activate(
 }
 
 
-  void
-on_animation_applybutton_clicked(
-    GtkButton       *button,
-    gpointer         user_data)
+static guint animation_apply_timer = 0;
+
+  static void
+update_animation_parameters(void)
 {
   GtkSpinButton *spinbutton;
   guint intval;
   gdouble freq, steps;
-
-  if( !Validate_Nearfield_Animation() )
-    return;
 
   spinbutton = GTK_SPIN_BUTTON(
       Builder_Get_Object(animate_dialog_builder, "animate_freq_spinbutton") );
@@ -2592,10 +2589,65 @@ on_animation_applybutton_clicked(
   intval = (guint)(1000.0 / steps / freq);
   near_field.anim_step = (double)M_2PI / steps;
 
-  SetFlag( NEAREH_ANIMATE );
   if( anim_tag > 0 )
     g_source_remove( anim_tag );
   anim_tag = g_timeout_add( intval, Animate_Near_Field, NULL );
+}
+
+  static gboolean
+apply_animation_delayed(gpointer user_data)
+{
+  if( isFlagSet(NEAREH_ANIMATE) )
+    update_animation_parameters();
+
+  animation_apply_timer = 0;
+  return( G_SOURCE_REMOVE );
+}
+
+  void
+on_animate_spinbutton_value_changed(
+    GtkSpinButton   *spinbutton,
+    gpointer         user_data)
+{
+  gtk_spin_button_update( spinbutton );
+
+  if( isFlagClear(NEAREH_ANIMATE) )
+    return;
+
+  if( animation_apply_timer != 0 )
+    g_source_remove( animation_apply_timer );
+
+  animation_apply_timer = g_timeout_add( 500, apply_animation_delayed, NULL );
+}
+
+  gboolean
+on_animate_spinbutton_focus_out_event(
+    GtkWidget       *widget,
+    GdkEventFocus   *event,
+    gpointer         user_data)
+{
+  if( animation_apply_timer != 0 )
+  {
+    g_source_remove( animation_apply_timer );
+    animation_apply_timer = 0;
+  }
+
+  if( isFlagSet(NEAREH_ANIMATE) )
+    update_animation_parameters();
+
+  return( FALSE );
+}
+
+  void
+on_animation_applybutton_clicked(
+    GtkButton       *button,
+    gpointer         user_data)
+{
+  if( !Validate_Nearfield_Animation() )
+    return;
+
+  SetFlag( NEAREH_ANIMATE );
+  update_animation_parameters();
 }
 
 
