@@ -12289,6 +12289,15 @@ Save NEC2 Editor data first?
                                   </object>
                                 </child>
                                 <child>
+                                  <object class="GtkMenuItem" id="rdpattern_opengl_nearfield">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">OpenGL Near Field _Test</property>
+                                    <property name="use-underline">True</property>
+                                    <signal name="activate" handler="on_rdpattern_opengl_nearfield_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
                                   <object class="GtkMenuItem" id="total_field">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>

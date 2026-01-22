@@ -89,6 +89,13 @@ GtkWidget
   *nec2_edit_window   = NULL,
   *sy_overrides_window = NULL;
 
+#ifdef HAVE_OPENGL
+/* OpenGL near field test window */
+GtkWidget
+  *nearfield_gl_window = NULL,
+  *nearfield_gl_area   = NULL;
+#endif
+
 /* Drawing area widgets */
 GtkWidget
   *structure_drawingarea = NULL,

@@ -353,19 +353,15 @@ Draw_Radiation_Pattern( cairo_t *cr )
   Segment_t segm;
 
   int
-    idx,
     nth,     /* Theta step count */
     nph,     /* Phi step count   */
     col_idx, /* Index to rad pattern color buffers */
     pts_idx; /* Index to rad pattern 3d-points buffer */
 
-  /* Frequency step and polarization type */
-  int fstep, pol;
+  /* Frequency step */
+  int fstep;
 
   double r_min, r_range;
-
-  /* Used to set text in labels */
-  gchar txt[16];
 
   static unsigned int cairo_last_gen = 0;
   unsigned int current_gen;
@@ -374,8 +370,6 @@ Draw_Radiation_Pattern( cairo_t *cr )
   fstep = calc_data.freq_step;
   if( isFlagClear(ENABLE_RDPAT) || (fstep < 0) )
     return;
-
-  pol = calc_data.pol_type;
 
   current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
 
@@ -955,6 +949,11 @@ Animate_Near_Field( gpointer udata )
 
   xnec2_widget_queue_draw( rdpattern_drawingarea );
 
+#ifdef HAVE_OPENGL
+  if( nearfield_gl_area )
+    xnec2_widget_queue_draw( nearfield_gl_area );
+#endif
+
   return( TRUE );
 
 } /* Animate_Near_Field() */
@@ -1200,6 +1199,11 @@ Redo_Radiation_Pattern( gpointer udata )
   if( isFlagSet(DRAW_ENABLED) )
   {
     xnec2_widget_queue_draw( rdpattern_drawingarea );
+
+#ifdef HAVE_OPENGL
+    if( nearfield_gl_area )
+      xnec2_widget_queue_draw( nearfield_gl_area );
+#endif
   }
 
   return FALSE;

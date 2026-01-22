@@ -24,6 +24,10 @@
 #include "mathlib.h"
 #include "measurements.h"
 
+#ifdef HAVE_OPENGL
+#include "opengl_nearfield.h"
+#endif
+
 
 /* Add configuration options here. To add new variables:
  *    Add a new section and description
@@ -634,6 +638,10 @@ Restore_Windows( gpointer dat )
     widget = Builder_Get_Object( main_window_builder, "show_sy_overrides" );
     gtk_menu_item_activate( GTK_MENU_ITEM(widget) );
   }
+#ifdef HAVE_OPENGL
+  /* Open nearfield window unconditionally */
+  opengl_nearfield_create_window();
+#endif
 
   return( FALSE );
 }

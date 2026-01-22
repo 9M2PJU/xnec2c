@@ -641,6 +641,11 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
       SetFlag( DRAW_NEW_EHFIELD );
 
       xnec2_widget_queue_draw( rdpattern_drawingarea );
+
+#ifdef HAVE_OPENGL
+      if( nearfield_gl_area )
+        xnec2_widget_queue_draw( nearfield_gl_area );
+#endif
     }
 
     Set_Window_Labels();

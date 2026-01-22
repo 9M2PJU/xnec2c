@@ -125,6 +125,13 @@ extern GtkWidget
   *nec2_edit_window,
   *sy_overrides_window;
 
+#ifdef HAVE_OPENGL
+/* OpenGL near field test window */
+extern GtkWidget
+  *nearfield_gl_window,
+  *nearfield_gl_area;
+#endif
+
 extern GtkBuilder
   *main_window_builder,
   *freqplots_window_builder,

@@ -25,6 +25,7 @@
 
 #ifdef HAVE_OPENGL
 #include "opengl_rdpattern.h"
+#include "opengl_nearfield.h"
 #endif
 
 /* Action flag for NEC2 "card" editors */
@@ -39,6 +40,35 @@ static int editor_action = EDITOR_NEW;
 
 /* Scroll increment for mouse wheel on rotation spinbuttons */
 #define SCROLL_ANGLE_INCREMENT  5.0
+
+#ifdef HAVE_OPENGL
+
+/* sync_nearfield_gl_view()
+ *
+ * Synchronize nearfield GL view with rdpattern projection parameters
+ */
+  static void
+sync_nearfield_gl_view(void)
+{
+  nearfield_gl_state_t *nf_state;
+
+  if( !nearfield_gl_area )
+    return;
+
+  nf_state = g_object_get_data(G_OBJECT(nearfield_gl_area), "gl_state");
+  if( !nf_state || !nf_state->gl || !nf_state->gl->arcball )
+    return;
+
+  arcball_set_view(nf_state->gl->arcball,
+      (float)rdpattern_proj_params.Wr,
+      (float)rdpattern_proj_params.Wi);
+  gtk_widget_queue_draw(nearfield_gl_area);
+
+} /* sync_nearfield_gl_view() */
+
+#endif /* HAVE_OPENGL */
+
+/*-----------------------------------------------------------------------*/
 
 /* wrap_angle()
  *
@@ -1783,6 +1813,11 @@ on_rdpattern_e_field_activate(
   if( isFlagSet(DRAW_EHFIELD) )
   {
     xnec2_widget_queue_draw( rdpattern_drawingarea );
+
+#ifdef HAVE_OPENGL
+    if( nearfield_gl_area )
+      xnec2_widget_queue_draw( nearfield_gl_area );
+#endif
   }
 }
 
@@ -1800,6 +1835,11 @@ on_rdpattern_h_field_activate(
   if( isFlagSet(DRAW_EHFIELD) )
   {
     xnec2_widget_queue_draw( rdpattern_drawingarea );
+
+#ifdef HAVE_OPENGL
+    if( nearfield_gl_area )
+      xnec2_widget_queue_draw( nearfield_gl_area );
+#endif
   }
 }
 
@@ -1817,6 +1857,11 @@ on_rdpattern_poynting_vector_activate(
   if( isFlagSet(DRAW_EHFIELD) )
   {
     xnec2_widget_queue_draw( rdpattern_drawingarea );
+
+#ifdef HAVE_OPENGL
+    if( nearfield_gl_area )
+      xnec2_widget_queue_draw( nearfield_gl_area );
+#endif
   }
 }
 
@@ -2029,6 +2074,10 @@ on_rdpattern_rotate_spinbutton_value_changed(
     New_Radiation_Projection_Angle();
   }
 
+#ifdef HAVE_OPENGL
+  sync_nearfield_gl_view();
+#endif
+
   gtk_spin_button_update(spinbutton);
 
 } /* on_rdpattern_rotate_spinbutton_value_changed() */
@@ -2079,6 +2128,10 @@ on_rdpattern_incline_spinbutton_value_changed(
   {
     New_Radiation_Projection_Angle();
   }
+
+#ifdef HAVE_OPENGL
+  sync_nearfield_gl_view();
+#endif
 
   gtk_spin_button_update(spinbutton);
 
@@ -2152,6 +2205,12 @@ on_rdpattern_freq_spinbutton_value_changed(
   {
     if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
       xnec2_widget_queue_draw( rdpattern_drawingarea );
+
+#ifdef HAVE_OPENGL
+      if( nearfield_gl_area )
+        xnec2_widget_queue_draw( nearfield_gl_area );
+#endif
+    }
   }
   else
   {
@@ -2489,6 +2548,26 @@ on_rdpattern_animate_activate(
     animate_dialog = create_animate_dialog( &animate_dialog_builder );
   }
   gtk_widget_show( animate_dialog );
+
+#ifdef HAVE_OPENGL
+  /* Open OpenGL near field test window automatically */
+  if( nearfield_gl_window == NULL )
+    opengl_nearfield_create_window();
+#endif
+}
+
+
+  void
+on_rdpattern_opengl_nearfield_activate(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+#ifdef HAVE_OPENGL
+  if( nearfield_gl_window != NULL )
+    gtk_window_present(GTK_WINDOW(nearfield_gl_window));
+  else
+    opengl_nearfield_create_window();
+#endif
 }
 
 
