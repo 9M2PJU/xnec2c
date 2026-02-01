@@ -560,10 +560,7 @@ Draw_Near_Field( cairo_t *cr )
 
   /* Range of Poynting vector values,
    * its max and min and log of max/min */
-  static double pov_max = 0, max;
-
-  /* Used to set text in labels */
-  gchar txt[9];
+  static double pov_max = 0;
 
   /* Line segments to draw on Screen */
   Segment_t segm;
@@ -762,27 +759,6 @@ Draw_Near_Field( cairo_t *cr )
   {
     return;
   }
-
-  /* Draw color legend overlay */
-  Draw_Color_Legend_Overlay( cr );
-
-  /* Show max field strength on color code bar */
-  if( isFlagSet(DRAW_EFIELD) )
-    max = near_field.max_er;
-  else if( isFlagSet(DRAW_HFIELD) )
-    max = near_field.max_hr;
-  else if( isFlagSet(DRAW_POYNTING) )
-    max = pov_max;
-
-  snprintf( txt, sizeof(txt), "%8.2E", max );
-  gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_colorcode_maxlabel")),
-      txt );
-
-  /* Show min field strength on color code bar */
-  gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_colorcode_minlabel")),
-      "0" );
 
 } /* Draw_Near_Field() */
 
