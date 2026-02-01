@@ -17,35 +17,26 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef DRAW_RADIATION_H
-#define DRAW_RADIATION_H        1
+#ifndef OPENGL_GRADIENT_OVERLAY_H
+#define OPENGL_GRADIENT_OVERLAY_H 1
 
 #include "common.h"
 
-/* Point in 3d xyz axes */
+#ifdef HAVE_OPENGL
+#include "opengl_cairo_overlay.h"
+
 typedef struct
 {
-  double
-    x, y, z, r;
+  cairo_gl_overlay_t *base;
+  gboolean needs_update;
 
-} point_3d_t;
+} gradient_overlay_t;
 
-/* Radiation pattern data accessor */
-typedef struct
-{
-  point_3d_t *points;
-  int nth;
-  int nph;
-  double r_min;
-  double r_range;
-  double r_max;
-  gboolean valid;
+gradient_overlay_t* gradient_overlay_new(void);
+void gradient_overlay_free(gradient_overlay_t *overlay);
+void gradient_overlay_set_viewport(gradient_overlay_t *overlay, int width, int height);
+void gradient_overlay_mark_dirty(gradient_overlay_t *overlay);
+void gradient_overlay_render(gradient_overlay_t *overlay);
 
-} rdpattern_data_t;
-
-unsigned int Generate_Rdpattern_Data(double *out_r_min, double *out_r_range);
-gboolean Get_Radiation_Pattern_Data(rdpattern_data_t *data);
-void Draw_Color_Legend_Overlay(cairo_t *cr);
-
-#endif
-
+#endif /* HAVE_OPENGL */
+#endif /* OPENGL_GRADIENT_OVERLAY_H */

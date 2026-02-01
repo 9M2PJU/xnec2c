@@ -38,9 +38,6 @@ static const char *nearfield_animation_error_msg =
 /* For coloring rad pattern */
 static double *red = NULL, *grn = NULL, *blu = NULL;
 
-/* Function prototypes */
-void Draw_Color_Legend_Overlay( cairo_t *cr );
-
 int need_rdpat_redraw = 1;
 
 /* Buffered points in 3d (xyz) space

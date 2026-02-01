@@ -113,6 +113,8 @@ xnec2c_SOURCES += \
   opengl_renderer.c opengl_renderer.h \
   opengl_rdpattern.c opengl_rdpattern.h \
   opengl_axes.c opengl_axes.h \
+  opengl_cairo_overlay.c opengl_cairo_overlay.h \
+  opengl_gradient_overlay.c opengl_gradient_overlay.h \
   opengl_nearfield.c opengl_nearfield.h
 
 xnec2c_CPPFLAGS += $(CGLM_CFLAGS)
