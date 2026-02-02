@@ -288,7 +288,8 @@ typedef struct
     rdpattern_eh_togglebutton,
     rdpattern_e_field,
     rdpattern_h_field,
-    rdpattern_poynting_vector;
+    rdpattern_poynting_vector,
+    rdpattern_gradient_key;
 
   /* Frequency plots window state of widgetsposition and size */
   int
@@ -1126,6 +1127,7 @@ void on_rdpattern_e_field_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_h_field_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_poynting_vector_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_overlay_structure_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_rdpattern_gradient_key_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_x_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_y_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_z_axis_clicked(GtkButton *button, gpointer user_data);

@@ -1833,6 +1833,20 @@ on_rdpattern_overlay_structure_activate(
 
 
   void
+on_rdpattern_gradient_key_toggled(
+    GtkCheckMenuItem *menuitem,
+    gpointer          user_data)
+{
+  if( gtk_check_menu_item_get_active(menuitem) )
+    rc_config.rdpattern_gradient_key = 1;
+  else
+    rc_config.rdpattern_gradient_key = 0;
+
+  xnec2_widget_queue_draw( rdpattern_drawingarea );
+}
+
+
+  void
 on_rdpattern_x_axis_clicked(
     GtkButton       *button,
     gpointer         user_data)

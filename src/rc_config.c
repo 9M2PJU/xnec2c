@@ -107,6 +107,11 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Radiation Pattern Window Menu Poynting vector state", .format = "%d",
 		.vars = { &rc_config.rdpattern_poynting_vector } },
 
+	{ .desc = "Radiation Pattern Window Gradient Key", .format = "%d",
+		.vars = { &rc_config.rdpattern_gradient_key },
+		.builder_window = &rdpattern_window_builder,
+		.builder_check_menu_item_id = "rdpattern_gradient_key" },
+
 	{ .desc = "Radiation Pattern Window Zoom spinbutton state", .format = "%d",
 		.vars = { &rc_config.rdpattern_zoom_spinbutton } },
 
@@ -527,6 +532,7 @@ Create_Default_Config( void )
   rc_config.rdpattern_e_field = 1;
   rc_config.rdpattern_h_field = 1;
   rc_config.rdpattern_poynting_vector = 0;
+  rc_config.rdpattern_gradient_key = 1;
   rc_config.rdpattern_zoom_spinbutton = 100;
   rc_config.use_opengl_renderer = 0;
 

@@ -12240,6 +12240,16 @@ Save NEC2 Editor data first?
                           </object>
                         </child>
                         <child>
+                          <object class="GtkCheckMenuItem" id="rdpattern_gradient_key">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">_Gradient Key</property>
+                            <property name="use-underline">True</property>
+                            <property name="active">True</property>
+                            <signal name="toggled" handler="on_rdpattern_gradient_key_toggled" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkMenuItem" id="near_field">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>

@@ -702,7 +702,8 @@ on_render(GtkGLArea *area, GdkGLContext *context)
 
     glUseProgram(0);
 
-    gradient_overlay_render(state->overlay);
+    if( rc_config.rdpattern_gradient_key )
+      gradient_overlay_render(state->overlay);
 
     Update_Rdpattern_UI();
 

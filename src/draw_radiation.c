@@ -513,7 +513,8 @@ Draw_Radiation_Pattern( cairo_t *cr )
   } /* for( nth = 0; nth < fpat.nth; nth++ ) */
 
   /* Draw color legend overlay */
-  Draw_Color_Legend_Overlay( cr );
+  if( rc_config.rdpattern_gradient_key )
+    Draw_Color_Legend_Overlay( cr );
 
   /* Update UI elements */
   Update_Rdpattern_UI();
