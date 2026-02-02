@@ -546,13 +546,23 @@ on_main_rdpattern_activate(
 
       rdpattern_cairo_da = Builder_Get_Object(
         rdpattern_window_builder, "rdpattern_drawingarea");
-      gtk_widget_hide(rdpattern_cairo_da);
 
       rdpattern_gl_area = opengl_rdpattern_create_widget();
       gtk_box_pack_start(GTK_BOX(box), rdpattern_gl_area, TRUE, TRUE, 0);
 
-      rdpattern_drawingarea = rdpattern_gl_area;
-      rc_config.use_opengl_renderer = 1;
+      /* Select renderer based on config preference */
+      if( rc_config.use_opengl_renderer )
+      {
+        gtk_widget_hide( rdpattern_cairo_da );
+        gtk_widget_show( rdpattern_gl_area );
+        rdpattern_drawingarea = rdpattern_gl_area;
+      }
+      else
+      {
+        gtk_widget_hide( rdpattern_gl_area );
+        gtk_widget_show( rdpattern_cairo_da );
+        rdpattern_drawingarea = rdpattern_cairo_da;
+      }
     }
 #else
     rdpattern_drawingarea = Builder_Get_Object(
@@ -1843,6 +1853,77 @@ on_rdpattern_gradient_key_toggled(
     rc_config.rdpattern_gradient_key = 0;
 
   xnec2_widget_queue_draw( rdpattern_drawingarea );
+}
+
+
+  void
+on_main_opengl_renderer_toggled(
+    GtkCheckMenuItem *menuitem,
+    gpointer          user_data)
+{
+#ifdef HAVE_OPENGL
+  if( gtk_check_menu_item_get_active(menuitem) )
+    rc_config.use_opengl_renderer = 1;
+  else
+    rc_config.use_opengl_renderer = 0;
+
+  /* Swap renderer if radiation pattern window is open */
+  if( rdpattern_window != NULL &&
+      rdpattern_gl_area != NULL &&
+      rdpattern_cairo_da != NULL )
+  {
+    if( rc_config.use_opengl_renderer )
+    {
+      rdpattern_gl_state_t *state;
+
+      gtk_widget_hide( rdpattern_cairo_da );
+      gtk_widget_show( rdpattern_gl_area );
+      rdpattern_drawingarea = rdpattern_gl_area;
+
+      /* Sync OpenGL arcball from Cairo projection angles and zoom */
+      state = opengl_rdpattern_get_state( rdpattern_gl_area );
+      if( state && state->gl && state->gl->arcball )
+      {
+        float base_distance = (float)rdpattern_proj_params.r_max * 2.165f;
+
+        arcball_set_view( state->gl->arcball,
+            (float)rdpattern_proj_params.Wr,
+            (float)rdpattern_proj_params.Wi );
+        arcball_set_zoom_factor( state->gl->arcball, base_distance,
+            (float)rdpattern_proj_params.xy_zoom );
+      }
+    }
+    else
+    {
+      gtk_widget_hide( rdpattern_gl_area );
+      gtk_widget_show( rdpattern_cairo_da );
+      rdpattern_drawingarea = rdpattern_cairo_da;
+
+      /* Sync Cairo scale from current zoom value */
+      rdpattern_proj_params.xy_scale =
+          rdpattern_proj_params.xy_scale1 * rdpattern_proj_params.xy_zoom;
+
+      /* Trigger Cairo projection recalculation */
+      New_Radiation_Projection_Angle();
+    }
+
+    /* Signal pattern data needs refresh */
+    if( isFlagSet(DRAW_GAIN) )
+    {
+      SetFlag( DRAW_NEW_RDPAT );
+    }
+    else if( isFlagSet(DRAW_EHFIELD) )
+    {
+      SetFlag( DRAW_NEW_EHFIELD );
+    }
+    else
+    {
+      /* No active pattern mode; redraw will show empty state */
+    }
+
+    xnec2_widget_queue_draw( rdpattern_drawingarea );
+  }
+#endif
 }
 
 

@@ -116,7 +116,9 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.rdpattern_zoom_spinbutton } },
 
 	{ .desc = "Use OpenGL Renderer for Radiation Patterns", .format = "%d",
-		.vars = { &rc_config.use_opengl_renderer } },
+		.vars = { &rc_config.use_opengl_renderer },
+		.builder_window = &main_window_builder,
+		.builder_check_menu_item_id = "main_opengl_renderer" },
 
 	{ .desc = "Frequency Plots Window Size, in pixels", .format = "%d,%d",
 		.vars = { &rc_config.freqplots_width, &rc_config.freqplots_height } },
@@ -534,7 +536,11 @@ Create_Default_Config( void )
   rc_config.rdpattern_poynting_vector = 0;
   rc_config.rdpattern_gradient_key = 1;
   rc_config.rdpattern_zoom_spinbutton = 100;
+#ifdef HAVE_OPENGL
+  rc_config.use_opengl_renderer = 1;
+#else
   rc_config.use_opengl_renderer = 0;
+#endif
 
   /* See enum GAIN_SCALE */
   rc_config.gain_style = GS_LINP;

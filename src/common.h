@@ -1128,6 +1128,7 @@ void on_rdpattern_h_field_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_poynting_vector_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_overlay_structure_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_gradient_key_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
+void on_main_opengl_renderer_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_x_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_y_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_z_axis_clicked(GtkButton *button, gpointer user_data);
