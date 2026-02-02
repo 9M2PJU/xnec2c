@@ -17,30 +17,44 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef OPENGL_DEBUG_WINDOW_H
-#define OPENGL_DEBUG_WINDOW_H 1
+#ifndef OPENGL_STRUCTURE_VIEW_H
+#define OPENGL_STRUCTURE_VIEW_H 1
 
 #include "common.h"
+
+/* Draw mode for structure view */
+typedef enum
+{
+  STRUCTURE_DRAW_GEOMETRY = 0,
+  STRUCTURE_DRAW_CURRENTS,
+  STRUCTURE_DRAW_CHARGES
+
+} structure_draw_mode_t;
 
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"
 #include "opengl_axes.h"
+#include "opengl_cylinder.h"
 
-/* Debug window OpenGL state */
+/* Structure view OpenGL state */
 typedef struct
 {
   gl_instance_t *gl;
   GLint position_location;
+  GLint normal_location;
   GLint color_location;
-  int line_count;
+  int vertex_count;
   opengl_axes_t *axes;
   gboolean initialized;
+  int geometry_generation;
 
-} debug_gl_state_t;
-
-/* Public API */
-GtkWidget* opengl_debug_create_window(void);
-void opengl_debug_window_killed(void);
+} structure_gl_state_t;
 
 #endif /* HAVE_OPENGL */
-#endif /* OPENGL_DEBUG_WINDOW_H */
+
+/* Public API - always available, stubs provided when no OpenGL */
+GtkWidget* opengl_structure_view_create(void);
+void opengl_structure_view_destroyed(void);
+void opengl_structure_view_queue_redraw(void);
+
+#endif /* OPENGL_STRUCTURE_VIEW_H */

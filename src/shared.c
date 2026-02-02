@@ -89,12 +89,10 @@ GtkWidget
   *nec2_edit_window   = NULL,
   *sy_overrides_window = NULL;
 
-#ifdef HAVE_OPENGL
-/* OpenGL debug window */
+/* OpenGL structure view window */
 GtkWidget
-  *debug_gl_window = NULL,
-  *debug_gl_area   = NULL;
-#endif
+  *structure_gl_window = NULL,
+  *structure_gl_area   = NULL;
 
 /* Drawing area widgets */
 GtkWidget

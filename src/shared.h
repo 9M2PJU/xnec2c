@@ -125,12 +125,10 @@ extern GtkWidget
   *nec2_edit_window,
   *sy_overrides_window;
 
-#ifdef HAVE_OPENGL
-/* OpenGL debug window */
+/* OpenGL structure view window */
 extern GtkWidget
-  *debug_gl_window,
-  *debug_gl_area;
-#endif
+  *structure_gl_window,
+  *structure_gl_area;
 
 extern GtkBuilder
   *main_window_builder,

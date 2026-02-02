@@ -23,9 +23,9 @@
 #include "measurements.h"
 #include <pthread.h>
 
+#include "opengl_structure_view.h"
 #ifdef HAVE_OPENGL
 #include "opengl_rdpattern.h"
-#include "opengl_debug_window.h"
 #endif
 
 /* Action flag for NEC2 "card" editors */
@@ -2582,11 +2582,9 @@ on_rdpattern_animate_activate(
   }
   gtk_widget_show( animate_dialog );
 
-#ifdef HAVE_OPENGL
-  /* Open OpenGL debug window automatically */
-  if( debug_gl_window == NULL )
-    opengl_debug_create_window();
-#endif
+  /* Open OpenGL structure view automatically */
+  if( structure_gl_window == NULL )
+    opengl_structure_view_create();
 }
 
 
@@ -2595,12 +2593,10 @@ on_rdpattern_opengl_nearfield_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
 {
-#ifdef HAVE_OPENGL
-  if( debug_gl_window != NULL )
-    gtk_window_present(GTK_WINDOW(debug_gl_window));
+  if( structure_gl_window != NULL )
+    gtk_window_present(GTK_WINDOW(structure_gl_window));
   else
-    opengl_debug_create_window();
-#endif
+    opengl_structure_view_create();
 }
 
 
@@ -5424,6 +5420,8 @@ on_main_zoom_spinbutton_value_changed(
     need_structure_redraw = 1;
     xnec2_widget_queue_draw( structure_drawingarea );
   }
+
+  opengl_structure_view_queue_redraw();
 }
 
 

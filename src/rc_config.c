@@ -24,9 +24,7 @@
 #include "mathlib.h"
 #include "measurements.h"
 
-#ifdef HAVE_OPENGL
-#include "opengl_debug_window.h"
-#endif
+#include "opengl_structure_view.h"
 
 
 /* Add configuration options here. To add new variables:
@@ -650,10 +648,9 @@ Restore_Windows( gpointer dat )
     widget = Builder_Get_Object( main_window_builder, "show_sy_overrides" );
     gtk_menu_item_activate( GTK_MENU_ITEM(widget) );
   }
-#ifdef HAVE_OPENGL
-  /* Open debug window unconditionally */
-  opengl_debug_create_window();
-#endif
+
+  /* Open structure view unconditionally */
+  opengl_structure_view_create();
 
   return( FALSE );
 }
