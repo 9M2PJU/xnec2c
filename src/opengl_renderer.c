@@ -255,6 +255,22 @@ arcball_set_viewport(arcball_state_t *ab, float height)
 
 /*-----------------------------------------------------------------------*/
 
+/* arcball_sync_view()
+ *
+ * Sync arcball rotation from projection parameters.
+ * Handles null checks for gl_instance and arcball.
+ */
+  void
+arcball_sync_view(gl_instance_t *gl, double wr, double wi)
+{
+  if( !gl || !gl->arcball )
+    return;
+
+  arcball_set_view(gl->arcball, (float)wr, (float)wi);
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* arcball_rotate()
  *
  * Apply rotation from mouse drag

@@ -603,7 +603,8 @@ on_render(GtkGLArea *area, GdkGLContext *context)
     if( r_max != last_nf_r_max )
     {
       rdpattern_proj_params.r_max = (double)r_max;
-      arcball_set_zoom_factor(state->gl->arcball, r_max * 2.165f,
+      arcball_set_zoom_factor(state->gl->arcball,
+          r_max * ARCBALL_BASE_DISTANCE_FACTOR,
           (float)rdpattern_proj_params.xy_zoom);
       opengl_axes_set_scale(state->axes, r_max);
       last_nf_r_max = r_max;
@@ -662,7 +663,7 @@ on_render(GtkGLArea *area, GdkGLContext *context)
       {
         opengl_rdpattern_update_buffers(state);
 
-        float base_distance = r_max * 2.165f;
+        float base_distance = r_max * ARCBALL_BASE_DISTANCE_FACTOR;
         rdpattern_proj_params.r_max = (double)r_max;
         arcball_set_zoom_factor(state->gl->arcball, base_distance,
             (float)rdpattern_proj_params.xy_zoom);

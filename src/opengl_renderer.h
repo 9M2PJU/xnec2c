@@ -26,6 +26,9 @@
 #include <epoxy/gl.h>
 #include <cglm/cglm.h>
 
+/* Base distance multiplier for arcball viewing (sqrt(3) * 1.25) */
+#define ARCBALL_BASE_DISTANCE_FACTOR 2.165f
+
 /* Shader container */
 typedef struct
 {
@@ -78,6 +81,7 @@ void arcball_set_aspect(arcball_state_t *ab, float aspect);
 void arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg);
 void arcball_set_zoom_factor(arcball_state_t *ab, float base_distance, float zoom_factor);
 void arcball_set_viewport(arcball_state_t *ab, float height);
+void arcball_sync_view(gl_instance_t *gl, double wr, double wi);
 void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
 void arcball_drag(arcball_state_t *ab, float x, float y);
 void arcball_end_drag(arcball_state_t *ab);

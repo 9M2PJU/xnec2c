@@ -59,7 +59,7 @@ get_segment_color_type(int seg_num)
 
 /* segment_type_to_rgb()
  *
- * Convert segment color type to RGB values using common.h constants
+ * Convert segment color type to RGB float values (matches common.h colors)
  */
   void
 segment_type_to_rgb(segment_color_type_t type, float *r, float *g, float *b)

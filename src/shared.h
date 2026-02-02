@@ -176,7 +176,6 @@ extern GtkBuilder
 
 /* Drawing area widgets */
 extern GtkWidget
-  *structure_drawingarea,
   *freqplots_drawingarea,
   *rdpattern_drawingarea,
   *rdpattern_gl_area,
