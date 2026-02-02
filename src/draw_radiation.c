@@ -922,11 +922,6 @@ Animate_Near_Field( gpointer udata )
 
   xnec2_widget_queue_draw( rdpattern_drawingarea );
 
-#ifdef HAVE_OPENGL
-  if( nearfield_gl_area )
-    xnec2_widget_queue_draw( nearfield_gl_area );
-#endif
-
   return( TRUE );
 
 } /* Animate_Near_Field() */
@@ -1170,14 +1165,7 @@ Redo_Radiation_Pattern( gpointer udata )
 
   /* Redraw radiation pattern on screen */
   if( isFlagSet(DRAW_ENABLED) )
-  {
     xnec2_widget_queue_draw( rdpattern_drawingarea );
-
-#ifdef HAVE_OPENGL
-    if( nearfield_gl_area )
-      xnec2_widget_queue_draw( nearfield_gl_area );
-#endif
-  }
 
   return FALSE;
 

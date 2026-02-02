@@ -29,6 +29,16 @@
 static color_triangle_t *rdpat_triangles = NULL;
 static int rdpat_triangle_count = 0;
 
+/* Near-field line buffer */
+static color_point_t *nf_lines = NULL;
+static int nf_line_count = 0;
+
+/* Poynting vector buffers */
+static double *pov_x = NULL;
+static double *pov_y = NULL;
+static double *pov_z = NULL;
+static double *pov_r = NULL;
+
 /*-----------------------------------------------------------------------*/
 
 /* opengl_rdpattern_state_new()
@@ -99,6 +109,219 @@ opengl_rdpattern_state_free(rdpattern_gl_state_t *state)
   g_free(state);
 
 } /* opengl_rdpattern_state_free() */
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_generate_nf_lines()
+ *
+ * Generate line geometry for near field vectors
+ */
+  static int
+opengl_rdpattern_generate_nf_lines(void)
+{
+  int idx, npts, line_idx;
+  int total_lines;
+  double fscale;
+  double dr;
+  double red, grn, blu;
+  double pov_max;
+  size_t mreq;
+
+  if( isFlagClear(ENABLE_NEAREH) || !near_field.valid )
+    return( -1 );
+
+  npts = fpat.nrx * fpat.nry * fpat.nrz;
+
+  /* Count total lines needed for all enabled field types */
+  total_lines = 0;
+  if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
+    total_lines += npts;
+  if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
+    total_lines += npts;
+  if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
+    total_lines += npts;
+
+  if( total_lines == 0 )
+    return( -1 );
+
+  /* Normalization scale factor */
+  if( fpat.near )
+    dr = (double)fpat.dxnr;
+  else
+    dr = sqrt(
+        (double)fpat.dxnr * (double)fpat.dxnr +
+        (double)fpat.dynr * (double)fpat.dynr +
+        (double)fpat.dznr * (double)fpat.dznr ) / 1.75;
+
+  /* Allocate line buffer for all enabled fields */
+  mreq = (size_t)total_lines * 2 * sizeof(color_point_t);
+  mem_realloc((void **)&nf_lines, mreq, __LOCATION__);
+
+  /* Calculate Poynting vector if enabled */
+  pov_max = 0.0;
+  if( isFlagSet(DRAW_POYNTING) &&
+      (fpat.nfeh & NEAR_EFIELD) &&
+      (fpat.nfeh & NEAR_HFIELD) )
+  {
+    int ipv;
+
+    mreq = (size_t)npts * sizeof(double);
+    mem_realloc((void **)&pov_x, mreq, __LOCATION__);
+    mem_realloc((void **)&pov_y, mreq, __LOCATION__);
+    mem_realloc((void **)&pov_z, mreq, __LOCATION__);
+    mem_realloc((void **)&pov_r, mreq, __LOCATION__);
+
+    for( ipv = 0; ipv < npts; ipv++ )
+    {
+      /* Poynting vector: E x H */
+      pov_x[ipv] =
+        near_field.ery[ipv] * near_field.hrz[ipv] -
+        near_field.hry[ipv] * near_field.erz[ipv];
+      pov_y[ipv] =
+        near_field.erz[ipv] * near_field.hrx[ipv] -
+        near_field.hrz[ipv] * near_field.erx[ipv];
+      pov_z[ipv] =
+        near_field.erx[ipv] * near_field.hry[ipv] -
+        near_field.hrx[ipv] * near_field.ery[ipv];
+      pov_r[ipv] = sqrt(
+          pov_x[ipv] * pov_x[ipv] +
+          pov_y[ipv] * pov_y[ipv] +
+          pov_z[ipv] * pov_z[ipv] );
+
+      if( pov_max < pov_r[ipv] )
+        pov_max = pov_r[ipv];
+    }
+  }
+
+  /* Generate line vertices for all enabled field types */
+  line_idx = 0;
+
+  for( idx = 0; idx < npts; idx++ )
+  {
+    /* Draw Near E Field */
+    if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
+    {
+      fscale = dr / near_field.er[idx];
+
+      nf_lines[line_idx].point.x = (float)near_field.px[idx];
+      nf_lines[line_idx].point.y = (float)near_field.py[idx];
+      nf_lines[line_idx].point.z = (float)near_field.pz[idx];
+
+      nf_lines[line_idx + 1].point.x = (float)(near_field.px[idx] + near_field.erx[idx] * fscale);
+      nf_lines[line_idx + 1].point.y = (float)(near_field.py[idx] + near_field.ery[idx] * fscale);
+      nf_lines[line_idx + 1].point.z = (float)(near_field.pz[idx] + near_field.erz[idx] * fscale);
+
+      Value_to_Color(&red, &grn, &blu, near_field.er[idx], near_field.max_er);
+
+      nf_lines[line_idx].color.r = (float)red;
+      nf_lines[line_idx].color.g = (float)grn;
+      nf_lines[line_idx].color.b = (float)blu;
+      nf_lines[line_idx].color.a = 1.0f;
+
+      nf_lines[line_idx + 1].color = nf_lines[line_idx].color;
+
+      line_idx += 2;
+    }
+
+    /* Draw Near H Field */
+    if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
+    {
+      fscale = dr / near_field.hr[idx];
+
+      nf_lines[line_idx].point.x = (float)near_field.px[idx];
+      nf_lines[line_idx].point.y = (float)near_field.py[idx];
+      nf_lines[line_idx].point.z = (float)near_field.pz[idx];
+
+      nf_lines[line_idx + 1].point.x = (float)(near_field.px[idx] + near_field.hrx[idx] * fscale);
+      nf_lines[line_idx + 1].point.y = (float)(near_field.py[idx] + near_field.hry[idx] * fscale);
+      nf_lines[line_idx + 1].point.z = (float)(near_field.pz[idx] + near_field.hrz[idx] * fscale);
+
+      Value_to_Color(&red, &grn, &blu, near_field.hr[idx], near_field.max_hr);
+
+      nf_lines[line_idx].color.r = (float)red;
+      nf_lines[line_idx].color.g = (float)grn;
+      nf_lines[line_idx].color.b = (float)blu;
+      nf_lines[line_idx].color.a = 1.0f;
+
+      nf_lines[line_idx + 1].color = nf_lines[line_idx].color;
+
+      line_idx += 2;
+    }
+
+    /* Draw Poynting Vector */
+    if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
+    {
+      fscale = dr / pov_r[idx];
+
+      nf_lines[line_idx].point.x = (float)near_field.px[idx];
+      nf_lines[line_idx].point.y = (float)near_field.py[idx];
+      nf_lines[line_idx].point.z = (float)near_field.pz[idx];
+
+      nf_lines[line_idx + 1].point.x = (float)(near_field.px[idx] + pov_x[idx] * fscale);
+      nf_lines[line_idx + 1].point.y = (float)(near_field.py[idx] + pov_y[idx] * fscale);
+      nf_lines[line_idx + 1].point.z = (float)(near_field.pz[idx] + pov_z[idx] * fscale);
+
+      Value_to_Color(&red, &grn, &blu, pov_r[idx], pov_max);
+
+      nf_lines[line_idx].color.r = (float)red;
+      nf_lines[line_idx].color.g = (float)grn;
+      nf_lines[line_idx].color.b = (float)blu;
+      nf_lines[line_idx].color.a = 1.0f;
+
+      nf_lines[line_idx + 1].color = nf_lines[line_idx].color;
+
+      line_idx += 2;
+    }
+  }
+
+  nf_line_count = total_lines;
+
+  return( nf_line_count );
+
+} /* opengl_rdpattern_generate_nf_lines() */
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_update_nf_buffers()
+ *
+ * Upload near-field line data to GPU
+ */
+  static void
+opengl_rdpattern_update_nf_buffers(rdpattern_gl_state_t *state)
+{
+  size_t buffer_size;
+
+  if( !state || !state->gl || !state->gl->initialized || !nf_lines || nf_line_count == 0 )
+    return;
+
+  glBindVertexArray(state->gl->vao);
+  glBindBuffer(GL_ARRAY_BUFFER, state->gl->vbo);
+
+  buffer_size = (size_t)nf_line_count * 2 * sizeof(color_point_t);
+  glBufferData(GL_ARRAY_BUFFER, buffer_size, nf_lines, GL_DYNAMIC_DRAW);
+
+  /* Position attribute */
+  glEnableVertexAttribArray(state->position_location);
+  glVertexAttribPointer(
+      state->position_location,
+      3, GL_FLOAT, GL_FALSE,
+      sizeof(color_point_t),
+      (void*)0);
+
+  /* Color attribute */
+  glEnableVertexAttribArray(state->color_location);
+  glVertexAttribPointer(
+      state->color_location,
+      4, GL_FLOAT, GL_FALSE,
+      sizeof(color_point_t),
+      (void*)(4 * sizeof(float)));
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+
+  state->line_count = nf_line_count;
+
+} /* opengl_rdpattern_update_nf_buffers() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -354,82 +577,139 @@ on_render(GtkGLArea *area, GdkGLContext *context)
 {
   rdpattern_gl_state_t *state;
   mat4 mvp;
-  unsigned int current_gen;
-  double r_min, r_range;
-  rdpattern_data_t rd_data;
   float r_max;
 
   state = g_object_get_data(G_OBJECT(area), "gl_state");
   if( !state || !state->gl || !state->gl->initialized )
-  {
-    /* GL not ready */
-    return( FALSE );
-  }
-
-  current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
-  if( current_gen == 0 )
     return( FALSE );
 
-  if( !Get_Radiation_Pattern_Data(&rd_data) || !rd_data.valid )
+  /* Near-field rendering path */
+  if( isFlagSet(DRAW_EHFIELD) && isFlagSet(ENABLE_NEAREH) && near_field.valid )
   {
-    pr_err("Failed to get radiation pattern data\n");
-    return( FALSE );
-  }
+    int line_count;
 
-  r_max = (float)rd_data.r_max;
+    line_count = opengl_rdpattern_generate_nf_lines();
+    if( line_count <= 0 )
+      return( FALSE );
 
-  if( current_gen != state->gl_last_gen )
-  {
-    int tri_count = opengl_rdpattern_generate_triangles(
-        rd_data.points, rd_data.nth, rd_data.nph, r_min, r_range);
-    if( tri_count > 0 )
+    opengl_rdpattern_update_nf_buffers(state);
+
+    if( state->line_count == 0 )
+      return( FALSE );
+
+    /* Set distance only on data change to preserve user zoom */
+    static float last_nf_r_max = 0.0f;
+    r_max = (float)near_field.r_max;
+    if( r_max != last_nf_r_max )
     {
-      opengl_rdpattern_update_buffers(state);
-
-      float distance = r_max * 2.165f;
-      arcball_set_distance(state->gl->arcball, distance);
-
-      gradient_overlay_mark_dirty(state->overlay);
-
-      state->gl_last_gen = current_gen;
+      rdpattern_proj_params.r_max = (double)r_max;
+      arcball_set_zoom_factor(state->gl->arcball, r_max * 2.165f,
+          (float)rdpattern_proj_params.xy_zoom);
+      opengl_axes_set_scale(state->axes, r_max);
+      last_nf_r_max = r_max;
     }
-    else
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    arcball_get_mvp(state->gl->arcball, mvp, 1.0f);
+
+    glUseProgram(state->gl->shader.program);
+    glUniformMatrix4fv(state->gl->mvp_location, 1, GL_FALSE, (float*)mvp);
+
+    glBindVertexArray(state->gl->vao);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glDrawArrays(GL_LINES, 0, state->line_count * 2);
+
+    glBindVertexArray(0);
+
+    opengl_axes_render(state->axes, mvp);
+
+    glUseProgram(0);
+
+    Update_Rdpattern_UI();
+
+    return( TRUE );
+  }
+
+  /* Far-field (gain) rendering path */
+  if( isFlagSet(DRAW_GAIN) )
+  {
+    unsigned int current_gen;
+    double r_min, r_range;
+    rdpattern_data_t rd_data;
+
+    current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
+    if( current_gen == 0 )
+      return( FALSE );
+
+    if( !Get_Radiation_Pattern_Data(&rd_data) || !rd_data.valid )
     {
-      pr_err("Triangle generation failed\n");
+      pr_err("Failed to get radiation pattern data\n");
       return( FALSE );
     }
+
+    r_max = (float)rd_data.r_max;
+
+    if( current_gen != state->gl_last_gen )
+    {
+      int tri_count = opengl_rdpattern_generate_triangles(
+          rd_data.points, rd_data.nth, rd_data.nph, r_min, r_range);
+
+      if( tri_count > 0 )
+      {
+        opengl_rdpattern_update_buffers(state);
+
+        float base_distance = r_max * 2.165f;
+        rdpattern_proj_params.r_max = (double)r_max;
+        arcball_set_zoom_factor(state->gl->arcball, base_distance,
+            (float)rdpattern_proj_params.xy_zoom);
+
+        gradient_overlay_mark_dirty(state->overlay);
+
+        state->gl_last_gen = current_gen;
+      }
+      else
+      {
+        pr_err("Triangle generation failed\n");
+        return( FALSE );
+      }
+    }
+
+    if( state->triangle_count == 0 )
+      return( FALSE );
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    arcball_get_mvp(state->gl->arcball, mvp, 1.0f);
+
+    glUseProgram(state->gl->shader.program);
+    glUniformMatrix4fv(state->gl->mvp_location, 1, GL_FALSE, (float*)mvp);
+
+    glBindVertexArray(state->gl->vao);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glDrawArrays(GL_TRIANGLES, 0, state->triangle_count * 3);
+
+    glBindVertexArray(0);
+
+    opengl_axes_set_scale(state->axes, r_max);
+    opengl_axes_render(state->axes, mvp);
+
+    glUseProgram(0);
+
+    gradient_overlay_render(state->overlay);
+
+    Update_Rdpattern_UI();
+
+    return( TRUE );
   }
 
-  if( state->triangle_count == 0 )
-    return( FALSE );
-
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  arcball_get_mvp(state->gl->arcball, mvp, 1.0f);
-
-  glUseProgram(state->gl->shader.program);
-  glUniformMatrix4fv(state->gl->mvp_location, 1, GL_FALSE, (float*)mvp);
-
-  glBindVertexArray(state->gl->vao);
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
-
-  glDrawArrays(GL_TRIANGLES, 0, state->triangle_count * 3);
-
-  glBindVertexArray(0);
-
-  opengl_axes_set_scale(state->axes, r_max);
-  opengl_axes_render(state->axes, mvp);
-
-  glUseProgram(0);
-
-  gradient_overlay_render(state->overlay);
-
-  /* Update UI elements */
-  Update_Rdpattern_UI();
-
-  return( TRUE );
+  return( FALSE );
 
 } /* on_render() */
 
@@ -594,6 +874,14 @@ opengl_rdpattern_cleanup(void)
 {
   free_ptr((void **)&rdpat_triangles);
   rdpat_triangle_count = 0;
+
+  free_ptr((void **)&nf_lines);
+  nf_line_count = 0;
+
+  free_ptr((void **)&pov_x);
+  free_ptr((void **)&pov_y);
+  free_ptr((void **)&pov_z);
+  free_ptr((void **)&pov_r);
 
 } /* opengl_rdpattern_cleanup() */
 

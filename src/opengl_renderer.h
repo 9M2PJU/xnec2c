@@ -75,7 +75,6 @@ void gl_shader_destroy(gl_shader_t *shader);
 arcball_state_t* arcball_new(float distance, float aspect, float fov_degrees);
 void arcball_free(arcball_state_t *ab);
 void arcball_set_aspect(arcball_state_t *ab, float aspect);
-void arcball_set_distance(arcball_state_t *ab, float distance);
 void arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg);
 void arcball_set_zoom_factor(arcball_state_t *ab, float base_distance, float zoom_factor);
 void arcball_set_viewport(arcball_state_t *ab, float height);

@@ -39,6 +39,10 @@ typedef struct
   opengl_axes_t *axes;
   gradient_overlay_t *overlay;
 
+  /* Near-field rendering state */
+  int line_count;
+  unsigned int nf_last_gen;
+
 } rdpattern_gl_state_t;
 
 /* Public API */

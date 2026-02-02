@@ -17,8 +17,8 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef OPENGL_NEARFIELD_H
-#define OPENGL_NEARFIELD_H 1
+#ifndef OPENGL_DEBUG_WINDOW_H
+#define OPENGL_DEBUG_WINDOW_H 1
 
 #include "common.h"
 
@@ -26,7 +26,7 @@
 #include "opengl_renderer.h"
 #include "opengl_axes.h"
 
-/* Near field OpenGL state */
+/* Debug window OpenGL state */
 typedef struct
 {
   gl_instance_t *gl;
@@ -36,11 +36,11 @@ typedef struct
   opengl_axes_t *axes;
   gboolean initialized;
 
-} nearfield_gl_state_t;
+} debug_gl_state_t;
 
 /* Public API */
-GtkWidget* opengl_nearfield_create_window(void);
-void opengl_nearfield_window_killed(void);
+GtkWidget* opengl_debug_create_window(void);
+void opengl_debug_window_killed(void);
 
 #endif /* HAVE_OPENGL */
-#endif /* OPENGL_NEARFIELD_H */
+#endif /* OPENGL_DEBUG_WINDOW_H */

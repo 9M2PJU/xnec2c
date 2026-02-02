@@ -17,40 +17,35 @@
  *    https://www.xnec2c.org/
  */
 
-#include "opengl_nearfield.h"
+#include "opengl_debug_window.h"
 #include "shared.h"
-#include "draw.h"
-#include "draw_radiation.h"
 #include "opengl_axes.h"
 
 #ifdef HAVE_OPENGL
 
-/* Line buffer for near field vectors */
-static color_point_t *nearfield_lines = NULL;
-static int nearfield_line_count = 0;
+/* Line buffer for debug geometry */
+static color_point_t *debug_lines = NULL;
+static int debug_line_count = 0;
+static gboolean debug_geometry_initialized = FALSE;
 
-/* Poynting vector buffers */
-static double *pov_x = NULL;
-static double *pov_y = NULL;
-static double *pov_z = NULL;
-static double *pov_r = NULL;
+/* Zoom spin button for debug window */
+static GtkSpinButton *debug_zoom = NULL;
 
-/* Zoom spin button for near field window */
-static GtkSpinButton *nearfield_zoom = NULL;
-
+/* Cube size for debug rendering */
+#define DEBUG_CUBE_SIZE 1.0f
 
 /*-----------------------------------------------------------------------*/
 
-/* nearfield_gl_state_new()
+/* debug_gl_state_new()
  *
- * Allocate and initialize near field GL state
+ * Allocate and initialize debug GL state
  */
-  static nearfield_gl_state_t*
-nearfield_gl_state_new(float aspect)
+  static debug_gl_state_t*
+debug_gl_state_new(float aspect)
 {
-  nearfield_gl_state_t *state;
+  debug_gl_state_t *state;
 
-  state = g_new0(nearfield_gl_state_t, 1);
+  state = g_new0(debug_gl_state_t, 1);
 
   state->gl = gl_instance_new("/gl/color-vertex.glsl", "/gl/color-fragment.glsl",
     6.0f, aspect);
@@ -70,7 +65,7 @@ nearfield_gl_state_new(float aspect)
   state->axes = opengl_axes_new(&state->gl->shader);
   if( !state->axes )
   {
-    pr_err("Failed to create axes renderer for near field\n");
+    pr_err("Failed to create axes renderer for debug window\n");
     gl_instance_free(state->gl);
     g_free(state);
     return( NULL );
@@ -80,16 +75,16 @@ nearfield_gl_state_new(float aspect)
 
   return( state );
 
-} /* nearfield_gl_state_new() */
+} /* debug_gl_state_new() */
 
 /*-----------------------------------------------------------------------*/
 
-/* nearfield_gl_state_free()
+/* debug_gl_state_free()
  *
- * Free near field GL state
+ * Free debug GL state
  */
   static void
-nearfield_gl_state_free(nearfield_gl_state_t *state)
+debug_gl_state_free(debug_gl_state_t *state)
 {
   if( !state )
     return;
@@ -98,197 +93,108 @@ nearfield_gl_state_free(nearfield_gl_state_t *state)
   gl_instance_free(state->gl);
   g_free(state);
 
-} /* nearfield_gl_state_free() */
+} /* debug_gl_state_free() */
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_nearfield_generate_lines()
+/* opengl_debug_add_line()
  *
- * Generate line geometry for near field vectors
- * Matches Cairo implementation: renders all enabled field types simultaneously
+ * Helper to add a colored line to the buffer
+ */
+  static void
+opengl_debug_add_line(
+    int *idx,
+    float x1, float y1, float z1,
+    float x2, float y2, float z2,
+    float r, float g, float b)
+{
+  int i = *idx;
+
+  debug_lines[i].point.x = x1;
+  debug_lines[i].point.y = y1;
+  debug_lines[i].point.z = z1;
+  debug_lines[i].color.r = r;
+  debug_lines[i].color.g = g;
+  debug_lines[i].color.b = b;
+  debug_lines[i].color.a = 1.0f;
+
+  debug_lines[i + 1].point.x = x2;
+  debug_lines[i + 1].point.y = y2;
+  debug_lines[i + 1].point.z = z2;
+  debug_lines[i + 1].color.r = r;
+  debug_lines[i + 1].color.g = g;
+  debug_lines[i + 1].color.b = b;
+  debug_lines[i + 1].color.a = 1.0f;
+
+  *idx = i + 2;
+
+} /* opengl_debug_add_line() */
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_debug_generate_cube()
+ *
+ * Generate wireframe cube for debug visualization
+ * 12 edges, color-coded by axis: X=red, Y=green, Z=blue
  */
   static int
-opengl_nearfield_generate_lines(nearfield_gl_state_t *state)
+opengl_debug_generate_cube(void)
 {
-  int idx, npts, line_idx;
-  int total_lines;
-  double fscale;
-  double dr;
-  double red, grn, blu;
-  double pov_max;
+  float s = DEBUG_CUBE_SIZE;
+  int idx = 0;
   size_t mreq;
 
-  if( !state || isFlagClear(ENABLE_NEAREH) || !near_field.valid )
-    return( -1 );
+  if( debug_geometry_initialized )
+    return( debug_line_count );
 
-  npts = fpat.nrx * fpat.nry * fpat.nrz;
+  /* 12 edges = 24 vertices */
+  mreq = 24 * sizeof(color_point_t);
+  mem_realloc((void **)&debug_lines, mreq, __LOCATION__);
 
-  /* Count total lines needed for all enabled field types */
-  total_lines = 0;
-  if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
-    total_lines += npts;
-  if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    total_lines += npts;
-  if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    total_lines += npts;
+  /* Bottom face edges (z = -s) */
+  opengl_debug_add_line(&idx, -s, -s, -s,  s, -s, -s, 1.0f, 0.0f, 0.0f);  /* X red */
+  opengl_debug_add_line(&idx,  s, -s, -s,  s,  s, -s, 0.0f, 1.0f, 0.0f);  /* Y green */
+  opengl_debug_add_line(&idx,  s,  s, -s, -s,  s, -s, 1.0f, 0.0f, 0.0f);  /* X red */
+  opengl_debug_add_line(&idx, -s,  s, -s, -s, -s, -s, 0.0f, 1.0f, 0.0f);  /* Y green */
 
-  if( total_lines == 0 )
-    return( -1 );
+  /* Top face edges (z = +s) */
+  opengl_debug_add_line(&idx, -s, -s,  s,  s, -s,  s, 1.0f, 0.0f, 0.0f);  /* X red */
+  opengl_debug_add_line(&idx,  s, -s,  s,  s,  s,  s, 0.0f, 1.0f, 0.0f);  /* Y green */
+  opengl_debug_add_line(&idx,  s,  s,  s, -s,  s,  s, 1.0f, 0.0f, 0.0f);  /* X red */
+  opengl_debug_add_line(&idx, -s,  s,  s, -s, -s,  s, 0.0f, 1.0f, 0.0f);  /* Y green */
 
-  /* Normalization scale factor matches Cairo implementation
-   * (from draw_radiation.c Draw_Near_Field) */
-  if( fpat.near )
-    dr = (double)fpat.dxnr;
-  else
-    dr = sqrt(
-        (double)fpat.dxnr * (double)fpat.dxnr +
-        (double)fpat.dynr * (double)fpat.dynr +
-        (double)fpat.dznr * (double)fpat.dznr ) / 1.75;
+  /* Vertical edges (Z blue) */
+  opengl_debug_add_line(&idx, -s, -s, -s, -s, -s,  s, 0.0f, 0.0f, 1.0f);
+  opengl_debug_add_line(&idx,  s, -s, -s,  s, -s,  s, 0.0f, 0.0f, 1.0f);
+  opengl_debug_add_line(&idx,  s,  s, -s,  s,  s,  s, 0.0f, 0.0f, 1.0f);
+  opengl_debug_add_line(&idx, -s,  s, -s, -s,  s,  s, 0.0f, 0.0f, 1.0f);
 
-  /* Allocate line buffer for all enabled fields */
-  mreq = (size_t)total_lines * 2 * sizeof(color_point_t);
-  mem_realloc((void **)&nearfield_lines, mreq, __LOCATION__);
+  debug_line_count = 12;
+  debug_geometry_initialized = TRUE;
 
-  /* Calculate Poynting vector if enabled */
-  pov_max = 0.0;
-  if( isFlagSet(DRAW_POYNTING) &&
-      (fpat.nfeh & NEAR_EFIELD) &&
-      (fpat.nfeh & NEAR_HFIELD) )
-  {
-    int ipv;
+  return( debug_line_count );
 
-    mreq = (size_t)npts * sizeof(double);
-    mem_realloc((void **)&pov_x, mreq, __LOCATION__);
-    mem_realloc((void **)&pov_y, mreq, __LOCATION__);
-    mem_realloc((void **)&pov_z, mreq, __LOCATION__);
-    mem_realloc((void **)&pov_r, mreq, __LOCATION__);
-    for( ipv = 0; ipv < npts; ipv++ )
-    {
-      /* Poynting vector: E × H */
-      pov_x[ipv] =
-        near_field.ery[ipv] * near_field.hrz[ipv] -
-        near_field.hry[ipv] * near_field.erz[ipv];
-      pov_y[ipv] =
-        near_field.erz[ipv] * near_field.hrx[ipv] -
-        near_field.hrz[ipv] * near_field.erx[ipv];
-      pov_z[ipv] =
-        near_field.erx[ipv] * near_field.hry[ipv] -
-        near_field.hrx[ipv] * near_field.ery[ipv];
-      pov_r[ipv] = sqrt(
-          pov_x[ipv] * pov_x[ipv] +
-          pov_y[ipv] * pov_y[ipv] +
-          pov_z[ipv] * pov_z[ipv] );
-      if( pov_max < pov_r[ipv] )
-        pov_max = pov_r[ipv];
-    }
-  }
-
-  /* Generate line vertices for all enabled field types */
-  line_idx = 0;
-
-  for( idx = 0; idx < npts; idx++ )
-  {
-    /*** Draw Near E Field ***/
-    if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
-    {
-      fscale = dr / near_field.er[idx];
-
-      nearfield_lines[line_idx].point.x = (float)near_field.px[idx];
-      nearfield_lines[line_idx].point.y = (float)near_field.py[idx];
-      nearfield_lines[line_idx].point.z = (float)near_field.pz[idx];
-
-      nearfield_lines[line_idx + 1].point.x = (float)(near_field.px[idx] + near_field.erx[idx] * fscale);
-      nearfield_lines[line_idx + 1].point.y = (float)(near_field.py[idx] + near_field.ery[idx] * fscale);
-      nearfield_lines[line_idx + 1].point.z = (float)(near_field.pz[idx] + near_field.erz[idx] * fscale);
-
-      Value_to_Color(&red, &grn, &blu, near_field.er[idx], near_field.max_er);
-
-      nearfield_lines[line_idx].color.r = (float)red;
-      nearfield_lines[line_idx].color.g = (float)grn;
-      nearfield_lines[line_idx].color.b = (float)blu;
-      nearfield_lines[line_idx].color.a = 1.0f;
-
-      nearfield_lines[line_idx + 1].color = nearfield_lines[line_idx].color;
-
-      line_idx += 2;
-    }
-
-    /*** Draw Near H Field ***/
-    if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    {
-      fscale = dr / near_field.hr[idx];
-
-      nearfield_lines[line_idx].point.x = (float)near_field.px[idx];
-      nearfield_lines[line_idx].point.y = (float)near_field.py[idx];
-      nearfield_lines[line_idx].point.z = (float)near_field.pz[idx];
-
-      nearfield_lines[line_idx + 1].point.x = (float)(near_field.px[idx] + near_field.hrx[idx] * fscale);
-      nearfield_lines[line_idx + 1].point.y = (float)(near_field.py[idx] + near_field.hry[idx] * fscale);
-      nearfield_lines[line_idx + 1].point.z = (float)(near_field.pz[idx] + near_field.hrz[idx] * fscale);
-
-      Value_to_Color(&red, &grn, &blu, near_field.hr[idx], near_field.max_hr);
-
-      nearfield_lines[line_idx].color.r = (float)red;
-      nearfield_lines[line_idx].color.g = (float)grn;
-      nearfield_lines[line_idx].color.b = (float)blu;
-      nearfield_lines[line_idx].color.a = 1.0f;
-
-      nearfield_lines[line_idx + 1].color = nearfield_lines[line_idx].color;
-
-      line_idx += 2;
-    }
-
-    /*** Draw Poynting Vector ***/
-    if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    {
-      fscale = dr / pov_r[idx];
-
-      nearfield_lines[line_idx].point.x = (float)near_field.px[idx];
-      nearfield_lines[line_idx].point.y = (float)near_field.py[idx];
-      nearfield_lines[line_idx].point.z = (float)near_field.pz[idx];
-
-      nearfield_lines[line_idx + 1].point.x = (float)(near_field.px[idx] + pov_x[idx] * fscale);
-      nearfield_lines[line_idx + 1].point.y = (float)(near_field.py[idx] + pov_y[idx] * fscale);
-      nearfield_lines[line_idx + 1].point.z = (float)(near_field.pz[idx] + pov_z[idx] * fscale);
-
-      Value_to_Color(&red, &grn, &blu, pov_r[idx], pov_max);
-
-      nearfield_lines[line_idx].color.r = (float)red;
-      nearfield_lines[line_idx].color.g = (float)grn;
-      nearfield_lines[line_idx].color.b = (float)blu;
-      nearfield_lines[line_idx].color.a = 1.0f;
-
-      nearfield_lines[line_idx + 1].color = nearfield_lines[line_idx].color;
-
-      line_idx += 2;
-    }
-  }
-
-  nearfield_line_count = total_lines;
-
-  return( nearfield_line_count );
-
-} /* opengl_nearfield_generate_lines() */
+} /* opengl_debug_generate_cube() */
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_nearfield_update_buffers()
+/* opengl_debug_update_buffers()
  *
  * Upload line data to GPU
  */
   static void
-opengl_nearfield_update_buffers(nearfield_gl_state_t *state)
+opengl_debug_update_buffers(debug_gl_state_t *state)
 {
   size_t buffer_size;
 
-  if( !state || !state->gl || !state->gl->initialized || !nearfield_lines || nearfield_line_count == 0 )
+  if( !state || !state->gl || !state->gl->initialized || !debug_lines || debug_line_count == 0 )
     return;
 
   glBindVertexArray(state->gl->vao);
   glBindBuffer(GL_ARRAY_BUFFER, state->gl->vbo);
 
-  buffer_size = (size_t)nearfield_line_count * 2 * sizeof(color_point_t);
-  glBufferData(GL_ARRAY_BUFFER, buffer_size, nearfield_lines, GL_DYNAMIC_DRAW);
+  buffer_size = (size_t)debug_line_count * 2 * sizeof(color_point_t);
+  glBufferData(GL_ARRAY_BUFFER, buffer_size, debug_lines, GL_DYNAMIC_DRAW);
 
   /* Position attribute */
   glEnableVertexAttribArray(state->position_location);
@@ -309,25 +215,25 @@ opengl_nearfield_update_buffers(nearfield_gl_state_t *state)
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-  state->line_count = nearfield_line_count;
+  state->line_count = debug_line_count;
 
-} /* opengl_nearfield_update_buffers() */
+} /* opengl_debug_update_buffers() */
 
 /*-----------------------------------------------------------------------*/
 
-/* nearfield_gl_get_state()
+/* debug_gl_get_state()
  *
- * Get near field GL state from widget
+ * Get debug GL state from widget
  */
-  static nearfield_gl_state_t*
-nearfield_gl_get_state(GtkWidget *widget)
+  static debug_gl_state_t*
+debug_gl_get_state(GtkWidget *widget)
 {
   if( !widget )
     return( NULL );
 
   return( g_object_get_data(G_OBJECT(widget), "gl_state") );
 
-} /* nearfield_gl_get_state() */
+} /* debug_gl_get_state() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -338,7 +244,7 @@ nearfield_gl_get_state(GtkWidget *widget)
   static void
 on_realize(GtkGLArea *area)
 {
-  nearfield_gl_state_t *state;
+  debug_gl_state_t *state;
   GtkAllocation alloc;
   float aspect;
 
@@ -346,31 +252,31 @@ on_realize(GtkGLArea *area)
 
   if( gtk_gl_area_get_error(area) != NULL )
   {
-    pr_err("GL context error in near field window\n");
+    pr_err("GL context error in debug window\n");
     return;
   }
 
   gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
   aspect = (float)alloc.width / (float)alloc.height;
 
-  state = nearfield_gl_state_new(aspect);
+  state = debug_gl_state_new(aspect);
   if( !state )
   {
-    pr_err("Failed to create near field GL state\n");
+    pr_err("Failed to create debug GL state\n");
     return;
   }
 
   arcball_set_viewport(state->gl->arcball, (float)alloc.height);
 
-  /* Initialize view to match Cairo rdpattern projection */
+  /* Initialize view to match rdpattern projection */
   arcball_set_view(state->gl->arcball,
       (float)rdpattern_proj_params.Wr,
       (float)rdpattern_proj_params.Wi);
 
   g_object_set_data_full(G_OBJECT(area), "gl_state", state,
-    (GDestroyNotify)nearfield_gl_state_free);
+    (GDestroyNotify)debug_gl_state_free);
 
-  pr_notice("Near field OpenGL context initialized (Wr=%.1f, Wi=%.1f)\n",
+  pr_notice("Debug OpenGL context initialized (Wr=%.1f, Wi=%.1f)\n",
       rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
 
 } /* on_realize() */
@@ -384,37 +290,32 @@ on_realize(GtkGLArea *area)
   static gboolean
 on_render(GtkGLArea *area, GdkGLContext *context)
 {
-  nearfield_gl_state_t *state;
+  debug_gl_state_t *state;
   mat4 mvp;
   int line_count;
-  float r_max;
   float zoom;
 
   state = g_object_get_data(G_OBJECT(area), "gl_state");
   if( !state || !state->gl || !state->gl->initialized )
     return( FALSE );
 
-  if( isFlagClear(ENABLE_NEAREH) || !near_field.valid )
-    return( FALSE );
-
-  line_count = opengl_nearfield_generate_lines(state);
+  line_count = opengl_debug_generate_cube();
   if( line_count <= 0 )
     return( FALSE );
 
-  opengl_nearfield_update_buffers(state);
+  opengl_debug_update_buffers(state);
 
   if( state->line_count == 0 )
     return( FALSE );
 
-  /* Set distance and axes scale */
-  r_max = (float)near_field.r_max;
-  arcball_set_distance(state->gl->arcball, r_max * 2.165f);
-  opengl_axes_set_scale(state->axes, r_max);
-
   /* Get zoom value from spinbutton */
   zoom = 1.0f;
-  if( nearfield_zoom )
-    zoom = (float)gtk_spin_button_get_value(nearfield_zoom);
+  if( debug_zoom )
+    zoom = (float)gtk_spin_button_get_value(debug_zoom);
+
+  /* Set distance and axes scale for cube */
+  arcball_set_zoom_factor(state->gl->arcball, DEBUG_CUBE_SIZE * 4.0f, zoom);
+  opengl_axes_set_scale(state->axes, DEBUG_CUBE_SIZE * 1.5f);
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -462,9 +363,9 @@ on_unrealize(GtkGLArea *area)
   static gboolean
 on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
-  nearfield_gl_state_t *state;
+  debug_gl_state_t *state;
 
-  state = nearfield_gl_get_state(widget);
+  state = debug_gl_get_state(widget);
   if( !state || !state->gl )
     return( FALSE );
 
@@ -479,9 +380,9 @@ on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data)
   static gboolean
 on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
-  nearfield_gl_state_t *state;
+  debug_gl_state_t *state;
 
-  state = nearfield_gl_get_state(widget);
+  state = debug_gl_get_state(widget);
   if( !state || !state->gl )
     return( FALSE );
 
@@ -496,9 +397,9 @@ on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer data)
   static gboolean
 on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
 {
-  nearfield_gl_state_t *state;
+  debug_gl_state_t *state;
 
-  state = nearfield_gl_get_state(widget);
+  state = debug_gl_get_state(widget);
   if( !state || !state->gl )
     return( FALSE );
 
@@ -519,10 +420,10 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data)
 {
   double zoom;
 
-  if( !nearfield_zoom )
+  if( !debug_zoom )
     return( FALSE );
 
-  zoom = gtk_spin_button_get_value(nearfield_zoom);
+  zoom = gtk_spin_button_get_value(debug_zoom);
   if( event->direction == GDK_SCROLL_UP )
     zoom *= 1.1;
   else if( event->direction == GDK_SCROLL_DOWN )
@@ -530,7 +431,7 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data)
   else
     return( FALSE );
 
-  gtk_spin_button_set_value(nearfield_zoom, zoom);
+  gtk_spin_button_set_value(debug_zoom, zoom);
   return( FALSE );
 }
 
@@ -541,10 +442,10 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data)
   static void
 on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 {
-  nearfield_gl_state_t *state;
+  debug_gl_state_t *state;
   float aspect;
 
-  state = nearfield_gl_get_state(widget);
+  state = debug_gl_get_state(widget);
   if( !state || !state->gl )
     return;
 
@@ -563,14 +464,14 @@ on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
   static void
 set_view_preset(float wr, float wi)
 {
-  nearfield_gl_state_t *state;
+  debug_gl_state_t *state;
 
-  state = nearfield_gl_get_state(nearfield_gl_area);
+  state = debug_gl_get_state(debug_gl_area);
   if( !state || !state->gl )
     return;
 
   arcball_set_view(state->gl->arcball, wr, wi);
-  xnec2_widget_queue_draw(nearfield_gl_area);
+  xnec2_widget_queue_draw(debug_gl_area);
 
 } /* set_view_preset() */
 
@@ -618,30 +519,6 @@ on_view_default_activate(GtkMenuItem *menuitem, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* on_animate_activate()
- *
- * Animation menu handler
- */
-  static void
-on_animate_activate(GtkMenuItem *menuitem, gpointer user_data)
-{
-  /* Open existing animation dialog which controls both Cairo and OpenGL */
-  if( !Validate_Nearfield_Animation() )
-    return;
-
-  if( animate_dialog == NULL )
-  {
-    animate_dialog = create_animate_dialog(&animate_dialog_builder);
-    gtk_widget_show(animate_dialog);
-  }
-  else
-  {
-    gtk_window_present(GTK_WINDOW(animate_dialog));
-  }
-}
-
-/*-----------------------------------------------------------------------*/
-
 /* on_zoom_value_changed()
  *
  * Zoom spin button value changed handler
@@ -649,7 +526,7 @@ on_animate_activate(GtkMenuItem *menuitem, gpointer user_data)
   static void
 on_zoom_value_changed(GtkSpinButton *spinbutton, gpointer user_data)
 {
-  xnec2_widget_queue_draw(nearfield_gl_area);
+  xnec2_widget_queue_draw(debug_gl_area);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -661,7 +538,7 @@ on_zoom_value_changed(GtkSpinButton *spinbutton, gpointer user_data)
   static void
 on_window_destroy(GObject *object, gpointer user_data)
 {
-  opengl_nearfield_window_killed();
+  opengl_debug_window_killed();
 }
 
 /*-----------------------------------------------------------------------*/
@@ -673,18 +550,18 @@ on_window_destroy(GObject *object, gpointer user_data)
   static gboolean
 on_delete_event(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
-  opengl_nearfield_window_killed();
+  opengl_debug_window_killed();
   return( FALSE );
 }
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_nearfield_create_window()
+/* opengl_debug_create_window()
  *
- * Creates the OpenGL near field test window
+ * Creates the OpenGL debug window
  */
   GtkWidget*
-opengl_nearfield_create_window(void)
+opengl_debug_create_window(void)
 {
   GtkWidget *window;
   GtkWidget *vbox;
@@ -696,14 +573,14 @@ opengl_nearfield_create_window(void)
   GtkWidget *label;
   GtkWidget *zoom_spin;
 
-  if( nearfield_gl_window != NULL )
+  if( debug_gl_window != NULL )
   {
-    gtk_window_present(GTK_WINDOW(nearfield_gl_window));
-    return( nearfield_gl_window );
+    gtk_window_present(GTK_WINDOW(debug_gl_window));
+    return( debug_gl_window );
   }
 
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(window), "OpenGL Near Field Test");
+  gtk_window_set_title(GTK_WINDOW(window), "OpenGL Debug Window");
   gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
 
   vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
@@ -733,16 +610,6 @@ opengl_nearfield_create_window(void)
 
   menu_item = gtk_menu_item_new_with_label("Default");
   g_signal_connect(menu_item, "activate", G_CALLBACK(on_view_default_activate), NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-
-  /* Animation menu */
-  menu_item = gtk_menu_item_new_with_label("Animation");
-  gtk_menu_shell_append(GTK_MENU_SHELL(menubar), menu_item);
-  menu = gtk_menu_new();
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), menu);
-
-  menu_item = gtk_menu_item_new_with_label("Start...");
-  g_signal_connect(menu_item, "activate", G_CALLBACK(on_animate_activate), NULL);
   gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
 
   /* GL area */
@@ -781,34 +648,34 @@ opengl_nearfield_create_window(void)
   g_signal_connect(zoom_spin, "value-changed", G_CALLBACK(on_zoom_value_changed), NULL);
   gtk_box_pack_start(GTK_BOX(hbox), zoom_spin, FALSE, FALSE, 0);
 
-  nearfield_zoom = GTK_SPIN_BUTTON(zoom_spin);
+  debug_zoom = GTK_SPIN_BUTTON(zoom_spin);
 
   g_signal_connect(window, "destroy", G_CALLBACK(on_window_destroy), NULL);
   g_signal_connect(window, "delete-event", G_CALLBACK(on_delete_event), NULL);
 
-  nearfield_gl_window = window;
-  nearfield_gl_area = gl_area;
+  debug_gl_window = window;
+  debug_gl_area = gl_area;
 
   gtk_widget_show_all(window);
 
   return( window );
 
-} /* opengl_nearfield_create_window() */
+} /* opengl_debug_create_window() */
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_nearfield_window_killed()
+/* opengl_debug_window_killed()
  *
  * Cleanup when window is closed
  */
   void
-opengl_nearfield_window_killed(void)
+opengl_debug_window_killed(void)
 {
-  nearfield_gl_window = NULL;
-  nearfield_gl_area = NULL;
-  nearfield_zoom = NULL;
+  debug_gl_window = NULL;
+  debug_gl_area = NULL;
+  debug_zoom = NULL;
 
-} /* opengl_nearfield_window_killed() */
+} /* opengl_debug_window_killed() */
 
 /*-----------------------------------------------------------------------*/
 

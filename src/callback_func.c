@@ -558,14 +558,14 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
           Builder_Get_Object(rdpattern_window_builder, "rdpattern_eh_togglebutton")),
         FALSE );
 
-    /* Swap to OpenGL renderer for radiation patterns */
+    /* Swap to OpenGL renderer if enabled */
 #ifdef HAVE_OPENGL
-    if( rdpattern_gl_area && rdpattern_cairo_da )
+    if( rc_config.use_opengl_renderer &&
+        rdpattern_gl_area && rdpattern_cairo_da )
     {
       gtk_widget_hide(rdpattern_cairo_da);
       gtk_widget_show(rdpattern_gl_area);
       rdpattern_drawingarea = rdpattern_gl_area;
-      rc_config.use_opengl_renderer = 1;
     }
 #endif
 
@@ -614,14 +614,14 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(Builder_Get_Object(
             rdpattern_window_builder, "rdpattern_gain_togglebutton")), FALSE );
 
-    /* Swap to Cairo renderer for near field patterns */
+    /* Swap to Cairo renderer if OpenGL disabled */
 #ifdef HAVE_OPENGL
-    if( rdpattern_cairo_da && rdpattern_gl_area )
+    if( !rc_config.use_opengl_renderer &&
+        rdpattern_cairo_da && rdpattern_gl_area )
     {
       gtk_widget_hide(rdpattern_gl_area);
       gtk_widget_show(rdpattern_cairo_da);
       rdpattern_drawingarea = rdpattern_cairo_da;
-      rc_config.use_opengl_renderer = 0;
     }
 #endif
 
@@ -641,11 +641,6 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
       SetFlag( DRAW_NEW_EHFIELD );
 
       xnec2_widget_queue_draw( rdpattern_drawingarea );
-
-#ifdef HAVE_OPENGL
-      if( nearfield_gl_area )
-        xnec2_widget_queue_draw( nearfield_gl_area );
-#endif
     }
 
     Set_Window_Labels();

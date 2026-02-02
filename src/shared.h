@@ -126,10 +126,10 @@ extern GtkWidget
   *sy_overrides_window;
 
 #ifdef HAVE_OPENGL
-/* OpenGL near field test window */
+/* OpenGL debug window */
 extern GtkWidget
-  *nearfield_gl_window,
-  *nearfield_gl_area;
+  *debug_gl_window,
+  *debug_gl_area;
 #endif
 
 extern GtkBuilder

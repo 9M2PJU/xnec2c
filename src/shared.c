@@ -90,10 +90,10 @@ GtkWidget
   *sy_overrides_window = NULL;
 
 #ifdef HAVE_OPENGL
-/* OpenGL near field test window */
+/* OpenGL debug window */
 GtkWidget
-  *nearfield_gl_window = NULL,
-  *nearfield_gl_area   = NULL;
+  *debug_gl_window = NULL,
+  *debug_gl_area   = NULL;
 #endif
 
 /* Drawing area widgets */

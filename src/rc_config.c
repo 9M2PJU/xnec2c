@@ -25,7 +25,7 @@
 #include "measurements.h"
 
 #ifdef HAVE_OPENGL
-#include "opengl_nearfield.h"
+#include "opengl_debug_window.h"
 #endif
 
 
@@ -639,8 +639,8 @@ Restore_Windows( gpointer dat )
     gtk_menu_item_activate( GTK_MENU_ITEM(widget) );
   }
 #ifdef HAVE_OPENGL
-  /* Open nearfield window unconditionally */
-  opengl_nearfield_create_window();
+  /* Open debug window unconditionally */
+  opengl_debug_create_window();
 #endif
 
   return( FALSE );

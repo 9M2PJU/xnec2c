@@ -187,20 +187,6 @@ arcball_set_aspect(arcball_state_t *ab, float aspect)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_set_distance()
- *
- * Set camera distance from origin
- */
-  void
-arcball_set_distance(arcball_state_t *ab, float distance)
-{
-  ab->distance = distance;
-  ab->eye[2] = distance;
-
-} /* arcball_set_distance() */
-
-/*-----------------------------------------------------------------------*/
-
 /* arcball_set_view()
  *
  * Set arcball model rotation to match Cairo view angles.
