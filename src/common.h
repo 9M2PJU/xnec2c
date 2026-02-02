@@ -442,6 +442,14 @@ typedef struct
 
 typedef struct
 {
+  point_f_3d_t point;
+  point_f_3d_t normal;
+  rgba_f_t color;
+
+} lit_color_point_t;
+
+typedef struct
+{
   color_point_t cp[3];
 
 } color_triangle_t;

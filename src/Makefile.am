@@ -115,7 +115,8 @@ xnec2c_SOURCES += \
   opengl_axes.c opengl_axes.h \
   opengl_cairo_overlay.c opengl_cairo_overlay.h \
   opengl_gradient_overlay.c opengl_gradient_overlay.h \
-  opengl_debug_window.c opengl_debug_window.h
+  opengl_cylinder.c opengl_cylinder.h \
+  opengl_structure_view.c opengl_structure_view.h
 
 xnec2c_CPPFLAGS += $(CGLM_CFLAGS)
 xnec2c_LDADD    += $(GL_LIBS) $(CGLM_LIBS)

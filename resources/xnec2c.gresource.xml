@@ -11,6 +11,8 @@
     <file>gl/color-fragment.glsl</file>
     <file>gl/text-vertex.glsl</file>
     <file>gl/text-fragment.glsl</file>
+    <file>gl/lit-color-vertex.glsl</file>
+    <file>gl/lit-color-fragment.glsl</file>
   </gresource>
 </gresources>
 
