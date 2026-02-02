@@ -224,8 +224,13 @@ create_filechooserdialog( GtkBuilder **builder )
 create_freqplots_window( GtkBuilder **builder )
 {
   GtkWidget *ret = NULL;
-  gchar *object_ids[] = { FREQPLOTS_WINDOW_IDS };
-  Gtk_Builder( builder, object_ids );
+
+  if( *builder == NULL )
+  {
+    gchar *object_ids[] = { FREQPLOTS_WINDOW_IDS };
+    Gtk_Builder( builder, object_ids );
+  }
+
   ret = Builder_Get_Object( *builder, "freqplots_window" );
   return( ret );
 }
@@ -234,8 +239,13 @@ create_freqplots_window( GtkBuilder **builder )
 create_rdpattern_window( GtkBuilder **builder )
 {
   GtkWidget *ret = NULL;
-  gchar *object_ids[] = { RDPATTERN_WINDOW_IDS };
-  Gtk_Builder( builder, object_ids );
+
+  if( *builder == NULL )
+  {
+    gchar *object_ids[] = { RDPATTERN_WINDOW_IDS };
+    Gtk_Builder( builder, object_ids );
+  }
+
   ret = Builder_Get_Object( *builder, "rdpattern_window" );
   return( ret );
 }
