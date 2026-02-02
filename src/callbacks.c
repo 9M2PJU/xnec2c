@@ -23,7 +23,7 @@
 #include "measurements.h"
 #include <pthread.h>
 
-#include "opengl_structure_view.h"
+#include "opengl_structure.h"
 #ifdef HAVE_OPENGL
 #include "opengl_rdpattern.h"
 #endif
@@ -1010,6 +1010,21 @@ on_main_rotate_spinbutton_value_changed(
     gtk_spin_button_set_value(rotate_rdpattern, (gdouble)structure_proj_params.Wr);
   }
 
+#ifdef HAVE_OPENGL
+  if( rc_config.use_opengl_renderer )
+  {
+    structure_gl_state_t *state;
+
+    state = opengl_structure_get_state(structure_gl_area);
+    if( state && state->gl && state->gl->arcball )
+    {
+      arcball_set_view(state->gl->arcball,
+          (float)structure_proj_params.Wr,
+          (float)structure_proj_params.Wi);
+    }
+  }
+#endif
+
   New_Structure_Projection_Angle();
   gtk_spin_button_update(spinbutton);
 
@@ -1041,6 +1056,21 @@ on_main_incline_spinbutton_value_changed(
   {
     gtk_spin_button_set_value(incline_rdpattern, (gdouble)structure_proj_params.Wi);
   }
+
+#ifdef HAVE_OPENGL
+  if( rc_config.use_opengl_renderer )
+  {
+    structure_gl_state_t *state;
+
+    state = opengl_structure_get_state(structure_gl_area);
+    if( state && state->gl && state->gl->arcball )
+    {
+      arcball_set_view(state->gl->arcball,
+          (float)structure_proj_params.Wr,
+          (float)structure_proj_params.Wi);
+    }
+  }
+#endif
 
   New_Structure_Projection_Angle();
   gtk_spin_button_update(spinbutton);
@@ -1923,6 +1953,44 @@ on_main_opengl_renderer_toggled(
 
     xnec2_widget_queue_draw( rdpattern_drawingarea );
   }
+
+  /* Swap renderer for structure view in main window */
+  if( structure_gl_area != NULL && structure_cairo_da != NULL )
+  {
+    if( rc_config.use_opengl_renderer )
+    {
+      structure_gl_state_t *state;
+
+      gtk_widget_hide( structure_cairo_da );
+      gtk_widget_show( structure_gl_area );
+      structure_drawingarea = structure_gl_area;
+
+      /* Sync OpenGL arcball from structure projection angles */
+      state = opengl_structure_get_state( structure_gl_area );
+      if( state && state->gl && state->gl->arcball )
+      {
+        float base_distance = (float)structure_proj_params.r_max * 2.165f;
+
+        arcball_set_view( state->gl->arcball,
+            (float)structure_proj_params.Wr,
+            (float)structure_proj_params.Wi );
+        arcball_set_zoom_factor( state->gl->arcball, base_distance,
+            (float)structure_proj_params.xy_zoom );
+      }
+    }
+    else
+    {
+      gtk_widget_hide( structure_gl_area );
+      gtk_widget_show( structure_cairo_da );
+      structure_drawingarea = structure_cairo_da;
+
+      /* Sync Cairo scale from current zoom value */
+      structure_proj_params.xy_scale =
+          structure_proj_params.xy_scale1 * structure_proj_params.xy_zoom;
+    }
+
+    xnec2_widget_queue_draw( structure_drawingarea );
+  }
 #endif
 }
 
@@ -2581,22 +2649,6 @@ on_rdpattern_animate_activate(
     animate_dialog = create_animate_dialog( &animate_dialog_builder );
   }
   gtk_widget_show( animate_dialog );
-
-  /* Open OpenGL structure view automatically */
-  if( structure_gl_window == NULL )
-    opengl_structure_view_create();
-}
-
-
-  void
-on_rdpattern_opengl_nearfield_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( structure_gl_window != NULL )
-    gtk_window_present(GTK_WINDOW(structure_gl_window));
-  else
-    opengl_structure_view_create();
 }
 
 
@@ -5421,7 +5473,7 @@ on_main_zoom_spinbutton_value_changed(
     xnec2_widget_queue_draw( structure_drawingarea );
   }
 
-  opengl_structure_view_queue_redraw();
+  opengl_structure_queue_redraw();
 }
 
 

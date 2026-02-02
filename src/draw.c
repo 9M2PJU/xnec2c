@@ -22,6 +22,72 @@
 
 /*-----------------------------------------------------------------------*/
 
+/* get_segment_color_type()
+ *
+ * Determine color classification for a segment based on excitation and loading.
+ * Priority: excitation > load > normal (matching Cairo draw_structure.c logic)
+ */
+  segment_color_type_t
+get_segment_color_type(int seg_num)
+{
+  int idx;
+
+  /* Check excitation sources (highest priority) */
+  for( idx = 0; idx < vsorc.nsant; idx++ )
+  {
+    if( vsorc.isant[idx] == seg_num )
+      return( SEG_COLOR_EXCITATION );
+  }
+
+  for( idx = 0; idx < vsorc.nvqd; idx++ )
+  {
+    if( vsorc.ivqd[idx] == seg_num )
+      return( SEG_COLOR_EXCITATION );
+  }
+
+  /* Check loaded segments */
+  for( idx = 0; idx < zload.nldseg; idx++ )
+  {
+    if( zload.ldsegn[idx] == seg_num )
+      return( SEG_COLOR_LOADED );
+  }
+
+  return( SEG_COLOR_NORMAL );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* segment_type_to_rgb()
+ *
+ * Convert segment color type to RGB values using common.h constants
+ */
+  void
+segment_type_to_rgb(segment_color_type_t type, float *r, float *g, float *b)
+{
+  switch( type )
+  {
+    case SEG_COLOR_EXCITATION:
+      *r = 1.0f;
+      *g = 0.0f;
+      *b = 0.0f;
+      break;
+
+    case SEG_COLOR_LOADED:
+      *r = 1.0f;
+      *g = 1.0f;
+      *b = 0.0f;
+      break;
+
+    case SEG_COLOR_NORMAL:
+      *r = 0.0f;
+      *g = 0.0f;
+      *b = 1.0f;
+      break;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
 /*  Project_on_Screen()
  *
  *  Projects a point in the x,y,z co-ordinate

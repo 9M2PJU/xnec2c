@@ -24,7 +24,7 @@
 #include "mathlib.h"
 #include "measurements.h"
 
-#include "opengl_structure_view.h"
+#include "opengl_structure.h"
 
 
 /* Add configuration options here. To add new variables:

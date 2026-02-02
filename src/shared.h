@@ -125,10 +125,22 @@ extern GtkWidget
   *nec2_edit_window,
   *sy_overrides_window;
 
-/* OpenGL structure view window */
+/* Structure drawing widgets */
 extern GtkWidget
-  *structure_gl_window,
+  *structure_drawingarea,
+  *structure_cairo_da,
   *structure_gl_area;
+
+/* Radiation pattern drawing widgets */
+extern GtkWidget
+  *rdpattern_drawingarea,
+  *rdpattern_gl_area,
+  *rdpattern_cairo_da;
+
+/* Frequency plots and save-as */
+extern GtkWidget
+  *freqplots_drawingarea,
+  *saveas_drawingarea;
 
 extern GtkBuilder
   *main_window_builder,

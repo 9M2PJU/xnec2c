@@ -89,18 +89,21 @@ GtkWidget
   *nec2_edit_window   = NULL,
   *sy_overrides_window = NULL;
 
-/* OpenGL structure view window */
-GtkWidget
-  *structure_gl_window = NULL,
-  *structure_gl_area   = NULL;
-
-/* Drawing area widgets */
+/* Structure drawing widgets */
 GtkWidget
   *structure_drawingarea = NULL,
-  *freqplots_drawingarea = NULL,
+  *structure_cairo_da    = NULL,
+  *structure_gl_area     = NULL;
+
+/* Radiation pattern drawing widgets */
+GtkWidget
   *rdpattern_drawingarea = NULL,
-  *rdpattern_gl_area = NULL,
-  *rdpattern_cairo_da = NULL;
+  *rdpattern_gl_area     = NULL,
+  *rdpattern_cairo_da    = NULL;
+
+/* Frequency plots drawing widget */
+GtkWidget
+  *freqplots_drawingarea = NULL;
 
 GtkWidget *saveas_drawingarea = NULL;
 

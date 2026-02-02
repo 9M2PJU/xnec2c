@@ -17,12 +17,12 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef OPENGL_STRUCTURE_VIEW_H
-#define OPENGL_STRUCTURE_VIEW_H 1
+#ifndef OPENGL_STRUCTURE_H
+#define OPENGL_STRUCTURE_H 1
 
 #include "common.h"
 
-/* Draw mode for structure view */
+/* Draw mode for structure rendering */
 typedef enum
 {
   STRUCTURE_DRAW_GEOMETRY = 0,
@@ -36,7 +36,7 @@ typedef enum
 #include "opengl_axes.h"
 #include "opengl_cylinder.h"
 
-/* Structure view OpenGL state */
+/* Structure OpenGL state */
 typedef struct
 {
   gl_instance_t *gl;
@@ -50,11 +50,14 @@ typedef struct
 
 } structure_gl_state_t;
 
+/* Get GL state from widget */
+structure_gl_state_t* opengl_structure_get_state(GtkWidget *widget);
+
 #endif /* HAVE_OPENGL */
 
-/* Public API - always available, stubs provided when no OpenGL */
-GtkWidget* opengl_structure_view_create(void);
-void opengl_structure_view_destroyed(void);
-void opengl_structure_view_queue_redraw(void);
+/* Public API - always available, stubs when no OpenGL */
+GtkWidget* opengl_structure_create_widget(void);
+void opengl_structure_queue_redraw(void);
+void opengl_structure_cleanup(void);
 
-#endif /* OPENGL_STRUCTURE_VIEW_H */
+#endif /* OPENGL_STRUCTURE_H */

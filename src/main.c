@@ -20,6 +20,7 @@
 #include "main.h"
 #include "shared.h"
 #include "mathlib.h"
+#include "opengl_structure.h"
 
 #include <getopt.h>
 
@@ -503,16 +504,17 @@ main (int argc, char *argv[])
       Builder_Get_Object(main_window_builder, "main_freq_spinbutton") );
 
   /* Get the structure drawing area and allocation */
-  structure_drawingarea =
+  structure_cairo_da =
     Builder_Get_Object( main_window_builder, "structure_drawingarea" );
+
   GtkAllocation allocation;
-  gtk_widget_get_allocation ( structure_drawingarea, &allocation );
+  gtk_widget_get_allocation( structure_cairo_da, &allocation );
   structure_width  = allocation.width;
   structure_height = allocation.height;
   New_Projection_Parameters(
       structure_width, structure_height, &structure_proj_params );
 
-  /* Initialize structure projection angles */
+  /* Initialize structure projection angles from spinbuttons */
   rotate_structure  = GTK_SPIN_BUTTON(
       Builder_Get_Object(main_window_builder, "main_rotate_spinbutton") );
   incline_structure = GTK_SPIN_BUTTON(
@@ -528,6 +530,31 @@ main (int argc, char *argv[])
     gtk_spin_button_get_value(incline_structure);
 
   structure_proj_params.xy_zoom = 1.0;
+
+  /* Create GL widget after proj_params initialized */
+#ifdef HAVE_OPENGL
+  {
+    GtkWidget *box = Builder_Get_Object(main_window_builder, "structure_box");
+
+    structure_gl_area = opengl_structure_create_widget();
+    gtk_box_pack_start(GTK_BOX(box), structure_gl_area, TRUE, TRUE, 0);
+
+    if( rc_config.use_opengl_renderer )
+    {
+      gtk_widget_hide(structure_cairo_da);
+      gtk_widget_show(structure_gl_area);
+      structure_drawingarea = structure_gl_area;
+    }
+    else
+    {
+      gtk_widget_hide(structure_gl_area);
+      gtk_widget_show(structure_cairo_da);
+      structure_drawingarea = structure_cairo_da;
+    }
+  }
+#else
+  structure_drawingarea = structure_cairo_da;
+#endif
   structure_proj_params.reset = TRUE;
   structure_proj_params.type = STRUCTURE_DRAWINGAREA;
 
@@ -679,6 +706,18 @@ Open_Input_File( gpointer arg )
   gtk_widget_show( Builder_Get_Object(main_window_builder, "main_hbox2") );
   gtk_widget_show( Builder_Get_Object(main_window_builder, "main_grid1") );
   gtk_widget_show( Builder_Get_Object(main_window_builder, "structure_frame") );
+
+#ifdef HAVE_OPENGL
+  /* Hide inactive structure renderer after parent visible */
+  if( structure_gl_area != NULL && structure_cairo_da != NULL )
+  {
+    if( rc_config.use_opengl_renderer )
+      gtk_widget_hide(structure_cairo_da);
+    else
+      gtk_widget_hide(structure_gl_area);
+  }
+#endif
+
   gtk_widget_show( Builder_Get_Object(main_window_builder, "main_view_menuitem") );
   gtk_widget_show( structure_drawingarea );
 

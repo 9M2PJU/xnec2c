@@ -17,38 +17,33 @@
  *    https://www.xnec2c.org/
  */
 
-#include "opengl_structure_view.h"
+#include "opengl_structure.h"
 #include "shared.h"
 #include "opengl_cylinder.h"
 #include "draw.h"
 
 #ifdef HAVE_OPENGL
 
-/* Scale factor for cylinder radius display (5x for visibility) */
+/* Scale factor for cylinder radius display */
 #define CYLINDER_RADIUS_SCALE 5.0
 
-/* Number of sides for cylinder rendering (higher = smoother) */
+/* Number of sides for cylinder rendering */
 #define STRUCTURE_CYLINDER_SEGMENTS 24
 
-/* Vertex buffer for structure geometry (with normals for lighting) */
+/* Vertex buffer for structure geometry */
 static lit_color_point_t *structure_vertices = NULL;
 static int structure_vertex_count = 0;
-static int structure_geometry_generation = 1;  /* Start at 1 to trigger initial generation */
+static int structure_geometry_generation = 1;
 static structure_draw_mode_t structure_last_mode = STRUCTURE_DRAW_GEOMETRY;
 
-/* Structure scale factor for zoom */
+/* Structure scale factor for view */
 static float structure_view_scale = 1.0f;
-
-/* Forward declarations for internal implementations */
-static GtkWidget* opengl_structure_view_create_impl(void);
-static void opengl_structure_view_destroyed_impl(void);
-static void opengl_structure_view_queue_redraw_impl(void);
 
 /*-----------------------------------------------------------------------*/
 
 /* opengl_structure_get_draw_mode()
  *
- * Derive draw mode from global flags (single point of truth)
+ * Derive draw mode from global flags
  */
   static structure_draw_mode_t
 opengl_structure_get_draw_mode(void)
@@ -60,8 +55,7 @@ opengl_structure_get_draw_mode(void)
     return( STRUCTURE_DRAW_CHARGES );
 
   return( STRUCTURE_DRAW_GEOMETRY );
-
-} /* opengl_structure_get_draw_mode() */
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -81,16 +75,16 @@ get_segment_magnitude(int idx, structure_draw_mode_t mode)
   if( mode == STRUCTURE_DRAW_CHARGES && crnt.bir != NULL && crnt.bii != NULL )
     return( cabs(cmplx(crnt.bir[idx], crnt.bii[idx])) );
 
-  /* GEOMETRY mode or NULL data pointers: magnitude not applicable */
   return( 0.0 );
-
-} /* get_segment_magnitude() */
+}
 
 /*-----------------------------------------------------------------------*/
 
 /* get_segment_color()
  *
- * Determine color for a segment based on type and draw mode
+ * Determine color for a segment based on type and draw mode.
+ * GEOMETRY mode uses shared get_segment_color_type() from draw.c
+ * CURRENTS/CHARGES mode uses heat map based on magnitude.
  */
   static void
 get_segment_color(
@@ -99,61 +93,39 @@ get_segment_color(
     double cmax,
     float *r, float *g, float *b)
 {
-  int i;
-  double red, grn, blu;
-  double mag;
-
-  /* Current/charge mode: color by magnitude (only if data is valid) */
-  if( (mode == STRUCTURE_DRAW_CURRENTS || mode == STRUCTURE_DRAW_CHARGES) &&
-      crnt.valid && cmax > 0.0 )
+  if( mode == STRUCTURE_DRAW_GEOMETRY )
   {
-    mag = get_segment_magnitude(idx, mode);
+    /* Use shared color logic from draw.c (idx+1 for 1-indexed seg_num) */
+    segment_color_type_t type = get_segment_color_type(idx + 1);
+    segment_type_to_rgb(type, r, g, b);
+    return;
+  }
+
+  /* Currents or charges mode: color by magnitude using heat map */
+  if( cmax > 0.0 )
+  {
+    double mag = get_segment_magnitude(idx, mode);
+    double red, grn, blu;
+
     Value_to_Color(&red, &grn, &blu, mag, cmax);
     *r = (float)red;
     *g = (float)grn;
     *b = (float)blu;
-    return;
   }
-
-  /* Check if segment is an excitation source */
-  for( i = 0; i < vsorc.nsant; i++ )
+  else
   {
-    if( vsorc.isant[i] - 1 == idx )
-    {
-      *r = 1.0f; *g = 0.0f; *b = 0.0f;
-      return;
-    }
+    /* No data: default gray */
+    *r = 0.5f;
+    *g = 0.5f;
+    *b = 0.5f;
   }
-
-  for( i = 0; i < vsorc.nvqd; i++ )
-  {
-    if( vsorc.ivqd[i] - 1 == idx )
-    {
-      *r = 1.0f; *g = 0.0f; *b = 0.0f;
-      return;
-    }
-  }
-
-  /* Check if segment is loaded */
-  for( i = 0; i < zload.nldseg; i++ )
-  {
-    if( zload.ldsegn[i] - 1 == idx )
-    {
-      *r = 1.0f; *g = 1.0f; *b = 0.0f;
-      return;
-    }
-  }
-
-  /* Default: blue for normal segments */
-  *r = 0.0f; *g = 0.0f; *b = 1.0f;
-
-} /* get_segment_color() */
+}
 
 /*-----------------------------------------------------------------------*/
 
 /* structure_gl_state_new()
  *
- * Allocate and initialize structure view GL state
+ * Allocate and initialize structure GL state
  */
   static structure_gl_state_t*
 structure_gl_state_new(float aspect)
@@ -183,7 +155,7 @@ structure_gl_state_new(float aspect)
   state->axes = opengl_axes_new(&state->gl->shader);
   if( !state->axes )
   {
-    pr_err("Failed to create axes renderer for structure view\n");
+    pr_err("Failed to create axes renderer for structure\n");
     gl_instance_free(state->gl);
     g_free(state);
     return( NULL );
@@ -192,14 +164,13 @@ structure_gl_state_new(float aspect)
   state->initialized = TRUE;
 
   return( state );
-
-} /* structure_gl_state_new() */
+}
 
 /*-----------------------------------------------------------------------*/
 
 /* structure_gl_state_free()
  *
- * Free structure view GL state
+ * Free structure GL state
  */
   static void
 structure_gl_state_free(structure_gl_state_t *state)
@@ -210,15 +181,13 @@ structure_gl_state_free(structure_gl_state_t *state)
   opengl_axes_free(state->axes);
   gl_instance_free(state->gl);
   g_free(state);
-
-} /* structure_gl_state_free() */
+}
 
 /*-----------------------------------------------------------------------*/
 
 /* opengl_structure_generate_geometry()
  *
  * Generate cylinder geometry for antenna wire segments
- * Colors based on segment type and current draw mode
  */
   static int
 opengl_structure_generate_geometry(structure_draw_mode_t mode)
@@ -231,7 +200,6 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
   double r_max;
   float r, g, b;
 
-  /* Check for geometry data */
   if( data.n <= 0 )
   {
     structure_vertex_count = 0;
@@ -239,14 +207,14 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
     return( 0 );
   }
 
-  /* Calculate vertices needed: each segment becomes a cylinder */
+  /* Calculate vertices needed */
   verts_per_seg = opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS);
   total_vertices = data.n * verts_per_seg;
 
   mreq = (size_t)total_vertices * sizeof(lit_color_point_t);
   mem_realloc((void **)&structure_vertices, mreq, __LOCATION__);
 
-  /* Find max current/charge magnitude for color scaling */
+  /* Find max magnitude for color scaling */
   cmax = 0.0;
   if( (mode == STRUCTURE_DRAW_CURRENTS || mode == STRUCTURE_DRAW_CHARGES) && crnt.valid )
   {
@@ -283,7 +251,7 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
 
   structure_view_scale = (float)r_max;
 
-  /* Generate lit cylinder for each wire segment */
+  /* Generate cylinder for each wire segment */
   vidx = 0;
   for( idx = 0; idx < data.n; idx++ )
   {
@@ -306,8 +274,7 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
   structure_geometry_generation++;
 
   return( structure_vertex_count );
-
-} /* opengl_structure_generate_geometry() */
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -359,24 +326,22 @@ opengl_structure_update_buffers(structure_gl_state_t *state)
 
   state->vertex_count = structure_vertex_count;
   state->geometry_generation = structure_geometry_generation;
-
-} /* opengl_structure_update_buffers() */
+}
 
 /*-----------------------------------------------------------------------*/
 
-/* structure_gl_get_state()
+/* opengl_structure_get_state()
  *
- * Get structure view GL state from widget
+ * Get GL state from widget
  */
-  static structure_gl_state_t*
-structure_gl_get_state(GtkWidget *widget)
+  structure_gl_state_t*
+opengl_structure_get_state(GtkWidget *widget)
 {
   if( !widget )
     return( NULL );
 
   return( g_object_get_data(G_OBJECT(widget), "gl_state") );
-
-} /* structure_gl_get_state() */
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -395,7 +360,7 @@ on_realize(GtkGLArea *area)
 
   if( gtk_gl_area_get_error(area) != NULL )
   {
-    pr_err("GL context error in structure view\n");
+    pr_err("GL context error in structure\n");
     return;
   }
 
@@ -405,24 +370,23 @@ on_realize(GtkGLArea *area)
   state = structure_gl_state_new(aspect);
   if( !state )
   {
-    pr_err("Failed to create structure view GL state\n");
+    pr_err("Failed to create structure GL state\n");
     return;
   }
 
   arcball_set_viewport(state->gl->arcball, (float)alloc.height);
 
-  /* Initialize view to match rdpattern projection */
+  /* Initialize view from structure projection params */
   arcball_set_view(state->gl->arcball,
-      (float)rdpattern_proj_params.Wr,
-      (float)rdpattern_proj_params.Wi);
+      (float)structure_proj_params.Wr,
+      (float)structure_proj_params.Wi);
 
   g_object_set_data_full(G_OBJECT(area), "gl_state", state,
     (GDestroyNotify)structure_gl_state_free);
 
-  pr_notice("Structure view OpenGL context initialized (Wr=%.1f, Wi=%.1f)\n",
-      rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
-
-} /* on_realize() */
+  pr_notice("Structure OpenGL initialized (Wr=%.1f, Wi=%.1f)\n",
+      structure_proj_params.Wr, structure_proj_params.Wi);
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -444,7 +408,6 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   if( !state || !state->gl || !state->gl->initialized )
     return( FALSE );
 
-  /* Derive mode from global flags (single point of truth) */
   current_mode = opengl_structure_get_draw_mode();
 
   /* Check if geometry needs regeneration */
@@ -461,15 +424,16 @@ on_render(GtkGLArea *area, GdkGLContext *context)
     vertex_count = structure_vertex_count;
   }
 
+  /* Get zoom from main window spinbutton */
+  zoom = 1.0f;
+  if( structure_zoom )
+    zoom = (float)gtk_spin_button_get_value(structure_zoom) / 100.0f;
+
   if( vertex_count <= 0 )
   {
-    /* No geometry - just clear and draw axes */
+    /* No geometry - clear and draw axes */
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    zoom = 1.0f;
-    if( structure_zoom )
-      zoom = (float)gtk_spin_button_get_value(structure_zoom);
 
     arcball_set_zoom_factor(state->gl->arcball, 4.0f, zoom);
     opengl_axes_set_scale(state->axes, 1.5f);
@@ -483,11 +447,6 @@ on_render(GtkGLArea *area, GdkGLContext *context)
 
   if( state->vertex_count == 0 )
     return( FALSE );
-
-  /* Get zoom value from main window's structure zoom spinbutton */
-  zoom = 1.0f;
-  if( structure_zoom )
-    zoom = (float)gtk_spin_button_get_value(structure_zoom) / 100.0f;
 
   /* Set distance and axes scale based on structure size */
   arcball_set_zoom_factor(state->gl->arcball, structure_view_scale * 4.0f, zoom);
@@ -505,7 +464,6 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  /* Draw triangles instead of lines */
   glDrawArrays(GL_TRIANGLES, 0, state->vertex_count);
 
   glBindVertexArray(0);
@@ -515,8 +473,7 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   glUseProgram(0);
 
   return( TRUE );
-
-} /* on_render() */
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -529,8 +486,7 @@ on_unrealize(GtkGLArea *area)
 {
   gl_area_cleanup_state(area, "gl_state",
       (void(*)(void*))structure_gl_state_free);
-
-} /* on_unrealize() */
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -543,13 +499,15 @@ on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
   structure_gl_state_t *state;
 
-  state = structure_gl_get_state(widget);
+  state = opengl_structure_get_state(widget);
   if( !state || !state->gl )
     return( FALSE );
 
   arcball_begin_drag(state->gl->arcball, event->button, event->x, event->y);
   return( TRUE );
 }
+
+/*-----------------------------------------------------------------------*/
 
 /* on_button_release()
  *
@@ -560,7 +518,7 @@ on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
   structure_gl_state_t *state;
 
-  state = structure_gl_get_state(widget);
+  state = opengl_structure_get_state(widget);
   if( !state || !state->gl )
     return( FALSE );
 
@@ -568,16 +526,18 @@ on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer data)
   return( TRUE );
 }
 
+/*-----------------------------------------------------------------------*/
+
 /* on_motion()
  *
- * Mouse motion handler
+ * Mouse motion handler - uses arcball for rotation (matches rdpattern)
  */
   static gboolean
-on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
+on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
   structure_gl_state_t *state;
 
-  state = structure_gl_get_state(widget);
+  state = opengl_structure_get_state(widget);
   if( !state || !state->gl )
     return( FALSE );
 
@@ -589,33 +549,36 @@ on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
   return( TRUE );
 }
 
+/*-----------------------------------------------------------------------*/
+
 /* on_scroll()
  *
- * Mouse scroll handler for zoom - updates main window's structure_zoom
+ * Mouse scroll handler - updates zoom (matches rdpattern pattern)
  */
   static gboolean
 on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data)
 {
-  double zoom;
-
   if( !structure_zoom )
     return( FALSE );
 
-  zoom = gtk_spin_button_get_value(structure_zoom);
+  structure_proj_params.xy_zoom = gtk_spin_button_get_value(structure_zoom);
+
   if( event->direction == GDK_SCROLL_UP )
-    zoom *= 1.1;
+    structure_proj_params.xy_zoom *= 1.1;
   else if( event->direction == GDK_SCROLL_DOWN )
-    zoom /= 1.1;
+    structure_proj_params.xy_zoom /= 1.1;
   else
     return( FALSE );
 
-  gtk_spin_button_set_value(structure_zoom, zoom);
+  gtk_spin_button_set_value(structure_zoom, structure_proj_params.xy_zoom);
   return( FALSE );
 }
 
+/*-----------------------------------------------------------------------*/
+
 /* on_resize()
  *
- * Window resize handler
+ * Widget resize handler
  */
   static void
 on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
@@ -623,159 +586,26 @@ on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
   structure_gl_state_t *state;
   float aspect;
 
-  state = structure_gl_get_state(widget);
+  state = opengl_structure_get_state(widget);
   if( !state || !state->gl )
     return;
 
   aspect = (float)allocation->width / (float)allocation->height;
   arcball_set_aspect(state->gl->arcball, aspect);
   arcball_set_viewport(state->gl->arcball, (float)allocation->height);
-
-} /* on_resize() */
-
-/*-----------------------------------------------------------------------*/
-
-/* set_view_preset()
- *
- * Set view to preset angles
- */
-  static void
-set_view_preset(float wr, float wi)
-{
-  structure_gl_state_t *state;
-
-  state = structure_gl_get_state(structure_gl_area);
-  if( !state || !state->gl )
-    return;
-
-  arcball_set_view(state->gl->arcball, wr, wi);
-  xnec2_widget_queue_draw(structure_gl_area);
-
-} /* set_view_preset() */
-
-/*-----------------------------------------------------------------------*/
-
-/* on_view_x_activate()
- *
- * View X axis button handler
- */
-  static void
-on_view_x_activate(GtkMenuItem *menuitem, gpointer user_data)
-{
-  set_view_preset(0.0f, 0.0f);
-}
-
-/* on_view_y_activate()
- *
- * View Y axis button handler
- */
-  static void
-on_view_y_activate(GtkMenuItem *menuitem, gpointer user_data)
-{
-  set_view_preset(90.0f, 0.0f);
-}
-
-/* on_view_z_activate()
- *
- * View Z axis button handler
- */
-  static void
-on_view_z_activate(GtkMenuItem *menuitem, gpointer user_data)
-{
-  set_view_preset(0.0f, 90.0f);
-}
-
-/* on_view_default_activate()
- *
- * Default view button handler
- */
-  static void
-on_view_default_activate(GtkMenuItem *menuitem, gpointer user_data)
-{
-  set_view_preset(45.0f, 45.0f);
 }
 
 /*-----------------------------------------------------------------------*/
 
-/* on_window_destroy()
+/* opengl_structure_create_widget_impl()
  *
- * Window destroy signal handler
- */
-  static void
-on_window_destroy(GObject *object, gpointer user_data)
-{
-  opengl_structure_view_destroyed_impl();
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* on_delete_event()
- *
- * Window delete event handler
- */
-  static gboolean
-on_delete_event(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
-  opengl_structure_view_destroyed_impl();
-  return( FALSE );
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_structure_view_create_impl()
- *
- * Creates the OpenGL structure view window (internal implementation)
+ * Create the OpenGL structure widget for main window
  */
   static GtkWidget*
-opengl_structure_view_create_impl(void)
+opengl_structure_create_widget_impl(void)
 {
-  GtkWidget *window;
-  GtkWidget *vbox;
-  GtkWidget *menubar;
-  GtkWidget *menu_item;
-  GtkWidget *menu;
   GtkWidget *gl_area;
 
-  if( structure_gl_window != NULL )
-  {
-    gtk_window_present(GTK_WINDOW(structure_gl_window));
-    return( structure_gl_window );
-  }
-
-  window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title(GTK_WINDOW(window), "OpenGL Structure View");
-  gtk_window_set_default_size(GTK_WINDOW(window), 800, 600);
-
-  vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-  gtk_container_add(GTK_CONTAINER(window), vbox);
-
-  /* Menu bar */
-  menubar = gtk_menu_bar_new();
-  gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
-
-  /* View menu */
-  menu_item = gtk_menu_item_new_with_label("View");
-  gtk_menu_shell_append(GTK_MENU_SHELL(menubar), menu_item);
-  menu = gtk_menu_new();
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_item), menu);
-
-  menu_item = gtk_menu_item_new_with_label("X Axis");
-  g_signal_connect(menu_item, "activate", G_CALLBACK(on_view_x_activate), NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-
-  menu_item = gtk_menu_item_new_with_label("Y Axis");
-  g_signal_connect(menu_item, "activate", G_CALLBACK(on_view_y_activate), NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-
-  menu_item = gtk_menu_item_new_with_label("Z Axis");
-  g_signal_connect(menu_item, "activate", G_CALLBACK(on_view_z_activate), NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-
-  menu_item = gtk_menu_item_new_with_label("Default");
-  g_signal_connect(menu_item, "activate", G_CALLBACK(on_view_default_activate), NULL);
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-
-  /* GL area */
   gl_area = gtk_gl_area_new();
   gtk_gl_area_set_has_depth_buffer(GTK_GL_AREA(gl_area), TRUE);
   gtk_widget_set_hexpand(gl_area, TRUE);
@@ -796,100 +626,80 @@ opengl_structure_view_create_impl(void)
   g_signal_connect(gl_area, "scroll-event", G_CALLBACK(on_scroll), NULL);
   g_signal_connect(gl_area, "size-allocate", G_CALLBACK(on_resize), NULL);
 
-  gtk_box_pack_start(GTK_BOX(vbox), gl_area, TRUE, TRUE, 0);
-
-  g_signal_connect(window, "destroy", G_CALLBACK(on_window_destroy), NULL);
-  g_signal_connect(window, "delete-event", G_CALLBACK(on_delete_event), NULL);
-
-  structure_gl_window = window;
-  structure_gl_area = gl_area;
-
-  gtk_widget_show_all(window);
-
-  return( window );
-
-} /* opengl_structure_view_create_impl() */
+  return( gl_area );
+}
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_structure_view_destroyed_impl()
+/* opengl_structure_queue_redraw_impl()
  *
- * Cleanup when window is closed (internal implementation)
+ * Request redraw of structure GL widget
  */
   static void
-opengl_structure_view_destroyed_impl(void)
-{
-  structure_gl_window = NULL;
-  structure_gl_area = NULL;
-
-  free_ptr((void **)&structure_vertices);
-  structure_vertex_count = 0;
-
-} /* opengl_structure_view_destroyed_impl() */
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_structure_view_queue_redraw()
- *
- * Request redraw of structure view if it exists
- */
-  static void
-opengl_structure_view_queue_redraw_impl(void)
+opengl_structure_queue_redraw_impl(void)
 {
   if( structure_gl_area != NULL )
   {
-    /* Force geometry regeneration */
     structure_geometry_generation++;
     xnec2_widget_queue_draw(structure_gl_area);
   }
+}
 
-} /* opengl_structure_view_queue_redraw_impl() */
+/*-----------------------------------------------------------------------*/
+
+/* opengl_structure_cleanup_impl()
+ *
+ * Cleanup structure GL resources
+ */
+  static void
+opengl_structure_cleanup_impl(void)
+{
+  free_ptr((void **)&structure_vertices);
+  structure_vertex_count = 0;
+}
 
 #endif /* HAVE_OPENGL */
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_structure_view_queue_redraw()
+/* opengl_structure_create_widget()
  *
- * Public API - always available, no-op when OpenGL not compiled in
- */
-  void
-opengl_structure_view_queue_redraw(void)
-{
-#ifdef HAVE_OPENGL
-  opengl_structure_view_queue_redraw_impl();
-#endif
-
-} /* opengl_structure_view_queue_redraw() */
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_structure_view_create()
- *
- * Public API - always available, returns NULL when OpenGL not compiled in
+ * Public API - create structure GL widget
  */
   GtkWidget*
-opengl_structure_view_create(void)
+opengl_structure_create_widget(void)
 {
 #ifdef HAVE_OPENGL
-  return( opengl_structure_view_create_impl() );
+  return( opengl_structure_create_widget_impl() );
 #else
   return( NULL );
 #endif
-
-} /* opengl_structure_view_create() */
+}
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_structure_view_destroyed()
+/* opengl_structure_queue_redraw()
  *
- * Public API - always available, no-op when OpenGL not compiled in
+ * Public API - request redraw
  */
   void
-opengl_structure_view_destroyed(void)
+opengl_structure_queue_redraw(void)
 {
 #ifdef HAVE_OPENGL
-  opengl_structure_view_destroyed_impl();
+  opengl_structure_queue_redraw_impl();
 #endif
+}
 
-} /* opengl_structure_view_destroyed() */
+/*-----------------------------------------------------------------------*/
+
+/* opengl_structure_cleanup()
+ *
+ * Public API - cleanup resources
+ */
+  void
+opengl_structure_cleanup(void)
+{
+#ifdef HAVE_OPENGL
+  opengl_structure_cleanup_impl();
+#endif
+}
