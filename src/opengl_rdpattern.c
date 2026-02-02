@@ -723,9 +723,8 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   static void
 on_unrealize(GtkGLArea *area)
 {
-  gtk_gl_area_make_current(area);
-
-  /* State freed automatically by GDestroyNotify */
+  gl_area_cleanup_state(area, "gl_state",
+      (void(*)(void*))opengl_rdpattern_state_free);
 
 } /* on_unrealize() */
 

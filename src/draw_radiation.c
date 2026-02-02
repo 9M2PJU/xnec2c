@@ -1236,9 +1236,6 @@ Viewer_Gain( projection_parameters_t proj_parameters, int fstep )
   void
 Rdpattern_Window_Killed( void )
 {
-  rc_config.rdpattern_width  = 0;
-  rc_config.rdpattern_height = 0;
-
   if( animate_dialog != NULL )
   {
     Gtk_Widget_Destroy( &animate_dialog );

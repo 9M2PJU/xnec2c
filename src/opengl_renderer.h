@@ -90,5 +90,9 @@ gl_instance_t* gl_instance_new(const char *vert_shader, const char *frag_shader,
   float arcball_distance, float aspect);
 void gl_instance_free(gl_instance_t *inst);
 
+/* GL area cleanup - frees state while context is current */
+void gl_area_cleanup_state(GtkGLArea *area, const char *key,
+    void (*free_func)(void *));
+
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_RENDERER_H */

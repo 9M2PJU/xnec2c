@@ -350,7 +350,8 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   static void
 on_unrealize(GtkGLArea *area)
 {
-  gtk_gl_area_make_current(area);
+  gl_area_cleanup_state(area, "gl_state",
+      (void(*)(void*))debug_gl_state_free);
 
 } /* on_unrealize() */
 

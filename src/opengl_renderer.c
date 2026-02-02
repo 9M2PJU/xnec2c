@@ -471,4 +471,28 @@ gl_instance_free(gl_instance_t *inst)
 
 /*-----------------------------------------------------------------------*/
 
+/* gl_area_cleanup_state()
+ *
+ * Free GL state while context is still current. Must be called from
+ * on_unrealize handler, not GDestroyNotify, because the GL context
+ * is destroyed before widget finalization.
+ *
+ * Uses g_object_steal_data to remove without triggering destroy notify.
+ */
+  void
+gl_area_cleanup_state(GtkGLArea *area, const char *key,
+    void (*free_func)(void *))
+{
+  void *state;
+
+  gtk_gl_area_make_current(area);
+
+  state = g_object_steal_data(G_OBJECT(area), key);
+  if( state )
+    free_func(state);
+
+} /* gl_area_cleanup_state() */
+
+/*-----------------------------------------------------------------------*/
+
 #endif /* HAVE_OPENGL */
