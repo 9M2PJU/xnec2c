@@ -25,6 +25,7 @@
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"
 #include "opengl_axes.h"
+#include "opengl_gradient_overlay.h"
 #include "draw_radiation.h"
 
 /* Radiation pattern OpenGL state */
@@ -36,6 +37,7 @@ typedef struct
   int triangle_count;
   unsigned int gl_last_gen;
   opengl_axes_t *axes;
+  gradient_overlay_t *overlay;
 
 } rdpattern_gl_state_t;
 

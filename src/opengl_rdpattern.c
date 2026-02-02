@@ -67,6 +67,16 @@ opengl_rdpattern_state_new(float aspect)
     return NULL;
   }
 
+  state->overlay = gradient_overlay_new();
+  if( !state->overlay )
+  {
+    pr_err("Failed to create gradient overlay\n");
+    opengl_axes_free(state->axes);
+    gl_instance_free(state->gl);
+    g_free(state);
+    return NULL;
+  }
+
   return( state );
 
 } /* opengl_rdpattern_state_new() */
@@ -83,6 +93,7 @@ opengl_rdpattern_state_free(rdpattern_gl_state_t *state)
   if( !state )
     return;
 
+  gradient_overlay_free(state->overlay);
   opengl_axes_free(state->axes);
   gl_instance_free(state->gl);
   g_free(state);
@@ -278,6 +289,24 @@ opengl_rdpattern_get_state(GtkWidget *widget)
 
 /*-----------------------------------------------------------------------*/
 
+/* update_viewport_state()
+ *
+ * Single point of truth for viewport-dependent state initialization.
+ * Updates arcball and overlay dimensions.
+ */
+  static void
+update_viewport_state(rdpattern_gl_state_t *state, int width, int height)
+{
+  float aspect = (float)width / (float)height;
+
+  arcball_set_aspect(state->gl->arcball, aspect);
+  arcball_set_viewport(state->gl->arcball, (float)height);
+  gradient_overlay_set_viewport(state->overlay, width, height);
+
+} /* update_viewport_state() */
+
+/*-----------------------------------------------------------------------*/
+
 /* on_realize()
  *
  * GtkGLArea realize signal handler - initializes OpenGL context
@@ -287,7 +316,6 @@ on_realize(GtkGLArea *area)
 {
   rdpattern_gl_state_t *state;
   GtkAllocation alloc;
-  float aspect;
 
   gtk_gl_area_make_current(area);
 
@@ -298,16 +326,15 @@ on_realize(GtkGLArea *area)
   }
 
   gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
-  aspect = (float)alloc.width / (float)alloc.height;
 
-  state = opengl_rdpattern_state_new(aspect);
+  state = opengl_rdpattern_state_new(1.0f);
   if( !state )
   {
     pr_err("Failed to create GL state\n");
     return;
   }
 
-  arcball_set_viewport(state->gl->arcball, (float)alloc.height);
+  update_viewport_state(state, alloc.width, alloc.height);
 
   g_object_set_data_full(G_OBJECT(area), "gl_state", state,
     (GDestroyNotify)opengl_rdpattern_state_free);
@@ -362,6 +389,8 @@ on_render(GtkGLArea *area, GdkGLContext *context)
       float distance = r_max * 2.165f;
       arcball_set_distance(state->gl->arcball, distance);
 
+      gradient_overlay_mark_dirty(state->overlay);
+
       state->gl_last_gen = current_gen;
     }
     else
@@ -394,6 +423,8 @@ on_render(GtkGLArea *area, GdkGLContext *context)
   opengl_axes_render(state->axes, mvp);
 
   glUseProgram(0);
+
+  gradient_overlay_render(state->overlay);
 
   /* Update UI elements */
   Update_Rdpattern_UI();
@@ -503,15 +534,14 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data)
 on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
 {
   rdpattern_gl_state_t *state;
-  float aspect;
 
   state = g_object_get_data(G_OBJECT(widget), "gl_state");
   if( !state || !state->gl )
     return;
 
-  aspect = (float)allocation->width / (float)allocation->height;
-  arcball_set_aspect(state->gl->arcball, aspect);
-  arcball_set_viewport(state->gl->arcball, (float)allocation->height);
+  update_viewport_state(state, allocation->width, allocation->height);
+
+  gtk_gl_area_queue_render(GTK_GL_AREA(widget));
 
 } /* on_resize() */
 

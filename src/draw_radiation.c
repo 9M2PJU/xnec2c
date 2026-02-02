@@ -1536,6 +1536,13 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
   int fstep = calc_data.freq_step;
   int pol = calc_data.pol_type;
 
+  /* Get dimensions from Cairo surface for positioning.
+   * This allows the function to work with both the Cairo renderer
+   * and OpenGL overlay without depending on global state. */
+  cairo_surface_t *surface = cairo_get_target(cr);
+  int surf_width = cairo_image_surface_get_width(surface);
+  int surf_height = cairo_image_surface_get_height(surface);
+
   double max_gain, min_gain, color_min;
   double grad_pos, pos, db_val;
   const int width = 20;
@@ -1564,8 +1571,8 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
   if (!rad_pattern[fstep].max_gain || !rad_pattern[fstep].min_gain) return;
   
   /* Position in bottom right corner */
-  x = rdpattern_proj_params.width - width - text_width - margin;
-  y = rdpattern_proj_params.height - height - margin;
+  x = surf_width - width - text_width - margin;
+  y = surf_height - height - margin;
 
   /* Get actual min/max gains and scale them */
   max_gain = rad_pattern[fstep].max_gain[pol];
@@ -1631,8 +1638,8 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
 
   /* Draw color gradient bar */
   if (x >= 0 && y >= 0 &&
-      x + width <= rdpattern_proj_params.width &&
-      y + height <= rdpattern_proj_params.height)
+      x + width <= surf_width &&
+      y + height <= surf_height)
   {
     /* Draw headings */
     int noise_mode = IS_NOISE_MODE(rc_config.gain_style);
