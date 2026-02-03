@@ -82,6 +82,8 @@ void arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg);
 void arcball_set_zoom_factor(arcball_state_t *ab, float base_distance, float zoom_factor);
 void arcball_set_viewport(arcball_state_t *ab, float height);
 void arcball_sync_view(gl_instance_t *gl, double wr, double wi);
+void arcball_set_preset_view(gl_instance_t *gl, double wr, double wi);
+void arcball_sync_zoom(gl_instance_t *gl, double r_max, double zoom);
 void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
 void arcball_drag(arcball_state_t *ab, float x, float y);
 void arcball_end_drag(arcball_state_t *ab);

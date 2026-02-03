@@ -271,6 +271,39 @@ arcball_sync_view(gl_instance_t *gl, double wr, double wi)
 
 /*-----------------------------------------------------------------------*/
 
+/* arcball_set_preset_view()
+ *
+ * Set arcball to preset view angles and reset pan.
+ * Used by view preset buttons (X/Y/Z axis, default view).
+ */
+  void
+arcball_set_preset_view(gl_instance_t *gl, double wr, double wi)
+{
+  arcball_sync_view(gl, wr, wi);
+
+  if( gl && gl->arcball )
+    arcball_reset_pan(gl->arcball);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_sync_zoom()
+ *
+ * Sync arcball zoom from r_max and zoom factor.
+ * Centralizes base_distance calculation using ARCBALL_BASE_DISTANCE_FACTOR.
+ */
+  void
+arcball_sync_zoom(gl_instance_t *gl, double r_max, double zoom)
+{
+  if( !gl || !gl->arcball )
+    return;
+
+  float base_distance = (float)r_max * ARCBALL_BASE_DISTANCE_FACTOR;
+  arcball_set_zoom_factor(gl->arcball, base_distance, (float)zoom);
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* arcball_rotate()
  *
  * Apply rotation from mouse drag

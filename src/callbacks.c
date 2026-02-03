@@ -1904,16 +1904,10 @@ on_main_opengl_renderer_toggled(
 
       /* Sync OpenGL arcball from Cairo projection angles and zoom */
       state = opengl_rdpattern_get_state( rdpattern_gl_area );
-      if( state && state->gl && state->gl->arcball )
-      {
-        float base_distance =
-            (float)rdpattern_proj_params.r_max * ARCBALL_BASE_DISTANCE_FACTOR;
-
-        arcball_sync_view( state->gl,
-            rdpattern_proj_params.Wr, rdpattern_proj_params.Wi );
-        arcball_set_zoom_factor( state->gl->arcball, base_distance,
-            (float)rdpattern_proj_params.xy_zoom );
-      }
+      arcball_sync_view( state ? state->gl : NULL,
+          rdpattern_proj_params.Wr, rdpattern_proj_params.Wi );
+      arcball_sync_zoom( state ? state->gl : NULL,
+          rdpattern_proj_params.r_max, rdpattern_proj_params.xy_zoom );
     }
     else
     {
@@ -1959,16 +1953,10 @@ on_main_opengl_renderer_toggled(
 
       /* Sync OpenGL arcball from structure projection angles */
       state = opengl_structure_get_state( structure_gl_area );
-      if( state && state->gl && state->gl->arcball )
-      {
-        float base_distance =
-            (float)structure_proj_params.r_max * ARCBALL_BASE_DISTANCE_FACTOR;
-
-        arcball_sync_view( state->gl,
-            structure_proj_params.Wr, structure_proj_params.Wi );
-        arcball_set_zoom_factor( state->gl->arcball, base_distance,
-            (float)structure_proj_params.xy_zoom );
-      }
+      arcball_sync_view( state ? state->gl : NULL,
+          structure_proj_params.Wr, structure_proj_params.Wi );
+      arcball_sync_zoom( state ? state->gl : NULL,
+          structure_proj_params.r_max, structure_proj_params.xy_zoom );
     }
     else
     {
@@ -2002,14 +1990,10 @@ on_rdpattern_x_axis_clicked(
     rdpattern_gl_state_t *state;
 
     state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    if( state && state->gl && state->gl->arcball )
-    {
-      arcball_set_view(state->gl->arcball, 0.0f, 0.0f);
-      arcball_reset_pan(state->gl->arcball);
-      gtk_spin_button_set_value(rotate_rdpattern, 0.0);
-      gtk_spin_button_set_value(incline_rdpattern, 0.0);
-      gtk_widget_queue_draw(rdpattern_drawingarea);
-    }
+    arcball_set_preset_view(state ? state->gl : NULL, 0.0, 0.0);
+    gtk_spin_button_set_value(rotate_rdpattern, 0.0);
+    gtk_spin_button_set_value(incline_rdpattern, 0.0);
+    gtk_widget_queue_draw(rdpattern_drawingarea);
 #endif
   }
   else
@@ -2039,14 +2023,10 @@ on_rdpattern_y_axis_clicked(
     rdpattern_gl_state_t *state;
 
     state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    if( state && state->gl && state->gl->arcball )
-    {
-      arcball_set_view(state->gl->arcball, 90.0f, 0.0f);
-      arcball_reset_pan(state->gl->arcball);
-      gtk_spin_button_set_value(rotate_rdpattern, 90.0);
-      gtk_spin_button_set_value(incline_rdpattern, 0.0);
-      gtk_widget_queue_draw(rdpattern_drawingarea);
-    }
+    arcball_set_preset_view(state ? state->gl : NULL, 90.0, 0.0);
+    gtk_spin_button_set_value(rotate_rdpattern, 90.0);
+    gtk_spin_button_set_value(incline_rdpattern, 0.0);
+    gtk_widget_queue_draw(rdpattern_drawingarea);
 #endif
   }
   else
@@ -2076,14 +2056,10 @@ on_rdpattern_z_axis_clicked(
     rdpattern_gl_state_t *state;
 
     state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    if( state && state->gl && state->gl->arcball )
-    {
-      arcball_set_view(state->gl->arcball, 0.0f, 90.0f);
-      arcball_reset_pan(state->gl->arcball);
-      gtk_spin_button_set_value(rotate_rdpattern, 0.0);
-      gtk_spin_button_set_value(incline_rdpattern, 90.0);
-      gtk_widget_queue_draw(rdpattern_drawingarea);
-    }
+    arcball_set_preset_view(state ? state->gl : NULL, 0.0, 90.0);
+    gtk_spin_button_set_value(rotate_rdpattern, 0.0);
+    gtk_spin_button_set_value(incline_rdpattern, 90.0);
+    gtk_widget_queue_draw(rdpattern_drawingarea);
 #endif
   }
   else
@@ -2113,14 +2089,10 @@ on_rdpattern_default_view_clicked(
     rdpattern_gl_state_t *state;
 
     state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    if( state && state->gl && state->gl->arcball )
-    {
-      arcball_set_view(state->gl->arcball, 45.0f, 45.0f);
-      arcball_reset_pan(state->gl->arcball);
-      gtk_spin_button_set_value(rotate_rdpattern, 45.0);
-      gtk_spin_button_set_value(incline_rdpattern, 45.0);
-      gtk_widget_queue_draw(rdpattern_drawingarea);
-    }
+    arcball_set_preset_view(state ? state->gl : NULL, 45.0, 45.0);
+    gtk_spin_button_set_value(rotate_rdpattern, 45.0);
+    gtk_spin_button_set_value(incline_rdpattern, 45.0);
+    gtk_widget_queue_draw(rdpattern_drawingarea);
 #endif
   }
   else
@@ -5527,22 +5499,16 @@ on_rdpattern_zoom_spinbutton_value_changed(
     rdpattern_proj_params.xy_scale1 * rdpattern_proj_params.xy_zoom;
 
   /* Sync to OpenGL arcball distance */
+#ifdef HAVE_OPENGL
   if( rc_config.use_opengl_renderer )
   {
-#ifdef HAVE_OPENGL
     rdpattern_gl_state_t *state;
 
     state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    if( state && state->gl && state->gl->arcball )
-    {
-      float base_distance =
-          (float)rdpattern_proj_params.r_max * ARCBALL_BASE_DISTANCE_FACTOR;
-
-      arcball_set_zoom_factor(state->gl->arcball, base_distance,
-          (float)rdpattern_proj_params.xy_zoom);
-    }
-#endif
+    arcball_sync_zoom( state ? state->gl : NULL,
+        rdpattern_proj_params.r_max, rdpattern_proj_params.xy_zoom );
   }
+#endif
 
   /* Trigger a redraw of structure drawingarea */
   need_rdpat_redraw = 1;
@@ -5587,24 +5553,19 @@ on_rdpattern_one_button_clicked(
   rdpattern_proj_params.dy_center = 0.0;
 
   /* Sync to OpenGL arcball */
+#ifdef HAVE_OPENGL
   if( rc_config.use_opengl_renderer )
   {
-#ifdef HAVE_OPENGL
     rdpattern_gl_state_t *state;
 
     state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    if( state && state->gl && state->gl->arcball )
-    {
-      float base_distance =
-          (float)rdpattern_proj_params.r_max * ARCBALL_BASE_DISTANCE_FACTOR;
-
-      arcball_set_zoom_factor(state->gl->arcball, base_distance, 1.0f);
-      state->gl->arcball->pan_offset[0] = 0.0f;
-      state->gl->arcball->pan_offset[1] = 0.0f;
-    }
-#endif
+    arcball_sync_zoom( state ? state->gl : NULL,
+        rdpattern_proj_params.r_max, 1.0 );
+    if( state && state->gl )
+      arcball_reset_pan( state->gl->arcball );
   }
   else
+#endif
   {
     New_Projection_Parameters(
         rdpattern_width,
