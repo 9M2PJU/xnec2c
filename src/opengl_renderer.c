@@ -26,29 +26,54 @@
 
 /* compile_shader()
  *
- * Compiles a shader from GResource path
+ * Compiles a shader from GResource path or filesystem path
  */
   static GLuint
 compile_shader(GLenum type, const char *path)
 {
   GBytes *bytes;
   const char *source;
+  char *file_source;
+  gsize file_size;
   GLuint shader;
   GLint status, len;
   char *log;
+  GError *error;
+  gboolean from_file;
 
-  bytes = g_resources_lookup_data(path, 0, NULL);
+  error = NULL;
+  bytes = g_resources_lookup_data(path, 0, &error);
+  from_file = FALSE;
+  file_source = NULL;
+
   if( !bytes )
   {
-    pr_err("Failed to load shader: %s\n", path);
-    return( 0 );
+    g_clear_error(&error);
+
+    if( !g_file_get_contents(path, &file_source, &file_size, &error) )
+    {
+      pr_err("Failed to load shader: %s (%s)\n", path,
+        error ? error->message : "unknown error");
+      g_clear_error(&error);
+      return( 0 );
+    }
+
+    source = file_source;
+    from_file = TRUE;
+  }
+  else
+  {
+    source = g_bytes_get_data(bytes, NULL);
   }
 
-  source = g_bytes_get_data(bytes, NULL);
   shader = glCreateShader(type);
   glShaderSource(shader, 1, &source, NULL);
   glCompileShader(shader);
-  g_bytes_unref(bytes);
+
+  if( from_file )
+    g_free(file_source);
+  else
+    g_bytes_unref(bytes);
 
   glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
   if( status == GL_FALSE )
@@ -135,17 +160,12 @@ gl_shader_destroy(gl_shader_t *shader)
  * Allocate and initialize arcball camera state
  */
   arcball_state_t*
-arcball_new(float distance, float aspect, float fov_degrees)
+arcball_new(float aspect, float fov_degrees)
 {
   arcball_state_t *ab;
 
   ab = g_new0(arcball_state_t, 1);
-  glm_vec3_copy((vec3){0, 0, distance}, ab->eye);
-  glm_vec3_zero(ab->center);
-  glm_vec3_copy((vec3){0, 1, 0}, ab->up);
   glm_mat4_identity(ab->rotation);
-  ab->distance = distance;
-  ab->zoom = 1.0f;
   glm_vec2_zero(ab->pan_offset);
   ab->last_x = 0.0f;
   ab->last_y = 0.0f;
@@ -153,6 +173,8 @@ arcball_new(float distance, float aspect, float fov_degrees)
   ab->aspect = aspect;
   ab->viewport_height = 1.0f;
   ab->fov_rad = glm_rad(fov_degrees);
+  ab->callback_count = 0;
+  ab->in_notify = FALSE;
 
   return( ab );
 
@@ -184,6 +206,9 @@ arcball_set_aspect(arcball_state_t *ab, float aspect)
   ab->aspect = aspect;
 
 } /* arcball_set_aspect() */
+
+/*-----------------------------------------------------------------------*/
+
 
 /*-----------------------------------------------------------------------*/
 
@@ -224,20 +249,86 @@ arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_set_zoom_factor()
+/* arcball_add_callback()
  *
- * Set arcball distance from base distance and zoom factor
+ * Register callback for arcball changes
  */
   void
-arcball_set_zoom_factor(arcball_state_t *ab, float base_distance, float zoom_factor)
+arcball_add_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data)
 {
-  if( !ab || zoom_factor <= 0.0f )
+  int i;
+
+  if( !ab || !func || ab->callback_count >= ARCBALL_MAX_CALLBACKS )
     return;
 
-  ab->distance = base_distance / zoom_factor;
-  ab->eye[2] = ab->distance;
+  for( i = 0; i < ab->callback_count; i++ )
+  {
+    if( ab->callbacks[i].func == func && ab->callbacks[i].user_data == user_data )
+      return;
+  }
 
-} /* arcball_set_zoom_factor() */
+  ab->callbacks[ab->callback_count].func = func;
+  ab->callbacks[ab->callback_count].user_data = user_data;
+  ab->callback_count++;
+
+} /* arcball_add_callback() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_remove_callback()
+ *
+ * Unregister callback
+ */
+  void
+arcball_remove_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data)
+{
+  int i, j;
+
+  if( !ab || !func )
+    return;
+
+  for( i = 0; i < ab->callback_count; i++ )
+  {
+    if( ab->callbacks[i].func == func && ab->callbacks[i].user_data == user_data )
+    {
+      for( j = i; j < ab->callback_count - 1; j++ )
+        ab->callbacks[j] = ab->callbacks[j + 1];
+
+      ab->callback_count--;
+      return;
+    }
+  }
+
+} /* arcball_remove_callback() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_notify_changed()
+ *
+ * Notify all registered callbacks of arcball change
+ */
+  void
+arcball_notify_changed(arcball_state_t *ab)
+{
+  int i;
+
+  if( !ab || ab->in_notify )
+    return;
+
+  ab->in_notify = TRUE;
+
+  for( i = 0; i < ab->callback_count; i++ )
+  {
+    if( ab->callbacks[i].func )
+      ab->callbacks[i].func(ab, ab->callbacks[i].user_data);
+  }
+
+  ab->in_notify = FALSE;
+
+} /* arcball_notify_changed() */
+
+/*-----------------------------------------------------------------------*/
+
 
 /*-----------------------------------------------------------------------*/
 
@@ -287,20 +378,48 @@ arcball_set_preset_view(gl_instance_t *gl, double wr, double wi)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_sync_zoom()
+
+/*-----------------------------------------------------------------------*/
+
+static void arcball_rotate(arcball_state_t *ab, float dx, float dy);
+static void arcball_pan(arcball_state_t *ab, float dx, float dy);
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_drag()
  *
- * Sync arcball zoom from r_max and zoom factor.
- * Centralizes base_distance calculation using ARCBALL_BASE_DISTANCE_FACTOR.
+ * Handle mouse drag - dispatches to rotate or pan based on button
  */
   void
-arcball_sync_zoom(gl_instance_t *gl, double r_max, double zoom)
+arcball_drag(arcball_state_t *ab, float x, float y)
 {
-  if( !gl || !gl->arcball )
+  float dx, dy;
+
+  if( !ab || ab->drag_button == 0 )
     return;
 
-  float base_distance = (float)r_max * ARCBALL_BASE_DISTANCE_FACTOR;
-  arcball_set_zoom_factor(gl->arcball, base_distance, (float)zoom);
-}
+  dx = x - ab->last_x;
+  dy = y - ab->last_y;
+
+  if( ab->drag_button == 1 )
+  {
+    arcball_rotate(ab, dx, dy);
+  }
+  else if( ab->drag_button == 2 )
+  {
+    arcball_pan(ab, dx / ab->viewport_height, dy / ab->viewport_height);
+  }
+  else
+  {
+    return;
+  }
+
+  ab->last_x = x;
+  ab->last_y = y;
+
+  arcball_notify_changed(ab);
+
+} /* arcball_drag() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -308,7 +427,7 @@ arcball_sync_zoom(gl_instance_t *gl, double r_max, double zoom)
  *
  * Apply rotation from mouse drag
  */
-  void
+  static void
 arcball_rotate(arcball_state_t *ab, float dx, float dy)
 {
   mat4 rot_x, rot_y;
@@ -334,18 +453,13 @@ arcball_rotate(arcball_state_t *ab, float dx, float dy)
 
 /* arcball_pan()
  *
- * Pan camera view
+ * Pan camera view - stores normalized pan offset
  */
-  void
+  static void
 arcball_pan(arcball_state_t *ab, float dx, float dy)
 {
-  float scale;
-
-  /* Convert pixel delta to world coordinates at center plane distance using
-   * perspective projection: visible_height = 2 * distance * tan(fov/2) */
-  scale = 2.0f * ab->distance * tanf(ab->fov_rad / 2.0f) / ab->viewport_height;
-  ab->pan_offset[0] += dx * scale;
-  ab->pan_offset[1] -= dy * scale;
+  ab->pan_offset[0] += dx;
+  ab->pan_offset[1] -= dy;
 
 } /* arcball_pan() */
 
@@ -366,36 +480,6 @@ arcball_begin_drag(arcball_state_t *ab, int button, float x, float y)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_drag()
- *
- * Process mouse drag motion
- */
-  void
-arcball_drag(arcball_state_t *ab, float x, float y)
-{
-  float dx, dy;
-
-  dx = x - ab->last_x;
-  dy = y - ab->last_y;
-
-  if( ab->drag_button == 1 )
-  {
-    arcball_rotate(ab, dx, dy);
-  }
-  else if( ab->drag_button == 2 )
-  {
-    arcball_pan(ab, dx, dy);
-  }
-  else
-  {
-    /* No drag active */
-    return;
-  }
-
-  ab->last_x = x;
-  ab->last_y = y;
-
-} /* arcball_drag() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -430,29 +514,27 @@ arcball_reset_pan(arcball_state_t *ab)
 
 /* arcball_get_mvp()
  *
- * Compute model-view-projection matrix
+ * Compute model-view-projection matrix from arcball state and scene parameters
  */
   void
-arcball_get_mvp(arcball_state_t *ab, mat4 dest, float zoom)
+arcball_get_mvp(arcball_state_t *ab, mat4 dest, float distance, float model_scale)
 {
   mat4 view, proj, model, trans;
-  vec3 eye_pos, center_pos;
+  vec3 eye_pos, center_pos, up;
 
   glm_mat4_identity(model);
   glm_mat4_copy(ab->rotation, model);
-  glm_scale(model, (vec3){zoom, zoom, zoom});
+  glm_scale(model, (vec3){model_scale, model_scale, model_scale});
 
-  /* Apply pan as model translation to avoid perspective distortion from
-   * tilting camera view direction; translates scene while keeping camera
-   * aimed at origin */
   glm_mat4_identity(trans);
   glm_translate(trans, (vec3){ab->pan_offset[0], ab->pan_offset[1], 0.0f});
   glm_mat4_mul(trans, model, model);
 
-  glm_vec3_copy(ab->eye, eye_pos);
-  glm_vec3_copy(ab->center, center_pos);
+  glm_vec3_copy((vec3){0.0f, 0.0f, distance}, eye_pos);
+  glm_vec3_zero(center_pos);
+  glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, up);
 
-  glm_lookat(eye_pos, center_pos, ab->up, view);
+  glm_lookat(eye_pos, center_pos, up, view);
   glm_perspective(ab->fov_rad, ab->aspect, 0.1f, 100.0f, proj);
 
   glm_mat4_mul(proj, view, dest);
@@ -487,7 +569,7 @@ gl_instance_new(const char *vert_shader, const char *frag_shader,
   glGenVertexArrays(1, &inst->vao);
   glGenBuffers(1, &inst->vbo);
 
-  inst->arcball = arcball_new(arcball_distance, aspect, 60.0f);
+  inst->arcball = arcball_new(aspect, 60.0f);
   inst->initialized = TRUE;
 
   return( inst );

@@ -38,15 +38,24 @@ typedef struct
 
 } gl_shader_t;
 
+#define ARCBALL_MAX_CALLBACKS 4
+
 /* Arcball camera state */
+typedef struct arcball_state arcball_state_t;
+
+/* Arcball change notification callback */
+typedef void (*arcball_callback_fn)(arcball_state_t *ab, gpointer user_data);
+
 typedef struct
 {
-  vec3 eye;
-  vec3 center;
-  vec3 up;
+  arcball_callback_fn func;
+  gpointer user_data;
+
+} arcball_callback_t;
+
+struct arcball_state
+{
   mat4 rotation;
-  float distance;
-  float zoom;
   vec2 pan_offset;
   float last_x;
   float last_y;
@@ -54,8 +63,10 @@ typedef struct
   float aspect;
   float viewport_height;
   float fov_rad;
-
-} arcball_state_t;
+  arcball_callback_t callbacks[ARCBALL_MAX_CALLBACKS];
+  int callback_count;
+  gboolean in_notify;
+};
 
 /* Generic GL instance base */
 typedef struct
@@ -75,21 +86,21 @@ gboolean gl_shader_load(gl_shader_t *shader,
 void gl_shader_destroy(gl_shader_t *shader);
 
 /* Arcball functions */
-arcball_state_t* arcball_new(float distance, float aspect, float fov_degrees);
+arcball_state_t* arcball_new(float aspect, float fov_degrees);
 void arcball_free(arcball_state_t *ab);
 void arcball_set_aspect(arcball_state_t *ab, float aspect);
 void arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg);
-void arcball_set_zoom_factor(arcball_state_t *ab, float base_distance, float zoom_factor);
 void arcball_set_viewport(arcball_state_t *ab, float height);
 void arcball_sync_view(gl_instance_t *gl, double wr, double wi);
 void arcball_set_preset_view(gl_instance_t *gl, double wr, double wi);
-void arcball_sync_zoom(gl_instance_t *gl, double r_max, double zoom);
 void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
 void arcball_drag(arcball_state_t *ab, float x, float y);
 void arcball_end_drag(arcball_state_t *ab);
-void arcball_pan(arcball_state_t *ab, float dx, float dy);
 void arcball_reset_pan(arcball_state_t *ab);
-void arcball_get_mvp(arcball_state_t *ab, mat4 dest, float zoom);
+void arcball_get_mvp(arcball_state_t *ab, mat4 dest, float distance, float model_scale);
+void arcball_add_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data);
+void arcball_remove_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data);
+void arcball_notify_changed(arcball_state_t *ab);
 
 /* GL instance functions */
 gl_instance_t* gl_instance_new(const char *vert_shader, const char *frag_shader,
