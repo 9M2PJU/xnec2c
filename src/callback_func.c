@@ -733,7 +733,6 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
     else if( crnt.valid )
     {
       xnec2_widget_queue_draw( structure_drawingarea );
-      opengl_structure_queue_redraw();
     }
 
     if( isFlagSet(OVERLAY_STRUCT) )
@@ -753,7 +752,6 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
       if( isFlagClear(FREQ_LOOP_RUNNING) )
       {
         xnec2_widget_queue_draw( structure_drawingarea );
-        opengl_structure_queue_redraw();
       }
       Free_Crnt_Buffs();
     }
@@ -794,7 +792,6 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
     else if( crnt.valid )
     {
       xnec2_widget_queue_draw( structure_drawingarea );
-      opengl_structure_queue_redraw();
     }
 
     if( isFlagSet(OVERLAY_STRUCT) )
@@ -815,7 +812,6 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
       if( isFlagClear(FREQ_LOOP_RUNNING) )
       {
         xnec2_widget_queue_draw( structure_drawingarea );
-        opengl_structure_queue_redraw();
       }
 
       Free_Crnt_Buffs();

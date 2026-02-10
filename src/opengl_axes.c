@@ -129,34 +129,39 @@ generate_label_texture(void)
 
 /* opengl_axes_new()
  *
- * Allocate and initialize axes renderer
+ * Allocate and initialize axes renderer with own shaders
  */
   opengl_axes_t*
-opengl_axes_new(gl_shader_t *line_shader)
+opengl_axes_new(void)
 {
   opengl_axes_t *axes;
-  gboolean shader_ok;
-
-  if( !line_shader )
-  {
-    pr_err("NULL line_shader parameter\n");
-    return NULL;
-  }
+  gboolean line_ok, label_ok;
 
   axes = g_new0(opengl_axes_t, 1);
 
-  axes->line_shader = line_shader;
-  axes->line_mvp_loc = glGetUniformLocation(line_shader->program, "mvp");
-  axes->line_pos_loc = glGetAttribLocation(line_shader->program, "position");
-  axes->line_col_loc = glGetAttribLocation(line_shader->program, "color");
+  line_ok = gl_shader_load(&axes->line_shader,
+    "/gl/color-vertex.glsl",
+    "/gl/color-fragment.glsl");
+
+  if( !line_ok )
+  {
+    pr_err("Failed to load axes line shader\n");
+    g_free(axes);
+    return( NULL );
+  }
+
+  axes->line_mvp_loc = glGetUniformLocation(axes->line_shader.program, "mvp");
+  axes->line_pos_loc = glGetAttribLocation(axes->line_shader.program, "position");
+  axes->line_col_loc = glGetAttribLocation(axes->line_shader.program, "color");
 
   glGenVertexArrays(1, &axes->lines_vao);
   glGenBuffers(1, &axes->lines_vbo);
 
-  shader_ok = gl_shader_load(&axes->label_shader,
-    "/gl/text-vertex.glsl", "/gl/text-fragment.glsl");
+  label_ok = gl_shader_load(&axes->label_shader,
+    "/gl/text-vertex.glsl",
+    "/gl/text-fragment.glsl");
 
-  if( shader_ok )
+  if( label_ok )
   {
     axes->label_mvp_loc = glGetUniformLocation(axes->label_shader.program, "mvp");
     axes->label_tex_loc = glGetUniformLocation(axes->label_shader.program, "tex");
@@ -176,13 +181,14 @@ opengl_axes_new(gl_shader_t *line_shader)
   else
   {
     pr_err("Failed to load text shaders\n");
+    gl_shader_destroy(&axes->line_shader);
     glDeleteBuffers(1, &axes->lines_vbo);
     glDeleteVertexArrays(1, &axes->lines_vao);
     g_free(axes);
     axes = NULL;
   }
 
-  return axes;
+  return( axes );
 
 } /* opengl_axes_new() */
 
@@ -326,7 +332,7 @@ opengl_axes_render(opengl_axes_t *axes, mat4 mvp)
     return;
 
   /* Render axis lines */
-  glUseProgram(axes->line_shader->program);
+  glUseProgram(axes->line_shader.program);
   glUniformMatrix4fv(axes->line_mvp_loc, 1, GL_FALSE, (float*)mvp);
 
   glBindVertexArray(axes->lines_vao);

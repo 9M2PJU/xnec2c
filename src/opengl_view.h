@@ -89,7 +89,12 @@ typedef struct
   unsigned int last_generation;
   arcball_state_t *arcball;
   GtkSpinButton **zoom_spinbutton;
-  float current_zoom;
+
+  /* Per-view projection parameters (not in arcball, which can be shared) */
+  float aspect;
+  float viewport_height;
+  float fov_rad;
+
   gboolean initialized;
 
 } gl_view_state_t;
@@ -102,7 +107,7 @@ GtkWidget* gl_view_create_widget(
     GtkSpinButton **zoom_spinbutton);
 
 gl_view_state_t* gl_view_get_state(GtkWidget *widget);
-void gl_view_invalidate(GtkWidget *widget);
+void gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball);
 void gl_view_sync_arcball(GtkWidget *widget, double wr, double wi);
 
 #endif /* HAVE_OPENGL */

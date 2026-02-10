@@ -51,7 +51,8 @@ update_overlay_texture(gradient_overlay_t *overlay)
   cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.0);
   cairo_paint(cr);
 
-  Draw_Color_Legend_Overlay(cr);
+  if( overlay->draw_func )
+    overlay->draw_func(cr);
 
   cairo_destroy(cr);
 
@@ -70,7 +71,7 @@ update_overlay_texture(gradient_overlay_t *overlay)
  * Allocate and initialize gradient overlay renderer
  */
   gradient_overlay_t*
-gradient_overlay_new(void)
+gradient_overlay_new(gradient_draw_fn draw_func)
 {
   gradient_overlay_t *overlay;
 
@@ -81,12 +82,13 @@ gradient_overlay_new(void)
   {
     pr_err("Failed to create cairo overlay base\n");
     g_free(overlay);
-    return NULL;
+    return( NULL );
   }
 
+  overlay->draw_func = draw_func;
   overlay->needs_update = TRUE;
 
-  return overlay;
+  return( overlay );
 
 } /* gradient_overlay_new() */
 

@@ -23,37 +23,14 @@
 #include "common.h"
 
 #ifdef HAVE_OPENGL
+
 #include "opengl_renderer.h"
-#include "opengl_axes.h"
-#include "opengl_gradient_overlay.h"
-#include "draw_radiation.h"
-
-/* Radiation pattern OpenGL state */
-typedef struct
-{
-  gl_instance_t *gl;
-  GLint position_location;
-  GLint color_location;
-  int triangle_count;
-  unsigned int gl_last_gen;
-  opengl_axes_t *axes;
-  gradient_overlay_t *overlay;
-
-  /* Near-field rendering state */
-  int line_count;
-  unsigned int nf_last_gen;
-
-} rdpattern_gl_state_t;
 
 /* Public API */
-rdpattern_gl_state_t* opengl_rdpattern_state_new(float aspect);
-void opengl_rdpattern_state_free(rdpattern_gl_state_t *state);
-rdpattern_gl_state_t* opengl_rdpattern_get_state(GtkWidget *widget);
 GtkWidget* opengl_rdpattern_create_widget(void);
-int opengl_rdpattern_generate_triangles(point_3d_t *points, int nth, int nph,
-    double r_min, double r_range);
-void opengl_rdpattern_update_buffers(rdpattern_gl_state_t *state);
 void opengl_rdpattern_cleanup(void);
+arcball_state_t* opengl_rdpattern_get_arcball(void);
+GtkWidget* opengl_rdpattern_get_widget(void);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_RDPATTERN_H */

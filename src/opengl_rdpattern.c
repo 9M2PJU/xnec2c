@@ -21,9 +21,10 @@
 #include "shared.h"
 #include "draw.h"
 #include "draw_radiation.h"
-#include "opengl_axes.h"
 
 #ifdef HAVE_OPENGL
+
+#include "opengl_view.h"
 
 /* Triangle buffer for radiation pattern mesh */
 static color_triangle_t *rdpat_triangles = NULL;
@@ -39,76 +40,22 @@ static double *pov_y = NULL;
 static double *pov_z = NULL;
 static double *pov_r = NULL;
 
-/*-----------------------------------------------------------------------*/
+/* Generation counters for change detection */
+static unsigned int rdpat_ff_generation = 0;
+static unsigned int rdpat_nf_generation = 0;
+static unsigned int rdpat_last_ff_gen = 0;
 
-/* opengl_rdpattern_state_new()
- *
- * Allocate and initialize radiation pattern GL state
- */
-  rdpattern_gl_state_t*
-opengl_rdpattern_state_new(float aspect)
-{
-  rdpattern_gl_state_t *state;
+/* Widget pointer for external access */
+static GtkWidget *rdpattern_gl_widget = NULL;
 
-  state = g_new0(rdpattern_gl_state_t, 1);
+/* Arcball for radiation pattern view */
+static arcball_state_t *rdpattern_arcball = NULL;
 
-  state->gl = gl_instance_new("/gl/color-vertex.glsl", "/gl/color-fragment.glsl",
-    6.0f, aspect);
-
-  if( !state->gl )
-  {
-    g_free(state);
-    return( NULL );
-  }
-
-  state->position_location = glGetAttribLocation(
-    state->gl->shader.program, "position");
-  state->color_location = glGetAttribLocation(
-    state->gl->shader.program, "color");
-  state->triangle_count = 0;
-  state->gl_last_gen = 0;
-
-  state->axes = opengl_axes_new(&state->gl->shader);
-  if( !state->axes )
-  {
-    pr_err("Failed to create axes renderer\n");
-    gl_instance_free(state->gl);
-    g_free(state);
-    return NULL;
-  }
-
-  state->overlay = gradient_overlay_new();
-  if( !state->overlay )
-  {
-    pr_err("Failed to create gradient overlay\n");
-    opengl_axes_free(state->axes);
-    gl_instance_free(state->gl);
-    g_free(state);
-    return NULL;
-  }
-
-  return( state );
-
-} /* opengl_rdpattern_state_new() */
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_rdpattern_state_free()
- *
- * Free radiation pattern GL state
- */
-  void
-opengl_rdpattern_state_free(rdpattern_gl_state_t *state)
-{
-  if( !state )
-    return;
-
-  gradient_overlay_free(state->overlay);
-  opengl_axes_free(state->axes);
-  gl_instance_free(state->gl);
-  g_free(state);
-
-} /* opengl_rdpattern_state_free() */
+/* Vertex attribute layout for color shader */
+static const gl_vertex_attrib_t rdpattern_attribs[] = {
+  { "position", 3, 0 },
+  { "color",    4, 4 * (int)sizeof(float) }
+};
 
 /*-----------------------------------------------------------------------*/
 
@@ -275,6 +222,7 @@ opengl_rdpattern_generate_nf_lines(void)
   }
 
   nf_line_count = total_lines;
+  rdpat_nf_generation++;
 
   return( nf_line_count );
 
@@ -282,54 +230,11 @@ opengl_rdpattern_generate_nf_lines(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_update_nf_buffers()
- *
- * Upload near-field line data to GPU
- */
-  static void
-opengl_rdpattern_update_nf_buffers(rdpattern_gl_state_t *state)
-{
-  size_t buffer_size;
-
-  if( !state || !state->gl || !state->gl->initialized || !nf_lines || nf_line_count == 0 )
-    return;
-
-  glBindVertexArray(state->gl->vao);
-  glBindBuffer(GL_ARRAY_BUFFER, state->gl->vbo);
-
-  buffer_size = (size_t)nf_line_count * 2 * sizeof(color_point_t);
-  glBufferData(GL_ARRAY_BUFFER, buffer_size, nf_lines, GL_DYNAMIC_DRAW);
-
-  /* Position attribute */
-  glEnableVertexAttribArray(state->position_location);
-  glVertexAttribPointer(
-      state->position_location,
-      3, GL_FLOAT, GL_FALSE,
-      sizeof(color_point_t),
-      (void*)0);
-
-  /* Color attribute */
-  glEnableVertexAttribArray(state->color_location);
-  glVertexAttribPointer(
-      state->color_location,
-      4, GL_FLOAT, GL_FALSE,
-      sizeof(color_point_t),
-      (void*)(4 * sizeof(float)));
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
-  state->line_count = nf_line_count;
-
-} /* opengl_rdpattern_update_nf_buffers() */
-
-/*-----------------------------------------------------------------------*/
-
 /* opengl_rdpattern_generate_triangles()
  *
  * Tessellate point_3d buffer into colored triangles
  */
-  int
+  static int
 opengl_rdpattern_generate_triangles(
     point_3d_t *points, int nth, int nph,
     double r_min, double r_range)
@@ -344,9 +249,6 @@ opengl_rdpattern_generate_triangles(
 
   /* Calculate triangle count: 2 per grid cell */
   rdpat_triangle_count = 2 * nph * (nth - 1);
-
-  pr_debug("Generating %d triangles (nth=%d, nph=%d)\n",
-    rdpat_triangle_count, nth, nph);
 
   mreq = (size_t)rdpat_triangle_count * sizeof(color_triangle_t);
   mem_realloc((void **)&rdpat_triangles, mreq, __LOCATION__);
@@ -451,137 +353,24 @@ opengl_rdpattern_generate_triangles(
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_update_buffers()
+/* rdpattern_scene_generate()
  *
- * Upload triangle data to GPU
- */
-  void
-opengl_rdpattern_update_buffers(rdpattern_gl_state_t *state)
-{
-  size_t buffer_size;
-
-  if( !state || !state->gl || !state->gl->initialized || !rdpat_triangles || rdpat_triangle_count == 0 )
-    return;
-
-  pr_debug("Updating GL buffers with %d triangles\n", rdpat_triangle_count);
-
-  glBindVertexArray(state->gl->vao);
-  glBindBuffer(GL_ARRAY_BUFFER, state->gl->vbo);
-
-  buffer_size = (size_t)rdpat_triangle_count * sizeof(color_triangle_t);
-  glBufferData(GL_ARRAY_BUFFER, buffer_size, rdpat_triangles, GL_STATIC_DRAW);
-
-  /* Position attribute */
-  glEnableVertexAttribArray(state->position_location);
-  glVertexAttribPointer(
-      state->position_location,
-      3, GL_FLOAT, GL_FALSE,
-      sizeof(color_point_t),
-      (void*)0);
-
-  /* Color attribute */
-  glEnableVertexAttribArray(state->color_location);
-  glVertexAttribPointer(
-      state->color_location,
-      4, GL_FLOAT, GL_FALSE,
-      sizeof(color_point_t),
-      (void*)(4 * sizeof(float)));
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
-  state->triangle_count = rdpat_triangle_count;
-
-} /* opengl_rdpattern_update_buffers() */
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_rdpattern_get_state()
- *
- * Get radiation pattern GL state from widget
- */
-  rdpattern_gl_state_t*
-opengl_rdpattern_get_state(GtkWidget *widget)
-{
-  if( !widget )
-    return( NULL );
-
-  return( g_object_get_data(G_OBJECT(widget), "gl_state") );
-
-} /* opengl_rdpattern_get_state() */
-
-/*-----------------------------------------------------------------------*/
-
-/* update_viewport_state()
- *
- * Single point of truth for viewport-dependent state initialization.
- * Updates arcball and overlay dimensions.
- */
-  static void
-update_viewport_state(rdpattern_gl_state_t *state, int width, int height)
-{
-  float aspect = (float)width / (float)height;
-
-  arcball_set_aspect(state->gl->arcball, aspect);
-  arcball_set_viewport(state->gl->arcball, (float)height);
-  gradient_overlay_set_viewport(state->overlay, width, height);
-
-} /* update_viewport_state() */
-
-/*-----------------------------------------------------------------------*/
-
-/* on_realize()
- *
- * GtkGLArea realize signal handler - initializes OpenGL context
- */
-  static void
-on_realize(GtkGLArea *area)
-{
-  rdpattern_gl_state_t *state;
-  GtkAllocation alloc;
-
-  gtk_gl_area_make_current(area);
-
-  if( gtk_gl_area_get_error(area) != NULL )
-  {
-    pr_err("GL context error\n");
-    return;
-  }
-
-  gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
-
-  state = opengl_rdpattern_state_new(1.0f);
-  if( !state )
-  {
-    pr_err("Failed to create GL state\n");
-    return;
-  }
-
-  update_viewport_state(state, alloc.width, alloc.height);
-
-  g_object_set_data_full(G_OBJECT(area), "gl_state", state,
-    (GDestroyNotify)opengl_rdpattern_state_free);
-
-  pr_notice("OpenGL context initialized\n");
-
-} /* on_realize() */
-
-/*-----------------------------------------------------------------------*/
-
-/* on_render()
- *
- * GtkGLArea render signal handler
+ * Scene provider generate callback.
+ * Handles both near-field (lines) and far-field (triangles) modes.
  */
   static gboolean
-on_render(GtkGLArea *area, GdkGLContext *context)
+rdpattern_scene_generate(gl_view_content_t *out)
 {
-  rdpattern_gl_state_t *state;
-  mat4 mvp;
+  float zoom;
   float r_max;
 
-  state = g_object_get_data(G_OBJECT(area), "gl_state");
-  if( !state || !state->gl || !state->gl->initialized )
-    return( FALSE );
+  /* Zoom from rdpattern spinbutton, normalized to multiplier */
+  zoom = 1.0f;
+  if( rdpattern_zoom )
+    zoom = (float)gtk_spin_button_get_value(rdpattern_zoom) / 100.0f;
+
+  if( zoom < 0.01f )
+    zoom = 0.01f;
 
   /* Near-field rendering path */
   if( isFlagSet(DRAW_EHFIELD) && isFlagSet(ENABLE_NEAREH) && near_field.valid )
@@ -592,45 +381,17 @@ on_render(GtkGLArea *area, GdkGLContext *context)
     if( line_count <= 0 )
       return( FALSE );
 
-    opengl_rdpattern_update_nf_buffers(state);
-
-    if( state->line_count == 0 )
-      return( FALSE );
-
-    /* Set distance only on data change to preserve user zoom */
-    static float last_nf_r_max = 0.0f;
     r_max = (float)near_field.r_max;
-    if( r_max != last_nf_r_max )
-    {
-      rdpattern_proj_params.r_max = (double)r_max;
-      arcball_set_zoom_factor(state->gl->arcball,
-          r_max * ARCBALL_BASE_DISTANCE_FACTOR,
-          (float)rdpattern_proj_params.xy_zoom);
-      opengl_axes_set_scale(state->axes, r_max);
-      last_nf_r_max = r_max;
-    }
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    arcball_get_mvp(state->gl->arcball, mvp, 1.0f);
-
-    glUseProgram(state->gl->shader.program);
-    glUniformMatrix4fv(state->gl->mvp_location, 1, GL_FALSE, (float*)mvp);
-
-    glBindVertexArray(state->gl->vao);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-
-    glDrawArrays(GL_LINES, 0, state->line_count * 2);
-
-    glBindVertexArray(0);
-
-    opengl_axes_render(state->axes, mvp);
-
-    glUseProgram(0);
-
-    Update_Rdpattern_UI();
+    out->vertices = nf_lines;
+    out->vertex_count = nf_line_count * 2;
+    out->vertex_stride = (int)sizeof(color_point_t);
+    out->draw_mode = GL_LINES;
+    out->r_max = r_max;
+    out->zoom = zoom;
+    out->model_scale = 1.0f;
+    out->show_gradient = FALSE;
+    out->generation = rdpat_nf_generation;
 
     return( TRUE );
   }
@@ -647,231 +408,62 @@ on_render(GtkGLArea *area, GdkGLContext *context)
       return( FALSE );
 
     if( !Get_Radiation_Pattern_Data(&rd_data) || !rd_data.valid )
-    {
-      pr_err("Failed to get radiation pattern data\n");
       return( FALSE );
-    }
 
     r_max = (float)rd_data.r_max;
 
-    if( current_gen != state->gl_last_gen )
+    /* Regenerate triangles on data change */
+    if( current_gen != rdpat_last_ff_gen )
     {
       int tri_count = opengl_rdpattern_generate_triangles(
           rd_data.points, rd_data.nth, rd_data.nph, r_min, r_range);
 
-      if( tri_count > 0 )
-      {
-        opengl_rdpattern_update_buffers(state);
-
-        float base_distance = r_max * ARCBALL_BASE_DISTANCE_FACTOR;
-        rdpattern_proj_params.r_max = (double)r_max;
-        arcball_set_zoom_factor(state->gl->arcball, base_distance,
-            (float)rdpattern_proj_params.xy_zoom);
-
-        gradient_overlay_mark_dirty(state->overlay);
-
-        state->gl_last_gen = current_gen;
-      }
-      else
-      {
-        pr_err("Triangle generation failed\n");
+      if( tri_count <= 0 )
         return( FALSE );
-      }
+
+      rdpat_ff_generation++;
+      rdpat_last_ff_gen = current_gen;
     }
 
-    if( state->triangle_count == 0 )
+    if( rdpat_triangle_count == 0 )
       return( FALSE );
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    arcball_get_mvp(state->gl->arcball, mvp, 1.0f);
-
-    glUseProgram(state->gl->shader.program);
-    glUniformMatrix4fv(state->gl->mvp_location, 1, GL_FALSE, (float*)mvp);
-
-    glBindVertexArray(state->gl->vao);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-
-    glDrawArrays(GL_TRIANGLES, 0, state->triangle_count * 3);
-
-    glBindVertexArray(0);
-
-    opengl_axes_set_scale(state->axes, r_max);
-    opengl_axes_render(state->axes, mvp);
-
-    glUseProgram(0);
-
-    if( rc_config.rdpattern_gradient_key )
-      gradient_overlay_render(state->overlay);
-
-    Update_Rdpattern_UI();
+    out->vertices = rdpat_triangles;
+    out->vertex_count = rdpat_triangle_count * 3;
+    out->vertex_stride = (int)sizeof(color_point_t);
+    out->draw_mode = GL_TRIANGLES;
+    out->r_max = r_max;
+    out->zoom = zoom;
+    out->model_scale = 1.0f;
+    out->show_gradient = isFlagSet(DRAW_GAIN) && rc_config.rdpattern_gradient_key;
+    out->generation = rdpat_ff_generation;
 
     return( TRUE );
   }
 
   return( FALSE );
-
-} /* on_render() */
+}
 
 /*-----------------------------------------------------------------------*/
 
-/* on_unrealize()
+/* rdpattern_scene_post_render()
  *
- * GtkGLArea unrealize signal handler - cleanup resources
+ * Scene provider post-render callback
  */
   static void
-on_unrealize(GtkGLArea *area)
+rdpattern_scene_post_render(void)
 {
-  gl_area_cleanup_state(area, "gl_state",
-      (void(*)(void*))opengl_rdpattern_state_free);
-
-} /* on_unrealize() */
+  Update_Rdpattern_UI();
+}
 
 /*-----------------------------------------------------------------------*/
 
-/* on_button_press()
+/* rdpattern_scene_cleanup()
  *
- * Mouse button press handler
- */
-  static gboolean
-on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer data)
-{
-  rdpattern_gl_state_t *state;
-
-  state = g_object_get_data(G_OBJECT(widget), "gl_state");
-  if( !state || !state->gl )
-    return( FALSE );
-
-  arcball_begin_drag(state->gl->arcball, event->button, event->x, event->y);
-  return( TRUE );
-}
-
-/* on_button_release()
- *
- * Mouse button release handler
- */
-  static gboolean
-on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer data)
-{
-  rdpattern_gl_state_t *state;
-
-  state = g_object_get_data(G_OBJECT(widget), "gl_state");
-  if( !state || !state->gl )
-    return( FALSE );
-
-  arcball_end_drag(state->gl->arcball);
-  return( TRUE );
-}
-
-/* on_motion()
- *
- * Mouse motion handler for rotation and pan
- */
-  static gboolean
-on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer data)
-{
-  rdpattern_gl_state_t *state;
-
-  state = g_object_get_data(G_OBJECT(widget), "gl_state");
-  if( !state || !state->gl )
-    return( FALSE );
-
-  if( !(event->state & (GDK_BUTTON1_MASK | GDK_BUTTON2_MASK)) )
-    return( FALSE );
-
-  arcball_drag(state->gl->arcball, event->x, event->y);
-  gtk_widget_queue_draw(widget);
-  return( TRUE );
-}
-
-/* on_scroll()
- *
- * Mouse scroll handler for zoom
- */
-  static gboolean
-on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer data)
-{
-  rdpattern_proj_params.xy_zoom =
-    gtk_spin_button_get_value( rdpattern_zoom );
-  if( event->direction == GDK_SCROLL_UP )
-    rdpattern_proj_params.xy_zoom *= 1.1;
-  else if( event->direction == GDK_SCROLL_DOWN )
-    rdpattern_proj_params.xy_zoom /= 1.1;
-  else
-    return( FALSE );
-
-  gtk_spin_button_set_value(
-      rdpattern_zoom, rdpattern_proj_params.xy_zoom );
-  return( FALSE );
-}
-
-/* on_resize()
- *
- * Window resize handler to update viewport dimensions
+ * Scene provider cleanup callback
  */
   static void
-on_resize(GtkWidget *widget, GdkRectangle *allocation, gpointer data)
-{
-  rdpattern_gl_state_t *state;
-
-  state = g_object_get_data(G_OBJECT(widget), "gl_state");
-  if( !state || !state->gl )
-    return;
-
-  update_viewport_state(state, allocation->width, allocation->height);
-
-  gtk_gl_area_queue_render(GTK_GL_AREA(widget));
-
-} /* on_resize() */
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_rdpattern_create_widget()
- *
- * Creates and configures GtkGLArea widget
- */
-  GtkWidget*
-opengl_rdpattern_create_widget(void)
-{
-  GtkWidget *gl_area;
-
-  gl_area = gtk_gl_area_new();
-
-  gtk_gl_area_set_has_depth_buffer(GTK_GL_AREA(gl_area), TRUE);
-  gtk_widget_set_hexpand(gl_area, TRUE);
-  gtk_widget_set_vexpand(gl_area, TRUE);
-
-  gtk_widget_add_events(gl_area,
-      GDK_BUTTON_PRESS_MASK |
-      GDK_BUTTON_RELEASE_MASK |
-      GDK_POINTER_MOTION_MASK |
-      GDK_SCROLL_MASK);
-
-  g_signal_connect(gl_area, "realize", G_CALLBACK(on_realize), NULL);
-  g_signal_connect(gl_area, "render", G_CALLBACK(on_render), NULL);
-  g_signal_connect(gl_area, "unrealize", G_CALLBACK(on_unrealize), NULL);
-  g_signal_connect(gl_area, "button-press-event", G_CALLBACK(on_button_press), NULL);
-  g_signal_connect(gl_area, "button-release-event", G_CALLBACK(on_button_release), NULL);
-  g_signal_connect(gl_area, "motion-notify-event", G_CALLBACK(on_motion), NULL);
-  g_signal_connect(gl_area, "scroll-event", G_CALLBACK(on_scroll), NULL);
-  g_signal_connect(gl_area, "size-allocate", G_CALLBACK(on_resize), NULL);
-
-  gtk_widget_show(gl_area);
-
-  return( gl_area );
-
-} /* opengl_rdpattern_create_widget() */
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_rdpattern_cleanup()
- *
- * Free resources
- */
-  void
-opengl_rdpattern_cleanup(void)
+rdpattern_scene_cleanup(void)
 {
   free_ptr((void **)&rdpat_triangles);
   rdpat_triangle_count = 0;
@@ -883,8 +475,86 @@ opengl_rdpattern_cleanup(void)
   free_ptr((void **)&pov_y);
   free_ptr((void **)&pov_z);
   free_ptr((void **)&pov_r);
+}
 
-} /* opengl_rdpattern_cleanup() */
+/*-----------------------------------------------------------------------*/
+
+/* Static scene configuration and provider */
+static gl_view_config_t rdpattern_view_config = {
+  .vertex_shader_path = "/gl/color-vertex.glsl",
+  .fragment_shader_path = "/gl/color-fragment.glsl",
+  .attribs = rdpattern_attribs,
+  .attrib_count = 2,
+  .vertex_stride = (int)sizeof(color_point_t),
+  .has_gradient = TRUE,
+  .gradient_draw = Draw_Color_Legend_Overlay
+};
+
+static gl_scene_provider_t rdpattern_scene_provider = {
+  .generate = rdpattern_scene_generate,
+  .post_render = rdpattern_scene_post_render,
+  .cleanup = rdpattern_scene_cleanup
+};
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_create_widget()
+ *
+ * Create the OpenGL radiation pattern widget using the generic view engine
+ */
+  GtkWidget*
+opengl_rdpattern_create_widget(void)
+{
+  if( !rdpattern_arcball )
+    rdpattern_arcball = arcball_new();
+
+  rdpattern_gl_widget = gl_view_create_widget(
+      &rdpattern_view_config,
+      &rdpattern_scene_provider,
+      rdpattern_arcball,
+      &rdpattern_zoom);
+
+  gtk_widget_show(rdpattern_gl_widget);
+
+  return( rdpattern_gl_widget );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_get_arcball()
+ *
+ * Return reference to rdpattern arcball
+ */
+  arcball_state_t*
+opengl_rdpattern_get_arcball(void)
+{
+  return( rdpattern_arcball );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_get_widget()
+ *
+ * Return the rdpattern GL widget
+ */
+  GtkWidget*
+opengl_rdpattern_get_widget(void)
+{
+  return( rdpattern_gl_widget );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_cleanup()
+ *
+ * Free resources
+ */
+  void
+opengl_rdpattern_cleanup(void)
+{
+  rdpattern_scene_cleanup();
+  rdpattern_gl_widget = NULL;
+}
 
 /*-----------------------------------------------------------------------*/
 

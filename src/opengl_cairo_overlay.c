@@ -61,7 +61,8 @@ cairo_gl_overlay_new(void)
   overlay = g_new0(cairo_gl_overlay_t, 1);
 
   shader_ok = gl_shader_load(&overlay->shader,
-    "/gl/text-vertex.glsl", "/gl/text-fragment.glsl");
+    "/gl/text-vertex.glsl",
+    "/gl/text-fragment.glsl");
 
   if( !shader_ok )
   {

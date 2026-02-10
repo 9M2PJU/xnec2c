@@ -190,12 +190,11 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
   state->content = content;
 
-  state->current_zoom = (state->zoom_spinbutton && *state->zoom_spinbutton) ?
-    (float)gtk_spin_button_get_value(*state->zoom_spinbutton) : content.zoom;
+  /* Scene provides normalized zoom via content.zoom */
+  camera_distance = content.r_max * ARCBALL_BASE_DISTANCE_FACTOR / content.zoom;
 
-  camera_distance = content.r_max * ARCBALL_BASE_DISTANCE_FACTOR / state->current_zoom;
-
-  arcball_get_mvp(state->arcball, mvp, camera_distance, content.model_scale);
+  arcball_get_mvp(state->arcball, mvp, camera_distance, content.model_scale,
+      state->aspect, state->fov_rad);
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -266,8 +265,8 @@ on_resize(GtkGLArea *area, int width, int height, gpointer user_data)
 
   aspect = (float)width / (float)height;
 
-  arcball_set_aspect(state->arcball, aspect);
-  arcball_set_viewport(state->arcball, (float)height);
+  state->aspect = aspect;
+  state->viewport_height = (float)height;
 
   if( state->overlay )
     gradient_overlay_set_viewport(state->overlay, width, height);
@@ -340,7 +339,9 @@ on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
   if( !state )
     return( FALSE );
 
-  arcball_drag(state->arcball, event->x, event->y);
+  arcball_drag(state->arcball, event->x, event->y, state->viewport_height);
+
+  /* arcball_drag calls arcball_notify_changed internally */
   gtk_widget_queue_draw(widget);
 
   return( TRUE );
@@ -407,13 +408,15 @@ gl_view_create_widget(
   state->scene = scene;
   state->arcball = arcball;
   state->zoom_spinbutton = zoom_spinbutton;
-  state->current_zoom = 1.0f;
   state->last_generation = (unsigned int)-1;
+  state->fov_rad = glm_rad(60.0f);
+  state->aspect = 1.0f;
+  state->viewport_height = 1.0f;
 
   gl_area = gtk_gl_area_new();
 
   gtk_gl_area_set_has_depth_buffer(GTK_GL_AREA(gl_area), TRUE);
-  gtk_gl_area_set_auto_render(GTK_GL_AREA(gl_area), FALSE);
+  gtk_gl_area_set_auto_render(GTK_GL_AREA(gl_area), TRUE);
 
   gtk_widget_set_size_request(gl_area, 400, 400);
   gtk_widget_set_hexpand(gl_area, TRUE);
@@ -461,19 +464,23 @@ gl_view_get_state(GtkWidget *widget)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_invalidate()
+/* gl_view_set_arcball()
  *
- * Mark scene dirty and queue redraw
+ * Set the arcball reference for a view
  */
   void
-gl_view_invalidate(GtkWidget *widget)
+gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball)
 {
-  if( !widget )
+  gl_view_state_t *state;
+
+  state = gl_view_get_state(widget);
+
+  if( !state || !arcball )
     return;
 
-  gtk_gl_area_queue_render(GTK_GL_AREA(widget));
+  state->arcball = arcball;
 
-} /* gl_view_invalidate() */
+} /* gl_view_set_arcball() */
 
 /*-----------------------------------------------------------------------*/
 

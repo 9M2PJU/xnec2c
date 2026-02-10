@@ -25,7 +25,10 @@
 
 #include "opengl_structure.h"
 #ifdef HAVE_OPENGL
+#include "opengl_view.h"
 #include "opengl_rdpattern.h"
+
+static void common_projection_share_arcball(void);
 #endif
 
 /* Action flag for NEC2 "card" editors */
@@ -677,6 +680,16 @@ on_main_rdpattern_activate(
     gtk_spin_button_set_value(
         GTK_SPIN_BUTTON(widget), rc_config.ant_temp_elevation);
 
+#ifdef HAVE_OPENGL
+    /* Establish arcball sharing after all initialization completes */
+    if( rc_config.use_opengl_renderer && isFlagSet(COMMON_PROJECTION) )
+    {
+      common_projection_share_arcball();
+      gl_view_sync_arcball(rdpattern_gl_area,
+          structure_proj_params.Wr, structure_proj_params.Wi);
+    }
+#endif
+
   } /* if( gtk_check_menu_item_get_active(...) ) */
   else if( isFlagSet(DRAW_ENABLED) )
     Gtk_Widget_Destroy( &rdpattern_window );
@@ -887,6 +900,116 @@ on_rdpattern_left_hand_activate(
 }
 
 
+/* common_projection_arcball_cb()
+ *
+ * Arcball change callback for COMMON_PROJECTION.
+ * Queues redraw on the other GL view when arcball is dragged.
+ */
+#ifdef HAVE_OPENGL
+  static void
+common_projection_arcball_cb(arcball_state_t *ab, gpointer user_data)
+{
+  GtkWidget *widget;
+
+  widget = (GtkWidget *)user_data;
+
+  if( widget )
+    gtk_widget_queue_draw(widget);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* common_projection_share_arcball()
+ *
+ * Swap rdpattern view to use structure arcball and register
+ * cross-view redraw callbacks.
+ */
+  static void
+common_projection_share_arcball(void)
+{
+  arcball_state_t *struct_ab;
+  GtkWidget *rdpat_widget;
+
+  struct_ab = opengl_structure_get_arcball();
+  rdpat_widget = opengl_rdpattern_get_widget();
+
+  if( !struct_ab || !rdpat_widget )
+    return;
+
+  gl_view_set_arcball(rdpat_widget, struct_ab);
+
+  arcball_add_callback(struct_ab,
+      common_projection_arcball_cb, rdpat_widget);
+
+  if( structure_gl_area )
+    arcball_add_callback(struct_ab,
+        common_projection_arcball_cb, structure_gl_area);
+
+  gtk_widget_queue_draw(rdpat_widget);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_common_projection_sync()
+ *
+ * Public API to establish arcball sharing for common projection.
+ * Called from main.c when rdpattern window is already open during file load.
+ */
+  void
+opengl_common_projection_sync(void)
+{
+  if( !rc_config.use_opengl_renderer || isFlagClear(COMMON_PROJECTION) )
+    return;
+
+  if( !rdpattern_gl_area )
+    return;
+
+  common_projection_share_arcball();
+  gl_view_sync_arcball(rdpattern_gl_area,
+      structure_proj_params.Wr, structure_proj_params.Wi);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* common_projection_unshare_arcball()
+ *
+ * Restore rdpattern view to its own arcball, copying current
+ * rotation state from the shared arcball.
+ */
+  static void
+common_projection_unshare_arcball(void)
+{
+  arcball_state_t *struct_ab;
+  arcball_state_t *rdpat_ab;
+  GtkWidget *rdpat_widget;
+
+  struct_ab = opengl_structure_get_arcball();
+  rdpat_ab = opengl_rdpattern_get_arcball();
+  rdpat_widget = opengl_rdpattern_get_widget();
+
+  if( struct_ab )
+  {
+    if( rdpat_widget )
+      arcball_remove_callback(struct_ab,
+          common_projection_arcball_cb, rdpat_widget);
+
+    if( structure_gl_area )
+      arcball_remove_callback(struct_ab,
+          common_projection_arcball_cb, structure_gl_area);
+  }
+
+  if( rdpat_ab && rdpat_widget )
+  {
+    if( struct_ab )
+      arcball_copy_rotation(rdpat_ab, struct_ab);
+
+    gl_view_set_arcball(rdpat_widget, rdpat_ab);
+  }
+}
+#endif
+
+/*-----------------------------------------------------------------------*/
+
   void
 on_common_projection_activate(
     GtkMenuItem     *menuitem,
@@ -907,10 +1030,23 @@ on_common_projection_activate(
           incline_rdpattern,
           &rdpattern_proj_params );
     }
+
+#ifdef HAVE_OPENGL
+    if( rc_config.use_opengl_renderer )
+      common_projection_share_arcball();
+#endif
+
     SetFlag( COMMON_PROJECTION );
   }
   else
+  {
+#ifdef HAVE_OPENGL
+    if( rc_config.use_opengl_renderer )
+      common_projection_unshare_arcball();
+#endif
+
     ClearFlag( COMMON_PROJECTION );
+  }
 }
 
 
@@ -928,17 +1064,38 @@ on_common_freq_activate(
 }
 
 
+/* structure_set_view_preset()
+ *
+ * Set structure view to preset angle and reset arcball pan
+ */
+  static void
+structure_set_view_preset(double wr, double wi)
+{
+  New_Viewer_Angle( wr, wi, rotate_structure,
+      incline_structure, &structure_proj_params );
+
+#ifdef HAVE_OPENGL
+  if( rc_config.use_opengl_renderer )
+  {
+    arcball_state_t *ab = opengl_structure_get_arcball();
+    if( ab )
+      arcball_reset_pan(ab);
+  }
+#endif
+
+  if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
+    New_Viewer_Angle( wr, wi, rotate_rdpattern,
+        incline_rdpattern, &rdpattern_proj_params );
+}
+
+/*-----------------------------------------------------------------------*/
+
   void
 on_main_x_axis_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  /* Recalculate projection parameters */
-  New_Viewer_Angle( 0.0, 0.0, rotate_structure,
-      incline_structure, &structure_proj_params );
-  if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
-    New_Viewer_Angle( 0.0, 0.0, rotate_rdpattern,
-        incline_rdpattern, &rdpattern_proj_params );
+  structure_set_view_preset( 0.0, 0.0 );
 }
 
 
@@ -947,12 +1104,7 @@ on_main_y_axis_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  /* Recalculate projection parameters */
-  New_Viewer_Angle( 90.0, 0.0, rotate_structure,
-      incline_structure, &structure_proj_params );
-  if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
-    New_Viewer_Angle( 90.0, 0.0, rotate_rdpattern,
-        incline_rdpattern, &rdpattern_proj_params );
+  structure_set_view_preset( 90.0, 0.0 );
 }
 
 
@@ -961,12 +1113,7 @@ on_main_z_axis_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  /* Recalculate projection parameters */
-  New_Viewer_Angle( 0.0, 90.0, rotate_structure,
-      incline_structure, &structure_proj_params );
-  if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
-    New_Viewer_Angle( 0.0, 90.0, rotate_rdpattern,
-        incline_rdpattern, &rdpattern_proj_params );
+  structure_set_view_preset( 0.0, 90.0 );
 }
 
 
@@ -975,12 +1122,7 @@ on_main_default_view_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  /* Projection at 45 deg rotation and inclination */
-  New_Viewer_Angle( 45.0, 45.0, rotate_structure,
-      incline_structure, &structure_proj_params );
-  if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
-    New_Viewer_Angle( 45.0, 45.0, rotate_rdpattern,
-        incline_rdpattern, &rdpattern_proj_params );
+  structure_set_view_preset( 45.0, 45.0 );
 }
 
 
@@ -1013,10 +1155,7 @@ on_main_rotate_spinbutton_value_changed(
 #ifdef HAVE_OPENGL
   if( rc_config.use_opengl_renderer )
   {
-    structure_gl_state_t *state;
-
-    state = opengl_structure_get_state(structure_gl_area);
-    arcball_sync_view(state ? state->gl : NULL,
+    gl_view_sync_arcball(structure_gl_area,
         structure_proj_params.Wr, structure_proj_params.Wi);
   }
 #endif
@@ -1056,10 +1195,7 @@ on_main_incline_spinbutton_value_changed(
 #ifdef HAVE_OPENGL
   if( rc_config.use_opengl_renderer )
   {
-    structure_gl_state_t *state;
-
-    state = opengl_structure_get_state(structure_gl_area);
-    arcball_sync_view(state ? state->gl : NULL,
+    gl_view_sync_arcball(structure_gl_area,
         structure_proj_params.Wr, structure_proj_params.Wi);
   }
 #endif
@@ -1602,6 +1738,12 @@ on_rdpattern_window_destroy(
     GObject       *object,
     gpointer       user_data)
 {
+#ifdef HAVE_OPENGL
+  /* Remove arcball sharing callbacks before widget destruction */
+  if( isFlagSet(COMMON_PROJECTION) && rc_config.use_opengl_renderer )
+    common_projection_unshare_arcball();
+#endif
+
   Rdpattern_Window_Killed();
 }
 
@@ -1896,18 +2038,16 @@ on_main_opengl_renderer_toggled(
   {
     if( rc_config.use_opengl_renderer )
     {
-      rdpattern_gl_state_t *state;
-
       gtk_widget_hide( rdpattern_cairo_da );
       gtk_widget_show( rdpattern_gl_area );
       rdpattern_drawingarea = rdpattern_gl_area;
 
-      /* Sync OpenGL arcball from Cairo projection angles and zoom */
-      state = opengl_rdpattern_get_state( rdpattern_gl_area );
-      arcball_sync_view( state ? state->gl : NULL,
-          rdpattern_proj_params.Wr, rdpattern_proj_params.Wi );
-      arcball_sync_zoom( state ? state->gl : NULL,
-          rdpattern_proj_params.r_max, rdpattern_proj_params.xy_zoom );
+      /* Sync OpenGL arcball from Cairo projection angles */
+      gl_view_sync_arcball(rdpattern_gl_area,
+          rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
+
+      /* Force aspect ratio update after showing GL area */
+      gtk_widget_queue_resize(rdpattern_gl_area);
     }
     else
     {
@@ -1945,18 +2085,16 @@ on_main_opengl_renderer_toggled(
   {
     if( rc_config.use_opengl_renderer )
     {
-      structure_gl_state_t *state;
-
       gtk_widget_hide( structure_cairo_da );
       gtk_widget_show( structure_gl_area );
       structure_drawingarea = structure_gl_area;
 
       /* Sync OpenGL arcball from structure projection angles */
-      state = opengl_structure_get_state( structure_gl_area );
-      arcball_sync_view( state ? state->gl : NULL,
-          structure_proj_params.Wr, structure_proj_params.Wi );
-      arcball_sync_zoom( state ? state->gl : NULL,
-          structure_proj_params.r_max, structure_proj_params.xy_zoom );
+      gl_view_sync_arcball(structure_gl_area,
+          structure_proj_params.Wr, structure_proj_params.Wi);
+
+      /* Force aspect ratio update after showing GL area */
+      gtk_widget_queue_resize(structure_gl_area);
     }
     else
     {
@@ -1975,36 +2113,51 @@ on_main_opengl_renderer_toggled(
 }
 
 
-  void
-on_rdpattern_x_axis_clicked(
-    GtkButton       *button,
-    gpointer         user_data)
+/* rdpattern_set_view_preset()
+ *
+ * Set rdpattern view to preset angle and reset arcball pan
+ */
+  static void
+rdpattern_set_view_preset(double wr, double wi)
 {
-  rdpattern_proj_params.Wr = 0.0;
-  rdpattern_proj_params.Wi = 0.0;
+  rdpattern_proj_params.Wr = wr;
+  rdpattern_proj_params.Wi = wi;
 
-  /* Sync to renderer */
   if( rc_config.use_opengl_renderer )
   {
 #ifdef HAVE_OPENGL
-    rdpattern_gl_state_t *state;
+    gl_view_state_t *state;
 
-    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    arcball_set_preset_view(state ? state->gl : NULL, 0.0, 0.0);
-    gtk_spin_button_set_value(rotate_rdpattern, 0.0);
-    gtk_spin_button_set_value(incline_rdpattern, 0.0);
+    state = gl_view_get_state(rdpattern_drawingarea);
+    if( state && state->arcball )
+    {
+      arcball_set_view(state->arcball, (float)wr, (float)wi);
+      arcball_reset_pan(state->arcball);
+    }
+    gtk_spin_button_set_value(rotate_rdpattern, wr);
+    gtk_spin_button_set_value(incline_rdpattern, wi);
     gtk_widget_queue_draw(rdpattern_drawingarea);
 #endif
   }
   else
   {
-    New_Viewer_Angle( 0.0, 0.0, rotate_rdpattern,
+    New_Viewer_Angle( wr, wi, rotate_rdpattern,
         incline_rdpattern, &rdpattern_proj_params );
   }
 
   if( isFlagSet(COMMON_PROJECTION) )
-    New_Viewer_Angle( 0.0, 0.0, rotate_structure,
+    New_Viewer_Angle( wr, wi, rotate_structure,
         incline_structure, &structure_proj_params );
+}
+
+/*-----------------------------------------------------------------------*/
+
+  void
+on_rdpattern_x_axis_clicked(
+    GtkButton       *button,
+    gpointer         user_data)
+{
+  rdpattern_set_view_preset( 0.0, 0.0 );
 }
 
 
@@ -2013,31 +2166,7 @@ on_rdpattern_y_axis_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  rdpattern_proj_params.Wr = 90.0;
-  rdpattern_proj_params.Wi = 0.0;
-
-  /* Sync to renderer */
-  if( rc_config.use_opengl_renderer )
-  {
-#ifdef HAVE_OPENGL
-    rdpattern_gl_state_t *state;
-
-    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    arcball_set_preset_view(state ? state->gl : NULL, 90.0, 0.0);
-    gtk_spin_button_set_value(rotate_rdpattern, 90.0);
-    gtk_spin_button_set_value(incline_rdpattern, 0.0);
-    gtk_widget_queue_draw(rdpattern_drawingarea);
-#endif
-  }
-  else
-  {
-    New_Viewer_Angle( 90.0, 0.0, rotate_rdpattern,
-        incline_rdpattern, &rdpattern_proj_params );
-  }
-
-  if( isFlagSet(COMMON_PROJECTION) )
-    New_Viewer_Angle( 90.0, 0.0, rotate_structure,
-        incline_structure, &structure_proj_params );
+  rdpattern_set_view_preset( 90.0, 0.0 );
 }
 
 
@@ -2046,31 +2175,7 @@ on_rdpattern_z_axis_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  rdpattern_proj_params.Wr = 0.0;
-  rdpattern_proj_params.Wi = 90.0;
-
-  /* Sync to renderer */
-  if( rc_config.use_opengl_renderer )
-  {
-#ifdef HAVE_OPENGL
-    rdpattern_gl_state_t *state;
-
-    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    arcball_set_preset_view(state ? state->gl : NULL, 0.0, 90.0);
-    gtk_spin_button_set_value(rotate_rdpattern, 0.0);
-    gtk_spin_button_set_value(incline_rdpattern, 90.0);
-    gtk_widget_queue_draw(rdpattern_drawingarea);
-#endif
-  }
-  else
-  {
-    New_Viewer_Angle( 0.0, 90.0, rotate_rdpattern,
-        incline_rdpattern, &rdpattern_proj_params );
-  }
-
-  if( isFlagSet(COMMON_PROJECTION) )
-    New_Viewer_Angle( 0.0, 90.0, rotate_structure,
-        incline_structure, &structure_proj_params );
+  rdpattern_set_view_preset( 0.0, 90.0 );
 }
 
 
@@ -2079,31 +2184,7 @@ on_rdpattern_default_view_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  rdpattern_proj_params.Wr = 45.0;
-  rdpattern_proj_params.Wi = 45.0;
-
-  /* Sync to renderer */
-  if( rc_config.use_opengl_renderer )
-  {
-#ifdef HAVE_OPENGL
-    rdpattern_gl_state_t *state;
-
-    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    arcball_set_preset_view(state ? state->gl : NULL, 45.0, 45.0);
-    gtk_spin_button_set_value(rotate_rdpattern, 45.0);
-    gtk_spin_button_set_value(incline_rdpattern, 45.0);
-    gtk_widget_queue_draw(rdpattern_drawingarea);
-#endif
-  }
-  else
-  {
-    New_Viewer_Angle( 45.0, 45.0, rotate_rdpattern,
-        incline_rdpattern, &rdpattern_proj_params );
-  }
-
-  if( isFlagSet(COMMON_PROJECTION) )
-    New_Viewer_Angle( 45.0, 45.0, rotate_structure,
-        incline_structure, &structure_proj_params );
+  rdpattern_set_view_preset( 45.0, 45.0 );
 }
 
 
@@ -2136,10 +2217,7 @@ on_rdpattern_rotate_spinbutton_value_changed(
   if( rc_config.use_opengl_renderer )
   {
 #ifdef HAVE_OPENGL
-    rdpattern_gl_state_t *state;
-
-    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    arcball_sync_view(state ? state->gl : NULL,
+    gl_view_sync_arcball(rdpattern_drawingarea,
         rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
     gtk_widget_queue_draw(rdpattern_drawingarea);
 #endif
@@ -2183,10 +2261,7 @@ on_rdpattern_incline_spinbutton_value_changed(
   if( rc_config.use_opengl_renderer )
   {
 #ifdef HAVE_OPENGL
-    rdpattern_gl_state_t *state;
-
-    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    arcball_sync_view(state ? state->gl : NULL,
+    gl_view_sync_arcball(rdpattern_drawingarea,
         rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
     gtk_widget_queue_draw(rdpattern_drawingarea);
 #endif
@@ -5428,8 +5503,6 @@ on_main_zoom_spinbutton_value_changed(
     need_structure_redraw = 1;
     xnec2_widget_queue_draw( structure_drawingarea );
   }
-
-  opengl_structure_queue_redraw();
 }
 
 
@@ -5498,19 +5571,7 @@ on_rdpattern_zoom_spinbutton_value_changed(
   rdpattern_proj_params.xy_scale =
     rdpattern_proj_params.xy_scale1 * rdpattern_proj_params.xy_zoom;
 
-  /* Sync to OpenGL arcball distance */
-#ifdef HAVE_OPENGL
-  if( rc_config.use_opengl_renderer )
-  {
-    rdpattern_gl_state_t *state;
-
-    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    arcball_sync_zoom( state ? state->gl : NULL,
-        rdpattern_proj_params.r_max, rdpattern_proj_params.xy_zoom );
-  }
-#endif
-
-  /* Trigger a redraw of structure drawingarea */
+  /* Trigger a redraw of rdpattern drawingarea */
   need_rdpat_redraw = 1;
   xnec2_widget_queue_draw( rdpattern_drawingarea );
 }
@@ -5552,17 +5613,15 @@ on_rdpattern_one_button_clicked(
   rdpattern_proj_params.dx_center = 0.0;
   rdpattern_proj_params.dy_center = 0.0;
 
-  /* Sync to OpenGL arcball */
+  /* Reset pan for OpenGL arcball */
 #ifdef HAVE_OPENGL
   if( rc_config.use_opengl_renderer )
   {
-    rdpattern_gl_state_t *state;
+    gl_view_state_t *state;
 
-    state = opengl_rdpattern_get_state(rdpattern_drawingarea);
-    arcball_sync_zoom( state ? state->gl : NULL,
-        rdpattern_proj_params.r_max, 1.0 );
-    if( state && state->gl )
-      arcball_reset_pan( state->gl->arcball );
+    state = gl_view_get_state(rdpattern_drawingarea);
+    if( state && state->arcball )
+      arcball_reset_pan(state->arcball);
   }
   else
 #endif

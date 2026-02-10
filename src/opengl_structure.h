@@ -31,33 +31,13 @@ typedef enum
 
 } structure_draw_mode_t;
 
-#ifdef HAVE_OPENGL
-#include "opengl_renderer.h"
-#include "opengl_axes.h"
-#include "opengl_cylinder.h"
-
-/* Structure OpenGL state */
-typedef struct
-{
-  gl_instance_t *gl;
-  GLint position_location;
-  GLint normal_location;
-  GLint color_location;
-  int vertex_count;
-  opengl_axes_t *axes;
-  gboolean initialized;
-  int geometry_generation;
-
-} structure_gl_state_t;
-
-/* Get GL state from widget */
-structure_gl_state_t* opengl_structure_get_state(GtkWidget *widget);
-
-#endif /* HAVE_OPENGL */
-
 /* Public API - always available, stubs when no OpenGL */
 GtkWidget* opengl_structure_create_widget(void);
-void opengl_structure_queue_redraw(void);
 void opengl_structure_cleanup(void);
+
+#ifdef HAVE_OPENGL
+#include "opengl_renderer.h"
+arcball_state_t* opengl_structure_get_arcball(void);
+#endif
 
 #endif /* OPENGL_STRUCTURE_H */

@@ -111,6 +111,7 @@ xnec2c_LDADD    += $(GSL_LIBS)
 if HAVE_OPENGL
 xnec2c_SOURCES += \
   opengl_renderer.c opengl_renderer.h \
+  opengl_view.c opengl_view.h \
   opengl_rdpattern.c opengl_rdpattern.h \
   opengl_axes.c opengl_axes.h \
   opengl_cairo_overlay.c opengl_cairo_overlay.h \

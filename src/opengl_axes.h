@@ -29,7 +29,7 @@ typedef struct
 {
   GLuint lines_vao;
   GLuint lines_vbo;
-  gl_shader_t *line_shader;
+  gl_shader_t line_shader;
   GLint line_mvp_loc;
   GLint line_pos_loc;
   GLint line_col_loc;
@@ -48,7 +48,7 @@ typedef struct
 
 } opengl_axes_t;
 
-opengl_axes_t* opengl_axes_new(gl_shader_t *line_shader);
+opengl_axes_t* opengl_axes_new(void);
 void opengl_axes_free(opengl_axes_t *axes);
 void opengl_axes_set_scale(opengl_axes_t *axes, float r_max);
 void opengl_axes_render(opengl_axes_t *axes, mat4 mvp);

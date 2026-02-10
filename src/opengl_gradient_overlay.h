@@ -25,14 +25,17 @@
 #ifdef HAVE_OPENGL
 #include "opengl_cairo_overlay.h"
 
+typedef void (*gradient_draw_fn)(cairo_t *cr);
+
 typedef struct
 {
   cairo_gl_overlay_t *base;
+  gradient_draw_fn draw_func;
   gboolean needs_update;
 
 } gradient_overlay_t;
 
-gradient_overlay_t* gradient_overlay_new(void);
+gradient_overlay_t* gradient_overlay_new(gradient_draw_fn draw_func);
 void gradient_overlay_free(gradient_overlay_t *overlay);
 void gradient_overlay_set_viewport(gradient_overlay_t *overlay, int width, int height);
 void gradient_overlay_mark_dirty(gradient_overlay_t *overlay);

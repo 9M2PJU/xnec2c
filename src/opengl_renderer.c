@@ -160,7 +160,7 @@ gl_shader_destroy(gl_shader_t *shader)
  * Allocate and initialize arcball camera state
  */
   arcball_state_t*
-arcball_new(float aspect, float fov_degrees)
+arcball_new(void)
 {
   arcball_state_t *ab;
 
@@ -170,9 +170,6 @@ arcball_new(float aspect, float fov_degrees)
   ab->last_x = 0.0f;
   ab->last_y = 0.0f;
   ab->drag_button = 0;
-  ab->aspect = aspect;
-  ab->viewport_height = 1.0f;
-  ab->fov_rad = glm_rad(fov_degrees);
   ab->callback_count = 0;
   ab->in_notify = FALSE;
 
@@ -195,20 +192,6 @@ arcball_free(arcball_state_t *ab)
 } /* arcball_free() */
 
 /*-----------------------------------------------------------------------*/
-
-/* arcball_set_aspect()
- *
- * Update aspect ratio
- */
-  void
-arcball_set_aspect(arcball_state_t *ab, float aspect)
-{
-  ab->aspect = aspect;
-
-} /* arcball_set_aspect() */
-
-/*-----------------------------------------------------------------------*/
-
 
 /*-----------------------------------------------------------------------*/
 
@@ -332,51 +315,22 @@ arcball_notify_changed(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_set_viewport()
+/* arcball_copy_rotation()
  *
- * Update viewport dimensions
+ * Copy rotation state from one arcball to another
  */
   void
-arcball_set_viewport(arcball_state_t *ab, float height)
+arcball_copy_rotation(arcball_state_t *dst, const arcball_state_t *src)
 {
-  if( height > 0.0f )
-    ab->viewport_height = height;
-
-} /* arcball_set_viewport() */
-
-/*-----------------------------------------------------------------------*/
-
-/* arcball_sync_view()
- *
- * Sync arcball rotation from projection parameters.
- * Handles null checks for gl_instance and arcball.
- */
-  void
-arcball_sync_view(gl_instance_t *gl, double wr, double wi)
-{
-  if( !gl || !gl->arcball )
+  if( !dst || !src )
     return;
 
-  arcball_set_view(gl->arcball, (float)wr, (float)wi);
-}
+  glm_mat4_copy((vec4 *)src->rotation, dst->rotation);
+
+} /* arcball_copy_rotation() */
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_set_preset_view()
- *
- * Set arcball to preset view angles and reset pan.
- * Used by view preset buttons (X/Y/Z axis, default view).
- */
-  void
-arcball_set_preset_view(gl_instance_t *gl, double wr, double wi)
-{
-  arcball_sync_view(gl, wr, wi);
-
-  if( gl && gl->arcball )
-    arcball_reset_pan(gl->arcball);
-}
-
-/*-----------------------------------------------------------------------*/
 
 
 /*-----------------------------------------------------------------------*/
@@ -391,7 +345,7 @@ static void arcball_pan(arcball_state_t *ab, float dx, float dy);
  * Handle mouse drag - dispatches to rotate or pan based on button
  */
   void
-arcball_drag(arcball_state_t *ab, float x, float y)
+arcball_drag(arcball_state_t *ab, float x, float y, float viewport_height)
 {
   float dx, dy;
 
@@ -401,13 +355,16 @@ arcball_drag(arcball_state_t *ab, float x, float y)
   dx = x - ab->last_x;
   dy = y - ab->last_y;
 
+  if( viewport_height < 1.0f )
+    viewport_height = 1.0f;
+
   if( ab->drag_button == 1 )
   {
     arcball_rotate(ab, dx, dy);
   }
   else if( ab->drag_button == 2 )
   {
-    arcball_pan(ab, dx / ab->viewport_height, dy / ab->viewport_height);
+    arcball_pan(ab, dx / viewport_height, dy / viewport_height);
   }
   else
   {
@@ -517,7 +474,8 @@ arcball_reset_pan(arcball_state_t *ab)
  * Compute model-view-projection matrix from arcball state and scene parameters
  */
   void
-arcball_get_mvp(arcball_state_t *ab, mat4 dest, float distance, float model_scale)
+arcball_get_mvp(arcball_state_t *ab, mat4 dest,
+    float distance, float model_scale, float aspect, float fov_rad)
 {
   mat4 view, proj, model, trans;
   vec3 eye_pos, center_pos, up;
@@ -535,7 +493,7 @@ arcball_get_mvp(arcball_state_t *ab, mat4 dest, float distance, float model_scal
   glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, up);
 
   glm_lookat(eye_pos, center_pos, up, view);
-  glm_perspective(ab->fov_rad, ab->aspect, 0.1f, 100.0f, proj);
+  glm_perspective(fov_rad, aspect, 0.1f, 100.0f, proj);
 
   glm_mat4_mul(proj, view, dest);
   glm_mat4_mul(dest, model, dest);
@@ -544,86 +502,5 @@ arcball_get_mvp(arcball_state_t *ab, mat4 dest, float distance, float model_scal
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_instance_new()
- *
- * Allocate and initialize GL instance
- */
-  gl_instance_t*
-gl_instance_new(const char *vert_shader, const char *frag_shader,
-  float arcball_distance, float aspect)
-{
-  gl_instance_t *inst;
-  gboolean ok;
-
-  inst = g_new0(gl_instance_t, 1);
-
-  ok = gl_shader_load(&inst->shader, vert_shader, frag_shader);
-  if( !ok )
-  {
-    g_free(inst);
-    return( NULL );
-  }
-
-  inst->mvp_location = glGetUniformLocation(inst->shader.program, "mvp");
-
-  glGenVertexArrays(1, &inst->vao);
-  glGenBuffers(1, &inst->vbo);
-
-  inst->arcball = arcball_new(aspect, 60.0f);
-  inst->initialized = TRUE;
-
-  return( inst );
-
-} /* gl_instance_new() */
-
-/*-----------------------------------------------------------------------*/
-
-/* gl_instance_free()
- *
- * Free GL instance resources
- */
-  void
-gl_instance_free(gl_instance_t *inst)
-{
-  if( !inst )
-    return;
-
-  if( inst->vbo )
-    glDeleteBuffers(1, &inst->vbo);
-  if( inst->vao )
-    glDeleteVertexArrays(1, &inst->vao);
-
-  gl_shader_destroy(&inst->shader);
-  arcball_free(inst->arcball);
-
-  g_free(inst);
-
-} /* gl_instance_free() */
-
-/*-----------------------------------------------------------------------*/
-
-/* gl_area_cleanup_state()
- *
- * Free GL state while context is still current. Must be called from
- * on_unrealize handler, not GDestroyNotify, because the GL context
- * is destroyed before widget finalization.
- *
- * Uses g_object_steal_data to remove without triggering destroy notify.
- */
-  void
-gl_area_cleanup_state(GtkGLArea *area, const char *key,
-    void (*free_func)(void *))
-{
-  void *state;
-
-  gtk_gl_area_make_current(area);
-
-  state = g_object_steal_data(G_OBJECT(area), key);
-  if( state )
-    free_func(state);
-
-} /* gl_area_cleanup_state() */
-
-/*-----------------------------------------------------------------------*/
 
 #endif /* HAVE_OPENGL */

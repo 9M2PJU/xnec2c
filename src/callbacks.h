@@ -29,5 +29,8 @@
 
 #include <gdk/gdkkeysyms.h>
 
+/* OpenGL common projection sync */
+void opengl_common_projection_sync(void);
+
 #endif
 

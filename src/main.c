@@ -765,6 +765,11 @@ Open_Input_File( gpointer arg )
 
     GtkWidget *box = Builder_Get_Object( rdpattern_window_builder, "rdpattern_box" );
     gtk_widget_show( box );
+
+#ifdef HAVE_OPENGL
+    /* Ensure arcball sharing is established for common projection */
+    opengl_common_projection_sync();
+#endif
   }
 
   /* Re-initiate frequency plots if window open */

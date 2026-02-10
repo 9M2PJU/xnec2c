@@ -60,25 +60,10 @@ struct arcball_state
   float last_x;
   float last_y;
   int drag_button;
-  float aspect;
-  float viewport_height;
-  float fov_rad;
   arcball_callback_t callbacks[ARCBALL_MAX_CALLBACKS];
   int callback_count;
   gboolean in_notify;
 };
-
-/* Generic GL instance base */
-typedef struct
-{
-  gl_shader_t shader;
-  GLuint vao;
-  GLuint vbo;
-  GLint mvp_location;
-  arcball_state_t *arcball;
-  gboolean initialized;
-
-} gl_instance_t;
 
 /* Shader functions */
 gboolean gl_shader_load(gl_shader_t *shader,
@@ -86,30 +71,20 @@ gboolean gl_shader_load(gl_shader_t *shader,
 void gl_shader_destroy(gl_shader_t *shader);
 
 /* Arcball functions */
-arcball_state_t* arcball_new(float aspect, float fov_degrees);
+arcball_state_t* arcball_new(void);
 void arcball_free(arcball_state_t *ab);
-void arcball_set_aspect(arcball_state_t *ab, float aspect);
 void arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg);
-void arcball_set_viewport(arcball_state_t *ab, float height);
-void arcball_sync_view(gl_instance_t *gl, double wr, double wi);
-void arcball_set_preset_view(gl_instance_t *gl, double wr, double wi);
 void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
-void arcball_drag(arcball_state_t *ab, float x, float y);
+void arcball_drag(arcball_state_t *ab, float x, float y, float viewport_height);
 void arcball_end_drag(arcball_state_t *ab);
 void arcball_reset_pan(arcball_state_t *ab);
-void arcball_get_mvp(arcball_state_t *ab, mat4 dest, float distance, float model_scale);
+void arcball_get_mvp(arcball_state_t *ab, mat4 dest,
+    float distance, float model_scale, float aspect, float fov_rad);
 void arcball_add_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data);
 void arcball_remove_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data);
 void arcball_notify_changed(arcball_state_t *ab);
+void arcball_copy_rotation(arcball_state_t *dst, const arcball_state_t *src);
 
-/* GL instance functions */
-gl_instance_t* gl_instance_new(const char *vert_shader, const char *frag_shader,
-  float arcball_distance, float aspect);
-void gl_instance_free(gl_instance_t *inst);
-
-/* GL area cleanup - frees state while context is current */
-void gl_area_cleanup_state(GtkGLArea *area, const char *key,
-    void (*free_func)(void *));
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_RENDERER_H */
