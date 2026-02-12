@@ -423,6 +423,9 @@ void rc_callback_check_menu_item(GtkCheckMenuItem *menuitem, gpointer user_data)
 			continue;
 
 		GtkBuilder *bw = *rc_config_vars[i].builder_window;
+		if (bw == NULL)
+			continue;
+
 		GtkWidget *w = Builder_Get_Object(bw, rc_config_vars[i].builder_check_menu_item_id);
 		if (GTK_CHECK_MENU_ITEM(w) == menuitem)
 		{
@@ -650,7 +653,7 @@ Restore_Windows( gpointer dat )
   }
 
   /* Open structure view unconditionally */
-  opengl_structure_view_create();
+  opengl_structure_create_widget();
 
   return( FALSE );
 }
@@ -834,10 +837,10 @@ Read_Config( void )
 		  pr_err("%s:%d: parse error (%s): %s \n", rc_config.config_file, lnum, v->desc, line);
 	  else
 	  {
-		  if (v->builder_check_menu_item_id != NULL && v->builder_window != NULL)
+		  if (v->builder_check_menu_item_id != NULL && v->builder_window != NULL
+				  && *v->builder_window != NULL)
 		  {
-			GtkBuilder *bw = *v->builder_window;
-			GtkWidget *w = Builder_Get_Object(bw, v->builder_check_menu_item_id);
+			GtkWidget *w = Builder_Get_Object(*v->builder_window, v->builder_check_menu_item_id);
 			int *var = (int*)v->vars[0];
 			gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(w), (gboolean)*var );
 		  }

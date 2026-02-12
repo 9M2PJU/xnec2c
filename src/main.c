@@ -477,9 +477,6 @@ main (int argc, char *argv[])
   main_window = create_main_window( &main_window_builder );
   gtk_window_set_title( GTK_WINDOW(main_window), PACKAGE_STRING );
 
-  /* Create window builders early for config checkbox sync */
-  create_rdpattern_window( &rdpattern_window_builder );
-  create_freqplots_window( &freqplots_window_builder );
   gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_hbox1") );
   gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_hbox2") );
   gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_grid1") );
