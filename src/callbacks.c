@@ -2046,6 +2046,12 @@ on_main_opengl_renderer_toggled(
       gl_view_sync_arcball(rdpattern_gl_area,
           rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
 
+      /* Apply common projection arcball sharing if enabled */
+      if( isFlagSet(COMMON_PROJECTION) )
+      {
+        common_projection_share_arcball();
+      }
+
       /* Force aspect ratio update after showing GL area */
       gtk_widget_queue_resize(rdpattern_gl_area);
     }
