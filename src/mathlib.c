@@ -749,7 +749,9 @@ void init_mathlib_menu(void)
 		gtk_menu_shell_append(GTK_MENU_SHELL(benchmark_menu), mathlibs[libidx].benchmark_widget);
 	}
 
-	gtk_widget_show_all(main_window);
+	gtk_widget_show_all(interactive_menu);
+	gtk_widget_show_all(batch_menu);
+	gtk_widget_show_all(benchmark_menu);
 }
 
 void mathlib_help(void)
