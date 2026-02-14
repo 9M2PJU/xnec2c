@@ -155,10 +155,14 @@ main(int argc, char *argv[])
 
   gtk_init(&argc, &argv);
 
-  arcball1 = arcball_new(1.0f, 45.0f);
-  arcball2 = arcball_new(1.0f, 45.0f);
-  arcball3 = arcball_new(1.0f, 45.0f);
-  shared_arcball = arcball_new(1.0f, 45.0f);
+  arcball1 = arcball_new();
+  arcball_set_view(arcball1, 0.0f, 45.0f);
+  arcball2 = arcball_new();
+  arcball_set_view(arcball2, 0.0f, 45.0f);
+  arcball3 = arcball_new();
+  arcball_set_view(arcball3, 0.0f, 45.0f);
+  shared_arcball = arcball_new();
+  arcball_set_view(shared_arcball, 0.0f, 45.0f);
 
   create_window(0, "Cylinders (lit-color)", &cylinder_view_config,
     &cylinder_scene_provider, arcball1);
