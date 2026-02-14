@@ -244,11 +244,25 @@ structure_scene_generate(gl_view_content_t *out)
 
   current_mode = opengl_structure_get_draw_mode();
 
-  /* Regenerate on mode change or when no geometry exists */
-  if( current_mode != structure_last_mode || structure_vertex_count == 0 )
+  /* Check if current mode requires current/charge data */
+  gboolean is_current_mode = (current_mode == STRUCTURE_DRAW_CURRENTS || current_mode == STRUCTURE_DRAW_CHARGES);
+
+  /* Regenerate on mode change, when no geometry exists, or when current data updates */
+  if( current_mode != structure_last_mode ||
+      structure_vertex_count == 0 ||
+      (is_current_mode && crnt.newer) )
   {
     structure_last_mode = current_mode;
     opengl_structure_generate_geometry(current_mode);
+
+    /* Prevent redundant regeneration on subsequent expose events */
+    if( crnt.newer && is_current_mode )
+    {
+      crnt.newer = 0;
+    }
+
+    /* Clear redraw flag to allow SUPPRESS_INTERMEDIATE_REDRAWS guard to function */
+    need_structure_redraw = 0;
   }
 
   /* Zoom from structure spinbutton, normalized to multiplier */
@@ -384,5 +398,20 @@ opengl_structure_cleanup(void)
 {
 #ifdef HAVE_OPENGL
   opengl_structure_cleanup_impl();
+#endif
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_structure_queue_draw()
+ *
+ * Public API - queue redraw of OpenGL structure widget
+ */
+  void
+opengl_structure_queue_draw(void)
+{
+#ifdef HAVE_OPENGL
+  if( structure_gl_widget != NULL )
+    xnec2_widget_queue_draw( structure_gl_widget );
 #endif
 }

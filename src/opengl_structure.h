@@ -34,6 +34,7 @@ typedef enum
 /* Public API - always available, stubs when no OpenGL */
 GtkWidget* opengl_structure_create_widget(void);
 void opengl_structure_cleanup(void);
+void opengl_structure_queue_draw(void);
 
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"

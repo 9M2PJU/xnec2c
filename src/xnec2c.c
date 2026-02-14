@@ -1080,6 +1080,13 @@ Start_Frequency_Loop( void )
     SetFlag( FREQ_LOOP_INIT );
     SetFlag( FREQ_LOOP_RUNNING );
 
+    /* Allow SUPPRESS guard to block first-iteration redraw */
+    if( isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
+    {
+      need_structure_redraw = 0;
+      need_rdpat_redraw = 0;
+    }
+
 	if (!rc_config.disable_pthread_freqloop)
 	{
 		mem_alloc((void**)&pth_freq_loop, sizeof(pthread_t), __LOCATION__);

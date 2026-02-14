@@ -19,6 +19,7 @@
 
 #include "draw_structure.h"
 #include "shared.h"
+#include "opengl_structure.h"
 
 int need_structure_redraw = 1;
 
@@ -643,6 +644,12 @@ Redo_Currents( gpointer udata )
       (isFlagSet(DRAW_CURRENTS) || isFlagSet(DRAW_CHARGES)) )
   {
     xnec2_widget_queue_draw( structure_drawingarea );
+  }
+
+  /* Redraw OpenGL structure if active */
+  if( isFlagSet(DRAW_CURRENTS) || isFlagSet(DRAW_CHARGES) )
+  {
+    opengl_structure_queue_draw();
   }
 
   return FALSE;

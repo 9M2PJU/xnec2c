@@ -682,6 +682,12 @@ Open_Input_File( gpointer arg )
 
   New_Frequency_Reset_Prev();
 
+  /* Scale geometry for current frequency before potential loop start.
+   * During forked frequency loop, children scale geometry independently,
+   * but parent's data.bi[] must be wavelength-normalized for any
+   * intermediate renders triggered by crnt.newer updates from children. */
+  New_Frequency();
+
   /* Allow re-draws on expose events etc */
   ClearFlag( INPUT_PENDING );
 
