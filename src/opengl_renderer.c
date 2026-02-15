@@ -171,6 +171,9 @@ arcball_new(void)
   ab->drag_button = 0;
   ab->callback_count = 0;
   ab->in_notify = FALSE;
+  ab->drag_mode = ARCBALL_DRAG_CONSTRAINED;
+  ab->wr_deg = 45.0f;
+  ab->wi_deg = 45.0f;
 
   return( ab );
 
@@ -191,6 +194,60 @@ arcball_free(arcball_state_t *ab)
 } /* arcball_free() */
 
 /*-----------------------------------------------------------------------*/
+
+/* arcball_wrap_angles()
+ *
+ * Normalize WR to [0,360) and WI to [-180,180) to match NEC2 convention
+ */
+  static void
+arcball_wrap_angles(arcball_state_t *ab)
+{
+  while( ab->wr_deg < 0.0f )
+    ab->wr_deg += 360.0f;
+  while( ab->wr_deg >= 360.0f )
+    ab->wr_deg -= 360.0f;
+
+  while( ab->wi_deg < -180.0f )
+    ab->wi_deg += 360.0f;
+  while( ab->wi_deg >= 180.0f )
+    ab->wi_deg -= 360.0f;
+
+} /* arcball_wrap_angles() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_extract_angles()
+ *
+ * Extract WR/WI from current rotation matrix (ZYZ Euler decomposition)
+ */
+  static void
+arcball_extract_angles(arcball_state_t *ab)
+{
+  float r22, r21, r01, r11;
+  float beta, gamma;
+
+  r22 = ab->rotation[2][2];
+  r21 = ab->rotation[2][1];
+  r01 = ab->rotation[0][1];
+  r11 = ab->rotation[1][1];
+
+  beta = acos(glm_clamp(r22, -1.0f, 1.0f));
+
+  if( fabs(sin(beta)) > 0.001f )
+  {
+    gamma = atan2(r21, r01);
+  }
+  else
+  {
+    gamma = atan2(-r11, r01);
+  }
+
+  ab->wi_deg = glm_deg(beta) - 90.0f;
+  ab->wr_deg = -glm_deg(gamma);
+
+  arcball_wrap_angles(ab);
+
+} /* arcball_extract_angles() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -221,6 +278,9 @@ arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg)
 {
   if( !ab )
     return;
+
+  ab->wr_deg = wr_deg;
+  ab->wi_deg = wi_deg;
 
   glm_mat4_identity(ab->rotation);
   glm_rotate(ab->rotation, glm_rad(-90.0f), (vec3){0, 0, 1});
@@ -335,6 +395,7 @@ arcball_copy_rotation(arcball_state_t *dst, const arcball_state_t *src)
 /*-----------------------------------------------------------------------*/
 
 static void arcball_rotate(arcball_state_t *ab, float dx, float dy);
+static void arcball_rotate_constrained(arcball_state_t *ab, float dx, float dy);
 
 /*-----------------------------------------------------------------------*/
 
@@ -357,7 +418,14 @@ arcball_drag(arcball_state_t *ab, float x, float y, float viewport_height)
   dx = x - ab->last_x;
   dy = y - ab->last_y;
 
-  arcball_rotate(ab, dx, dy);
+  if( ab->drag_mode == ARCBALL_DRAG_CONSTRAINED )
+  {
+    arcball_rotate_constrained(ab, dx, dy);
+  }
+  else
+  {
+    arcball_rotate(ab, dx, dy);
+  }
 
   ab->last_x = x;
   ab->last_y = y;
@@ -393,6 +461,24 @@ arcball_rotate(arcball_state_t *ab, float dx, float dy)
   glm_mat4_mul(rot_y, ab->rotation, ab->rotation);
 
 } /* arcball_rotate() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_rotate_constrained()
+ *
+ * Constrained rotation updates WR/WI and rebuilds matrix
+ */
+  static void
+arcball_rotate_constrained(arcball_state_t *ab, float dx, float dy)
+{
+  ab->wr_deg -= dx / (float)MOTION_EVENTS_COUNT;
+  ab->wi_deg += dy / (float)MOTION_EVENTS_COUNT;
+
+  arcball_wrap_angles(ab);
+
+  arcball_set_view(ab, ab->wr_deg, ab->wi_deg);
+
+} /* arcball_rotate_constrained() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -456,6 +542,60 @@ arcball_get_mvp(arcball_state_t *ab, mat4 dest, const vec2 pan_offset,
   glm_mat4_mul(dest, model, dest);
 
 } /* arcball_get_mvp() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_set_drag_mode()
+ *
+ * Set rotation mode, extract angles if switching to constrained
+ */
+  void
+arcball_set_drag_mode(arcball_state_t *ab, arcball_drag_mode_t mode)
+{
+  if( !ab )
+    return;
+
+  if( mode == ARCBALL_DRAG_CONSTRAINED && ab->drag_mode != ARCBALL_DRAG_CONSTRAINED )
+    arcball_extract_angles(ab);
+
+  ab->drag_mode = mode;
+
+} /* arcball_set_drag_mode() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_get_drag_mode()
+ *
+ * Get current rotation mode
+ */
+  arcball_drag_mode_t
+arcball_get_drag_mode(arcball_state_t *ab)
+{
+  if( !ab )
+    return( ARCBALL_DRAG_FREE );
+
+  return( ab->drag_mode );
+
+} /* arcball_get_drag_mode() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_get_angles()
+ *
+ * Get current WR/WI angles (meaningful in constrained mode)
+ */
+  void
+arcball_get_angles(arcball_state_t *ab, float *wr, float *wi)
+{
+  if( !ab )
+    return;
+
+  if( wr )
+    *wr = ab->wr_deg;
+  if( wi )
+    *wi = ab->wi_deg;
+
+} /* arcball_get_angles() */
 
 /*-----------------------------------------------------------------------*/
 

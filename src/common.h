@@ -384,6 +384,9 @@ typedef struct
   double ant_temp_elevation; /* Antenna elevation tilt (degrees), +=up */
   /* Use OpenGL rendering for radiation patterns */
   int use_opengl_renderer;
+
+  /* Use constrained rotation for OpenGL arcball */
+  int arcball_constrained_rotation;
 } rc_config_t;
 
 typedef struct {
@@ -1137,6 +1140,7 @@ void on_rdpattern_poynting_vector_activate(GtkMenuItem *menuitem, gpointer user_
 void on_rdpattern_overlay_structure_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_gradient_key_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
 void on_main_opengl_renderer_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
+void on_arcball_constrained_rotation_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_x_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_y_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_z_axis_clicked(GtkButton *button, gpointer user_data);

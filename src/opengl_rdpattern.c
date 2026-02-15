@@ -555,7 +555,14 @@ static gl_scene_provider_t rdpattern_scene_provider = {
 opengl_rdpattern_create_widget(void)
 {
   if( !rdpattern_arcball )
+  {
     rdpattern_arcball = arcball_new();
+
+    /* Initialize mode from rc_config */
+    arcball_set_drag_mode(rdpattern_arcball,
+        rc_config.arcball_constrained_rotation ?
+        ARCBALL_DRAG_CONSTRAINED : ARCBALL_DRAG_FREE);
+  }
 
   rdpattern_gl_widget = gl_view_create_widget(
       &rdpattern_view_config,

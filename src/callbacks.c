@@ -2116,6 +2116,41 @@ on_main_opengl_renderer_toggled(
 }
 
 
+  void
+on_arcball_constrained_rotation_toggled(
+    GtkCheckMenuItem *menuitem,
+    gpointer          user_data)
+{
+#ifdef HAVE_OPENGL
+  arcball_state_t *structure_ab, *rdpattern_ab;
+  arcball_drag_mode_t mode;
+
+  if( gtk_check_menu_item_get_active(menuitem) )
+  {
+    rc_config.arcball_constrained_rotation = 1;
+    mode = ARCBALL_DRAG_CONSTRAINED;
+  }
+  else
+  {
+    rc_config.arcball_constrained_rotation = 0;
+    mode = ARCBALL_DRAG_FREE;
+  }
+
+  structure_ab = opengl_structure_get_arcball();
+  if( structure_ab )
+    arcball_set_drag_mode(structure_ab, mode);
+
+  if( isFlagClear(COMMON_PROJECTION) )
+  {
+    rdpattern_ab = opengl_rdpattern_get_arcball();
+    if( rdpattern_ab )
+      arcball_set_drag_mode(rdpattern_ab, mode);
+  }
+#endif
+
+} /* on_arcball_constrained_rotation_toggled() */
+
+
 /* rdpattern_set_view_preset()
  *
  * Set rdpattern view to preset angle and reset arcball pan

@@ -362,7 +362,14 @@ static gl_scene_provider_t structure_scene_provider = {
 opengl_structure_create_widget_impl(void)
 {
   if( !structure_arcball )
+  {
     structure_arcball = arcball_new();
+
+    /* Initialize mode from rc_config */
+    arcball_set_drag_mode(structure_arcball,
+        rc_config.arcball_constrained_rotation ?
+        ARCBALL_DRAG_CONSTRAINED : ARCBALL_DRAG_FREE);
+  }
 
   /* Initialize arcball from current projection angles */
   arcball_set_view(structure_arcball,

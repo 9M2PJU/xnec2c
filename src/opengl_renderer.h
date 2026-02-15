@@ -29,6 +29,14 @@
 /* Base distance multiplier for arcball viewing (sqrt(3) * 1.25) */
 #define ARCBALL_BASE_DISTANCE_FACTOR 2.165f
 
+/* Arcball rotation mode */
+typedef enum
+{
+  ARCBALL_DRAG_FREE = 0,
+  ARCBALL_DRAG_CONSTRAINED = 1
+
+} arcball_drag_mode_t;
+
 /* Vertex attribute descriptor */
 typedef struct
 {
@@ -71,6 +79,9 @@ struct arcball_state
   arcball_callback_t callbacks[ARCBALL_MAX_CALLBACKS];
   int callback_count;
   gboolean in_notify;
+  arcball_drag_mode_t drag_mode;
+  float wr_deg;
+  float wi_deg;
 };
 
 /* Shader functions */
@@ -92,6 +103,9 @@ void arcball_add_callback(arcball_state_t *ab, arcball_callback_fn func, gpointe
 void arcball_remove_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data);
 void arcball_notify_changed(arcball_state_t *ab);
 void arcball_copy_rotation(arcball_state_t *dst, const arcball_state_t *src);
+void arcball_set_drag_mode(arcball_state_t *ab, arcball_drag_mode_t mode);
+arcball_drag_mode_t arcball_get_drag_mode(arcball_state_t *ab);
+void arcball_get_angles(arcball_state_t *ab, float *wr, float *wi);
 
 
 #endif /* HAVE_OPENGL */

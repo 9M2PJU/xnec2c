@@ -118,6 +118,11 @@ rc_config_vars_t rc_config_vars[] = {
 		.builder_window = &main_window_builder,
 		.builder_check_menu_item_id = "main_opengl_renderer" },
 
+	{ .desc = "Use Constrained Rotation for OpenGL Arcball", .format = "%d",
+		.vars = { &rc_config.arcball_constrained_rotation },
+		.builder_window = &main_window_builder,
+		.builder_check_menu_item_id = "arcball_constrained_rotation" },
+
 	{ .desc = "Frequency Plots Window Size, in pixels", .format = "%d,%d",
 		.vars = { &rc_config.freqplots_width, &rc_config.freqplots_height } },
 
@@ -542,6 +547,8 @@ Create_Default_Config( void )
 #else
   rc_config.use_opengl_renderer = 0;
 #endif
+
+  rc_config.arcball_constrained_rotation = 1;
 
   /* See enum GAIN_SCALE */
   rc_config.gain_style = GS_LINP;

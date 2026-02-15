@@ -11122,6 +11122,16 @@ Save NEC2 Editor data first?
                             <signal name="toggled" handler="on_main_opengl_renderer_toggled" swapped="no"/>
                           </object>
                         </child>
+                        <child>
+                          <object class="GtkCheckMenuItem" id="arcball_constrained_rotation">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">Constrained _Rotation</property>
+                            <property name="use-underline">True</property>
+                            <property name="active">True</property>
+                            <signal name="toggled" handler="on_arcball_constrained_rotation_toggled" swapped="no"/>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
