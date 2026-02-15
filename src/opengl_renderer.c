@@ -431,7 +431,8 @@ arcball_end_drag(arcball_state_t *ab)
  */
   void
 arcball_get_mvp(arcball_state_t *ab, mat4 dest, const vec2 pan_offset,
-    float distance, float model_scale, float aspect, float fov_rad)
+    float distance, float model_scale, float aspect, float fov_rad,
+    float near_plane, float far_plane)
 {
   mat4 view, proj, model, trans;
   vec3 eye_pos, center_pos, up;
@@ -449,7 +450,7 @@ arcball_get_mvp(arcball_state_t *ab, mat4 dest, const vec2 pan_offset,
   glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, up);
 
   glm_lookat(eye_pos, center_pos, up, view);
-  glm_perspective(fov_rad, aspect, 0.1f, 100.0f, proj);
+  glm_perspective(fov_rad, aspect, near_plane, far_plane, proj);
 
   glm_mat4_mul(proj, view, dest);
   glm_mat4_mul(dest, model, dest);

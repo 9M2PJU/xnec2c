@@ -5640,12 +5640,31 @@ on_structure_drawingarea_scroll_event(
     GdkEvent        *event,
     gpointer         user_data)
 {
+  int viewport_width, viewport_height;
+  double scale;
+
+  viewport_width = gtk_widget_get_allocated_width(widget);
+  viewport_height = gtk_widget_get_allocated_height(widget);
+
   structure_proj_params.xy_zoom =
     gtk_spin_button_get_value( structure_zoom );
+
+  scale = compute_zoom_scale(viewport_width, viewport_height,
+      structure_proj_params.xy_zoom);
+
   if( event->scroll.direction == GDK_SCROLL_UP )
-    structure_proj_params.xy_zoom *= 1.1;
+  {
+    structure_proj_params.xy_zoom *= (1.0 + 0.1 * scale);
+  }
   else if( event->scroll.direction == GDK_SCROLL_DOWN )
-    structure_proj_params.xy_zoom /= 1.1;
+  {
+    structure_proj_params.xy_zoom /= (1.0 + 0.1 * scale);
+  }
+  else
+  {
+    return( FALSE );
+  }
+
   gtk_spin_button_set_value(
       structure_zoom, structure_proj_params.xy_zoom );
   return( FALSE );
@@ -5658,12 +5677,31 @@ on_rdpattern_drawingarea_scroll_event(
     GdkEvent        *event,
     gpointer         user_data)
 {
+  int viewport_width, viewport_height;
+  double scale;
+
+  viewport_width = gtk_widget_get_allocated_width(widget);
+  viewport_height = gtk_widget_get_allocated_height(widget);
+
   rdpattern_proj_params.xy_zoom =
     gtk_spin_button_get_value( rdpattern_zoom );
+
+  scale = compute_zoom_scale(viewport_width, viewport_height,
+      rdpattern_proj_params.xy_zoom);
+
   if( event->scroll.direction == GDK_SCROLL_UP )
-    rdpattern_proj_params.xy_zoom *= 1.1;
+  {
+    rdpattern_proj_params.xy_zoom *= (1.0 + 0.1 * scale);
+  }
   else if( event->scroll.direction == GDK_SCROLL_DOWN )
-    rdpattern_proj_params.xy_zoom /= 1.1;
+  {
+    rdpattern_proj_params.xy_zoom /= (1.0 + 0.1 * scale);
+  }
+  else
+  {
+    return( FALSE );
+  }
+
   gtk_spin_button_set_value(
       rdpattern_zoom, rdpattern_proj_params.xy_zoom );
   return( FALSE );

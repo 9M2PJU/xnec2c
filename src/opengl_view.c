@@ -297,8 +297,30 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   /* Cache distance for pan calculations during drag */
   state->cached_camera_distance = camera_distance;
 
-  arcball_get_mvp(state->arcball, mvp, state->pan_offset,
-      camera_distance, content.model_scale, state->aspect, state->fov_rad);
+  /* Compute clip planes dynamically based on scene geometry and camera position.
+   * This prevents Z-depth clipping when zooming out while maintaining depth
+   * precision by keeping near plane as far from camera as geometry allows. */
+  {
+    float nearest_point, farthest_point, near_plane, far_plane;
+
+    nearest_point = camera_distance - content.r_max;
+    farthest_point = camera_distance + content.r_max;
+
+    far_plane = farthest_point * 1.2f;
+
+    if( nearest_point > 0.0f )
+    {
+      near_plane = nearest_point * 0.8f;
+    }
+    else
+    {
+      near_plane = 0.001f;
+    }
+
+    arcball_get_mvp(state->arcball, mvp, state->pan_offset,
+        camera_distance, content.model_scale, state->aspect, state->fov_rad,
+        near_plane, far_plane);
+  }
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -517,7 +539,8 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
 {
   gl_view_state_t *state;
   GtkSpinButton *spinbutton;
-  double value, step;
+  double value, scale, zoom_percent;
+  int viewport_width, viewport_height;
 
   state = (gl_view_state_t *)user_data;
 
@@ -526,12 +549,17 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
 
   spinbutton = *state->zoom_spinbutton;
   value = gtk_spin_button_get_value(spinbutton);
-  gtk_spin_button_get_increments(spinbutton, &step, NULL);
+
+  viewport_width = (int)(state->viewport_height * state->aspect);
+  viewport_height = (int)state->viewport_height;
+  zoom_percent = value;
+
+  scale = compute_zoom_scale(viewport_width, viewport_height, zoom_percent);
 
   if( event->direction == GDK_SCROLL_UP )
-    value += step;
+    value *= (1.0 + 0.1 * scale);
   else if( event->direction == GDK_SCROLL_DOWN )
-    value -= step;
+    value /= (1.0 + 0.1 * scale);
   else
     return( FALSE );
 

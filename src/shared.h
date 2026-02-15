@@ -314,4 +314,31 @@ extern Segment_t *structure_segs;
 
 /*------------------------------------------------------------------------*/
 
+/* compute_zoom_scale()
+ *
+ * Compute zoom scaling factor based on viewport dimensions and current zoom level.
+ * Accounts for three factors:
+ * - Diagonal normalization: larger viewports get proportionally larger increments
+ * - Base 2x multiplier: makes zoom approximately twice as fast as original
+ * - Logarithmic damping: prevents jarring jumps at high zoom levels
+ */
+  static inline double
+compute_zoom_scale(int viewport_width, int viewport_height, double zoom_percent)
+{
+  double diagonal, zoom_normalized;
+
+  diagonal = sqrt((double)(viewport_width * viewport_width + viewport_height * viewport_height));
+  zoom_normalized = zoom_percent / 100.0;
+
+  if( zoom_normalized < 1.0 )
+  {
+    zoom_normalized = 1.0;
+  }
+
+  return (diagonal / 707.0) * (2.0 / (1.0 + log2(zoom_normalized)));
+
+} /* compute_zoom_scale() */
+
+/*------------------------------------------------------------------------*/
+
 #endif
