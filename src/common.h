@@ -387,6 +387,9 @@ typedef struct
 
   /* Use constrained rotation for OpenGL arcball */
   int arcball_constrained_rotation;
+
+  /* OpenGL MSAA sample count (0, 2, 4, 8, or 16) */
+  int opengl_msaa_samples;
 } rc_config_t;
 
 typedef struct {
@@ -407,6 +410,15 @@ enum GAIN_SCALE
 };
 
 #define IS_NOISE_MODE(gs) ((gs) == GS_NOISE || (gs) == GS_NOISE_LOG)
+/* OpenGL MSAA sample counts */
+enum OPENGL_MSAA
+{
+  MSAA_OFF = 0,
+  MSAA_2X = 2,
+  MSAA_4X = 4,
+  MSAA_8X = 8,
+  MSAA_16X = 16
+};
 
 /* Minimum gain value used for color mapping */
 #define COLOR_MIN_GAIN -60.0
@@ -1141,6 +1153,11 @@ void on_rdpattern_overlay_structure_activate(GtkMenuItem *menuitem, gpointer use
 void on_rdpattern_gradient_key_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
 void on_main_opengl_renderer_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
 void on_arcball_constrained_rotation_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
+void on_main_opengl_msaa_off_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_main_opengl_msaa_2x_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_main_opengl_msaa_4x_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_main_opengl_msaa_8x_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_main_opengl_msaa_16x_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_x_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_y_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_z_axis_clicked(GtkButton *button, gpointer user_data);

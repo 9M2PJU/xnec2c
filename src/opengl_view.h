@@ -114,6 +114,14 @@ typedef struct
   vec2 pan_offset;
   float cached_camera_distance;
 
+  /* MSAA state */
+  GLuint msaa_fbo;
+  GLuint msaa_color_rbo;
+  GLuint msaa_depth_rbo;
+  int msaa_samples;
+  int msaa_width;
+  int msaa_height;
+
   gboolean initialized;
 
 } gl_view_state_t;
@@ -129,6 +137,7 @@ gl_view_state_t* gl_view_get_state(GtkWidget *widget);
 void gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball);
 void gl_view_sync_arcball(GtkWidget *widget, double wr, double wi);
 void gl_view_reset_pan(GtkWidget *widget);
+void Set_MSAA_Samples(int samples);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_VIEW_H */

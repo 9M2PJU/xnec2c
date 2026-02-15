@@ -11132,6 +11132,69 @@ Save NEC2 Editor data first?
                             <signal name="toggled" handler="on_arcball_constrained_rotation_toggled" swapped="no"/>
                           </object>
                         </child>
+                        <child>
+                          <object class="GtkMenuItem">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">OpenGL _MSAA</property>
+                            <property name="use-underline">True</property>
+                            <child type="submenu">
+                              <object class="GtkMenu">
+                                <property name="can-focus">False</property>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_off">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_Off</property>
+                                    <property name="use-underline">True</property>
+                                    <signal name="activate" handler="on_main_opengl_msaa_off_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_2x">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_2x</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="group">main_opengl_msaa_off</property>
+                                    <signal name="activate" handler="on_main_opengl_msaa_2x_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_4x">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_4x</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="active">True</property>
+                                    <property name="group">main_opengl_msaa_off</property>
+                                    <signal name="activate" handler="on_main_opengl_msaa_4x_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_8x">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_8x</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="group">main_opengl_msaa_off</property>
+                                    <signal name="activate" handler="on_main_opengl_msaa_8x_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_16x">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">1_6x</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="group">main_opengl_msaa_off</property>
+                                    <signal name="activate" handler="on_main_opengl_msaa_16x_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

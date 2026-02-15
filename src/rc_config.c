@@ -25,6 +25,7 @@
 #include "measurements.h"
 
 #include "opengl_structure.h"
+#include "opengl_view.h"
 
 
 /* Add configuration options here. To add new variables:
@@ -122,6 +123,9 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.arcball_constrained_rotation },
 		.builder_window = &main_window_builder,
 		.builder_check_menu_item_id = "arcball_constrained_rotation" },
+
+	{ .desc = "OpenGL Anti-Aliasing Samples", .format = "%d",
+		.vars = { &rc_config.opengl_msaa_samples } },
 
 	{ .desc = "Frequency Plots Window Size, in pixels", .format = "%d,%d",
 		.vars = { &rc_config.freqplots_width, &rc_config.freqplots_height } },
@@ -544,8 +548,10 @@ Create_Default_Config( void )
   rc_config.rdpattern_zoom_spinbutton = 100;
 #ifdef HAVE_OPENGL
   rc_config.use_opengl_renderer = 1;
+  rc_config.opengl_msaa_samples = MSAA_4X;
 #else
   rc_config.use_opengl_renderer = 0;
+  rc_config.opengl_msaa_samples = MSAA_OFF;
 #endif
 
   rc_config.arcball_constrained_rotation = 1;
@@ -737,6 +743,11 @@ Restore_GUI_State( void )
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
   else
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
+
+#ifdef HAVE_OPENGL
+  /* Restore MSAA menu selection */
+  Set_MSAA_Samples( rc_config.opengl_msaa_samples );
+#endif
 
   g_idle_add( Restore_Windows, NULL );
 

@@ -24,6 +24,98 @@
 
 /*-----------------------------------------------------------------------*/
 
+/* gl_view_recreate_msaa()
+ *
+ * Recreate MSAA resources without destroying GL widget
+ */
+  static void
+gl_view_recreate_msaa(gl_view_state_t *state, int requested_samples)
+{
+  GLint max_samples;
+  int width, height;
+
+  if( !state || !state->initialized )
+    return;
+
+  /* Delete existing MSAA resources */
+  if( state->msaa_fbo )
+  {
+    glDeleteFramebuffers(1, &state->msaa_fbo);
+    state->msaa_fbo = 0;
+  }
+
+  if( state->msaa_color_rbo )
+  {
+    glDeleteRenderbuffers(1, &state->msaa_color_rbo);
+    state->msaa_color_rbo = 0;
+  }
+
+  if( state->msaa_depth_rbo )
+  {
+    glDeleteRenderbuffers(1, &state->msaa_depth_rbo);
+    state->msaa_depth_rbo = 0;
+  }
+
+  state->msaa_samples = 0;
+
+  if( requested_samples == 0 )
+    return;
+
+  /* Query hardware limit and clamp */
+  glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+  state->msaa_samples = (requested_samples > max_samples) ? max_samples : requested_samples;
+
+  if( state->msaa_samples < 2 )
+  {
+    state->msaa_samples = 0;
+    return;
+  }
+
+  /* Get current viewport dimensions */
+  width = state->msaa_width;
+  height = state->msaa_height;
+
+  if( width == 0 || height == 0 )
+    return;
+
+  /* Create multisampled color renderbuffer */
+  glGenRenderbuffers(1, &state->msaa_color_rbo);
+  glBindRenderbuffer(GL_RENDERBUFFER, state->msaa_color_rbo);
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, state->msaa_samples,
+      GL_RGBA8, width, height);
+
+  /* Create multisampled depth renderbuffer */
+  glGenRenderbuffers(1, &state->msaa_depth_rbo);
+  glBindRenderbuffer(GL_RENDERBUFFER, state->msaa_depth_rbo);
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, state->msaa_samples,
+      GL_DEPTH_COMPONENT24, width, height);
+
+  /* Create FBO and attach renderbuffers */
+  glGenFramebuffers(1, &state->msaa_fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, state->msaa_fbo);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+      GL_RENDERBUFFER, state->msaa_color_rbo);
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+      GL_RENDERBUFFER, state->msaa_depth_rbo);
+
+  if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+  {
+    pr_err("MSAA framebuffer incomplete\n");
+    glDeleteFramebuffers(1, &state->msaa_fbo);
+    glDeleteRenderbuffers(1, &state->msaa_color_rbo);
+    glDeleteRenderbuffers(1, &state->msaa_depth_rbo);
+    state->msaa_fbo = 0;
+    state->msaa_color_rbo = 0;
+    state->msaa_depth_rbo = 0;
+    state->msaa_samples = 0;
+  }
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+} /* gl_view_recreate_msaa() */
+
+/*-----------------------------------------------------------------------*/
+
 /* gl_view_state_free()
  *
  * Free view state resources
@@ -62,6 +154,25 @@ gl_view_state_free(gl_view_state_t *state)
 
   if( state->axes )
     opengl_axes_free(state->axes);
+
+  /* Free MSAA resources */
+  if( state->msaa_fbo )
+  {
+    glDeleteFramebuffers(1, &state->msaa_fbo);
+    state->msaa_fbo = 0;
+  }
+
+  if( state->msaa_color_rbo )
+  {
+    glDeleteRenderbuffers(1, &state->msaa_color_rbo);
+    state->msaa_color_rbo = 0;
+  }
+
+  if( state->msaa_depth_rbo )
+  {
+    glDeleteRenderbuffers(1, &state->msaa_depth_rbo);
+    state->msaa_depth_rbo = 0;
+  }
 
   if( state->vbo )
     glDeleteBuffers(1, &state->vbo);
@@ -182,6 +293,9 @@ on_realize(GtkGLArea *area, gpointer user_data)
 
   state->initialized = TRUE;
 
+  /* Initialize MSAA resources after GL context is ready */
+  gl_view_recreate_msaa(state, rc_config.opengl_msaa_samples);
+
 } /* on_realize() */
 
 /*-----------------------------------------------------------------------*/
@@ -263,6 +377,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   gl_view_content_t content;
   mat4 mvp;
   float camera_distance;
+  GLint default_fbo = 0;
 
   state = (gl_view_state_t *)user_data;
 
@@ -322,10 +437,16 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
         near_plane, far_plane);
   }
 
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  /* Save default FBO and bind MSAA FBO if active */
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &default_fbo);
 
-  glEnable(GL_DEPTH_TEST);
+  if( state->msaa_fbo )
+    glBindFramebuffer(GL_FRAMEBUFFER, state->msaa_fbo);
+
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glEnable(GL_DEPTH_TEST);
 
   if( content.vertex_count > 0 )
   {
@@ -385,6 +506,17 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   if( state->scene->post_render )
     state->scene->post_render();
 
+  /* Blit MSAA to default FBO */
+  if( state->msaa_fbo )
+  {
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, state->msaa_fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, default_fbo);
+    glBlitFramebuffer(0, 0, state->msaa_width, state->msaa_height,
+                      0, 0, state->msaa_width, state->msaa_height,
+                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, default_fbo);
+  }
+
   return( TRUE );
 
 } /* on_render() */
@@ -410,6 +542,14 @@ on_resize(GtkGLArea *area, int width, int height, gpointer user_data)
 
   state->aspect = aspect;
   state->viewport_height = (float)height;
+
+  /* Store dimensions for MSAA recreation */
+  state->msaa_width = width;
+  state->msaa_height = height;
+
+  /* Recreate MSAA FBO at new dimensions */
+  if( state->msaa_samples > 0 )
+    gl_view_recreate_msaa(state, state->msaa_samples);
 
   if( state->overlay )
     gradient_overlay_set_viewport(state->overlay, width, height);
@@ -712,6 +852,65 @@ gl_view_reset_pan(GtkWidget *widget)
   glm_vec2_zero(state->pan_offset);
 
 } /* gl_view_reset_pan() */
+
+/*-----------------------------------------------------------------------*/
+
+/* Set_MSAA_Samples()
+ *
+ * Change MSAA sample count for all GL views
+ */
+  void
+Set_MSAA_Samples(int samples)
+{
+  static char *msaa_widget_names[] = {
+    "main_opengl_msaa_off",
+    NULL,
+    "main_opengl_msaa_2x",
+    NULL,
+    "main_opengl_msaa_4x",
+    NULL, NULL, NULL,
+    "main_opengl_msaa_8x",
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    "main_opengl_msaa_16x"
+  };
+
+  GtkWidget *widget;
+  gl_view_state_t *state;
+
+  rc_config.opengl_msaa_samples = samples;
+
+  /* Update menu selection */
+  if( samples <= 16 && msaa_widget_names[samples] )
+  {
+    widget = Builder_Get_Object(main_window_builder, msaa_widget_names[samples]);
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget), TRUE);
+  }
+
+  /* Recreate MSAA resources for structure view */
+  if( structure_gl_area )
+  {
+    state = gl_view_get_state(structure_gl_area);
+    if( state )
+    {
+      gtk_gl_area_make_current(GTK_GL_AREA(structure_gl_area));
+      gl_view_recreate_msaa(state, samples);
+      gtk_widget_queue_draw(structure_gl_area);
+    }
+  }
+
+  /* Recreate MSAA resources for radiation pattern view */
+  if( rdpattern_gl_area )
+  {
+    state = gl_view_get_state(rdpattern_gl_area);
+    if( state )
+    {
+      gtk_gl_area_make_current(GTK_GL_AREA(rdpattern_gl_area));
+      gl_view_recreate_msaa(state, samples);
+      gtk_widget_queue_draw(rdpattern_gl_area);
+    }
+  }
+
+} /* Set_MSAA_Samples() */
 
 /*-----------------------------------------------------------------------*/
 

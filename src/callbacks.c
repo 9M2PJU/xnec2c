@@ -2117,6 +2117,66 @@ on_main_opengl_renderer_toggled(
 
 
   void
+on_main_opengl_msaa_off_activate(
+    GtkMenuItem *menuitem,
+    gpointer     user_data)
+{
+#ifdef HAVE_OPENGL
+  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    Set_MSAA_Samples(MSAA_OFF);
+#endif
+}
+
+
+  void
+on_main_opengl_msaa_2x_activate(
+    GtkMenuItem *menuitem,
+    gpointer     user_data)
+{
+#ifdef HAVE_OPENGL
+  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    Set_MSAA_Samples(MSAA_2X);
+#endif
+}
+
+
+  void
+on_main_opengl_msaa_4x_activate(
+    GtkMenuItem *menuitem,
+    gpointer     user_data)
+{
+#ifdef HAVE_OPENGL
+  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    Set_MSAA_Samples(MSAA_4X);
+#endif
+}
+
+
+  void
+on_main_opengl_msaa_8x_activate(
+    GtkMenuItem *menuitem,
+    gpointer     user_data)
+{
+#ifdef HAVE_OPENGL
+  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    Set_MSAA_Samples(MSAA_8X);
+#endif
+}
+
+
+  void
+on_main_opengl_msaa_16x_activate(
+    GtkMenuItem *menuitem,
+    gpointer     user_data)
+{
+#ifdef HAVE_OPENGL
+  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    Set_MSAA_Samples(MSAA_16X);
+#endif
+}
+
+
+  void
 on_arcball_constrained_rotation_toggled(
     GtkCheckMenuItem *menuitem,
     gpointer          user_data)
