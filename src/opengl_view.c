@@ -37,6 +37,26 @@ gl_view_state_free(gl_view_state_t *state)
   if( state->scene && state->scene->cleanup )
     state->scene->cleanup();
 
+  if( state->scene && state->scene->overlay_cleanup )
+    state->scene->overlay_cleanup();
+
+  /* Free overlay rendering resources */
+  if( state->ovl_initialized )
+  {
+    if( state->ovl_vbo )
+      glDeleteBuffers(1, &state->ovl_vbo);
+
+    if( state->ovl_vao )
+      glDeleteVertexArrays(1, &state->ovl_vao);
+
+    gl_shader_destroy(&state->ovl_shader);
+
+    if( state->ovl_attrib_locations )
+      g_free(state->ovl_attrib_locations);
+
+    state->ovl_initialized = FALSE;
+  }
+
   if( state->overlay )
     gradient_overlay_free(state->overlay);
 
@@ -126,6 +146,40 @@ on_realize(GtkGLArea *area, gpointer user_data)
     gradient_overlay_set_viewport(state->overlay, alloc.width, alloc.height);
   }
 
+  /* Initialize overlay rendering resources if configured */
+  if( state->scene->overlay_config )
+  {
+    const gl_overlay_config_t *ocfg = state->scene->overlay_config;
+
+    ok = gl_shader_load(&state->ovl_shader,
+        ocfg->vertex_shader_path,
+        ocfg->fragment_shader_path);
+
+    if( ok )
+    {
+      state->ovl_mvp_location =
+        glGetUniformLocation(state->ovl_shader.program, "mvp");
+
+      glGenVertexArrays(1, &state->ovl_vao);
+      glGenBuffers(1, &state->ovl_vbo);
+
+      state->ovl_attrib_locations = g_new(GLint, ocfg->attrib_count);
+      for( i = 0; i < ocfg->attrib_count; i++ )
+      {
+        state->ovl_attrib_locations[i] = glGetAttribLocation(
+            state->ovl_shader.program,
+            ocfg->attribs[i].name);
+      }
+
+      state->ovl_last_generation = (unsigned int)-1;
+      state->ovl_initialized = TRUE;
+    }
+    else
+    {
+      pr_err("Failed to load overlay shaders\n");
+    }
+  }
+
   state->initialized = TRUE;
 
 } /* on_realize() */
@@ -148,6 +202,53 @@ on_unrealize(GtkGLArea *area, gpointer user_data)
   gl_view_state_free(state);
 
 } /* on_unrealize() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_view_draw_pass()
+ *
+ * Execute a rendering pass with given shader, VAO, VBO, and vertex attributes
+ */
+  static void
+gl_view_draw_pass(
+    GLuint shader_program,
+    GLint mvp_location,
+    mat4 mvp,
+    GLuint vao,
+    GLuint vbo,
+    const gl_vertex_attrib_t *attribs,
+    const GLint *attrib_locations,
+    int attrib_count,
+    const gl_view_content_t *content)
+{
+  int i;
+
+  glUseProgram(shader_program);
+  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (float *)mvp);
+
+  glBindVertexArray(vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+  for( i = 0; i < attrib_count; i++ )
+  {
+    glEnableVertexAttribArray(attrib_locations[i]);
+    glVertexAttribPointer(
+        attrib_locations[i],
+        attribs[i].components,
+        GL_FLOAT,
+        GL_FALSE,
+        content->vertex_stride,
+        (void *)(long)attribs[i].offset);
+  }
+
+  glDrawArrays(content->draw_mode, 0, content->vertex_count);
+
+  for( i = 0; i < attrib_count; i++ )
+    glDisableVertexAttribArray(attrib_locations[i]);
+
+  glBindVertexArray(0);
+
+} /* gl_view_draw_pass() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -203,34 +304,51 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
   if( content.vertex_count > 0 )
   {
-    int i;
+    gl_view_draw_pass(
+        state->shader.program,
+        state->mvp_location,
+        mvp,
+        state->vao,
+        state->vbo,
+        state->config->attribs,
+        state->attrib_locations,
+        state->config->attrib_count,
+        &content);
+  }
 
-    glUseProgram(state->shader.program);
-    glUniformMatrix4fv(state->mvp_location, 1, GL_FALSE, (float *)mvp);
+  /* Render structure overlay if provider is active */
+  if( state->ovl_initialized && state->scene->overlay_generate )
+  {
+    gl_view_content_t ovl_content;
 
-    glBindVertexArray(state->vao);
-    glBindBuffer(GL_ARRAY_BUFFER, state->vbo);
-
-    for( i = 0; i < state->config->attrib_count; i++ )
+    if( state->scene->overlay_generate(&ovl_content) &&
+        ovl_content.vertex_count > 0 )
     {
-      const gl_vertex_attrib_t *attr = &state->config->attribs[i];
+      const gl_overlay_config_t *ocfg = state->scene->overlay_config;
 
-      glEnableVertexAttribArray(state->attrib_locations[i]);
-      glVertexAttribPointer(
-        state->attrib_locations[i],
-        attr->components,
-        GL_FLOAT,
-        GL_FALSE,
-        content.vertex_stride,
-        (void *)(long)attr->offset);
+      /* Upload overlay vertices on generation change */
+      if( ovl_content.generation != state->ovl_last_generation )
+      {
+        glBindBuffer(GL_ARRAY_BUFFER, state->ovl_vbo);
+        glBufferData(GL_ARRAY_BUFFER,
+            ovl_content.vertex_count * ovl_content.vertex_stride,
+            ovl_content.vertices,
+            GL_STATIC_DRAW);
+        state->ovl_last_generation = ovl_content.generation;
+      }
+
+      /* Draw overlay with its own shader, same MVP */
+      gl_view_draw_pass(
+          state->ovl_shader.program,
+          state->ovl_mvp_location,
+          mvp,
+          state->ovl_vao,
+          state->ovl_vbo,
+          ocfg->attribs,
+          state->ovl_attrib_locations,
+          ocfg->attrib_count,
+          &ovl_content);
     }
-
-    glDrawArrays(content.draw_mode, 0, content.vertex_count);
-
-    for( i = 0; i < state->config->attrib_count; i++ )
-      glDisableVertexAttribArray(state->attrib_locations[i]);
-
-    glBindVertexArray(0);
   }
 
   opengl_axes_set_scale(state->axes, content.r_max * 1.1f);

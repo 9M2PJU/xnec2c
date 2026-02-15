@@ -18,6 +18,7 @@
  */
 
 #include "opengl_rdpattern.h"
+#include "opengl_structure.h"
 #include "shared.h"
 #include "draw.h"
 #include "draw_radiation.h"
@@ -55,6 +56,14 @@ static arcball_state_t *rdpattern_arcball = NULL;
 static const gl_vertex_attrib_t rdpattern_attribs[] = {
   { "position", 3, 0 },
   { "color",    4, 4 * (int)sizeof(float) }
+};
+
+/* Overlay configuration for structure rendering in rdpattern */
+static const gl_overlay_config_t rdpattern_overlay_config = {
+  .vertex_shader_path = "/gl/lit-color-vertex.glsl",
+  .fragment_shader_path = "/gl/lit-color-fragment.glsl",
+  .attribs = opengl_structure_attribs,
+  .attrib_count = 3
 };
 
 /*-----------------------------------------------------------------------*/
@@ -479,6 +488,43 @@ rdpattern_scene_cleanup(void)
 
 /*-----------------------------------------------------------------------*/
 
+/* rdpattern_overlay_generate()
+ *
+ * Overlay provider generate callback.
+ * Returns structure geometry for overlay when OVERLAY_STRUCT is set.
+ */
+  static gboolean
+rdpattern_overlay_generate(gl_view_content_t *out)
+{
+  const structure_overlay_data_t *geom;
+
+  if( isFlagClear(OVERLAY_STRUCT) || data.n <= 0 )
+    return( FALSE );
+
+  /* Ensure shared geometry is fresh */
+  opengl_structure_update_shared_geometry();
+  geom = opengl_structure_get_shared_geometry();
+
+  if( !geom || geom->vertex_count <= 0 )
+    return( FALSE );
+
+  out->vertices = geom->vertices;
+  out->vertex_count = geom->vertex_count;
+  out->vertex_stride = geom->vertex_stride;
+  out->draw_mode = GL_TRIANGLES;
+  out->show_gradient = FALSE;
+
+  /* Overlay pass shares primary content MVP; these fields are unused */
+  out->r_max = 0.0f;
+  out->zoom = 1.0f;
+  out->model_scale = 1.0f;
+  out->generation = geom->generation;
+
+  return( TRUE );
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* Static scene configuration and provider */
 static gl_view_config_t rdpattern_view_config = {
   .vertex_shader_path = "/gl/color-vertex.glsl",
@@ -493,7 +539,10 @@ static gl_view_config_t rdpattern_view_config = {
 static gl_scene_provider_t rdpattern_scene_provider = {
   .generate = rdpattern_scene_generate,
   .post_render = rdpattern_scene_post_render,
-  .cleanup = rdpattern_scene_cleanup
+  .cleanup = rdpattern_scene_cleanup,
+  .overlay_config = &rdpattern_overlay_config,
+  .overlay_generate = rdpattern_overlay_generate,
+  .overlay_cleanup = NULL
 };
 
 /*-----------------------------------------------------------------------*/

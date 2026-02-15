@@ -29,6 +29,15 @@
 /* Base distance multiplier for arcball viewing (sqrt(3) * 1.25) */
 #define ARCBALL_BASE_DISTANCE_FACTOR 2.165f
 
+/* Vertex attribute descriptor */
+typedef struct
+{
+  const char *name;
+  int components;
+  int offset;
+
+} gl_vertex_attrib_t;
+
 /* Shader container */
 typedef struct
 {

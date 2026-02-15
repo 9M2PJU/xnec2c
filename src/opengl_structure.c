@@ -32,14 +32,15 @@
 /* Number of sides for cylinder rendering */
 #define STRUCTURE_CYLINDER_SEGMENTS 24
 
-/* Vertex buffer for structure geometry */
+/* Shared geometry buffer accessible by both structure window and overlay */
 static lit_color_point_t *structure_vertices = NULL;
 static int structure_vertex_count = 0;
 static unsigned int structure_geometry_generation = 1;
 static structure_draw_mode_t structure_last_mode = STRUCTURE_DRAW_GEOMETRY;
-
-/* Structure scale factor for view */
 static float structure_view_scale = 1.0f;
+
+/* Public accessor for shared geometry */
+static structure_overlay_data_t shared_overlay_data = { 0 };
 
 /* Widget pointer for queue_redraw */
 static GtkWidget *structure_gl_widget = NULL;
@@ -47,8 +48,8 @@ static GtkWidget *structure_gl_widget = NULL;
 /* Arcball for structure view */
 static arcball_state_t *structure_arcball = NULL;
 
-/* Vertex attribute layout for lit-color shader */
-static const gl_vertex_attrib_t structure_attribs[] = {
+/* Vertex attribute layout for lit-color shader (shared with overlay consumers) */
+const gl_vertex_attrib_t opengl_structure_attribs[3] = {
   { "position", 3, 0 },
   { "normal",   3, 4 * (int)sizeof(float) },
   { "color",    4, 8 * (int)sizeof(float) }
@@ -231,23 +232,24 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
 
 /*-----------------------------------------------------------------------*/
 
-/* structure_scene_generate()
+/* opengl_structure_update_shared_geometry()
  *
- * Scene provider generate callback.
- * Detects mode changes via global flags, regenerates geometry when stale.
+ * Check staleness of shared geometry buffer and regenerate if needed.
+ * Called by both structure window and rdpattern overlay before rendering.
  */
-  static gboolean
-structure_scene_generate(gl_view_content_t *out)
+  void
+opengl_structure_update_shared_geometry(void)
 {
   structure_draw_mode_t current_mode;
-  float zoom;
 
   current_mode = opengl_structure_get_draw_mode();
 
   /* Check if current mode requires current/charge data */
-  gboolean is_current_mode = (current_mode == STRUCTURE_DRAW_CURRENTS || current_mode == STRUCTURE_DRAW_CHARGES);
+  gboolean is_current_mode =
+    (current_mode == STRUCTURE_DRAW_CURRENTS ||
+     current_mode == STRUCTURE_DRAW_CHARGES);
 
-  /* Regenerate on mode change, when no geometry exists, or when current data updates */
+  /* Regenerate on mode change, empty buffer, or new current data */
   if( current_mode != structure_last_mode ||
       structure_vertex_count == 0 ||
       (is_current_mode && crnt.newer) )
@@ -257,13 +259,45 @@ structure_scene_generate(gl_view_content_t *out)
 
     /* Prevent redundant regeneration on subsequent expose events */
     if( crnt.newer && is_current_mode )
-    {
       crnt.newer = 0;
-    }
 
-    /* Clear redraw flag to allow SUPPRESS_INTERMEDIATE_REDRAWS guard to function */
+    /* Clear redraw flag for SUPPRESS_INTERMEDIATE_REDRAWS guard */
     need_structure_redraw = 0;
+
+    /* Update shared overlay data after regeneration */
+    shared_overlay_data.vertices = structure_vertices;
+    shared_overlay_data.vertex_count = structure_vertex_count;
+    shared_overlay_data.vertex_stride = (int)sizeof(lit_color_point_t);
+    shared_overlay_data.view_scale = structure_view_scale;
+    shared_overlay_data.generation = structure_geometry_generation;
   }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_structure_get_shared_geometry()
+ *
+ * Return read-only pointer to shared structure geometry data
+ */
+  const structure_overlay_data_t*
+opengl_structure_get_shared_geometry(void)
+{
+  return( &shared_overlay_data );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* structure_scene_generate()
+ *
+ * Scene provider generate callback.
+ * Delegates to shared geometry updater, then fills view content.
+ */
+  static gboolean
+structure_scene_generate(gl_view_content_t *out)
+{
+  float zoom;
+
+  opengl_structure_update_shared_geometry();
 
   /* Zoom from structure spinbutton, normalized to multiplier */
   zoom = 1.0f;
@@ -305,7 +339,7 @@ structure_scene_cleanup(void)
 static gl_view_config_t structure_view_config = {
   .vertex_shader_path = "/gl/lit-color-vertex.glsl",
   .fragment_shader_path = "/gl/lit-color-fragment.glsl",
-  .attribs = structure_attribs,
+  .attribs = opengl_structure_attribs,
   .attrib_count = 3,
   .vertex_stride = (int)sizeof(lit_color_point_t),
   .has_gradient = FALSE,

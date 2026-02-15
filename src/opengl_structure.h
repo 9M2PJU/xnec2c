@@ -31,6 +31,17 @@ typedef enum
 
 } structure_draw_mode_t;
 
+/* Shared structure geometry for overlay rendering */
+typedef struct
+{
+  void *vertices;
+  int vertex_count;
+  int vertex_stride;
+  float view_scale;
+  unsigned int generation;
+
+} structure_overlay_data_t;
+
 /* Public API - always available, stubs when no OpenGL */
 GtkWidget* opengl_structure_create_widget(void);
 void opengl_structure_cleanup(void);
@@ -38,7 +49,19 @@ void opengl_structure_queue_draw(void);
 
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"
+
+/* Vertex attribute layout for lit-color shader (structure rendering) */
+extern const gl_vertex_attrib_t opengl_structure_attribs[3];
+
 arcball_state_t* opengl_structure_get_arcball(void);
+
+/* Update shared geometry buffer from global data/crnt/flags.
+ * Call before reading shared geometry to ensure freshness. */
+void opengl_structure_update_shared_geometry(void);
+
+/* Return read-only pointer to shared geometry data */
+const structure_overlay_data_t* opengl_structure_get_shared_geometry(void);
+
 #endif
 
 #endif /* OPENGL_STRUCTURE_H */

@@ -27,15 +27,6 @@
 #include "opengl_axes.h"
 #include "opengl_gradient_overlay.h"
 
-/* Vertex attribute descriptor */
-typedef struct
-{
-  const char *name;
-  int components;
-  int offset;
-
-} gl_vertex_attrib_t;
-
 /* View content provided by scene generator */
 typedef struct
 {
@@ -51,12 +42,27 @@ typedef struct
 
 } gl_view_content_t;
 
+/* Overlay configuration for second rendering pass */
+typedef struct
+{
+  const char *vertex_shader_path;
+  const char *fragment_shader_path;
+  const gl_vertex_attrib_t *attribs;
+  int attrib_count;
+
+} gl_overlay_config_t;
+
 /* Scene provider interface */
 typedef struct
 {
   gboolean (*generate)(gl_view_content_t *out);
   void (*post_render)(void);
   void (*cleanup)(void);
+
+  /* Optional overlay (second shader pass) */
+  const gl_overlay_config_t *overlay_config;
+  gboolean (*overlay_generate)(gl_view_content_t *out);
+  void (*overlay_cleanup)(void);
 
 } gl_scene_provider_t;
 
@@ -89,6 +95,15 @@ typedef struct
   unsigned int last_generation;
   arcball_state_t *arcball;
   GtkSpinButton **zoom_spinbutton;
+
+  /* Optional overlay (second shader pass) */
+  gl_shader_t ovl_shader;
+  GLuint ovl_vao;
+  GLuint ovl_vbo;
+  GLint ovl_mvp_location;
+  GLint *ovl_attrib_locations;
+  unsigned int ovl_last_generation;
+  gboolean ovl_initialized;
 
   /* Per-view projection parameters (not in arcball, which can be shared) */
   float aspect;

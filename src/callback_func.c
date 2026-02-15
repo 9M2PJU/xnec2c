@@ -738,6 +738,7 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
     if( isFlagSet(OVERLAY_STRUCT) )
     {
       xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_gl_area );
     }
   }
   else
@@ -758,6 +759,7 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
     if( isFlagSet(OVERLAY_STRUCT) )
     {
       xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_gl_area );
     }
   }
 
@@ -797,6 +799,7 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
     if( isFlagSet(OVERLAY_STRUCT) )
     {
       xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_gl_area );
     }
   }
   else
@@ -820,6 +823,7 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
     if( isFlagSet(OVERLAY_STRUCT) )
     {
       xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_gl_area );
     }
   }
 
