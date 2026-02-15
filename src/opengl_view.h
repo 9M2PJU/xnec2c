@@ -110,6 +110,10 @@ typedef struct
   float viewport_height;
   float fov_rad;
 
+  /* Per-view pan state (independent from arcball rotation) */
+  vec2 pan_offset;
+  float cached_camera_distance;
+
   gboolean initialized;
 
 } gl_view_state_t;
@@ -124,6 +128,7 @@ GtkWidget* gl_view_create_widget(
 gl_view_state_t* gl_view_get_state(GtkWidget *widget);
 void gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball);
 void gl_view_sync_arcball(GtkWidget *widget, double wr, double wi);
+void gl_view_reset_pan(GtkWidget *widget);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_VIEW_H */

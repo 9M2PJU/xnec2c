@@ -166,7 +166,6 @@ arcball_new(void)
 
   ab = g_new0(arcball_state_t, 1);
   glm_mat4_identity(ab->rotation);
-  glm_vec2_zero(ab->pan_offset);
   ab->last_x = 0.0f;
   ab->last_y = 0.0f;
   ab->drag_button = 0;
@@ -336,13 +335,13 @@ arcball_copy_rotation(arcball_state_t *dst, const arcball_state_t *src)
 /*-----------------------------------------------------------------------*/
 
 static void arcball_rotate(arcball_state_t *ab, float dx, float dy);
-static void arcball_pan(arcball_state_t *ab, float dx, float dy);
 
 /*-----------------------------------------------------------------------*/
 
 /* arcball_drag()
  *
- * Handle mouse drag - dispatches to rotate or pan based on button
+ * Handle mouse drag for rotation (button 1 only).
+ * Pan (button 2) is handled by the view layer.
  */
   void
 arcball_drag(arcball_state_t *ab, float x, float y, float viewport_height)
@@ -352,24 +351,13 @@ arcball_drag(arcball_state_t *ab, float x, float y, float viewport_height)
   if( !ab || ab->drag_button == 0 )
     return;
 
+  if( ab->drag_button != 1 )
+    return;
+
   dx = x - ab->last_x;
   dy = y - ab->last_y;
 
-  if( viewport_height < 1.0f )
-    viewport_height = 1.0f;
-
-  if( ab->drag_button == 1 )
-  {
-    arcball_rotate(ab, dx, dy);
-  }
-  else if( ab->drag_button == 2 )
-  {
-    arcball_pan(ab, dx / viewport_height, dy / viewport_height);
-  }
-  else
-  {
-    return;
-  }
+  arcball_rotate(ab, dx, dy);
 
   ab->last_x = x;
   ab->last_y = y;
@@ -408,20 +396,6 @@ arcball_rotate(arcball_state_t *ab, float dx, float dy)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_pan()
- *
- * Pan camera view - stores normalized pan offset
- */
-  static void
-arcball_pan(arcball_state_t *ab, float dx, float dy)
-{
-  ab->pan_offset[0] += dx;
-  ab->pan_offset[1] -= dy;
-
-} /* arcball_pan() */
-
-/*-----------------------------------------------------------------------*/
-
 /* arcball_begin_drag()
  *
  * Begin mouse drag operation
@@ -434,9 +408,6 @@ arcball_begin_drag(arcball_state_t *ab, int button, float x, float y)
   ab->last_y = y;
 
 } /* arcball_begin_drag() */
-
-/*-----------------------------------------------------------------------*/
-
 
 /*-----------------------------------------------------------------------*/
 
@@ -453,28 +424,13 @@ arcball_end_drag(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_reset_pan()
- *
- * Reset pan offset to center view
- */
-  void
-arcball_reset_pan(arcball_state_t *ab)
-{
-  if( !ab )
-    return;
-
-  glm_vec2_zero(ab->pan_offset);
-
-} /* arcball_reset_pan() */
-
-/*-----------------------------------------------------------------------*/
-
 /* arcball_get_mvp()
  *
- * Compute model-view-projection matrix from arcball state and scene parameters
+ * Compute model-view-projection matrix from arcball rotation and scene parameters.
+ * Pan offset is provided by the view layer as it is per-view state.
  */
   void
-arcball_get_mvp(arcball_state_t *ab, mat4 dest,
+arcball_get_mvp(arcball_state_t *ab, mat4 dest, const vec2 pan_offset,
     float distance, float model_scale, float aspect, float fov_rad)
 {
   mat4 view, proj, model, trans;
@@ -485,7 +441,7 @@ arcball_get_mvp(arcball_state_t *ab, mat4 dest,
   glm_scale(model, (vec3){model_scale, model_scale, model_scale});
 
   glm_mat4_identity(trans);
-  glm_translate(trans, (vec3){ab->pan_offset[0], ab->pan_offset[1], 0.0f});
+  glm_translate(trans, (vec3){pan_offset[0], pan_offset[1], 0.0f});
   glm_mat4_mul(trans, model, model);
 
   glm_vec3_copy((vec3){0.0f, 0.0f, distance}, eye_pos);

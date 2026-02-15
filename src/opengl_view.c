@@ -294,8 +294,11 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   /* Scene provides normalized zoom via content.zoom */
   camera_distance = content.r_max * ARCBALL_BASE_DISTANCE_FACTOR / content.zoom;
 
-  arcball_get_mvp(state->arcball, mvp, camera_distance, content.model_scale,
-      state->aspect, state->fov_rad);
+  /* Cache distance for pan calculations during drag */
+  state->cached_camera_distance = camera_distance;
+
+  arcball_get_mvp(state->arcball, mvp, state->pan_offset,
+      camera_distance, content.model_scale, state->aspect, state->fov_rad);
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -445,21 +448,58 @@ on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 
 /* on_motion()
  *
- * Mouse motion handler
+ * Mouse motion handler. Handles rotation (button 1) via arcball,
+ * and pan (button 2) with proper world-space scaling.
  */
   static gboolean
 on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
   gl_view_state_t *state;
+  float dx, dy;
+  float scale;
 
   state = (gl_view_state_t *)user_data;
 
-  if( !state )
+  if( !state || !state->arcball )
     return( FALSE );
 
-  arcball_drag(state->arcball, event->x, event->y, state->viewport_height);
+  if( state->arcball->drag_button == 0 )
+    return( FALSE );
 
-  /* arcball_drag calls arcball_notify_changed internally */
+  if( state->arcball->drag_button == 1 )
+  {
+    /* Rotation handled by arcball */
+    arcball_drag(state->arcball, event->x, event->y, state->viewport_height);
+  }
+  else if( state->arcball->drag_button == 2 )
+  {
+    /* Pan: compute pixel delta */
+    dx = event->x - state->arcball->last_x;
+    dy = event->y - state->arcball->last_y;
+
+    /* Convert pixel delta to world-space delta at model plane.
+     * Formula: 2 * distance * tan(fov/2) / viewport_height
+     * Pan translation is post-scale in MVP chain, so model_scale omitted.
+     * Aspect correction handled by projection matrix, not world-space conversion. */
+    scale = 2.0f * state->cached_camera_distance *
+            tanf(state->fov_rad / 2.0f) /
+            state->viewport_height;
+
+    state->pan_offset[0] += dx * scale;
+    state->pan_offset[1] -= dy * scale;
+
+    /* Update arcball last position for next delta */
+    state->arcball->last_x = event->x;
+    state->arcball->last_y = event->y;
+
+    /* Notify arcball callbacks to trigger cross-view redraw */
+    arcball_notify_changed(state->arcball);
+  }
+  else
+  {
+    return( FALSE );
+  }
+
   gtk_widget_queue_draw(widget);
 
   return( TRUE );
@@ -530,6 +570,10 @@ gl_view_create_widget(
   state->fov_rad = glm_rad(60.0f);
   state->aspect = 1.0f;
   state->viewport_height = 1.0f;
+
+  /* Initialize per-view pan state */
+  glm_vec2_zero(state->pan_offset);
+  state->cached_camera_distance = 1.0f;
 
   gl_area = gtk_gl_area_new();
 
@@ -620,6 +664,26 @@ gl_view_sync_arcball(GtkWidget *widget, double wr, double wi)
   arcball_notify_changed(state->arcball);
 
 } /* gl_view_sync_arcball() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_view_reset_pan()
+ *
+ * Reset pan offset to center the view
+ */
+  void
+gl_view_reset_pan(GtkWidget *widget)
+{
+  gl_view_state_t *state;
+
+  state = gl_view_get_state(widget);
+
+  if( !state )
+    return;
+
+  glm_vec2_zero(state->pan_offset);
+
+} /* gl_view_reset_pan() */
 
 /*-----------------------------------------------------------------------*/
 

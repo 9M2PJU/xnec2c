@@ -1066,7 +1066,7 @@ on_common_freq_activate(
 
 /* structure_set_view_preset()
  *
- * Set structure view to preset angle and reset arcball pan
+ * Set structure view to preset angle and reset view pan
  */
   static void
 structure_set_view_preset(double wr, double wi)
@@ -1075,12 +1075,8 @@ structure_set_view_preset(double wr, double wi)
       incline_structure, &structure_proj_params );
 
 #ifdef HAVE_OPENGL
-  if( rc_config.use_opengl_renderer )
-  {
-    arcball_state_t *ab = opengl_structure_get_arcball();
-    if( ab )
-      arcball_reset_pan(ab);
-  }
+  if( rc_config.use_opengl_renderer && structure_gl_area )
+    gl_view_reset_pan(structure_gl_area);
 #endif
 
   if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
@@ -2137,10 +2133,10 @@ rdpattern_set_view_preset(double wr, double wi)
 
     state = gl_view_get_state(rdpattern_drawingarea);
     if( state && state->arcball )
-    {
       arcball_set_view(state->arcball, (float)wr, (float)wi);
-      arcball_reset_pan(state->arcball);
-    }
+
+    gl_view_reset_pan(rdpattern_drawingarea);
+
     gtk_spin_button_set_value(rotate_rdpattern, wr);
     gtk_spin_button_set_value(incline_rdpattern, wi);
     gtk_widget_queue_draw(rdpattern_drawingarea);
@@ -5620,16 +5616,10 @@ on_rdpattern_one_button_clicked(
   rdpattern_proj_params.dx_center = 0.0;
   rdpattern_proj_params.dy_center = 0.0;
 
-  /* Reset pan for OpenGL arcball */
+  /* Reset pan for OpenGL view */
 #ifdef HAVE_OPENGL
   if( rc_config.use_opengl_renderer )
-  {
-    gl_view_state_t *state;
-
-    state = gl_view_get_state(rdpattern_drawingarea);
-    if( state && state->arcball )
-      arcball_reset_pan(state->arcball);
-  }
+    gl_view_reset_pan(rdpattern_drawingarea);
   else
 #endif
   {

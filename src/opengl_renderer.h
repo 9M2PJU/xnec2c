@@ -65,7 +65,6 @@ typedef struct
 struct arcball_state
 {
   mat4 rotation;
-  vec2 pan_offset;
   float last_x;
   float last_y;
   int drag_button;
@@ -86,8 +85,7 @@ void arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg);
 void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
 void arcball_drag(arcball_state_t *ab, float x, float y, float viewport_height);
 void arcball_end_drag(arcball_state_t *ab);
-void arcball_reset_pan(arcball_state_t *ab);
-void arcball_get_mvp(arcball_state_t *ab, mat4 dest,
+void arcball_get_mvp(arcball_state_t *ab, mat4 dest, const vec2 pan_offset,
     float distance, float model_scale, float aspect, float fov_rad);
 void arcball_add_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data);
 void arcball_remove_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data);
