@@ -139,6 +139,59 @@ get_segment_color(
 
 /*-----------------------------------------------------------------------*/
 
+/* calculate_excitation_center()
+ *
+ * Calculate the 3D center point of all excitation segments
+ */
+  static gboolean
+calculate_excitation_center(double *cx, double *cy, double *cz)
+{
+  int idx, seg_idx;
+  int count;
+  double sum_x, sum_y, sum_z;
+
+  sum_x = 0.0;
+  sum_y = 0.0;
+  sum_z = 0.0;
+  count = 0;
+
+  for( idx = 0; idx < vsorc.nsant; idx++ )
+  {
+    seg_idx = vsorc.isant[idx] - 1;
+    if( seg_idx >= 0 && seg_idx < data.n )
+    {
+      sum_x += (data.x1[seg_idx] + data.x2[seg_idx]) / 2.0;
+      sum_y += (data.y1[seg_idx] + data.y2[seg_idx]) / 2.0;
+      sum_z += (data.z1[seg_idx] + data.z2[seg_idx]) / 2.0;
+      count++;
+    }
+  }
+
+  for( idx = 0; idx < vsorc.nvqd; idx++ )
+  {
+    seg_idx = vsorc.ivqd[idx] - 1;
+    if( seg_idx >= 0 && seg_idx < data.n )
+    {
+      sum_x += (data.x1[seg_idx] + data.x2[seg_idx]) / 2.0;
+      sum_y += (data.y1[seg_idx] + data.y2[seg_idx]) / 2.0;
+      sum_z += (data.z1[seg_idx] + data.z2[seg_idx]) / 2.0;
+      count++;
+    }
+  }
+
+  if( count == 0 )
+    return( FALSE );
+
+  *cx = sum_x / (double)count;
+  *cy = sum_y / (double)count;
+  *cz = sum_z / (double)count;
+
+  return( TRUE );
+
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* opengl_structure_generate_geometry()
  *
  * Generate cylinder geometry for antenna wire segments
@@ -161,8 +214,8 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
     return( 0 );
   }
 
-  /* Calculate vertices needed */
   verts_per_seg = opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS);
+
   total_vertices = data.n * verts_per_seg;
 
   mreq = (size_t)total_vertices * sizeof(lit_color_point_t);
@@ -270,6 +323,11 @@ opengl_structure_update_shared_geometry(void)
     shared_overlay_data.vertex_stride = (int)sizeof(lit_color_point_t);
     shared_overlay_data.view_scale = structure_view_scale;
     shared_overlay_data.generation = structure_geometry_generation;
+    shared_overlay_data.has_excitation_center =
+        calculate_excitation_center(
+            &shared_overlay_data.excitation_center_x,
+            &shared_overlay_data.excitation_center_y,
+            &shared_overlay_data.excitation_center_z);
   }
 }
 

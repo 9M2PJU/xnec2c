@@ -49,6 +49,17 @@ static unsigned int rdpat_ff_generation = 0;
 static unsigned int rdpat_nf_generation = 0;
 static unsigned int rdpat_last_ff_gen = 0;
 
+/* Track translation state to detect changes */
+static gboolean rdpat_last_translate_state = FALSE;
+
+/* Cache overlay model scale adjustment for translation */
+static double rdpat_ovl_scale_adj = 1.0;
+static double rdpat_last_ovl_scale_adj = 1.0;
+
+/* Translated far-field points buffer for excitation center offset */
+static point_3d_t *rdpat_translated_points = NULL;
+static int rdpat_translated_capacity = 0;
+
 /* Widget pointer for external access */
 static GtkWidget *rdpattern_gl_widget = NULL;
 
@@ -365,6 +376,22 @@ opengl_rdpattern_generate_triangles(
 
 /*-----------------------------------------------------------------------*/
 
+/* rdpattern_overlay_base_scale()
+ *
+ * Calculate the base scale factor mapping structure coordinates
+ * to radiation pattern coordinate space
+ */
+  static float
+rdpattern_overlay_base_scale(float r_max, float view_scale)
+{
+  if( view_scale > 0.001f )
+    return( OVERLAY_DEFAULT_EXTENT * r_max / view_scale );
+
+  return( 1.0f );
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* rdpattern_scene_generate()
  *
  * Scene provider generate callback.
@@ -375,6 +402,9 @@ rdpattern_scene_generate(gl_view_content_t *out)
 {
   float zoom;
   float r_max;
+  gboolean translate_to_excitation;
+  float offset_x, offset_y, offset_z;
+  const structure_overlay_data_t *geom = NULL;
 
   /* Zoom from rdpattern spinbutton, normalized to multiplier */
   zoom = 1.0f;
@@ -383,6 +413,25 @@ rdpattern_scene_generate(gl_view_content_t *out)
 
   if( zoom < 0.01f )
     zoom = 0.01f;
+
+  /* Check if we need to translate pattern to excitation center */
+  translate_to_excitation = FALSE;
+  offset_x = 0.0f;
+  offset_y = 0.0f;
+  offset_z = 0.0f;
+
+  if( isFlagSet(OVERLAY_STRUCT) )
+  {
+    geom = opengl_structure_get_shared_geometry();
+    if( geom && geom->has_excitation_center )
+    {
+      translate_to_excitation = TRUE;
+
+      offset_x = (float)geom->excitation_center_x;
+      offset_y = (float)geom->excitation_center_y;
+      offset_z = (float)geom->excitation_center_z;
+    }
+  }
 
   /* Near-field rendering path */
   if( isFlagSet(DRAW_EHFIELD) && isFlagSet(ENABLE_NEAREH) && near_field.valid )
@@ -394,6 +443,9 @@ rdpattern_scene_generate(gl_view_content_t *out)
       return( FALSE );
 
     r_max = (float)near_field.r_max;
+
+    /* Near-field positions directly overlap structure in same coordinate space;
+     * no translation needed (excitation already aligned) */
 
     out->vertices = nf_lines;
     out->vertex_count = nf_line_count * 2;
@@ -414,6 +466,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
     unsigned int current_gen;
     double r_min, r_range;
     rdpattern_data_t rd_data;
+    point_3d_t *points_to_use;
 
     current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
     if( current_gen == 0 )
@@ -424,17 +477,57 @@ rdpattern_scene_generate(gl_view_content_t *out)
 
     r_max = (float)rd_data.r_max;
 
-    /* Regenerate triangles on data change */
-    if( current_gen != rdpat_last_ff_gen )
+    points_to_use = rd_data.points;
+
+    if( translate_to_excitation )
+    {
+      int npts, i;
+      float model_scale;
+      float scaled_off_x, scaled_off_y, scaled_off_z;
+
+      npts = rd_data.nth * rd_data.nph;
+
+      /* Scale offset from structure coords to radiation pattern coords */
+      model_scale = rdpattern_overlay_base_scale(r_max, geom->view_scale)
+          * (float)rdpat_ovl_scale_adj;
+
+      scaled_off_x = offset_x * model_scale;
+      scaled_off_y = offset_y * model_scale;
+      scaled_off_z = offset_z * model_scale;
+
+      if( npts > rdpat_translated_capacity )
+      {
+        size_t mreq = (size_t)npts * sizeof(point_3d_t);
+        mem_realloc((void **)&rdpat_translated_points, mreq, __LOCATION__);
+        rdpat_translated_capacity = npts;
+      }
+
+      for( i = 0; i < npts; i++ )
+      {
+        rdpat_translated_points[i].x = rd_data.points[i].x + (double)scaled_off_x;
+        rdpat_translated_points[i].y = rd_data.points[i].y + (double)scaled_off_y;
+        rdpat_translated_points[i].z = rd_data.points[i].z + (double)scaled_off_z;
+        rdpat_translated_points[i].r = rd_data.points[i].r;
+      }
+
+      points_to_use = rdpat_translated_points;
+    }
+
+    /* Regenerate triangles on data change or translation state change or scale change */
+    if( current_gen != rdpat_last_ff_gen ||
+        translate_to_excitation != rdpat_last_translate_state ||
+        (translate_to_excitation && rdpat_ovl_scale_adj != rdpat_last_ovl_scale_adj) )
     {
       int tri_count = opengl_rdpattern_generate_triangles(
-          rd_data.points, rd_data.nth, rd_data.nph, r_min, r_range);
+          points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
 
       if( tri_count <= 0 )
         return( FALSE );
 
       rdpat_ff_generation++;
       rdpat_last_ff_gen = current_gen;
+      rdpat_last_translate_state = translate_to_excitation;
+      rdpat_last_ovl_scale_adj = rdpat_ovl_scale_adj;
     }
 
     if( rdpat_triangle_count == 0 )
@@ -487,6 +580,9 @@ rdpattern_scene_cleanup(void)
   free_ptr((void **)&pov_y);
   free_ptr((void **)&pov_z);
   free_ptr((void **)&pov_r);
+
+  free_ptr((void **)&rdpat_translated_points);
+  rdpat_translated_capacity = 0;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -506,6 +602,10 @@ rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer vie
   if( !state || isFlagClear(OVERLAY_STRUCT) )
     return( FALSE );
 
+  /* Scale adjustment only applies to far-field (gain) view */
+  if( isFlagClear(DRAW_GAIN) )
+    return( FALSE );
+
   /* Compute scale factor matching zoom behavior */
   scale = compute_zoom_scale(
       (int)(state->viewport_height * state->aspect),
@@ -518,6 +618,9 @@ rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer vie
     state->ovl_model_scale_adj /= (1.0 + 0.1 * scale);
   else
     return( FALSE );
+
+  /* Cache for use in translation calculation */
+  rdpat_ovl_scale_adj = state->ovl_model_scale_adj;
 
   gtk_widget_queue_draw(widget);
 
@@ -561,10 +664,12 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
   out->draw_mode = GL_TRIANGLES;
   out->show_gradient = FALSE;
 
-  /* Normalize structure extent to slightly exceed radiation pattern extent.
-   * model_scale = OVERLAY_DEFAULT_EXTENT * primary_r_max / structure_view_scale */
-  out->model_scale = (geom->view_scale > 0.001f) ?
-      (OVERLAY_DEFAULT_EXTENT * primary->r_max / geom->view_scale) : 1.0f;
+  /* Scale structure to match radiation pattern space for far-field,
+   * use 1:1 for near-field (both already in meters) */
+  if( isFlagSet(DRAW_GAIN) )
+    out->model_scale = rdpattern_overlay_base_scale(primary->r_max, geom->view_scale);
+  else
+    out->model_scale = 1.0f;
 
   /* Unused by overlay rendering (shares primary camera) */
   out->r_max = 0.0f;
