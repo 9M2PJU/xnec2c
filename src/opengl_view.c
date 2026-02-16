@@ -18,6 +18,7 @@
  */
 
 #include "opengl_view.h"
+#include "opengl_cairo_overlay.h"
 #include "shared.h"
 
 #ifdef HAVE_OPENGL
@@ -125,6 +126,17 @@ gl_view_state_free(gl_view_state_t *state)
 {
   if( !state )
     return;
+
+  if( state->tooltip_timeout_id )
+  {
+    g_source_remove(state->tooltip_timeout_id);
+    state->tooltip_timeout_id = 0;
+  }
+
+  g_free(state->tooltip_text);
+
+  if( state->tooltip_overlay )
+    cairo_gl_overlay_free(state->tooltip_overlay);
 
   if( state->scene && state->scene->cleanup )
     state->scene->cleanup();
@@ -467,7 +479,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   {
     gl_view_content_t ovl_content;
 
-    if( state->scene->overlay_generate(&ovl_content) &&
+    if( state->scene->overlay_generate(&content, &ovl_content) &&
         ovl_content.vertex_count > 0 )
     {
       const gl_overlay_config_t *ocfg = state->scene->overlay_config;
@@ -483,17 +495,44 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
         state->ovl_last_generation = ovl_content.generation;
       }
 
-      /* Draw overlay with its own shader, same MVP */
-      gl_view_draw_pass(
-          state->ovl_shader.program,
-          state->ovl_mvp_location,
-          mvp,
-          state->ovl_vao,
-          state->ovl_vbo,
-          ocfg->attribs,
-          state->ovl_attrib_locations,
-          ocfg->attrib_count,
-          &ovl_content);
+      /* Compute overlay MVP with user-adjusted model scale */
+      {
+        mat4 ovl_mvp;
+        float ovl_model_scale, nearest_point, farthest_point, near_plane, far_plane;
+
+        /* Apply user adjustment to default scale from overlay_generate */
+        ovl_model_scale = ovl_content.model_scale * state->ovl_model_scale_adj;
+
+        /* Use same clip planes as primary */
+        nearest_point = camera_distance - content.r_max;
+        farthest_point = camera_distance + content.r_max;
+        far_plane = farthest_point * 1.2f;
+
+        if( nearest_point > 0.0f )
+        {
+          near_plane = nearest_point * 0.8f;
+        }
+        else
+        {
+          near_plane = 0.001f;
+        }
+
+        arcball_get_mvp(state->arcball, ovl_mvp, state->pan_offset,
+            camera_distance, ovl_model_scale, state->aspect, state->fov_rad,
+            near_plane, far_plane);
+
+        /* Draw overlay with its own shader and MVP */
+        gl_view_draw_pass(
+            state->ovl_shader.program,
+            state->ovl_mvp_location,
+            ovl_mvp,
+            state->ovl_vao,
+            state->ovl_vbo,
+            ocfg->attribs,
+            state->ovl_attrib_locations,
+            ocfg->attrib_count,
+            &ovl_content);
+      }
     }
   }
 
@@ -502,6 +541,67 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
   if( state->overlay && content.show_gradient )
     gradient_overlay_render(state->overlay);
+
+  /* Render tooltip if active */
+  if( state->tooltip_active && state->tooltip_text )
+  {
+    cairo_surface_t *surface;
+    cairo_t *cr;
+    cairo_text_extents_t extents;
+    double x, y, padding;
+    int surf_width, surf_height;
+
+    surf_width = (int)(state->viewport_height * state->aspect);
+    surf_height = (int)state->viewport_height;
+
+    surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, surf_width, surf_height);
+    cr = cairo_create(surface);
+
+    cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(cr, 16.0);
+
+    cairo_text_extents(cr, state->tooltip_text, &extents);
+
+    padding = 12.0;
+    x = (surf_width - extents.width) / 2.0 - extents.x_bearing;
+    y = (surf_height - extents.height) / 2.0 - extents.y_bearing;
+
+    /* Background box with fade */
+    cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.7 * state->tooltip_alpha);
+    cairo_rectangle(cr,
+        x + extents.x_bearing - padding,
+        y + extents.y_bearing - padding,
+        extents.width + 2.0 * padding,
+        extents.height + 2.0 * padding);
+    cairo_fill(cr);
+
+    /* Text with fade */
+    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, state->tooltip_alpha);
+    cairo_move_to(cr, x, y);
+    cairo_show_text(cr, state->tooltip_text);
+
+    cairo_destroy(cr);
+
+    /* Lazily allocate cached tooltip overlay */
+    if( !state->tooltip_overlay )
+      state->tooltip_overlay = cairo_gl_overlay_new();
+
+    if( state->tooltip_overlay )
+    {
+      glDisable(GL_DEPTH_TEST);
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+      cairo_gl_overlay_set_size(state->tooltip_overlay, surf_width, surf_height);
+      cairo_gl_overlay_upload(state->tooltip_overlay, surface);
+      cairo_gl_overlay_render(state->tooltip_overlay);
+
+      glDisable(GL_BLEND);
+      glEnable(GL_DEPTH_TEST);
+    }
+
+    cairo_surface_destroy(surface);
+  }
 
   if( state->scene->post_render )
     state->scene->post_render();
@@ -672,7 +772,9 @@ on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 
 /* on_scroll()
  *
- * Mouse scroll handler
+ * Mouse scroll handler.
+ * Shift+scroll invokes scene-specific handler if provided.
+ * Normal scroll adjusts primary zoom via spinbutton.
  */
   static gboolean
 on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
@@ -684,7 +786,17 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
 
   state = (gl_view_state_t *)user_data;
 
-  if( !state || !state->zoom_spinbutton || !*state->zoom_spinbutton )
+  if( !state )
+    return( FALSE );
+
+  /* Shift+scroll: invoke scene-specific handler */
+  if( (event->state & GDK_SHIFT_MASK) && state->scene->on_shift_scroll )
+  {
+    return( state->scene->on_shift_scroll(widget, event, state) );
+  }
+
+  /* Normal scroll: adjust primary zoom */
+  if( !state->zoom_spinbutton || !*state->zoom_spinbutton )
     return( FALSE );
 
   spinbutton = *state->zoom_spinbutton;
@@ -742,6 +854,16 @@ gl_view_create_widget(
   /* Initialize per-view pan state */
   glm_vec2_zero(state->pan_offset);
   state->cached_camera_distance = 1.0f;
+
+  /* Initialize overlay scale adjustment (1.0 = default from overlay_generate) */
+  state->ovl_model_scale_adj = 1.0f;
+
+  /* Initialize tooltip state */
+  state->tooltip_active = FALSE;
+  state->tooltip_text = NULL;
+  state->tooltip_alpha = 0.0;
+  state->tooltip_start_time = 0;
+  state->tooltip_timeout_id = 0;
 
   gl_area = gtk_gl_area_new();
 
@@ -852,6 +974,95 @@ gl_view_reset_pan(GtkWidget *widget)
   glm_vec2_zero(state->pan_offset);
 
 } /* gl_view_reset_pan() */
+
+/*-----------------------------------------------------------------------*/
+
+/* tooltip_update_callback()
+ *
+ * Timer callback for tooltip fade animation.
+ * Tooltip stays visible for tooltip_hold_ms, then fades over 500ms.
+ */
+  static gboolean
+tooltip_update_callback(gpointer user_data)
+{
+  GtkWidget *widget;
+  gl_view_state_t *state;
+  gint64 current_time, elapsed_ms;
+  double progress;
+
+  widget = GTK_WIDGET(user_data);
+  state = gl_view_get_state(widget);
+
+  if( !state || !state->tooltip_active )
+    return( FALSE );
+
+  current_time = g_get_monotonic_time();
+  elapsed_ms = (current_time - state->tooltip_start_time) / 1000;
+
+  /* Stay visible for configured hold duration */
+  if( elapsed_ms < state->tooltip_hold_ms )
+  {
+    state->tooltip_alpha = 1.0;
+    gtk_widget_queue_draw(widget);
+    return( TRUE );
+  }
+
+  /* Fade over 500ms after hold period */
+  progress = (double)(elapsed_ms - state->tooltip_hold_ms) / 500.0;
+
+  if( progress >= 1.0 )
+  {
+    state->tooltip_active = FALSE;
+    state->tooltip_alpha = 0.0;
+    state->tooltip_timeout_id = 0;
+    gtk_widget_queue_draw(widget);
+    return( FALSE );
+  }
+
+  /* Linear fade from 1.0 to 0.0 */
+  state->tooltip_alpha = 1.0 - progress;
+
+  gtk_widget_queue_draw(widget);
+
+  return( TRUE );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_view_show_tooltip()
+ *
+ * Display a tooltip message that holds for duration_ms then fades over 500ms
+ */
+  void
+gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms)
+{
+  gl_view_state_t *state;
+
+  state = gl_view_get_state(widget);
+
+  if( !state || !text )
+    return;
+
+  /* Remove existing tooltip timer */
+  if( state->tooltip_timeout_id )
+  {
+    g_source_remove(state->tooltip_timeout_id);
+    state->tooltip_timeout_id = 0;
+  }
+
+  g_free(state->tooltip_text);
+  state->tooltip_text = g_strdup(text);
+  state->tooltip_active = TRUE;
+  state->tooltip_alpha = 1.0;
+  state->tooltip_hold_ms = duration_ms;
+  state->tooltip_start_time = g_get_monotonic_time();
+
+  /* Timer fires every 16ms (60fps) for smooth fade */
+  state->tooltip_timeout_id = g_timeout_add(16, tooltip_update_callback, widget);
+
+  gtk_widget_queue_draw(widget);
+
+} /* gl_view_show_tooltip() */
 
 /*-----------------------------------------------------------------------*/
 

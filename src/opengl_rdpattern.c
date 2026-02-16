@@ -27,6 +27,9 @@
 
 #include "opengl_view.h"
 
+/* Default structure overlay extent as multiple of radiation pattern r_max */
+#define OVERLAY_DEFAULT_EXTENT 1.25f
+
 /* Triangle buffer for radiation pattern mesh */
 static color_triangle_t *rdpat_triangles = NULL;
 static int rdpat_triangle_count = 0;
@@ -488,18 +491,62 @@ rdpattern_scene_cleanup(void)
 
 /*-----------------------------------------------------------------------*/
 
+/* rdpattern_on_shift_scroll()
+ *
+ * Shift+scroll handler for adjusting overlay structure scale
+ */
+  static gboolean
+rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer view_state)
+{
+  gl_view_state_t *state;
+  double scale;
+
+  state = (gl_view_state_t *)view_state;
+
+  if( !state || isFlagClear(OVERLAY_STRUCT) )
+    return( FALSE );
+
+  /* Compute scale factor matching zoom behavior */
+  scale = compute_zoom_scale(
+      (int)(state->viewport_height * state->aspect),
+      (int)state->viewport_height,
+      state->ovl_model_scale_adj * 100.0);
+
+  if( event->direction == GDK_SCROLL_UP )
+    state->ovl_model_scale_adj *= (1.0 + 0.1 * scale);
+  else if( event->direction == GDK_SCROLL_DOWN )
+    state->ovl_model_scale_adj /= (1.0 + 0.1 * scale);
+  else
+    return( FALSE );
+
+  gtk_widget_queue_draw(widget);
+
+  return( TRUE );
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* rdpattern_overlay_generate()
  *
  * Overlay provider generate callback.
  * Returns structure geometry for overlay when OVERLAY_STRUCT is set.
+ * Computes physical scale ratio from structure to radiation pattern.
  */
   static gboolean
-rdpattern_overlay_generate(gl_view_content_t *out)
+rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *out)
 {
   const structure_overlay_data_t *geom;
+  static gboolean tooltip_shown = FALSE;
 
-  if( isFlagClear(OVERLAY_STRUCT) || data.n <= 0 )
+  if( isFlagClear(OVERLAY_STRUCT) || data.n <= 0 || !primary )
     return( FALSE );
+
+  /* Show tooltip on first activation */
+  if( !tooltip_shown && rdpattern_gl_widget )
+  {
+    gl_view_show_tooltip(rdpattern_gl_widget, "Shift Scroll to Scale Structure", 2500);
+    tooltip_shown = TRUE;
+  }
 
   /* Ensure shared geometry is fresh */
   opengl_structure_update_shared_geometry();
@@ -514,10 +561,14 @@ rdpattern_overlay_generate(gl_view_content_t *out)
   out->draw_mode = GL_TRIANGLES;
   out->show_gradient = FALSE;
 
-  /* Overlay pass shares primary content MVP; these fields are unused */
+  /* Normalize structure extent to slightly exceed radiation pattern extent.
+   * model_scale = OVERLAY_DEFAULT_EXTENT * primary_r_max / structure_view_scale */
+  out->model_scale = (geom->view_scale > 0.001f) ?
+      (OVERLAY_DEFAULT_EXTENT * primary->r_max / geom->view_scale) : 1.0f;
+
+  /* Unused by overlay rendering (shares primary camera) */
   out->r_max = 0.0f;
   out->zoom = 1.0f;
-  out->model_scale = 1.0f;
   out->generation = geom->generation;
 
   return( TRUE );
@@ -542,7 +593,8 @@ static gl_scene_provider_t rdpattern_scene_provider = {
   .cleanup = rdpattern_scene_cleanup,
   .overlay_config = &rdpattern_overlay_config,
   .overlay_generate = rdpattern_overlay_generate,
-  .overlay_cleanup = NULL
+  .overlay_cleanup = NULL,
+  .on_shift_scroll = rdpattern_on_shift_scroll
 };
 
 /*-----------------------------------------------------------------------*/

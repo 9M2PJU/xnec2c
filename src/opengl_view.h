@@ -61,8 +61,11 @@ typedef struct
 
   /* Optional overlay (second shader pass) */
   const gl_overlay_config_t *overlay_config;
-  gboolean (*overlay_generate)(gl_view_content_t *out);
+  gboolean (*overlay_generate)(const gl_view_content_t *primary, gl_view_content_t *out);
   void (*overlay_cleanup)(void);
+
+  /* Optional shift+scroll handler for custom behavior */
+  gboolean (*on_shift_scroll)(GtkWidget *widget, GdkEventScroll *event, gpointer view_state);
 
 } gl_scene_provider_t;
 
@@ -114,6 +117,18 @@ typedef struct
   vec2 pan_offset;
   float cached_camera_distance;
 
+  /* Overlay scale adjustment (user-controlled via shift+scroll) */
+  float ovl_model_scale_adj;
+
+  /* Tooltip state for transient messages */
+  gboolean tooltip_active;
+  char *tooltip_text;
+  double tooltip_alpha;
+  gint64 tooltip_start_time;
+  guint tooltip_timeout_id;
+  int tooltip_hold_ms;
+  cairo_gl_overlay_t *tooltip_overlay;
+
   /* MSAA state */
   GLuint msaa_fbo;
   GLuint msaa_color_rbo;
@@ -137,6 +152,7 @@ gl_view_state_t* gl_view_get_state(GtkWidget *widget);
 void gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball);
 void gl_view_sync_arcball(GtkWidget *widget, double wr, double wi);
 void gl_view_reset_pan(GtkWidget *widget);
+void gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms);
 void Set_MSAA_Samples(int samples);
 
 #endif /* HAVE_OPENGL */
