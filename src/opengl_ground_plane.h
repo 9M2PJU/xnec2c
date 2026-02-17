@@ -17,43 +17,34 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef OPENGL_AXES_H
-#define OPENGL_AXES_H 1
+#ifndef OPENGL_GROUND_PLANE_H
+#define OPENGL_GROUND_PLANE_H 1
 
 #include "common.h"
 
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"
 
+#define GROUND_PLANE_EXTENT 100.0f
+
 typedef struct
 {
-  GLuint lines_vao;
-  GLuint lines_vbo;
-  gl_shader_t line_shader;
-  GLint line_mvp_loc;
-  GLint line_pos_loc;
-  GLint line_col_loc;
-
-  GLuint labels_vao;
-  GLuint labels_vbo;
-  GLuint label_texture;
-  gl_shader_t label_shader;
-  GLint label_mvp_loc;
-  GLint label_tex_loc;
-  GLint label_pos_loc;
-  GLint label_uv_loc;
-
-  float r_max;
+  GLuint vao;
+  GLuint vbo;
+  gl_shader_t shader;
+  GLint mvp_location;
+  GLint attrib_locations[3];
+  float scale;
   gboolean initialized;
 
-} opengl_axes_t;
+} opengl_ground_plane_t;
 
-opengl_axes_t* opengl_axes_new(void);
-void opengl_axes_free(void *ctx);
-void opengl_axes_prepare(void *ctx, float r_max);
-void opengl_axes_render(void *ctx, mat4 mvp);
-gboolean opengl_axes_is_active(void *ctx);
-float opengl_axes_far_extent(void *ctx, float r_max);
+opengl_ground_plane_t* opengl_ground_plane_new(void);
+void opengl_ground_plane_free(void *ctx);
+void opengl_ground_plane_prepare(void *ctx, float r_max);
+void opengl_ground_plane_render(void *ctx, mat4 mvp);
+gboolean opengl_ground_plane_is_active(void *ctx);
+float opengl_ground_plane_far_extent(void *ctx, float r_max);
 
 #endif /* HAVE_OPENGL */
-#endif /* OPENGL_AXES_H */
+#endif /* OPENGL_GROUND_PLANE_H */

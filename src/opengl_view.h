@@ -24,7 +24,6 @@
 
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"
-#include "opengl_axes.h"
 #include "opengl_gradient_overlay.h"
 
 /* View content provided by scene generator */
@@ -51,6 +50,27 @@ typedef struct
   int attrib_count;
 
 } gl_overlay_config_t;
+
+/* Renderable interface callback types */
+typedef void (*gl_render_fn)(void *ctx, mat4 mvp);
+typedef void (*gl_prepare_fn)(void *ctx, float r_max);
+typedef void (*gl_destroy_fn)(void *ctx);
+typedef gboolean (*gl_active_fn)(void *ctx);
+typedef float (*gl_extent_fn)(void *ctx, float r_max);
+
+/* Unified renderable — all 3D objects implement this */
+typedef struct
+{
+  gl_render_fn render;
+  gl_prepare_fn prepare;
+  gl_destroy_fn destroy;
+  gl_active_fn is_active;
+  gl_extent_fn far_extent;
+  void *ctx;
+  float alpha;
+  vec3 origin;
+
+} gl_renderable_t;
 
 /* Scene provider interface */
 typedef struct
@@ -85,12 +105,7 @@ typedef struct
 /* View state (engine-internal) */
 typedef struct
 {
-  gl_shader_t shader;
-  GLuint vao;
-  GLuint vbo;
-  GLint mvp_location;
-  GLint *attrib_locations;
-  opengl_axes_t *axes;
+  GArray *renderables;
   gradient_overlay_t *overlay;
   gl_view_config_t *config;
   gl_scene_provider_t *scene;
@@ -98,15 +113,6 @@ typedef struct
   unsigned int last_generation;
   arcball_state_t *arcball;
   GtkSpinButton **zoom_spinbutton;
-
-  /* Optional overlay (second shader pass) */
-  gl_shader_t ovl_shader;
-  GLuint ovl_vao;
-  GLuint ovl_vbo;
-  GLint ovl_mvp_location;
-  GLint *ovl_attrib_locations;
-  unsigned int ovl_last_generation;
-  gboolean ovl_initialized;
 
   /* Per-view projection parameters (not in arcball, which can be shared) */
   float aspect;

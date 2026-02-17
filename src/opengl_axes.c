@@ -199,8 +199,10 @@ opengl_axes_new(void)
  * Free axes renderer resources
  */
   void
-opengl_axes_free(opengl_axes_t *axes)
+opengl_axes_free(void *ctx)
 {
+  opengl_axes_t *axes = ctx;
+
   if( !axes )
     return;
 
@@ -233,13 +235,14 @@ setup_vertex_attrib(GLint loc, GLint size, size_t stride, size_t offset)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_axes_set_scale()
+/* opengl_axes_prepare()
  *
  * Update axis scale and regenerate buffers
  */
   void
-opengl_axes_set_scale(opengl_axes_t *axes, float r_max)
+opengl_axes_prepare(void *ctx, float r_max)
 {
+  opengl_axes_t *axes = ctx;
   color_point_t lines[NUM_AXES * 2];
   text_vertex_t labels[NUM_AXES * 6];
   float label_offset;
@@ -317,7 +320,37 @@ opengl_axes_set_scale(opengl_axes_t *axes, float r_max)
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
-} /* opengl_axes_set_scale() */
+} /* opengl_axes_prepare() */
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_axes_is_active()
+ *
+ * Returns whether axes are active for rendering
+ */
+  gboolean
+opengl_axes_is_active(void *ctx)
+{
+  (void)ctx;
+
+  return( TRUE );
+
+} /* opengl_axes_is_active() */
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_axes_far_extent()
+ *
+ * Returns the spatial extent contribution for clip plane calculation
+ */
+  float
+opengl_axes_far_extent(void *ctx, float r_max)
+{
+  (void)ctx;
+
+  return( r_max * AXIS_LENGTH_SCALE );
+
+} /* opengl_axes_far_extent() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -326,8 +359,10 @@ opengl_axes_set_scale(opengl_axes_t *axes, float r_max)
  * Render axes lines and labels
  */
   void
-opengl_axes_render(opengl_axes_t *axes, mat4 mvp)
+opengl_axes_render(void *ctx, mat4 mvp)
 {
+  opengl_axes_t *axes = ctx;
+
   if( !axes || !axes->initialized || axes->r_max == 0.0f )
     return;
 

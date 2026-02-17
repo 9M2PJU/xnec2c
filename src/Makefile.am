@@ -114,6 +114,7 @@ xnec2c_SOURCES += \
   opengl_view.c opengl_view.h \
   opengl_rdpattern.c opengl_rdpattern.h \
   opengl_axes.c opengl_axes.h \
+  opengl_ground_plane.c opengl_ground_plane.h \
   opengl_cairo_overlay.c opengl_cairo_overlay.h \
   opengl_gradient_overlay.c opengl_gradient_overlay.h \
   opengl_cylinder.c opengl_cylinder.h \

@@ -18,10 +18,54 @@
  */
 
 #include "opengl_view.h"
+#include "opengl_axes.h"
 #include "opengl_cairo_overlay.h"
+#include "opengl_ground_plane.h"
 #include "shared.h"
 
 #ifdef HAVE_OPENGL
+
+/* Scene rendering context — owns shader and GL resources for primary geometry */
+typedef struct
+{
+  gl_view_state_t *view;
+  gl_shader_t shader;
+  GLuint vao;
+  GLuint vbo;
+  GLint mvp_location;
+  GLint *attrib_locations;
+
+} gl_scene_ctx_t;
+
+/* Overlay rendering context — owns shader, GL resources, and cached MVP */
+typedef struct
+{
+  gl_view_state_t *view;
+  gl_shader_t shader;
+  GLuint vao;
+  GLuint vbo;
+  GLint mvp_location;
+  GLint *attrib_locations;
+  unsigned int last_generation;
+  gboolean initialized;
+  mat4 cached_mvp;
+  gl_view_content_t ovl_content;
+
+} gl_overlay_ctx_t;
+
+/* Scene renderable callbacks */
+static void gl_scene_prepare(void *ctx, float r_max);
+static void gl_scene_render(void *ctx, mat4 mvp);
+static gboolean gl_scene_is_active(void *ctx);
+static float gl_scene_far_extent(void *ctx, float r_max);
+static void gl_scene_free(void *ctx);
+
+/* Overlay renderable callbacks */
+static void gl_overlay_prepare(void *ctx, float r_max);
+static void gl_overlay_render(void *ctx, mat4 mvp);
+static gboolean gl_overlay_is_active(void *ctx);
+static float gl_overlay_far_extent(void *ctx, float r_max);
+static void gl_overlay_free(void *ctx);
 
 /*-----------------------------------------------------------------------*/
 
@@ -138,34 +182,26 @@ gl_view_state_free(gl_view_state_t *state)
   if( state->tooltip_overlay )
     cairo_gl_overlay_free(state->tooltip_overlay);
 
-  if( state->scene && state->scene->cleanup )
-    state->scene->cleanup();
-
-  if( state->scene && state->scene->overlay_cleanup )
-    state->scene->overlay_cleanup();
-
-  /* Free overlay rendering resources */
-  if( state->ovl_initialized )
+  /* Destroy all renderables in reverse registration order */
+  if( state->renderables )
   {
-    if( state->ovl_vbo )
-      glDeleteBuffers(1, &state->ovl_vbo);
+    int ri;
 
-    if( state->ovl_vao )
-      glDeleteVertexArrays(1, &state->ovl_vao);
+    for( ri = (int)state->renderables->len - 1; ri >= 0; ri-- )
+    {
+      gl_renderable_t *r = &g_array_index(
+          state->renderables, gl_renderable_t, ri);
 
-    gl_shader_destroy(&state->ovl_shader);
+      if( r->destroy )
+        r->destroy(r->ctx);
+    }
 
-    if( state->ovl_attrib_locations )
-      g_free(state->ovl_attrib_locations);
-
-    state->ovl_initialized = FALSE;
+    g_array_free(state->renderables, TRUE);
+    state->renderables = NULL;
   }
 
   if( state->overlay )
     gradient_overlay_free(state->overlay);
-
-  if( state->axes )
-    opengl_axes_free(state->axes);
 
   /* Free MSAA resources */
   if( state->msaa_fbo )
@@ -186,17 +222,6 @@ gl_view_state_free(gl_view_state_t *state)
     state->msaa_depth_rbo = 0;
   }
 
-  if( state->vbo )
-    glDeleteBuffers(1, &state->vbo);
-
-  if( state->vao )
-    glDeleteVertexArrays(1, &state->vao);
-
-  gl_shader_destroy(&state->shader);
-
-  if( state->attrib_locations )
-    g_free(state->attrib_locations);
-
   g_free(state);
 
 } /* gl_view_state_free() */
@@ -212,6 +237,7 @@ on_realize(GtkGLArea *area, gpointer user_data)
 {
   gl_view_state_t *state;
   GtkAllocation alloc;
+  gl_renderable_t r;
   gboolean ok;
   int i;
 
@@ -225,37 +251,155 @@ on_realize(GtkGLArea *area, gpointer user_data)
     return;
   }
 
-  ok = gl_shader_load(&state->shader,
-    state->config->vertex_shader_path,
-    state->config->fragment_shader_path);
-
-  if( !ok )
+  /* Create scene rendering context */
   {
-    pr_err("Failed to load shaders\n");
-    return;
+    gl_scene_ctx_t *sc;
+
+    sc = g_new0(gl_scene_ctx_t, 1);
+    sc->view = state;
+
+    ok = gl_shader_load(&sc->shader,
+        state->config->vertex_shader_path,
+        state->config->fragment_shader_path);
+
+    if( !ok )
+    {
+      pr_err("Failed to load shaders\n");
+      g_free(sc);
+      return;
+    }
+
+    sc->mvp_location = glGetUniformLocation(sc->shader.program, "mvp");
+
+    glGenVertexArrays(1, &sc->vao);
+    glGenBuffers(1, &sc->vbo);
+
+    sc->attrib_locations = g_new(GLint, state->config->attrib_count);
+
+    for( i = 0; i < state->config->attrib_count; i++ )
+    {
+      sc->attrib_locations[i] = glGetAttribLocation(
+          sc->shader.program,
+          state->config->attribs[i].name);
+    }
+
+    /* Build renderables array */
+    state->renderables = g_array_sized_new(FALSE, TRUE,
+        sizeof(gl_renderable_t), 4);
+
+    r = (gl_renderable_t){
+      .render     = gl_scene_render,
+      .prepare    = gl_scene_prepare,
+      .destroy    = gl_scene_free,
+      .is_active  = gl_scene_is_active,
+      .far_extent = gl_scene_far_extent,
+      .ctx        = sc,
+      .alpha      = 1.0f,
+      .origin     = {0.0f, 0.0f, 0.0f}
+    };
+    g_array_append_val(state->renderables, r);
   }
 
-  state->mvp_location = glGetUniformLocation(state->shader.program, "mvp");
-
-  glGenVertexArrays(1, &state->vao);
-  glGenBuffers(1, &state->vbo);
-
-  state->attrib_locations = g_new(GLint, state->config->attrib_count);
-
-  for( i = 0; i < state->config->attrib_count; i++ )
+  /* Create overlay rendering context if configured */
+  if( state->scene->overlay_config )
   {
-    state->attrib_locations[i] = glGetAttribLocation(
-      state->shader.program,
-      state->config->attribs[i].name);
+    const gl_overlay_config_t *ocfg = state->scene->overlay_config;
+    gl_overlay_ctx_t *ovl;
+
+    ovl = g_new0(gl_overlay_ctx_t, 1);
+    ovl->view = state;
+
+    ok = gl_shader_load(&ovl->shader,
+        ocfg->vertex_shader_path,
+        ocfg->fragment_shader_path);
+
+    if( ok )
+    {
+      ovl->mvp_location =
+        glGetUniformLocation(ovl->shader.program, "mvp");
+
+      glGenVertexArrays(1, &ovl->vao);
+      glGenBuffers(1, &ovl->vbo);
+
+      ovl->attrib_locations = g_new(GLint, ocfg->attrib_count);
+      for( i = 0; i < ocfg->attrib_count; i++ )
+      {
+        ovl->attrib_locations[i] = glGetAttribLocation(
+            ovl->shader.program,
+            ocfg->attribs[i].name);
+      }
+
+      ovl->last_generation = (unsigned int)-1;
+      ovl->initialized = TRUE;
+
+      r = (gl_renderable_t){
+        .render     = gl_overlay_render,
+        .prepare    = gl_overlay_prepare,
+        .destroy    = gl_overlay_free,
+        .is_active  = gl_overlay_is_active,
+        .far_extent = gl_overlay_far_extent,
+        .ctx        = ovl,
+        .alpha      = 1.0f,
+        .origin     = {0.0f, 0.0f, 0.0f}
+      };
+      g_array_append_val(state->renderables, r);
+    }
+    else
+    {
+      pr_err("Failed to load overlay shaders\n");
+      g_free(ovl);
+    }
   }
 
-  state->axes = opengl_axes_new();
-  if( !state->axes )
+  /* Create axes renderer */
   {
-    pr_err("Failed to create axes renderer\n");
-    return;
+    opengl_axes_t *axes;
+
+    axes = opengl_axes_new();
+    if( !axes )
+    {
+      pr_err("Failed to create axes renderer\n");
+      return;
+    }
+
+    r = (gl_renderable_t){
+      .render     = opengl_axes_render,
+      .prepare    = opengl_axes_prepare,
+      .destroy    = opengl_axes_free,
+      .is_active  = opengl_axes_is_active,
+      .far_extent = opengl_axes_far_extent,
+      .ctx        = axes,
+      .alpha      = 1.0f,
+      .origin     = {0.0f, 0.0f, 0.0f}
+    };
+    g_array_append_val(state->renderables, r);
   }
 
+  /* Create ground plane renderer */
+  {
+    opengl_ground_plane_t *ground_plane;
+
+    ground_plane = opengl_ground_plane_new();
+    if( !ground_plane )
+    {
+      pr_err("Failed to create ground plane renderer\n");
+      return;
+    }
+
+    r = (gl_renderable_t){
+      .render     = opengl_ground_plane_render,
+      .prepare    = opengl_ground_plane_prepare,
+      .destroy    = opengl_ground_plane_free,
+      .is_active  = opengl_ground_plane_is_active,
+      .far_extent = opengl_ground_plane_far_extent,
+      .ctx        = ground_plane,
+      .alpha      = 0.5f,
+      .origin     = {0.0f, 0.0f, 0.0f}
+    };
+    g_array_append_val(state->renderables, r);
+  }
+
+  /* Gradient overlay (2D HUD, not a renderable) */
   if( state->config->has_gradient )
   {
     state->overlay = gradient_overlay_new(state->config->gradient_draw);
@@ -267,40 +411,6 @@ on_realize(GtkGLArea *area, gpointer user_data)
 
     gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
     gradient_overlay_set_viewport(state->overlay, alloc.width, alloc.height);
-  }
-
-  /* Initialize overlay rendering resources if configured */
-  if( state->scene->overlay_config )
-  {
-    const gl_overlay_config_t *ocfg = state->scene->overlay_config;
-
-    ok = gl_shader_load(&state->ovl_shader,
-        ocfg->vertex_shader_path,
-        ocfg->fragment_shader_path);
-
-    if( ok )
-    {
-      state->ovl_mvp_location =
-        glGetUniformLocation(state->ovl_shader.program, "mvp");
-
-      glGenVertexArrays(1, &state->ovl_vao);
-      glGenBuffers(1, &state->ovl_vbo);
-
-      state->ovl_attrib_locations = g_new(GLint, ocfg->attrib_count);
-      for( i = 0; i < ocfg->attrib_count; i++ )
-      {
-        state->ovl_attrib_locations[i] = glGetAttribLocation(
-            state->ovl_shader.program,
-            ocfg->attribs[i].name);
-      }
-
-      state->ovl_last_generation = (unsigned int)-1;
-      state->ovl_initialized = TRUE;
-    }
-    else
-    {
-      pr_err("Failed to load overlay shaders\n");
-    }
   }
 
   state->initialized = TRUE;
@@ -331,26 +441,21 @@ on_unrealize(GtkGLArea *area, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_draw_pass()
+/* gl_view_setup_attribs()
  *
- * Execute a rendering pass with given shader, VAO, VBO, and vertex attributes
+ * Configure vertex attribute pointers in VAO. Called once during prepare
+ * when VBO data changes. VAO retains this state for subsequent renders.
  */
   static void
-gl_view_draw_pass(
-    GLuint shader_program,
-    GLint mvp_location,
-    mat4 mvp,
+gl_view_setup_attribs(
     GLuint vao,
     GLuint vbo,
     const gl_vertex_attrib_t *attribs,
     const GLint *attrib_locations,
     int attrib_count,
-    const gl_view_content_t *content)
+    int vertex_stride)
 {
   int i;
-
-  glUseProgram(shader_program);
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (float *)mvp);
 
   glBindVertexArray(vao);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -363,18 +468,321 @@ gl_view_draw_pass(
         attribs[i].components,
         GL_FLOAT,
         GL_FALSE,
-        content->vertex_stride,
+        vertex_stride,
         (void *)(long)attribs[i].offset);
   }
 
-  glDrawArrays(content->draw_mode, 0, content->vertex_count);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 
-  for( i = 0; i < attrib_count; i++ )
-    glDisableVertexAttribArray(attrib_locations[i]);
+} /* gl_view_setup_attribs() */
 
+/*-----------------------------------------------------------------------*/
+
+/* gl_view_draw_pass()
+ *
+ * Execute a rendering pass. VAO already has attrib config from prepare.
+ */
+  static void
+gl_view_draw_pass(
+    GLuint shader_program,
+    GLint mvp_location,
+    mat4 mvp,
+    GLuint vao,
+    GLenum draw_mode,
+    int vertex_count)
+{
+  glUseProgram(shader_program);
+  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (float *)mvp);
+
+  glBindVertexArray(vao);
+  glDrawArrays(draw_mode, 0, vertex_count);
   glBindVertexArray(0);
 
 } /* gl_view_draw_pass() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_prepare()
+ *
+ * Upload scene vertex data on generation change
+ */
+  static void
+gl_scene_prepare(void *ctx, float r_max)
+{
+  gl_scene_ctx_t *sc = ctx;
+  gl_view_state_t *view = sc->view;
+  gl_view_content_t *c = &view->content;
+
+  (void)r_max;
+
+  if( c->generation == view->last_generation )
+    return;
+
+  if( c->vertex_count > 0 )
+  {
+    glBindBuffer(GL_ARRAY_BUFFER, sc->vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+        c->vertex_count * c->vertex_stride,
+        c->vertices,
+        GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    /* Reconfigure VAO attrib pointers for new VBO layout */
+    gl_view_setup_attribs(sc->vao, sc->vbo,
+        view->config->attribs, sc->attrib_locations,
+        view->config->attrib_count, c->vertex_stride);
+  }
+
+  if( view->overlay )
+    gradient_overlay_mark_dirty(view->overlay);
+
+  view->last_generation = c->generation;
+
+} /* gl_scene_prepare() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_render()
+ *
+ * Render scene geometry using generic draw pass
+ */
+  static void
+gl_scene_render(void *ctx, mat4 mvp)
+{
+  gl_scene_ctx_t *sc = ctx;
+  gl_view_state_t *view = sc->view;
+
+  gl_view_draw_pass(
+      sc->shader.program,
+      sc->mvp_location,
+      mvp,
+      sc->vao,
+      view->content.draw_mode,
+      view->content.vertex_count);
+
+} /* gl_scene_render() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_is_active()
+ *
+ * Returns TRUE when scene has vertex data to render
+ */
+  static gboolean
+gl_scene_is_active(void *ctx)
+{
+  gl_scene_ctx_t *sc = ctx;
+
+  return( sc->view->content.vertex_count > 0 );
+
+} /* gl_scene_is_active() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_far_extent()
+ *
+ * Returns the scene geometry extent for clip plane calculation
+ */
+  static float
+gl_scene_far_extent(void *ctx, float r_max)
+{
+  (void)ctx;
+
+  return( r_max );
+
+} /* gl_scene_far_extent() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_free()
+ *
+ * Free scene rendering context and GL resources
+ */
+  static void
+gl_scene_free(void *ctx)
+{
+  gl_scene_ctx_t *sc = ctx;
+
+  if( !sc )
+    return;
+
+  if( sc->view->scene && sc->view->scene->cleanup )
+    sc->view->scene->cleanup();
+
+  if( sc->vbo )
+    glDeleteBuffers(1, &sc->vbo);
+
+  if( sc->vao )
+    glDeleteVertexArrays(1, &sc->vao);
+
+  gl_shader_destroy(&sc->shader);
+
+  g_free(sc->attrib_locations);
+  g_free(sc);
+
+} /* gl_scene_free() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_overlay_prepare()
+ *
+ * Generate overlay content, upload to VBO, and cache own MVP
+ */
+  static void
+gl_overlay_prepare(void *ctx, float r_max)
+{
+  gl_overlay_ctx_t *ovl = ctx;
+  gl_view_state_t *view = ovl->view;
+
+  ovl->ovl_content.vertex_count = 0;
+
+  if( !ovl->initialized )
+    return;
+
+  if( !view->scene->overlay_generate )
+    return;
+
+  if( !view->scene->overlay_generate(&view->content, &ovl->ovl_content) )
+    return;
+
+  if( ovl->ovl_content.vertex_count <= 0 )
+    return;
+
+  /* Upload overlay vertices on generation change */
+  if( ovl->ovl_content.generation != ovl->last_generation )
+  {
+    glBindBuffer(GL_ARRAY_BUFFER, ovl->vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+        ovl->ovl_content.vertex_count * ovl->ovl_content.vertex_stride,
+        ovl->ovl_content.vertices,
+        GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    /* Reconfigure VAO attrib pointers for new VBO layout */
+    {
+      const gl_overlay_config_t *ocfg = view->scene->overlay_config;
+
+      gl_view_setup_attribs(ovl->vao, ovl->vbo,
+          ocfg->attribs, ovl->attrib_locations,
+          ocfg->attrib_count, ovl->ovl_content.vertex_stride);
+    }
+
+    ovl->last_generation = ovl->ovl_content.generation;
+  }
+
+  /* Compute and cache own MVP with user-adjusted model scale */
+  {
+    float ovl_model_scale, nearest_point, farthest_point, near_plane, far_plane;
+
+    ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
+
+    nearest_point = view->cached_camera_distance - r_max;
+    farthest_point = view->cached_camera_distance + r_max;
+    far_plane = farthest_point * 1.2f;
+
+    if( nearest_point > 0.0f )
+    {
+      near_plane = nearest_point * 0.8f;
+    }
+    else
+    {
+      near_plane = 0.001f;
+    }
+
+    arcball_get_mvp(view->arcball, ovl->cached_mvp, view->pan_offset,
+        view->cached_camera_distance, ovl_model_scale,
+        view->aspect, view->fov_rad, near_plane, far_plane);
+  }
+
+} /* gl_overlay_prepare() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_overlay_render()
+ *
+ * Render overlay using cached MVP (ignores passed MVP)
+ */
+  static void
+gl_overlay_render(void *ctx, mat4 mvp)
+{
+  gl_overlay_ctx_t *ovl = ctx;
+
+  (void)mvp;
+
+  if( ovl->ovl_content.vertex_count <= 0 )
+    return;
+
+  gl_view_draw_pass(
+      ovl->shader.program,
+      ovl->mvp_location,
+      ovl->cached_mvp,
+      ovl->vao,
+      ovl->ovl_content.draw_mode,
+      ovl->ovl_content.vertex_count);
+
+} /* gl_overlay_render() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_overlay_is_active()
+ *
+ * Returns TRUE when overlay is initialized and provider exists
+ */
+  static gboolean
+gl_overlay_is_active(void *ctx)
+{
+  gl_overlay_ctx_t *ovl = ctx;
+
+  return( ovl->initialized &&
+          ovl->view->scene->overlay_generate != NULL );
+
+} /* gl_overlay_is_active() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_overlay_far_extent()
+ *
+ * Returns the overlay extent for clip plane calculation
+ */
+  static float
+gl_overlay_far_extent(void *ctx, float r_max)
+{
+  (void)ctx;
+
+  return( r_max );
+
+} /* gl_overlay_far_extent() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_overlay_free()
+ *
+ * Free overlay rendering context and GL resources
+ */
+  static void
+gl_overlay_free(void *ctx)
+{
+  gl_overlay_ctx_t *ovl = ctx;
+
+  if( !ovl )
+    return;
+
+  if( ovl->view->scene && ovl->view->scene->overlay_cleanup )
+    ovl->view->scene->overlay_cleanup();
+
+  if( ovl->vbo )
+    glDeleteBuffers(1, &ovl->vbo);
+
+  if( ovl->vao )
+    glDeleteVertexArrays(1, &ovl->vao);
+
+  gl_shader_destroy(&ovl->shader);
+
+  g_free(ovl->attrib_locations);
+  g_free(ovl);
+
+} /* gl_overlay_free() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -390,48 +798,51 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   mat4 mvp;
   float camera_distance;
   GLint default_fbo = 0;
+  guint32 active_mask;
+  guint i;
 
   state = (gl_view_state_t *)user_data;
 
   if( !state || !state->initialized )
     return( FALSE );
 
+  /* Data acquisition preamble */
   if( !state->scene->generate(&content) )
     return( FALSE );
 
-  if( content.generation != state->last_generation )
-  {
-    if( content.vertex_count > 0 )
-    {
-      glBindBuffer(GL_ARRAY_BUFFER, state->vbo);
-      glBufferData(GL_ARRAY_BUFFER,
-        content.vertex_count * content.vertex_stride,
-        content.vertices,
-        GL_STATIC_DRAW);
-    }
-
-    if( state->overlay )
-      gradient_overlay_mark_dirty(state->overlay);
-
-    state->last_generation = content.generation;
-  }
-
   state->content = content;
 
-  /* Scene provides normalized zoom via content.zoom */
   camera_distance = content.r_max * ARCBALL_BASE_DISTANCE_FACTOR / content.zoom;
-
-  /* Cache distance for pan calculations during drag */
   state->cached_camera_distance = camera_distance;
 
-  /* Compute clip planes dynamically based on scene geometry and camera position.
-   * This prevents Z-depth clipping when zooming out while maintaining depth
-   * precision by keeping near plane as far from camera as geometry allows. */
+  /* Active survey — build mask and compute far extent in one pass */
   {
-    float nearest_point, farthest_point, near_plane, far_plane;
+    float effective_far, nearest_point, farthest_point, near_plane, far_plane, ext;
+
+    active_mask = 0;
+    effective_far = 0.0f;
+
+    for( i = 0; i < state->renderables->len; i++ )
+    {
+      gl_renderable_t *r = &g_array_index(
+          state->renderables, gl_renderable_t, i);
+
+      if( r->is_active != NULL && !r->is_active(r->ctx) )
+        continue;
+
+      active_mask |= (1u << i);
+
+      if( r->far_extent )
+      {
+        ext = r->far_extent(r->ctx, content.r_max);
+
+        if( ext > effective_far )
+          effective_far = ext;
+      }
+    }
 
     nearest_point = camera_distance - content.r_max;
-    farthest_point = camera_distance + content.r_max;
+    farthest_point = camera_distance + effective_far;
 
     far_plane = farthest_point * 1.2f;
 
@@ -449,96 +860,94 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
         near_plane, far_plane);
   }
 
-  /* Save default FBO and bind MSAA FBO if active */
+  /* Framebuffer setup */
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &default_fbo);
 
   if( state->msaa_fbo )
     glBindFramebuffer(GL_FRAMEBUFFER, state->msaa_fbo);
 
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glEnable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
 
-  if( content.vertex_count > 0 )
+  /* Opaque pass — depth buffer fully populated */
+  for( i = 0; i < state->renderables->len; i++ )
   {
-    gl_view_draw_pass(
-        state->shader.program,
-        state->mvp_location,
-        mvp,
-        state->vao,
-        state->vbo,
-        state->config->attribs,
-        state->attrib_locations,
-        state->config->attrib_count,
-        &content);
+    gl_renderable_t *r = &g_array_index(
+        state->renderables, gl_renderable_t, i);
+
+    if( r->alpha < 1.0f )
+      continue;
+
+    if( !(active_mask & (1u << i)) )
+      continue;
+
+    r->prepare(r->ctx, content.r_max);
+    r->render(r->ctx, mvp);
   }
 
-  /* Render structure overlay if provider is active */
-  if( state->ovl_initialized && state->scene->overlay_generate )
+  /* Transparent pass — sorted back-to-front by depth */
   {
-    gl_view_content_t ovl_content;
+    int trans_indices[state->renderables->len];
+    float trans_depths[state->renderables->len];
+    int trans_count, j, k;
 
-    if( state->scene->overlay_generate(&content, &ovl_content) &&
-        ovl_content.vertex_count > 0 )
+    trans_count = 0;
+
+    for( i = 0; i < state->renderables->len; i++ )
     {
-      const gl_overlay_config_t *ocfg = state->scene->overlay_config;
+      gl_renderable_t *r = &g_array_index(
+          state->renderables, gl_renderable_t, i);
 
-      /* Upload overlay vertices on generation change */
-      if( ovl_content.generation != state->ovl_last_generation )
+      if( r->alpha >= 1.0f )
+        continue;
+
+      if( !(active_mask & (1u << i)) )
+        continue;
+
+      trans_depths[trans_count] =
+          state->arcball->rotation[0][2] * r->origin[0] +
+          state->arcball->rotation[1][2] * r->origin[1] +
+          state->arcball->rotation[2][2] * r->origin[2];
+      trans_indices[trans_count] = (int)i;
+      trans_count++;
+    }
+
+    /* Insertion sort ascending — farthest (most negative depth) first */
+    for( j = 1; j < trans_count; j++ )
+    {
+      float key_depth = trans_depths[j];
+      int key_idx = trans_indices[j];
+
+      k = j - 1;
+
+      while( k >= 0 && trans_depths[k] > key_depth )
       {
-        glBindBuffer(GL_ARRAY_BUFFER, state->ovl_vbo);
-        glBufferData(GL_ARRAY_BUFFER,
-            ovl_content.vertex_count * ovl_content.vertex_stride,
-            ovl_content.vertices,
-            GL_STATIC_DRAW);
-        state->ovl_last_generation = ovl_content.generation;
+        trans_depths[k + 1] = trans_depths[k];
+        trans_indices[k + 1] = trans_indices[k];
+        k--;
       }
 
-      /* Compute overlay MVP with user-adjusted model scale */
-      {
-        mat4 ovl_mvp;
-        float ovl_model_scale, nearest_point, farthest_point, near_plane, far_plane;
+      trans_depths[k + 1] = key_depth;
+      trans_indices[k + 1] = key_idx;
+    }
 
-        /* Apply user adjustment to default scale from overlay_generate */
-        ovl_model_scale = ovl_content.model_scale * state->ovl_model_scale_adj;
+    for( j = 0; j < trans_count; j++ )
+    {
+      gl_renderable_t *r = &g_array_index(
+          state->renderables, gl_renderable_t, trans_indices[j]);
 
-        /* Use same clip planes as primary */
-        nearest_point = camera_distance - content.r_max;
-        farthest_point = camera_distance + content.r_max;
-        far_plane = farthest_point * 1.2f;
-
-        if( nearest_point > 0.0f )
-        {
-          near_plane = nearest_point * 0.8f;
-        }
-        else
-        {
-          near_plane = 0.001f;
-        }
-
-        arcball_get_mvp(state->arcball, ovl_mvp, state->pan_offset,
-            camera_distance, ovl_model_scale, state->aspect, state->fov_rad,
-            near_plane, far_plane);
-
-        /* Draw overlay with its own shader and MVP */
-        gl_view_draw_pass(
-            state->ovl_shader.program,
-            state->ovl_mvp_location,
-            ovl_mvp,
-            state->ovl_vao,
-            state->ovl_vbo,
-            ocfg->attribs,
-            state->ovl_attrib_locations,
-            ocfg->attrib_count,
-            &ovl_content);
-      }
+      r->prepare(r->ctx, content.r_max);
+      r->render(r->ctx, mvp);
     }
   }
 
-  opengl_axes_set_scale(state->axes, content.r_max * 1.1f);
-  opengl_axes_render(state->axes, mvp);
+  /* Post-3D callbacks */
+  if( state->scene->post_render )
+    state->scene->post_render();
 
+  /* 2D HUD — screen-space, rendered to MSAA FBO */
   if( state->overlay && content.show_gradient )
     gradient_overlay_render(state->overlay);
 
@@ -602,9 +1011,6 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
     cairo_surface_destroy(surface);
   }
-
-  if( state->scene->post_render )
-    state->scene->post_render();
 
   /* Blit MSAA to default FBO */
   if( state->msaa_fbo )
