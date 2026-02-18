@@ -17,20 +17,15 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef OPENGL_RDPATTERN_H
-#define OPENGL_RDPATTERN_H 1
+#ifndef OPENGL_MSAA_H
+#define OPENGL_MSAA_H 1
 
 #include "common.h"
 
 #ifdef HAVE_OPENGL
 
-#include "opengl_renderer.h"
-
-/* Public API */
-GtkWidget* opengl_rdpattern_create_widget(void);
-void opengl_rdpattern_cleanup(void);
-arcball_state_t* opengl_rdpattern_get_arcball(void);
-GtkWidget* opengl_rdpattern_get_widget(void);
+/* Set MSAA sample count for all GL views */
+void Set_MSAA_Samples(int samples);
 
 #endif /* HAVE_OPENGL */
-#endif /* OPENGL_RDPATTERN_H */
+#endif /* OPENGL_MSAA_H */

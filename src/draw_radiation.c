@@ -22,7 +22,7 @@
 #include "shared.h"
 
 #ifdef HAVE_OPENGL
-#include "opengl_rdpattern.h"
+#include "opengl/opengl_rdpattern.h"
 #endif
 
 /* Constants for display layout */

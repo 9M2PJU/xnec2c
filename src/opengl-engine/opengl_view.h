@@ -169,7 +169,7 @@ void gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball);
 void gl_view_sync_arcball(GtkWidget *widget, double wr, double wi);
 void gl_view_reset_pan(GtkWidget *widget);
 void gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms);
-void Set_MSAA_Samples(int samples);
+void gl_view_recreate_msaa(gl_view_state_t *state, int requested_samples);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_VIEW_H */

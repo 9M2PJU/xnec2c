@@ -18,13 +18,13 @@
  */
 
 #include "opengl_structure.h"
-#include "shared.h"
-#include "draw.h"
+#include "../shared.h"
+#include "../draw.h"
 
 #ifdef HAVE_OPENGL
 
-#include "opengl_view.h"
-#include "opengl_cylinder.h"
+#include "../opengl-engine/opengl_view.h"
+#include "../opengl-engine/opengl_cylinder.h"
 
 /* Scale factor for cylinder radius display */
 #define CYLINDER_RADIUS_SCALE 5.0

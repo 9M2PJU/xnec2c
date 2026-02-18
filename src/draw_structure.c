@@ -19,7 +19,7 @@
 
 #include "draw_structure.h"
 #include "shared.h"
-#include "opengl_structure.h"
+#include "opengl/opengl_structure.h"
 
 int need_structure_redraw = 1;
 

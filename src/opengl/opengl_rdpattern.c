@@ -19,13 +19,13 @@
 
 #include "opengl_rdpattern.h"
 #include "opengl_structure.h"
-#include "shared.h"
-#include "draw.h"
-#include "draw_radiation.h"
+#include "../shared.h"
+#include "../draw.h"
+#include "../draw_radiation.h"
 
 #ifdef HAVE_OPENGL
 
-#include "opengl_view.h"
+#include "../opengl-engine/opengl_view.h"
 
 /* Default structure overlay extent as multiple of radiation pattern r_max */
 #define OVERLAY_DEFAULT_EXTENT 1.25f

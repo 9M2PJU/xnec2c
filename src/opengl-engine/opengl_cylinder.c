@@ -18,7 +18,7 @@
  */
 
 #include "opengl_cylinder.h"
-#include "shared.h"
+#include "../shared.h"
 
 #ifdef HAVE_OPENGL
 

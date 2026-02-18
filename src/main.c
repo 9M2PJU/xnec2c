@@ -20,7 +20,7 @@
 #include "main.h"
 #include "shared.h"
 #include "mathlib.h"
-#include "opengl_structure.h"
+#include "opengl/opengl_structure.h"
 
 #include <getopt.h>
 

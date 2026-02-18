@@ -54,7 +54,7 @@ void opengl_structure_cleanup(void);
 void opengl_structure_queue_draw(void);
 
 #ifdef HAVE_OPENGL
-#include "opengl_renderer.h"
+#include "../opengl-engine/opengl_renderer.h"
 
 /* Vertex attribute layout for lit-color shader (structure rendering) */
 extern const gl_vertex_attrib_t opengl_structure_attribs[3];

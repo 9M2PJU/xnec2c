@@ -20,7 +20,7 @@
 #include "callback_func.h"
 #include "shared.h"
 
-#include "opengl_structure.h"
+#include "opengl/opengl_structure.h"
 
 /*-----------------------------------------------------------------------*/
 

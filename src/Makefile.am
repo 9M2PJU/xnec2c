@@ -110,15 +110,16 @@ xnec2c_CPPFLAGS += $(GSL_CFLAGS)
 xnec2c_LDADD    += $(GSL_LIBS)
 if HAVE_OPENGL
 xnec2c_SOURCES += \
-  opengl_renderer.c opengl_renderer.h \
-  opengl_view.c opengl_view.h \
-  opengl_rdpattern.c opengl_rdpattern.h \
-  opengl_axes.c opengl_axes.h \
-  opengl_ground_plane.c opengl_ground_plane.h \
-  opengl_cairo_overlay.c opengl_cairo_overlay.h \
-  opengl_gradient_overlay.c opengl_gradient_overlay.h \
-  opengl_cylinder.c opengl_cylinder.h \
-  opengl_structure.c opengl_structure.h
+  opengl-engine/opengl_renderer.c opengl-engine/opengl_renderer.h \
+  opengl-engine/opengl_view.c opengl-engine/opengl_view.h \
+  opengl-engine/opengl_axes.c opengl-engine/opengl_axes.h \
+  opengl-engine/opengl_ground_plane.c opengl-engine/opengl_ground_plane.h \
+  opengl-engine/opengl_cairo_overlay.c opengl-engine/opengl_cairo_overlay.h \
+  opengl-engine/opengl_gradient_overlay.c opengl-engine/opengl_gradient_overlay.h \
+  opengl-engine/opengl_cylinder.c opengl-engine/opengl_cylinder.h \
+  opengl/opengl_rdpattern.c opengl/opengl_rdpattern.h \
+  opengl/opengl_structure.c opengl/opengl_structure.h \
+  opengl/opengl_msaa.c opengl/opengl_msaa.h
 
 xnec2c_CPPFLAGS += $(CGLM_CFLAGS)
 xnec2c_LDADD    += $(GL_LIBS) $(CGLM_LIBS)

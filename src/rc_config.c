@@ -24,8 +24,8 @@
 #include "mathlib.h"
 #include "measurements.h"
 
-#include "opengl_structure.h"
-#include "opengl_view.h"
+#include "opengl/opengl_structure.h"
+#include "opengl/opengl_msaa.h"
 
 
 /* Add configuration options here. To add new variables:

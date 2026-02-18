@@ -23,10 +23,11 @@
 #include "measurements.h"
 #include <pthread.h>
 
-#include "opengl_structure.h"
+#include "opengl/opengl_structure.h"
 #ifdef HAVE_OPENGL
-#include "opengl_view.h"
-#include "opengl_rdpattern.h"
+#include "opengl-engine/opengl_view.h"
+#include "opengl/opengl_rdpattern.h"
+#include "opengl/opengl_msaa.h"
 
 static void common_projection_share_arcball(void);
 #endif
