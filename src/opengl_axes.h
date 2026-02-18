@@ -51,7 +51,7 @@ typedef struct
 opengl_axes_t* opengl_axes_new(void);
 void opengl_axes_free(void *ctx);
 void opengl_axes_prepare(void *ctx, float r_max);
-void opengl_axes_render(void *ctx, mat4 mvp);
+void opengl_axes_render(void *ctx, mat4 mvp, float _alpha);
 gboolean opengl_axes_is_active(void *ctx);
 float opengl_axes_far_extent(void *ctx, float r_max);
 

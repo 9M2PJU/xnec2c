@@ -33,6 +33,7 @@ typedef struct
   GLuint vbo;
   gl_shader_t shader;
   GLint mvp_location;
+  GLint u_alpha_location;
   GLint attrib_locations[3];
   float scale;
   gboolean initialized;
@@ -42,7 +43,7 @@ typedef struct
 opengl_ground_plane_t* opengl_ground_plane_new(void);
 void opengl_ground_plane_free(void *ctx);
 void opengl_ground_plane_prepare(void *ctx, float r_max);
-void opengl_ground_plane_render(void *ctx, mat4 mvp);
+void opengl_ground_plane_render(void *ctx, mat4 mvp, float alpha);
 gboolean opengl_ground_plane_is_active(void *ctx);
 float opengl_ground_plane_far_extent(void *ctx, float r_max);
 

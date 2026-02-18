@@ -33,6 +33,7 @@ typedef struct
   GLuint vao;
   GLuint vbo;
   GLint mvp_location;
+  GLint u_alpha_location;
   GLint *attrib_locations;
 
 } gl_scene_ctx_t;
@@ -45,6 +46,7 @@ typedef struct
   GLuint vao;
   GLuint vbo;
   GLint mvp_location;
+  GLint u_alpha_location;
   GLint *attrib_locations;
   unsigned int last_generation;
   gboolean initialized;
@@ -55,14 +57,14 @@ typedef struct
 
 /* Scene renderable callbacks */
 static void gl_scene_prepare(void *ctx, float r_max);
-static void gl_scene_render(void *ctx, mat4 mvp);
+static void gl_scene_render(void *ctx, mat4 mvp, float alpha);
 static gboolean gl_scene_is_active(void *ctx);
 static float gl_scene_far_extent(void *ctx, float r_max);
 static void gl_scene_free(void *ctx);
 
 /* Overlay renderable callbacks */
 static void gl_overlay_prepare(void *ctx, float r_max);
-static void gl_overlay_render(void *ctx, mat4 mvp);
+static void gl_overlay_render(void *ctx, mat4 mvp, float alpha);
 static gboolean gl_overlay_is_active(void *ctx);
 static float gl_overlay_far_extent(void *ctx, float r_max);
 static void gl_overlay_free(void *ctx);
@@ -200,6 +202,8 @@ gl_view_state_free(gl_view_state_t *state)
     state->renderables = NULL;
   }
 
+  g_free(state->saved_alphas);
+
   if( state->overlay )
     gradient_overlay_free(state->overlay);
 
@@ -270,6 +274,7 @@ on_realize(GtkGLArea *area, gpointer user_data)
     }
 
     sc->mvp_location = glGetUniformLocation(sc->shader.program, "mvp");
+    sc->u_alpha_location = glGetUniformLocation(sc->shader.program, "u_alpha");
 
     glGenVertexArrays(1, &sc->vao);
     glGenBuffers(1, &sc->vbo);
@@ -288,14 +293,15 @@ on_realize(GtkGLArea *area, gpointer user_data)
         sizeof(gl_renderable_t), 4);
 
     r = (gl_renderable_t){
-      .render     = gl_scene_render,
-      .prepare    = gl_scene_prepare,
-      .destroy    = gl_scene_free,
-      .is_active  = gl_scene_is_active,
-      .far_extent = gl_scene_far_extent,
-      .ctx        = sc,
-      .alpha      = 1.0f,
-      .origin     = {0.0f, 0.0f, 0.0f}
+      .render               = gl_scene_render,
+      .prepare              = gl_scene_prepare,
+      .destroy              = gl_scene_free,
+      .is_active            = gl_scene_is_active,
+      .far_extent           = gl_scene_far_extent,
+      .ctx                  = sc,
+      .alpha                = 1.0f,
+      .origin               = {0.0f, 0.0f, 0.0f},
+      .transparent_sort_order = 1
     };
     g_array_append_val(state->renderables, r);
   }
@@ -317,6 +323,8 @@ on_realize(GtkGLArea *area, gpointer user_data)
     {
       ovl->mvp_location =
         glGetUniformLocation(ovl->shader.program, "mvp");
+      ovl->u_alpha_location =
+        glGetUniformLocation(ovl->shader.program, "u_alpha");
 
       glGenVertexArrays(1, &ovl->vao);
       glGenBuffers(1, &ovl->vbo);
@@ -333,14 +341,15 @@ on_realize(GtkGLArea *area, gpointer user_data)
       ovl->initialized = TRUE;
 
       r = (gl_renderable_t){
-        .render     = gl_overlay_render,
-        .prepare    = gl_overlay_prepare,
-        .destroy    = gl_overlay_free,
-        .is_active  = gl_overlay_is_active,
-        .far_extent = gl_overlay_far_extent,
-        .ctx        = ovl,
-        .alpha      = 1.0f,
-        .origin     = {0.0f, 0.0f, 0.0f}
+        .render               = gl_overlay_render,
+        .prepare              = gl_overlay_prepare,
+        .destroy              = gl_overlay_free,
+        .is_active            = gl_overlay_is_active,
+        .far_extent           = gl_overlay_far_extent,
+        .ctx                  = ovl,
+        .alpha                = 1.0f,
+        .origin               = {0.0f, 0.0f, 0.0f},
+        .transparent_sort_order = 0
       };
       g_array_append_val(state->renderables, r);
     }
@@ -363,14 +372,15 @@ on_realize(GtkGLArea *area, gpointer user_data)
     }
 
     r = (gl_renderable_t){
-      .render     = opengl_axes_render,
-      .prepare    = opengl_axes_prepare,
-      .destroy    = opengl_axes_free,
-      .is_active  = opengl_axes_is_active,
-      .far_extent = opengl_axes_far_extent,
-      .ctx        = axes,
-      .alpha      = 1.0f,
-      .origin     = {0.0f, 0.0f, 0.0f}
+      .render               = opengl_axes_render,
+      .prepare              = opengl_axes_prepare,
+      .destroy              = opengl_axes_free,
+      .is_active            = opengl_axes_is_active,
+      .far_extent           = opengl_axes_far_extent,
+      .ctx                  = axes,
+      .alpha                = 1.0f,
+      .origin               = {0.0f, 0.0f, 0.0f},
+      .transparent_sort_order = 0
     };
     g_array_append_val(state->renderables, r);
   }
@@ -387,14 +397,15 @@ on_realize(GtkGLArea *area, gpointer user_data)
     }
 
     r = (gl_renderable_t){
-      .render     = opengl_ground_plane_render,
-      .prepare    = opengl_ground_plane_prepare,
-      .destroy    = opengl_ground_plane_free,
-      .is_active  = opengl_ground_plane_is_active,
-      .far_extent = opengl_ground_plane_far_extent,
-      .ctx        = ground_plane,
-      .alpha      = 0.5f,
-      .origin     = {0.0f, 0.0f, 0.0f}
+      .render               = opengl_ground_plane_render,
+      .prepare              = opengl_ground_plane_prepare,
+      .destroy              = opengl_ground_plane_free,
+      .is_active            = opengl_ground_plane_is_active,
+      .far_extent           = opengl_ground_plane_far_extent,
+      .ctx                  = ground_plane,
+      .alpha                = 0.5f,
+      .origin               = {0.0f, 0.0f, 0.0f},
+      .transparent_sort_order = 2
     };
     g_array_append_val(state->renderables, r);
   }
@@ -412,6 +423,9 @@ on_realize(GtkGLArea *area, gpointer user_data)
     gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
     gradient_overlay_set_viewport(state->overlay, alloc.width, alloc.height);
   }
+
+  /* Allocate drag save/restore array sized to renderable count */
+  state->saved_alphas = g_new0(float, state->renderables->len);
 
   state->initialized = TRUE;
 
@@ -548,10 +562,14 @@ gl_scene_prepare(void *ctx, float r_max)
  * Render scene geometry using generic draw pass
  */
   static void
-gl_scene_render(void *ctx, mat4 mvp)
+gl_scene_render(void *ctx, mat4 mvp, float alpha)
 {
   gl_scene_ctx_t *sc = ctx;
   gl_view_state_t *view = sc->view;
+
+  /* Set alpha multiplier before draw pass */
+  glUseProgram(sc->shader.program);
+  glUniform1f(sc->u_alpha_location, alpha);
 
   gl_view_draw_pass(
       sc->shader.program,
@@ -704,7 +722,7 @@ gl_overlay_prepare(void *ctx, float r_max)
  * Render overlay using cached MVP (ignores passed MVP)
  */
   static void
-gl_overlay_render(void *ctx, mat4 mvp)
+gl_overlay_render(void *ctx, mat4 mvp, float alpha)
 {
   gl_overlay_ctx_t *ovl = ctx;
 
@@ -712,6 +730,10 @@ gl_overlay_render(void *ctx, mat4 mvp)
 
   if( ovl->ovl_content.vertex_count <= 0 )
     return;
+
+  /* Set alpha multiplier before draw pass */
+  glUseProgram(ovl->shader.program);
+  glUniform1f(ovl->u_alpha_location, alpha);
 
   gl_view_draw_pass(
       ovl->shader.program,
@@ -884,12 +906,13 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       continue;
 
     r->prepare(r->ctx, content.r_max);
-    r->render(r->ctx, mvp);
+    r->render(r->ctx, mvp, r->alpha);
   }
 
-  /* Transparent pass — sorted back-to-front by depth */
+  /* Transparent pass — sorted by priority then back-to-front depth */
   {
     int trans_indices[state->renderables->len];
+    int trans_orders[state->renderables->len];
     float trans_depths[state->renderables->len];
     int trans_count, j, k;
 
@@ -906,6 +929,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       if( !(active_mask & (1u << i)) )
         continue;
 
+      trans_orders[trans_count] = r->transparent_sort_order;
       trans_depths[trans_count] =
           state->arcball->rotation[0][2] * r->origin[0] +
           state->arcball->rotation[1][2] * r->origin[1] +
@@ -914,24 +938,37 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       trans_count++;
     }
 
-    /* Insertion sort ascending — farthest (most negative depth) first */
+    /* Insertion sort: ascending sort_order, then ascending depth
+     * (farthest first within same priority) */
     for( j = 1; j < trans_count; j++ )
     {
+      int key_order = trans_orders[j];
       float key_depth = trans_depths[j];
       int key_idx = trans_indices[j];
 
       k = j - 1;
 
-      while( k >= 0 && trans_depths[k] > key_depth )
+      while( k >= 0 &&
+             (trans_orders[k] > key_order ||
+              (trans_orders[k] == key_order &&
+               trans_depths[k] > key_depth)) )
       {
+        trans_orders[k + 1] = trans_orders[k];
         trans_depths[k + 1] = trans_depths[k];
         trans_indices[k + 1] = trans_indices[k];
         k--;
       }
 
+      trans_orders[k + 1] = key_order;
       trans_depths[k + 1] = key_depth;
       trans_indices[k + 1] = key_idx;
     }
+
+    /* Depth writes ON so transparent shells self-occlude.
+     * Interior objects render first (lower sort_order) and
+     * write depth; enclosing shells depth-test against them. */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     for( j = 0; j < trans_count; j++ )
     {
@@ -939,8 +976,13 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
           state->renderables, gl_renderable_t, trans_indices[j]);
 
       r->prepare(r->ctx, content.r_max);
-      r->render(r->ctx, mvp);
+      r->render(r->ctx, mvp, r->alpha);
+
+      /* Re-assert blend in case renderable modified GL state */
+      glEnable(GL_BLEND);
     }
+
+    glDisable(GL_BLEND);
   }
 
   /* Post-3D callbacks */
@@ -1083,6 +1125,22 @@ on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
   if( event->button == 1 || event->button == 2 )
   {
     arcball_begin_drag(state->arcball, event->button, event->x, event->y);
+
+    /* Save current alphas and halve all renderables for drag feedback */
+    {
+      guint ri;
+
+      for( ri = 0; ri < state->renderables->len; ri++ )
+      {
+        gl_renderable_t *r = &g_array_index(
+            state->renderables, gl_renderable_t, ri);
+
+        state->saved_alphas[ri] = r->alpha;
+        r->alpha *= 0.5f;
+      }
+    }
+    gtk_widget_queue_draw(widget);
+
     return( TRUE );
   }
 
@@ -1107,6 +1165,20 @@ on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
     return( FALSE );
 
   arcball_end_drag(state->arcball);
+
+  /* Restore all alphas from drag transparency */
+  {
+    guint ri;
+
+    for( ri = 0; ri < state->renderables->len; ri++ )
+    {
+      gl_renderable_t *r = &g_array_index(
+          state->renderables, gl_renderable_t, ri);
+
+      r->alpha = state->saved_alphas[ri];
+    }
+  }
+  gtk_widget_queue_draw(widget);
 
   return( TRUE );
 
@@ -1263,6 +1335,8 @@ gl_view_create_widget(
 
   /* Initialize overlay scale adjustment (1.0 = default from overlay_generate) */
   state->ovl_model_scale_adj = 1.0f;
+
+  /* saved_alphas allocated after renderables are built in on_realize */
 
   /* Initialize tooltip state */
   state->tooltip_active = FALSE;

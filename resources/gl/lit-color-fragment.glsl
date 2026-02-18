@@ -1,4 +1,5 @@
 #version 120
+uniform float u_alpha;
 varying vec4 vertexColor;
 varying vec3 viewNormal;
 varying vec3 viewPos;
@@ -47,5 +48,5 @@ void main() {
   /* Final brightness boost */
   color *= BRIGHTNESS_BOOST;
 
-  gl_FragColor = vec4(clamp(color, 0.0, 1.0), vertexColor.a);
+  gl_FragColor = vec4(clamp(color, 0.0, 1.0), vertexColor.a * u_alpha);
 }

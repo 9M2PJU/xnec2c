@@ -119,6 +119,7 @@ opengl_ground_plane_new(void)
   }
 
   gp->mvp_location = glGetUniformLocation(gp->shader.program, "mvp");
+  gp->u_alpha_location = glGetUniformLocation(gp->shader.program, "u_alpha");
 
   for( i = 0; i < 3; i++ )
   {
@@ -268,13 +269,14 @@ opengl_ground_plane_far_extent(void *ctx, float r_max)
  * opengl_ground_plane_render - Render ground plane with checkerboard pattern
  * @ctx: Ground plane context
  * @mvp: Model-view-projection matrix
+ * @alpha: Alpha multiplier from engine for fragment output
  *
  * Binds VAO/VBO, configures vertex attributes, and draws ground plane quad
  * with transparent checkerboard pattern. Enables alpha blending and renders
  * with custom shader that produces 0.5m tile pattern.
  */
   void
-opengl_ground_plane_render(void *ctx, mat4 mvp)
+opengl_ground_plane_render(void *ctx, mat4 mvp, float alpha)
 {
   opengl_ground_plane_t *gp = ctx;
 
@@ -286,6 +288,7 @@ opengl_ground_plane_render(void *ctx, mat4 mvp)
   glDepthMask(GL_FALSE);
 
   glUseProgram(gp->shader.program);
+  glUniform1f(gp->u_alpha_location, alpha);
   glUniformMatrix4fv(gp->mvp_location, 1, GL_FALSE, (float *)mvp);
 
   /* VAO has attrib config from init — bind and draw */

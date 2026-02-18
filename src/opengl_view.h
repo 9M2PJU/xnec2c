@@ -52,7 +52,7 @@ typedef struct
 } gl_overlay_config_t;
 
 /* Renderable interface callback types */
-typedef void (*gl_render_fn)(void *ctx, mat4 mvp);
+typedef void (*gl_render_fn)(void *ctx, mat4 mvp, float alpha);
 typedef void (*gl_prepare_fn)(void *ctx, float r_max);
 typedef void (*gl_destroy_fn)(void *ctx);
 typedef gboolean (*gl_active_fn)(void *ctx);
@@ -69,6 +69,9 @@ typedef struct
   void *ctx;
   float alpha;
   vec3 origin;
+
+  /* Sort priority for transparent pass (lower renders first) */
+  int transparent_sort_order;
 
 } gl_renderable_t;
 
@@ -134,6 +137,9 @@ typedef struct
   guint tooltip_timeout_id;
   int tooltip_hold_ms;
   cairo_gl_overlay_t *tooltip_overlay;
+
+  /* Drag save/restore for all renderable alphas */
+  float *saved_alphas;
 
   /* MSAA state */
   GLuint msaa_fbo;

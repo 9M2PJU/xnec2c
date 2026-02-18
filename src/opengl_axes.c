@@ -359,9 +359,12 @@ opengl_axes_far_extent(void *ctx, float r_max)
  * Render axes lines and labels
  */
   void
-opengl_axes_render(void *ctx, mat4 mvp)
+opengl_axes_render(void *ctx, mat4 mvp, float _alpha)
 {
   opengl_axes_t *axes = ctx;
+
+  /* Axes use fixed-color shaders with no alpha uniform */
+  (void)_alpha;
 
   if( !axes || !axes->initialized || axes->r_max == 0.0f )
     return;
