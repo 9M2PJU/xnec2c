@@ -1,4 +1,5 @@
 #version 120
+uniform float u_alpha;
 varying vec4 vertexColor;
 varying vec3 viewNormal;
 varying vec3 viewPos;
@@ -15,7 +16,6 @@ const float SHADE_RANGE = 0.4;
 const float TILE_SIZE = 0.5;
 const vec3 DARK_GREEN = vec3(0.15, 0.25, 0.12);
 const vec3 LIGHT_GREEN = vec3(0.20, 0.32, 0.15);
-const float GROUND_ALPHA = 0.5;
 
 void main() {
   vec3 lightDir = normalize(LIGHT_DIR_RAW);
@@ -43,5 +43,5 @@ void main() {
   /* Add subtle specular */
   color += vec3(1.0) * spec * SPECULAR_INTENSITY;
 
-  gl_FragColor = vec4(clamp(color, 0.0, 1.0), GROUND_ALPHA);
+  gl_FragColor = vec4(clamp(color, 0.0, 1.0), u_alpha);
 }

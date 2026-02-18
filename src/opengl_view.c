@@ -25,6 +25,9 @@
 
 #ifdef HAVE_OPENGL
 
+/* Drag transparency: alpha multiplier applied to marked renderables during drag */
+#define DRAG_ALPHA_FACTOR 0.5f
+
 /* Scene rendering context — owns shader and GL resources for primary geometry */
 typedef struct
 {
@@ -202,8 +205,6 @@ gl_view_state_free(gl_view_state_t *state)
     state->renderables = NULL;
   }
 
-  g_free(state->saved_alphas);
-
   if( state->overlay )
     gradient_overlay_free(state->overlay);
 
@@ -301,7 +302,8 @@ on_realize(GtkGLArea *area, gpointer user_data)
       .ctx                  = sc,
       .alpha                = 1.0f,
       .origin               = {0.0f, 0.0f, 0.0f},
-      .transparent_sort_order = 1
+      .transparent_sort_order = 1,
+      .transparent_on_drag  = TRUE
     };
     g_array_append_val(state->renderables, r);
   }
@@ -349,7 +351,8 @@ on_realize(GtkGLArea *area, gpointer user_data)
         .ctx                  = ovl,
         .alpha                = 1.0f,
         .origin               = {0.0f, 0.0f, 0.0f},
-        .transparent_sort_order = 0
+        .transparent_sort_order = 0,
+        .transparent_on_drag  = TRUE
       };
       g_array_append_val(state->renderables, r);
     }
@@ -405,7 +408,8 @@ on_realize(GtkGLArea *area, gpointer user_data)
       .ctx                  = ground_plane,
       .alpha                = 0.5f,
       .origin               = {0.0f, 0.0f, 0.0f},
-      .transparent_sort_order = 2
+      .transparent_sort_order = 2,
+      .transparent_on_drag  = FALSE
     };
     g_array_append_val(state->renderables, r);
   }
@@ -423,9 +427,6 @@ on_realize(GtkGLArea *area, gpointer user_data)
     gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
     gradient_overlay_set_viewport(state->overlay, alloc.width, alloc.height);
   }
-
-  /* Allocate drag save/restore array sized to renderable count */
-  state->saved_alphas = g_new0(float, state->renderables->len);
 
   state->initialized = TRUE;
 
@@ -899,20 +900,25 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     gl_renderable_t *r = &g_array_index(
         state->renderables, gl_renderable_t, i);
 
-    if( r->alpha < 1.0f )
+    float eff_alpha = r->alpha *
+        (state->drag_active && r->transparent_on_drag
+         ? state->drag_alpha_factor : 1.0f);
+
+    if( eff_alpha < 1.0f )
       continue;
 
     if( !(active_mask & (1u << i)) )
       continue;
 
     r->prepare(r->ctx, content.r_max);
-    r->render(r->ctx, mvp, r->alpha);
+    r->render(r->ctx, mvp, eff_alpha);
   }
 
   /* Transparent pass — sorted by priority then back-to-front depth */
   {
     int trans_indices[state->renderables->len];
     int trans_orders[state->renderables->len];
+    float trans_alphas[state->renderables->len];
     float trans_depths[state->renderables->len];
     int trans_count, j, k;
 
@@ -923,12 +929,17 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       gl_renderable_t *r = &g_array_index(
           state->renderables, gl_renderable_t, i);
 
-      if( r->alpha >= 1.0f )
+      float eff_alpha = r->alpha *
+          (state->drag_active && r->transparent_on_drag
+           ? state->drag_alpha_factor : 1.0f);
+
+      if( eff_alpha >= 1.0f )
         continue;
 
       if( !(active_mask & (1u << i)) )
         continue;
 
+      trans_alphas[trans_count] = eff_alpha;
       trans_orders[trans_count] = r->transparent_sort_order;
       trans_depths[trans_count] =
           state->arcball->rotation[0][2] * r->origin[0] +
@@ -943,6 +954,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     for( j = 1; j < trans_count; j++ )
     {
       int key_order = trans_orders[j];
+      float key_alpha = trans_alphas[j];
       float key_depth = trans_depths[j];
       int key_idx = trans_indices[j];
 
@@ -954,12 +966,14 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
                trans_depths[k] > key_depth)) )
       {
         trans_orders[k + 1] = trans_orders[k];
+        trans_alphas[k + 1] = trans_alphas[k];
         trans_depths[k + 1] = trans_depths[k];
         trans_indices[k + 1] = trans_indices[k];
         k--;
       }
 
       trans_orders[k + 1] = key_order;
+      trans_alphas[k + 1] = key_alpha;
       trans_depths[k + 1] = key_depth;
       trans_indices[k + 1] = key_idx;
     }
@@ -976,7 +990,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
           state->renderables, gl_renderable_t, trans_indices[j]);
 
       r->prepare(r->ctx, content.r_max);
-      r->render(r->ctx, mvp, r->alpha);
+      r->render(r->ctx, mvp, trans_alphas[j]);
 
       /* Re-assert blend in case renderable modified GL state */
       glEnable(GL_BLEND);
@@ -1126,19 +1140,7 @@ on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
   {
     arcball_begin_drag(state->arcball, event->button, event->x, event->y);
 
-    /* Save current alphas and halve all renderables for drag feedback */
-    {
-      guint ri;
-
-      for( ri = 0; ri < state->renderables->len; ri++ )
-      {
-        gl_renderable_t *r = &g_array_index(
-            state->renderables, gl_renderable_t, ri);
-
-        state->saved_alphas[ri] = r->alpha;
-        r->alpha *= 0.5f;
-      }
-    }
+    state->drag_active = TRUE;
     gtk_widget_queue_draw(widget);
 
     return( TRUE );
@@ -1166,18 +1168,7 @@ on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 
   arcball_end_drag(state->arcball);
 
-  /* Restore all alphas from drag transparency */
-  {
-    guint ri;
-
-    for( ri = 0; ri < state->renderables->len; ri++ )
-    {
-      gl_renderable_t *r = &g_array_index(
-          state->renderables, gl_renderable_t, ri);
-
-      r->alpha = state->saved_alphas[ri];
-    }
-  }
+  state->drag_active = FALSE;
   gtk_widget_queue_draw(widget);
 
   return( TRUE );
@@ -1336,7 +1327,8 @@ gl_view_create_widget(
   /* Initialize overlay scale adjustment (1.0 = default from overlay_generate) */
   state->ovl_model_scale_adj = 1.0f;
 
-  /* saved_alphas allocated after renderables are built in on_realize */
+  /* Drag transparency: halve alpha for marked renderables while dragging */
+  state->drag_alpha_factor = DRAG_ALPHA_FACTOR;
 
   /* Initialize tooltip state */
   state->tooltip_active = FALSE;

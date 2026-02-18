@@ -73,6 +73,9 @@ typedef struct
   /* Sort priority for transparent pass (lower renders first) */
   int transparent_sort_order;
 
+  /* Whether alpha is reduced during drag interaction */
+  gboolean transparent_on_drag;
+
 } gl_renderable_t;
 
 /* Scene provider interface */
@@ -138,8 +141,9 @@ typedef struct
   int tooltip_hold_ms;
   cairo_gl_overlay_t *tooltip_overlay;
 
-  /* Drag save/restore for all renderable alphas */
-  float *saved_alphas;
+  /* Drag transparency state */
+  gboolean drag_active;
+  float drag_alpha_factor;
 
   /* MSAA state */
   GLuint msaa_fbo;
