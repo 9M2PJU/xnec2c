@@ -19,6 +19,7 @@
 
 #include "opengl_msaa.h"
 #include "../opengl-engine/opengl_view.h"
+#include "../opengl-engine/opengl_view_msaa.h"
 #include "../shared.h"
 
 #ifdef HAVE_OPENGL

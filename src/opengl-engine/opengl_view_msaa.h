@@ -1,0 +1,42 @@
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ *  The official website and doumentation for xnec2c is available here:
+ *    https://www.xnec2c.org/
+ */
+
+#ifndef OPENGL_VIEW_MSAA_H
+#define OPENGL_VIEW_MSAA_H 1
+
+#include "opengl_view.h"
+
+#ifdef HAVE_OPENGL
+
+/* gl_view_recreate_msaa()
+ *
+ * Recreate MSAA resources without destroying GL widget.
+ * Pass requested_samples=0 to disable MSAA.
+ */
+void gl_view_recreate_msaa(gl_view_state_t *state, int requested_samples);
+
+/* gl_view_msaa_free()
+ *
+ * Release MSAA framebuffer, color, and depth renderbuffer resources.
+ * Zeroes the corresponding fields in state.
+ */
+void gl_view_msaa_free(gl_view_state_t *state);
+
+#endif /* HAVE_OPENGL */
+#endif /* OPENGL_VIEW_MSAA_H */

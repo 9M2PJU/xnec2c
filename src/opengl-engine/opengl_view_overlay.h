@@ -1,0 +1,36 @@
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ *  The official website and doumentation for xnec2c is available here:
+ *    https://www.xnec2c.org/
+ */
+
+#ifndef OPENGL_VIEW_OVERLAY_H
+#define OPENGL_VIEW_OVERLAY_H 1
+
+#include "common.h"
+
+#ifdef HAVE_OPENGL
+#include "opengl_view.h"
+
+/* gl_view_overlay_renderable_new()
+ *
+ * Create overlay renderable for second-pass rendering. Returns inactive
+ * renderable if overlay_config is NULL or shader load fails.
+ */
+gl_renderable_t gl_view_overlay_renderable_new(gl_view_state_t *state);
+
+#endif /* HAVE_OPENGL */
+#endif /* OPENGL_VIEW_OVERLAY_H */

@@ -26,6 +26,9 @@
 #include "opengl_renderer.h"
 #include "opengl_gradient_overlay.h"
 
+/* Drag transparency: alpha multiplier applied to marked renderables during drag */
+#define DRAG_ALPHA_FACTOR 0.5f
+
 /* View content provided by scene generator */
 typedef struct
 {
@@ -169,7 +172,32 @@ void gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball);
 void gl_view_sync_arcball(GtkWidget *widget, double wr, double wi);
 void gl_view_reset_pan(GtkWidget *widget);
 void gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms);
-void gl_view_recreate_msaa(gl_view_state_t *state, int requested_samples);
+void gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height);
+
+/* gl_view_setup_attribs()
+ *
+ * Configure vertex attribute pointers in VAO. Called once during prepare
+ * when VBO data changes. VAO retains this state for subsequent renders.
+ */
+void gl_view_setup_attribs(
+    GLuint vao,
+    GLuint vbo,
+    const gl_vertex_attrib_t *attribs,
+    const GLint *attrib_locations,
+    int attrib_count,
+    int vertex_stride);
+
+/* gl_view_draw_pass()
+ *
+ * Execute a rendering pass. VAO already has attrib config from prepare.
+ */
+void gl_view_draw_pass(
+    GLuint shader_program,
+    GLint mvp_location,
+    mat4 mvp,
+    GLuint vao,
+    GLenum draw_mode,
+    int vertex_count);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_VIEW_H */

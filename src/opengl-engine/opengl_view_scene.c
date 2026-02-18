@@ -1,0 +1,235 @@
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ *  The official website and doumentation for xnec2c is available here:
+ *    https://www.xnec2c.org/
+ */
+
+#include "opengl_view_scene.h"
+#include "opengl_gradient_overlay.h"
+#include "../shared.h"
+
+#ifdef HAVE_OPENGL
+
+/* Scene rendering context — owns shader and GL resources for primary geometry */
+typedef struct
+{
+  gl_view_state_t *view;
+  gl_shader_t shader;
+  GLuint vao;
+  GLuint vbo;
+  GLint mvp_location;
+  GLint u_alpha_location;
+  GLint *attrib_locations;
+
+} gl_scene_ctx_t;
+
+/* Forward declarations for callbacks */
+static void gl_scene_prepare(void *ctx, float r_max);
+static void gl_scene_render(void *ctx, mat4 mvp, float alpha);
+static gboolean gl_scene_is_active(void *ctx);
+static float gl_scene_far_extent(void *ctx, float r_max);
+static void gl_scene_free(void *ctx);
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_prepare()
+ *
+ * Upload scene vertex data on generation change
+ */
+  static void
+gl_scene_prepare(void *ctx, float r_max)
+{
+  gl_scene_ctx_t *sc = ctx;
+  gl_view_state_t *view = sc->view;
+  gl_view_content_t *c = &view->content;
+
+  (void)r_max;
+
+  if( c->generation == view->last_generation )
+    return;
+
+  if( c->vertex_count > 0 )
+  {
+    glBindBuffer(GL_ARRAY_BUFFER, sc->vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+        c->vertex_count * c->vertex_stride,
+        c->vertices,
+        GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    /* Reconfigure VAO attrib pointers for new VBO layout */
+    gl_view_setup_attribs(sc->vao, sc->vbo,
+        view->config->attribs, sc->attrib_locations,
+        view->config->attrib_count, c->vertex_stride);
+  }
+
+  if( view->overlay )
+    gradient_overlay_mark_dirty(view->overlay);
+
+  view->last_generation = c->generation;
+
+} /* gl_scene_prepare() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_render()
+ *
+ * Render scene geometry using generic draw pass
+ */
+  static void
+gl_scene_render(void *ctx, mat4 mvp, float alpha)
+{
+  gl_scene_ctx_t *sc = ctx;
+  gl_view_state_t *view = sc->view;
+
+  /* Set alpha multiplier before draw pass */
+  glUseProgram(sc->shader.program);
+  glUniform1f(sc->u_alpha_location, alpha);
+
+  gl_view_draw_pass(
+      sc->shader.program,
+      sc->mvp_location,
+      mvp,
+      sc->vao,
+      view->content.draw_mode,
+      view->content.vertex_count);
+
+} /* gl_scene_render() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_is_active()
+ *
+ * Returns TRUE when scene has vertex data to render
+ */
+  static gboolean
+gl_scene_is_active(void *ctx)
+{
+  gl_scene_ctx_t *sc = ctx;
+
+  return( sc->view->content.vertex_count > 0 );
+
+} /* gl_scene_is_active() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_far_extent()
+ *
+ * Returns the scene geometry extent for clip plane calculation
+ */
+  static float
+gl_scene_far_extent(void *ctx, float r_max)
+{
+  (void)ctx;
+
+  return( r_max );
+
+} /* gl_scene_far_extent() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_scene_free()
+ *
+ * Free scene rendering context and GL resources
+ */
+  static void
+gl_scene_free(void *ctx)
+{
+  gl_scene_ctx_t *sc = ctx;
+
+  if( !sc )
+    return;
+
+  if( sc->view->scene && sc->view->scene->cleanup )
+    sc->view->scene->cleanup();
+
+  if( sc->vbo )
+    glDeleteBuffers(1, &sc->vbo);
+
+  if( sc->vao )
+    glDeleteVertexArrays(1, &sc->vao);
+
+  gl_shader_destroy(&sc->shader);
+
+  g_free(sc->attrib_locations);
+  g_free(sc);
+
+} /* gl_scene_free() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_view_scene_renderable_new()
+ *
+ * Create scene renderable for primary geometry rendering
+ */
+  gl_renderable_t
+gl_view_scene_renderable_new(gl_view_state_t *state)
+{
+  gl_scene_ctx_t *sc;
+  gl_renderable_t r;
+  gboolean ok;
+  int i;
+
+  sc = g_new0(gl_scene_ctx_t, 1);
+  sc->view = state;
+
+  ok = gl_shader_load(&sc->shader,
+      state->config->vertex_shader_path,
+      state->config->fragment_shader_path);
+
+  if( !ok )
+  {
+    pr_err("Failed to load shaders\n");
+    g_free(sc);
+
+    return( (gl_renderable_t){0} );
+  }
+
+  sc->mvp_location = glGetUniformLocation(sc->shader.program, "mvp");
+  sc->u_alpha_location = glGetUniformLocation(sc->shader.program, "u_alpha");
+
+  glGenVertexArrays(1, &sc->vao);
+  glGenBuffers(1, &sc->vbo);
+
+  sc->attrib_locations = g_new(GLint, state->config->attrib_count);
+
+  for( i = 0; i < state->config->attrib_count; i++ )
+  {
+    sc->attrib_locations[i] = glGetAttribLocation(
+        sc->shader.program,
+        state->config->attribs[i].name);
+  }
+
+  r = (gl_renderable_t){
+    .render               = gl_scene_render,
+    .prepare              = gl_scene_prepare,
+    .destroy              = gl_scene_free,
+    .is_active            = gl_scene_is_active,
+    .far_extent           = gl_scene_far_extent,
+    .ctx                  = sc,
+    .alpha                = 1.0f,
+    .origin               = {0.0f, 0.0f, 0.0f},
+    .transparent_sort_order = 1,
+    .transparent_on_drag  = TRUE
+  };
+
+  return( r );
+
+} /* gl_view_scene_renderable_new() */
+
+/*-----------------------------------------------------------------------*/
+
+#endif /* HAVE_OPENGL */

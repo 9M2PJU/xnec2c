@@ -112,6 +112,12 @@ if HAVE_OPENGL
 xnec2c_SOURCES += \
   opengl-engine/opengl_renderer.c opengl-engine/opengl_renderer.h \
   opengl-engine/opengl_view.c opengl-engine/opengl_view.h \
+  opengl-engine/opengl_view_render.c opengl-engine/opengl_view_render.h \
+  opengl-engine/opengl_view_scene.c opengl-engine/opengl_view_scene.h \
+  opengl-engine/opengl_view_overlay.c opengl-engine/opengl_view_overlay.h \
+  opengl-engine/opengl_view_input.c opengl-engine/opengl_view_input.h \
+  opengl-engine/opengl_view_tooltip.c \
+  opengl-engine/opengl_view_msaa.c opengl-engine/opengl_view_msaa.h \
   opengl-engine/opengl_axes.c opengl-engine/opengl_axes.h \
   opengl-engine/opengl_ground_plane.c opengl-engine/opengl_ground_plane.h \
   opengl-engine/opengl_cairo_overlay.c opengl-engine/opengl_cairo_overlay.h \
