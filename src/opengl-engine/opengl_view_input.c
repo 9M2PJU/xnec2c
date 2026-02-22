@@ -166,6 +166,12 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
   if( !state )
     return( FALSE );
 
+  /* Ctrl+scroll: invoke segment radius scaling handler */
+  if( (event->state & GDK_CONTROL_MASK) && state->scene->on_ctrl_scroll )
+  {
+    return( state->scene->on_ctrl_scroll(widget, event, state) );
+  }
+
   /* Shift+scroll: invoke scene-specific handler */
   if( (event->state & GDK_SHIFT_MASK) && state->scene->on_shift_scroll )
   {

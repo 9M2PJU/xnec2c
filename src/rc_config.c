@@ -142,6 +142,9 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "OpenGL Anti-Aliasing Samples", .format = "%d",
 		.vars = { &rc_config.opengl_msaa_samples } },
 
+	{ .desc = "OpenGL Cylinder Radius Scale", .format = "%lf",
+		.vars = { &rc_config.opengl_cylinder_radius_scale } },
+
 	{ .desc = "Frequency Plots Window Size, in pixels", .format = "%d,%d",
 		.vars = { &rc_config.freqplots_width, &rc_config.freqplots_height } },
 
@@ -570,6 +573,7 @@ Create_Default_Config( void )
 #endif
 
   rc_config.arcball_constrained_rotation = 1;
+  rc_config.opengl_cylinder_radius_scale = 1.0;
 
   /* Common projection default on, overlay structure default off */
   rc_config.main_common_projection = 1;

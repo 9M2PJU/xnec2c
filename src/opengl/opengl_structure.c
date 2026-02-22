@@ -26,11 +26,23 @@
 #include "../opengl-engine/opengl_view.h"
 #include "../opengl-engine/opengl_cylinder.h"
 
-/* Scale factor for cylinder radius display */
-#define CYLINDER_RADIUS_SCALE 5.0
+/* Default scale factor for cylinder radius display */
+#define CYLINDER_RADIUS_SCALE_DEFAULT 1.0
+
+/* Scale below which segments render as lines instead of cylinders */
+#define CYLINDER_SCALE_LINE_THRESHOLD 1.0
+
+/* Minimum radius as fraction of model extent for visible cylinders */
+#define CYLINDER_MIN_VISIBLE_FRACTION 0.0015
+
+/* Maximum allowed radius scale */
+#define CYLINDER_RADIUS_SCALE_MAX 100.0
 
 /* Number of sides for cylinder rendering */
 #define STRUCTURE_CYLINDER_SEGMENTS 24
+
+/* Mutable cylinder radius scale factor (user-adjustable via Ctrl+scroll) */
+static double cylinder_radius_scale = CYLINDER_RADIUS_SCALE_DEFAULT;
 
 /* Shared geometry buffer accessible by both structure window and overlay */
 static lit_color_point_t *structure_vertices = NULL;
@@ -38,6 +50,13 @@ static int structure_vertex_count = 0;
 static unsigned int structure_geometry_generation = 1;
 static structure_draw_mode_t structure_last_mode = STRUCTURE_DRAW_GEOMETRY;
 static float structure_view_scale = 1.0f;
+static GLenum structure_draw_mode = GL_TRIANGLES;
+
+/* Track previous radius scale to detect changes requiring regeneration */
+static double structure_last_radius_scale = CYLINDER_RADIUS_SCALE_DEFAULT;
+
+/* Tooltip shown once per session */
+static gboolean ctrl_scroll_tooltip_shown = FALSE;
 
 /* Public accessor for shared geometry */
 static structure_overlay_data_t shared_overlay_data = { 0 };
@@ -54,6 +73,121 @@ const gl_vertex_attrib_t opengl_structure_attribs[3] = {
   { "normal",   3, 4 * (int)sizeof(float) },
   { "color",    4, 8 * (int)sizeof(float) }
 };
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_structure_get_radius_scale()
+ *
+ * Return current cylinder radius display scale factor
+ */
+  double
+opengl_structure_get_radius_scale(void)
+{
+  return( cylinder_radius_scale );
+
+} /* opengl_structure_get_radius_scale() */
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_structure_set_radius_scale()
+ *
+ * Set cylinder radius display scale factor and sync to rc_config.
+ * Bumps geometry generation to force regeneration on next render.
+ */
+  void
+opengl_structure_set_radius_scale(double scale)
+{
+  if( scale < 0.0 )
+  {
+    scale = 0.0;
+  }
+
+  if( scale > CYLINDER_RADIUS_SCALE_MAX )
+  {
+    scale = CYLINDER_RADIUS_SCALE_MAX;
+  }
+
+  cylinder_radius_scale = scale;
+  rc_config.opengl_cylinder_radius_scale = scale;
+
+} /* opengl_structure_set_radius_scale() */
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_structure_on_ctrl_scroll()
+ *
+ * Ctrl+scroll handler for adjusting cylinder radius scale.
+ * Shared by structure and rdpattern scene providers.
+ */
+  gboolean
+opengl_structure_on_ctrl_scroll(
+    GtkWidget *widget, GdkEventScroll *event, gpointer view_state)
+{
+  gl_view_state_t *state;
+  double scale, new_scale;
+
+  state = (gl_view_state_t *)view_state;
+
+  if( !state )
+    return( FALSE );
+
+  /* Compute increment matching zoom scroll feel */
+  scale = compute_zoom_scale(
+      (int)(state->viewport_height * state->aspect),
+      (int)state->viewport_height,
+      (cylinder_radius_scale > 0.1 ? cylinder_radius_scale : 0.1) * 100.0);
+
+  new_scale = cylinder_radius_scale;
+
+  if( event->direction == GDK_SCROLL_UP )
+  {
+    /* Scroll up: thicker. If at zero, jump to threshold. */
+    if( new_scale < CYLINDER_SCALE_LINE_THRESHOLD )
+    {
+      new_scale = CYLINDER_SCALE_LINE_THRESHOLD;
+    }
+    else
+    {
+      new_scale *= (1.0 + 0.1 * scale);
+    }
+  }
+  else if( event->direction == GDK_SCROLL_DOWN )
+  {
+    /* Scroll down: thinner. Below threshold snaps to zero (line mode). */
+    new_scale /= (1.0 + 0.1 * scale);
+
+    if( new_scale < CYLINDER_SCALE_LINE_THRESHOLD )
+    {
+      new_scale = 0.0;
+    }
+  }
+  else
+  {
+    return( FALSE );
+  }
+
+  opengl_structure_set_radius_scale(new_scale);
+
+  /* Show tooltip on first use */
+  if( !ctrl_scroll_tooltip_shown )
+  {
+    gl_view_show_tooltip(widget, "Ctrl+Scroll: Wire Radius", 2500);
+    ctrl_scroll_tooltip_shown = TRUE;
+  }
+
+  /* Queue redraw on the event source widget */
+  gtk_widget_queue_draw(widget);
+
+  /* Queue redraw on cross-window GL areas */
+  if( structure_gl_widget && widget != structure_gl_widget )
+    gtk_widget_queue_draw(structure_gl_widget);
+
+  if( rdpattern_gl_area && widget != rdpattern_gl_area )
+    gtk_widget_queue_draw(rdpattern_gl_area);
+
+  return( TRUE );
+
+} /* opengl_structure_on_ctrl_scroll() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -201,22 +335,27 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
 {
   int idx, vidx;
   int total_vertices;
-  int verts_per_seg;
   size_t mreq;
   double cmax;
   double r_max;
   float r, g, b;
+  gboolean line_mode;
 
   if( data.n <= 0 )
   {
     structure_vertex_count = 0;
     structure_view_scale = 1.0f;
+    structure_draw_mode = GL_TRIANGLES;
     return( 0 );
   }
 
-  verts_per_seg = opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS);
+  line_mode = (cylinder_radius_scale < CYLINDER_SCALE_LINE_THRESHOLD);
 
-  total_vertices = data.n * verts_per_seg;
+  /* Vertex budget depends on rendering mode */
+  if( line_mode )
+    total_vertices = data.n * 2;
+  else
+    total_vertices = data.n * opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS);
 
   mreq = (size_t)total_vertices * sizeof(lit_color_point_t);
   mem_realloc((void **)&structure_vertices, mreq, __LOCATION__);
@@ -258,26 +397,126 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
 
   structure_view_scale = (float)r_max;
 
-  /* Generate cylinder for each wire segment */
   vidx = 0;
-  for( idx = 0; idx < data.n; idx++ )
+
+  if( line_mode )
   {
-    lit_cylinder_mesh_t mesh;
+    /* Line mode: 2 vertices per segment, drawn as GL_LINES */
+    for( idx = 0; idx < data.n; idx++ )
+    {
+      double dx, dy, dz, len;
+      float nx, ny, nz;
 
-    mesh.vertices = structure_vertices;
-    mesh.vertex_count = total_vertices;
+      get_segment_color(idx, mode, cmax, &r, &g, &b);
 
-    get_segment_color(idx, mode, cmax, &r, &g, &b);
+      /* Normal perpendicular to segment axis for consistent lighting.
+       * Matches cylinder cross-section logic so lines shade like
+       * the visible side of the cylinder they replace. */
+      dx = data.x2[idx] - data.x1[idx];
+      dy = data.y2[idx] - data.y1[idx];
+      dz = data.z2[idx] - data.z1[idx];
+      len = sqrt(dx * dx + dy * dy + dz * dz);
 
-    vidx = opengl_lit_cylinder_append(&mesh, vidx,
-        data.x1[idx], data.y1[idx], data.z1[idx],
-        data.x2[idx], data.y2[idx], data.z2[idx],
-        data.bi[idx] * CYLINDER_RADIUS_SCALE,
-        STRUCTURE_CYLINDER_SEGMENTS,
-        r, g, b, 1.0f);
+      if( len > 1e-10 )
+      {
+        double ax_d = dx / len;
+        double ay_d = dy / len;
+        double az_d = dz / len;
+        double px, py, pz, pmag;
+
+        /* Find perpendicular via cross with least-parallel basis vector */
+        if( fabs(ax_d) < 0.9 )
+        {
+          px = 0.0;
+          py = -az_d;
+          pz = ay_d;
+        }
+        else
+        {
+          px = -az_d;
+          py = 0.0;
+          pz = ax_d;
+        }
+
+        pmag = sqrt(px * px + py * py + pz * pz);
+        nx = (float)(px / pmag);
+        ny = (float)(py / pmag);
+        nz = (float)(pz / pmag);
+      }
+      else
+      {
+        nx = 0.0f;
+        ny = 0.0f;
+        nz = 1.0f;
+      }
+
+      /* Endpoint 1 */
+      structure_vertices[vidx].point.x = (float)data.x1[idx];
+      structure_vertices[vidx].point.y = (float)data.y1[idx];
+      structure_vertices[vidx].point.z = (float)data.z1[idx];
+      structure_vertices[vidx].normal.x = nx;
+      structure_vertices[vidx].normal.y = ny;
+      structure_vertices[vidx].normal.z = nz;
+      structure_vertices[vidx].color.r = r;
+      structure_vertices[vidx].color.g = g;
+      structure_vertices[vidx].color.b = b;
+      structure_vertices[vidx].color.a = 1.0f;
+      vidx++;
+
+      /* Endpoint 2 */
+      structure_vertices[vidx].point.x = (float)data.x2[idx];
+      structure_vertices[vidx].point.y = (float)data.y2[idx];
+      structure_vertices[vidx].point.z = (float)data.z2[idx];
+      structure_vertices[vidx].normal.x = nx;
+      structure_vertices[vidx].normal.y = ny;
+      structure_vertices[vidx].normal.z = nz;
+      structure_vertices[vidx].color.r = r;
+      structure_vertices[vidx].color.g = g;
+      structure_vertices[vidx].color.b = b;
+      structure_vertices[vidx].color.a = 1.0f;
+      vidx++;
+    }
+
+    structure_draw_mode = GL_LINES;
+  }
+  else
+  {
+    /* Cylinder mode: full 3D cylinders with minimum visible radius.
+     * Scale minimum proportionally so ctrl+scroll affects zero-radius wires too. */
+    double scale_factor = cylinder_radius_scale / CYLINDER_RADIUS_SCALE_DEFAULT;
+    double min_visible = CYLINDER_MIN_VISIBLE_FRACTION * r_max * scale_factor;
+
+    for( idx = 0; idx < data.n; idx++ )
+    {
+      lit_cylinder_mesh_t mesh;
+      double radius;
+
+      mesh.vertices = structure_vertices;
+      mesh.vertex_count = total_vertices;
+
+      get_segment_color(idx, mode, cmax, &r, &g, &b);
+
+      /* Scale radius with fabs for safety, clamp to minimum visible */
+      radius = fabs(data.bi[idx]) * cylinder_radius_scale;
+
+      if( radius < min_visible )
+      {
+        radius = min_visible;
+      }
+
+      vidx = opengl_lit_cylinder_append(&mesh, vidx,
+          data.x1[idx], data.y1[idx], data.z1[idx],
+          data.x2[idx], data.y2[idx], data.z2[idx],
+          radius,
+          STRUCTURE_CYLINDER_SEGMENTS,
+          r, g, b, 1.0f);
+    }
+
+    structure_draw_mode = GL_TRIANGLES;
   }
 
   structure_vertex_count = vidx;
+  structure_last_radius_scale = cylinder_radius_scale;
   structure_geometry_generation++;
 
   return( structure_vertex_count );
@@ -305,6 +544,7 @@ opengl_structure_update_shared_geometry(void)
   /* Regenerate on mode change, empty buffer, or new current data */
   if( current_mode != structure_last_mode ||
       structure_vertex_count == 0 ||
+      cylinder_radius_scale != structure_last_radius_scale ||
       (is_current_mode && crnt.newer) )
   {
     structure_last_mode = current_mode;
@@ -322,6 +562,7 @@ opengl_structure_update_shared_geometry(void)
     shared_overlay_data.vertex_count = structure_vertex_count;
     shared_overlay_data.vertex_stride = (int)sizeof(lit_color_point_t);
     shared_overlay_data.view_scale = structure_view_scale;
+    shared_overlay_data.draw_mode = structure_draw_mode;
     shared_overlay_data.generation = structure_geometry_generation;
     shared_overlay_data.has_excitation_center =
         calculate_excitation_center(
@@ -368,7 +609,7 @@ structure_scene_generate(gl_view_content_t *out)
   out->vertices = structure_vertices;
   out->vertex_count = structure_vertex_count;
   out->vertex_stride = (int)sizeof(lit_color_point_t);
-  out->draw_mode = GL_TRIANGLES;
+  out->draw_mode = structure_draw_mode;
   out->r_max = (structure_vertex_count > 0) ? structure_view_scale : 1.5f;
   out->zoom = zoom;
   out->model_scale = 1.0f;
@@ -407,7 +648,8 @@ static gl_view_config_t structure_view_config = {
 static gl_scene_provider_t structure_scene_provider = {
   .generate = structure_scene_generate,
   .post_render = NULL,
-  .cleanup = structure_scene_cleanup
+  .cleanup = structure_scene_cleanup,
+  .on_ctrl_scroll = opengl_structure_on_ctrl_scroll
 };
 
 /*-----------------------------------------------------------------------*/
@@ -417,7 +659,7 @@ static gl_scene_provider_t structure_scene_provider = {
  * Update spin button display text without emitting value_changed signal
  */
   void
-opengl_update_spin_display(GtkWidget *spin, double angle)
+opengl_update_spin_display(GtkSpinButton *spin, double angle)
 {
   gchar value[6];
 
@@ -471,6 +713,19 @@ structure_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
   static GtkWidget*
 opengl_structure_create_widget_impl(void)
 {
+  /* Return existing widget if already created */
+  if( structure_gl_widget )
+    return( structure_gl_widget );
+
+  /* Load persisted radius scale from config.
+   * Treat sub-threshold values as unset (upgrade from old config). */
+  cylinder_radius_scale = rc_config.opengl_cylinder_radius_scale;
+  if( cylinder_radius_scale < CYLINDER_SCALE_LINE_THRESHOLD )
+  {
+    cylinder_radius_scale = CYLINDER_RADIUS_SCALE_DEFAULT;
+  }
+  structure_last_radius_scale = cylinder_radius_scale;
+
   if( !structure_arcball )
   {
     structure_arcball = arcball_new();

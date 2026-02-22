@@ -38,6 +38,7 @@ typedef struct
   int vertex_count;
   int vertex_stride;
   float view_scale;
+  unsigned int draw_mode;
   unsigned int generation;
 
   /* Excitation center coordinates in structure space */
@@ -61,6 +62,15 @@ extern const gl_vertex_attrib_t opengl_structure_attribs[3];
 
 arcball_state_t* opengl_structure_get_arcball(void);
 
+/* Get/set cylinder radius display scale factor */
+double opengl_structure_get_radius_scale(void);
+void opengl_structure_set_radius_scale(double scale);
+
+/* Ctrl+scroll handler for adjusting cylinder radius scale.
+ * Usable by any scene provider that renders structure geometry. */
+gboolean opengl_structure_on_ctrl_scroll(
+    GtkWidget *widget, GdkEventScroll *event, gpointer view_state);
+
 /* Update shared geometry buffer from global data/crnt/flags.
  * Call before reading shared geometry to ensure freshness. */
 void opengl_structure_update_shared_geometry(void);
@@ -69,7 +79,7 @@ void opengl_structure_update_shared_geometry(void);
 const structure_overlay_data_t* opengl_structure_get_shared_geometry(void);
 
 /* Update spin button display text without emitting value_changed signal */
-void opengl_update_spin_display(GtkWidget *spin, double angle);
+void opengl_update_spin_display(GtkSpinButton *spin, double angle);
 
 #endif
 

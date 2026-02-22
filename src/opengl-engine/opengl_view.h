@@ -96,6 +96,9 @@ typedef struct
   /* Optional shift+scroll handler for custom behavior */
   gboolean (*on_shift_scroll)(GtkWidget *widget, GdkEventScroll *event, gpointer view_state);
 
+  /* Optional ctrl+scroll handler for segment radius scaling */
+  gboolean (*on_ctrl_scroll)(GtkWidget *widget, GdkEventScroll *event, gpointer view_state);
+
 } gl_scene_provider_t;
 
 /* Static view configuration */

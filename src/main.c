@@ -22,6 +22,9 @@
 #include "mathlib.h"
 #include "opengl/opengl_structure.h"
 
+/* Forward declaration — full sy_overrides.h conflicts with openblas via gsl */
+extern void sy_overrides_close_if_empty(void);
+
 #include <getopt.h>
 
 static void sig_handler(int signal);

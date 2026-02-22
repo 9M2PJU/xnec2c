@@ -391,6 +391,9 @@ typedef struct
   /* OpenGL MSAA sample count (0, 2, 4, 8, or 16) */
   int opengl_msaa_samples;
 
+  /* OpenGL cylinder radius display scale factor */
+  double opengl_cylinder_radius_scale;
+
   /* Main window common projection toggle */
   int main_common_projection;
 

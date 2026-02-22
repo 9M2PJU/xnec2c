@@ -661,7 +661,7 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
   out->vertices = geom->vertices;
   out->vertex_count = geom->vertex_count;
   out->vertex_stride = geom->vertex_stride;
-  out->draw_mode = GL_TRIANGLES;
+  out->draw_mode = geom->draw_mode;
   out->show_gradient = FALSE;
 
   /* Scale structure to match radiation pattern space for far-field,
@@ -699,7 +699,8 @@ static gl_scene_provider_t rdpattern_scene_provider = {
   .overlay_config = &rdpattern_overlay_config,
   .overlay_generate = rdpattern_overlay_generate,
   .overlay_cleanup = NULL,
-  .on_shift_scroll = rdpattern_on_shift_scroll
+  .on_shift_scroll = rdpattern_on_shift_scroll,
+  .on_ctrl_scroll = opengl_structure_on_ctrl_scroll
 };
 
 /*-----------------------------------------------------------------------*/
