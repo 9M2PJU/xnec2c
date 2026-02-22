@@ -711,6 +711,12 @@ on_main_rdpattern_activate(
       gl_view_sync_arcball(rdpattern_gl_area,
           structure_proj_params.Wr, structure_proj_params.Wi);
     }
+    else if( rc_config.use_opengl_renderer )
+    {
+      /* Initialize rdpattern arcball from its own projection angles */
+      gl_view_sync_arcball(rdpattern_gl_area,
+          rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
+    }
 #endif
 
   } /* if( gtk_check_menu_item_get_active(...) ) */
