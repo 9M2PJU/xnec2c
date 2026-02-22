@@ -651,6 +651,28 @@ on_main_rdpattern_activate(
       ClearFlag( DRAW_POYNTING );
     }
 
+    /* Restore overlay structure state */
+    widget = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_overlay_structure" );
+    if( rc_config.rdpattern_overlay_structure )
+    {
+      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
+      SetFlag( OVERLAY_STRUCT );
+    }
+    else
+    {
+      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
+      ClearFlag( OVERLAY_STRUCT );
+    }
+
+    /* Sync rdpattern common projection widget from main window state */
+    widget = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_common_projection" );
+    if( rc_config.main_common_projection )
+      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
+    else
+      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
+
     if( isFlagClear(INPUT_OPENED) )
     {
       GtkWidget *box =

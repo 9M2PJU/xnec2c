@@ -390,6 +390,12 @@ typedef struct
 
   /* OpenGL MSAA sample count (0, 2, 4, 8, or 16) */
   int opengl_msaa_samples;
+
+  /* Main window common projection toggle */
+  int main_common_projection;
+
+  /* Rdpattern overlay structure toggle */
+  int rdpattern_overlay_structure;
 } rc_config_t;
 
 typedef struct {

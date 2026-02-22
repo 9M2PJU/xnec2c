@@ -124,6 +124,21 @@ rc_config_vars_t rc_config_vars[] = {
 		.builder_window = &main_window_builder,
 		.builder_check_menu_item_id = "arcball_constrained_rotation" },
 
+	{ .desc = "Main Window Common Projection", .format = "%d",
+		.vars = { &rc_config.main_common_projection },
+		.builder_window = &main_window_builder,
+		.builder_check_menu_item_id = "main_common_projection" },
+
+	{ .desc = "Radiation Pattern Window Common Projection", .format = "%d",
+		.vars = { &rc_config.main_common_projection },
+		.builder_window = &rdpattern_window_builder,
+		.builder_check_menu_item_id = "rdpattern_common_projection" },
+
+	{ .desc = "Radiation Pattern Window Overlay Structure", .format = "%d",
+		.vars = { &rc_config.rdpattern_overlay_structure },
+		.builder_window = &rdpattern_window_builder,
+		.builder_check_menu_item_id = "rdpattern_overlay_structure" },
+
 	{ .desc = "OpenGL Anti-Aliasing Samples", .format = "%d",
 		.vars = { &rc_config.opengl_msaa_samples } },
 
@@ -555,6 +570,10 @@ Create_Default_Config( void )
 #endif
 
   rc_config.arcball_constrained_rotation = 1;
+
+  /* Common projection default on, overlay structure default off */
+  rc_config.main_common_projection = 1;
+  rc_config.rdpattern_overlay_structure = 0;
 
   /* See enum GAIN_SCALE */
   rc_config.gain_style = GS_LINP;
