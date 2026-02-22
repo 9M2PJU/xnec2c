@@ -354,6 +354,58 @@ static gl_scene_provider_t structure_scene_provider = {
 
 /*-----------------------------------------------------------------------*/
 
+/* opengl_update_spin_display()
+ *
+ * Update spin button display text without emitting value_changed signal
+ */
+  void
+opengl_update_spin_display(GtkWidget *spin, double angle)
+{
+  gchar value[6];
+
+  snprintf( value, sizeof(value), "%d", (int)angle );
+  gtk_entry_set_text( GTK_ENTRY(spin), value );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* structure_arcball_changed_cb()
+ *
+ * Arcball change callback for constrained rotation mode.
+ * Syncs arcball WR/WI angles back to structure_proj_params and
+ * spin button display text, matching Cairo's Motion_Event behavior.
+ */
+  static void
+structure_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
+{
+  float wr, wi;
+
+  (void)_user_data;
+
+  if( arcball_get_drag_mode(ab) != ARCBALL_DRAG_CONSTRAINED )
+    return;
+
+  arcball_get_angles(ab, &wr, &wi);
+
+  structure_proj_params.Wr = (double)wr;
+  structure_proj_params.Wi = (double)wi;
+
+  opengl_update_spin_display( rotate_structure, structure_proj_params.Wr );
+  opengl_update_spin_display( incline_structure, structure_proj_params.Wi );
+
+  /* Sync rdpattern spin buttons when common projection is active */
+  if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
+  {
+    rdpattern_proj_params.Wr = structure_proj_params.Wr;
+    rdpattern_proj_params.Wi = structure_proj_params.Wi;
+
+    opengl_update_spin_display( rotate_rdpattern, rdpattern_proj_params.Wr );
+    opengl_update_spin_display( incline_rdpattern, rdpattern_proj_params.Wi );
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* opengl_structure_create_widget_impl()
  *
  * Create the OpenGL structure widget using the generic view engine
@@ -369,6 +421,10 @@ opengl_structure_create_widget_impl(void)
     arcball_set_drag_mode(structure_arcball,
         rc_config.arcball_constrained_rotation ?
         ARCBALL_DRAG_CONSTRAINED : ARCBALL_DRAG_FREE);
+
+    /* Sync constrained rotation back to WR/WI and spin buttons */
+    arcball_add_callback(structure_arcball,
+        structure_arcball_changed_cb, NULL);
   }
 
   /* Initialize arcball from current projection angles */

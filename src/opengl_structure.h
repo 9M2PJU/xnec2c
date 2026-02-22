@@ -62,6 +62,9 @@ void opengl_structure_update_shared_geometry(void);
 /* Return read-only pointer to shared geometry data */
 const structure_overlay_data_t* opengl_structure_get_shared_geometry(void);
 
+/* Update spin button display text without emitting value_changed signal */
+void opengl_update_spin_display(GtkWidget *spin, double angle);
+
 #endif
 
 #endif /* OPENGL_STRUCTURE_H */

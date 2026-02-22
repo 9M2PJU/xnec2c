@@ -590,6 +590,7 @@ main (int argc, char *argv[])
   gboolean
 Open_Input_File( gpointer arg )
 {
+  static char prev_input_file[PATH_MAX] = "";
   gboolean ok, new;
   GtkWidget *widget;
 
@@ -670,7 +671,6 @@ Open_Input_File( gpointer arg )
   } /* if( FORKED ) */
 
   /* Initialize xnec2c */
-  SetFlag( COMMON_PROJECTION );
   SetFlag( COMMON_FREQUENCY );
   SetFlag( MAIN_NEW_FREQ );
   if( isFlagSet(PLOT_ENABLED) ) SetFlag( FREQ_LOOP_INIT );
@@ -691,15 +691,22 @@ Open_Input_File( gpointer arg )
   /* Allow re-draws on expose events etc */
   ClearFlag( INPUT_PENDING );
 
-  /* Set projection at 45 deg rotation and
-   * inclination if NEC2 editor window is not open, but
-   * not while optimizing because so the view stays where it is */
-  if( (nec2_edit_window == NULL) && isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
+  gboolean same_file = (strcmp(rc_config.input_file, prev_input_file) == 0);
+
+  /* Set projection at 45 deg rotation and inclination if NEC2 editor window
+   * is not open, not while optimizing, and only when opening a different file */
+  if( (nec2_edit_window == NULL) &&
+      isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) &&
+      !same_file )
   {
     New_Viewer_Angle( 45.0, 45.0, rotate_structure,
         incline_structure, &structure_proj_params );
     New_Structure_Projection_Angle();
   }
+
+  /* Update tracked filename for next comparison */
+  strncpy(prev_input_file, rc_config.input_file, PATH_MAX - 1);
+  prev_input_file[PATH_MAX - 1] = '\0';
 
   /* Show current frequency */
   gtk_spin_button_set_value( mainwin_frequency, (gdouble)calc_data.freq_mhz );
@@ -770,8 +777,12 @@ Open_Input_File( gpointer arg )
     gtk_widget_show( box );
 
 #ifdef HAVE_OPENGL
-    /* Ensure arcball sharing is established for common projection */
-    opengl_common_projection_sync();
+    /* Establish arcball sharing for common projection on new file load */
+    if( !same_file )
+    {
+      opengl_common_projection_sync();
+    }
+    /* Preserve existing view when re-opening same file */
 #endif
   }
 

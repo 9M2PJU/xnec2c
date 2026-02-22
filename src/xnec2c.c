@@ -940,6 +940,7 @@ gboolean Frequency_Loop( gpointer udata )
   {
     ClearFlag( FREQ_LOOP_RUNNING );
     SetFlag( FREQ_LOOP_DONE );
+    g_mutex_unlock(&global_lock);
 
 	clock_gettime(CLOCK_MONOTONIC, &end);
 	pr_notice("Frequency loop elapsed time: %f seconds. (%s)\n",

@@ -547,6 +547,38 @@ static gl_scene_provider_t rdpattern_scene_provider = {
 
 /*-----------------------------------------------------------------------*/
 
+/* rdpattern_arcball_changed_cb()
+ *
+ * Arcball change callback for constrained rotation mode.
+ * Syncs arcball WR/WI angles back to rdpattern_proj_params and
+ * spin button display text when COMMON_PROJECTION is off.
+ */
+  static void
+rdpattern_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
+{
+  float wr, wi;
+
+  (void)_user_data;
+
+  if( arcball_get_drag_mode(ab) != ARCBALL_DRAG_CONSTRAINED )
+    return;
+
+  /* When common projection is active, the structure arcball is
+   * the single point of truth — structure callback handles sync */
+  if( isFlagSet(COMMON_PROJECTION) )
+    return;
+
+  arcball_get_angles(ab, &wr, &wi);
+
+  rdpattern_proj_params.Wr = (double)wr;
+  rdpattern_proj_params.Wi = (double)wi;
+
+  opengl_update_spin_display( rotate_rdpattern, rdpattern_proj_params.Wr );
+  opengl_update_spin_display( incline_rdpattern, rdpattern_proj_params.Wi );
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* opengl_rdpattern_create_widget()
  *
  * Create the OpenGL radiation pattern widget using the generic view engine
@@ -562,6 +594,10 @@ opengl_rdpattern_create_widget(void)
     arcball_set_drag_mode(rdpattern_arcball,
         rc_config.arcball_constrained_rotation ?
         ARCBALL_DRAG_CONSTRAINED : ARCBALL_DRAG_FREE);
+
+    /* Sync constrained rotation back to WR/WI and spin buttons */
+    arcball_add_callback(rdpattern_arcball,
+        rdpattern_arcball_changed_cb, NULL);
   }
 
   rdpattern_gl_widget = gl_view_create_widget(
