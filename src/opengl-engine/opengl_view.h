@@ -37,6 +37,7 @@ typedef struct
   int vertex_stride;
   GLenum draw_mode;
   float r_max;
+  float clip_extent;
   float zoom;
   float model_scale;
   gboolean show_gradient;
@@ -134,6 +135,11 @@ typedef struct
   /* Per-view pan state (independent from arcball rotation) */
   vec2 pan_offset;
   float cached_camera_distance;
+
+  /* Cached clip planes from main render pass — shared by all renderables
+   * so depth values are in the same projection space */
+  float cached_near_plane;
+  float cached_far_plane;
 
   /* Overlay scale adjustment (user-controlled via shift+scroll) */
   float ovl_model_scale_adj;

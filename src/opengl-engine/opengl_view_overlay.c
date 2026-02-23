@@ -50,7 +50,9 @@ static void gl_overlay_free(void *ctx);
 
 /* gl_overlay_prepare()
  *
- * Generate overlay content, upload to VBO, and cache own MVP
+ * Upload overlay VBO and cache own MVP.
+ * ovl_content is pre-populated by gl_overlay_far_extent during
+ * the active survey — no overlay_generate call here.
  */
   static void
 gl_overlay_prepare(void *ctx, float r_max)
@@ -58,15 +60,7 @@ gl_overlay_prepare(void *ctx, float r_max)
   gl_overlay_ctx_t *ovl = ctx;
   gl_view_state_t *view = ovl->view;
 
-  ovl->ovl_content.vertex_count = 0;
-
   if( !ovl->initialized )
-    return;
-
-  if( !view->scene->overlay_generate )
-    return;
-
-  if( !view->scene->overlay_generate(&view->content, &ovl->ovl_content) )
     return;
 
   if( ovl->ovl_content.vertex_count <= 0 )
@@ -94,28 +88,18 @@ gl_overlay_prepare(void *ctx, float r_max)
     ovl->last_generation = ovl->ovl_content.generation;
   }
 
-  /* Compute and cache own MVP with user-adjusted model scale */
+  /* Compute and cache own MVP with user-adjusted model scale.
+   * Projection parameters (near/far) shared with main render pass
+   * so all renderables produce comparable depth values. */
   {
-    float ovl_model_scale, nearest_point, farthest_point, near_plane, far_plane;
+    float ovl_model_scale;
 
     ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
 
-    nearest_point = view->cached_camera_distance - r_max;
-    farthest_point = view->cached_camera_distance + r_max;
-    far_plane = farthest_point * 1.2f;
-
-    if( nearest_point > 0.0f )
-    {
-      near_plane = nearest_point * 0.8f;
-    }
-    else
-    {
-      near_plane = 0.001f;
-    }
-
     arcball_get_mvp(view->arcball, ovl->cached_mvp, view->pan_offset,
         view->cached_camera_distance, ovl_model_scale,
-        view->aspect, view->fov_rad, near_plane, far_plane);
+        view->aspect, view->fov_rad,
+        view->cached_near_plane, view->cached_far_plane);
   }
 
 } /* gl_overlay_prepare() */
@@ -170,14 +154,48 @@ gl_overlay_is_active(void *ctx)
 
 /* gl_overlay_far_extent()
  *
- * Returns the overlay extent for clip plane calculation
+ * Authoritative call site for overlay_generate — populates ovl_content
+ * so clip plane computation uses current-frame data (no one-frame lag).
+ * Returns the overlay's scaled geometry extent so the main pass
+ * clip planes encompass structure geometry at all scale factors.
  */
   static float
 gl_overlay_far_extent(void *ctx, float r_max)
 {
-  (void)ctx;
+  gl_overlay_ctx_t *ovl = ctx;
+  gl_view_state_t *view = ovl->view;
+  float result, ovl_model_scale, scaled_extent;
 
-  return( r_max );
+  result = r_max;
+
+  /* Reset before generation attempt so stale data does not persist
+   * when overlay_generate declines (e.g. OVERLAY_STRUCT unchecked) */
+  ovl->ovl_content.vertex_count = 0;
+
+  if( !ovl->initialized )
+  {
+    return( result );
+  }
+
+  if( !view->scene->overlay_generate )
+  {
+    return( result );
+  }
+
+  if( !view->scene->overlay_generate(&view->content, &ovl->ovl_content) )
+  {
+    return( result );
+  }
+
+  ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
+  scaled_extent = ovl->ovl_content.r_max * ovl_model_scale;
+
+  if( scaled_extent > r_max )
+  {
+    result = scaled_extent;
+  }
+
+  return( result );
 
 } /* gl_overlay_far_extent() */
 

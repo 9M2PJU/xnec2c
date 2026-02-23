@@ -452,6 +452,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
     out->vertex_stride = (int)sizeof(color_point_t);
     out->draw_mode = GL_LINES;
     out->r_max = r_max;
+    out->clip_extent = r_max;
     out->zoom = zoom;
     out->model_scale = 1.0f;
     out->show_gradient = FALSE;
@@ -467,6 +468,9 @@ rdpattern_scene_generate(gl_view_content_t *out)
     double r_min, r_range;
     rdpattern_data_t rd_data;
     point_3d_t *points_to_use;
+    float off_len;
+
+    off_len = 0.0f;
 
     current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
     if( current_gen == 0 )
@@ -494,6 +498,11 @@ rdpattern_scene_generate(gl_view_content_t *out)
       scaled_off_x = offset_x * model_scale;
       scaled_off_y = offset_y * model_scale;
       scaled_off_z = offset_z * model_scale;
+
+      off_len = (float)sqrt(
+          (double)(scaled_off_x * scaled_off_x +
+                   scaled_off_y * scaled_off_y +
+                   scaled_off_z * scaled_off_z));
 
       if( npts > rdpat_translated_capacity )
       {
@@ -537,7 +546,13 @@ rdpattern_scene_generate(gl_view_content_t *out)
     out->vertex_count = rdpat_triangle_count * 3;
     out->vertex_stride = (int)sizeof(color_point_t);
     out->draw_mode = GL_TRIANGLES;
+
     out->r_max = r_max;
+
+    /* Clip extent accounts for excitation center translation so
+     * clip planes encompass shifted geometry without altering
+     * camera distance or overlay scaling (which depend on r_max) */
+    out->clip_extent = r_max + off_len;
     out->zoom = zoom;
     out->model_scale = 1.0f;
     out->show_gradient = isFlagSet(DRAW_GAIN) && rc_config.rdpattern_gradient_key;
@@ -671,8 +686,9 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
   else
     out->model_scale = 1.0f;
 
-  /* Unused by overlay rendering (shares primary camera) */
-  out->r_max = 0.0f;
+  /* Structure raw extent for overlay clip plane calculation */
+  out->r_max = geom->view_scale;
+  out->clip_extent = geom->view_scale;
   out->zoom = 1.0f;
   out->generation = geom->generation;
 

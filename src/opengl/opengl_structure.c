@@ -611,6 +611,7 @@ structure_scene_generate(gl_view_content_t *out)
   out->vertex_stride = (int)sizeof(lit_color_point_t);
   out->draw_mode = structure_draw_mode;
   out->r_max = (structure_vertex_count > 0) ? structure_view_scale : 1.5f;
+  out->clip_extent = out->r_max;
   out->zoom = zoom;
   out->model_scale = 1.0f;
   out->show_gradient = FALSE;

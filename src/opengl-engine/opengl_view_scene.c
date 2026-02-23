@@ -128,14 +128,25 @@ gl_scene_is_active(void *ctx)
 
 /* gl_scene_far_extent()
  *
- * Returns the scene geometry extent for clip plane calculation
+ * Returns the scene geometry extent for clip plane calculation.
+ * Uses clip_extent when set (accounts for translation offsets),
+ * falls back to r_max.
  */
   static float
 gl_scene_far_extent(void *ctx, float r_max)
 {
-  (void)ctx;
+  gl_scene_ctx_t *sc = ctx;
+  float result, clip_ext;
 
-  return( r_max );
+  result = r_max;
+  clip_ext = sc->view->content.clip_extent;
+
+  if( clip_ext > r_max )
+  {
+    result = clip_ext;
+  }
+
+  return( result );
 
 } /* gl_scene_far_extent() */
 

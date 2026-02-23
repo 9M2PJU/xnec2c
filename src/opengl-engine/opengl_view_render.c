@@ -95,7 +95,7 @@ gl_view_draw_pass(
 on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 {
   gl_view_state_t *state;
-  gl_view_content_t content;
+  gl_view_content_t content = {0};
   mat4 mvp;
   float camera_distance;
   GLint default_fbo = 0;
@@ -142,7 +142,13 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       }
     }
 
-    nearest_point = camera_distance - content.r_max;
+    /* clip_extent accounts for translation offsets; all providers set it */
+    if( effective_far < content.clip_extent )
+    {
+      effective_far = content.clip_extent;
+    }
+
+    nearest_point = camera_distance - content.clip_extent;
     farthest_point = camera_distance + effective_far;
 
     far_plane = farthest_point * 1.2f;
@@ -155,6 +161,9 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     {
       near_plane = 0.001f;
     }
+
+    state->cached_near_plane = near_plane;
+    state->cached_far_plane = far_plane;
 
     arcball_get_mvp(state->arcball, mvp, state->pan_offset,
         camera_distance, content.model_scale, state->aspect, state->fov_rad,
