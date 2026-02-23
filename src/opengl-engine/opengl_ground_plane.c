@@ -31,13 +31,10 @@ static const point_f_3d_t ground_normal = {0.0f, 0.0f, 1.0f};
 
 /*-----------------------------------------------------------------------*/
 
-/**
- * generate_ground_plane_vertices - Generate vertices for ground plane quad at Z=0
- * @vertices: Output vertex buffer
- * @scale: Scale factor for plane extent
+/* generate_ground_plane_vertices()
  *
- * Creates two triangles forming a quad in the XY plane at Z=0. All vertices
- * have upward normals (0,0,1) and green grass color. Extent is scale * GROUND_PLANE_EXTENT.
+ * Create two triangles forming a quad in the XY plane at Z=0.
+ * All vertices have upward normals and green color.
  */
   static void
 generate_ground_plane_vertices(lit_color_point_t *vertices, float scale)
@@ -84,14 +81,10 @@ generate_ground_plane_vertices(lit_color_point_t *vertices, float scale)
 
 /*-----------------------------------------------------------------------*/
 
-/**
- * opengl_ground_plane_new - Create and initialize ground plane rendering context
+/* opengl_ground_plane_new()
  *
- * Allocates and initializes OpenGL resources for ground plane rendering.
- * Creates VAO and VBO with initial unit-scale vertices. Loads custom shader
- * for checkerboard pattern rendering.
- *
- * Return: Allocated ground plane context, or NULL on failure
+ * Allocate and initialize ground plane rendering context with VAO, VBO,
+ * and checkerboard shader
  */
   opengl_ground_plane_t*
 opengl_ground_plane_new(void)
@@ -167,11 +160,9 @@ opengl_ground_plane_new(void)
 
 /*-----------------------------------------------------------------------*/
 
-/**
- * opengl_ground_plane_free - Free ground plane resources
- * @ctx: Ground plane context to free
+/* opengl_ground_plane_free()
  *
- * Deletes OpenGL resources and frees allocated memory.
+ * Free ground plane GL resources and allocated memory
  */
   void
 opengl_ground_plane_free(void *ctx)
@@ -194,13 +185,10 @@ opengl_ground_plane_free(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/**
- * opengl_ground_plane_prepare - Update ground plane scale based on scene bounds
- * @ctx: Ground plane context
- * @r_max: Maximum scene radius
+/* opengl_ground_plane_prepare()
  *
- * Regenerates vertices scaled to r_max. Plane extends GROUND_PLANE_EXTENT
- * beyond r_max. Skips update if scale unchanged.
+ * Regenerate ground plane vertices scaled to r_max.
+ * Skips update if scale unchanged.
  */
   void
 opengl_ground_plane_prepare(void *ctx, float r_max)
@@ -229,30 +217,10 @@ opengl_ground_plane_prepare(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/**
- * opengl_ground_plane_is_active - Check if ground plane is active
- * @ctx: Ground plane context
+/* opengl_ground_plane_far_extent()
  *
- * Returns TRUE when NEC model defines a ground card (GN) with
- * ksymp == 2 and a valid ground type.
- */
-  gboolean
-opengl_ground_plane_is_active(void *ctx)
-{
-  (void)ctx;
-
-  return( gnd.ksymp == 2 && gnd.iperf >= 0 );
-
-} /* opengl_ground_plane_is_active() */
-
-/*-----------------------------------------------------------------------*/
-
-/**
- * opengl_ground_plane_far_extent - Returns spatial extent for clip plane calculation
- * @ctx: Ground plane context
- * @r_max: Maximum scene radius
- *
- * Ground plane extends GROUND_PLANE_EXTENT times r_max from the origin.
+ * Return spatial extent for clip plane calculation.
+ * Ground plane extends GROUND_PLANE_EXTENT times r_max from origin.
  */
   float
 opengl_ground_plane_far_extent(void *ctx, float r_max)
@@ -265,15 +233,9 @@ opengl_ground_plane_far_extent(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/**
- * opengl_ground_plane_render - Render ground plane with checkerboard pattern
- * @ctx: Ground plane context
- * @mvp: Model-view-projection matrix
- * @alpha: Alpha multiplier from engine for fragment output
+/* opengl_ground_plane_render()
  *
- * Binds VAO/VBO, configures vertex attributes, and draws ground plane quad
- * with transparent checkerboard pattern. Enables alpha blending and renders
- * with custom shader that produces 0.5m tile pattern.
+ * Render ground plane quad with transparent checkerboard pattern
  */
   void
 opengl_ground_plane_render(void *ctx, mat4 mvp, float alpha)

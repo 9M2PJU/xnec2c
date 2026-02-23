@@ -762,7 +762,7 @@ opengl_rdpattern_create_widget(void)
 {
   if( !rdpattern_arcball )
   {
-    rdpattern_arcball = arcball_new();
+    rdpattern_arcball = arcball_new((float)MOTION_EVENTS_COUNT);
 
     /* Initialize mode from rc_config */
     arcball_set_drag_mode(rdpattern_arcball,

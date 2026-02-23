@@ -32,6 +32,22 @@
 
 /*-----------------------------------------------------------------------*/
 
+/* gl_view_ground_plane_is_active()
+ *
+ * Domain-layer predicate for ground plane visibility.
+ * Returns TRUE when NEC model has a ground card with ksymp == 2.
+ */
+  static gboolean
+gl_view_ground_plane_is_active(void *ctx)
+{
+  (void)ctx;
+
+  return( gnd.ksymp == 2 && gnd.iperf >= 0 );
+
+} /* gl_view_ground_plane_is_active() */
+
+/*-----------------------------------------------------------------------*/
+
 /* gl_view_state_free()
  *
  * Free view state resources
@@ -49,6 +65,9 @@ gl_view_state_free(gl_view_state_t *state)
   }
 
   g_free(state->tooltip_text);
+
+  if( state->tooltip_surface )
+    cairo_surface_destroy(state->tooltip_surface);
 
   if( state->tooltip_overlay )
     cairo_gl_overlay_free(state->tooltip_overlay);
@@ -158,7 +177,7 @@ on_realize(GtkGLArea *area, gpointer user_data)
       .render               = opengl_ground_plane_render,
       .prepare              = opengl_ground_plane_prepare,
       .destroy              = opengl_ground_plane_free,
-      .is_active            = opengl_ground_plane_is_active,
+      .is_active            = gl_view_ground_plane_is_active,
       .far_extent           = opengl_ground_plane_far_extent,
       .ctx                  = ground_plane,
       .alpha                = 0.5f,
@@ -169,21 +188,20 @@ on_realize(GtkGLArea *area, gpointer user_data)
     g_array_append_val(state->renderables, r);
   }
 
-  /* Gradient overlay (2D HUD, not a renderable) */
+  state->initialized = TRUE;
+
+  /* Gradient overlay (2D HUD, not a renderable) — optional */
   if( state->config->has_gradient )
   {
     state->overlay = gradient_overlay_new(state->config->gradient_draw);
     if( !state->overlay )
-    {
       pr_err("Failed to create gradient overlay\n");
-      return;
+    else
+    {
+      gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
+      gradient_overlay_set_viewport(state->overlay, alloc.width, alloc.height);
     }
-
-    gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
-    gradient_overlay_set_viewport(state->overlay, alloc.width, alloc.height);
   }
-
-  state->initialized = TRUE;
 
   /* Initialize MSAA resources after GL context is ready */
   gl_view_recreate_msaa(state, rc_config.opengl_msaa_samples);

@@ -228,10 +228,15 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
       trans_alphas[trans_count] = eff_alpha;
       trans_orders[trans_count] = r->transparent_sort_order;
-      trans_depths[trans_count] =
-          state->arcball->rotation[0][2] * r->origin[0] +
-          state->arcball->rotation[1][2] * r->origin[1] +
-          state->arcball->rotation[2][2] * r->origin[2];
+      {
+        float view_z[3];
+
+        arcball_get_rotation_col(state->arcball, 2, view_z);
+        trans_depths[trans_count] =
+            view_z[0] * r->origin[0] +
+            view_z[1] * r->origin[1] +
+            view_z[2] * r->origin[2];
+      }
       trans_indices[trans_count] = (int)i;
       trans_count++;
     }

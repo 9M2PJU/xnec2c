@@ -24,6 +24,31 @@
 
 /*-----------------------------------------------------------------------*/
 
+/* set_lit_vertex()
+ *
+ * Set all fields of a lit vertex (position, normal, color)
+ */
+  static inline void
+set_lit_vertex(lit_color_point_t *v,
+    float px, float py, float pz,
+    float nx, float ny, float nz,
+    float cr, float cg, float cb, float ca)
+{
+  v->point.x = px;
+  v->point.y = py;
+  v->point.z = pz;
+  v->normal.x = nx;
+  v->normal.y = ny;
+  v->normal.z = nz;
+  v->color.r = cr;
+  v->color.g = cg;
+  v->color.b = cb;
+  v->color.a = ca;
+
+} /* set_lit_vertex() */
+
+/*-----------------------------------------------------------------------*/
+
 /* opengl_cylinder_vertex_count()
  *
  * Calculate required vertex count for a cylinder with given segments
@@ -171,78 +196,14 @@ opengl_lit_cylinder_append(
     float tv1z = (float)(z2 + pz1);
 
     /* Triangle 1: bottom-left, bottom-right, top-right */
-    v[vidx].point.x = bv0x;
-    v[vidx].point.y = bv0y;
-    v[vidx].point.z = bv0z;
-    v[vidx].normal.x = nx0;
-    v[vidx].normal.y = ny0;
-    v[vidx].normal.z = nz0;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
-
-    v[vidx].point.x = bv1x;
-    v[vidx].point.y = bv1y;
-    v[vidx].point.z = bv1z;
-    v[vidx].normal.x = nx1;
-    v[vidx].normal.y = ny1;
-    v[vidx].normal.z = nz1;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
-
-    v[vidx].point.x = tv1x;
-    v[vidx].point.y = tv1y;
-    v[vidx].point.z = tv1z;
-    v[vidx].normal.x = nx1;
-    v[vidx].normal.y = ny1;
-    v[vidx].normal.z = nz1;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
+    set_lit_vertex(&v[vidx++], bv0x, bv0y, bv0z, nx0, ny0, nz0, r, g, b, a);
+    set_lit_vertex(&v[vidx++], bv1x, bv1y, bv1z, nx1, ny1, nz1, r, g, b, a);
+    set_lit_vertex(&v[vidx++], tv1x, tv1y, tv1z, nx1, ny1, nz1, r, g, b, a);
 
     /* Triangle 2: bottom-left, top-right, top-left */
-    v[vidx].point.x = bv0x;
-    v[vidx].point.y = bv0y;
-    v[vidx].point.z = bv0z;
-    v[vidx].normal.x = nx0;
-    v[vidx].normal.y = ny0;
-    v[vidx].normal.z = nz0;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
-
-    v[vidx].point.x = tv1x;
-    v[vidx].point.y = tv1y;
-    v[vidx].point.z = tv1z;
-    v[vidx].normal.x = nx1;
-    v[vidx].normal.y = ny1;
-    v[vidx].normal.z = nz1;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
-
-    v[vidx].point.x = tv0x;
-    v[vidx].point.y = tv0y;
-    v[vidx].point.z = tv0z;
-    v[vidx].normal.x = nx0;
-    v[vidx].normal.y = ny0;
-    v[vidx].normal.z = nz0;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
+    set_lit_vertex(&v[vidx++], bv0x, bv0y, bv0z, nx0, ny0, nz0, r, g, b, a);
+    set_lit_vertex(&v[vidx++], tv1x, tv1y, tv1z, nx1, ny1, nz1, r, g, b, a);
+    set_lit_vertex(&v[vidx++], tv0x, tv0y, tv0z, nx0, ny0, nz0, r, g, b, a);
   }
 
   /* End cap normals point along axis */
@@ -272,78 +233,26 @@ opengl_lit_cylinder_append(
     double pz1 = radius * (cos1 * az + sin1 * bz);
 
     /* Bottom cap triangle */
-    v[vidx].point.x = (float)x1;
-    v[vidx].point.y = (float)y1;
-    v[vidx].point.z = (float)z1;
-    v[vidx].normal.x = cap_nx_bot;
-    v[vidx].normal.y = cap_ny_bot;
-    v[vidx].normal.z = cap_nz_bot;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
-
-    v[vidx].point.x = (float)(x1 + px1);
-    v[vidx].point.y = (float)(y1 + py1);
-    v[vidx].point.z = (float)(z1 + pz1);
-    v[vidx].normal.x = cap_nx_bot;
-    v[vidx].normal.y = cap_ny_bot;
-    v[vidx].normal.z = cap_nz_bot;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
-
-    v[vidx].point.x = (float)(x1 + px0);
-    v[vidx].point.y = (float)(y1 + py0);
-    v[vidx].point.z = (float)(z1 + pz0);
-    v[vidx].normal.x = cap_nx_bot;
-    v[vidx].normal.y = cap_ny_bot;
-    v[vidx].normal.z = cap_nz_bot;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
+    set_lit_vertex(&v[vidx++],
+        (float)x1, (float)y1, (float)z1,
+        cap_nx_bot, cap_ny_bot, cap_nz_bot, r, g, b, a);
+    set_lit_vertex(&v[vidx++],
+        (float)(x1 + px1), (float)(y1 + py1), (float)(z1 + pz1),
+        cap_nx_bot, cap_ny_bot, cap_nz_bot, r, g, b, a);
+    set_lit_vertex(&v[vidx++],
+        (float)(x1 + px0), (float)(y1 + py0), (float)(z1 + pz0),
+        cap_nx_bot, cap_ny_bot, cap_nz_bot, r, g, b, a);
 
     /* Top cap triangle */
-    v[vidx].point.x = (float)x2;
-    v[vidx].point.y = (float)y2;
-    v[vidx].point.z = (float)z2;
-    v[vidx].normal.x = cap_nx_top;
-    v[vidx].normal.y = cap_ny_top;
-    v[vidx].normal.z = cap_nz_top;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
-
-    v[vidx].point.x = (float)(x2 + px0);
-    v[vidx].point.y = (float)(y2 + py0);
-    v[vidx].point.z = (float)(z2 + pz0);
-    v[vidx].normal.x = cap_nx_top;
-    v[vidx].normal.y = cap_ny_top;
-    v[vidx].normal.z = cap_nz_top;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
-
-    v[vidx].point.x = (float)(x2 + px1);
-    v[vidx].point.y = (float)(y2 + py1);
-    v[vidx].point.z = (float)(z2 + pz1);
-    v[vidx].normal.x = cap_nx_top;
-    v[vidx].normal.y = cap_ny_top;
-    v[vidx].normal.z = cap_nz_top;
-    v[vidx].color.r = r;
-    v[vidx].color.g = g;
-    v[vidx].color.b = b;
-    v[vidx].color.a = a;
-    vidx++;
+    set_lit_vertex(&v[vidx++],
+        (float)x2, (float)y2, (float)z2,
+        cap_nx_top, cap_ny_top, cap_nz_top, r, g, b, a);
+    set_lit_vertex(&v[vidx++],
+        (float)(x2 + px0), (float)(y2 + py0), (float)(z2 + pz0),
+        cap_nx_top, cap_ny_top, cap_nz_top, r, g, b, a);
+    set_lit_vertex(&v[vidx++],
+        (float)(x2 + px1), (float)(y2 + py1), (float)(z2 + pz1),
+        cap_nx_top, cap_ny_top, cap_nz_top, r, g, b, a);
   }
 
   return( vidx );

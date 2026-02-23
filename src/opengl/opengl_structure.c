@@ -729,7 +729,7 @@ opengl_structure_create_widget_impl(void)
 
   if( !structure_arcball )
   {
-    structure_arcball = arcball_new();
+    structure_arcball = arcball_new((float)MOTION_EVENTS_COUNT);
 
     /* Initialize mode from rc_config */
     arcball_set_drag_mode(structure_arcball,

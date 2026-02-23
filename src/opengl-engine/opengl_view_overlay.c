@@ -43,7 +43,7 @@ typedef struct
 static void gl_overlay_prepare(void *ctx, float r_max);
 static void gl_overlay_render(void *ctx, mat4 mvp, float alpha);
 static gboolean gl_overlay_is_active(void *ctx);
-static float gl_overlay_far_extent(void *ctx, float r_max);
+static float gl_overlay_generate_and_extent(void *ctx, float r_max);
 static void gl_overlay_free(void *ctx);
 
 /*-----------------------------------------------------------------------*/
@@ -51,7 +51,7 @@ static void gl_overlay_free(void *ctx);
 /* gl_overlay_prepare()
  *
  * Upload overlay VBO and cache own MVP.
- * ovl_content is pre-populated by gl_overlay_far_extent during
+ * ovl_content is pre-populated by gl_overlay_generate_and_extent during
  * the active survey — no overlay_generate call here.
  */
   static void
@@ -152,15 +152,14 @@ gl_overlay_is_active(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_overlay_far_extent()
+/* gl_overlay_generate_and_extent()
  *
- * Authoritative call site for overlay_generate — populates ovl_content
- * so clip plane computation uses current-frame data (no one-frame lag).
- * Returns the overlay's scaled geometry extent so the main pass
- * clip planes encompass structure geometry at all scale factors.
+ * Regenerate overlay content via overlay_generate, then return the
+ * overlay's scaled geometry extent for clip plane computation.
+ * Called during the active survey before prepare/render.
  */
   static float
-gl_overlay_far_extent(void *ctx, float r_max)
+gl_overlay_generate_and_extent(void *ctx, float r_max)
 {
   gl_overlay_ctx_t *ovl = ctx;
   gl_view_state_t *view = ovl->view;
@@ -197,7 +196,7 @@ gl_overlay_far_extent(void *ctx, float r_max)
 
   return( result );
 
-} /* gl_overlay_far_extent() */
+} /* gl_overlay_generate_and_extent() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -290,7 +289,7 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
     .prepare              = gl_overlay_prepare,
     .destroy              = gl_overlay_free,
     .is_active            = gl_overlay_is_active,
-    .far_extent           = gl_overlay_far_extent,
+    .far_extent           = gl_overlay_generate_and_extent,
     .ctx                  = ovl,
     .alpha                = 1.0f,
     .origin               = {0.0f, 0.0f, 0.0f},

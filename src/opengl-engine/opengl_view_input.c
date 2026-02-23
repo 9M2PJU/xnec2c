@@ -96,25 +96,32 @@ on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
   gl_view_state_t *state;
   float dx, dy;
   float scale;
+  int drag_button;
 
   state = (gl_view_state_t *)user_data;
 
   if( !state || !state->arcball )
     return( FALSE );
 
-  if( state->arcball->drag_button == 0 )
+  drag_button = arcball_get_drag_button(state->arcball);
+
+  if( drag_button == 0 )
     return( FALSE );
 
-  if( state->arcball->drag_button == 1 )
+  if( drag_button == 1 )
   {
     /* Rotation handled by arcball */
     arcball_drag(state->arcball, event->x, event->y, state->viewport_height);
   }
-  else if( state->arcball->drag_button == 2 )
+  else if( drag_button == 2 )
   {
-    /* Pan: compute pixel delta */
-    dx = event->x - state->arcball->last_x;
-    dy = event->y - state->arcball->last_y;
+    /* Pan: compute pixel delta from last recorded position */
+    float last_x, last_y;
+
+    arcball_get_last_pos(state->arcball, &last_x, &last_y);
+
+    dx = event->x - last_x;
+    dy = event->y - last_y;
 
     /* Convert pixel delta to world-space delta at model plane.
      * Formula: 2 * distance * tan(fov/2) / viewport_height
@@ -127,9 +134,7 @@ on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
     state->pan_offset[0] += dx * scale;
     state->pan_offset[1] -= dy * scale;
 
-    /* Update arcball last position for next delta */
-    state->arcball->last_x = event->x;
-    state->arcball->last_y = event->y;
+    arcball_update_last_pos(state->arcball, event->x, event->y);
 
     /* Notify arcball callbacks to trigger cross-view redraw */
     arcball_notify_changed(state->arcball);

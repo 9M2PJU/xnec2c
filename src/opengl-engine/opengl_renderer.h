@@ -82,6 +82,7 @@ struct arcball_state
   arcball_drag_mode_t drag_mode;
   float wr_deg;
   float wi_deg;
+  float motion_divisor;
 };
 
 /* Shader functions */
@@ -90,7 +91,7 @@ gboolean gl_shader_load(gl_shader_t *shader,
 void gl_shader_destroy(gl_shader_t *shader);
 
 /* Arcball functions */
-arcball_state_t* arcball_new(void);
+arcball_state_t* arcball_new(float motion_divisor);
 void arcball_free(arcball_state_t *ab);
 void arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg);
 void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
@@ -106,6 +107,10 @@ void arcball_copy_rotation(arcball_state_t *dst, const arcball_state_t *src);
 void arcball_set_drag_mode(arcball_state_t *ab, arcball_drag_mode_t mode);
 arcball_drag_mode_t arcball_get_drag_mode(arcball_state_t *ab);
 void arcball_get_angles(arcball_state_t *ab, float *wr, float *wi);
+int arcball_get_drag_button(arcball_state_t *ab);
+void arcball_get_last_pos(arcball_state_t *ab, float *x, float *y);
+void arcball_update_last_pos(arcball_state_t *ab, float x, float y);
+void arcball_get_rotation_col(arcball_state_t *ab, int col, float out[3]);
 
 
 #endif /* HAVE_OPENGL */

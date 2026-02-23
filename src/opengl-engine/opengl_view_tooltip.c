@@ -24,20 +24,28 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_render_tooltip()
+/* gl_view_render_tooltip_surface()
  *
- * Render tooltip overlay with fade animation
+ * Regenerate the cached Cairo surface with tooltip text.
+ * Called when text or dimensions change (tooltip_surface_valid == FALSE).
  */
-  void
-gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height)
+  static void
+gl_view_render_tooltip_surface(gl_view_state_t *state, int surf_width, int surf_height)
 {
-  cairo_surface_t *surface;
   cairo_t *cr;
   cairo_text_extents_t extents;
   double x, y, padding;
 
-  surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, surf_width, surf_height);
-  cr = cairo_create(surface);
+  /* Release stale surface */
+  if( state->tooltip_surface )
+  {
+    cairo_surface_destroy(state->tooltip_surface);
+    state->tooltip_surface = NULL;
+  }
+
+  state->tooltip_surface = cairo_image_surface_create(
+      CAIRO_FORMAT_ARGB32, surf_width, surf_height);
+  cr = cairo_create(state->tooltip_surface);
 
   cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 16.0);
@@ -48,8 +56,8 @@ gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height)
   x = (surf_width - extents.width) / 2.0 - extents.x_bearing;
   y = (surf_height - extents.height) / 2.0 - extents.y_bearing;
 
-  /* Background box with fade */
-  cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.7 * state->tooltip_alpha);
+  /* Background box at full opacity — fade applied via GL blend */
+  cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.7);
   cairo_rectangle(cr,
       x + extents.x_bearing - padding,
       y + extents.y_bearing - padding,
@@ -57,32 +65,59 @@ gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height)
       extents.height + 2.0 * padding);
   cairo_fill(cr);
 
-  /* Text with fade */
-  cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, state->tooltip_alpha);
+  /* Text at full opacity — fade applied via GL blend */
+  cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
   cairo_move_to(cr, x, y);
   cairo_show_text(cr, state->tooltip_text);
 
   cairo_destroy(cr);
 
+  state->tooltip_surf_width = surf_width;
+  state->tooltip_surf_height = surf_height;
+  state->tooltip_surface_valid = TRUE;
+
+} /* gl_view_render_tooltip_surface() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_view_render_tooltip()
+ *
+ * Render tooltip overlay with fade animation.
+ * Regenerates cached surface only when text or dimensions change.
+ */
+  void
+gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height)
+{
+  /* Regenerate surface if invalidated or dimensions changed */
+  if( !state->tooltip_surface_valid ||
+      state->tooltip_surf_width != surf_width ||
+      state->tooltip_surf_height != surf_height )
+  {
+    gl_view_render_tooltip_surface(state, surf_width, surf_height);
+  }
+
   /* Lazily allocate cached tooltip overlay */
   if( !state->tooltip_overlay )
     state->tooltip_overlay = cairo_gl_overlay_new();
 
-  if( state->tooltip_overlay )
+  if( state->tooltip_overlay && state->tooltip_surface )
   {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    /* Modulate alpha for fade: scale source by constant alpha */
+    glBlendColor(0.0f, 0.0f, 0.0f, (float)state->tooltip_alpha);
+    glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     cairo_gl_overlay_set_size(state->tooltip_overlay, surf_width, surf_height);
-    cairo_gl_overlay_upload(state->tooltip_overlay, surface);
+    cairo_gl_overlay_upload(state->tooltip_overlay, state->tooltip_surface);
     cairo_gl_overlay_render(state->tooltip_overlay);
 
+    /* Restore standard blend func */
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
   }
-
-  cairo_surface_destroy(surface);
 
 } /* gl_view_render_tooltip() */
 
@@ -165,6 +200,7 @@ gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms)
   state->tooltip_text = g_strdup(text);
   state->tooltip_active = TRUE;
   state->tooltip_alpha = 1.0;
+  state->tooltip_surface_valid = FALSE;
   state->tooltip_hold_ms = duration_ms;
   state->tooltip_start_time = g_get_monotonic_time();
 

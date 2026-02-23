@@ -19,7 +19,6 @@
 
 #include "opengl_gradient_overlay.h"
 #include "../shared.h"
-#include "../draw_radiation.h"
 
 #ifdef HAVE_OPENGL
 

@@ -152,6 +152,10 @@ typedef struct
   guint tooltip_timeout_id;
   int tooltip_hold_ms;
   cairo_gl_overlay_t *tooltip_overlay;
+  cairo_surface_t *tooltip_surface;
+  int tooltip_surf_width;
+  int tooltip_surf_height;
+  gboolean tooltip_surface_valid;
 
   /* Drag transparency state */
   gboolean drag_active;

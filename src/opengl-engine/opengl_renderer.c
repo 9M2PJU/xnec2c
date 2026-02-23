@@ -157,10 +157,11 @@ gl_shader_destroy(gl_shader_t *shader)
 
 /* arcball_new()
  *
- * Allocate and initialize arcball camera state
+ * Allocate and initialize arcball camera state.
+ * motion_divisor controls drag sensitivity in constrained mode.
  */
   arcball_state_t*
-arcball_new(void)
+arcball_new(float motion_divisor)
 {
   arcball_state_t *ab;
 
@@ -174,6 +175,7 @@ arcball_new(void)
   ab->drag_mode = ARCBALL_DRAG_CONSTRAINED;
   ab->wr_deg = 45.0f;
   ab->wi_deg = 45.0f;
+  ab->motion_divisor = motion_divisor;
 
   return( ab );
 
@@ -471,8 +473,8 @@ arcball_rotate(arcball_state_t *ab, float dx, float dy)
   static void
 arcball_rotate_constrained(arcball_state_t *ab, float dx, float dy)
 {
-  ab->wr_deg -= dx / (float)MOTION_EVENTS_COUNT;
-  ab->wi_deg += dy / (float)MOTION_EVENTS_COUNT;
+  ab->wr_deg -= dx / ab->motion_divisor;
+  ab->wi_deg += dy / ab->motion_divisor;
 
   arcball_wrap_angles(ab);
 
@@ -599,5 +601,74 @@ arcball_get_angles(arcball_state_t *ab, float *wr, float *wi)
 
 /*-----------------------------------------------------------------------*/
 
+/* arcball_get_drag_button()
+ *
+ * Return the currently held mouse button (0 if no drag active)
+ */
+  int
+arcball_get_drag_button(arcball_state_t *ab)
+{
+  if( !ab )
+    return( 0 );
+
+  return( ab->drag_button );
+
+} /* arcball_get_drag_button() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_get_last_pos()
+ *
+ * Retrieve the last recorded mouse position
+ */
+  void
+arcball_get_last_pos(arcball_state_t *ab, float *x, float *y)
+{
+  if( !ab )
+    return;
+
+  if( x )
+    *x = ab->last_x;
+  if( y )
+    *y = ab->last_y;
+
+} /* arcball_get_last_pos() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_update_last_pos()
+ *
+ * Update the stored last mouse position for delta computation
+ */
+  void
+arcball_update_last_pos(arcball_state_t *ab, float x, float y)
+{
+  if( !ab )
+    return;
+
+  ab->last_x = x;
+  ab->last_y = y;
+
+} /* arcball_update_last_pos() */
+
+/*-----------------------------------------------------------------------*/
+
+/* arcball_get_rotation_col()
+ *
+ * Extract one column from the rotation matrix (e.g. col=2 for view Z axis)
+ */
+  void
+arcball_get_rotation_col(arcball_state_t *ab, int col, float out[3])
+{
+  if( !ab || col < 0 || col > 3 )
+    return;
+
+  out[0] = ab->rotation[0][col];
+  out[1] = ab->rotation[1][col];
+  out[2] = ab->rotation[2][col];
+
+} /* arcball_get_rotation_col() */
+
+/*-----------------------------------------------------------------------*/
 
 #endif /* HAVE_OPENGL */
