@@ -814,6 +814,21 @@ opengl_structure_cleanup(void)
 
 /*-----------------------------------------------------------------------*/
 
+/* opengl_structure_invalidate()
+ *
+ * Public API - mark cached geometry stale so next render regenerates
+ * from current NEC2 data arrays.  Call after geometry reload.
+ */
+  void
+opengl_structure_invalidate(void)
+{
+#ifdef HAVE_OPENGL
+  structure_vertex_count = 0;
+#endif
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* opengl_structure_queue_draw()
  *
  * Public API - queue redraw of OpenGL structure widget
