@@ -48,11 +48,11 @@ int opengl_cylinder_vertex_count(int segments);
 int opengl_lit_cylinder_append(
     lit_cylinder_mesh_t *mesh,
     int start_vertex,
-    double x1, double y1, double z1,
-    double x2, double y2, double z2,
+    const point_f_3d_t *p1,
+    const point_f_3d_t *p2,
     double radius,
     int segments,
-    float r, float g, float b, float a);
+    const rgba_f_t *color);
 
 /* Free lit cylinder mesh data */
 void opengl_lit_cylinder_free(lit_cylinder_mesh_t *mesh);

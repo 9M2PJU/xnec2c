@@ -18,6 +18,7 @@
  */
 
 #include "opengl_view_render.h"
+#include "opengl_view_tooltip.h"
 #include "opengl_gradient_overlay.h"
 #include "../shared.h"
 
@@ -87,6 +88,18 @@ gl_view_draw_pass(
 
 /*-----------------------------------------------------------------------*/
 
+/* Sorting entry for the transparent render pass */
+typedef struct
+{
+  int index;
+  int sort_order;
+  float alpha;
+  float depth;
+
+} trans_item_t;
+
+/*-----------------------------------------------------------------------*/
+
 /* on_render()
  *
  * GtkGLArea render signal handler
@@ -132,6 +145,12 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
         continue;
 
       active_mask |= (1u << i);
+
+      /* Generate content before extent is queried — allows renderables
+       * that produce data as a side effect of extent calculation to
+       * do so in a dedicated, clearly-named step */
+      if( r->generate )
+        r->generate(r->ctx);
 
       if( r->far_extent )
       {
@@ -203,10 +222,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
   /* Transparent pass — sorted by priority then back-to-front depth */
   {
-    int trans_indices[state->renderables->len];
-    int trans_orders[state->renderables->len];
-    float trans_alphas[state->renderables->len];
-    float trans_depths[state->renderables->len];
+    trans_item_t items[state->renderables->len];
     int trans_count, j, k;
 
     trans_count = 0;
@@ -226,18 +242,18 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       if( !(active_mask & (1u << i)) )
         continue;
 
-      trans_alphas[trans_count] = eff_alpha;
-      trans_orders[trans_count] = r->transparent_sort_order;
+      items[trans_count].alpha = eff_alpha;
+      items[trans_count].sort_order = r->transparent_sort_order;
       {
         float view_z[3];
 
         arcball_get_rotation_col(state->arcball, 2, view_z);
-        trans_depths[trans_count] =
+        items[trans_count].depth =
             view_z[0] * r->origin[0] +
             view_z[1] * r->origin[1] +
             view_z[2] * r->origin[2];
       }
-      trans_indices[trans_count] = (int)i;
+      items[trans_count].index = (int)i;
       trans_count++;
     }
 
@@ -245,29 +261,20 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
      * (farthest first within same priority) */
     for( j = 1; j < trans_count; j++ )
     {
-      int key_order = trans_orders[j];
-      float key_alpha = trans_alphas[j];
-      float key_depth = trans_depths[j];
-      int key_idx = trans_indices[j];
+      trans_item_t key = items[j];
 
       k = j - 1;
 
       while( k >= 0 &&
-             (trans_orders[k] > key_order ||
-              (trans_orders[k] == key_order &&
-               trans_depths[k] > key_depth)) )
+             (items[k].sort_order > key.sort_order ||
+              (items[k].sort_order == key.sort_order &&
+               items[k].depth > key.depth)) )
       {
-        trans_orders[k + 1] = trans_orders[k];
-        trans_alphas[k + 1] = trans_alphas[k];
-        trans_depths[k + 1] = trans_depths[k];
-        trans_indices[k + 1] = trans_indices[k];
+        items[k + 1] = items[k];
         k--;
       }
 
-      trans_orders[k + 1] = key_order;
-      trans_alphas[k + 1] = key_alpha;
-      trans_depths[k + 1] = key_depth;
-      trans_indices[k + 1] = key_idx;
+      items[k + 1] = key;
     }
 
     /* Depth writes ON so transparent shells self-occlude.
@@ -279,10 +286,10 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     for( j = 0; j < trans_count; j++ )
     {
       gl_renderable_t *r = &g_array_index(
-          state->renderables, gl_renderable_t, trans_indices[j]);
+          state->renderables, gl_renderable_t, items[j].index);
 
       r->prepare(r->ctx, content.r_max);
-      r->render(r->ctx, mvp, trans_alphas[j]);
+      r->render(r->ctx, mvp, items[j].alpha);
 
       /* Re-assert blend in case renderable modified GL state */
       glEnable(GL_BLEND);

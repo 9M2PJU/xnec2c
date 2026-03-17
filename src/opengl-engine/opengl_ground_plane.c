@@ -39,40 +39,22 @@ static const point_f_3d_t ground_normal = {0.0f, 0.0f, 1.0f};
   static void
 generate_ground_plane_vertices(lit_color_point_t *vertices, float scale)
 {
+  /* XY-plane offsets for two triangles forming a quad:
+   * triangle 1: (-,-), (-,+), (+,-); triangle 2: (-,+), (+,+), (+,-) */
+  static const float ground_quad_offsets[GROUND_PLANE_VERTICES][2] = {
+    {-1.0f, -1.0f}, {-1.0f, +1.0f}, {+1.0f, -1.0f},
+    {-1.0f, +1.0f}, {+1.0f, +1.0f}, {+1.0f, -1.0f}
+  };
   float extent;
   int i;
 
   extent = scale * GROUND_PLANE_EXTENT;
 
-  /* Triangle 1: (-x, -y, 0), (-x, +y, 0), (+x, -y, 0) */
-  vertices[0].point.x = -extent;
-  vertices[0].point.y = -extent;
-  vertices[0].point.z = 0.0f;
-
-  vertices[1].point.x = -extent;
-  vertices[1].point.y = extent;
-  vertices[1].point.z = 0.0f;
-
-  vertices[2].point.x = extent;
-  vertices[2].point.y = -extent;
-  vertices[2].point.z = 0.0f;
-
-  /* Triangle 2: (-x, +y, 0), (+x, +y, 0), (+x, -y, 0) */
-  vertices[3].point.x = -extent;
-  vertices[3].point.y = extent;
-  vertices[3].point.z = 0.0f;
-
-  vertices[4].point.x = extent;
-  vertices[4].point.y = extent;
-  vertices[4].point.z = 0.0f;
-
-  vertices[5].point.x = extent;
-  vertices[5].point.y = -extent;
-  vertices[5].point.z = 0.0f;
-
-  /* All vertices have upward normal and green color */
   for( i = 0; i < GROUND_PLANE_VERTICES; i++ )
   {
+    vertices[i].point.x = extent * ground_quad_offsets[i][0];
+    vertices[i].point.y = extent * ground_quad_offsets[i][1];
+    vertices[i].point.z = 0.0f;
     vertices[i].normal = ground_normal;
     vertices[i].color = ground_color;
   }

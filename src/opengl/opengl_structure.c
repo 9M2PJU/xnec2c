@@ -24,6 +24,7 @@
 #ifdef HAVE_OPENGL
 
 #include "../opengl-engine/opengl_view.h"
+#include "../opengl-engine/opengl_view_tooltip.h"
 #include "../opengl-engine/opengl_cylinder.h"
 
 /* Default scale factor for cylinder radius display */
@@ -504,12 +505,14 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
         radius = min_visible;
       }
 
-      vidx = opengl_lit_cylinder_append(&mesh, vidx,
-          data.x1[idx], data.y1[idx], data.z1[idx],
-          data.x2[idx], data.y2[idx], data.z2[idx],
-          radius,
-          STRUCTURE_CYLINDER_SEGMENTS,
-          r, g, b, 1.0f);
+      {
+        point_f_3d_t seg_p1 = {(float)data.x1[idx], (float)data.y1[idx], (float)data.z1[idx]};
+        point_f_3d_t seg_p2 = {(float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx]};
+        rgba_f_t seg_color = {r, g, b, 1.0f};
+
+        vidx = opengl_lit_cylinder_append(&mesh, vidx,
+            &seg_p1, &seg_p2, radius, STRUCTURE_CYLINDER_SEGMENTS, &seg_color);
+      }
     }
 
     structure_draw_mode = GL_TRIANGLES;
@@ -646,11 +649,28 @@ static gl_view_config_t structure_view_config = {
   .gradient_draw = NULL
 };
 
+/* opengl_structure_ground_plane_is_active()
+ *
+ * Ground plane is visible when a real ground is defined and enabled.
+ * Matches the NEC2 perfect/real ground condition used during calculation.
+ */
+  static gboolean
+opengl_structure_ground_plane_is_active(void *_ctx)
+{
+  (void)_ctx;
+
+  return( gnd.ksymp == 2 && gnd.iperf >= 0 );
+
+} /* opengl_structure_ground_plane_is_active() */
+
+/*-----------------------------------------------------------------------*/
+
 static gl_scene_provider_t structure_scene_provider = {
-  .generate = structure_scene_generate,
-  .post_render = NULL,
-  .cleanup = structure_scene_cleanup,
-  .on_ctrl_scroll = opengl_structure_on_ctrl_scroll
+  .generate                 = structure_scene_generate,
+  .post_render              = NULL,
+  .cleanup                  = structure_scene_cleanup,
+  .on_ctrl_scroll           = opengl_structure_on_ctrl_scroll,
+  .ground_plane_is_active   = opengl_structure_ground_plane_is_active
 };
 
 /*-----------------------------------------------------------------------*/

@@ -23,28 +23,13 @@
 #include "opengl_view_input.h"
 #include "opengl_view_render.h"
 #include "opengl_view_msaa.h"
+#include "opengl_view_tooltip.h"
 #include "opengl_axes.h"
 #include "opengl_cairo_overlay.h"
 #include "opengl_ground_plane.h"
 #include "../shared.h"
 
 #ifdef HAVE_OPENGL
-
-/*-----------------------------------------------------------------------*/
-
-/* gl_view_ground_plane_is_active()
- *
- * Domain-layer predicate for ground plane visibility.
- * Returns TRUE when NEC model has a ground card with ksymp == 2.
- */
-  static gboolean
-gl_view_ground_plane_is_active(void *ctx)
-{
-  (void)ctx;
-
-  return( gnd.ksymp == 2 && gnd.iperf >= 0 );
-
-} /* gl_view_ground_plane_is_active() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -162,7 +147,9 @@ on_realize(GtkGLArea *area, gpointer user_data)
     g_array_append_val(state->renderables, r);
   }
 
-  /* Create ground plane renderer */
+  /* Create ground plane renderer — only when the scene provides an
+   * is_active predicate, since visibility is domain-specific */
+  if( state->scene->ground_plane_is_active )
   {
     opengl_ground_plane_t *ground_plane;
 
@@ -177,7 +164,7 @@ on_realize(GtkGLArea *area, gpointer user_data)
       .render               = opengl_ground_plane_render,
       .prepare              = opengl_ground_plane_prepare,
       .destroy              = opengl_ground_plane_free,
-      .is_active            = gl_view_ground_plane_is_active,
+      .is_active            = state->scene->ground_plane_is_active,
       .far_extent           = opengl_ground_plane_far_extent,
       .ctx                  = ground_plane,
       .alpha                = 0.5f,

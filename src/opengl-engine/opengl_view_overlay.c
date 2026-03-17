@@ -43,7 +43,8 @@ typedef struct
 static void gl_overlay_prepare(void *ctx, float r_max);
 static void gl_overlay_render(void *ctx, mat4 mvp, float alpha);
 static gboolean gl_overlay_is_active(void *ctx);
-static float gl_overlay_generate_and_extent(void *ctx, float r_max);
+static void gl_overlay_generate(void *ctx);
+static float gl_overlay_far_extent(void *ctx, float r_max);
 static void gl_overlay_free(void *ctx);
 
 /*-----------------------------------------------------------------------*/
@@ -152,51 +153,59 @@ gl_overlay_is_active(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_overlay_generate_and_extent()
+/* gl_overlay_generate()
  *
- * Regenerate overlay content via overlay_generate, then return the
- * overlay's scaled geometry extent for clip plane computation.
- * Called during the active survey before prepare/render.
+ * Regenerate overlay content via overlay_generate, storing the result
+ * in ovl_content. Resets vertex_count first so stale data does not
+ * persist when overlay_generate declines (e.g. OVERLAY_STRUCT unchecked).
+ * Called during the active survey before far_extent is queried.
  */
-  static float
-gl_overlay_generate_and_extent(void *ctx, float r_max)
+  static void
+gl_overlay_generate(void *ctx)
 {
   gl_overlay_ctx_t *ovl = ctx;
   gl_view_state_t *view = ovl->view;
-  float result, ovl_model_scale, scaled_extent;
 
-  result = r_max;
-
-  /* Reset before generation attempt so stale data does not persist
-   * when overlay_generate declines (e.g. OVERLAY_STRUCT unchecked) */
+  /* Reset before generation attempt */
   ovl->ovl_content.vertex_count = 0;
 
   if( !ovl->initialized )
-  {
-    return( result );
-  }
+    return;
 
   if( !view->scene->overlay_generate )
-  {
-    return( result );
-  }
+    return;
 
-  if( !view->scene->overlay_generate(&view->content, &ovl->ovl_content) )
-  {
-    return( result );
-  }
+  view->scene->overlay_generate(&view->content, &ovl->ovl_content);
+
+} /* gl_overlay_generate() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_overlay_far_extent()
+ *
+ * Return the overlay's scaled geometry extent for clip plane computation.
+ * Reads ovl_content populated by gl_overlay_generate during the same
+ * survey pass.
+ */
+  static float
+gl_overlay_far_extent(void *ctx, float r_max)
+{
+  gl_overlay_ctx_t *ovl = ctx;
+  gl_view_state_t *view = ovl->view;
+  float ovl_model_scale, scaled_extent;
+
+  if( ovl->ovl_content.vertex_count <= 0 )
+    return( r_max );
 
   ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
   scaled_extent = ovl->ovl_content.r_max * ovl_model_scale;
 
   if( scaled_extent > r_max )
-  {
-    result = scaled_extent;
-  }
+    return( scaled_extent );
 
-  return( result );
+  return( r_max );
 
-} /* gl_overlay_generate_and_extent() */
+} /* gl_overlay_far_extent() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -289,7 +298,8 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
     .prepare              = gl_overlay_prepare,
     .destroy              = gl_overlay_free,
     .is_active            = gl_overlay_is_active,
-    .far_extent           = gl_overlay_generate_and_extent,
+    .generate             = gl_overlay_generate,
+    .far_extent           = gl_overlay_far_extent,
     .ctx                  = ovl,
     .alpha                = 1.0f,
     .origin               = {0.0f, 0.0f, 0.0f},

@@ -22,13 +22,6 @@
 
 #ifdef HAVE_OPENGL
 
-typedef struct
-{
-  float x, y, z;
-  float u, v;
-
-} overlay_vertex_t;
-
 /* Fullscreen quad with V-flipped UV mapping for Cairo coordinate compensation.
  *
  * Cairo origin is top-left with Y increasing downward.
@@ -37,7 +30,7 @@ typedef struct
  *
  * This mapping: NDC top (Y=+1) -> UV V=0 -> Cairo row 0 (visual top)
  * Result: Cairo content appears with correct vertical orientation. */
-static const overlay_vertex_t quad_vertices[6] = {
+static const text_vertex_t quad_vertices[6] = {
   {-1.0f,  1.0f, 0.0f,  0.0f, 0.0f},
   {-1.0f, -1.0f, 0.0f,  0.0f, 1.0f},
   { 1.0f, -1.0f, 0.0f,  1.0f, 1.0f},
@@ -85,11 +78,11 @@ cairo_gl_overlay_new(void)
 
   glEnableVertexAttribArray(overlay->position_location);
   glVertexAttribPointer(overlay->position_location, 3, GL_FLOAT, GL_FALSE,
-    sizeof(overlay_vertex_t), (void*)0);
+    sizeof(text_vertex_t), (void*)0);
 
   glEnableVertexAttribArray(overlay->texcoord_location);
   glVertexAttribPointer(overlay->texcoord_location, 2, GL_FLOAT, GL_FALSE,
-    sizeof(overlay_vertex_t), (void*)(3 * sizeof(float)));
+    sizeof(text_vertex_t), (void*)(3 * sizeof(float)));
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);

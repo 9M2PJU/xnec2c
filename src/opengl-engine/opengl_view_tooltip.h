@@ -17,39 +17,26 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef OPENGL_RENDERER_H
-#define OPENGL_RENDERER_H 1
+#ifndef OPENGL_VIEW_TOOLTIP_H
+#define OPENGL_VIEW_TOOLTIP_H 1
 
 #include "common.h"
 
 #ifdef HAVE_OPENGL
-#include <epoxy/gl.h>
-#include <cglm/cglm.h>
-#include "opengl_arcball.h"
+#include "opengl_view.h"
 
-/* Vertex attribute descriptor */
-typedef struct
-{
-  const char *name;
-  int components;
-  int offset;
+/* gl_view_show_tooltip()
+ *
+ * Display a tooltip message that holds for duration_ms then fades over 500ms.
+ */
+void gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms);
 
-} gl_vertex_attrib_t;
-
-/* Shader container */
-typedef struct
-{
-  GLuint program;
-  GLuint vertex;
-  GLuint fragment;
-
-} gl_shader_t;
-
-/* Shader functions */
-gboolean gl_shader_load(gl_shader_t *shader,
-  const char *vertex_path, const char *fragment_path);
-void gl_shader_destroy(gl_shader_t *shader);
-
+/* gl_view_render_tooltip()
+ *
+ * Render tooltip overlay with fade animation. Called from the render loop
+ * when state->tooltip_active is set.
+ */
+void gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height);
 
 #endif /* HAVE_OPENGL */
-#endif /* OPENGL_RENDERER_H */
+#endif /* OPENGL_VIEW_TOOLTIP_H */

@@ -26,6 +26,7 @@
 #ifdef HAVE_OPENGL
 
 #include "../opengl-engine/opengl_view.h"
+#include "../opengl-engine/opengl_view_tooltip.h"
 
 /* Default structure overlay extent as multiple of radiation pattern r_max */
 #define OVERLAY_DEFAULT_EXTENT 1.25f

@@ -86,12 +86,15 @@ opengl_cylinder_vertex_count(int segments)
 opengl_lit_cylinder_append(
     lit_cylinder_mesh_t *mesh,
     int start_vertex,
-    double x1, double y1, double z1,
-    double x2, double y2, double z2,
+    const point_f_3d_t *p1,
+    const point_f_3d_t *p2,
     double radius,
     int segments,
-    float r, float g, float b, float a)
+    const rgba_f_t *color)
 {
+  double x1 = p1->x, y1 = p1->y, z1 = p1->z;
+  double x2 = p2->x, y2 = p2->y, z2 = p2->z;
+  float r = color->r, g = color->g, b = color->b, a = color->a;
   double dx, dy, dz, length;
   double ax, ay, az;
   double bx, by, bz;

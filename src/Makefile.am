@@ -110,13 +110,14 @@ xnec2c_CPPFLAGS += $(GSL_CFLAGS)
 xnec2c_LDADD    += $(GSL_LIBS)
 if HAVE_OPENGL
 xnec2c_SOURCES += \
+  opengl-engine/opengl_arcball.c opengl-engine/opengl_arcball.h \
   opengl-engine/opengl_renderer.c opengl-engine/opengl_renderer.h \
   opengl-engine/opengl_view.c opengl-engine/opengl_view.h \
   opengl-engine/opengl_view_render.c opengl-engine/opengl_view_render.h \
   opengl-engine/opengl_view_scene.c opengl-engine/opengl_view_scene.h \
   opengl-engine/opengl_view_overlay.c opengl-engine/opengl_view_overlay.h \
   opengl-engine/opengl_view_input.c opengl-engine/opengl_view_input.h \
-  opengl-engine/opengl_view_tooltip.c \
+  opengl-engine/opengl_view_tooltip.c opengl-engine/opengl_view_tooltip.h \
   opengl-engine/opengl_view_msaa.c opengl-engine/opengl_view_msaa.h \
   opengl-engine/opengl_axes.c opengl-engine/opengl_axes.h \
   opengl-engine/opengl_ground_plane.c opengl-engine/opengl_ground_plane.h \

@@ -62,6 +62,10 @@ typedef void (*gl_destroy_fn)(void *ctx);
 typedef gboolean (*gl_active_fn)(void *ctx);
 typedef float (*gl_extent_fn)(void *ctx, float r_max);
 
+/* Called once per frame before far_extent; used for content generation
+ * in renderables that must produce data before extent is known */
+typedef void (*gl_generate_fn)(void *ctx);
+
 /* Unified renderable — all 3D objects implement this */
 typedef struct
 {
@@ -70,6 +74,11 @@ typedef struct
   gl_destroy_fn destroy;
   gl_active_fn is_active;
   gl_extent_fn far_extent;
+
+  /* Called once per frame before far_extent; generates content for
+   * renderables that must populate data before extent is known */
+  gl_generate_fn generate;
+
   void *ctx;
   float alpha;
   vec3 origin;
@@ -99,6 +108,10 @@ typedef struct
 
   /* Optional ctrl+scroll handler for segment radius scaling */
   gboolean (*on_ctrl_scroll)(GtkWidget *widget, GdkEventScroll *event, gpointer view_state);
+
+  /* Optional predicate controlling ground plane visibility.
+   * When NULL, ground plane renderable is not created for this view. */
+  gl_active_fn ground_plane_is_active;
 
 } gl_scene_provider_t;
 
@@ -184,9 +197,6 @@ gl_view_state_t* gl_view_get_state(GtkWidget *widget);
 void gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball);
 void gl_view_sync_arcball(GtkWidget *widget, double wr, double wi);
 void gl_view_reset_pan(GtkWidget *widget);
-void gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms);
-void gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height);
-
 /* gl_view_setup_attribs()
  *
  * Configure vertex attribute pointers in VAO. Called once during prepare
