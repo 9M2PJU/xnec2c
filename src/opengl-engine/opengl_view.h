@@ -43,6 +43,9 @@ typedef struct
   gboolean show_gradient;
   unsigned int generation;
 
+  /* When TRUE, engine uses model_scale as-is (no ovl_model_scale_adj) */
+  gboolean scale_adj_locked;
+
 } gl_view_content_t;
 
 /* Overlay configuration for second rendering pass */

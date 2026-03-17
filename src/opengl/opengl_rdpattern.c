@@ -683,9 +683,15 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
   /* Scale structure to match radiation pattern space for far-field,
    * use 1:1 for near-field (both already in meters) */
   if( isFlagSet(DRAW_GAIN) )
+  {
     out->model_scale = rdpattern_overlay_base_scale(primary->r_max, geom->view_scale);
+    out->scale_adj_locked = FALSE;
+  }
   else
+  {
     out->model_scale = 1.0f;
+    out->scale_adj_locked = TRUE;
+  }
 
   /* Structure raw extent for overlay clip plane calculation */
   out->r_max = geom->view_scale;

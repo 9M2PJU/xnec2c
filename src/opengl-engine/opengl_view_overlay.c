@@ -95,7 +95,10 @@ gl_overlay_prepare(void *ctx, float r_max)
   {
     float ovl_model_scale;
 
-    ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
+    if( ovl->ovl_content.scale_adj_locked )
+      ovl_model_scale = ovl->ovl_content.model_scale;
+    else
+      ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
 
     arcball_get_mvp(view->arcball, ovl->cached_mvp, view->pan_offset,
         view->cached_camera_distance, ovl_model_scale,
@@ -197,7 +200,11 @@ gl_overlay_far_extent(void *ctx, float r_max)
   if( ovl->ovl_content.vertex_count <= 0 )
     return( r_max );
 
-  ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
+  if( ovl->ovl_content.scale_adj_locked )
+    ovl_model_scale = ovl->ovl_content.model_scale;
+  else
+    ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
+
   scaled_extent = ovl->ovl_content.r_max * ovl_model_scale;
 
   if( scaled_extent > r_max )
