@@ -18,6 +18,7 @@
  */
 
 #include "opengl_structure.h"
+#include "opengl_rdpattern.h"
 #include "../shared.h"
 #include "../draw.h"
 
@@ -183,8 +184,11 @@ opengl_structure_on_ctrl_scroll(
   if( structure_gl_widget && widget != structure_gl_widget )
     gtk_widget_queue_draw(structure_gl_widget);
 
-  if( rdpattern_gl_area && widget != rdpattern_gl_area )
-    gtk_widget_queue_draw(rdpattern_gl_area);
+  {
+    GtkWidget *rdpat_w = opengl_rdpattern_get_widget();
+    if( rdpat_w && widget != rdpat_w )
+      gtk_widget_queue_draw(rdpat_w);
+  }
 
   return( TRUE );
 
@@ -206,7 +210,8 @@ opengl_structure_get_draw_mode(void)
     return( STRUCTURE_DRAW_CHARGES );
 
   return( STRUCTURE_DRAW_GEOMETRY );
-}
+
+} /* opengl_structure_get_draw_mode() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -323,6 +328,31 @@ calculate_excitation_center(double *cx, double *cy, double *cz)
 
   return( TRUE );
 
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* lit_color_point_set()
+ *
+ * Fill a lit_color_point_t vertex with position, normal, and color.
+ */
+  static void
+lit_color_point_set(
+    lit_color_point_t *v,
+    float px, float py, float pz,
+    float nx, float ny, float nz,
+    float r, float g, float b)
+{
+  v->point.x  = px;
+  v->point.y  = py;
+  v->point.z  = pz;
+  v->normal.x = nx;
+  v->normal.y = ny;
+  v->normal.z = nz;
+  v->color.r  = r;
+  v->color.g  = g;
+  v->color.b  = b;
+  v->color.a  = 1.0f;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -452,29 +482,15 @@ opengl_structure_generate_geometry(structure_draw_mode_t mode)
       }
 
       /* Endpoint 1 */
-      structure_vertices[vidx].point.x = (float)data.x1[idx];
-      structure_vertices[vidx].point.y = (float)data.y1[idx];
-      structure_vertices[vidx].point.z = (float)data.z1[idx];
-      structure_vertices[vidx].normal.x = nx;
-      structure_vertices[vidx].normal.y = ny;
-      structure_vertices[vidx].normal.z = nz;
-      structure_vertices[vidx].color.r = r;
-      structure_vertices[vidx].color.g = g;
-      structure_vertices[vidx].color.b = b;
-      structure_vertices[vidx].color.a = 1.0f;
+      lit_color_point_set(&structure_vertices[vidx],
+          (float)data.x1[idx], (float)data.y1[idx], (float)data.z1[idx],
+          nx, ny, nz, r, g, b);
       vidx++;
 
       /* Endpoint 2 */
-      structure_vertices[vidx].point.x = (float)data.x2[idx];
-      structure_vertices[vidx].point.y = (float)data.y2[idx];
-      structure_vertices[vidx].point.z = (float)data.z2[idx];
-      structure_vertices[vidx].normal.x = nx;
-      structure_vertices[vidx].normal.y = ny;
-      structure_vertices[vidx].normal.z = nz;
-      structure_vertices[vidx].color.r = r;
-      structure_vertices[vidx].color.g = g;
-      structure_vertices[vidx].color.b = b;
-      structure_vertices[vidx].color.a = 1.0f;
+      lit_color_point_set(&structure_vertices[vidx],
+          (float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx],
+          nx, ny, nz, r, g, b);
       vidx++;
     }
 
@@ -738,13 +754,8 @@ opengl_structure_create_widget_impl(void)
   if( structure_gl_widget )
     return( structure_gl_widget );
 
-  /* Load persisted radius scale from config.
-   * Treat sub-threshold values as unset (upgrade from old config). */
+  /* Load persisted radius scale from config; zero means line mode */
   cylinder_radius_scale = rc_config.opengl_cylinder_radius_scale;
-  if( cylinder_radius_scale < CYLINDER_SCALE_LINE_THRESHOLD )
-  {
-    cylinder_radius_scale = CYLINDER_RADIUS_SCALE_DEFAULT;
-  }
   structure_last_radius_scale = cylinder_radius_scale;
 
   if( !structure_arcball )
@@ -785,6 +796,18 @@ opengl_structure_create_widget_impl(void)
 opengl_structure_get_arcball(void)
 {
   return( structure_arcball );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_structure_get_widget()
+ *
+ * Return the structure GL widget
+ */
+  GtkWidget*
+opengl_structure_get_widget(void)
+{
+  return( structure_gl_widget );
 }
 
 /*-----------------------------------------------------------------------*/

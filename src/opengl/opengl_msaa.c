@@ -18,6 +18,8 @@
  */
 
 #include "opengl_msaa.h"
+#include "opengl_rdpattern.h"
+#include "opengl_structure.h"
 #include "../opengl-engine/opengl_view.h"
 #include "../opengl-engine/opengl_view_msaa.h"
 #include "../shared.h"
@@ -56,26 +58,32 @@ Set_MSAA_Samples(int samples)
   }
 
   /* Recreate MSAA resources for structure view */
-  if( structure_gl_area )
   {
-    state = gl_view_get_state(structure_gl_area);
-    if( state )
+    GtkWidget *w = opengl_structure_get_widget();
+    if( w )
     {
-      gtk_gl_area_make_current(GTK_GL_AREA(structure_gl_area));
-      gl_view_recreate_msaa(state, samples);
-      gtk_widget_queue_draw(structure_gl_area);
+      state = gl_view_get_state(w);
+      if( state )
+      {
+        gtk_gl_area_make_current(GTK_GL_AREA(w));
+        gl_view_recreate_msaa(state, samples);
+        gtk_widget_queue_draw(w);
+      }
     }
   }
 
   /* Recreate MSAA resources for radiation pattern view */
-  if( rdpattern_gl_area )
   {
-    state = gl_view_get_state(rdpattern_gl_area);
-    if( state )
+    GtkWidget *w = opengl_rdpattern_get_widget();
+    if( w )
     {
-      gtk_gl_area_make_current(GTK_GL_AREA(rdpattern_gl_area));
-      gl_view_recreate_msaa(state, samples);
-      gtk_widget_queue_draw(rdpattern_gl_area);
+      state = gl_view_get_state(w);
+      if( state )
+      {
+        gtk_gl_area_make_current(GTK_GL_AREA(w));
+        gl_view_recreate_msaa(state, samples);
+        gtk_widget_queue_draw(w);
+      }
     }
   }
 

@@ -39,11 +39,9 @@ static int rdpat_triangle_count = 0;
 static color_point_t *nf_lines = NULL;
 static int nf_line_count = 0;
 
-/* Poynting vector buffers */
-static double *pov_x = NULL;
-static double *pov_y = NULL;
-static double *pov_z = NULL;
-static double *pov_r = NULL;
+/* Poynting vector per-sample data */
+typedef struct { double x, y, z, r; } poynting_vec_t;
+static poynting_vec_t *pov = NULL;
 
 /* Generation counters for change detection */
 static unsigned int rdpat_ff_generation = 0;
@@ -83,6 +81,67 @@ static const gl_overlay_config_t rdpattern_overlay_config = {
 
 /*-----------------------------------------------------------------------*/
 
+/* nf_line_append()
+ *
+ * Fill two consecutive color_point_t entries as a line segment.
+ * Returns line_idx advanced by 2.
+ */
+  static int
+nf_line_append(
+    color_point_t *buf, int line_idx,
+    point_f_3d_t origin, point_f_3d_t endpoint, rgba_f_t color)
+{
+  buf[line_idx].point.x     = origin.x;
+  buf[line_idx].point.y     = origin.y;
+  buf[line_idx].point.z     = origin.z;
+  buf[line_idx].color.r     = color.r;
+  buf[line_idx].color.g     = color.g;
+  buf[line_idx].color.b     = color.b;
+  buf[line_idx].color.a     = color.a;
+
+  buf[line_idx + 1].point.x = endpoint.x;
+  buf[line_idx + 1].point.y = endpoint.y;
+  buf[line_idx + 1].point.z = endpoint.z;
+  buf[line_idx + 1].color   = buf[line_idx].color;
+
+  return( line_idx + 2 );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* nf_field_line()
+ *
+ * Build a single near-field vector line from origin, field components,
+ * and magnitude.  Scales the vector by dr / magnitude and colors by
+ * magnitude / max_val.  Returns line_idx advanced by 2.
+ */
+  static int
+nf_field_line(
+    color_point_t *buf, int line_idx,
+    double px, double py, double pz,
+    double comp_x, double comp_y, double comp_z,
+    double dr, double magnitude, double max_val)
+{
+  double fscale;
+  double red, grn, blu;
+
+  point_f_3d_t org = { (float)px, (float)py, (float)pz };
+
+  fscale = dr / magnitude;
+  point_f_3d_t end = {
+    (float)(px + comp_x * fscale),
+    (float)(py + comp_y * fscale),
+    (float)(pz + comp_z * fscale)
+  };
+
+  Value_to_Color(&red, &grn, &blu, magnitude, max_val);
+  rgba_f_t col = { (float)red, (float)grn, (float)blu, 1.0f };
+
+  return( nf_line_append(buf, line_idx, org, end, col) );
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* opengl_rdpattern_generate_nf_lines()
  *
  * Generate line geometry for near field vectors
@@ -92,9 +151,7 @@ opengl_rdpattern_generate_nf_lines(void)
 {
   int idx, npts, line_idx;
   int total_lines;
-  double fscale;
   double dr;
-  double red, grn, blu;
   double pov_max;
   size_t mreq;
 
@@ -136,31 +193,28 @@ opengl_rdpattern_generate_nf_lines(void)
   {
     int ipv;
 
-    mreq = (size_t)npts * sizeof(double);
-    mem_realloc((void **)&pov_x, mreq, __LOCATION__);
-    mem_realloc((void **)&pov_y, mreq, __LOCATION__);
-    mem_realloc((void **)&pov_z, mreq, __LOCATION__);
-    mem_realloc((void **)&pov_r, mreq, __LOCATION__);
+    mreq = (size_t)npts * sizeof(poynting_vec_t);
+    mem_realloc((void **)&pov, mreq, __LOCATION__);
 
     for( ipv = 0; ipv < npts; ipv++ )
     {
       /* Poynting vector: E x H */
-      pov_x[ipv] =
+      pov[ipv].x =
         near_field.ery[ipv] * near_field.hrz[ipv] -
         near_field.hry[ipv] * near_field.erz[ipv];
-      pov_y[ipv] =
+      pov[ipv].y =
         near_field.erz[ipv] * near_field.hrx[ipv] -
         near_field.hrz[ipv] * near_field.erx[ipv];
-      pov_z[ipv] =
+      pov[ipv].z =
         near_field.erx[ipv] * near_field.hry[ipv] -
         near_field.hrx[ipv] * near_field.ery[ipv];
-      pov_r[ipv] = sqrt(
-          pov_x[ipv] * pov_x[ipv] +
-          pov_y[ipv] * pov_y[ipv] +
-          pov_z[ipv] * pov_z[ipv] );
+      pov[ipv].r = sqrt(
+          pov[ipv].x * pov[ipv].x +
+          pov[ipv].y * pov[ipv].y +
+          pov[ipv].z * pov[ipv].z );
 
-      if( pov_max < pov_r[ipv] )
-        pov_max = pov_r[ipv];
+      if( pov_max < pov[ipv].r )
+        pov_max = pov[ipv].r;
     }
   }
 
@@ -171,78 +225,24 @@ opengl_rdpattern_generate_nf_lines(void)
   {
     /* Draw Near E Field */
     if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
-    {
-      fscale = dr / near_field.er[idx];
-
-      nf_lines[line_idx].point.x = (float)near_field.px[idx];
-      nf_lines[line_idx].point.y = (float)near_field.py[idx];
-      nf_lines[line_idx].point.z = (float)near_field.pz[idx];
-
-      nf_lines[line_idx + 1].point.x = (float)(near_field.px[idx] + near_field.erx[idx] * fscale);
-      nf_lines[line_idx + 1].point.y = (float)(near_field.py[idx] + near_field.ery[idx] * fscale);
-      nf_lines[line_idx + 1].point.z = (float)(near_field.pz[idx] + near_field.erz[idx] * fscale);
-
-      Value_to_Color(&red, &grn, &blu, near_field.er[idx], near_field.max_er);
-
-      nf_lines[line_idx].color.r = (float)red;
-      nf_lines[line_idx].color.g = (float)grn;
-      nf_lines[line_idx].color.b = (float)blu;
-      nf_lines[line_idx].color.a = 1.0f;
-
-      nf_lines[line_idx + 1].color = nf_lines[line_idx].color;
-
-      line_idx += 2;
-    }
+      line_idx = nf_field_line(nf_lines, line_idx,
+          near_field.px[idx], near_field.py[idx], near_field.pz[idx],
+          near_field.erx[idx], near_field.ery[idx], near_field.erz[idx],
+          dr, near_field.er[idx], near_field.max_er);
 
     /* Draw Near H Field */
     if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    {
-      fscale = dr / near_field.hr[idx];
-
-      nf_lines[line_idx].point.x = (float)near_field.px[idx];
-      nf_lines[line_idx].point.y = (float)near_field.py[idx];
-      nf_lines[line_idx].point.z = (float)near_field.pz[idx];
-
-      nf_lines[line_idx + 1].point.x = (float)(near_field.px[idx] + near_field.hrx[idx] * fscale);
-      nf_lines[line_idx + 1].point.y = (float)(near_field.py[idx] + near_field.hry[idx] * fscale);
-      nf_lines[line_idx + 1].point.z = (float)(near_field.pz[idx] + near_field.hrz[idx] * fscale);
-
-      Value_to_Color(&red, &grn, &blu, near_field.hr[idx], near_field.max_hr);
-
-      nf_lines[line_idx].color.r = (float)red;
-      nf_lines[line_idx].color.g = (float)grn;
-      nf_lines[line_idx].color.b = (float)blu;
-      nf_lines[line_idx].color.a = 1.0f;
-
-      nf_lines[line_idx + 1].color = nf_lines[line_idx].color;
-
-      line_idx += 2;
-    }
+      line_idx = nf_field_line(nf_lines, line_idx,
+          near_field.px[idx], near_field.py[idx], near_field.pz[idx],
+          near_field.hrx[idx], near_field.hry[idx], near_field.hrz[idx],
+          dr, near_field.hr[idx], near_field.max_hr);
 
     /* Draw Poynting Vector */
     if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    {
-      fscale = dr / pov_r[idx];
-
-      nf_lines[line_idx].point.x = (float)near_field.px[idx];
-      nf_lines[line_idx].point.y = (float)near_field.py[idx];
-      nf_lines[line_idx].point.z = (float)near_field.pz[idx];
-
-      nf_lines[line_idx + 1].point.x = (float)(near_field.px[idx] + pov_x[idx] * fscale);
-      nf_lines[line_idx + 1].point.y = (float)(near_field.py[idx] + pov_y[idx] * fscale);
-      nf_lines[line_idx + 1].point.z = (float)(near_field.pz[idx] + pov_z[idx] * fscale);
-
-      Value_to_Color(&red, &grn, &blu, pov_r[idx], pov_max);
-
-      nf_lines[line_idx].color.r = (float)red;
-      nf_lines[line_idx].color.g = (float)grn;
-      nf_lines[line_idx].color.b = (float)blu;
-      nf_lines[line_idx].color.a = 1.0f;
-
-      nf_lines[line_idx + 1].color = nf_lines[line_idx].color;
-
-      line_idx += 2;
-    }
+      line_idx = nf_field_line(nf_lines, line_idx,
+          near_field.px[idx], near_field.py[idx], near_field.pz[idx],
+          pov[idx].x, pov[idx].y, pov[idx].z,
+          dr, pov[idx].r, pov_max);
   }
 
   nf_line_count = total_lines;
@@ -251,6 +251,32 @@ opengl_rdpattern_generate_nf_lines(void)
   return( nf_line_count );
 
 } /* opengl_rdpattern_generate_nf_lines() */
+
+/*-----------------------------------------------------------------------*/
+
+/* fill_tri_vertex()
+ *
+ * Fill one vertex slot of a color_triangle_t from a point_3d_t.
+ * Color is derived from the normalized (r - r_min) / r_range ratio.
+ */
+  static void
+fill_tri_vertex(
+    color_triangle_t *tri, int vi,
+    point_3d_t *pt, double r_min, double r_range)
+{
+  double red, grn, blu;
+
+  tri->cp[vi].point.x = (float)pt->x;
+  tri->cp[vi].point.y = (float)pt->y;
+  tri->cp[vi].point.z = (float)pt->z;
+  tri->cp[vi].point.r = (float)pt->r;
+
+  Value_to_Color(&red, &grn, &blu, (pt->r - r_min) / r_range, 1.0);
+  tri->cp[vi].color.r = (float)red;
+  tri->cp[vi].color.g = (float)grn;
+  tri->cp[vi].color.b = (float)blu;
+  tri->cp[vi].color.a = 1.0f;
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -265,7 +291,6 @@ opengl_rdpattern_generate_triangles(
 {
   int nph_idx, nth_idx, tri_idx;
   int p0, p1, p2, p3;
-  double red, grn, blu;
   size_t mreq;
 
   if( !points || nth < 2 || nph < 1 )
@@ -291,81 +316,15 @@ opengl_rdpattern_generate_triangles(
       p3 = (nth_idx + 1) + nph_idx * nth;
 
       /* Triangle A: p0 -> p1 -> p2 */
-      rdpat_triangles[tri_idx].cp[0].point.x = (float)points[p0].x;
-      rdpat_triangles[tri_idx].cp[0].point.y = (float)points[p0].y;
-      rdpat_triangles[tri_idx].cp[0].point.z = (float)points[p0].z;
-      rdpat_triangles[tri_idx].cp[0].point.r = (float)points[p0].r;
-
-      rdpat_triangles[tri_idx].cp[1].point.x = (float)points[p1].x;
-      rdpat_triangles[tri_idx].cp[1].point.y = (float)points[p1].y;
-      rdpat_triangles[tri_idx].cp[1].point.z = (float)points[p1].z;
-      rdpat_triangles[tri_idx].cp[1].point.r = (float)points[p1].r;
-
-      rdpat_triangles[tri_idx].cp[2].point.x = (float)points[p2].x;
-      rdpat_triangles[tri_idx].cp[2].point.y = (float)points[p2].y;
-      rdpat_triangles[tri_idx].cp[2].point.z = (float)points[p2].z;
-      rdpat_triangles[tri_idx].cp[2].point.r = (float)points[p2].r;
-
-      Value_to_Color(&red, &grn, &blu,
-          (points[p0].r - r_min) / r_range, 1.0);
-      rdpat_triangles[tri_idx].cp[0].color.r = (float)red;
-      rdpat_triangles[tri_idx].cp[0].color.g = (float)grn;
-      rdpat_triangles[tri_idx].cp[0].color.b = (float)blu;
-      rdpat_triangles[tri_idx].cp[0].color.a = 1.0f;
-
-      Value_to_Color(&red, &grn, &blu,
-          (points[p1].r - r_min) / r_range, 1.0);
-      rdpat_triangles[tri_idx].cp[1].color.r = (float)red;
-      rdpat_triangles[tri_idx].cp[1].color.g = (float)grn;
-      rdpat_triangles[tri_idx].cp[1].color.b = (float)blu;
-      rdpat_triangles[tri_idx].cp[1].color.a = 1.0f;
-
-      Value_to_Color(&red, &grn, &blu,
-          (points[p2].r - r_min) / r_range, 1.0);
-      rdpat_triangles[tri_idx].cp[2].color.r = (float)red;
-      rdpat_triangles[tri_idx].cp[2].color.g = (float)grn;
-      rdpat_triangles[tri_idx].cp[2].color.b = (float)blu;
-      rdpat_triangles[tri_idx].cp[2].color.a = 1.0f;
-
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 0, &points[p0], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 1, &points[p1], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 2, &points[p2], r_min, r_range);
       tri_idx++;
 
       /* Triangle B: p0 -> p2 -> p3 */
-      rdpat_triangles[tri_idx].cp[0].point.x = (float)points[p0].x;
-      rdpat_triangles[tri_idx].cp[0].point.y = (float)points[p0].y;
-      rdpat_triangles[tri_idx].cp[0].point.z = (float)points[p0].z;
-      rdpat_triangles[tri_idx].cp[0].point.r = (float)points[p0].r;
-
-      rdpat_triangles[tri_idx].cp[1].point.x = (float)points[p2].x;
-      rdpat_triangles[tri_idx].cp[1].point.y = (float)points[p2].y;
-      rdpat_triangles[tri_idx].cp[1].point.z = (float)points[p2].z;
-      rdpat_triangles[tri_idx].cp[1].point.r = (float)points[p2].r;
-
-      rdpat_triangles[tri_idx].cp[2].point.x = (float)points[p3].x;
-      rdpat_triangles[tri_idx].cp[2].point.y = (float)points[p3].y;
-      rdpat_triangles[tri_idx].cp[2].point.z = (float)points[p3].z;
-      rdpat_triangles[tri_idx].cp[2].point.r = (float)points[p3].r;
-
-      Value_to_Color(&red, &grn, &blu,
-          (points[p0].r - r_min) / r_range, 1.0);
-      rdpat_triangles[tri_idx].cp[0].color.r = (float)red;
-      rdpat_triangles[tri_idx].cp[0].color.g = (float)grn;
-      rdpat_triangles[tri_idx].cp[0].color.b = (float)blu;
-      rdpat_triangles[tri_idx].cp[0].color.a = 1.0f;
-
-      Value_to_Color(&red, &grn, &blu,
-          (points[p2].r - r_min) / r_range, 1.0);
-      rdpat_triangles[tri_idx].cp[1].color.r = (float)red;
-      rdpat_triangles[tri_idx].cp[1].color.g = (float)grn;
-      rdpat_triangles[tri_idx].cp[1].color.b = (float)blu;
-      rdpat_triangles[tri_idx].cp[1].color.a = 1.0f;
-
-      Value_to_Color(&red, &grn, &blu,
-          (points[p3].r - r_min) / r_range, 1.0);
-      rdpat_triangles[tri_idx].cp[2].color.r = (float)red;
-      rdpat_triangles[tri_idx].cp[2].color.g = (float)grn;
-      rdpat_triangles[tri_idx].cp[2].color.b = (float)blu;
-      rdpat_triangles[tri_idx].cp[2].color.a = 1.0f;
-
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 0, &points[p0], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 1, &points[p2], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 2, &points[p3], r_min, r_range);
       tri_idx++;
 
     } /* for( nth_idx < nth - 1 ) */
@@ -393,11 +352,6 @@ rdpattern_overlay_base_scale(float r_max, float view_scale)
 
 /*-----------------------------------------------------------------------*/
 
-/* rdpattern_scene_generate()
- *
- * Scene provider generate callback.
- * Handles both near-field (lines) and far-field (triangles) modes.
- */
 /* rdpattern_init_empty_scene()
  *
  * Populate a minimal scene with no geometry so the render loop clears
@@ -633,10 +587,7 @@ rdpattern_scene_cleanup(void)
   free_ptr((void **)&nf_lines);
   nf_line_count = 0;
 
-  free_ptr((void **)&pov_x);
-  free_ptr((void **)&pov_y);
-  free_ptr((void **)&pov_z);
-  free_ptr((void **)&pov_r);
+  free_ptr((void **)&pov);
 
   free_ptr((void **)&rdpat_translated_points);
   rdpat_translated_capacity = 0;
@@ -816,12 +767,12 @@ rdpattern_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_create_widget()
+/* opengl_rdpattern_create_widget_impl()
  *
  * Create the OpenGL radiation pattern widget using the generic view engine
  */
-  GtkWidget*
-opengl_rdpattern_create_widget(void)
+  static GtkWidget*
+opengl_rdpattern_create_widget_impl(void)
 {
   if( !rdpattern_arcball )
   {
@@ -862,24 +813,12 @@ opengl_rdpattern_get_arcball(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_get_widget()
- *
- * Return the rdpattern GL widget
- */
-  GtkWidget*
-opengl_rdpattern_get_widget(void)
-{
-  return( rdpattern_gl_widget );
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_rdpattern_cleanup()
+/* opengl_rdpattern_cleanup_impl()
  *
  * Free resources
  */
-  void
-opengl_rdpattern_cleanup(void)
+  static void
+opengl_rdpattern_cleanup_impl(void)
 {
   rdpattern_scene_cleanup();
   rdpattern_gl_widget = NULL;
@@ -888,3 +827,64 @@ opengl_rdpattern_cleanup(void)
 /*-----------------------------------------------------------------------*/
 
 #endif /* HAVE_OPENGL */
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_create_widget()
+ *
+ * Public API - create radiation pattern GL widget
+ */
+  GtkWidget*
+opengl_rdpattern_create_widget(void)
+{
+#ifdef HAVE_OPENGL
+  return( opengl_rdpattern_create_widget_impl() );
+#else
+  return( NULL );
+#endif
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_cleanup()
+ *
+ * Public API - cleanup resources
+ */
+  void
+opengl_rdpattern_cleanup(void)
+{
+#ifdef HAVE_OPENGL
+  opengl_rdpattern_cleanup_impl();
+#endif
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_get_widget()
+ *
+ * Public API - return rdpattern GL widget
+ */
+  GtkWidget*
+opengl_rdpattern_get_widget(void)
+{
+#ifdef HAVE_OPENGL
+  return( rdpattern_gl_widget );
+#else
+  return( NULL );
+#endif
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* opengl_rdpattern_queue_draw()
+ *
+ * Public API - queue redraw of OpenGL radiation pattern widget
+ */
+  void
+opengl_rdpattern_queue_draw(void)
+{
+#ifdef HAVE_OPENGL
+  if( rdpattern_gl_widget != NULL )
+    xnec2_widget_queue_draw( rdpattern_gl_widget );
+#endif
+}

@@ -62,6 +62,7 @@ void opengl_structure_queue_draw(void);
 extern const gl_vertex_attrib_t opengl_structure_attribs[3];
 
 arcball_state_t* opengl_structure_get_arcball(void);
+GtkWidget* opengl_structure_get_widget(void);
 
 /* Get/set cylinder radius display scale factor */
 double opengl_structure_get_radius_scale(void);

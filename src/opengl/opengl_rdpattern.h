@@ -22,15 +22,16 @@
 
 #include "common.h"
 
-#ifdef HAVE_OPENGL
-
-#include "../opengl-engine/opengl_renderer.h"
-
-/* Public API */
+/* Public API - always available, stubs when no OpenGL */
 GtkWidget* opengl_rdpattern_create_widget(void);
 void opengl_rdpattern_cleanup(void);
-arcball_state_t* opengl_rdpattern_get_arcball(void);
 GtkWidget* opengl_rdpattern_get_widget(void);
+void opengl_rdpattern_queue_draw(void);
+
+#ifdef HAVE_OPENGL
+#include "../opengl-engine/opengl_renderer.h"
+
+arcball_state_t* opengl_rdpattern_get_arcball(void);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_RDPATTERN_H */
