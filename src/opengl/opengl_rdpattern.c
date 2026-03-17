@@ -822,6 +822,12 @@ opengl_rdpattern_cleanup_impl(void)
 {
   rdpattern_scene_cleanup();
   rdpattern_gl_widget = NULL;
+
+  if( rdpattern_arcball )
+  {
+    arcball_free(rdpattern_arcball);
+    rdpattern_arcball = NULL;
+  }
 }
 
 /*-----------------------------------------------------------------------*/

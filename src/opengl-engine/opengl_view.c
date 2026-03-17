@@ -186,6 +186,13 @@ on_realize(GtkGLArea *area, gpointer user_data)
     g_array_append_val(state->renderables, r);
   }
 
+  if( state->renderables->len > MAX_RENDERABLES )
+  {
+    pr_err("Renderable count %u exceeds MAX_RENDERABLES (%d)\n",
+        state->renderables->len, MAX_RENDERABLES);
+    return;
+  }
+
   state->initialized = TRUE;
 
   /* Gradient overlay (2D HUD, not a renderable) — optional */

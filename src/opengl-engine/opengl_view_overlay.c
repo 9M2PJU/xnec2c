@@ -49,6 +49,23 @@ static void gl_overlay_free(void *ctx);
 
 /*-----------------------------------------------------------------------*/
 
+/* gl_overlay_effective_scale()
+ *
+ * Compute effective overlay model scale, applying user adjustment
+ * unless scale_adj_locked is set by the scene provider.
+ */
+  static inline float
+gl_overlay_effective_scale(const gl_overlay_ctx_t *ovl)
+{
+  if( ovl->ovl_content.scale_adj_locked )
+    return( ovl->ovl_content.model_scale );
+
+  return( ovl->ovl_content.model_scale * ovl->view->ovl_model_scale_adj );
+
+} /* gl_overlay_effective_scale() */
+
+/*-----------------------------------------------------------------------*/
+
 /* gl_overlay_prepare()
  *
  * Upload overlay VBO and cache own MVP.
@@ -93,12 +110,7 @@ gl_overlay_prepare(void *ctx, float r_max)
    * Projection parameters (near/far) shared with main render pass
    * so all renderables produce comparable depth values. */
   {
-    float ovl_model_scale;
-
-    if( ovl->ovl_content.scale_adj_locked )
-      ovl_model_scale = ovl->ovl_content.model_scale;
-    else
-      ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
+    float ovl_model_scale = gl_overlay_effective_scale(ovl);
 
     arcball_get_mvp(view->arcball, ovl->cached_mvp, view->pan_offset,
         view->cached_camera_distance, ovl_model_scale,
@@ -194,16 +206,12 @@ gl_overlay_generate(void *ctx)
 gl_overlay_far_extent(void *ctx, float r_max)
 {
   gl_overlay_ctx_t *ovl = ctx;
-  gl_view_state_t *view = ovl->view;
   float ovl_model_scale, scaled_extent;
 
   if( ovl->ovl_content.vertex_count <= 0 )
     return( r_max );
 
-  if( ovl->ovl_content.scale_adj_locked )
-    ovl_model_scale = ovl->ovl_content.model_scale;
-  else
-    ovl_model_scale = ovl->ovl_content.model_scale * view->ovl_model_scale_adj;
+  ovl_model_scale = gl_overlay_effective_scale(ovl);
 
   scaled_extent = ovl->ovl_content.r_max * ovl_model_scale;
 

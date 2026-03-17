@@ -24,39 +24,33 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_render_tooltip_surface()
+/* render_centered_text_box()
  *
- * Regenerate the cached Cairo surface with tooltip text.
- * Called when text or dimensions change (tooltip_surface_valid == FALSE).
+ * Create a Cairo surface with centered text over a semi-transparent
+ * background box. Returns newly-created surface; caller owns it.
+ * All content rendered at full opacity; callers apply fade via GL blend.
  */
-  static void
-gl_view_render_tooltip_surface(gl_view_state_t *state, int surf_width, int surf_height)
+  static cairo_surface_t*
+render_centered_text_box(const char *text, int width, int height)
 {
+  cairo_surface_t *surface;
   cairo_t *cr;
   cairo_text_extents_t extents;
   double x, y, padding;
 
-  /* Release stale surface */
-  if( state->tooltip_surface )
-  {
-    cairo_surface_destroy(state->tooltip_surface);
-    state->tooltip_surface = NULL;
-  }
-
-  state->tooltip_surface = cairo_image_surface_create(
-      CAIRO_FORMAT_ARGB32, surf_width, surf_height);
-  cr = cairo_create(state->tooltip_surface);
+  surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+  cr = cairo_create(surface);
 
   cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
   cairo_set_font_size(cr, 16.0);
 
-  cairo_text_extents(cr, state->tooltip_text, &extents);
+  cairo_text_extents(cr, text, &extents);
 
   padding = 12.0;
-  x = (surf_width - extents.width) / 2.0 - extents.x_bearing;
-  y = (surf_height - extents.height) / 2.0 - extents.y_bearing;
+  x = (width - extents.width) / 2.0 - extents.x_bearing;
+  y = (height - extents.height) / 2.0 - extents.y_bearing;
 
-  /* Background box at full opacity — fade applied via GL blend */
+  /* Background box */
   cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.7);
   cairo_rectangle(cr,
       x + extents.x_bearing - padding,
@@ -65,13 +59,36 @@ gl_view_render_tooltip_surface(gl_view_state_t *state, int surf_width, int surf_
       extents.height + 2.0 * padding);
   cairo_fill(cr);
 
-  /* Text at full opacity — fade applied via GL blend */
+  /* Text */
   cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
   cairo_move_to(cr, x, y);
-  cairo_show_text(cr, state->tooltip_text);
+  cairo_show_text(cr, text);
 
   cairo_destroy(cr);
 
+  return( surface );
+
+} /* render_centered_text_box() */
+
+/*-----------------------------------------------------------------------*/
+
+/* gl_view_render_tooltip_surface()
+ *
+ * Regenerate the cached Cairo surface with tooltip text.
+ * Called when text or dimensions change (tooltip_surface_valid == FALSE).
+ */
+  static void
+gl_view_render_tooltip_surface(gl_view_state_t *state, int surf_width, int surf_height)
+{
+  /* Release stale surface */
+  if( state->tooltip_surface )
+  {
+    cairo_surface_destroy(state->tooltip_surface);
+    state->tooltip_surface = NULL;
+  }
+
+  state->tooltip_surface = render_centered_text_box(
+      state->tooltip_text, surf_width, surf_height);
   state->tooltip_surf_width = surf_width;
   state->tooltip_surf_height = surf_height;
   state->tooltip_surface_valid = TRUE;
@@ -229,44 +246,14 @@ gl_view_render_status_message(gl_view_state_t *state,
       state->status_surf_width != surf_width ||
       state->status_surf_height != surf_height )
   {
-    cairo_t *cr;
-    cairo_text_extents_t extents;
-    double x, y, padding;
-
     if( state->status_surface )
     {
       cairo_surface_destroy(state->status_surface);
       state->status_surface = NULL;
     }
 
-    state->status_surface = cairo_image_surface_create(
-        CAIRO_FORMAT_ARGB32, surf_width, surf_height);
-    cr = cairo_create(state->status_surface);
-
-    cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    cairo_set_font_size(cr, 16.0);
-
-    cairo_text_extents(cr, message, &extents);
-
-    padding = 12.0;
-    x = (surf_width - extents.width) / 2.0 - extents.x_bearing;
-    y = (surf_height - extents.height) / 2.0 - extents.y_bearing;
-
-    /* Background box at full opacity */
-    cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.7);
-    cairo_rectangle(cr,
-        x + extents.x_bearing - padding,
-        y + extents.y_bearing - padding,
-        extents.width + 2.0 * padding,
-        extents.height + 2.0 * padding);
-    cairo_fill(cr);
-
-    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
-    cairo_move_to(cr, x, y);
-    cairo_show_text(cr, message);
-
-    cairo_destroy(cr);
-
+    state->status_surface = render_centered_text_box(
+        message, surf_width, surf_height);
     state->status_surf_width = surf_width;
     state->status_surf_height = surf_height;
     state->status_last_text = message;

@@ -113,6 +113,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   float camera_distance;
   GLint default_fbo = 0;
   guint32 active_mask;
+  float eff_alphas[MAX_RENDERABLES];
   guint i;
 
   state = (gl_view_state_t *)user_data;
@@ -145,6 +146,10 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
         continue;
 
       active_mask |= (1u << i);
+
+      eff_alphas[i] = r->alpha *
+          (state->drag_active && r->transparent_on_drag
+           ? state->drag_alpha_factor : 1.0f);
 
       /* Generate content before extent is queried — allows renderables
        * that produce data as a side effect of extent calculation to
@@ -206,14 +211,12 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     gl_renderable_t *r = &g_array_index(
         state->renderables, gl_renderable_t, i);
 
-    float eff_alpha = r->alpha *
-        (state->drag_active && r->transparent_on_drag
-         ? state->drag_alpha_factor : 1.0f);
-
-    if( eff_alpha < 1.0f )
+    if( !(active_mask & (1u << i)) )
       continue;
 
-    if( !(active_mask & (1u << i)) )
+    float eff_alpha = eff_alphas[i];
+
+    if( eff_alpha < 1.0f )
       continue;
 
     r->prepare(r->ctx, content.r_max);
@@ -232,14 +235,12 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       gl_renderable_t *r = &g_array_index(
           state->renderables, gl_renderable_t, i);
 
-      float eff_alpha = r->alpha *
-          (state->drag_active && r->transparent_on_drag
-           ? state->drag_alpha_factor : 1.0f);
-
-      if( eff_alpha >= 1.0f )
+      if( !(active_mask & (1u << i)) )
         continue;
 
-      if( !(active_mask & (1u << i)) )
+      float eff_alpha = eff_alphas[i];
+
+      if( eff_alpha >= 1.0f )
         continue;
 
       items[trans_count].alpha = eff_alpha;

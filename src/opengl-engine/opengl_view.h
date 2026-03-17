@@ -29,6 +29,9 @@
 /* Drag transparency: alpha multiplier applied to marked renderables during drag */
 #define DRAG_ALPHA_FACTOR 0.5f
 
+/* Maximum renderables per view (constrained by guint32 active_mask in render loop) */
+#define MAX_RENDERABLES 32
+
 /* View content provided by scene generator */
 typedef struct
 {

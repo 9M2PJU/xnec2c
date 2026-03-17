@@ -821,6 +821,12 @@ opengl_structure_cleanup_impl(void)
 {
   structure_scene_cleanup();
   structure_gl_widget = NULL;
+
+  if( structure_arcball )
+  {
+    arcball_free(structure_arcball);
+    structure_arcball = NULL;
+  }
 }
 
 #endif /* HAVE_OPENGL */
