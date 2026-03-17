@@ -38,5 +38,13 @@ void gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms);
  */
 void gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height);
 
+/* gl_view_render_status_message()
+ *
+ * Render a persistent centered status message overlay. Called from the
+ * render loop when state->content.status_message is non-NULL.
+ */
+void gl_view_render_status_message(gl_view_state_t *state,
+    const char *message, int surf_width, int surf_height);
+
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_VIEW_TOOLTIP_H */

@@ -213,4 +213,86 @@ gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms)
 
 /*-----------------------------------------------------------------------*/
 
+/* gl_view_render_status_message()
+ *
+ * Render a persistent centered status message overlay with alpha=1.0.
+ * Regenerates cached surface only when text pointer or dimensions change.
+ */
+  void
+gl_view_render_status_message(gl_view_state_t *state,
+    const char *message, int surf_width, int surf_height)
+{
+  /* Regenerate surface if message or dimensions changed.
+   * status_last_text is compared by pointer — valid only for string literals,
+   * which are guaranteed unique addresses per translation unit. */
+  if( state->status_last_text != message ||
+      state->status_surf_width != surf_width ||
+      state->status_surf_height != surf_height )
+  {
+    cairo_t *cr;
+    cairo_text_extents_t extents;
+    double x, y, padding;
+
+    if( state->status_surface )
+    {
+      cairo_surface_destroy(state->status_surface);
+      state->status_surface = NULL;
+    }
+
+    state->status_surface = cairo_image_surface_create(
+        CAIRO_FORMAT_ARGB32, surf_width, surf_height);
+    cr = cairo_create(state->status_surface);
+
+    cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(cr, 16.0);
+
+    cairo_text_extents(cr, message, &extents);
+
+    padding = 12.0;
+    x = (surf_width - extents.width) / 2.0 - extents.x_bearing;
+    y = (surf_height - extents.height) / 2.0 - extents.y_bearing;
+
+    /* Background box at full opacity */
+    cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.7);
+    cairo_rectangle(cr,
+        x + extents.x_bearing - padding,
+        y + extents.y_bearing - padding,
+        extents.width + 2.0 * padding,
+        extents.height + 2.0 * padding);
+    cairo_fill(cr);
+
+    cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
+    cairo_move_to(cr, x, y);
+    cairo_show_text(cr, message);
+
+    cairo_destroy(cr);
+
+    state->status_surf_width = surf_width;
+    state->status_surf_height = surf_height;
+    state->status_last_text = message;
+  }
+
+  /* Lazily allocate cached status overlay */
+  if( !state->status_overlay )
+    state->status_overlay = cairo_gl_overlay_new();
+
+  if( state->status_overlay && state->status_surface )
+  {
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    cairo_gl_overlay_set_size(state->status_overlay, surf_width, surf_height);
+    cairo_gl_overlay_upload(state->status_overlay, state->status_surface);
+    cairo_gl_overlay_render(state->status_overlay);
+
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+  }
+
+} /* gl_view_render_status_message() */
+
+/*-----------------------------------------------------------------------*/
+
 #endif /* HAVE_OPENGL */

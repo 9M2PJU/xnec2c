@@ -398,6 +398,26 @@ rdpattern_overlay_base_scale(float r_max, float view_scale)
  * Scene provider generate callback.
  * Handles both near-field (lines) and far-field (triangles) modes.
  */
+/* rdpattern_init_empty_scene()
+ *
+ * Populate a minimal scene with no geometry so the render loop clears
+ * the framebuffer.  Caller sets status_message after return.
+ *
+ * Only non-zero fields are set here; the caller (on_render in
+ * opengl_view_render.c) provides the struct zero-initialized via {0}.
+ */
+  static void
+rdpattern_init_empty_scene(gl_view_content_t *out, float zoom)
+{
+  out->draw_mode = GL_TRIANGLES;
+  out->r_max = 1.0f;
+  out->clip_extent = 1.0f;
+  out->zoom = zoom;
+  out->model_scale = 1.0f;
+}
+
+/*-----------------------------------------------------------------------*/
+
   static gboolean
 rdpattern_scene_generate(gl_view_content_t *out)
 {
@@ -462,6 +482,14 @@ rdpattern_scene_generate(gl_view_content_t *out)
     return( TRUE );
   }
 
+  /* Near-field selected but NE/NH cards absent or data not yet valid */
+  if( isFlagSet(DRAW_EHFIELD) )
+  {
+    rdpattern_init_empty_scene(out, zoom);
+    out->status_message = "Near field requires NE or NH cards in the NEC file";
+    return( TRUE );
+  }
+
   /* Far-field (gain) rendering path */
   if( isFlagSet(DRAW_GAIN) )
   {
@@ -472,6 +500,14 @@ rdpattern_scene_generate(gl_view_content_t *out)
     float off_len;
 
     off_len = 0.0f;
+
+    /* No RP card — cannot compute gain pattern */
+    if( isFlagClear(ENABLE_RDPAT) )
+    {
+      rdpattern_init_empty_scene(out, zoom);
+      out->status_message = "Gain pattern requires an RP card in the NEC file";
+      return( TRUE );
+    }
 
     current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
     if( current_gen == 0 )
@@ -562,7 +598,12 @@ rdpattern_scene_generate(gl_view_content_t *out)
     return( TRUE );
   }
 
-  return( FALSE );
+  /* Neither near-field nor far-field is active; return a minimal scene so
+   * the render loop proceeds to clear the framebuffer to black */
+  rdpattern_init_empty_scene(out, zoom);
+  out->status_message = "Select Gain Pattern or Near Field";
+
+  return( TRUE );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -704,6 +745,20 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
 
 /*-----------------------------------------------------------------------*/
 
+/* rdpattern_axes_is_active()
+ *
+ * Axes are meaningful only when a pattern is rendered — hide them
+ * when neither gain nor near-field is selected.
+ */
+  static gboolean
+rdpattern_axes_is_active(void *ctx)
+{
+  (void)ctx;
+  return( isFlagSet(DRAW_GAIN) || isFlagSet(DRAW_EHFIELD) );
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* Static scene configuration and provider */
 static gl_view_config_t rdpattern_view_config = {
   .vertex_shader_path = "/gl/color-vertex.glsl",
@@ -723,7 +778,8 @@ static gl_scene_provider_t rdpattern_scene_provider = {
   .overlay_generate = rdpattern_overlay_generate,
   .overlay_cleanup = NULL,
   .on_shift_scroll = rdpattern_on_shift_scroll,
-  .on_ctrl_scroll = opengl_structure_on_ctrl_scroll
+  .on_ctrl_scroll = opengl_structure_on_ctrl_scroll,
+  .axes_is_active = rdpattern_axes_is_active
 };
 
 /*-----------------------------------------------------------------------*/

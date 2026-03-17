@@ -547,10 +547,6 @@ Main_Freqplots_Activate( void )
   void
 Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
 {
-  /* If radiation pattern data do not
-   * allow drawing of radiation pattern */
-  if( isFlagClear(ENABLE_RDPAT) ) return;
-
   /* Enable or not gain (radiation) pattern plotting */
   if( flag )
   {
@@ -559,6 +555,14 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(
           Builder_Get_Object(rdpattern_window_builder, "rdpattern_eh_togglebutton")),
         FALSE );
+
+    /* No RP card: flags are set so the renderer shows the status message;
+     * skip data operations that require valid radiation pattern data */
+    if( isFlagClear(ENABLE_RDPAT) )
+    {
+      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      return;
+    }
 
     /* Swap to OpenGL renderer if enabled */
 #ifdef HAVE_OPENGL
@@ -605,9 +609,6 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
   void
 Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
 {
-  /* If no near EH data */
-  if( !fpat.nfeh ) return;
-
   /* Enable or not E/H fields plotting */
   if( flag )
   {
@@ -615,6 +616,14 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
     ClearFlag( DRAW_GAIN );
     gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(Builder_Get_Object(
             rdpattern_window_builder, "rdpattern_gain_togglebutton")), FALSE );
+
+    /* No NE/NH cards: flags are set so the renderer shows the status message;
+     * skip data operations that require valid near-field configuration */
+    if( !fpat.nfeh )
+    {
+      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      return;
+    }
 
     /* Swap to Cairo renderer if OpenGL disabled */
 #ifdef HAVE_OPENGL

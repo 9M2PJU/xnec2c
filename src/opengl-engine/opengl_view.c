@@ -57,6 +57,12 @@ gl_view_state_free(gl_view_state_t *state)
   if( state->tooltip_overlay )
     cairo_gl_overlay_free(state->tooltip_overlay);
 
+  if( state->status_surface )
+    cairo_surface_destroy(state->status_surface);
+
+  if( state->status_overlay )
+    cairo_gl_overlay_free(state->status_overlay);
+
   /* Destroy all renderables in reverse registration order */
   if( state->renderables )
   {
@@ -144,6 +150,11 @@ on_realize(GtkGLArea *area, gpointer user_data)
       .origin               = {0.0f, 0.0f, 0.0f},
       .transparent_sort_order = 0
     };
+
+    /* Scene provider may supply a domain-specific axes predicate */
+    if( state->scene->axes_is_active )
+      r.is_active = state->scene->axes_is_active;
+
     g_array_append_val(state->renderables, r);
   }
 

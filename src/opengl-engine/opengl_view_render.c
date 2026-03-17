@@ -306,15 +306,21 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   if( state->overlay && content.show_gradient )
     gradient_overlay_render(state->overlay);
 
-  /* Render tooltip if active */
-  if( state->tooltip_active && state->tooltip_text )
+  /* Surface dimensions for 2D overlays (tooltip, status message) */
   {
     int surf_width, surf_height;
 
     surf_width = (int)(state->viewport_height * state->aspect);
     surf_height = (int)state->viewport_height;
 
-    gl_view_render_tooltip(state, surf_width, surf_height);
+    /* Render tooltip if active */
+    if( state->tooltip_active && state->tooltip_text )
+      gl_view_render_tooltip(state, surf_width, surf_height);
+
+    /* Render persistent status message if scene requested one */
+    if( state->content.status_message )
+      gl_view_render_status_message(state, state->content.status_message,
+          surf_width, surf_height);
   }
 
   /* Blit MSAA to default FBO */

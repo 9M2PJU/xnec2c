@@ -46,6 +46,9 @@ typedef struct
   /* When TRUE, engine uses model_scale as-is (no ovl_model_scale_adj) */
   gboolean scale_adj_locked;
 
+  /* Centered text overlay rendered when no data to display; NULL = none */
+  const char *status_message;
+
 } gl_view_content_t;
 
 /* Overlay configuration for second rendering pass */
@@ -116,6 +119,10 @@ typedef struct
    * When NULL, ground plane renderable is not created for this view. */
   gl_active_fn ground_plane_is_active;
 
+  /* Optional predicate controlling axes visibility.
+   * When NULL, the default opengl_axes_is_active predicate applies. */
+  gl_active_fn axes_is_active;
+
 } gl_scene_provider_t;
 
 /* Static view configuration */
@@ -172,6 +179,13 @@ typedef struct
   int tooltip_surf_width;
   int tooltip_surf_height;
   gboolean tooltip_surface_valid;
+
+  /* Status message overlay (persistent, no fade) */
+  cairo_gl_overlay_t *status_overlay;
+  cairo_surface_t *status_surface;
+  int status_surf_width;
+  int status_surf_height;
+  const char *status_last_text;
 
   /* Drag transparency state */
   gboolean drag_active;
