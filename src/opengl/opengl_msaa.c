@@ -26,66 +26,70 @@
 
 #ifdef HAVE_OPENGL
 
-/* Set_MSAA_Samples()
- *
- * Change MSAA sample count for all GL views
+/* MSAA sample count to menu widget name mapping */
+typedef struct { int samples; const char *name; } msaa_widget_entry_t;
+
+static const msaa_widget_entry_t msaa_widget_map[] = {
+  {  0, "main_opengl_msaa_off" },
+  {  2, "main_opengl_msaa_2x"  },
+  {  4, "main_opengl_msaa_4x"  },
+  {  8, "main_opengl_msaa_8x"  },
+  { 16, "main_opengl_msaa_16x" }
+};
+
+/*-----------------------------------------------------------------------*/
+
+/** msaa_update_view() - Recreate MSAA framebuffer resources for one GL view and queue redraw
+ * @get_widget: function returning the GtkWidget for the target view
+ * @samples: new MSAA sample count
+ */
+  static void
+msaa_update_view(GtkWidget *(*get_widget)(void), int samples)
+{
+  GtkWidget *w;
+  gl_view_state_t *state;
+
+  w = get_widget();
+  if( !w )
+    return;
+
+  state = gl_view_get_state(w);
+  if( !state )
+    return;
+
+  gtk_gl_area_make_current(GTK_GL_AREA(w));
+  gl_view_recreate_msaa(state, samples);
+  gtk_widget_queue_draw(w);
+
+} /* msaa_update_view() */
+
+/*-----------------------------------------------------------------------*/
+
+/** Set_MSAA_Samples() - Change MSAA sample count for all GL views
+ * @samples: new sample count (0, 2, 4, 8, or 16)
  */
   void
 Set_MSAA_Samples(int samples)
 {
-  static char *msaa_widget_names[] = {
-    "main_opengl_msaa_off",
-    NULL,
-    "main_opengl_msaa_2x",
-    NULL,
-    "main_opengl_msaa_4x",
-    NULL, NULL, NULL,
-    "main_opengl_msaa_8x",
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-    "main_opengl_msaa_16x"
-  };
-
   GtkWidget *widget;
-  gl_view_state_t *state;
+  int mi;
 
   rc_config.opengl_msaa_samples = samples;
 
-  /* Update menu selection */
-  if( samples <= 16 && msaa_widget_names[samples] )
+  /* Update menu selection via struct map linear scan */
+  for( mi = 0; mi < (int)(sizeof(msaa_widget_map) / sizeof(msaa_widget_map[0])); mi++ )
   {
-    widget = Builder_Get_Object(main_window_builder, msaa_widget_names[samples]);
-    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget), TRUE);
-  }
-
-  /* Recreate MSAA resources for structure view */
-  {
-    GtkWidget *w = opengl_structure_get_widget();
-    if( w )
+    if( msaa_widget_map[mi].samples == samples )
     {
-      state = gl_view_get_state(w);
-      if( state )
-      {
-        gtk_gl_area_make_current(GTK_GL_AREA(w));
-        gl_view_recreate_msaa(state, samples);
-        gtk_widget_queue_draw(w);
-      }
+      widget = Builder_Get_Object(main_window_builder,
+          (gchar *)msaa_widget_map[mi].name);
+      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget), TRUE);
+      break;
     }
   }
 
-  /* Recreate MSAA resources for radiation pattern view */
-  {
-    GtkWidget *w = opengl_rdpattern_get_widget();
-    if( w )
-    {
-      state = gl_view_get_state(w);
-      if( state )
-      {
-        gtk_gl_area_make_current(GTK_GL_AREA(w));
-        gl_view_recreate_msaa(state, samples);
-        gtk_widget_queue_draw(w);
-      }
-    }
-  }
+  msaa_update_view(opengl_structure_get_widget, samples);
+  msaa_update_view(opengl_rdpattern_get_widget, samples);
 
 } /* Set_MSAA_Samples() */
 

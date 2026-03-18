@@ -26,10 +26,7 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_setup_attribs()
- *
- * Configure vertex attribute pointers in VAO. Called once during prepare
- * when VBO data changes. VAO retains this state for subsequent renders.
+/** gl_view_setup_attribs() - Configure vertex attribute pointers in VAO
  */
   void
 gl_view_setup_attribs(
@@ -64,9 +61,12 @@ gl_view_setup_attribs(
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_draw_pass()
- *
- * Execute a rendering pass. VAO already has attrib config from prepare.
+/** gl_view_draw_pass() - Execute a rendering pass
+ * @state: view state containing geometry and matrices
+ * @shader: shader program to use for this pass
+ * @projection: projection matrix
+ * @view: view matrix
+ * @use_lighting: whether to enable lighting calculations
  */
   void
 gl_view_draw_pass(
@@ -100,9 +100,10 @@ typedef struct
 
 /*-----------------------------------------------------------------------*/
 
-/* on_render()
- *
- * GtkGLArea render signal handler
+/** on_render() - GtkGLArea render signal handler
+ * @area: GL area widget being rendered
+ * @context: GL context
+ * @user_data: pointer to gl_view_state_t
  */
   static gboolean
 on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
@@ -225,7 +226,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
   /* Transparent pass — sorted by priority then back-to-front depth */
   {
-    trans_item_t items[state->renderables->len];
+    trans_item_t items[MAX_RENDERABLES];
     int trans_count, j, k;
 
     trans_count = 0;
@@ -341,9 +342,9 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_render_connect()
- *
- * Wire the render signal handler to a GL area widget.
+/** gl_view_render_connect() - Wire the render signal handler to a GL area widget
+ * @gl_area: GtkGLArea widget to attach handler to
+ * @state: view state passed as user_data to on_render()
  */
   void
 gl_view_render_connect(GtkWidget *gl_area, gl_view_state_t *state)

@@ -39,6 +39,12 @@ typedef struct
 
 } lit_cylinder_mesh_t;
 
+/* Set all fields of a lit vertex (position, normal, color, alpha) */
+void set_lit_vertex(lit_color_point_t *v,
+    float px, float py, float pz,
+    float nx, float ny, float nz,
+    float cr, float cg, float cb, float ca);
+
 /* Calculate required vertex count for a cylinder with given segments */
 int opengl_cylinder_vertex_count(int segments);
 

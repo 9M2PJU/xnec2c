@@ -24,11 +24,20 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* set_lit_vertex()
- *
- * Set all fields of a lit vertex (position, normal, color)
+/** set_lit_vertex() - Set all fields of a lit vertex (position, normal, color)
+ * @v: vertex structure to populate
+ * @px: position x coordinate
+ * @py: position y coordinate
+ * @pz: position z coordinate
+ * @nx: normal x component
+ * @ny: normal y component
+ * @nz: normal z component
+ * @cr: color red component
+ * @cg: color green component
+ * @cb: color blue component
+ * @ca: color alpha component
  */
-  static inline void
+  void
 set_lit_vertex(lit_color_point_t *v,
     float px, float py, float pz,
     float nx, float ny, float nz,
@@ -49,11 +58,8 @@ set_lit_vertex(lit_color_point_t *v,
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_cylinder_vertex_count()
- *
- * Calculate required vertex count for a cylinder with given segments
- * Each segment has 2 triangles (6 vertices) for the side
- * Plus 2 triangles for end caps = segments * 3 vertices each
+/** opengl_cylinder_vertex_count() - Calculate required vertex count for a cylinder with given segments
+ * @segments: number of segments around cylinder circumference
  */
   int
 opengl_cylinder_vertex_count(int segments)
@@ -76,11 +82,14 @@ opengl_cylinder_vertex_count(int segments)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_lit_cylinder_append()
- *
- * Append lit cylinder triangles with computed normals to existing mesh buffer
- * Normals point radially outward from cylinder axis for side faces,
- * and along axis direction for end caps
+/** opengl_lit_cylinder_append() - Append lit cylinder triangles with computed normals to existing mesh buffer
+ * @mesh: mesh buffer to append to
+ * @start_vertex: starting vertex index in mesh
+ * @p1: cylinder bottom endpoint
+ * @p2: cylinder top endpoint
+ * @radius: cylinder radius
+ * @segments: number of segments around circumference
+ * @color: cylinder color
  */
   int
 opengl_lit_cylinder_append(
@@ -264,9 +273,8 @@ opengl_lit_cylinder_append(
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_lit_cylinder_free()
- *
- * Free lit cylinder mesh data
+/** opengl_lit_cylinder_free() - Free lit cylinder mesh data
+ * @mesh: mesh structure to free
  */
   void
 opengl_lit_cylinder_free(lit_cylinder_mesh_t *mesh)
