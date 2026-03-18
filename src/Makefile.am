@@ -125,7 +125,9 @@ xnec2c_SOURCES += \
   opengl-engine/opengl_gradient_overlay.c opengl-engine/opengl_gradient_overlay.h \
   opengl-engine/opengl_cylinder.c opengl-engine/opengl_cylinder.h \
   opengl/opengl_rdpattern.c opengl/opengl_rdpattern.h \
+  opengl/opengl_rdpattern_geometry.c opengl/opengl_rdpattern_geometry.h \
   opengl/opengl_structure.c opengl/opengl_structure.h \
+  opengl/opengl_structure_geometry.c opengl/opengl_structure_geometry.h \
   opengl/opengl_msaa.c opengl/opengl_msaa.h
 
 xnec2c_CPPFLAGS += $(CGLM_CFLAGS)

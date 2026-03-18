@@ -18,9 +18,10 @@
  */
 
 #include "opengl_rdpattern.h"
+#include "opengl_rdpattern_geometry.h"
 #include "opengl_structure.h"
+#include "opengl_structure_geometry.h"
 #include "../shared.h"
-#include "../draw.h"
 #include "../draw_radiation.h"
 
 #ifdef HAVE_OPENGL
@@ -31,21 +32,7 @@
 /* Default structure overlay extent as multiple of radiation pattern r_max */
 #define OVERLAY_DEFAULT_EXTENT 1.25f
 
-/* Triangle buffer for radiation pattern mesh */
-static color_triangle_t *rdpat_triangles = NULL;
-static int rdpat_triangle_count = 0;
-
-/* Near-field line buffer */
-static color_point_t *nf_lines = NULL;
-static int nf_line_count = 0;
-
-/* Poynting vector per-sample data */
-typedef struct { double x, y, z, r; } poynting_vec_t;
-static poynting_vec_t *pov = NULL;
-
-/* Generation counters for change detection */
-static unsigned int rdpat_ff_generation = 0;
-static unsigned int rdpat_nf_generation = 0;
+/* Last far-field NEC generation seen — staleness detection */
 static unsigned int rdpat_last_ff_gen = 0;
 
 /* Track translation state to detect changes */
@@ -79,267 +66,12 @@ static const gl_overlay_config_t rdpattern_overlay_config = {
   .attrib_count = 3
 };
 
-/*-----------------------------------------------------------------------*/
-
-/* nf_line_append()
- *
- * Fill two consecutive color_point_t entries as a line segment.
- * Returns line_idx advanced by 2.
- */
-  static int
-nf_line_append(
-    color_point_t *buf, int line_idx,
-    point_f_3d_t origin, point_f_3d_t endpoint, rgba_f_t color)
-{
-  buf[line_idx].point.x     = origin.x;
-  buf[line_idx].point.y     = origin.y;
-  buf[line_idx].point.z     = origin.z;
-  buf[line_idx].color.r     = color.r;
-  buf[line_idx].color.g     = color.g;
-  buf[line_idx].color.b     = color.b;
-  buf[line_idx].color.a     = color.a;
-
-  buf[line_idx + 1].point.x = endpoint.x;
-  buf[line_idx + 1].point.y = endpoint.y;
-  buf[line_idx + 1].point.z = endpoint.z;
-  buf[line_idx + 1].color   = buf[line_idx].color;
-
-  return( line_idx + 2 );
-}
 
 /*-----------------------------------------------------------------------*/
 
-/* nf_field_line()
- *
- * Build a single near-field vector line from origin, field components,
- * and magnitude.  Scales the vector by dr / magnitude and colors by
- * magnitude / max_val.  Returns line_idx advanced by 2.
- */
-  static int
-nf_field_line(
-    color_point_t *buf, int line_idx,
-    double px, double py, double pz,
-    double comp_x, double comp_y, double comp_z,
-    double dr, double magnitude, double max_val)
-{
-  double fscale;
-  double red, grn, blu;
-
-  point_f_3d_t org = { (float)px, (float)py, (float)pz };
-
-  fscale = dr / magnitude;
-  point_f_3d_t end = {
-    (float)(px + comp_x * fscale),
-    (float)(py + comp_y * fscale),
-    (float)(pz + comp_z * fscale)
-  };
-
-  Value_to_Color(&red, &grn, &blu, magnitude, max_val);
-  rgba_f_t col = { (float)red, (float)grn, (float)blu, 1.0f };
-
-  return( nf_line_append(buf, line_idx, org, end, col) );
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_rdpattern_generate_nf_lines()
- *
- * Generate line geometry for near field vectors
- */
-  static int
-opengl_rdpattern_generate_nf_lines(void)
-{
-  int idx, npts, line_idx;
-  int total_lines;
-  double dr;
-  double pov_max;
-  size_t mreq;
-
-  if( isFlagClear(ENABLE_NEAREH) || !near_field.valid )
-    return( -1 );
-
-  npts = fpat.nrx * fpat.nry * fpat.nrz;
-
-  /* Count total lines needed for all enabled field types */
-  total_lines = 0;
-  if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
-    total_lines += npts;
-  if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    total_lines += npts;
-  if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    total_lines += npts;
-
-  if( total_lines == 0 )
-    return( -1 );
-
-  /* Normalization scale factor */
-  if( fpat.near )
-    dr = (double)fpat.dxnr;
-  else
-    dr = sqrt(
-        (double)fpat.dxnr * (double)fpat.dxnr +
-        (double)fpat.dynr * (double)fpat.dynr +
-        (double)fpat.dznr * (double)fpat.dznr ) / 1.75;
-
-  /* Allocate line buffer for all enabled fields */
-  mreq = (size_t)total_lines * 2 * sizeof(color_point_t);
-  mem_realloc((void **)&nf_lines, mreq, __LOCATION__);
-
-  /* Calculate Poynting vector if enabled */
-  pov_max = 0.0;
-  if( isFlagSet(DRAW_POYNTING) &&
-      (fpat.nfeh & NEAR_EFIELD) &&
-      (fpat.nfeh & NEAR_HFIELD) )
-  {
-    int ipv;
-
-    mreq = (size_t)npts * sizeof(poynting_vec_t);
-    mem_realloc((void **)&pov, mreq, __LOCATION__);
-
-    for( ipv = 0; ipv < npts; ipv++ )
-    {
-      /* Poynting vector: E x H */
-      pov[ipv].x =
-        near_field.ery[ipv] * near_field.hrz[ipv] -
-        near_field.hry[ipv] * near_field.erz[ipv];
-      pov[ipv].y =
-        near_field.erz[ipv] * near_field.hrx[ipv] -
-        near_field.hrz[ipv] * near_field.erx[ipv];
-      pov[ipv].z =
-        near_field.erx[ipv] * near_field.hry[ipv] -
-        near_field.hrx[ipv] * near_field.ery[ipv];
-      pov[ipv].r = sqrt(
-          pov[ipv].x * pov[ipv].x +
-          pov[ipv].y * pov[ipv].y +
-          pov[ipv].z * pov[ipv].z );
-
-      if( pov_max < pov[ipv].r )
-        pov_max = pov[ipv].r;
-    }
-  }
-
-  /* Generate line vertices for all enabled field types */
-  line_idx = 0;
-
-  for( idx = 0; idx < npts; idx++ )
-  {
-    /* Draw Near E Field */
-    if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
-      line_idx = nf_field_line(nf_lines, line_idx,
-          near_field.px[idx], near_field.py[idx], near_field.pz[idx],
-          near_field.erx[idx], near_field.ery[idx], near_field.erz[idx],
-          dr, near_field.er[idx], near_field.max_er);
-
-    /* Draw Near H Field */
-    if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-      line_idx = nf_field_line(nf_lines, line_idx,
-          near_field.px[idx], near_field.py[idx], near_field.pz[idx],
-          near_field.hrx[idx], near_field.hry[idx], near_field.hrz[idx],
-          dr, near_field.hr[idx], near_field.max_hr);
-
-    /* Draw Poynting Vector */
-    if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-      line_idx = nf_field_line(nf_lines, line_idx,
-          near_field.px[idx], near_field.py[idx], near_field.pz[idx],
-          pov[idx].x, pov[idx].y, pov[idx].z,
-          dr, pov[idx].r, pov_max);
-  }
-
-  nf_line_count = total_lines;
-  rdpat_nf_generation++;
-
-  return( nf_line_count );
-
-} /* opengl_rdpattern_generate_nf_lines() */
-
-/*-----------------------------------------------------------------------*/
-
-/* fill_tri_vertex()
- *
- * Fill one vertex slot of a color_triangle_t from a point_3d_t.
- * Color is derived from the normalized (r - r_min) / r_range ratio.
- */
-  static void
-fill_tri_vertex(
-    color_triangle_t *tri, int vi,
-    point_3d_t *pt, double r_min, double r_range)
-{
-  double red, grn, blu;
-
-  tri->cp[vi].point.x = (float)pt->x;
-  tri->cp[vi].point.y = (float)pt->y;
-  tri->cp[vi].point.z = (float)pt->z;
-  tri->cp[vi].point.r = (float)pt->r;
-
-  Value_to_Color(&red, &grn, &blu, (pt->r - r_min) / r_range, 1.0);
-  tri->cp[vi].color.r = (float)red;
-  tri->cp[vi].color.g = (float)grn;
-  tri->cp[vi].color.b = (float)blu;
-  tri->cp[vi].color.a = 1.0f;
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* opengl_rdpattern_generate_triangles()
- *
- * Tessellate point_3d buffer into colored triangles
- */
-  static int
-opengl_rdpattern_generate_triangles(
-    point_3d_t *points, int nth, int nph,
-    double r_min, double r_range)
-{
-  int nph_idx, nth_idx, tri_idx;
-  int p0, p1, p2, p3;
-  size_t mreq;
-
-  if( !points || nth < 2 || nph < 1 )
-    return( -1 );
-
-  /* Calculate triangle count: 2 per grid cell */
-  rdpat_triangle_count = 2 * nph * (nth - 1);
-
-  mreq = (size_t)rdpat_triangle_count * sizeof(color_triangle_t);
-  mem_realloc((void **)&rdpat_triangles, mreq, __LOCATION__);
-
-  tri_idx = 0;
-
-  /* Generate triangles for each grid cell */
-  for( nph_idx = 0; nph_idx < nph; nph_idx++ )
-  {
-    for( nth_idx = 0; nth_idx < nth - 1; nth_idx++ )
-    {
-      /* Calculate vertex indices with phi wrapping */
-      p0 = nth_idx + nph_idx * nth;
-      p1 = nth_idx + ((nph_idx + 1) % nph) * nth;
-      p2 = (nth_idx + 1) + ((nph_idx + 1) % nph) * nth;
-      p3 = (nth_idx + 1) + nph_idx * nth;
-
-      /* Triangle A: p0 -> p1 -> p2 */
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 0, &points[p0], r_min, r_range);
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 1, &points[p1], r_min, r_range);
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 2, &points[p2], r_min, r_range);
-      tri_idx++;
-
-      /* Triangle B: p0 -> p2 -> p3 */
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 0, &points[p0], r_min, r_range);
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 1, &points[p2], r_min, r_range);
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 2, &points[p3], r_min, r_range);
-      tri_idx++;
-
-    } /* for( nth_idx < nth - 1 ) */
-  } /* for( nph_idx < nph ) */
-
-  return( rdpat_triangle_count );
-
-} /* opengl_rdpattern_generate_triangles() */
-
-/*-----------------------------------------------------------------------*/
-
-/* rdpattern_overlay_base_scale()
- *
- * Calculate the base scale factor mapping structure coordinates
- * to radiation pattern coordinate space
+/** rdpattern_overlay_base_scale() - Calculate base scale factor mapping structure to rdpattern coordinate space
+ * @r_max: radiation pattern maximum radius
+ * @view_scale: structure geometry extent
  */
   static float
 rdpattern_overlay_base_scale(float r_max, float view_scale)
@@ -352,13 +84,12 @@ rdpattern_overlay_base_scale(float r_max, float view_scale)
 
 /*-----------------------------------------------------------------------*/
 
-/* rdpattern_init_empty_scene()
+/** rdpattern_init_empty_scene() - Populate a minimal scene with no geometry
+ * @out: scene content to initialize
+ * @zoom: zoom factor to set in the scene
  *
- * Populate a minimal scene with no geometry so the render loop clears
- * the framebuffer.  Caller sets status_message after return.
- *
- * Only non-zero fields are set here; the caller (on_render in
- * opengl_view_render.c) provides the struct zero-initialized via {0}.
+ * Caller sets status_message after return.  Only non-zero fields are set;
+ * caller provides the struct zero-initialized via {0}.
  */
   static void
 rdpattern_init_empty_scene(gl_view_content_t *out, float zoom)
@@ -412,6 +143,8 @@ rdpattern_scene_generate(gl_view_content_t *out)
   if( isFlagSet(DRAW_EHFIELD) && isFlagSet(ENABLE_NEAREH) && near_field.valid )
   {
     int line_count;
+    int nf_count;
+    color_point_t *nf_buf;
 
     line_count = opengl_rdpattern_generate_nf_lines();
     if( line_count <= 0 )
@@ -422,8 +155,9 @@ rdpattern_scene_generate(gl_view_content_t *out)
     /* Near-field positions directly overlap structure in same coordinate space;
      * no translation needed (excitation already aligned) */
 
-    out->vertices = nf_lines;
-    out->vertex_count = nf_line_count * 2;
+    nf_buf = opengl_rdpattern_get_nf_lines(&nf_count);
+    out->vertices = nf_buf;
+    out->vertex_count = nf_count * 2;
     out->vertex_stride = (int)sizeof(color_point_t);
     out->draw_mode = GL_LINES;
     out->r_max = r_max;
@@ -431,7 +165,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
     out->zoom = zoom;
     out->model_scale = 1.0f;
     out->show_gradient = FALSE;
-    out->generation = rdpat_nf_generation;
+    out->generation = opengl_rdpattern_get_nf_generation();
 
     return( TRUE );
   }
@@ -524,17 +258,21 @@ rdpattern_scene_generate(gl_view_content_t *out)
       if( tri_count <= 0 )
         return( FALSE );
 
-      rdpat_ff_generation++;
       rdpat_last_ff_gen = current_gen;
       rdpat_last_translate_state = translate_to_excitation;
       rdpat_last_ovl_scale_adj = rdpat_ovl_scale_adj;
     }
 
-    if( rdpat_triangle_count == 0 )
-      return( FALSE );
+    {
+      int tri_count;
+      color_triangle_t *tri_buf = opengl_rdpattern_get_triangles(&tri_count);
 
-    out->vertices = rdpat_triangles;
-    out->vertex_count = rdpat_triangle_count * 3;
+      if( tri_count == 0 )
+        return( FALSE );
+
+      out->vertices = tri_buf;
+      out->vertex_count = tri_count * 3;
+    }
     out->vertex_stride = (int)sizeof(color_point_t);
     out->draw_mode = GL_TRIANGLES;
 
@@ -547,7 +285,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
     out->zoom = zoom;
     out->model_scale = 1.0f;
     out->show_gradient = isFlagSet(DRAW_GAIN) && rc_config.rdpattern_gradient_key;
-    out->generation = rdpat_ff_generation;
+    out->generation = opengl_rdpattern_get_ff_generation();
 
     return( TRUE );
   }
@@ -562,9 +300,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
 
 /*-----------------------------------------------------------------------*/
 
-/* rdpattern_scene_post_render()
- *
- * Scene provider post-render callback
+/** rdpattern_scene_post_render() - Scene provider post-render callback
  */
   static void
 rdpattern_scene_post_render(void)
@@ -574,20 +310,12 @@ rdpattern_scene_post_render(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* rdpattern_scene_cleanup()
- *
- * Scene provider cleanup callback
+/** rdpattern_scene_cleanup() - Scene provider cleanup callback
  */
   static void
 rdpattern_scene_cleanup(void)
 {
-  free_ptr((void **)&rdpat_triangles);
-  rdpat_triangle_count = 0;
-
-  free_ptr((void **)&nf_lines);
-  nf_line_count = 0;
-
-  free_ptr((void **)&pov);
+  opengl_rdpattern_geometry_cleanup();
 
   free_ptr((void **)&rdpat_translated_points);
   rdpat_translated_capacity = 0;
@@ -595,9 +323,10 @@ rdpattern_scene_cleanup(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* rdpattern_on_shift_scroll()
- *
- * Shift+scroll handler for adjusting overlay structure scale
+/** rdpattern_on_shift_scroll() - Shift+scroll handler for adjusting overlay structure scale
+ * @widget: source scroll widget
+ * @event: scroll event
+ * @view_state: pointer to gl_view_state_t
  */
   static gboolean
 rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer view_state)
@@ -637,9 +366,10 @@ rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer vie
 
 /*-----------------------------------------------------------------------*/
 
-/* rdpattern_overlay_generate()
+/** rdpattern_overlay_generate() - Overlay provider generate callback
+ * @primary: primary scene content (rdpattern geometry)
+ * @out: overlay scene content to populate
  *
- * Overlay provider generate callback.
  * Returns structure geometry for overlay when OVERLAY_STRUCT is set.
  * Computes physical scale ratio from structure to radiation pattern.
  */
@@ -696,10 +426,11 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
 
 /*-----------------------------------------------------------------------*/
 
-/* rdpattern_axes_is_active()
+/** rdpattern_axes_is_active() - Report whether axes renderable should be drawn
+ * @ctx: unused context pointer
  *
- * Axes are meaningful only when a pattern is rendered — hide them
- * when neither gain nor near-field is selected.
+ * Axes are meaningful only when a pattern is rendered — hidden when
+ * neither gain nor near-field is selected.
  */
   static gboolean
 rdpattern_axes_is_active(void *ctx)
@@ -735,9 +466,10 @@ static gl_scene_provider_t rdpattern_scene_provider = {
 
 /*-----------------------------------------------------------------------*/
 
-/* rdpattern_arcball_changed_cb()
+/** rdpattern_arcball_changed_cb() - Arcball change callback for constrained rotation mode
+ * @ab: arcball that changed
+ * @_user_data: unused
  *
- * Arcball change callback for constrained rotation mode.
  * Syncs arcball WR/WI angles back to rdpattern_proj_params and
  * spin button display text when COMMON_PROJECTION is off.
  */
@@ -767,9 +499,7 @@ rdpattern_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_create_widget_impl()
- *
- * Create the OpenGL radiation pattern widget using the generic view engine
+/** opengl_rdpattern_create_widget_impl() - Create the OpenGL radiation pattern widget using the generic view engine
  */
   static GtkWidget*
 opengl_rdpattern_create_widget_impl(void)
@@ -801,9 +531,7 @@ opengl_rdpattern_create_widget_impl(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_get_arcball()
- *
- * Return reference to rdpattern arcball
+/** opengl_rdpattern_get_arcball() - Return reference to rdpattern arcball
  */
   arcball_state_t*
 opengl_rdpattern_get_arcball(void)
@@ -813,9 +541,7 @@ opengl_rdpattern_get_arcball(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_cleanup_impl()
- *
- * Free resources
+/** opengl_rdpattern_cleanup_impl() - Free rdpattern GL resources
  */
   static void
 opengl_rdpattern_cleanup_impl(void)
@@ -836,9 +562,7 @@ opengl_rdpattern_cleanup_impl(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_create_widget()
- *
- * Public API - create radiation pattern GL widget
+/** opengl_rdpattern_create_widget() - Public API: create radiation pattern GL widget
  */
   GtkWidget*
 opengl_rdpattern_create_widget(void)
@@ -852,9 +576,7 @@ opengl_rdpattern_create_widget(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_cleanup()
- *
- * Public API - cleanup resources
+/** opengl_rdpattern_cleanup() - Public API: cleanup rdpattern resources
  */
   void
 opengl_rdpattern_cleanup(void)
@@ -866,9 +588,7 @@ opengl_rdpattern_cleanup(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_get_widget()
- *
- * Public API - return rdpattern GL widget
+/** opengl_rdpattern_get_widget() - Public API: return rdpattern GL widget
  */
   GtkWidget*
 opengl_rdpattern_get_widget(void)
@@ -882,9 +602,7 @@ opengl_rdpattern_get_widget(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_rdpattern_queue_draw()
- *
- * Public API - queue redraw of OpenGL radiation pattern widget
+/** opengl_rdpattern_queue_draw() - Public API: queue redraw of OpenGL radiation pattern widget
  */
   void
 opengl_rdpattern_queue_draw(void)
