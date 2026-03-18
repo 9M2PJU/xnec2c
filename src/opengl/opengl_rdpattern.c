@@ -374,7 +374,7 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
   const structure_overlay_data_t *geom;
   static gboolean tooltip_shown = FALSE;
 
-  if( isFlagClear(OVERLAY_STRUCT) || data.n <= 0 || !primary )
+  if( isFlagClear(OVERLAY_STRUCT) || (data.n <= 0 && data.m <= 0) || !primary )
     return( FALSE );
 
   /* Show tooltip on first activation */

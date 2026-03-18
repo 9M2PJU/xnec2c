@@ -89,6 +89,75 @@ get_segment_magnitude(int idx, structure_draw_mode_t mode)
 
 /*-----------------------------------------------------------------------*/
 
+/** get_patch_current_magnitude() - RSS magnitude of patch surface currents
+ * @idx: patch index (0-based into data.m)
+ *
+ * Projects the xyz current vector onto the patch t1/t2 tangent directions
+ * and returns the root-sum-square magnitude.
+ */
+  static double
+get_patch_current_magnitude(int idx)
+{
+  int ci = data.n + idx * 3;
+  complex double cur_x = crnt.cur[ci];
+  complex double cur_y = crnt.cur[ci + 1];
+  complex double cur_z = crnt.cur[ci + 2];
+  double ct1m = cabs(cur_x * data.t1x[idx] + cur_y * data.t1y[idx] + cur_z * data.t1z[idx]);
+  double ct2m = cabs(cur_x * data.t2x[idx] + cur_y * data.t2y[idx] + cur_z * data.t2z[idx]);
+
+  return( sqrt(ct1m * ct1m + ct2m * ct2m) );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** get_patch_normal() - Surface normal via cross product of t1 and t2
+ * @idx: patch index (0-based into data.m)
+ */
+  static void
+get_patch_normal(int idx, float *nx, float *ny, float *nz)
+{
+  *nx = (float)(data.t1y[idx] * data.t2z[idx] - data.t1z[idx] * data.t2y[idx]);
+  *ny = (float)(data.t1z[idx] * data.t2x[idx] - data.t1x[idx] * data.t2z[idx]);
+  *nz = (float)(data.t1x[idx] * data.t2y[idx] - data.t1y[idx] * data.t2x[idx]);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** get_patch_color() - Determine patch display color based on draw mode
+ * @idx: patch index (0-based into data.m)
+ * @mode: current structure draw mode
+ * @cmax: maximum current magnitude for color scaling
+ */
+  static void
+get_patch_color(int idx, structure_draw_mode_t mode, double cmax,
+    float *out_r, float *out_g, float *out_b)
+{
+  if( mode == STRUCTURE_DRAW_CURRENTS && cmax > 0.0 && crnt.valid && crnt.cur != NULL )
+  {
+    double mag = get_patch_current_magnitude(idx);
+    double red, grn, blu;
+
+    Value_to_Color(&red, &grn, &blu, mag, cmax);
+    *out_r = (float)red;
+    *out_g = (float)grn;
+    *out_b = (float)blu;
+  }
+  else if( mode == STRUCTURE_DRAW_CHARGES )
+  {
+    *out_r = 0.5f;
+    *out_g = 0.5f;
+    *out_b = 0.5f;
+  }
+  else
+  {
+    *out_r = 0.2f;
+    *out_g = 0.4f;
+    *out_b = 0.9f;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
 /** get_segment_color() - Determine color for a segment based on type and draw mode
  * @idx: segment index
  * @mode: current draw mode (geometry, currents, or charges)
@@ -212,7 +281,7 @@ opengl_structure_generate_geometry(
   float r, g, b;
   gboolean line_mode;
 
-  if( data.n <= 0 )
+  if( data.n <= 0 && data.m <= 0 )
   {
     structure_vertex_count = 0;
     structure_view_scale = 1.0f;
@@ -222,16 +291,17 @@ opengl_structure_generate_geometry(
 
   line_mode = (cylinder_radius_scale < CYLINDER_SCALE_LINE_THRESHOLD);
 
-  /* Vertex budget depends on rendering mode */
+  /* Vertex budget depends on rendering mode.
+   * Patches: line mode = 4 verts (cross), cylinder mode = 6 verts (2 triangles). */
   if( line_mode )
-    total_vertices = data.n * 2;
+    total_vertices = data.n * 2 + data.m * 4;
   else
-    total_vertices = data.n * opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS);
+    total_vertices = data.n * opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS) + data.m * 6;
 
   mreq = (size_t)total_vertices * sizeof(lit_color_point_t);
   mem_realloc((void **)&structure_vertices, mreq, __LOCATION__);
 
-  /* Find max magnitude for color scaling */
+  /* Find max magnitude for color scaling (wires + patch currents) */
   cmax = 0.0;
   if( (mode == STRUCTURE_DRAW_CURRENTS || mode == STRUCTURE_DRAW_CHARGES) && crnt.valid )
   {
@@ -240,6 +310,18 @@ opengl_structure_generate_geometry(
       double mag = get_segment_magnitude(idx, mode);
       if( mag > cmax )
         cmax = mag;
+    }
+
+    /* Patch current magnitudes (currents mode only; no patch charge data) */
+    if( mode == STRUCTURE_DRAW_CURRENTS && crnt.cur != NULL )
+    {
+      for( idx = 0; idx < data.m; idx++ )
+      {
+        double mag = get_patch_current_magnitude(idx);
+
+        if( mag > cmax )
+          cmax = mag;
+      }
     }
   }
 
@@ -261,6 +343,32 @@ opengl_structure_generate_geometry(
 
     if( r2 > r_max )
       r_max = r2;
+  }
+
+  /* Extend r_max to include patch corners */
+  for( idx = 0; idx < data.m; idx++ )
+  {
+    double s = sqrt(data.pbi[idx]) / 2.0;
+    double dx1 = s * data.t1x[idx];
+    double dy1 = s * data.t1y[idx];
+    double dz1 = s * data.t1z[idx];
+    double dx2 = s * data.t2x[idx];
+    double dy2 = s * data.t2y[idx];
+    double dz2 = s * data.t2z[idx];
+    int corner;
+
+    for( corner = 0; corner < 4; corner++ )
+    {
+      double sx1 = (corner & 1) ? 1.0 : -1.0;
+      double sx2 = (corner & 2) ? 1.0 : -1.0;
+      double cpx = data.px[idx] + sx1 * dx1 + sx2 * dx2;
+      double cpy = data.py[idx] + sx1 * dy1 + sx2 * dy2;
+      double cpz = data.pz[idx] + sx1 * dz1 + sx2 * dz2;
+      double rd = sqrt(cpx * cpx + cpy * cpy + cpz * cpz);
+
+      if( rd > r_max )
+        r_max = rd;
+    }
   }
 
   if( r_max < 0.001 )
@@ -334,6 +442,45 @@ opengl_structure_generate_geometry(
       vidx++;
     }
 
+    /* Patch crosses in line mode: 2 perpendicular lines per patch */
+    for( idx = 0; idx < data.m; idx++ )
+    {
+      double s = sqrt(data.pbi[idx]) / 2.0;
+      float nx, ny, nz;
+      float p_r, p_g, p_b;
+
+      get_patch_normal(idx, &nx, &ny, &nz);
+      get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
+
+      /* Line along t1 axis */
+      set_lit_vertex(&structure_vertices[vidx],
+          (float)(data.px[idx] - s * data.t1x[idx]),
+          (float)(data.py[idx] - s * data.t1y[idx]),
+          (float)(data.pz[idx] - s * data.t1z[idx]),
+          nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
+      set_lit_vertex(&structure_vertices[vidx],
+          (float)(data.px[idx] + s * data.t1x[idx]),
+          (float)(data.py[idx] + s * data.t1y[idx]),
+          (float)(data.pz[idx] + s * data.t1z[idx]),
+          nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
+
+      /* Line along t2 axis */
+      set_lit_vertex(&structure_vertices[vidx],
+          (float)(data.px[idx] - s * data.t2x[idx]),
+          (float)(data.py[idx] - s * data.t2y[idx]),
+          (float)(data.pz[idx] - s * data.t2z[idx]),
+          nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
+      set_lit_vertex(&structure_vertices[vidx],
+          (float)(data.px[idx] + s * data.t2x[idx]),
+          (float)(data.py[idx] + s * data.t2y[idx]),
+          (float)(data.pz[idx] + s * data.t2z[idx]),
+          nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
+    }
+
     structure_draw_mode = GL_LINES;
   }
   else
@@ -369,6 +516,55 @@ opengl_structure_generate_geometry(
         vidx = opengl_lit_cylinder_append(&mesh, vidx,
             &seg_p1, &seg_p2, radius, STRUCTURE_CYLINDER_SEGMENTS, &seg_color);
       }
+    }
+
+    /* Patch quads in cylinder mode: 2 triangles per patch (flat colored) */
+    for( idx = 0; idx < data.m; idx++ )
+    {
+      double s = sqrt(data.pbi[idx]) / 2.0;
+      float nx, ny, nz;
+      float p_r, p_g, p_b;
+      float c0x, c0y, c0z, c1x, c1y, c1z, c2x, c2y, c2z, c3x, c3y, c3z;
+
+      get_patch_normal(idx, &nx, &ny, &nz);
+
+      /* Quad corners */
+      c0x = (float)(data.px[idx] + s * data.t1x[idx] + s * data.t2x[idx]);
+      c0y = (float)(data.py[idx] + s * data.t1y[idx] + s * data.t2y[idx]);
+      c0z = (float)(data.pz[idx] + s * data.t1z[idx] + s * data.t2z[idx]);
+      c1x = (float)(data.px[idx] - s * data.t1x[idx] + s * data.t2x[idx]);
+      c1y = (float)(data.py[idx] - s * data.t1y[idx] + s * data.t2y[idx]);
+      c1z = (float)(data.pz[idx] - s * data.t1z[idx] + s * data.t2z[idx]);
+      c2x = (float)(data.px[idx] - s * data.t1x[idx] - s * data.t2x[idx]);
+      c2y = (float)(data.py[idx] - s * data.t1y[idx] - s * data.t2y[idx]);
+      c2z = (float)(data.pz[idx] - s * data.t1z[idx] - s * data.t2z[idx]);
+      c3x = (float)(data.px[idx] + s * data.t1x[idx] - s * data.t2x[idx]);
+      c3y = (float)(data.py[idx] + s * data.t1y[idx] - s * data.t2y[idx]);
+      c3z = (float)(data.pz[idx] + s * data.t1z[idx] - s * data.t2z[idx]);
+
+      get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
+
+      /* Triangle 1: c0, c1, c2 */
+      set_lit_vertex(&structure_vertices[vidx],
+          c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
+      set_lit_vertex(&structure_vertices[vidx],
+          c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
+      set_lit_vertex(&structure_vertices[vidx],
+          c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
+
+      /* Triangle 2: c0, c2, c3 */
+      set_lit_vertex(&structure_vertices[vidx],
+          c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
+      set_lit_vertex(&structure_vertices[vidx],
+          c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
+      set_lit_vertex(&structure_vertices[vidx],
+          c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      vidx++;
     }
 
     structure_draw_mode = GL_TRIANGLES;

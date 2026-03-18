@@ -251,6 +251,9 @@ static gl_scene_provider_t structure_scene_provider = {
   .generate                 = structure_scene_generate,
   .post_render              = NULL,
   .cleanup                  = structure_scene_cleanup,
+  .overlay_config           = NULL,
+  .overlay_generate         = NULL,
+  .overlay_cleanup          = NULL,
   .on_ctrl_scroll           = opengl_structure_on_ctrl_scroll,
   .ground_plane_is_active   = opengl_structure_ground_plane_is_active
 };
