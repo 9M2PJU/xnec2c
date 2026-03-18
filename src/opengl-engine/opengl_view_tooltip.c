@@ -18,6 +18,7 @@
  */
 
 #include "opengl_view.h"
+#include "opengl_view_tooltip.h"
 #include "opengl_cairo_overlay.h"
 
 #ifdef HAVE_OPENGL

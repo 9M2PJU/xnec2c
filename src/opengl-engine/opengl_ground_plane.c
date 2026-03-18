@@ -24,6 +24,7 @@
 
 /*-----------------------------------------------------------------------*/
 
+#define GROUND_PLANE_EXTENT 100.0f
 #define GROUND_PLANE_VERTICES 6
 
 static const rgba_f_t ground_color = {0.4f, 0.7f, 0.3f, 1.0f};

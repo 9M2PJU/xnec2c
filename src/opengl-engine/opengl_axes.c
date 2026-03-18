@@ -147,6 +147,7 @@ opengl_axes_new(void)
   }
 
   axes->line_mvp_loc = glGetUniformLocation(axes->line_shader.program, "mvp");
+  axes->line_u_alpha_loc = glGetUniformLocation(axes->line_shader.program, "u_alpha");
   axes->line_pos_loc = glGetAttribLocation(axes->line_shader.program, "position");
   axes->line_col_loc = glGetAttribLocation(axes->line_shader.program, "color");
 
@@ -360,7 +361,6 @@ opengl_axes_render(void *ctx, mat4 mvp, float _alpha)
 {
   opengl_axes_t *axes = ctx;
 
-  /* Axes use fixed-color shaders with no alpha uniform */
   (void)_alpha;
 
   if( !axes || !axes->initialized || axes->r_max == 0.0f )
@@ -369,6 +369,7 @@ opengl_axes_render(void *ctx, mat4 mvp, float _alpha)
   /* Render axis lines */
   glUseProgram(axes->line_shader.program);
   glUniformMatrix4fv(axes->line_mvp_loc, 1, GL_FALSE, (float*)mvp);
+  glUniform1f(axes->line_u_alpha_loc, 1.0f);
 
   glBindVertexArray(axes->lines_vao);
   glDrawArrays(GL_LINES, 0, NUM_AXES * 2);

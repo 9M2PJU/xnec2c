@@ -25,8 +25,6 @@
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"
 
-#define GROUND_PLANE_EXTENT 100.0f
-
 typedef struct
 {
   GLuint vao;

@@ -62,11 +62,12 @@ gl_view_setup_attribs(
 /*-----------------------------------------------------------------------*/
 
 /** gl_view_draw_pass() - Execute a rendering pass
- * @state: view state containing geometry and matrices
- * @shader: shader program to use for this pass
- * @projection: projection matrix
- * @view: view matrix
- * @use_lighting: whether to enable lighting calculations
+ * @shader_program: GL shader program handle
+ * @mvp_location: uniform location for the MVP matrix
+ * @mvp: model-view-projection matrix
+ * @vao: vertex array object to draw
+ * @draw_mode: GL primitive type (GL_TRIANGLES, GL_LINES, etc.)
+ * @vertex_count: number of vertices to draw
  */
   void
 gl_view_draw_pass(

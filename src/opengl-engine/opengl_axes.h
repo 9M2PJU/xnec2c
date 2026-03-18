@@ -31,6 +31,7 @@ typedef struct
   GLuint lines_vbo;
   gl_shader_t line_shader;
   GLint line_mvp_loc;
+  GLint line_u_alpha_loc;
   GLint line_pos_loc;
   GLint line_col_loc;
 
