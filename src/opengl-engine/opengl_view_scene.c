@@ -45,9 +45,9 @@ static void gl_scene_free(void *ctx);
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_scene_prepare()
- *
- * Upload scene vertex data on generation change
+/** gl_scene_prepare() - Upload scene vertex data on generation change
+ * @ctx: scene context
+ * @r_max: unused
  */
   static void
 gl_scene_prepare(void *ctx, float r_max)
@@ -85,9 +85,10 @@ gl_scene_prepare(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_scene_render()
- *
- * Render scene geometry using generic draw pass
+/** gl_scene_render() - Render scene geometry using generic draw pass
+ * @ctx: scene context
+ * @mvp: model-view-projection matrix
+ * @alpha: alpha multiplier
  */
   static void
 gl_scene_render(void *ctx, mat4 mvp, float alpha)
@@ -111,9 +112,8 @@ gl_scene_render(void *ctx, mat4 mvp, float alpha)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_scene_is_active()
- *
- * Returns TRUE when scene has vertex data to render
+/** gl_scene_is_active() - Returns TRUE when scene has vertex data to render
+ * @ctx: scene context
  */
   static gboolean
 gl_scene_is_active(void *ctx)
@@ -126,11 +126,11 @@ gl_scene_is_active(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_scene_far_extent()
+/** gl_scene_far_extent() - Returns the scene geometry extent for clip plane calculation
+ * @ctx: scene context
+ * @r_max: default extent
  *
- * Returns the scene geometry extent for clip plane calculation.
- * Uses clip_extent when set (accounts for translation offsets),
- * falls back to r_max.
+ * Uses clip_extent when set (accounts for translation offsets), falls back to r_max.
  */
   static float
 gl_scene_far_extent(void *ctx, float r_max)
@@ -152,9 +152,8 @@ gl_scene_far_extent(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_scene_free()
- *
- * Free scene rendering context and GL resources
+/** gl_scene_free() - Free scene rendering context and GL resources
+ * @ctx: scene context
  */
   static void
 gl_scene_free(void *ctx)
@@ -182,9 +181,8 @@ gl_scene_free(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_scene_renderable_new()
- *
- * Create scene renderable for primary geometry rendering
+/** gl_view_scene_renderable_new() - Create scene renderable for primary geometry rendering
+ * @state: view state
  */
   gl_renderable_t
 gl_view_scene_renderable_new(gl_view_state_t *state)

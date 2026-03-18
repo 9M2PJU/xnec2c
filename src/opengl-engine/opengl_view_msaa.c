@@ -24,10 +24,8 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_msaa_free()
- *
- * Release MSAA framebuffer, color, and depth renderbuffer resources.
- * Zeroes the corresponding fields in state.
+/** gl_view_msaa_free() - Release MSAA framebuffer, color, and depth renderbuffer resources
+ * @state: view state containing MSAA resources to free
  */
   void
 gl_view_msaa_free(gl_view_state_t *state)
@@ -59,9 +57,9 @@ gl_view_msaa_free(gl_view_state_t *state)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_recreate_msaa()
- *
- * Recreate MSAA resources without destroying GL widget
+/** gl_view_recreate_msaa() - Recreate MSAA resources without destroying GL widget
+ * @state: view state to update with new MSAA resources
+ * @requested_samples: number of MSAA samples to use (clamped to hardware limit)
  */
   void
 gl_view_recreate_msaa(gl_view_state_t *state, int requested_samples)

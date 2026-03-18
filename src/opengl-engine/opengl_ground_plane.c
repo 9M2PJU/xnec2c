@@ -31,9 +31,10 @@ static const point_f_3d_t ground_normal = {0.0f, 0.0f, 1.0f};
 
 /*-----------------------------------------------------------------------*/
 
-/* generate_ground_plane_vertices()
+/** generate_ground_plane_vertices() - Create two triangles forming a quad in the XY plane at Z=0
+ * @vertices: output vertex buffer (must hold GROUND_PLANE_VERTICES entries)
+ * @scale: uniform scale factor applied to GROUND_PLANE_EXTENT
  *
- * Create two triangles forming a quad in the XY plane at Z=0.
  * All vertices have upward normals and green color.
  */
   static void
@@ -63,10 +64,10 @@ generate_ground_plane_vertices(lit_color_point_t *vertices, float scale)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_ground_plane_new()
+/** opengl_ground_plane_new() - Allocate and initialize ground plane rendering context
  *
- * Allocate and initialize ground plane rendering context with VAO, VBO,
- * and checkerboard shader
+ * Sets up VAO, VBO, and checkerboard shader.
+ * Returns allocated context, or NULL on shader load failure.
  */
   opengl_ground_plane_t*
 opengl_ground_plane_new(void)
@@ -142,9 +143,8 @@ opengl_ground_plane_new(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_ground_plane_free()
- *
- * Free ground plane GL resources and allocated memory
+/** opengl_ground_plane_free() - Free ground plane GL resources and allocated memory
+ * @ctx: pointer to opengl_ground_plane_t returned by opengl_ground_plane_new()
  */
   void
 opengl_ground_plane_free(void *ctx)
@@ -167,10 +167,11 @@ opengl_ground_plane_free(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_ground_plane_prepare()
+/** opengl_ground_plane_prepare() - Regenerate ground plane vertices scaled to r_max
+ * @ctx: pointer to opengl_ground_plane_t
+ * @r_max: scene geometry extent used to scale the ground plane
  *
- * Regenerate ground plane vertices scaled to r_max.
- * Skips update if scale unchanged.
+ * Skips VBO update if scale is unchanged since last call.
  */
   void
 opengl_ground_plane_prepare(void *ctx, float r_max)
@@ -199,9 +200,10 @@ opengl_ground_plane_prepare(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_ground_plane_far_extent()
+/** opengl_ground_plane_far_extent() - Return spatial extent for clip plane calculation
+ * @ctx: pointer to opengl_ground_plane_t (unused)
+ * @r_max: scene geometry extent
  *
- * Return spatial extent for clip plane calculation.
  * Ground plane extends GROUND_PLANE_EXTENT times r_max from origin.
  */
   float
@@ -215,9 +217,10 @@ opengl_ground_plane_far_extent(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_ground_plane_render()
- *
- * Render ground plane quad with transparent checkerboard pattern
+/** opengl_ground_plane_render() - Render ground plane quad with transparent checkerboard pattern
+ * @ctx: pointer to opengl_ground_plane_t
+ * @mvp: model-view-projection matrix
+ * @alpha: opacity passed to u_alpha uniform
  */
   void
 opengl_ground_plane_render(void *ctx, mat4 mvp, float alpha)

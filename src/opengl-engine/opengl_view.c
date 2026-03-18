@@ -33,9 +33,8 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_state_free()
- *
- * Free view state resources
+/** gl_view_state_free() - Free view state resources
+ * @state: view state
  */
   static void
 gl_view_state_free(gl_view_state_t *state)
@@ -92,9 +91,9 @@ gl_view_state_free(gl_view_state_t *state)
 
 /*-----------------------------------------------------------------------*/
 
-/* on_realize()
- *
- * GtkGLArea realize signal handler
+/** on_realize() - GtkGLArea realize signal handler
+ * @area: GL area widget
+ * @user_data: view state
  */
   static void
 on_realize(GtkGLArea *area, gpointer user_data)
@@ -215,9 +214,9 @@ on_realize(GtkGLArea *area, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* on_unrealize()
- *
- * GtkGLArea unrealize signal handler
+/** on_unrealize() - GtkGLArea unrealize signal handler
+ * @area: GL area widget
+ * @user_data: view state
  */
   static void
 on_unrealize(GtkGLArea *area, gpointer user_data)
@@ -234,9 +233,11 @@ on_unrealize(GtkGLArea *area, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* on_resize()
- *
- * GtkGLArea resize signal handler
+/** on_resize() - GtkGLArea resize signal handler
+ * @area: GL area widget
+ * @width: new width in pixels
+ * @height: new height in pixels
+ * @user_data: view state
  */
   static void
 on_resize(GtkGLArea *area, int width, int height, gpointer user_data)
@@ -271,9 +272,11 @@ on_resize(GtkGLArea *area, int width, int height, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_create_widget()
- *
- * Create GL area widget with engine wired
+/** gl_view_create_widget() - Create GL area widget with engine wired
+ * @config: view configuration
+ * @scene: scene provider
+ * @arcball: arcball state
+ * @zoom_spinbutton: pointer to zoom spinbutton pointer
  */
   GtkWidget*
 gl_view_create_widget(
@@ -340,9 +343,8 @@ gl_view_create_widget(
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_get_state()
- *
- * Get view state from widget
+/** gl_view_get_state() - Get view state from widget
+ * @widget: GL area widget
  */
   gl_view_state_t*
 gl_view_get_state(GtkWidget *widget)
@@ -356,9 +358,9 @@ gl_view_get_state(GtkWidget *widget)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_set_arcball()
- *
- * Set the arcball reference for a view
+/** gl_view_set_arcball() - Set the arcball reference for a view
+ * @widget: GL area widget
+ * @arcball: arcball state
  */
   void
 gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball)
@@ -376,9 +378,10 @@ gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_sync_arcball()
- *
- * Sync arcball rotation from angles
+/** gl_view_sync_arcball() - Sync arcball rotation from angles
+ * @widget: GL area widget
+ * @wr: rotation angle (real component)
+ * @wi: rotation angle (imaginary component)
  */
   void
 gl_view_sync_arcball(GtkWidget *widget, double wr, double wi)
@@ -397,9 +400,8 @@ gl_view_sync_arcball(GtkWidget *widget, double wr, double wi)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_reset_pan()
- *
- * Reset pan offset to center the view
+/** gl_view_reset_pan() - Reset pan offset to center the view
+ * @widget: GL area widget
  */
   void
 gl_view_reset_pan(GtkWidget *widget)

@@ -61,9 +61,7 @@ static const rgba_f_t axis_color = {1.0f, 1.0f, 1.0f, 1.0f};
 
 /*-----------------------------------------------------------------------*/
 
-/* generate_label_texture()
- *
- * Creates a texture atlas with X, Y, Z labels using Cairo
+/** generate_label_texture() - Creates a texture atlas with X, Y, Z labels using Cairo
  */
   static GLuint
 generate_label_texture(void)
@@ -127,9 +125,7 @@ generate_label_texture(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_axes_new()
- *
- * Allocate and initialize axes renderer with own shaders
+/** opengl_axes_new() - Allocate and initialize axes renderer with own shaders
  */
   opengl_axes_t*
 opengl_axes_new(void)
@@ -194,9 +190,8 @@ opengl_axes_new(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_axes_free()
- *
- * Free axes renderer resources
+/** opengl_axes_free() - Free axes renderer resources
+ * @ctx: axes context
  */
   void
 opengl_axes_free(void *ctx)
@@ -222,9 +217,11 @@ opengl_axes_free(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* setup_vertex_attrib()
- *
- * Configure vertex attribute pointer
+/** setup_vertex_attrib() - Configure vertex attribute pointer
+ * @loc: attribute location
+ * @size: number of components
+ * @stride: byte offset between consecutive attributes
+ * @offset: byte offset to first component
  */
   static void
 setup_vertex_attrib(GLint loc, GLint size, size_t stride, size_t offset)
@@ -235,9 +232,9 @@ setup_vertex_attrib(GLint loc, GLint size, size_t stride, size_t offset)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_axes_prepare()
- *
- * Update axis scale and regenerate buffers
+/** opengl_axes_prepare() - Update axis scale and regenerate buffers
+ * @ctx: axes context
+ * @r_max: maximum radius for axis scaling
  */
   void
 opengl_axes_prepare(void *ctx, float r_max)
@@ -324,9 +321,8 @@ opengl_axes_prepare(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_axes_is_active()
- *
- * Returns whether axes are active for rendering
+/** opengl_axes_is_active() - Returns whether axes are active for rendering
+ * @_ctx: unused
  */
   gboolean
 opengl_axes_is_active(void *ctx)
@@ -339,9 +335,9 @@ opengl_axes_is_active(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_axes_far_extent()
- *
- * Returns the spatial extent contribution for clip plane calculation
+/** opengl_axes_far_extent() - Returns the spatial extent contribution for clip plane calculation
+ * @_ctx: unused
+ * @r_max: maximum radius
  */
   float
 opengl_axes_far_extent(void *ctx, float r_max)
@@ -354,9 +350,10 @@ opengl_axes_far_extent(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/* opengl_axes_render()
- *
- * Render axes lines and labels
+/** opengl_axes_render() - Render axes lines and labels
+ * @ctx: axes context
+ * @mvp: model-view-projection matrix
+ * @_alpha: unused
  */
   void
 opengl_axes_render(void *ctx, mat4 mvp, float _alpha)

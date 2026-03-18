@@ -24,9 +24,8 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* update_overlay_texture()
- *
- * Regenerate overlay texture using Cairo
+/** update_overlay_texture() - Regenerate overlay texture using Cairo
+ * @overlay: overlay instance
  */
   static void
 update_overlay_texture(gradient_overlay_t *overlay)
@@ -65,9 +64,8 @@ update_overlay_texture(gradient_overlay_t *overlay)
 
 /*-----------------------------------------------------------------------*/
 
-/* gradient_overlay_new()
- *
- * Allocate and initialize gradient overlay renderer
+/** gradient_overlay_new() - Allocate and initialize gradient overlay renderer
+ * @draw_func: Cairo drawing function callback
  */
   gradient_overlay_t*
 gradient_overlay_new(gradient_draw_fn draw_func)
@@ -93,9 +91,8 @@ gradient_overlay_new(gradient_draw_fn draw_func)
 
 /*-----------------------------------------------------------------------*/
 
-/* gradient_overlay_free()
- *
- * Free gradient overlay resources
+/** gradient_overlay_free() - Free gradient overlay resources
+ * @overlay: overlay instance to free
  */
   void
 gradient_overlay_free(gradient_overlay_t *overlay)
@@ -110,9 +107,10 @@ gradient_overlay_free(gradient_overlay_t *overlay)
 
 /*-----------------------------------------------------------------------*/
 
-/* gradient_overlay_set_viewport()
- *
- * Update viewport dimensions and mark texture for regeneration
+/** gradient_overlay_set_viewport() - Update viewport dimensions and mark texture for regeneration
+ * @overlay: overlay instance
+ * @width: viewport width in pixels
+ * @height: viewport height in pixels
  */
   void
 gradient_overlay_set_viewport(gradient_overlay_t *overlay, int width, int height)
@@ -130,9 +128,8 @@ gradient_overlay_set_viewport(gradient_overlay_t *overlay, int width, int height
 
 /*-----------------------------------------------------------------------*/
 
-/* gradient_overlay_mark_dirty()
- *
- * Mark overlay texture for regeneration
+/** gradient_overlay_mark_dirty() - Mark overlay texture for regeneration
+ * @overlay: overlay instance
  */
   void
 gradient_overlay_mark_dirty(gradient_overlay_t *overlay)
@@ -144,9 +141,8 @@ gradient_overlay_mark_dirty(gradient_overlay_t *overlay)
 
 /*-----------------------------------------------------------------------*/
 
-/* gradient_overlay_render()
- *
- * Render gradient overlay in screen space
+/** gradient_overlay_render() - Render gradient overlay in screen space
+ * @overlay: overlay instance
  */
   void
 gradient_overlay_render(gradient_overlay_t *overlay)

@@ -41,9 +41,7 @@ static const text_vertex_t quad_vertices[6] = {
 
 /*-----------------------------------------------------------------------*/
 
-/* cairo_gl_overlay_new()
- *
- * Allocate and initialize Cairo overlay renderer with V-flipped UV mapping
+/** cairo_gl_overlay_new() - Allocate and initialize Cairo overlay renderer with V-flipped UV mapping
  */
   cairo_gl_overlay_t*
 cairo_gl_overlay_new(void)
@@ -105,9 +103,8 @@ cairo_gl_overlay_new(void)
 
 /*-----------------------------------------------------------------------*/
 
-/* cairo_gl_overlay_free()
- *
- * Free Cairo overlay resources
+/** cairo_gl_overlay_free() - Free Cairo overlay resources
+ * @overlay: overlay instance to free
  */
   void
 cairo_gl_overlay_free(cairo_gl_overlay_t *overlay)
@@ -129,9 +126,10 @@ cairo_gl_overlay_free(cairo_gl_overlay_t *overlay)
 
 /*-----------------------------------------------------------------------*/
 
-/* cairo_gl_overlay_set_size()
- *
- * Update overlay dimensions
+/** cairo_gl_overlay_set_size() - Update overlay dimensions
+ * @overlay: overlay instance
+ * @width: new width in pixels
+ * @height: new height in pixels
  */
   void
 cairo_gl_overlay_set_size(cairo_gl_overlay_t *overlay, int width, int height)
@@ -146,9 +144,9 @@ cairo_gl_overlay_set_size(cairo_gl_overlay_t *overlay, int width, int height)
 
 /*-----------------------------------------------------------------------*/
 
-/* cairo_gl_overlay_upload()
- *
- * Upload Cairo surface data to OpenGL texture
+/** cairo_gl_overlay_upload() - Upload Cairo surface data to OpenGL texture
+ * @overlay: overlay instance
+ * @surface: Cairo surface containing ARGB32 data
  */
   void
 cairo_gl_overlay_upload(cairo_gl_overlay_t *overlay, cairo_surface_t *surface)
@@ -173,9 +171,8 @@ cairo_gl_overlay_upload(cairo_gl_overlay_t *overlay, cairo_surface_t *surface)
 
 /*-----------------------------------------------------------------------*/
 
-/* cairo_gl_overlay_render()
- *
- * Render overlay fullscreen with orthographic projection
+/** cairo_gl_overlay_render() - Render overlay fullscreen with orthographic projection
+ * @overlay: overlay instance
  */
   void
 cairo_gl_overlay_render(cairo_gl_overlay_t *overlay)

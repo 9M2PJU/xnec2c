@@ -49,10 +49,8 @@ static void gl_overlay_free(void *ctx);
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_overlay_effective_scale()
- *
- * Compute effective overlay model scale, applying user adjustment
- * unless scale_adj_locked is set by the scene provider.
+/** gl_overlay_effective_scale() - Compute effective overlay model scale, applying user adjustment unless scale_adj_locked is set by the scene provider
+ * @ovl: overlay context
  */
   static inline float
 gl_overlay_effective_scale(const gl_overlay_ctx_t *ovl)
@@ -66,9 +64,10 @@ gl_overlay_effective_scale(const gl_overlay_ctx_t *ovl)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_overlay_prepare()
+/** gl_overlay_prepare() - Upload overlay VBO and cache own MVP
+ * @ctx: overlay context
+ * @r_max: current maximum scene extent
  *
- * Upload overlay VBO and cache own MVP.
  * ovl_content is pre-populated by gl_overlay_generate_and_extent during
  * the active survey — no overlay_generate call here.
  */
@@ -122,9 +121,10 @@ gl_overlay_prepare(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_overlay_render()
- *
- * Render overlay using cached MVP (ignores passed MVP)
+/** gl_overlay_render() - Render overlay using cached MVP (ignores passed MVP)
+ * @ctx: overlay context
+ * @mvp: unused
+ * @alpha: alpha multiplier
  */
   static void
 gl_overlay_render(void *ctx, mat4 mvp, float alpha)
@@ -152,9 +152,8 @@ gl_overlay_render(void *ctx, mat4 mvp, float alpha)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_overlay_is_active()
- *
- * Returns TRUE when overlay is initialized and provider exists
+/** gl_overlay_is_active() - Returns TRUE when overlay is initialized and provider exists
+ * @ctx: overlay context
  */
   static gboolean
 gl_overlay_is_active(void *ctx)
@@ -168,11 +167,11 @@ gl_overlay_is_active(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_overlay_generate()
+/** gl_overlay_generate() - Regenerate overlay content via overlay_generate, storing the result in ovl_content
+ * @ctx: overlay context
  *
- * Regenerate overlay content via overlay_generate, storing the result
- * in ovl_content. Resets vertex_count first so stale data does not
- * persist when overlay_generate declines (e.g. OVERLAY_STRUCT unchecked).
+ * Resets vertex_count first so stale data does not persist when overlay_generate
+ * declines (e.g. OVERLAY_STRUCT unchecked).
  * Called during the active survey before far_extent is queried.
  */
   static void
@@ -196,11 +195,11 @@ gl_overlay_generate(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_overlay_far_extent()
+/** gl_overlay_far_extent() - Return the overlay's scaled geometry extent for clip plane computation
+ * @ctx: overlay context
+ * @r_max: current maximum scene extent
  *
- * Return the overlay's scaled geometry extent for clip plane computation.
- * Reads ovl_content populated by gl_overlay_generate during the same
- * survey pass.
+ * Reads ovl_content populated by gl_overlay_generate during the same survey pass.
  */
   static float
 gl_overlay_far_extent(void *ctx, float r_max)
@@ -224,9 +223,8 @@ gl_overlay_far_extent(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_overlay_free()
- *
- * Free overlay rendering context and GL resources
+/** gl_overlay_free() - Free overlay rendering context and GL resources
+ * @ctx: overlay context
  */
   static void
 gl_overlay_free(void *ctx)
@@ -254,9 +252,8 @@ gl_overlay_free(void *ctx)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_overlay_renderable_new()
- *
- * Create overlay renderable for second-pass rendering
+/** gl_view_overlay_renderable_new() - Create overlay renderable for second-pass rendering
+ * @state: view state
  */
   gl_renderable_t
 gl_view_overlay_renderable_new(gl_view_state_t *state)

@@ -24,10 +24,12 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* render_centered_text_box()
+/** render_centered_text_box() - Create a Cairo surface with centered text over a semi-transparent background box
+ * @text: text to render
+ * @width: surface width in pixels
+ * @height: surface height in pixels
  *
- * Create a Cairo surface with centered text over a semi-transparent
- * background box. Returns newly-created surface; caller owns it.
+ * Returns newly-created surface; caller owns it.
  * All content rendered at full opacity; callers apply fade via GL blend.
  */
   static cairo_surface_t*
@@ -72,9 +74,11 @@ render_centered_text_box(const char *text, int width, int height)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_render_tooltip_surface()
+/** gl_view_render_tooltip_surface() - Regenerate the cached Cairo surface with tooltip text
+ * @state: view state
+ * @surf_width: surface width in pixels
+ * @surf_height: surface height in pixels
  *
- * Regenerate the cached Cairo surface with tooltip text.
  * Called when text or dimensions change (tooltip_surface_valid == FALSE).
  */
   static void
@@ -97,9 +101,11 @@ gl_view_render_tooltip_surface(gl_view_state_t *state, int surf_width, int surf_
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_render_tooltip()
+/** gl_view_render_tooltip() - Render tooltip overlay with fade animation
+ * @state: view state
+ * @surf_width: surface width in pixels
+ * @surf_height: surface height in pixels
  *
- * Render tooltip overlay with fade animation.
  * Regenerates cached surface only when text or dimensions change.
  */
   void
@@ -140,9 +146,9 @@ gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height)
 
 /*-----------------------------------------------------------------------*/
 
-/* tooltip_update_callback()
+/** tooltip_update_callback() - Timer callback for tooltip fade animation
+ * @user_data: GtkWidget pointer
  *
- * Timer callback for tooltip fade animation.
  * Tooltip stays visible for tooltip_hold_ms, then fades over 500ms.
  */
   static gboolean
@@ -192,9 +198,10 @@ tooltip_update_callback(gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_show_tooltip()
- *
- * Display a tooltip message that holds for duration_ms then fades over 500ms
+/** gl_view_show_tooltip() - Display a tooltip message that holds for duration_ms then fades over 500ms
+ * @widget: GL area widget
+ * @text: tooltip text
+ * @duration_ms: hold duration in milliseconds before fade
  */
   void
 gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms)
@@ -230,9 +237,12 @@ gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_render_status_message()
+/** gl_view_render_status_message() - Render a persistent centered status message overlay with alpha=1.0
+ * @state: view state
+ * @message: status message text
+ * @surf_width: surface width in pixels
+ * @surf_height: surface height in pixels
  *
- * Render a persistent centered status message overlay with alpha=1.0.
  * Regenerates cached surface only when text pointer or dimensions change.
  */
   void

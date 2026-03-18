@@ -30,10 +30,8 @@ static void arcball_rotate_constrained(arcball_state_t *ab, float dx, float dy);
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_new()
- *
- * Allocate and initialize arcball camera state.
- * motion_divisor controls drag sensitivity in constrained mode.
+/** arcball_new() - Allocate and initialize arcball camera state
+ * @motion_divisor: controls drag sensitivity in constrained mode
  */
   arcball_state_t*
 arcball_new(float motion_divisor)
@@ -58,9 +56,8 @@ arcball_new(float motion_divisor)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_free()
- *
- * Free arcball camera state
+/** arcball_free() - Free arcball camera state
+ * @ab: arcball state to free
  */
   void
 arcball_free(arcball_state_t *ab)
@@ -72,9 +69,8 @@ arcball_free(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_wrap_angles()
- *
- * Normalize WR to [0,360) and WI to [-180,180) to match NEC2 convention
+/** arcball_wrap_angles() - Normalize WR to [0,360) and WI to [-180,180) to match NEC2 convention
+ * @ab: arcball state
  */
   static void
 arcball_wrap_angles(arcball_state_t *ab)
@@ -93,9 +89,8 @@ arcball_wrap_angles(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_extract_angles()
- *
- * Extract WR/WI from current rotation matrix (ZYZ Euler decomposition)
+/** arcball_extract_angles() - Extract WR/WI from current rotation matrix (ZYZ Euler decomposition)
+ * @ab: arcball state
  */
   static void
 arcball_extract_angles(arcball_state_t *ab)
@@ -128,9 +123,10 @@ arcball_extract_angles(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_set_view()
- *
- * Set arcball model rotation to match Cairo view angles.
+/** arcball_set_view() - Set arcball model rotation to match Cairo view angles
+ * @ab: arcball state
+ * @wr_deg: azimuth angle in degrees
+ * @wi_deg: elevation angle in degrees
  *
  * Coordinate system differences:
  *   Cairo:   Z-up world, camera at spherical(Wr,Wi) looking at origin
@@ -168,9 +164,10 @@ arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_add_callback()
- *
- * Register callback for arcball changes
+/** arcball_add_callback() - Register callback for arcball changes
+ * @ab: arcball state
+ * @func: callback function
+ * @user_data: user data passed to callback
  */
   void
 arcball_add_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data)
@@ -194,9 +191,10 @@ arcball_add_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer use
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_remove_callback()
- *
- * Unregister callback
+/** arcball_remove_callback() - Unregister callback
+ * @ab: arcball state
+ * @func: callback function to remove
+ * @user_data: user data associated with callback
  */
   void
 arcball_remove_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data)
@@ -222,9 +220,8 @@ arcball_remove_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer 
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_notify_changed()
- *
- * Notify all registered callbacks of arcball change
+/** arcball_notify_changed() - Notify all registered callbacks of arcball change
+ * @ab: arcball state
  */
   void
 arcball_notify_changed(arcball_state_t *ab)
@@ -248,9 +245,9 @@ arcball_notify_changed(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_copy_rotation()
- *
- * Copy rotation state from one arcball to another
+/** arcball_copy_rotation() - Copy rotation state from one arcball to another
+ * @dst: destination arcball state
+ * @src: source arcball state
  */
   void
 arcball_copy_rotation(arcball_state_t *dst, const arcball_state_t *src)
@@ -264,9 +261,12 @@ arcball_copy_rotation(arcball_state_t *dst, const arcball_state_t *src)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_drag()
+/** arcball_drag() - Handle mouse drag for rotation (button 1 only)
+ * @ab: arcball state
+ * @x: current mouse x coordinate
+ * @y: current mouse y coordinate
+ * @viewport_height: viewport height
  *
- * Handle mouse drag for rotation (button 1 only).
  * Pan (button 2) is handled by the view layer.
  */
   void
@@ -301,9 +301,10 @@ arcball_drag(arcball_state_t *ab, float x, float y, float viewport_height)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_rotate()
- *
- * Apply rotation from mouse drag
+/** arcball_rotate() - Apply rotation from mouse drag
+ * @ab: arcball state
+ * @dx: mouse delta x
+ * @dy: mouse delta y
  */
   static void
 arcball_rotate(arcball_state_t *ab, float dx, float dy)
@@ -329,9 +330,10 @@ arcball_rotate(arcball_state_t *ab, float dx, float dy)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_rotate_constrained()
- *
- * Constrained rotation updates WR/WI and rebuilds matrix
+/** arcball_rotate_constrained() - Constrained rotation updates WR/WI and rebuilds matrix
+ * @ab: arcball state
+ * @dx: mouse delta x
+ * @dy: mouse delta y
  */
   static void
 arcball_rotate_constrained(arcball_state_t *ab, float dx, float dy)
@@ -347,9 +349,11 @@ arcball_rotate_constrained(arcball_state_t *ab, float dx, float dy)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_begin_drag()
- *
- * Begin mouse drag operation
+/** arcball_begin_drag() - Begin mouse drag operation
+ * @ab: arcball state
+ * @button: mouse button number
+ * @x: mouse x coordinate
+ * @y: mouse y coordinate
  */
   void
 arcball_begin_drag(arcball_state_t *ab, int button, float x, float y)
@@ -362,9 +366,8 @@ arcball_begin_drag(arcball_state_t *ab, int button, float x, float y)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_end_drag()
- *
- * End mouse drag operation
+/** arcball_end_drag() - End mouse drag operation
+ * @ab: arcball state
  */
   void
 arcball_end_drag(arcball_state_t *ab)
@@ -375,9 +378,17 @@ arcball_end_drag(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_get_mvp()
+/** arcball_get_mvp() - Compute model-view-projection matrix from arcball rotation and scene parameters
+ * @ab: arcball state
+ * @dest: destination matrix
+ * @pan_offset: pan offset (provided by view layer)
+ * @distance: camera distance
+ * @model_scale: model scale factor
+ * @aspect: viewport aspect ratio
+ * @fov_rad: field of view in radians
+ * @near_plane: near clipping plane distance
+ * @far_plane: far clipping plane distance
  *
- * Compute model-view-projection matrix from arcball rotation and scene parameters.
  * Pan offset is provided by the view layer as it is per-view state.
  */
   void
@@ -410,9 +421,9 @@ arcball_get_mvp(arcball_state_t *ab, mat4 dest, const vec2 pan_offset,
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_set_drag_mode()
- *
- * Set rotation mode, extract angles if switching to constrained
+/** arcball_set_drag_mode() - Set rotation mode, extract angles if switching to constrained
+ * @ab: arcball state
+ * @mode: drag mode to set
  */
   void
 arcball_set_drag_mode(arcball_state_t *ab, arcball_drag_mode_t mode)
@@ -429,9 +440,8 @@ arcball_set_drag_mode(arcball_state_t *ab, arcball_drag_mode_t mode)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_get_drag_mode()
- *
- * Get current rotation mode
+/** arcball_get_drag_mode() - Get current rotation mode
+ * @ab: arcball state
  */
   arcball_drag_mode_t
 arcball_get_drag_mode(arcball_state_t *ab)
@@ -445,9 +455,10 @@ arcball_get_drag_mode(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_get_angles()
- *
- * Get current WR/WI angles (meaningful in constrained mode)
+/** arcball_get_angles() - Get current WR/WI angles (meaningful in constrained mode)
+ * @ab: arcball state
+ * @wr: pointer to store WR angle
+ * @wi: pointer to store WI angle
  */
   void
 arcball_get_angles(arcball_state_t *ab, float *wr, float *wi)
@@ -464,9 +475,8 @@ arcball_get_angles(arcball_state_t *ab, float *wr, float *wi)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_get_drag_button()
- *
- * Return the currently held mouse button (0 if no drag active)
+/** arcball_get_drag_button() - Return the currently held mouse button (0 if no drag active)
+ * @ab: arcball state
  */
   int
 arcball_get_drag_button(arcball_state_t *ab)
@@ -480,9 +490,10 @@ arcball_get_drag_button(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_get_last_pos()
- *
- * Retrieve the last recorded mouse position
+/** arcball_get_last_pos() - Retrieve the last recorded mouse position
+ * @ab: arcball state
+ * @x: pointer to store x coordinate
+ * @y: pointer to store y coordinate
  */
   void
 arcball_get_last_pos(arcball_state_t *ab, float *x, float *y)
@@ -499,9 +510,10 @@ arcball_get_last_pos(arcball_state_t *ab, float *x, float *y)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_update_last_pos()
- *
- * Update the stored last mouse position for delta computation
+/** arcball_update_last_pos() - Update the stored last mouse position for delta computation
+ * @ab: arcball state
+ * @x: new x coordinate
+ * @y: new y coordinate
  */
   void
 arcball_update_last_pos(arcball_state_t *ab, float x, float y)
@@ -516,9 +528,10 @@ arcball_update_last_pos(arcball_state_t *ab, float x, float y)
 
 /*-----------------------------------------------------------------------*/
 
-/* arcball_get_rotation_col()
- *
- * Extract one column from the rotation matrix (e.g. col=2 for view Z axis)
+/** arcball_get_rotation_col() - Extract one column from the rotation matrix (e.g. col=2 for view Z axis)
+ * @ab: arcball state
+ * @col: column index
+ * @out: output array for column values
  */
   void
 arcball_get_rotation_col(arcball_state_t *ab, int col, float out[3])

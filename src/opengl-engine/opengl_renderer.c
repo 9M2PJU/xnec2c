@@ -24,9 +24,9 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* compile_shader()
- *
- * Compiles a shader from GResource path or filesystem path
+/** compile_shader() - Compiles a shader from GResource path or filesystem path
+ * @type: shader type (GL_VERTEX_SHADER or GL_FRAGMENT_SHADER)
+ * @path: GResource path or filesystem path to shader source
  */
   static GLuint
 compile_shader(GLenum type, const char *path)
@@ -93,9 +93,10 @@ compile_shader(GLenum type, const char *path)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_shader_load()
- *
- * Loads and compiles vertex and fragment shaders
+/** gl_shader_load() - Loads and compiles vertex and fragment shaders
+ * @shader: shader structure to populate
+ * @vertex_path: path to vertex shader source
+ * @fragment_path: path to fragment shader source
  */
   gboolean
 gl_shader_load(gl_shader_t *shader,
@@ -135,9 +136,8 @@ gl_shader_load(gl_shader_t *shader,
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_shader_destroy()
- *
- * Cleanup shader resources
+/** gl_shader_destroy() - Cleanup shader resources
+ * @shader: shader structure to destroy
  */
   void
 gl_shader_destroy(gl_shader_t *shader)

@@ -30,9 +30,10 @@ static gboolean on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer use
 
 /*-----------------------------------------------------------------------*/
 
-/* on_button_press()
- *
- * Mouse button press handler
+/** on_button_press() - Mouse button press handler
+ * @widget: GL area widget
+ * @event: button press event
+ * @user_data: view state
  */
   static gboolean
 on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
@@ -60,9 +61,10 @@ on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* on_button_release()
- *
- * Mouse button release handler
+/** on_button_release() - Mouse button release handler
+ * @widget: GL area widget
+ * @event: button release event
+ * @user_data: view state
  */
   static gboolean
 on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
@@ -85,10 +87,12 @@ on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* on_motion()
+/** on_motion() - Mouse motion handler
+ * @widget: GL area widget
+ * @event: motion event
+ * @user_data: view state
  *
- * Mouse motion handler. Handles rotation (button 1) via arcball,
- * and pan (button 2) with proper world-space scaling.
+ * Handles rotation (button 1) via arcball, and pan (button 2) with proper world-space scaling.
  */
   static gboolean
 on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
@@ -152,11 +156,12 @@ on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* on_scroll()
+/** on_scroll() - Mouse scroll handler
+ * @widget: GL area widget
+ * @event: scroll event
+ * @user_data: view state
  *
- * Mouse scroll handler.
- * Shift+scroll invokes scene-specific handler if provided.
- * Normal scroll adjusts primary zoom via spinbutton.
+ * Shift+scroll invokes scene-specific handler if provided. Normal scroll adjusts primary zoom via spinbutton.
  */
   static gboolean
 on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
@@ -211,9 +216,9 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
-/* gl_view_input_connect()
- *
- * Wire input signal handlers to GL area widget
+/** gl_view_input_connect() - Wire input signal handlers to GL area widget
+ * @gl_area: GL area widget
+ * @state: view state
  */
   void
 gl_view_input_connect(GtkWidget *gl_area, gl_view_state_t *state)
