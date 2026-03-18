@@ -52,11 +52,6 @@ static GtkWidget *rdpattern_gl_widget = NULL;
 /* Arcball for radiation pattern view */
 static arcball_state_t *rdpattern_arcball = NULL;
 
-/* Vertex attribute layout for color shader */
-static const gl_vertex_attrib_t rdpattern_attribs[] = {
-  { "position", 3, 0 },
-  { "color",    4, 4 * (int)sizeof(float) }
-};
 
 /* Overlay configuration for structure rendering in rdpattern */
 static const gl_overlay_config_t rdpattern_overlay_config = {
@@ -144,7 +139,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
   {
     int line_count;
     int nf_count;
-    color_point_t *nf_buf;
+    lit_color_point_t *nf_buf;
 
     line_count = opengl_rdpattern_generate_nf_lines();
     if( line_count <= 0 )
@@ -158,7 +153,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
     nf_buf = opengl_rdpattern_get_nf_lines(&nf_count);
     out->vertices = nf_buf;
     out->vertex_count = nf_count * 2;
-    out->vertex_stride = (int)sizeof(color_point_t);
+    out->vertex_stride = (int)sizeof(lit_color_point_t);
     out->draw_mode = GL_LINES;
     out->r_max = r_max;
     out->clip_extent = r_max;
@@ -265,7 +260,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
 
     {
       int tri_count;
-      color_triangle_t *tri_buf = opengl_rdpattern_get_triangles(&tri_count);
+      lit_color_triangle_t *tri_buf = opengl_rdpattern_get_triangles(&tri_count);
 
       if( tri_count == 0 )
         return( FALSE );
@@ -273,7 +268,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
       out->vertices = tri_buf;
       out->vertex_count = tri_count * 3;
     }
-    out->vertex_stride = (int)sizeof(color_point_t);
+    out->vertex_stride = (int)sizeof(lit_color_point_t);
     out->draw_mode = GL_TRIANGLES;
 
     out->r_max = r_max;
@@ -443,11 +438,11 @@ rdpattern_axes_is_active(void *ctx)
 
 /* Static scene configuration and provider */
 static gl_view_config_t rdpattern_view_config = {
-  .vertex_shader_path = "/gl/color-vertex.glsl",
-  .fragment_shader_path = "/gl/color-fragment.glsl",
-  .attribs = rdpattern_attribs,
-  .attrib_count = 2,
-  .vertex_stride = (int)sizeof(color_point_t),
+  .vertex_shader_path = "/gl/lit-color-vertex.glsl",
+  .fragment_shader_path = "/gl/lit-color-fragment.glsl",
+  .attribs = opengl_structure_attribs,
+  .attrib_count = 3,
+  .vertex_stride = (int)sizeof(lit_color_point_t),
   .has_gradient = TRUE,
   .gradient_draw = Draw_Color_Legend_Overlay
 };

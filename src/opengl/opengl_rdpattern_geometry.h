@@ -37,10 +37,10 @@ int opengl_rdpattern_generate_triangles(
     double r_min, double r_range);
 
 /* Return near-field line vertex buffer and count */
-color_point_t* opengl_rdpattern_get_nf_lines(int *count);
+lit_color_point_t* opengl_rdpattern_get_nf_lines(int *count);
 
 /* Return far-field triangle buffer and count */
-color_triangle_t* opengl_rdpattern_get_triangles(int *count);
+lit_color_triangle_t* opengl_rdpattern_get_triangles(int *count);
 
 /* Return current far-field generation counter */
 unsigned int opengl_rdpattern_get_ff_generation(void);

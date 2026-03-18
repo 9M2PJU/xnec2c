@@ -18,6 +18,7 @@
  */
 
 #include "opengl_rdpattern_geometry.h"
+#include "../opengl-engine/opengl_cylinder.h"
 #include "../shared.h"
 #include "../draw.h"
 #include "../draw_radiation.h"
@@ -25,11 +26,11 @@
 #ifdef HAVE_OPENGL
 
 /* Triangle buffer for radiation pattern mesh */
-static color_triangle_t *rdpat_triangles = NULL;
+static lit_color_triangle_t *rdpat_triangles = NULL;
 static int rdpat_triangle_count = 0;
 
 /* Near-field line buffer */
-static color_point_t *nf_lines = NULL;
+static lit_color_point_t *nf_lines = NULL;
 static int nf_line_count = 0;
 
 /* Poynting vector per-sample data */
@@ -53,21 +54,19 @@ static unsigned int rdpat_nf_generation = 0;
  */
   static int
 nf_line_append(
-    color_point_t *buf, int line_idx,
+    lit_color_point_t *buf, int line_idx,
     point_f_3d_t origin, point_f_3d_t endpoint, rgba_f_t color)
 {
-  buf[line_idx].point.x     = origin.x;
-  buf[line_idx].point.y     = origin.y;
-  buf[line_idx].point.z     = origin.z;
-  buf[line_idx].color.r     = color.r;
-  buf[line_idx].color.g     = color.g;
-  buf[line_idx].color.b     = color.b;
-  buf[line_idx].color.a     = color.a;
+  /* Constant normal (0, 0, 1) gives uniform shading on line primitives */
+  set_lit_vertex(&buf[line_idx],
+      origin.x, origin.y, origin.z,
+      0.0f, 0.0f, 1.0f,
+      color.r, color.g, color.b, color.a);
 
-  buf[line_idx + 1].point.x = endpoint.x;
-  buf[line_idx + 1].point.y = endpoint.y;
-  buf[line_idx + 1].point.z = endpoint.z;
-  buf[line_idx + 1].color   = buf[line_idx].color;
+  set_lit_vertex(&buf[line_idx + 1],
+      endpoint.x, endpoint.y, endpoint.z,
+      0.0f, 0.0f, 1.0f,
+      color.r, color.g, color.b, color.a);
 
   return( line_idx + 2 );
 }
@@ -92,7 +91,7 @@ nf_line_append(
  */
   static int
 nf_field_line(
-    color_point_t *buf, int line_idx,
+    lit_color_point_t *buf, int line_idx,
     double px, double py, double pz,
     double comp_x, double comp_y, double comp_z,
     double dr, double magnitude, double max_val)
@@ -157,7 +156,7 @@ opengl_rdpattern_generate_nf_lines(void)
         (double)fpat.dznr * (double)fpat.dznr ) / 1.75;
 
   /* Allocate line buffer for all enabled fields */
-  mreq = (size_t)total_lines * 2 * sizeof(color_point_t);
+  mreq = (size_t)total_lines * 2 * sizeof(lit_color_point_t);
   mem_realloc((void **)&nf_lines, mreq, __LOCATION__);
 
   /* Calculate Poynting vector if enabled */
@@ -229,10 +228,11 @@ opengl_rdpattern_generate_nf_lines(void)
 
 /*-----------------------------------------------------------------------*/
 
-/** fill_tri_vertex() - Fill one vertex slot of a color_triangle_t from a point_3d_t
+/** fill_tri_vertex() - Fill one vertex slot of a lit_color_triangle_t from a point_3d_t
  * @tri: triangle to populate
  * @vi: vertex index within triangle (0, 1, or 2)
  * @pt: source point with position and radius
+ * @normal: pre-computed smooth vertex normal
  * @r_min: minimum radius for color normalization
  * @r_range: radius range for color normalization
  *
@@ -240,21 +240,17 @@ opengl_rdpattern_generate_nf_lines(void)
  */
   static void
 fill_tri_vertex(
-    color_triangle_t *tri, int vi,
-    point_3d_t *pt, double r_min, double r_range)
+    lit_color_triangle_t *tri, int vi,
+    point_3d_t *pt, point_f_3d_t *normal,
+    double r_min, double r_range)
 {
   double red, grn, blu;
 
-  tri->cp[vi].point.x = (float)pt->x;
-  tri->cp[vi].point.y = (float)pt->y;
-  tri->cp[vi].point.z = (float)pt->z;
-  tri->cp[vi].point.r = (float)pt->r;
-
   Value_to_Color(&red, &grn, &blu, (pt->r - r_min) / r_range, 1.0);
-  tri->cp[vi].color.r = (float)red;
-  tri->cp[vi].color.g = (float)grn;
-  tri->cp[vi].color.b = (float)blu;
-  tri->cp[vi].color.a = 1.0f;
+  set_lit_vertex(&tri->cp[vi],
+      (float)pt->x, (float)pt->y, (float)pt->z,
+      normal->x, normal->y, normal->z,
+      (float)red, (float)grn, (float)blu, 1.0f);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -273,9 +269,11 @@ opengl_rdpattern_generate_triangles(
     point_3d_t *points, int nth, int nph,
     double r_min, double r_range)
 {
-  int nph_idx, nth_idx, tri_idx;
+  int nph_idx, nth_idx, tri_idx, vi;
   int p0, p1, p2, p3;
+  int npts;
   size_t mreq;
+  point_f_3d_t *vertex_normals;
 
   if( !points || nth < 2 || nph < 1 )
     return( -1 );
@@ -283,37 +281,118 @@ opengl_rdpattern_generate_triangles(
   /* Calculate triangle count: 2 per grid cell */
   rdpat_triangle_count = 2 * nph * (nth - 1);
 
-  mreq = (size_t)rdpat_triangle_count * sizeof(color_triangle_t);
+  mreq = (size_t)rdpat_triangle_count * sizeof(lit_color_triangle_t);
   mem_realloc((void **)&rdpat_triangles, mreq, __LOCATION__);
 
-  tri_idx = 0;
+  /* Allocate and zero temporary per-vertex normal accumulator */
+  npts = nth * nph;
+  mreq = (size_t)npts * sizeof(point_f_3d_t);
+  vertex_normals = NULL;
+  mem_realloc((void **)&vertex_normals, mreq, __LOCATION__);
+  memset(vertex_normals, 0, mreq);
 
-  /* Generate triangles for each grid cell */
+  /* Pass 1: accumulate face normals into each corner vertex */
   for( nph_idx = 0; nph_idx < nph; nph_idx++ )
   {
     for( nth_idx = 0; nth_idx < nth - 1; nth_idx++ )
     {
-      /* Calculate vertex indices with phi wrapping */
+      float e1x, e1y, e1z, e2x, e2y, e2z, fnx, fny, fnz;
+      point_3d_t *pp0, *pp1, *pp2, *pp3;
+
+      p0 = nth_idx + nph_idx * nth;
+      p1 = nth_idx + ((nph_idx + 1) % nph) * nth;
+      p2 = (nth_idx + 1) + ((nph_idx + 1) % nph) * nth;
+      p3 = (nth_idx + 1) + nph_idx * nth;
+
+      pp0 = &points[p0];
+      pp1 = &points[p1];
+      pp2 = &points[p2];
+      pp3 = &points[p3];
+
+      /* Triangle A face normal: cross(p1-p0, p2-p0) */
+      e1x = (float)(pp1->x - pp0->x);
+      e1y = (float)(pp1->y - pp0->y);
+      e1z = (float)(pp1->z - pp0->z);
+      e2x = (float)(pp2->x - pp0->x);
+      e2y = (float)(pp2->y - pp0->y);
+      e2z = (float)(pp2->z - pp0->z);
+      fnx = e1y * e2z - e1z * e2y;
+      fny = e1z * e2x - e1x * e2z;
+      fnz = e1x * e2y - e1y * e2x;
+
+      vertex_normals[p0].x += fnx; vertex_normals[p0].y += fny; vertex_normals[p0].z += fnz;
+      vertex_normals[p1].x += fnx; vertex_normals[p1].y += fny; vertex_normals[p1].z += fnz;
+      vertex_normals[p2].x += fnx; vertex_normals[p2].y += fny; vertex_normals[p2].z += fnz;
+
+      /* Triangle B face normal: cross(p2-p0, p3-p0) */
+      e1x = (float)(pp2->x - pp0->x);
+      e1y = (float)(pp2->y - pp0->y);
+      e1z = (float)(pp2->z - pp0->z);
+      e2x = (float)(pp3->x - pp0->x);
+      e2y = (float)(pp3->y - pp0->y);
+      e2z = (float)(pp3->z - pp0->z);
+      fnx = e1y * e2z - e1z * e2y;
+      fny = e1z * e2x - e1x * e2z;
+      fnz = e1x * e2y - e1y * e2x;
+
+      vertex_normals[p0].x += fnx; vertex_normals[p0].y += fny; vertex_normals[p0].z += fnz;
+      vertex_normals[p2].x += fnx; vertex_normals[p2].y += fny; vertex_normals[p2].z += fnz;
+      vertex_normals[p3].x += fnx; vertex_normals[p3].y += fny; vertex_normals[p3].z += fnz;
+
+    } /* for( nth_idx < nth - 1 ) */
+  } /* for( nph_idx < nph ) — pass 1 */
+
+  /* Normalize accumulated vertex normals */
+  for( vi = 0; vi < npts; vi++ )
+  {
+    float len = sqrtf(
+        vertex_normals[vi].x * vertex_normals[vi].x +
+        vertex_normals[vi].y * vertex_normals[vi].y +
+        vertex_normals[vi].z * vertex_normals[vi].z );
+
+    if( len > 1e-6f )
+    {
+      vertex_normals[vi].x /= len;
+      vertex_normals[vi].y /= len;
+      vertex_normals[vi].z /= len;
+    }
+    /* else: degenerate vertex retains zero normal — ambient only */
+  }
+
+  /* Pass 2: fill triangles with position, smooth normal, and color */
+  tri_idx = 0;
+
+  for( nph_idx = 0; nph_idx < nph; nph_idx++ )
+  {
+    for( nth_idx = 0; nth_idx < nth - 1; nth_idx++ )
+    {
       p0 = nth_idx + nph_idx * nth;
       p1 = nth_idx + ((nph_idx + 1) % nph) * nth;
       p2 = (nth_idx + 1) + ((nph_idx + 1) % nph) * nth;
       p3 = (nth_idx + 1) + nph_idx * nth;
 
       /* Triangle A: p0 -> p1 -> p2 */
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 0, &points[p0], r_min, r_range);
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 1, &points[p1], r_min, r_range);
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 2, &points[p2], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 0,
+          &points[p0], &vertex_normals[p0], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 1,
+          &points[p1], &vertex_normals[p1], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 2,
+          &points[p2], &vertex_normals[p2], r_min, r_range);
       tri_idx++;
 
       /* Triangle B: p0 -> p2 -> p3 */
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 0, &points[p0], r_min, r_range);
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 1, &points[p2], r_min, r_range);
-      fill_tri_vertex(&rdpat_triangles[tri_idx], 2, &points[p3], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 0,
+          &points[p0], &vertex_normals[p0], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 1,
+          &points[p2], &vertex_normals[p2], r_min, r_range);
+      fill_tri_vertex(&rdpat_triangles[tri_idx], 2,
+          &points[p3], &vertex_normals[p3], r_min, r_range);
       tri_idx++;
 
     } /* for( nth_idx < nth - 1 ) */
-  } /* for( nph_idx < nph ) */
+  } /* for( nph_idx < nph ) — pass 2 */
 
+  free_ptr((void **)&vertex_normals);
   rdpat_ff_generation++;
 
   return( rdpat_triangle_count );
@@ -325,7 +404,7 @@ opengl_rdpattern_generate_triangles(
 /** opengl_rdpattern_get_nf_lines() - Return near-field line vertex buffer and line count
  * @count: output line count
  */
-  color_point_t*
+  lit_color_point_t*
 opengl_rdpattern_get_nf_lines(int *count)
 {
   *count = nf_line_count;
@@ -337,7 +416,7 @@ opengl_rdpattern_get_nf_lines(int *count)
 /** opengl_rdpattern_get_triangles() - Return far-field triangle buffer and triangle count
  * @count: output triangle count
  */
-  color_triangle_t*
+  lit_color_triangle_t*
 opengl_rdpattern_get_triangles(int *count)
 {
   *count = rdpat_triangle_count;

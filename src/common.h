@@ -480,6 +480,12 @@ typedef struct
 
 typedef struct
 {
+  lit_color_point_t cp[3];
+
+} lit_color_triangle_t;
+
+typedef struct
+{
   float x, y, z;
   float u, v;
 
