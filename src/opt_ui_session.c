@@ -16,6 +16,8 @@
 #include "sy_overrides.h"
 #include "shared.h"
 
+static void pso_auto_populate_particles(int num_vars);
+
 /**
  * check_opt_complete - periodic check if optimizer has finished
  */
@@ -107,6 +109,42 @@ void on_opt_start_clicked(GtkButton *button, gpointer user_data)
 		return;
 	}
 
+	/* Check for zero-range variables (min >= max) */
+	{
+		int bad = 0;
+		char bad_names[256];
+
+		bad_names[0] = '\0';
+		for (int i = 0; i < num_vars; i++)
+		{
+			if (vars[i].min && vars[i].max)
+			{
+				double lo = gsl_vector_get(vars[i].min, 0);
+				double hi = gsl_vector_get(vars[i].max, 0);
+				if (lo >= hi)
+				{
+					if (bad > 0)
+					{
+						strncat(bad_names, ", ",
+							sizeof(bad_names) - strlen(bad_names) - 1);
+					}
+					strncat(bad_names, vars[i].name,
+						sizeof(bad_names) - strlen(bad_names) - 1);
+					bad++;
+				}
+			}
+		}
+		if (bad > 0)
+		{
+			Notice(GTK_BUTTONS_OK, "Optimization",
+				"%d variable(s) have min >= max: %s\n"
+				"Set different min and max values for each optimized variable.",
+				bad, bad_names);
+			sy_overrides_free_opt_vars(vars, num_vars);
+			return;
+		}
+	}
+
 	/* Read fitness config from UI */
 	opt_ui_get_fitness_config(&fit_cfg);
 
@@ -165,6 +203,9 @@ void on_opt_start_clicked(GtkButton *button, gpointer user_data)
 
 		pso_config_init(&algo_params.pso_cfg);
 
+		/* Auto-populate particle count if zero */
+		pso_auto_populate_particles(num_vars);
+
 		num_particles = get_entry_double(pso_particles_entry);
 		num_neighbors = get_entry_double(pso_neighbors_entry);
 
@@ -221,6 +262,12 @@ void on_opt_start_clicked(GtkButton *button, gpointer user_data)
 
 		/* Poll for progress and completion */
 		g_timeout_add(500, check_opt_complete, NULL);
+	}
+	else
+	{
+		Notice(GTK_BUTTONS_OK, "Optimization",
+			"Optimization failed to start.\n"
+			"Check the terminal for details.");
 	}
 }
 
@@ -288,6 +335,49 @@ void opt_ui_update_status(void)
 			set_formula_with_score(log->best_minima);
 		}
 	}
+}
+
+/*------------------------------------------------------------------------*/
+
+/**
+ * pso_auto_populate_particles - fill particle entry with default when zero
+ */
+static void pso_auto_populate_particles(int num_vars)
+{
+	double p;
+
+	p = get_entry_double(pso_particles_entry);
+	if (isnan(p) || (int)p == 0)
+	{
+		char buf[16];
+
+		snprintf(buf, sizeof(buf), "%d",
+			num_vars * PSO_DEFAULT_PARTICLES_PER_DIM);
+		gtk_entry_set_text(GTK_ENTRY(pso_particles_entry), buf);
+	}
+}
+
+/**
+ * on_pso_particles_focus_out - auto-populate particle count when zero
+ */
+gboolean on_pso_particles_focus_out(GtkWidget *widget,
+	GdkEventFocus *event, gpointer user_data)
+{
+	simple_var_t *vars = NULL;
+	int num_vars;
+
+	(void)widget;
+	(void)event;
+	(void)user_data;
+
+	num_vars = sy_overrides_get_opt_vars(&vars);
+	if (num_vars > 0)
+	{
+		pso_auto_populate_particles(num_vars);
+	}
+	sy_overrides_free_opt_vars(vars, num_vars);
+
+	return FALSE;
 }
 
 /*------------------------------------------------------------------------*/

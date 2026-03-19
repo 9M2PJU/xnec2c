@@ -202,6 +202,8 @@ void opt_ui_init(GtkBuilder *builder)
 		G_CALLBACK(on_opt_cancel_clicked), NULL);
 	g_signal_connect(formula_help_button, "clicked",
 		G_CALLBACK(on_opt_formula_help_clicked), NULL);
+	g_signal_connect(pso_particles_entry, "focus-out-event",
+		G_CALLBACK(on_pso_particles_focus_out), NULL);
 
 	/* Auto-save .opt on widget changes */
 	{
@@ -240,6 +242,11 @@ void opt_ui_init(GtkBuilder *builder)
 
 	/* Load saved configuration, then initialize formula display */
 	opt_file_load();
+
+	/* Sync algorithm widget visibility with current combo selection;
+	 * GTK does not emit 'changed' on initial load, so call explicitly. */
+	on_algo_changed(GTK_COMBO_BOX(algo_combo), NULL);
+
 	opt_ui_update_formula();
 }
 

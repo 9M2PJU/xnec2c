@@ -105,5 +105,7 @@ void on_opt_formula_help_clicked(GtkButton *button, gpointer user_data);
 void on_opt_start_clicked(GtkButton *button, gpointer user_data);
 void on_opt_cancel_clicked(GtkButton *button, gpointer user_data);
 void on_algo_changed(GtkComboBox *combo, gpointer user_data);
+gboolean on_pso_particles_focus_out(GtkWidget *widget,
+	GdkEventFocus *event, gpointer user_data);
 
 #endif
