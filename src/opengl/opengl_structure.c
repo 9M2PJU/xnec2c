@@ -49,6 +49,15 @@ const gl_vertex_attrib_t opengl_structure_attribs[3] = {
   { "color",    4, 8 * (int)sizeof(float) }
 };
 
+/* Vertex attribute layout for chevron shader (structure_vertex_t) */
+const gl_vertex_attrib_t opengl_chevron_attribs[5] = {
+  { "position",  3, 0 },
+  { "normal",    3, 4 * (int)sizeof(float) },
+  { "color",     4, 8 * (int)sizeof(float) },
+  { "uv",        2, 12 * (int)sizeof(float) },
+  { "flow_data", 2, 14 * (int)sizeof(float) }
+};
+
 /*-----------------------------------------------------------------------*/
 
 /** opengl_structure_get_radius_scale() - Return current cylinder radius display scale factor
@@ -223,9 +232,9 @@ structure_scene_cleanup(void)
 static gl_view_config_t structure_view_config = {
   .vertex_shader_path = "/gl/lit-color-vertex.glsl",
   .fragment_shader_path = "/gl/lit-color-fragment.glsl",
-  .attribs = opengl_structure_attribs,
-  .attrib_count = 3,
-  .vertex_stride = (int)sizeof(lit_color_point_t),
+  .attribs = opengl_chevron_attribs,
+  .attrib_count = 5,
+  .vertex_stride = (int)sizeof(structure_vertex_t),
   .has_gradient = FALSE,
   .gradient_draw = NULL
 };

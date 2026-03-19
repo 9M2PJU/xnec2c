@@ -61,8 +61,23 @@ void opengl_structure_queue_draw(void);
 #ifdef HAVE_OPENGL
 #include "../opengl-engine/opengl_renderer.h"
 
+/* Extended vertex with UV and flow data for chevron shader.
+ * First 48 bytes are layout-identical to lit_color_point_t. */
+typedef struct
+{
+  point_f_3d_t point;
+  point_f_3d_t normal;
+  rgba_f_t color;
+  float uv[2];
+  float flow_data[2];
+
+} structure_vertex_t;
+
 /* Vertex attribute layout for lit-color shader (structure rendering) */
 extern const gl_vertex_attrib_t opengl_structure_attribs[3];
+
+/* Vertex attribute layout for chevron shader (5 attribs: pos/norm/color/uv/flow) */
+extern const gl_vertex_attrib_t opengl_chevron_attribs[5];
 
 arcball_state_t* opengl_structure_get_arcball(void);
 GtkWidget* opengl_structure_get_widget(void);

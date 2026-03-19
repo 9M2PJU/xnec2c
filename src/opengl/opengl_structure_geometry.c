@@ -36,7 +36,7 @@
 #define STRUCTURE_CYLINDER_SEGMENTS 24
 
 /* Shared geometry buffer accessible by both structure window and overlay */
-static lit_color_point_t *structure_vertices = NULL;
+static structure_vertex_t *structure_vertices = NULL;
 static int structure_vertex_count = 0;
 static unsigned int structure_geometry_generation = 1;
 static structure_draw_mode_t structure_last_mode = STRUCTURE_DRAW_GEOMETRY;
@@ -89,21 +89,36 @@ get_segment_magnitude(int idx, structure_draw_mode_t mode)
 
 /*-----------------------------------------------------------------------*/
 
-/** get_patch_current_magnitude() - RSS magnitude of patch surface currents
+/** get_patch_tangent_magnitudes() - Project patch current onto tangent axes
  * @idx: patch index (0-based into data.m)
+ * @ct1m: output magnitude along t1
+ * @ct2m: output magnitude along t2
  *
- * Projects the xyz current vector onto the patch t1/t2 tangent directions
- * and returns the root-sum-square magnitude.
+ * Caller must ensure crnt.cur is valid and idx is in range.
  */
-  static double
-get_patch_current_magnitude(int idx)
+  static void
+get_patch_tangent_magnitudes(int idx, double *ct1m, double *ct2m)
 {
   int ci = data.n + idx * 3;
   complex double cur_x = crnt.cur[ci];
   complex double cur_y = crnt.cur[ci + 1];
   complex double cur_z = crnt.cur[ci + 2];
-  double ct1m = cabs(cur_x * data.t1x[idx] + cur_y * data.t1y[idx] + cur_z * data.t1z[idx]);
-  double ct2m = cabs(cur_x * data.t2x[idx] + cur_y * data.t2y[idx] + cur_z * data.t2z[idx]);
+
+  *ct1m = cabs(cur_x * data.t1x[idx] + cur_y * data.t1y[idx] + cur_z * data.t1z[idx]);
+  *ct2m = cabs(cur_x * data.t2x[idx] + cur_y * data.t2y[idx] + cur_z * data.t2z[idx]);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** get_patch_current_magnitude() - RSS magnitude of patch surface currents
+ * @idx: patch index (0-based into data.m)
+ */
+  static double
+get_patch_current_magnitude(int idx)
+{
+  double ct1m, ct2m;
+
+  get_patch_tangent_magnitudes(idx, &ct1m, &ct2m);
 
   return( sqrt(ct1m * ct1m + ct2m * ct2m) );
 }
@@ -154,6 +169,65 @@ get_patch_color(int idx, structure_draw_mode_t mode, double cmax,
     *out_g = 0.4f;
     *out_b = 0.9f;
   }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** get_patch_flow_data() - Compute chevron flow angle and magnitude ratio for a patch
+ * @idx: patch index (0-based into data.m)
+ * @mode: current structure draw mode
+ * @cmax: maximum current magnitude for ratio scaling
+ * @out_angle: output flow angle in radians on tangent plane
+ * @out_mag_ratio: output magnitude ratio (0..1)
+ */
+  static void
+get_patch_flow_data(int idx, structure_draw_mode_t mode, double cmax,
+    float *out_angle, float *out_mag_ratio)
+{
+  if( mode == STRUCTURE_DRAW_CURRENTS && cmax > 0.0 &&
+      crnt.valid && crnt.cur != NULL )
+  {
+    double ct1m, ct2m, mag;
+
+    get_patch_tangent_magnitudes(idx, &ct1m, &ct2m);
+    mag = sqrt(ct1m * ct1m + ct2m * ct2m);
+
+    *out_angle = (float)atan2(ct2m, ct1m);
+    *out_mag_ratio = (float)(mag / cmax);
+  }
+  else
+  {
+    *out_angle = 0.0f;
+    *out_mag_ratio = 0.0f;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** set_structure_vertex() - Set all fields of an extended structure vertex
+ */
+  static void
+set_structure_vertex(structure_vertex_t *sv,
+    float px, float py, float pz,
+    float nx, float ny, float nz,
+    float cr, float cg, float cb, float ca,
+    float u, float v_coord,
+    float flow_angle, float mag_ratio)
+{
+  sv->point.x = px;
+  sv->point.y = py;
+  sv->point.z = pz;
+  sv->normal.x = nx;
+  sv->normal.y = ny;
+  sv->normal.z = nz;
+  sv->color.r = cr;
+  sv->color.g = cg;
+  sv->color.b = cb;
+  sv->color.a = ca;
+  sv->uv[0] = u;
+  sv->uv[1] = v_coord;
+  sv->flow_data[0] = flow_angle;
+  sv->flow_data[1] = mag_ratio;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -298,7 +372,7 @@ opengl_structure_generate_geometry(
   else
     total_vertices = data.n * opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS) + data.m * 6;
 
-  mreq = (size_t)total_vertices * sizeof(lit_color_point_t);
+  mreq = (size_t)total_vertices * sizeof(structure_vertex_t);
   mem_realloc((void **)&structure_vertices, mreq, __LOCATION__);
 
   /* Find max magnitude for color scaling (wires + patch currents) */
@@ -430,15 +504,17 @@ opengl_structure_generate_geometry(
       }
 
       /* Endpoint 1 */
-      set_lit_vertex(&structure_vertices[vidx],
+      set_structure_vertex(&structure_vertices[vidx],
           (float)data.x1[idx], (float)data.y1[idx], (float)data.z1[idx],
-          nx, ny, nz, r, g, b, 1.0f);
+          nx, ny, nz, r, g, b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
 
       /* Endpoint 2 */
-      set_lit_vertex(&structure_vertices[vidx],
+      set_structure_vertex(&structure_vertices[vidx],
           (float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx],
-          nx, ny, nz, r, g, b, 1.0f);
+          nx, ny, nz, r, g, b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
     }
 
@@ -453,31 +529,35 @@ opengl_structure_generate_geometry(
       get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
 
       /* Line along t1 axis */
-      set_lit_vertex(&structure_vertices[vidx],
+      set_structure_vertex(&structure_vertices[vidx],
           (float)(data.px[idx] - s * data.t1x[idx]),
           (float)(data.py[idx] - s * data.t1y[idx]),
           (float)(data.pz[idx] - s * data.t1z[idx]),
-          nx, ny, nz, p_r, p_g, p_b, 1.0f);
+          nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
-      set_lit_vertex(&structure_vertices[vidx],
+      set_structure_vertex(&structure_vertices[vidx],
           (float)(data.px[idx] + s * data.t1x[idx]),
           (float)(data.py[idx] + s * data.t1y[idx]),
           (float)(data.pz[idx] + s * data.t1z[idx]),
-          nx, ny, nz, p_r, p_g, p_b, 1.0f);
+          nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
 
       /* Line along t2 axis */
-      set_lit_vertex(&structure_vertices[vidx],
+      set_structure_vertex(&structure_vertices[vidx],
           (float)(data.px[idx] - s * data.t2x[idx]),
           (float)(data.py[idx] - s * data.t2y[idx]),
           (float)(data.pz[idx] - s * data.t2z[idx]),
-          nx, ny, nz, p_r, p_g, p_b, 1.0f);
+          nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
-      set_lit_vertex(&structure_vertices[vidx],
+      set_structure_vertex(&structure_vertices[vidx],
           (float)(data.px[idx] + s * data.t2x[idx]),
           (float)(data.py[idx] + s * data.t2y[idx]),
           (float)(data.pz[idx] + s * data.t2z[idx]),
-          nx, ny, nz, p_r, p_g, p_b, 1.0f);
+          nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
     }
 
@@ -490,13 +570,18 @@ opengl_structure_generate_geometry(
     double scale_factor = cylinder_radius_scale / CYLINDER_RADIUS_SCALE_DEFAULT;
     double min_visible = CYLINDER_MIN_VISIBLE_FRACTION * r_max * scale_factor;
 
+    /* Temp buffer for one cylinder's vertices (segments × 12) */
+    int cyl_vcount = opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS);
+    lit_color_point_t cyl_temp[STRUCTURE_CYLINDER_SEGMENTS * 12];
+
     for( idx = 0; idx < data.n; idx++ )
     {
       lit_cylinder_mesh_t mesh;
       double radius;
+      int cyl_vidx, j;
 
-      mesh.vertices = structure_vertices;
-      mesh.vertex_count = total_vertices;
+      mesh.vertices = cyl_temp;
+      mesh.vertex_count = cyl_vcount;
 
       get_segment_color(idx, mode, cmax, &r, &g, &b);
 
@@ -513,22 +598,36 @@ opengl_structure_generate_geometry(
         point_f_3d_t seg_p2 = {(float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx]};
         rgba_f_t seg_color = {r, g, b, 1.0f};
 
-        vidx = opengl_lit_cylinder_append(&mesh, vidx,
+        cyl_vidx = opengl_lit_cylinder_append(&mesh, 0,
             &seg_p1, &seg_p2, radius, STRUCTURE_CYLINDER_SEGMENTS, &seg_color);
+      }
+
+      /* Expand lit_color_point_t -> structure_vertex_t */
+      for( j = 0; j < cyl_vidx; j++ )
+      {
+        structure_vertices[vidx].point  = cyl_temp[j].point;
+        structure_vertices[vidx].normal = cyl_temp[j].normal;
+        structure_vertices[vidx].color  = cyl_temp[j].color;
+        structure_vertices[vidx].uv[0] = 0.0f;
+        structure_vertices[vidx].uv[1] = 0.0f;
+        structure_vertices[vidx].flow_data[0] = 0.0f;
+        structure_vertices[vidx].flow_data[1] = 0.0f;
+        vidx++;
       }
     }
 
-    /* Patch quads in cylinder mode: 2 triangles per patch (flat colored) */
+    /* Patch quads in cylinder mode: 2 triangles per patch with UV + flow data */
     for( idx = 0; idx < data.m; idx++ )
     {
       double s = sqrt(data.pbi[idx]) / 2.0;
       float nx, ny, nz;
       float p_r, p_g, p_b;
+      float flow_angle, mag_ratio;
       float c0x, c0y, c0z, c1x, c1y, c1z, c2x, c2y, c2z, c3x, c3y, c3z;
 
       get_patch_normal(idx, &nx, &ny, &nz);
 
-      /* Quad corners */
+      /* Quad corners: c0(+t1,+t2) c1(-t1,+t2) c2(-t1,-t2) c3(+t1,-t2) */
       c0x = (float)(data.px[idx] + s * data.t1x[idx] + s * data.t2x[idx]);
       c0y = (float)(data.py[idx] + s * data.t1y[idx] + s * data.t2y[idx]);
       c0z = (float)(data.pz[idx] + s * data.t1z[idx] + s * data.t2z[idx]);
@@ -543,27 +642,34 @@ opengl_structure_generate_geometry(
       c3z = (float)(data.pz[idx] + s * data.t1z[idx] - s * data.t2z[idx]);
 
       get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
+      get_patch_flow_data(idx, mode, cmax, &flow_angle, &mag_ratio);
 
-      /* Triangle 1: c0, c1, c2 */
-      set_lit_vertex(&structure_vertices[vidx],
-          c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      /* Triangle 1: c0(1,1), c1(0,1), c2(0,0) */
+      set_structure_vertex(&structure_vertices[vidx],
+          c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          1.0f, 1.0f, flow_angle, mag_ratio);
       vidx++;
-      set_lit_vertex(&structure_vertices[vidx],
-          c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      set_structure_vertex(&structure_vertices[vidx],
+          c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 1.0f, flow_angle, mag_ratio);
       vidx++;
-      set_lit_vertex(&structure_vertices[vidx],
-          c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      set_structure_vertex(&structure_vertices[vidx],
+          c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, flow_angle, mag_ratio);
       vidx++;
 
-      /* Triangle 2: c0, c2, c3 */
-      set_lit_vertex(&structure_vertices[vidx],
-          c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      /* Triangle 2: c0(1,1), c2(0,0), c3(1,0) */
+      set_structure_vertex(&structure_vertices[vidx],
+          c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          1.0f, 1.0f, flow_angle, mag_ratio);
       vidx++;
-      set_lit_vertex(&structure_vertices[vidx],
-          c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      set_structure_vertex(&structure_vertices[vidx],
+          c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, flow_angle, mag_ratio);
       vidx++;
-      set_lit_vertex(&structure_vertices[vidx],
-          c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f);
+      set_structure_vertex(&structure_vertices[vidx],
+          c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          1.0f, 0.0f, flow_angle, mag_ratio);
       vidx++;
     }
 
@@ -616,7 +722,7 @@ opengl_structure_update_shared_geometry(void)
     /* Update shared overlay data after regeneration */
     shared_overlay_data.vertices = structure_vertices;
     shared_overlay_data.vertex_count = structure_vertex_count;
-    shared_overlay_data.vertex_stride = (int)sizeof(lit_color_point_t);
+    shared_overlay_data.vertex_stride = (int)sizeof(structure_vertex_t);
     shared_overlay_data.view_scale = structure_view_scale;
     shared_overlay_data.draw_mode = structure_draw_mode;
     shared_overlay_data.generation = structure_geometry_generation;

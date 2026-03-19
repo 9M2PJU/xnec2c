@@ -57,8 +57,8 @@ static arcball_state_t *rdpattern_arcball = NULL;
 static const gl_overlay_config_t rdpattern_overlay_config = {
   .vertex_shader_path = "/gl/lit-color-vertex.glsl",
   .fragment_shader_path = "/gl/lit-color-fragment.glsl",
-  .attribs = opengl_structure_attribs,
-  .attrib_count = 3
+  .attribs = opengl_chevron_attribs,
+  .attrib_count = 5
 };
 
 
