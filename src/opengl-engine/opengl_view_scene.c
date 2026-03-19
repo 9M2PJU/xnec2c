@@ -61,32 +61,6 @@ gl_scene_prepare(void *ctx, float r_max)
 
   (void)r_max;
 
-  /* Generate LIC noise texture on first prepare (GL context is active) */
-  if( view->noise_tex == 0 )
-  {
-    enum { NOISE_SIZE = 256 };
-    unsigned char noise_data[NOISE_SIZE * NOISE_SIZE];
-    int i;
-
-    srand(42);
-    for( i = 0; i < NOISE_SIZE * NOISE_SIZE; i++ )
-      noise_data[i] = (unsigned char)(rand() % 256);
-
-    glGenTextures(1, &view->noise_tex);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, view->noise_tex);
-
-    /* GL_RED for core profile compatibility (GL_LUMINANCE is
-     * deprecated in 3.x+ core contexts created by GtkGLArea) */
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, NOISE_SIZE, NOISE_SIZE, 0,
-        GL_RED, GL_UNSIGNED_BYTE, noise_data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glActiveTexture(GL_TEXTURE0);
-  }
-
   if( c->generation == view->last_generation )
     return;
 
@@ -208,13 +182,6 @@ gl_scene_free(void *ctx)
 
   if( sc->view->scene && sc->view->scene->cleanup )
     sc->view->scene->cleanup();
-
-  /* Release shared noise texture when scene is destroyed */
-  if( sc->view->noise_tex )
-  {
-    glDeleteTextures(1, &sc->view->noise_tex);
-    sc->view->noise_tex = 0;
-  }
 
   if( sc->vbo )
     glDeleteBuffers(1, &sc->vbo);

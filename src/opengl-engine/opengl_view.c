@@ -62,6 +62,13 @@ gl_view_state_free(gl_view_state_t *state)
   if( state->status_overlay )
     cairo_gl_overlay_free(state->status_overlay);
 
+  /* Release shared noise texture before renderables */
+  if( state->noise_tex )
+  {
+    glDeleteTextures(1, &state->noise_tex);
+    state->noise_tex = 0;
+  }
+
   /* Destroy all renderables in reverse registration order */
   if( state->renderables )
   {
@@ -193,6 +200,38 @@ on_realize(GtkGLArea *area, gpointer user_data)
   }
 
   state->initialized = TRUE;
+
+  /* Generate LIC noise texture (256x256 grayscale, shared by all renderables).
+   * Created here in view state rather than in a single renderable so that
+   * both scene and overlay can reference it without ownership ambiguity. */
+  {
+    enum { NOISE_SIZE = 256 };
+    unsigned char noise_data[NOISE_SIZE * NOISE_SIZE];
+    unsigned int rng = 42;
+    int ni;
+
+    for( ni = 0; ni < NOISE_SIZE * NOISE_SIZE; ni++ )
+    {
+      rng ^= rng << 13;
+      rng ^= rng >> 17;
+      rng ^= rng << 5;
+      noise_data[ni] = (unsigned char)(rng & 0xFF);
+    }
+
+    glGenTextures(1, &state->noise_tex);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, state->noise_tex);
+
+    /* GL_RED for core profile compatibility (GL_LUMINANCE is
+     * deprecated in 3.x+ core contexts created by GtkGLArea) */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, NOISE_SIZE, NOISE_SIZE, 0,
+        GL_RED, GL_UNSIGNED_BYTE, noise_data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glActiveTexture(GL_TEXTURE0);
+  }
 
   /* Gradient overlay (2D HUD, not a renderable) — optional */
   if( state->config->has_gradient )

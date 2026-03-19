@@ -322,6 +322,15 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
         ocfg->attribs[i].name);
   }
 
+  /* Override default generic value for flow_data attribute.
+   * See gl_view_scene_renderable_new() for rationale. */
+  {
+    GLint flow_loc = glGetAttribLocation(ovl->shader.program, "flow_data");
+
+    if( flow_loc >= 0 )
+      glVertexAttrib4f(flow_loc, 0.0f, 0.0f, 0.0f, 0.0f);
+  }
+
   ovl->last_generation = (unsigned int)-1;
   ovl->initialized = TRUE;
 

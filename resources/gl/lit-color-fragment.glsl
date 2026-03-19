@@ -128,34 +128,6 @@ void main() {
       angle = atan(re2, re1);
     }
 
-    vec2 centered = vUV - vec2(0.5);
-    float ca = cos(angle);
-    float sa = sin(angle);
-
-    /* Clockwise pattern rotation to align chevrons with flow direction.
-     * Transposed rotation matrix: pattern rotates in same sense as angle. */
-    vec2 rotated = vec2(
-        centered.x * ca + centered.y * sa,
-       -centered.x * sa + centered.y * ca);
-
-    float chevron;
-    if (flow_mode == FLOW_DIR_POLARIZATION_TILT) {
-      /* Bidirectional: mirrored V-marks for oscillation axis */
-      float row_fwd = fract( rotated.x * CHEVRON_FREQ);
-      float row_rev = fract(-rotated.x * CHEVRON_FREQ);
-      float chev_fwd = abs(rotated.y) * 2.0 + row_fwd;
-      float chev_rev = abs(rotated.y) * 2.0 + row_rev;
-      chev_fwd = 1.0 - smoothstep(0.45, 0.55, fract(chev_fwd));
-      chev_rev = 1.0 - smoothstep(0.45, 0.55, fract(chev_rev));
-      chevron = max(chev_fwd, chev_rev);
-    }
-    else {
-      /* Unidirectional: repeating V-shape, 6 chevron marks */
-      float row = fract(rotated.x * CHEVRON_FREQ);
-      chevron = abs(rotated.y) * 2.0 + row;
-      chevron = 1.0 - smoothstep(0.45, 0.55, fract(chevron));
-    }
-
     if (flow_mode == FLOW_DIR_LIC) {
       /* LIC: line integral convolution in screen space.
        * Noise sampled at gl_FragCoord (window pixels) so adjacent
@@ -209,11 +181,38 @@ void main() {
       color *= mix(1.0 - lic_strength, 1.0 + lic_strength, acc);
     }
     else {
-    /* Darken lit color at chevron marks, scaled by magnitude.
-     * Floor at MIN so weak currents still show faint chevrons. */
-    float contrast = mix(CHEVRON_MIN_CONTRAST,
-                         CHEVRON_MAX_CONTRAST, mag_ratio);
-    color = mix(color, color * 0.4, chevron * contrast);
+      /* Rotate UV coordinates to align chevron pattern with flow direction.
+       * Transposed rotation matrix: pattern rotates in same sense as angle. */
+      vec2 centered = vUV - vec2(0.5);
+      float ca = cos(angle);
+      float sa = sin(angle);
+      vec2 rotated = vec2(
+          centered.x * ca + centered.y * sa,
+         -centered.x * sa + centered.y * ca);
+
+      float chevron;
+      if (flow_mode == FLOW_DIR_POLARIZATION_TILT) {
+        /* Bidirectional: mirrored V-marks for oscillation axis */
+        float row_fwd = fract( rotated.x * CHEVRON_FREQ);
+        float row_rev = fract(-rotated.x * CHEVRON_FREQ);
+        float chev_fwd = abs(rotated.y) * 2.0 + row_fwd;
+        float chev_rev = abs(rotated.y) * 2.0 + row_rev;
+        chev_fwd = 1.0 - smoothstep(0.45, 0.55, fract(chev_fwd));
+        chev_rev = 1.0 - smoothstep(0.45, 0.55, fract(chev_rev));
+        chevron = max(chev_fwd, chev_rev);
+      }
+      else {
+        /* Unidirectional: repeating V-shape, 6 chevron marks */
+        float row = fract(rotated.x * CHEVRON_FREQ);
+        chevron = abs(rotated.y) * 2.0 + row;
+        chevron = 1.0 - smoothstep(0.45, 0.55, fract(chevron));
+      }
+
+      /* Darken lit color at chevron marks, scaled by magnitude.
+       * Floor at MIN so weak currents still show faint chevrons. */
+      float contrast = mix(CHEVRON_MIN_CONTRAST,
+                           CHEVRON_MAX_CONTRAST, mag_ratio);
+      color = mix(color, color * 0.4, chevron * contrast);
     }
   }
 
