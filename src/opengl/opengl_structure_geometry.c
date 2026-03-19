@@ -35,6 +35,14 @@
 /* Number of sides for cylinder rendering */
 #define STRUCTURE_CYLINDER_SEGMENTS 24
 
+/* Arrow geometry in UV patch space (0..1 range), 80% of box */
+#define LINE_ARROW_TAIL_OFF    -0.24f
+#define LINE_ARROW_NECK_OFF     0.04f
+#define LINE_ARROW_TIP_OFF      0.28f
+#define LINE_ARROW_SHAFT_HW     0.024f
+#define LINE_ARROW_HEAD_HS      0.096f
+
+
 /* Shared geometry buffer accessible by both structure window and overlay */
 static structure_vertex_t *structure_vertices = NULL;
 static int structure_vertex_count = 0;
@@ -336,6 +344,35 @@ calculate_excitation_center(double *cx, double *cy, double *cz)
 
 /*-----------------------------------------------------------------------*/
 
+/** patch_uv_to_3d() - Convert UV coordinates on patch surface to 3D world position
+ * @idx: patch index (0-based into data.m)
+ * @s: half-side length of the patch (sqrt(pbi)/2)
+ * @u: horizontal UV coordinate (0..1)
+ * @v: vertical UV coordinate (0..1)
+ * @out_x: output x position
+ * @out_y: output y position
+ * @out_z: output z position
+ *
+ * Maps UV in [0,1]^2 to world space via:
+ *   P(u,v) = center + (2u-1)*s*t1 + (2v-1)*s*t2
+ */
+  static void
+patch_uv_to_3d(int idx, double s, float u, float v,
+    float *out_x, float *out_y, float *out_z)
+{
+  double du = 2.0 * (double)u - 1.0;
+  double dv = 2.0 * (double)v - 1.0;
+
+  *out_x = (float)(data.px[idx] + du * s * data.t1x[idx]
+                                 + dv * s * data.t2x[idx]);
+  *out_y = (float)(data.py[idx] + du * s * data.t1y[idx]
+                                 + dv * s * data.t2y[idx]);
+  *out_z = (float)(data.pz[idx] + du * s * data.t1z[idx]
+                                 + dv * s * data.t2z[idx]);
+}
+
+/*-----------------------------------------------------------------------*/
+
 /** opengl_structure_generate_geometry() - Generate cylinder geometry for antenna wire segments
  * @mode: draw mode (geometry, currents, or charges)
  * @cylinder_radius_scale: user-adjustable radius multiplier
@@ -366,9 +403,10 @@ opengl_structure_generate_geometry(
   line_mode = (cylinder_radius_scale < CYLINDER_SCALE_LINE_THRESHOLD);
 
   /* Vertex budget depends on rendering mode.
-   * Patches: line mode = 4 verts (cross), cylinder mode = 6 verts (2 triangles). */
+   * Patches: line mode = box(8) + arrow(14) = 22,
+   * cylinder mode = 6 verts (2 triangles). */
   if( line_mode )
-    total_vertices = data.n * 2 + data.m * 4;
+    total_vertices = data.n * 2 + data.m * 22;
   else
     total_vertices = data.n * opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS) + data.m * 6;
 
@@ -518,47 +556,205 @@ opengl_structure_generate_geometry(
       vidx++;
     }
 
-    /* Patch crosses in line mode: 2 perpendicular lines per patch */
+    /* Patch outlines in line mode: box edges + interior fill */
     for( idx = 0; idx < data.m; idx++ )
     {
       double s = sqrt(data.pbi[idx]) / 2.0;
       float nx, ny, nz;
       float p_r, p_g, p_b;
+      float c0x, c0y, c0z, c1x, c1y, c1z;
+      float c2x, c2y, c2z, c3x, c3y, c3z;
 
       get_patch_normal(idx, &nx, &ny, &nz);
       get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
 
-      /* Line along t1 axis */
+      /* Quad corners: c0(+t1,+t2) c1(-t1,+t2) c2(-t1,-t2) c3(+t1,-t2) */
+      c0x = (float)(data.px[idx] + s * data.t1x[idx] + s * data.t2x[idx]);
+      c0y = (float)(data.py[idx] + s * data.t1y[idx] + s * data.t2y[idx]);
+      c0z = (float)(data.pz[idx] + s * data.t1z[idx] + s * data.t2z[idx]);
+      c1x = (float)(data.px[idx] - s * data.t1x[idx] + s * data.t2x[idx]);
+      c1y = (float)(data.py[idx] - s * data.t1y[idx] + s * data.t2y[idx]);
+      c1z = (float)(data.pz[idx] - s * data.t1z[idx] + s * data.t2z[idx]);
+      c2x = (float)(data.px[idx] - s * data.t1x[idx] - s * data.t2x[idx]);
+      c2y = (float)(data.py[idx] - s * data.t1y[idx] - s * data.t2y[idx]);
+      c2z = (float)(data.pz[idx] - s * data.t1z[idx] - s * data.t2z[idx]);
+      c3x = (float)(data.px[idx] + s * data.t1x[idx] - s * data.t2x[idx]);
+      c3y = (float)(data.py[idx] + s * data.t1y[idx] - s * data.t2y[idx]);
+      c3z = (float)(data.pz[idx] + s * data.t1z[idx] - s * data.t2z[idx]);
+
+      /* Box outline: 4 edges as GL_LINES pairs (8 vertices) */
       set_structure_vertex(&structure_vertices[vidx],
-          (float)(data.px[idx] - s * data.t1x[idx]),
-          (float)(data.py[idx] - s * data.t1y[idx]),
-          (float)(data.pz[idx] - s * data.t1z[idx]),
-          nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
           0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
-          (float)(data.px[idx] + s * data.t1x[idx]),
-          (float)(data.py[idx] + s * data.t1y[idx]),
-          (float)(data.pz[idx] + s * data.t1z[idx]),
-          nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
           0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
 
-      /* Line along t2 axis */
       set_structure_vertex(&structure_vertices[vidx],
-          (float)(data.px[idx] - s * data.t2x[idx]),
-          (float)(data.py[idx] - s * data.t2y[idx]),
-          (float)(data.pz[idx] - s * data.t2z[idx]),
-          nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
           0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
-          (float)(data.px[idx] + s * data.t2x[idx]),
-          (float)(data.py[idx] + s * data.t2y[idx]),
-          (float)(data.pz[idx] + s * data.t2z[idx]),
-          nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
           0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
+
+      set_structure_vertex(&structure_vertices[vidx],
+          c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
+      vidx++;
+      set_structure_vertex(&structure_vertices[vidx],
+          c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
+      vidx++;
+
+      set_structure_vertex(&structure_vertices[vidx],
+          c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
+      vidx++;
+      set_structure_vertex(&structure_vertices[vidx],
+          c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+          0.0f, 0.0f, 0.0f, 0.0f);
+      vidx++;
+
+      /* Interior fill: chevron V-marks or stipple dots */
+      {
+        gboolean use_chevrons = FALSE;
+        float flow_angle = 0.0f;
+        float mag_ratio = 0.0f;
+
+        if( mode == STRUCTURE_DRAW_CURRENTS )
+        {
+          get_patch_flow_data(idx, mode, cmax, &flow_angle, &mag_ratio);
+
+          if( mag_ratio > 0.01f )
+            use_chevrons = TRUE;
+        }
+
+        if( use_chevrons )
+        {
+          /* Arrow only rendered when current data is active and above threshold */
+          /* Bold arrow: rectangle shaft + wide arrowhead (7 lines, 14 vertices)
+           *
+           *   s0────────s1
+           *   │     ┌────a_left
+           *   │     │   ╱
+           *   │     │  tip
+           *   │     │   ╲
+           *   │     └────a_right
+           *   s3────────s2
+           */
+          float fca = cosf(flow_angle);
+          float fsa = sinf(flow_angle);
+          float pu = -fsa;
+          float pv = fca;
+          float s0u, s0v, s1u, s1v, s2u, s2v, s3u, s3v;
+          float alu, alv, aru, arv, tipu, tipv;
+          float s0x, s0y, s0z, s1x, s1y, s1z;
+          float s2x, s2y, s2z, s3x, s3y, s3z;
+          float alx, aly, alz, arx, ary, arz;
+          float tipx, tipy, tipz;
+
+          /* Shaft corners in UV space */
+          s0u = 0.5f + LINE_ARROW_TAIL_OFF * fca + LINE_ARROW_SHAFT_HW * pu;
+          s0v = 0.5f + LINE_ARROW_TAIL_OFF * fsa + LINE_ARROW_SHAFT_HW * pv;
+          s1u = 0.5f + LINE_ARROW_NECK_OFF * fca + LINE_ARROW_SHAFT_HW * pu;
+          s1v = 0.5f + LINE_ARROW_NECK_OFF * fsa + LINE_ARROW_SHAFT_HW * pv;
+          s2u = 0.5f + LINE_ARROW_NECK_OFF * fca - LINE_ARROW_SHAFT_HW * pu;
+          s2v = 0.5f + LINE_ARROW_NECK_OFF * fsa - LINE_ARROW_SHAFT_HW * pv;
+          s3u = 0.5f + LINE_ARROW_TAIL_OFF * fca - LINE_ARROW_SHAFT_HW * pu;
+          s3v = 0.5f + LINE_ARROW_TAIL_OFF * fsa - LINE_ARROW_SHAFT_HW * pv;
+
+          /* Arrowhead points in UV space */
+          alu = 0.5f + LINE_ARROW_NECK_OFF * fca + LINE_ARROW_HEAD_HS * pu;
+          alv = 0.5f + LINE_ARROW_NECK_OFF * fsa + LINE_ARROW_HEAD_HS * pv;
+          aru = 0.5f + LINE_ARROW_NECK_OFF * fca - LINE_ARROW_HEAD_HS * pu;
+          arv = 0.5f + LINE_ARROW_NECK_OFF * fsa - LINE_ARROW_HEAD_HS * pv;
+          tipu = 0.5f + LINE_ARROW_TIP_OFF * fca;
+          tipv = 0.5f + LINE_ARROW_TIP_OFF * fsa;
+
+          /* Convert all points to 3D */
+          patch_uv_to_3d(idx, s, s0u, s0v, &s0x, &s0y, &s0z);
+          patch_uv_to_3d(idx, s, s1u, s1v, &s1x, &s1y, &s1z);
+          patch_uv_to_3d(idx, s, s2u, s2v, &s2x, &s2y, &s2z);
+          patch_uv_to_3d(idx, s, s3u, s3v, &s3x, &s3y, &s3z);
+          patch_uv_to_3d(idx, s, alu, alv, &alx, &aly, &alz);
+          patch_uv_to_3d(idx, s, aru, arv, &arx, &ary, &arz);
+          patch_uv_to_3d(idx, s, tipu, tipv, &tipx, &tipy, &tipz);
+
+          /* Shaft top edge: s0 to s1 */
+          set_structure_vertex(&structure_vertices[vidx],
+              s0x, s0y, s0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+          set_structure_vertex(&structure_vertices[vidx],
+              s1x, s1y, s1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+
+          /* Shaft bottom edge: s3 to s2 */
+          set_structure_vertex(&structure_vertices[vidx],
+              s3x, s3y, s3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+          set_structure_vertex(&structure_vertices[vidx],
+              s2x, s2y, s2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+
+          /* Tail cap: s0 to s3 */
+          set_structure_vertex(&structure_vertices[vidx],
+              s0x, s0y, s0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+          set_structure_vertex(&structure_vertices[vidx],
+              s3x, s3y, s3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+
+          /* Top notch: s1 to a_left */
+          set_structure_vertex(&structure_vertices[vidx],
+              s1x, s1y, s1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+          set_structure_vertex(&structure_vertices[vidx],
+              alx, aly, alz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+
+          /* Top arm: a_left to tip */
+          set_structure_vertex(&structure_vertices[vidx],
+              alx, aly, alz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+          set_structure_vertex(&structure_vertices[vidx],
+              tipx, tipy, tipz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+
+          /* Bottom notch: s2 to a_right */
+          set_structure_vertex(&structure_vertices[vidx],
+              s2x, s2y, s2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+          set_structure_vertex(&structure_vertices[vidx],
+              arx, ary, arz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+
+          /* Bottom arm: a_right to tip */
+          set_structure_vertex(&structure_vertices[vidx],
+              arx, ary, arz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+          set_structure_vertex(&structure_vertices[vidx],
+              tipx, tipy, tipz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+              0.0f, 0.0f, 0.0f, 0.0f);
+          vidx++;
+        }
+      }
     }
 
     structure_draw_mode = GL_LINES;
