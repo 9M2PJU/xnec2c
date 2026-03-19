@@ -31,6 +31,16 @@ typedef enum
 
 } structure_draw_mode_t;
 
+/* Flow direction visualization mode for patch currents */
+typedef enum
+{
+  FLOW_DIR_REFERENCE_PHASE = 0,
+  FLOW_DIR_POLARIZATION_TILT,
+  FLOW_DIR_PEAK_MAGNITUDE,
+  FLOW_DIR_LIC
+
+} flow_direction_mode_t;
+
 /* Shared structure geometry for overlay rendering */
 typedef struct
 {
@@ -69,7 +79,7 @@ typedef struct
   point_f_3d_t normal;
   rgba_f_t color;
   float uv[2];
-  float flow_data[2];
+  float flow_data[4];   /* Re(ct1), Im(ct1), Re(ct2), Im(ct2) */
 
 } structure_vertex_t;
 
@@ -100,6 +110,12 @@ const structure_overlay_data_t* opengl_structure_get_shared_geometry(void);
 
 /* Update spin button display text without emitting value_changed signal */
 void opengl_update_spin_display(GtkSpinButton *spin, double angle);
+
+/* Timeout callback for flow phase animation (FLOW_ANIMATE flag) */
+gboolean Animate_Flow_Phase(gpointer udata);
+
+/* Reset flow phase to zero on both CPU geometry and GPU views */
+void opengl_structure_reset_flow_phase(void);
 
 #endif
 

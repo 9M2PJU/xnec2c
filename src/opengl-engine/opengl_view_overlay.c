@@ -31,6 +31,9 @@ typedef struct
   GLuint vbo;
   GLint mvp_location;
   GLint u_alpha_location;
+  GLint flow_mode_location;
+  GLint u_phase_location;
+  GLint noise_tex_location;
   GLint *attrib_locations;
   unsigned int last_generation;
   gboolean initialized;
@@ -136,9 +139,20 @@ gl_overlay_render(void *ctx, mat4 mvp, float alpha)
   if( ovl->ovl_content.vertex_count <= 0 )
     return;
 
-  /* Set alpha multiplier before draw pass */
+  /* Set uniforms before draw pass */
   glUseProgram(ovl->shader.program);
   glUniform1f(ovl->u_alpha_location, alpha);
+  glUniform1i(ovl->flow_mode_location, rc_config.opengl_flow_direction_mode);
+  glUniform1f(ovl->u_phase_location, ovl->view->flow_phase);
+
+  /* Bind LIC noise texture to unit 1 (shared with scene via view state) */
+  if( ovl->view->noise_tex != 0 )
+  {
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, ovl->view->noise_tex);
+    glUniform1i(ovl->noise_tex_location, 1);
+    glActiveTexture(GL_TEXTURE0);
+  }
 
   gl_view_draw_pass(
       ovl->shader.program,
@@ -290,6 +304,12 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
     glGetUniformLocation(ovl->shader.program, "mvp");
   ovl->u_alpha_location =
     glGetUniformLocation(ovl->shader.program, "u_alpha");
+  ovl->flow_mode_location =
+    glGetUniformLocation(ovl->shader.program, "flow_mode");
+  ovl->u_phase_location =
+    glGetUniformLocation(ovl->shader.program, "u_phase");
+  ovl->noise_tex_location =
+    glGetUniformLocation(ovl->shader.program, "noise_tex");
 
   glGenVertexArrays(1, &ovl->vao);
   glGenBuffers(1, &ovl->vbo);

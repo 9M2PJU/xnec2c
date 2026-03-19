@@ -222,6 +222,9 @@ typedef struct Segment
 // Suppress intermediate redraws during frequency loops
 #define SUPPRESS_INTERMEDIATE_REDRAWS    0x0080000000000000ll
 
+/* Patch current flow direction phase animation active */
+#define FLOW_ANIMATE        0x0100000000000000ll
+
 #define ALL_FLAGS           0xFFFFFFFFFFFFFFFFll
 
 /* Type of near field data requested */
@@ -399,6 +402,9 @@ typedef struct
 
   /* Rdpattern overlay structure toggle */
   int rdpattern_overlay_structure;
+
+  /* Patch current flow direction visualization mode */
+  int opengl_flow_direction_mode;
 } rc_config_t;
 
 typedef struct {
@@ -1200,6 +1206,8 @@ gboolean on_rdpattern_window_key_press_event(GtkWidget *widget, GdkEventKey *eve
 void on_near_peak_value_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_near_snapshot_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_structure_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_flow_direction_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_animate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 gboolean on_animate_spinbutton_focus_out_event(GtkWidget *widget, GdkEventFocus *event, gpointer user_data);
 void on_animation_applybutton_clicked(GtkButton *button, gpointer user_data);

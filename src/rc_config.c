@@ -145,6 +145,9 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "OpenGL Cylinder Radius Scale", .format = "%lf",
 		.vars = { &rc_config.opengl_cylinder_radius_scale } },
 
+	{ .desc = "OpenGL Flow Direction Mode", .format = "%d",
+		.vars = { &rc_config.opengl_flow_direction_mode } },
+
 	{ .desc = "Frequency Plots Window Size, in pixels", .format = "%d,%d",
 		.vars = { &rc_config.freqplots_width, &rc_config.freqplots_height } },
 
@@ -759,6 +762,26 @@ Restore_GUI_State( void )
     widget = Builder_Get_Object( main_window_builder, "main_loop_start" );
     gtk_button_clicked( GTK_BUTTON(widget) );
   }
+
+  /* Restore flow direction radio selection in main window */
+  {
+    gchar *flow_dir_ids[] = {
+      "main_flow_dir_ref_phase",
+      "main_flow_dir_pol_axis",
+      "main_flow_dir_peak_mag",
+      "main_flow_dir_lic"
+    };
+
+    int fmode = rc_config.opengl_flow_direction_mode;
+
+    if( fmode >= 0 &&
+        fmode < (int)(sizeof(flow_dir_ids) / sizeof(flow_dir_ids[0])) )
+    {
+      widget = Builder_Get_Object( main_window_builder, flow_dir_ids[fmode] );
+      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
+    }
+  }
+
 
   /* Set the "Confirm Quit" menu item */
   widget = Builder_Get_Object( main_window_builder, "confirm_quit" );

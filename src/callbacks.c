@@ -35,6 +35,7 @@ static void common_projection_share_arcball(void);
 /* Action flag for NEC2 "card" editors */
 static int editor_action = EDITOR_NEW;
 
+
 /* Canonical angle ranges for wrapping
  * Adjustments have wider bounds to allow triggering wrap detection */
 #define ROTATE_LOWER    0.0
@@ -2810,6 +2811,19 @@ on_rdpattern_animate_activate(
 }
 
 
+  void
+on_structure_animate_activate(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+  if( animate_dialog == NULL )
+  {
+    animate_dialog = create_animate_dialog( &animate_dialog_builder );
+  }
+  gtk_widget_show( animate_dialog );
+}
+
+
 static guint animation_apply_timer = 0;
 
   static void
@@ -2830,13 +2844,24 @@ update_animation_parameters(void)
 
   if( anim_tag > 0 )
     g_source_remove( anim_tag );
-  anim_tag = g_timeout_add( intval, Animate_Near_Field, NULL );
+  anim_tag = 0;
+
+  if( flow_anim_tag > 0 )
+    g_source_remove( flow_anim_tag );
+  flow_anim_tag = 0;
+
+  /* Install independent timers for each active animation */
+  if( isFlagSet(NEAREH_ANIMATE) )
+    anim_tag = g_timeout_add( intval, Animate_Near_Field, NULL );
+
+  if( isFlagSet(FLOW_ANIMATE) )
+    flow_anim_tag = g_timeout_add( intval, Animate_Flow_Phase, NULL );
 }
 
   static gboolean
 apply_animation_delayed(gpointer user_data)
 {
-  if( isFlagSet(NEAREH_ANIMATE) )
+  if( isFlagSet(FLOW_ANIMATE) || isFlagSet(NEAREH_ANIMATE) )
     update_animation_parameters();
 
   animation_apply_timer = 0;
@@ -2850,7 +2875,8 @@ on_animate_spinbutton_value_changed(
 {
   gtk_spin_button_update( spinbutton );
 
-  if( isFlagClear(NEAREH_ANIMATE) )
+  /* Skip live update if no animation is active */
+  if( isFlagClear(FLOW_ANIMATE) && isFlagClear(NEAREH_ANIMATE) )
     return;
 
   if( animation_apply_timer != 0 )
@@ -2871,7 +2897,7 @@ on_animate_spinbutton_focus_out_event(
     animation_apply_timer = 0;
   }
 
-  if( isFlagSet(NEAREH_ANIMATE) )
+  if( isFlagSet(FLOW_ANIMATE) || isFlagSet(NEAREH_ANIMATE) )
     update_animation_parameters();
 
   return( FALSE );
@@ -2882,10 +2908,13 @@ on_animation_applybutton_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  if( !Validate_Nearfield_Animation() )
-    return;
+  /* Flow animation always applicable when patches exist */
+  SetFlag( FLOW_ANIMATE );
 
-  SetFlag( NEAREH_ANIMATE );
+  /* Near field animation requires valid EH field setup */
+  if( isFlagSet(DRAW_EHFIELD) && Validate_Nearfield_Animation() )
+    SetFlag( NEAREH_ANIMATE );
+
   update_animation_parameters();
 }
 
@@ -2895,10 +2924,17 @@ on_animation_cancelbutton_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
+  ClearFlag( FLOW_ANIMATE );
   ClearFlag( NEAREH_ANIMATE );
+  opengl_structure_reset_flow_phase();
+
   if( anim_tag )
     g_source_remove( anim_tag );
   anim_tag = 0;
+
+  if( flow_anim_tag )
+    g_source_remove( flow_anim_tag );
+  flow_anim_tag = 0;
 }
 
 
@@ -2907,26 +2943,69 @@ on_animation_okbutton_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  GtkSpinButton *spinbutton;
-  guint intval;
-  gdouble freq, steps;
+  SetFlag( FLOW_ANIMATE );
 
-  if( !Validate_Nearfield_Animation() )
+  if( isFlagSet(DRAW_EHFIELD) && Validate_Nearfield_Animation() )
+    SetFlag( NEAREH_ANIMATE );
+
+  update_animation_parameters();
+}
+
+
+/** on_flow_direction_activate() - Callback for flow direction radio menu items
+ * @menuitem: activated radio menu item
+ * @user_data: unused
+ *
+ * Determines mode from widget identity across both window builders.
+ * Skips inactive radio emissions to avoid double-fire on group switches.
+ */
+  void
+on_flow_direction_activate(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+  static const struct
+  {
+    gchar *id;
+    int mode;
+  } items[] = {
+    { "main_flow_dir_ref_phase", FLOW_DIR_REFERENCE_PHASE },
+    { "main_flow_dir_pol_axis",  FLOW_DIR_POLARIZATION_TILT },
+    { "main_flow_dir_peak_mag",  FLOW_DIR_PEAK_MAGNITUDE },
+    { "main_flow_dir_lic",       FLOW_DIR_LIC },
+  };
+
+  int i;
+
+  if( GTK_IS_CHECK_MENU_ITEM(menuitem) &&
+      !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
     return;
 
-  spinbutton = GTK_SPIN_BUTTON(
-      Builder_Get_Object(animate_dialog_builder, "animate_freq_spinbutton") );
-  freq = gtk_spin_button_get_value( spinbutton );
-  spinbutton = GTK_SPIN_BUTTON(
-      Builder_Get_Object(animate_dialog_builder, "animate_steps_spinbutton") );
-  steps = gtk_spin_button_get_value( spinbutton );
-  intval = (guint)(1000.0 / steps / freq);
-  near_field.anim_step = (double)M_2PI / steps;
+  for( i = 0; i < (int)(sizeof(items) / sizeof(items[0])); i++ )
+  {
+    GtkWidget *w = Builder_Get_Object(main_window_builder, items[i].id);
 
-  SetFlag( NEAREH_ANIMATE );
-  if( anim_tag > 0 )
-    g_source_remove( anim_tag );
-  anim_tag = g_timeout_add( intval, Animate_Near_Field, NULL );
+    if( GTK_WIDGET(menuitem) == w )
+    {
+      rc_config.opengl_flow_direction_mode = items[i].mode;
+      opengl_structure_invalidate();
+      opengl_structure_queue_draw();
+
+      /* Animation produces no visible change for phase-invariant modes.
+       * Grey out Animate menu item for Polarization Tilt and Peak Magnitude. */
+      {
+        gboolean animatable =
+          (items[i].mode == FLOW_DIR_REFERENCE_PHASE ||
+           items[i].mode == FLOW_DIR_LIC);
+
+        GtkWidget *anim_w = Builder_Get_Object(
+            main_window_builder, "main_structure_animate");
+        gtk_widget_set_sensitive(anim_w, animatable);
+      }
+
+      return;
+    }
+  }
 }
 
 
@@ -2935,6 +3014,19 @@ on_animate_dialog_destroy(
     GObject       *object,
     gpointer       user_data)
 {
+  /* Stop all animations when dialog closes */
+  ClearFlag( FLOW_ANIMATE );
+  ClearFlag( NEAREH_ANIMATE );
+  opengl_structure_reset_flow_phase();
+
+  if( anim_tag )
+    g_source_remove( anim_tag );
+  anim_tag = 0;
+
+  if( flow_anim_tag )
+    g_source_remove( flow_anim_tag );
+  flow_anim_tag = 0;
+
   animate_dialog = NULL;
   g_object_unref( animate_dialog_builder );
   animate_dialog_builder = NULL;

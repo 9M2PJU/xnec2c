@@ -190,6 +190,12 @@ typedef struct
   int status_surf_height;
   const char *status_last_text;
 
+  /* Patch current flow phase animation offset (radians) */
+  float flow_phase;
+
+  /* LIC noise texture (256x256 grayscale, shared by all renderables) */
+  GLuint noise_tex;
+
   /* Drag transparency state */
   gboolean drag_active;
   float drag_alpha_factor;

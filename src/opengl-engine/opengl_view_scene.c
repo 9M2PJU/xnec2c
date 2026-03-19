@@ -32,6 +32,9 @@ typedef struct
   GLuint vbo;
   GLint mvp_location;
   GLint u_alpha_location;
+  GLint flow_mode_location;
+  GLint u_phase_location;
+  GLint noise_tex_location;
   GLint *attrib_locations;
 
 } gl_scene_ctx_t;
@@ -57,6 +60,32 @@ gl_scene_prepare(void *ctx, float r_max)
   gl_view_content_t *c = &view->content;
 
   (void)r_max;
+
+  /* Generate LIC noise texture on first prepare (GL context is active) */
+  if( view->noise_tex == 0 )
+  {
+    enum { NOISE_SIZE = 256 };
+    unsigned char noise_data[NOISE_SIZE * NOISE_SIZE];
+    int i;
+
+    srand(42);
+    for( i = 0; i < NOISE_SIZE * NOISE_SIZE; i++ )
+      noise_data[i] = (unsigned char)(rand() % 256);
+
+    glGenTextures(1, &view->noise_tex);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, view->noise_tex);
+
+    /* GL_RED for core profile compatibility (GL_LUMINANCE is
+     * deprecated in 3.x+ core contexts created by GtkGLArea) */
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, NOISE_SIZE, NOISE_SIZE, 0,
+        GL_RED, GL_UNSIGNED_BYTE, noise_data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glActiveTexture(GL_TEXTURE0);
+  }
 
   if( c->generation == view->last_generation )
     return;
@@ -96,9 +125,23 @@ gl_scene_render(void *ctx, mat4 mvp, float alpha)
   gl_scene_ctx_t *sc = ctx;
   gl_view_state_t *view = sc->view;
 
-  /* Set alpha multiplier before draw pass */
+  /* Set uniforms before draw pass */
   glUseProgram(sc->shader.program);
   glUniform1f(sc->u_alpha_location, alpha);
+
+  /* Flow direction mode and phase animation offset.
+   * Locations are -1 for shaders without these uniforms (no-op). */
+  glUniform1i(sc->flow_mode_location, rc_config.opengl_flow_direction_mode);
+  glUniform1f(sc->u_phase_location, sc->view->flow_phase);
+
+  /* Bind LIC noise texture to unit 1 */
+  if( sc->view->noise_tex != 0 )
+  {
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, sc->view->noise_tex);
+    glUniform1i(sc->noise_tex_location, 1);
+    glActiveTexture(GL_TEXTURE0);
+  }
 
   gl_view_draw_pass(
       sc->shader.program,
@@ -166,6 +209,13 @@ gl_scene_free(void *ctx)
   if( sc->view->scene && sc->view->scene->cleanup )
     sc->view->scene->cleanup();
 
+  /* Release shared noise texture when scene is destroyed */
+  if( sc->view->noise_tex )
+  {
+    glDeleteTextures(1, &sc->view->noise_tex);
+    sc->view->noise_tex = 0;
+  }
+
   if( sc->vbo )
     glDeleteBuffers(1, &sc->vbo);
 
@@ -209,6 +259,9 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
 
   sc->mvp_location = glGetUniformLocation(sc->shader.program, "mvp");
   sc->u_alpha_location = glGetUniformLocation(sc->shader.program, "u_alpha");
+  sc->flow_mode_location = glGetUniformLocation(sc->shader.program, "flow_mode");
+  sc->u_phase_location = glGetUniformLocation(sc->shader.program, "u_phase");
+  sc->noise_tex_location = glGetUniformLocation(sc->shader.program, "noise_tex");
 
   glGenVertexArrays(1, &sc->vao);
   glGenBuffers(1, &sc->vbo);
@@ -220,6 +273,18 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
     sc->attrib_locations[i] = glGetAttribLocation(
         sc->shader.program,
         state->config->attribs[i].name);
+  }
+
+  /* Override default generic value for flow_data attribute.
+   * OpenGL defaults unbound vec4 attributes to (0,0,0,1); the w=1
+   * causes mag_sq=1.0 in the fragment shader, falsely activating
+   * the flow/chevron/LIC block for non-patch vertices (rdpattern
+   * shell, wire segments using 3-attrib config). */
+  {
+    GLint flow_loc = glGetAttribLocation(sc->shader.program, "flow_data");
+
+    if( flow_loc >= 0 )
+      glVertexAttrib4f(flow_loc, 0.0f, 0.0f, 0.0f, 0.0f);
   }
 
   r = (gl_renderable_t){

@@ -54,6 +54,10 @@ static GLenum structure_draw_mode = GL_TRIANGLES;
 /* Track previous radius scale to detect changes requiring regeneration */
 static double structure_last_radius_scale = CYLINDER_RADIUS_SCALE_DEFAULT;
 
+/* Current flow phase for line-mode arrow angle computation (radians).
+ * Set by Animate_Flow_Phase; triangle-mode uses shader u_phase instead. */
+static float structure_flow_phase = 0.0f;
+
 /* Public accessor for shared geometry */
 static structure_overlay_data_t shared_overlay_data = { 0 };
 
@@ -97,23 +101,45 @@ get_segment_magnitude(int idx, structure_draw_mode_t mode)
 
 /*-----------------------------------------------------------------------*/
 
-/** get_patch_tangent_magnitudes() - Project patch current onto tangent axes
+/** get_patch_tangent_projections() - Project patch current onto tangent axes as complex phasors
  * @idx: patch index (0-based into data.m)
- * @ct1m: output magnitude along t1
- * @ct2m: output magnitude along t2
+ * @ct1: output complex projection onto t1
+ * @ct2: output complex projection onto t2
  *
+ * Preserves phase information needed for polarization analysis.
  * Caller must ensure crnt.cur is valid and idx is in range.
  */
   static void
-get_patch_tangent_magnitudes(int idx, double *ct1m, double *ct2m)
+get_patch_tangent_projections(int idx,
+    complex double *ct1, complex double *ct2)
 {
   int ci = data.n + idx * 3;
   complex double cur_x = crnt.cur[ci];
   complex double cur_y = crnt.cur[ci + 1];
   complex double cur_z = crnt.cur[ci + 2];
 
-  *ct1m = cabs(cur_x * data.t1x[idx] + cur_y * data.t1y[idx] + cur_z * data.t1z[idx]);
-  *ct2m = cabs(cur_x * data.t2x[idx] + cur_y * data.t2y[idx] + cur_z * data.t2z[idx]);
+  *ct1 = cur_x * data.t1x[idx] + cur_y * data.t1y[idx] + cur_z * data.t1z[idx];
+  *ct2 = cur_x * data.t2x[idx] + cur_y * data.t2y[idx] + cur_z * data.t2z[idx];
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** get_patch_tangent_magnitudes() - Project patch current onto tangent axes (magnitude only)
+ * @idx: patch index (0-based into data.m)
+ * @ct1m: output magnitude along t1
+ * @ct2m: output magnitude along t2
+ *
+ * Wrapper around get_patch_tangent_projections() for callers
+ * that need only magnitudes (color mapping, RSS computation).
+ */
+  static void
+get_patch_tangent_magnitudes(int idx, double *ct1m, double *ct2m)
+{
+  complex double ct1, ct2;
+
+  get_patch_tangent_projections(idx, &ct1, &ct2);
+  *ct1m = cabs(ct1);
+  *ct2m = cabs(ct2);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -181,38 +207,50 @@ get_patch_color(int idx, structure_draw_mode_t mode, double cmax,
 
 /*-----------------------------------------------------------------------*/
 
-/** get_patch_flow_data() - Compute chevron flow angle and magnitude ratio for a patch
+/** get_patch_flow_data() - Populate flow_data with complex tangent projections
  * @idx: patch index (0-based into data.m)
  * @mode: current structure draw mode
  * @cmax: maximum current magnitude for ratio scaling
- * @out_angle: output flow angle in radians on tangent plane
- * @out_mag_ratio: output magnitude ratio (0..1)
+ * @fd: output array of 4 floats {Re(ct1), Im(ct1), Re(ct2), Im(ct2)}
+ *      scaled by mag_ratio so the shader can derive both direction and intensity
+ *
+ * All four components are zero when current data is absent or below threshold.
+ * The shader computes instantaneous direction at arbitrary phase from these
+ * complex components, enabling all visualization modes without CPU recomputation.
  */
   static void
 get_patch_flow_data(int idx, structure_draw_mode_t mode, double cmax,
-    float *out_angle, float *out_mag_ratio)
+    float *fd)
 {
   if( mode == STRUCTURE_DRAW_CURRENTS && cmax > 0.0 &&
       crnt.valid && crnt.cur != NULL )
   {
-    double ct1m, ct2m, mag;
+    complex double ct1, ct2;
+    double scale;
 
-    get_patch_tangent_magnitudes(idx, &ct1m, &ct2m);
-    mag = sqrt(ct1m * ct1m + ct2m * ct2m);
+    get_patch_tangent_projections(idx, &ct1, &ct2);
+    scale = 1.0 / cmax;
 
-    *out_angle = (float)atan2(ct2m, ct1m);
-    *out_mag_ratio = (float)(mag / cmax);
+    /* Normalize by cmax so sqrt(dot(fd,fd)) recovers mag_ratio (0..1).
+     * Phase relationships preserved; shader computes direction at any phase. */
+    fd[0] = (float)(creal(ct1) * scale);
+    fd[1] = (float)(cimag(ct1) * scale);
+    fd[2] = (float)(creal(ct2) * scale);
+    fd[3] = (float)(cimag(ct2) * scale);
   }
   else
   {
-    *out_angle = 0.0f;
-    *out_mag_ratio = 0.0f;
+    fd[0] = 0.0f;
+    fd[1] = 0.0f;
+    fd[2] = 0.0f;
+    fd[3] = 0.0f;
   }
 }
 
 /*-----------------------------------------------------------------------*/
 
 /** set_structure_vertex() - Set all fields of an extended structure vertex
+ * @fd0..fd3: flow_data components {Re(ct1), Im(ct1), Re(ct2), Im(ct2)}
  */
   static void
 set_structure_vertex(structure_vertex_t *sv,
@@ -220,7 +258,7 @@ set_structure_vertex(structure_vertex_t *sv,
     float nx, float ny, float nz,
     float cr, float cg, float cb, float ca,
     float u, float v_coord,
-    float flow_angle, float mag_ratio)
+    float fd0, float fd1, float fd2, float fd3)
 {
   sv->point.x = px;
   sv->point.y = py;
@@ -234,8 +272,10 @@ set_structure_vertex(structure_vertex_t *sv,
   sv->color.a = ca;
   sv->uv[0] = u;
   sv->uv[1] = v_coord;
-  sv->flow_data[0] = flow_angle;
-  sv->flow_data[1] = mag_ratio;
+  sv->flow_data[0] = fd0;
+  sv->flow_data[1] = fd1;
+  sv->flow_data[2] = fd2;
+  sv->flow_data[3] = fd3;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -360,15 +400,20 @@ calculate_excitation_center(double *cx, double *cy, double *cz)
 patch_uv_to_3d(int idx, double s, float u, float v,
     float *out_x, float *out_y, float *out_z)
 {
+  int j = idx + data.n;
   double du = 2.0 * (double)u - 1.0;
   double dv = 2.0 * (double)v - 1.0;
 
-  *out_x = (float)(data.px[idx] + du * s * data.t1x[idx]
-                                 + dv * s * data.t2x[idx]);
-  *out_y = (float)(data.py[idx] + du * s * data.t1y[idx]
-                                 + dv * s * data.t2y[idx]);
-  *out_z = (float)(data.pz[idx] + du * s * data.t1z[idx]
-                                 + dv * s * data.t2z[idx]);
+  /* Use save.xtemp/ytemp/ztemp (original unscaled coordinates) instead of
+   * data.px/py/pz which are wavelength-scaled by Frequency_Scale_Geometry().
+   * Wire endpoints (data.x1/y1/z1/x2/y2/z2) are not wavelength-scaled,
+   * so patches must also use unscaled coords to stay dimensionally consistent. */
+  *out_x = (float)(save.xtemp[j] + du * s * data.t1x[idx]
+                                  + dv * s * data.t2x[idx]);
+  *out_y = (float)(save.ytemp[j] + du * s * data.t1y[idx]
+                                  + dv * s * data.t2y[idx]);
+  *out_z = (float)(save.ztemp[j] + du * s * data.t1z[idx]
+                                  + dv * s * data.t2z[idx]);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -457,10 +502,11 @@ opengl_structure_generate_geometry(
       r_max = r2;
   }
 
-  /* Extend r_max to include patch corners */
+  /* Extend r_max to include patch corners (unscaled coordinates) */
   for( idx = 0; idx < data.m; idx++ )
   {
-    double s = sqrt(data.pbi[idx]) / 2.0;
+    int j = idx + data.n;
+    double s = sqrt(save.bitemp[j]) / 2.0;
     double dx1 = s * data.t1x[idx];
     double dy1 = s * data.t1y[idx];
     double dz1 = s * data.t1z[idx];
@@ -473,9 +519,9 @@ opengl_structure_generate_geometry(
     {
       double sx1 = (corner & 1) ? 1.0 : -1.0;
       double sx2 = (corner & 2) ? 1.0 : -1.0;
-      double cpx = data.px[idx] + sx1 * dx1 + sx2 * dx2;
-      double cpy = data.py[idx] + sx1 * dy1 + sx2 * dy2;
-      double cpz = data.pz[idx] + sx1 * dz1 + sx2 * dz2;
+      double cpx = save.xtemp[j] + sx1 * dx1 + sx2 * dx2;
+      double cpy = save.ytemp[j] + sx1 * dy1 + sx2 * dy2;
+      double cpz = save.ztemp[j] + sx1 * dz1 + sx2 * dz2;
       double rd = sqrt(cpx * cpx + cpy * cpy + cpz * cpz);
 
       if( rd > r_max )
@@ -545,21 +591,22 @@ opengl_structure_generate_geometry(
       set_structure_vertex(&structure_vertices[vidx],
           (float)data.x1[idx], (float)data.y1[idx], (float)data.z1[idx],
           nx, ny, nz, r, g, b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
 
       /* Endpoint 2 */
       set_structure_vertex(&structure_vertices[vidx],
           (float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx],
           nx, ny, nz, r, g, b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
     }
 
     /* Patch outlines in line mode: box edges + interior fill */
     for( idx = 0; idx < data.m; idx++ )
     {
-      double s = sqrt(data.pbi[idx]) / 2.0;
+      int j = idx + data.n;
+      double s = sqrt(save.bitemp[j]) / 2.0;
       float nx, ny, nz;
       float p_r, p_g, p_b;
       float c0x, c0y, c0z, c1x, c1y, c1z;
@@ -569,65 +616,70 @@ opengl_structure_generate_geometry(
       get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
 
       /* Quad corners: c0(+t1,+t2) c1(-t1,+t2) c2(-t1,-t2) c3(+t1,-t2) */
-      c0x = (float)(data.px[idx] + s * data.t1x[idx] + s * data.t2x[idx]);
-      c0y = (float)(data.py[idx] + s * data.t1y[idx] + s * data.t2y[idx]);
-      c0z = (float)(data.pz[idx] + s * data.t1z[idx] + s * data.t2z[idx]);
-      c1x = (float)(data.px[idx] - s * data.t1x[idx] + s * data.t2x[idx]);
-      c1y = (float)(data.py[idx] - s * data.t1y[idx] + s * data.t2y[idx]);
-      c1z = (float)(data.pz[idx] - s * data.t1z[idx] + s * data.t2z[idx]);
-      c2x = (float)(data.px[idx] - s * data.t1x[idx] - s * data.t2x[idx]);
-      c2y = (float)(data.py[idx] - s * data.t1y[idx] - s * data.t2y[idx]);
-      c2z = (float)(data.pz[idx] - s * data.t1z[idx] - s * data.t2z[idx]);
-      c3x = (float)(data.px[idx] + s * data.t1x[idx] - s * data.t2x[idx]);
-      c3y = (float)(data.py[idx] + s * data.t1y[idx] - s * data.t2y[idx]);
-      c3z = (float)(data.pz[idx] + s * data.t1z[idx] - s * data.t2z[idx]);
+      c0x = (float)(save.xtemp[j] + s * data.t1x[idx] + s * data.t2x[idx]);
+      c0y = (float)(save.ytemp[j] + s * data.t1y[idx] + s * data.t2y[idx]);
+      c0z = (float)(save.ztemp[j] + s * data.t1z[idx] + s * data.t2z[idx]);
+      c1x = (float)(save.xtemp[j] - s * data.t1x[idx] + s * data.t2x[idx]);
+      c1y = (float)(save.ytemp[j] - s * data.t1y[idx] + s * data.t2y[idx]);
+      c1z = (float)(save.ztemp[j] - s * data.t1z[idx] + s * data.t2z[idx]);
+      c2x = (float)(save.xtemp[j] - s * data.t1x[idx] - s * data.t2x[idx]);
+      c2y = (float)(save.ytemp[j] - s * data.t1y[idx] - s * data.t2y[idx]);
+      c2z = (float)(save.ztemp[j] - s * data.t1z[idx] - s * data.t2z[idx]);
+      c3x = (float)(save.xtemp[j] + s * data.t1x[idx] - s * data.t2x[idx]);
+      c3y = (float)(save.ytemp[j] + s * data.t1y[idx] - s * data.t2y[idx]);
+      c3z = (float)(save.ztemp[j] + s * data.t1z[idx] - s * data.t2z[idx]);
 
       /* Box outline: 4 edges as GL_LINES pairs (8 vertices) */
       set_structure_vertex(&structure_vertices[vidx],
           c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
 
       set_structure_vertex(&structure_vertices[vidx],
           c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
 
       set_structure_vertex(&structure_vertices[vidx],
           c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
 
       set_structure_vertex(&structure_vertices[vidx],
           c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
 
       /* Interior fill: chevron V-marks or stipple dots */
       {
         gboolean use_chevrons = FALSE;
-        float flow_angle = 0.0f;
+        float fd[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
         float mag_ratio = 0.0f;
 
         if( mode == STRUCTURE_DRAW_CURRENTS )
         {
-          get_patch_flow_data(idx, mode, cmax, &flow_angle, &mag_ratio);
+          get_patch_flow_data(idx, mode, cmax, fd);
+
+          /* Recover mag_ratio from scaled components for threshold check */
+          mag_ratio = (float)sqrt(
+              fd[0] * fd[0] + fd[1] * fd[1] +
+              fd[2] * fd[2] + fd[3] * fd[3]);
 
           if( mag_ratio > 0.01f )
             use_chevrons = TRUE;
@@ -646,8 +698,73 @@ opengl_structure_generate_geometry(
            *   │     └────a_right
            *   s3────────s2
            */
+          /* Derive arrow angle from complex tangent projections.
+           * Mode dispatch selects the appropriate angle computation. */
+          float flow_angle;
+          int fdir_mode = rc_config.opengl_flow_direction_mode;
+
+          if( fdir_mode == FLOW_DIR_POLARIZATION_TILT )
+          {
+            /* Tilt axis: psi = 0.5 * atan2(2*Re(ct1*conj(ct2)), |ct1|^2 - |ct2|^2) */
+            float ct1_sq = fd[0] * fd[0] + fd[1] * fd[1];
+            float ct2_sq = fd[2] * fd[2] + fd[3] * fd[3];
+            float cross = fd[0] * fd[2] + fd[1] * fd[3];
+            flow_angle = 0.5f * atan2f(2.0f * cross, ct1_sq - ct2_sq);
+          }
+          else if( fdir_mode == FLOW_DIR_PEAK_MAGNITUDE )
+          {
+            /* Peak instant: P = ct1^2 + ct2^2, alpha0 = -0.5*arg(P) */
+            float p_re = (fd[0] * fd[0] - fd[1] * fd[1])
+                       + (fd[2] * fd[2] - fd[3] * fd[3]);
+            float p_im = 2.0f * (fd[0] * fd[1] + fd[2] * fd[3]);
+            float alpha0 = -0.5f * atan2f(p_im, p_re);
+            float ca0 = cosf(alpha0);
+            float sa0 = sinf(alpha0);
+            flow_angle = atan2f(fd[2] * ca0 - fd[3] * sa0,
+                                fd[0] * ca0 - fd[1] * sa0);
+          }
+          else
+          {
+            /* Reference phase (Mode 0): real parts at current flow phase.
+             * Static when not animating (phase=0); rotates when animating. */
+            float cp = cosf(structure_flow_phase);
+            float sp = sinf(structure_flow_phase);
+            flow_angle = atan2f(fd[2] * cp - fd[3] * sp,
+                                fd[0] * cp - fd[1] * sp);
+          }
+
           float fca = cosf(flow_angle);
           float fsa = sinf(flow_angle);
+
+          /* Polarization tilt: bidirectional shaft, no arrowhead */
+          if( fdir_mode == FLOW_DIR_POLARIZATION_TILT )
+          {
+            float e0u, e0v, e1u, e1v;
+            float e0x, e0y, e0z, e1x, e1y, e1z;
+
+            e0u = 0.5f - LINE_ARROW_TIP_OFF * fca;
+            e0v = 0.5f - LINE_ARROW_TIP_OFF * fsa;
+            e1u = 0.5f + LINE_ARROW_TIP_OFF * fca;
+            e1v = 0.5f + LINE_ARROW_TIP_OFF * fsa;
+
+            patch_uv_to_3d(idx, s, e0u, e0v, &e0x, &e0y, &e0z);
+            patch_uv_to_3d(idx, s, e1u, e1v, &e1x, &e1y, &e1z);
+
+            /* Double-ended shaft: single line through center */
+            set_structure_vertex(&structure_vertices[vidx],
+                e0x, e0y, e0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+                0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            vidx++;
+            set_structure_vertex(&structure_vertices[vidx],
+                e1x, e1y, e1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
+                0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            vidx++;
+          }
+          else
+          {
+          /* Unidirectional arrow: shaft + arrowhead.
+           * Modes 0 (reference phase) and 3 (LIC) both use this path;
+           * LIC is a fragment-shader-only effect with no line-mode equivalent. */
           float pu = -fsa;
           float pv = fca;
           float s0u, s0v, s1u, s1v, s2u, s2v, s3u, s3v;
@@ -687,72 +804,73 @@ opengl_structure_generate_geometry(
           /* Shaft top edge: s0 to s1 */
           set_structure_vertex(&structure_vertices[vidx],
               s0x, s0y, s0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               s1x, s1y, s1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
 
           /* Shaft bottom edge: s3 to s2 */
           set_structure_vertex(&structure_vertices[vidx],
               s3x, s3y, s3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               s2x, s2y, s2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
 
           /* Tail cap: s0 to s3 */
           set_structure_vertex(&structure_vertices[vidx],
               s0x, s0y, s0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               s3x, s3y, s3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
 
           /* Top notch: s1 to a_left */
           set_structure_vertex(&structure_vertices[vidx],
               s1x, s1y, s1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               alx, aly, alz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
 
           /* Top arm: a_left to tip */
           set_structure_vertex(&structure_vertices[vidx],
               alx, aly, alz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               tipx, tipy, tipz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
 
           /* Bottom notch: s2 to a_right */
           set_structure_vertex(&structure_vertices[vidx],
               s2x, s2y, s2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               arx, ary, arz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
 
           /* Bottom arm: a_right to tip */
           set_structure_vertex(&structure_vertices[vidx],
               arx, ary, arz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               tipx, tipy, tipz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
           vidx++;
+          } /* end unidirectional arrow else block */
         }
       }
     }
@@ -808,6 +926,8 @@ opengl_structure_generate_geometry(
         structure_vertices[vidx].uv[1] = 0.0f;
         structure_vertices[vidx].flow_data[0] = 0.0f;
         structure_vertices[vidx].flow_data[1] = 0.0f;
+        structure_vertices[vidx].flow_data[2] = 0.0f;
+        structure_vertices[vidx].flow_data[3] = 0.0f;
         vidx++;
       }
     }
@@ -815,57 +935,58 @@ opengl_structure_generate_geometry(
     /* Patch quads in cylinder mode: 2 triangles per patch with UV + flow data */
     for( idx = 0; idx < data.m; idx++ )
     {
-      double s = sqrt(data.pbi[idx]) / 2.0;
+      int j = idx + data.n;
+      double s = sqrt(save.bitemp[j]) / 2.0;
       float nx, ny, nz;
       float p_r, p_g, p_b;
-      float flow_angle, mag_ratio;
+      float fd[4];
       float c0x, c0y, c0z, c1x, c1y, c1z, c2x, c2y, c2z, c3x, c3y, c3z;
 
       get_patch_normal(idx, &nx, &ny, &nz);
 
       /* Quad corners: c0(+t1,+t2) c1(-t1,+t2) c2(-t1,-t2) c3(+t1,-t2) */
-      c0x = (float)(data.px[idx] + s * data.t1x[idx] + s * data.t2x[idx]);
-      c0y = (float)(data.py[idx] + s * data.t1y[idx] + s * data.t2y[idx]);
-      c0z = (float)(data.pz[idx] + s * data.t1z[idx] + s * data.t2z[idx]);
-      c1x = (float)(data.px[idx] - s * data.t1x[idx] + s * data.t2x[idx]);
-      c1y = (float)(data.py[idx] - s * data.t1y[idx] + s * data.t2y[idx]);
-      c1z = (float)(data.pz[idx] - s * data.t1z[idx] + s * data.t2z[idx]);
-      c2x = (float)(data.px[idx] - s * data.t1x[idx] - s * data.t2x[idx]);
-      c2y = (float)(data.py[idx] - s * data.t1y[idx] - s * data.t2y[idx]);
-      c2z = (float)(data.pz[idx] - s * data.t1z[idx] - s * data.t2z[idx]);
-      c3x = (float)(data.px[idx] + s * data.t1x[idx] - s * data.t2x[idx]);
-      c3y = (float)(data.py[idx] + s * data.t1y[idx] - s * data.t2y[idx]);
-      c3z = (float)(data.pz[idx] + s * data.t1z[idx] - s * data.t2z[idx]);
+      c0x = (float)(save.xtemp[j] + s * data.t1x[idx] + s * data.t2x[idx]);
+      c0y = (float)(save.ytemp[j] + s * data.t1y[idx] + s * data.t2y[idx]);
+      c0z = (float)(save.ztemp[j] + s * data.t1z[idx] + s * data.t2z[idx]);
+      c1x = (float)(save.xtemp[j] - s * data.t1x[idx] + s * data.t2x[idx]);
+      c1y = (float)(save.ytemp[j] - s * data.t1y[idx] + s * data.t2y[idx]);
+      c1z = (float)(save.ztemp[j] - s * data.t1z[idx] + s * data.t2z[idx]);
+      c2x = (float)(save.xtemp[j] - s * data.t1x[idx] - s * data.t2x[idx]);
+      c2y = (float)(save.ytemp[j] - s * data.t1y[idx] - s * data.t2y[idx]);
+      c2z = (float)(save.ztemp[j] - s * data.t1z[idx] - s * data.t2z[idx]);
+      c3x = (float)(save.xtemp[j] + s * data.t1x[idx] - s * data.t2x[idx]);
+      c3y = (float)(save.ytemp[j] + s * data.t1y[idx] - s * data.t2y[idx]);
+      c3z = (float)(save.ztemp[j] + s * data.t1z[idx] - s * data.t2z[idx]);
 
       get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
-      get_patch_flow_data(idx, mode, cmax, &flow_angle, &mag_ratio);
+      get_patch_flow_data(idx, mode, cmax, fd);
 
       /* Triangle 1: c0(1,1), c1(0,1), c2(0,0) */
       set_structure_vertex(&structure_vertices[vidx],
           c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          1.0f, 1.0f, flow_angle, mag_ratio);
+          1.0f, 1.0f, fd[0], fd[1], fd[2], fd[3]);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 1.0f, flow_angle, mag_ratio);
+          0.0f, 1.0f, fd[0], fd[1], fd[2], fd[3]);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, flow_angle, mag_ratio);
+          0.0f, 0.0f, fd[0], fd[1], fd[2], fd[3]);
       vidx++;
 
       /* Triangle 2: c0(1,1), c2(0,0), c3(1,0) */
       set_structure_vertex(&structure_vertices[vidx],
           c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          1.0f, 1.0f, flow_angle, mag_ratio);
+          1.0f, 1.0f, fd[0], fd[1], fd[2], fd[3]);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, flow_angle, mag_ratio);
+          0.0f, 0.0f, fd[0], fd[1], fd[2], fd[3]);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          1.0f, 0.0f, flow_angle, mag_ratio);
+          1.0f, 0.0f, fd[0], fd[1], fd[2], fd[3]);
       vidx++;
     }
 
@@ -959,6 +1080,20 @@ opengl_structure_geometry_cleanup(void)
 opengl_structure_geometry_invalidate(void)
 {
   structure_vertex_count = 0;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** opengl_structure_geometry_set_flow_phase() - Set flow phase for line-mode arrow angle computation
+ * @phase: phase offset in radians
+ *
+ * Called by Animate_Flow_Phase before invalidating geometry.
+ * Triangle-mode patches use the shader u_phase uniform instead.
+ */
+  void
+opengl_structure_geometry_set_flow_phase(float phase)
+{
+  structure_flow_phase = phase;
 }
 
 /*-----------------------------------------------------------------------*/

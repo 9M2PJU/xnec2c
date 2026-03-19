@@ -55,7 +55,7 @@ const gl_vertex_attrib_t opengl_chevron_attribs[5] = {
   { "normal",    3, 4 * (int)sizeof(float) },
   { "color",     4, 8 * (int)sizeof(float) },
   { "uv",        2, 12 * (int)sizeof(float) },
-  { "flow_data", 2, 14 * (int)sizeof(float) }
+  { "flow_data", 4, 14 * (int)sizeof(float) }
 };
 
 /*-----------------------------------------------------------------------*/
@@ -402,6 +402,124 @@ opengl_structure_cleanup_impl(void)
 }
 
 #endif /* HAVE_OPENGL */
+
+/*-----------------------------------------------------------------------*/
+
+/** set_view_flow_phase() - Set flow phase on a GL widget and queue redraw
+ * @w: GL widget (NULL-safe, returns silently)
+ * @phase: absolute phase in radians
+ */
+  static void
+set_view_flow_phase(GtkWidget *w, float phase)
+{
+  gl_view_state_t *state;
+
+  if( !w )
+    return;
+
+  state = gl_view_get_state(w);
+  if( state )
+    state->flow_phase = phase;
+
+  xnec2_widget_queue_draw(w);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** advance_view_flow_phase() - Advance flow phase with 2-pi wrap
+ * @w: GL widget (NULL-safe, returns 0)
+ * @step: phase increment in radians
+ *
+ * Returns new phase value.  Does not queue redraw; caller controls
+ * draw ordering relative to line-mode geometry invalidation.
+ */
+  static float
+advance_view_flow_phase(GtkWidget *w, float step)
+{
+  gl_view_state_t *state;
+
+  if( !w )
+    return( 0.0f );
+
+  state = gl_view_get_state(w);
+  if( !state )
+    return( 0.0f );
+
+  state->flow_phase += step;
+  if( state->flow_phase > (float)M_2PI )
+    state->flow_phase -= (float)M_2PI;
+
+  return( state->flow_phase );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** Animate_Flow_Phase() - Timeout callback advancing patch current flow phase
+ * @udata: unused
+ *
+ * Advances flow_phase on both structure and rdpattern GL views by
+ * near_field.anim_step radians per tick. Returns FALSE to stop the
+ * timeout when FLOW_ANIMATE is cleared.
+ */
+  gboolean
+Animate_Flow_Phase(gpointer udata)
+{
+  float new_phase;
+  gboolean line_mode;
+
+  if( isFlagClear(FLOW_ANIMATE) )
+  {
+    flow_anim_tag = 0;
+    return( FALSE );
+  }
+
+  new_phase = advance_view_flow_phase(
+      structure_gl_widget, (float)near_field.anim_step);
+
+  /* Line-mode arrows are baked into vertex positions on the CPU.
+   * Update the geometry module's phase and force regeneration. */
+  line_mode = (cylinder_radius_scale < CYLINDER_SCALE_LINE_THRESHOLD);
+
+  if( line_mode )
+  {
+    opengl_structure_geometry_set_flow_phase(new_phase);
+    opengl_structure_geometry_invalidate();
+  }
+
+  if( structure_gl_widget )
+    xnec2_widget_queue_draw(structure_gl_widget);
+
+  /* Advance phase on rdpattern overlay view */
+  {
+    GtkWidget *rdpat_w = opengl_rdpattern_get_widget();
+
+    advance_view_flow_phase(rdpat_w, (float)near_field.anim_step);
+    if( rdpat_w )
+      xnec2_widget_queue_draw(rdpat_w);
+  }
+
+  return( TRUE );
+
+} /* Animate_Flow_Phase() */
+
+/*-----------------------------------------------------------------------*/
+
+/** opengl_structure_reset_flow_phase() - Reset flow phase to zero on all views
+ *
+ * Called when flow animation stops (cancel/destroy) to return arrows
+ * and chevrons to the static reference-phase direction.
+ */
+  void
+opengl_structure_reset_flow_phase(void)
+{
+#ifdef HAVE_OPENGL
+  opengl_structure_geometry_set_flow_phase(0.0f);
+  opengl_structure_geometry_invalidate();
+
+  set_view_flow_phase(structure_gl_widget, 0.0f);
+  set_view_flow_phase(opengl_rdpattern_get_widget(), 0.0f);
+#endif
+}
 
 /*-----------------------------------------------------------------------*/
 
