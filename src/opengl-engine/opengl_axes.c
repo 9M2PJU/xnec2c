@@ -28,8 +28,9 @@
 #define AXIS_LENGTH_SCALE 1.1f
 #define LABEL_OFFSET_SCALE 1.15f
 #define LABEL_SIZE_SCALE 0.05f
-#define LABEL_TEX_WIDTH 32
-#define LABEL_TEX_MARGIN 8
+#define LABEL_TEX_SCALE  4
+#define LABEL_TEX_WIDTH  (32 * LABEL_TEX_SCALE)
+#define LABEL_TEX_MARGIN (8 * LABEL_TEX_SCALE)
 
 /* Axis labels indexed by axis number (0=X, 1=Y, 2=Z) */
 static const char *axis_labels[NUM_AXES] = {"X", "Y", "Z"};
@@ -73,9 +74,10 @@ generate_label_texture(void)
   int width, height;
   PangoLayout *layout;
   PangoFontDescription *font_desc;
+  char font_str[32];
 
   width = NUM_AXES * LABEL_TEX_WIDTH;
-  height = 32;
+  height = 32 * LABEL_TEX_SCALE;
 
   surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
   cr = cairo_create(surface);
@@ -86,14 +88,15 @@ generate_label_texture(void)
   cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
 
   layout = pango_cairo_create_layout(cr);
-  font_desc = pango_font_description_from_string("Sans Bold 20");
+  snprintf(font_str, sizeof(font_str), "Sans Bold %d", 20 * LABEL_TEX_SCALE);
+  font_desc = pango_font_description_from_string(font_str);
   pango_layout_set_font_description(layout, font_desc);
 
   for( int i = 0; i < NUM_AXES; i++ )
   {
     int tex_x = LABEL_TEX_MARGIN + i * LABEL_TEX_WIDTH;
     pango_layout_set_text(layout, axis_labels[i], -1);
-    cairo_move_to(cr, tex_x, 4);
+    cairo_move_to(cr, tex_x, 4 * LABEL_TEX_SCALE);
     pango_cairo_show_layout(cr, layout);
   }
 
@@ -383,14 +386,9 @@ opengl_axes_render(void *ctx, mat4 mvp, float _alpha)
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, axes->label_texture);
 
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
   glBindVertexArray(axes->labels_vao);
   glDrawArrays(GL_TRIANGLES, 0, NUM_AXES * 6);
   glBindVertexArray(0);
-
-  glDisable(GL_BLEND);
   glBindTexture(GL_TEXTURE_2D, 0);
 
   glUseProgram(0);
