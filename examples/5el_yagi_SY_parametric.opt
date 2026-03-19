@@ -10,7 +10,7 @@ min_size=9.9999999999999995e-07
 temperature=0
 
 [pso]
-particles=0
+particles=24
 neighbors=0
 inertia=0.90000000000000002
 cognitive=0.5

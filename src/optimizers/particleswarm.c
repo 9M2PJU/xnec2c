@@ -121,7 +121,7 @@ pso_t *pso_new(const pso_config_t *config)
 	/* Computed defaults for swarm topology */
 	if (pso->config.num_particles <= 0)
 	{
-		pso->config.num_particles = d * 10;
+		pso->config.num_particles = d * PSO_DEFAULT_PARTICLES_PER_DIM;
 	}
 	if (pso->config.num_neighbors <= 0)
 	{

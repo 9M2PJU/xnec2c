@@ -18,6 +18,8 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "../console.h"
 #include <string.h>
 
 #include <gsl/gsl_blas.h>
@@ -31,19 +33,19 @@
  *
  * Checks name, values, enabled mask, min/max bounds, perturb_scale,
  * round_each, round_result for internal consistency.
- * Returns 0 on success, -1 on error (message to stderr).
+ * Returns 0 on success, -1 on error (message via pr_warn).
  */
 int simple_validate_var(const simple_var_t *v, int idx)
 {
 	if (!v->name || v->name[0] == '\0')
 	{
-		fprintf(stderr, "simple_new: var[%d] name is NULL or empty\n", idx);
+		pr_warn("var[%d] name is NULL or empty\n", idx);
 		return -1;
 	}
 
 	if (!v->values || v->values->size == 0)
 	{
-		fprintf(stderr, "simple_new: var '%s' values is NULL or empty\n", v->name);
+		pr_warn("var '%s' values is NULL or empty\n", v->name);
 		return -1;
 	}
 
@@ -54,7 +56,7 @@ int simple_validate_var(const simple_var_t *v, int idx)
 	{
 		if (v->enabled->size != n)
 		{
-			fprintf(stderr, "simple_new: var '%s' enabled->size (%zu) != values->size (%zu)\n",
+			pr_warn("var '%s' enabled->size (%zu) != values->size (%zu)\n",
 				v->name, v->enabled->size, n);
 			return -1;
 		}
@@ -64,7 +66,7 @@ int simple_validate_var(const simple_var_t *v, int idx)
 			double e = gsl_vector_get(v->enabled, i);
 			if (e != 0.0 && e != 1.0)
 			{
-				fprintf(stderr, "simple_new: var '%s' enabled[%zu] = %g (must be 0.0 or 1.0)\n",
+				pr_warn("var '%s' enabled[%zu] = %g (must be 0.0 or 1.0)\n",
 					v->name, i, e);
 				return -1;
 			}
@@ -74,7 +76,7 @@ int simple_validate_var(const simple_var_t *v, int idx)
 	/* Validate min/max: both or neither, matching size, min <= max, initial in bounds */
 	if ((v->min != NULL) != (v->max != NULL))
 	{
-		fprintf(stderr, "simple_new: var '%s' min and max must both be set or both NULL\n",
+		pr_warn("var '%s' min and max must both be set or both NULL\n",
 			v->name);
 		return -1;
 	}
@@ -83,7 +85,7 @@ int simple_validate_var(const simple_var_t *v, int idx)
 	{
 		if (v->min->size != n || v->max->size != n)
 		{
-			fprintf(stderr, "simple_new: var '%s' min/max size mismatch with values\n",
+			pr_warn("var '%s' min/max size mismatch with values\n",
 				v->name);
 			return -1;
 		}
@@ -92,9 +94,10 @@ int simple_validate_var(const simple_var_t *v, int idx)
 		{
 			double lo = gsl_vector_get(v->min, i);
 			double hi = gsl_vector_get(v->max, i);
-			if (lo > hi)
+			if (lo >= hi)
 			{
-				fprintf(stderr, "simple_new: var '%s' min[%zu]=%g > max[%zu]=%g\n",
+				pr_warn("var '%s' min[%zu]=%g >= max[%zu]=%g"
+					" (zero or negative range)\n",
 					v->name, i, lo, i, hi);
 				return -1;
 			}
@@ -106,8 +109,7 @@ int simple_validate_var(const simple_var_t *v, int idx)
 				double val = gsl_vector_get(v->values, i);
 				if (val < lo || val > hi)
 				{
-					fprintf(stderr,
-						"simple_new: var '%s'[%zu] initial value %g outside [%g, %g]\n",
+					pr_warn(	"var '%s'[%zu] initial value %g outside [%g, %g]\n",
 						v->name, i, val, lo, hi);
 					return -1;
 				}
@@ -120,7 +122,7 @@ int simple_validate_var(const simple_var_t *v, int idx)
 	{
 		if (v->perturb_scale->size != n)
 		{
-			fprintf(stderr, "simple_new: var '%s' perturb_scale size mismatch\n", v->name);
+			pr_warn("var '%s' perturb_scale size mismatch\n", v->name);
 			return -1;
 		}
 
@@ -128,7 +130,7 @@ int simple_validate_var(const simple_var_t *v, int idx)
 		{
 			if (gsl_vector_get(v->perturb_scale, i) == 0.0)
 			{
-				fprintf(stderr, "simple_new: var '%s' perturb_scale[%zu] is zero\n",
+				pr_warn("var '%s' perturb_scale[%zu] is zero\n",
 					v->name, i);
 				return -1;
 			}
@@ -140,13 +142,13 @@ int simple_validate_var(const simple_var_t *v, int idx)
 	{
 		if (v->round_each->size != n)
 		{
-			fprintf(stderr, "simple_new: var '%s' round_each size mismatch\n", v->name);
+			pr_warn("var '%s' round_each size mismatch\n", v->name);
 			return -1;
 		}
 
 		if (gsl_vector_min(v->round_each) <= 0.0)
 		{
-			fprintf(stderr, "simple_new: var '%s' round_each has element <= 0\n",
+			pr_warn("var '%s' round_each has element <= 0\n",
 				v->name);
 			return -1;
 		}
@@ -157,13 +159,13 @@ int simple_validate_var(const simple_var_t *v, int idx)
 	{
 		if (v->round_result->size != n)
 		{
-			fprintf(stderr, "simple_new: var '%s' round_result size mismatch\n", v->name);
+			pr_warn("var '%s' round_result size mismatch\n", v->name);
 			return -1;
 		}
 
 		if (gsl_vector_min(v->round_result) <= 0.0)
 		{
-			fprintf(stderr, "simple_new: var '%s' round_result has element <= 0\n",
+			pr_warn("var '%s' round_result has element <= 0\n",
 				v->name);
 			return -1;
 		}

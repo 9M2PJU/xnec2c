@@ -24,6 +24,9 @@
 
 #include <gsl/gsl_vector.h>
 
+/** Default particles-per-dimension when num_particles is zero */
+#define PSO_DEFAULT_PARTICLES_PER_DIM 3
+
 /** Log verbosity flags, combinable via bitwise OR */
 enum pso_log_flags
 {
@@ -45,7 +48,7 @@ typedef void (*pso_log_func_t)(const gsl_vector *pos, double fit, void *ctx);
 typedef struct
 {
 	int dimensions;            /**< Hypersurface dimensions (0 = from initial_guess) */
-	int num_particles;         /**< Swarm size (0 = dimensions * 10) */
+	int num_particles;         /**< Swarm size (0 = dimensions * PSO_DEFAULT_PARTICLES_PER_DIM) */
 	int num_neighbors;         /**< Neighborhood size (0 = sqrt(num_particles)) */
 	int iterations;            /**< Max iterations (0 = 1000) */
 

@@ -108,10 +108,10 @@
                       <object class="GtkComboBoxText" id="opt_algo_combo">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="active">0</property>
+                        <property name="active">1</property>
                         <items>
                           <item>Simplex</item>
-                          <item>PSO</item>
+                          <item>Particle Swarm</item>
                         </items>
                       </object>
                       <packing>
@@ -466,7 +466,7 @@
                                     <property name="max-width-chars">8</property>
                                     <property name="xalign">1</property>
                                     <property name="text">0</property>
-                                    <property name="tooltip-text">Number of particles exploring simultaneously. Higher values enable more parallel exploration but slower iterations. (0 = auto: dimensions × 3)</property>
+                                    <property name="tooltip-text">Number of particles exploring simultaneously. Higher values enable more parallel exploration but slower iterations. Enter 0 to auto-calculate as dimensions × 3.</property>
                                   </object>
                                   <packing>
                                     <property name="left-attach">1</property>
