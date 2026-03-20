@@ -149,9 +149,19 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
       active_mask |= (1u << i);
 
-      eff_alphas[i] = r->alpha *
-          (state->drag_active && r->transparent_on_drag
-           ? state->drag_alpha_factor : 1.0f);
+      if( rc_config.opengl_transparent_on_click )
+      {
+        /* Transparency only during drag */
+        eff_alphas[i] = r->alpha *
+            (state->drag_active && r->transparent_on_drag
+             ? state->drag_alpha_factor : 1.0f);
+      }
+      else
+      {
+        /* Always-on transparency (not tied to drag) */
+        eff_alphas[i] = r->alpha *
+            (r->transparent_on_drag ? state->drag_alpha_factor : 1.0f);
+      }
 
       /* Generate content before extent is queried — allows renderables
        * that produce data as a side effect of extent calculation to

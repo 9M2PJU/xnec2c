@@ -139,6 +139,14 @@ rc_config_vars_t rc_config_vars[] = {
 		.builder_window = &rdpattern_window_builder,
 		.builder_check_menu_item_id = "rdpattern_overlay_structure" },
 
+	{ .desc = "OpenGL Drag Transparency Level", .format = "%d",
+		.vars = { &rc_config.opengl_drag_transparency_level } },
+
+	{ .desc = "OpenGL Transparent on Click", .format = "%d",
+		.vars = { &rc_config.opengl_transparent_on_click },
+		.builder_window = &main_window_builder,
+		.builder_check_menu_item_id = "opengl_transparent_on_click" },
+
 	{ .desc = "OpenGL Anti-Aliasing Samples", .format = "%d",
 		.vars = { &rc_config.opengl_msaa_samples } },
 
@@ -576,6 +584,8 @@ Create_Default_Config( void )
 #endif
 
   rc_config.arcball_constrained_rotation = 1;
+  rc_config.opengl_drag_transparency_level = 50;
+  rc_config.opengl_transparent_on_click = 1;
   rc_config.opengl_cylinder_radius_scale = 1.0;
 
   /* Common projection default on, overlay structure default off */
@@ -791,6 +801,28 @@ Restore_GUI_State( void )
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
 
 #ifdef HAVE_OPENGL
+  /* Restore transparency level radio selection */
+  {
+    gchar *transparency_ids[] = {
+      "opengl_transparency_opaque",
+      "opengl_transparency_25",
+      "opengl_transparency_50",
+      "opengl_transparency_75"
+    };
+
+    int idx;
+    switch( rc_config.opengl_drag_transparency_level )
+    {
+      case 25: idx = 1; break;
+      case 50: idx = 2; break;
+      case 75: idx = 3; break;
+      default: idx = 0; break;
+    }
+
+    widget = Builder_Get_Object( main_window_builder, transparency_ids[idx] );
+    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
+  }
+
   /* Restore MSAA menu selection */
   Set_MSAA_Samples( rc_config.opengl_msaa_samples );
 #endif

@@ -405,6 +405,12 @@ typedef struct
 
   /* Patch current flow direction visualization mode */
   int opengl_flow_direction_mode;
+
+  /* OpenGL drag transparency level (0=opaque, 25, 50, 75) */
+  int opengl_drag_transparency_level;
+
+  /* Whether transparency is triggered by click/drag (1) or always on (0) */
+  int opengl_transparent_on_click;
 } rc_config_t;
 
 typedef struct {
@@ -1179,6 +1185,11 @@ void on_main_opengl_msaa_2x_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_main_opengl_msaa_4x_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_main_opengl_msaa_8x_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_main_opengl_msaa_16x_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_opengl_transparency_opaque_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_opengl_transparency_25_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_opengl_transparency_50_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_opengl_transparency_75_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_opengl_transparent_on_click_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_x_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_y_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_z_axis_clicked(GtkButton *button, gpointer user_data);

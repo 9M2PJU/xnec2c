@@ -348,8 +348,9 @@ gl_view_create_widget(
   /* Initialize overlay scale adjustment (1.0 = default from overlay_generate) */
   state->ovl_model_scale_adj = 1.0f;
 
-  /* Drag transparency: halve alpha for marked renderables while dragging */
-  state->drag_alpha_factor = DRAG_ALPHA_FACTOR;
+  /* Drag transparency: alpha multiplier from rc_config level */
+  state->drag_alpha_factor =
+      DRAG_ALPHA_FROM_LEVEL(rc_config.opengl_drag_transparency_level);
 
   /* Initialize tooltip state */
   state->tooltip_active = FALSE;

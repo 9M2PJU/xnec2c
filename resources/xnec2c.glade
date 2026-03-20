@@ -11205,6 +11205,81 @@ Save NEC2 Editor data first?
                           </object>
                         </child>
                         <child>
+                          <object class="GtkSeparatorMenuItem">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkMenuItem">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">_Transparency</property>
+                            <property name="use-underline">True</property>
+                            <child type="submenu">
+                              <object class="GtkMenu">
+                                <property name="can-focus">False</property>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="opengl_transparency_opaque">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_Opaque</property>
+                                    <property name="use-underline">True</property>
+                                    <signal name="activate" handler="on_opengl_transparency_opaque_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="opengl_transparency_25">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_25%</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="group">opengl_transparency_opaque</property>
+                                    <signal name="activate" handler="on_opengl_transparency_25_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="opengl_transparency_50">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_50%</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="active">True</property>
+                                    <property name="group">opengl_transparency_opaque</property>
+                                    <signal name="activate" handler="on_opengl_transparency_50_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="opengl_transparency_75">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_75%</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="group">opengl_transparency_opaque</property>
+                                    <signal name="activate" handler="on_opengl_transparency_75_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkSeparatorMenuItem">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkCheckMenuItem" id="opengl_transparent_on_click">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">Transparent on _Click</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="active">True</property>
+                                    <signal name="toggled" handler="on_opengl_transparent_on_click_toggled" swapped="no"/>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkMenuItem">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>

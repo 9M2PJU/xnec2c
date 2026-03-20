@@ -26,11 +26,12 @@
 #include "opengl_renderer.h"
 #include "opengl_gradient_overlay.h"
 
-/* Drag transparency: alpha multiplier applied to marked renderables during drag */
-#define DRAG_ALPHA_FACTOR 0.5f
-
 /* Maximum renderables per view (constrained by guint32 active_mask in render loop) */
 #define MAX_RENDERABLES 32
+
+/* Convert transparency percentage (0/25/50/75) to alpha multiplier */
+#define DRAG_ALPHA_FROM_LEVEL(lvl) \
+    ((lvl) == 0 ? 1.0f : 1.0f - ((lvl) / 100.0f))
 
 /* View content provided by scene generator */
 typedef struct
