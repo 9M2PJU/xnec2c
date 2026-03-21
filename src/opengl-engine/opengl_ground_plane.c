@@ -18,6 +18,7 @@
  */
 
 #include "opengl_ground_plane.h"
+#include "opengl_view_peel.h"
 #include "../shared.h"
 
 #ifdef HAVE_OPENGL
@@ -97,6 +98,7 @@ opengl_ground_plane_new(void)
 
   gp->mvp_location = glGetUniformLocation(gp->shader.program, "mvp");
   gp->u_alpha_location = glGetUniformLocation(gp->shader.program, "u_alpha");
+  gl_view_peel_locs_init(&gp->peel_locs, gp->shader.program);
 
   for( i = 0; i < 3; i++ )
   {
@@ -220,32 +222,27 @@ opengl_ground_plane_far_extent(void *ctx, float r_max)
 
 /** opengl_ground_plane_render() - Render ground plane quad with transparent checkerboard pattern
  * @ctx: pointer to opengl_ground_plane_t
- * @mvp: model-view-projection matrix
- * @alpha: opacity passed to u_alpha uniform
+ * @params: per-frame render parameters
  */
   void
-opengl_ground_plane_render(void *ctx, mat4 mvp, float alpha)
+opengl_ground_plane_render(void *ctx, const gl_render_params_t *params)
 {
   opengl_ground_plane_t *gp = ctx;
 
   if( !gp || !gp->initialized )
     return;
 
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDepthMask(GL_FALSE);
-
   glUseProgram(gp->shader.program);
-  glUniform1f(gp->u_alpha_location, alpha);
-  glUniformMatrix4fv(gp->mvp_location, 1, GL_FALSE, (float *)mvp);
+  glUniform1f(gp->u_alpha_location, params->alpha);
+  glUniformMatrix4fv(gp->mvp_location, 1, GL_FALSE, (const float *)params->mvp);
 
-  /* VAO has attrib config from init — bind and draw */
+  gl_view_set_peel_uniforms(&gp->peel_locs, params);
+
+  /* VAO has attrib config from init — bind and draw.
+   * Blend and depth mask managed by the peel render loop. */
   glBindVertexArray(gp->vao);
   glDrawArrays(GL_TRIANGLES, 0, GROUND_PLANE_VERTICES);
   glBindVertexArray(0);
-
-  glDepthMask(GL_TRUE);
-  glDisable(GL_BLEND);
 
 } /* opengl_ground_plane_render() */
 

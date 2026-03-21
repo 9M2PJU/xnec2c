@@ -29,6 +29,14 @@
 /* Maximum renderables per view (constrained by guint32 active_mask in render loop) */
 #define MAX_RENDERABLES 32
 
+/* Number of depth-peel passes for order-independent transparency.
+ * 4 covers: near patch face, far patch face, near cylinder wall,
+ * far cylinder wall — or structure front/back + radiation front/back. */
+#define PEEL_PASSES 4
+
+/* Texture unit used for the previous-pass depth texture during depth peeling */
+#define PEEL_DEPTH_TEX_UNIT 2
+
 /* Convert transparency percentage (0/25/50/75) to alpha multiplier */
 #define DRAG_ALPHA_FROM_LEVEL(lvl) \
     ((lvl) == 0 ? 1.0f : 1.0f - ((lvl) / 100.0f))
@@ -65,8 +73,29 @@ typedef struct
 
 } gl_overlay_config_t;
 
+/* Per-frame render parameters passed to each renderable's render callback */
+typedef struct gl_render_params_s
+{
+  mat4 mvp;
+  mat4 mv;
+  float alpha;
+  int peel_pass;
+  int viewport_width;
+  int viewport_height;
+
+} gl_render_params_t;
+
+/* Uniform locations for depth-peel discard logic (shared by all peel-aware shaders) */
+typedef struct
+{
+  GLint peel_depth;
+  GLint viewport_size;
+  GLint peel_pass;
+
+} gl_peel_uniform_locs_t;
+
 /* Renderable interface callback types */
-typedef void (*gl_render_fn)(void *ctx, mat4 mvp, float alpha);
+typedef void (*gl_render_fn)(void *ctx, const gl_render_params_t *params);
 typedef void (*gl_prepare_fn)(void *ctx, float r_max);
 typedef void (*gl_destroy_fn)(void *ctx);
 typedef gboolean (*gl_active_fn)(void *ctx);
@@ -93,7 +122,11 @@ typedef struct
   float alpha;
   vec3 origin;
 
-  /* Sort priority for transparent pass (lower renders first) */
+  /* Sort priority for transparent pass (lower value renders first).
+   * With depth peeling, per-pixel layering is handled by the peel
+   * passes; sort_order controls renderable draw order within each
+   * pass — the GL_ZERO dest blend factor means the nearest fragment
+   * at each pixel wins, so order matters only at equal depth. */
   int transparent_sort_order;
 
   /* Whether alpha is reduced during drag interaction */
@@ -143,7 +176,7 @@ typedef struct
 } gl_view_config_t;
 
 /* View state (engine-internal) */
-typedef struct
+typedef struct gl_view_state_s
 {
   GArray *renderables;
   gradient_overlay_t *overlay;
@@ -209,9 +242,34 @@ typedef struct
   int msaa_width;
   int msaa_height;
 
+  /* Depth-peel transparency state */
+  GLuint peel_fbo[2];          /* ping-pong FBOs for depth peeling */
+  GLuint peel_depth_tex[2];    /* depth textures attached to peel FBOs */
+  GLuint peel_color_tex;       /* shared color texture for current layer */
+  GLuint accum_fbo;            /* accumulation FBO (under-operator) */
+  GLuint accum_color_tex;      /* RGBA accumulation texture */
+  GLuint composite_program;    /* fullscreen quad shader program */
+  GLuint composite_vs;         /* composite vertex shader */
+  GLuint composite_fs;         /* composite fragment shader */
+  GLuint composite_vao;        /* fullscreen triangle VAO */
+  GLuint composite_vbo;        /* fullscreen triangle VBO (3 vertices) */
+  GLint  composite_u_layer;    /* sampler uniform: current peel layer */
+  int peel_width;              /* current peel texture dimensions */
+  int peel_height;
+
   gboolean initialized;
 
 } gl_view_state_t;
+
+/* Sorting entry for the transparent render pass */
+typedef struct
+{
+  int index;
+  int sort_order;
+  float alpha;
+  float depth;
+
+} gl_trans_item_t;
 
 /* Public API */
 GtkWidget* gl_view_create_widget(
@@ -244,7 +302,7 @@ void gl_view_setup_attribs(
 void gl_view_draw_pass(
     GLuint shader_program,
     GLint mvp_location,
-    mat4 mvp,
+    const float *mvp,
     GLuint vao,
     GLenum draw_mode,
     int vertex_count);

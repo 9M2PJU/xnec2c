@@ -18,6 +18,7 @@
  */
 
 #include "opengl_view_overlay.h"
+#include "opengl_view_peel.h"
 #include "../shared.h"
 
 #ifdef HAVE_OPENGL
@@ -30,21 +31,24 @@ typedef struct
   GLuint vao;
   GLuint vbo;
   GLint mvp_location;
+  GLint u_mv_location;
   GLint u_alpha_location;
   GLint flow_mode_location;
   GLint u_phase_location;
   GLint noise_tex_location;
+  gl_peel_uniform_locs_t peel_locs;
   GLint *attrib_locations;
   unsigned int last_generation;
   gboolean initialized;
   mat4 cached_mvp;
+  mat4 cached_mv;
   gl_view_content_t ovl_content;
 
 } gl_overlay_ctx_t;
 
 /* Forward declarations for callbacks */
 static void gl_overlay_prepare(void *ctx, float r_max);
-static void gl_overlay_render(void *ctx, mat4 mvp, float alpha);
+static void gl_overlay_render(void *ctx, const gl_render_params_t *params);
 static gboolean gl_overlay_is_active(void *ctx);
 static void gl_overlay_generate(void *ctx);
 static float gl_overlay_far_extent(void *ctx, float r_max);
@@ -114,8 +118,8 @@ gl_overlay_prepare(void *ctx, float r_max)
   {
     float ovl_model_scale = gl_overlay_effective_scale(ovl);
 
-    arcball_get_mvp(view->arcball, ovl->cached_mvp, view->pan_offset,
-        view->cached_camera_distance, ovl_model_scale,
+    arcball_get_mvp(view->arcball, ovl->cached_mvp, ovl->cached_mv,
+        view->pan_offset, view->cached_camera_distance, ovl_model_scale,
         view->aspect, view->fov_rad,
         view->cached_near_plane, view->cached_far_plane);
   }
@@ -124,24 +128,24 @@ gl_overlay_prepare(void *ctx, float r_max)
 
 /*-----------------------------------------------------------------------*/
 
-/** gl_overlay_render() - Render overlay using cached MVP (ignores passed MVP)
+/** gl_overlay_render() - Render overlay using cached MVP (ignores params->mvp)
  * @ctx: overlay context
- * @mvp: unused
- * @alpha: alpha multiplier
+ * @params: per-frame render parameters (mvp/mv ignored — overlay uses own projection)
  */
   static void
-gl_overlay_render(void *ctx, mat4 mvp, float alpha)
+gl_overlay_render(void *ctx, const gl_render_params_t *params)
 {
   gl_overlay_ctx_t *ovl = ctx;
-
-  (void)mvp;
 
   if( ovl->ovl_content.vertex_count <= 0 )
     return;
 
-  /* Set uniforms before draw pass */
+  /* Set uniforms before draw pass.
+   * Overlay uses its own cached MV (different model_scale). */
   glUseProgram(ovl->shader.program);
-  glUniform1f(ovl->u_alpha_location, alpha);
+  glUniformMatrix4fv(ovl->u_mv_location, 1, GL_FALSE,
+      (float *)ovl->cached_mv);
+  glUniform1f(ovl->u_alpha_location, params->alpha);
   glUniform1i(ovl->flow_mode_location, rc_config.opengl_flow_direction_mode);
   glUniform1f(ovl->u_phase_location, ovl->view->flow_phase);
 
@@ -154,10 +158,12 @@ gl_overlay_render(void *ctx, mat4 mvp, float alpha)
     glActiveTexture(GL_TEXTURE0);
   }
 
+  gl_view_set_peel_uniforms(&ovl->peel_locs, params);
+
   gl_view_draw_pass(
       ovl->shader.program,
       ovl->mvp_location,
-      ovl->cached_mvp,
+      (const float *)ovl->cached_mvp,
       ovl->vao,
       ovl->ovl_content.draw_mode,
       ovl->ovl_content.vertex_count);
@@ -302,6 +308,8 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
 
   ovl->mvp_location =
     glGetUniformLocation(ovl->shader.program, "mvp");
+  ovl->u_mv_location =
+    glGetUniformLocation(ovl->shader.program, "u_mv");
   ovl->u_alpha_location =
     glGetUniformLocation(ovl->shader.program, "u_alpha");
   ovl->flow_mode_location =
@@ -310,6 +318,7 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
     glGetUniformLocation(ovl->shader.program, "u_phase");
   ovl->noise_tex_location =
     glGetUniformLocation(ovl->shader.program, "noise_tex");
+  gl_view_peel_locs_init(&ovl->peel_locs, ovl->shader.program);
 
   glGenVertexArrays(1, &ovl->vao);
   glGenBuffers(1, &ovl->vbo);
@@ -344,7 +353,7 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
     .ctx                  = ovl,
     .alpha                = 1.0f,
     .origin               = {0.0f, 0.0f, 0.0f},
-    .transparent_sort_order = 0,
+    .transparent_sort_order = 1,
     .transparent_on_drag  = TRUE
   };
 

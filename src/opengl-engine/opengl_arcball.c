@@ -378,9 +378,10 @@ arcball_end_drag(arcball_state_t *ab)
 
 /*-----------------------------------------------------------------------*/
 
-/** arcball_get_mvp() - Compute model-view-projection matrix from arcball rotation and scene parameters
+/** arcball_get_mvp() - Compute model-view-projection and model-view matrices
  * @ab: arcball state
- * @dest: destination matrix
+ * @dest: destination MVP matrix (projection * view * model)
+ * @mv_dest: destination model-view matrix (view * model, no projection)
  * @pan_offset: pan offset (provided by view layer)
  * @distance: camera distance
  * @model_scale: model scale factor
@@ -392,9 +393,9 @@ arcball_end_drag(arcball_state_t *ab)
  * Pan offset is provided by the view layer as it is per-view state.
  */
   void
-arcball_get_mvp(arcball_state_t *ab, mat4 dest, const vec2 pan_offset,
-    float distance, float model_scale, float aspect, float fov_rad,
-    float near_plane, float far_plane)
+arcball_get_mvp(arcball_state_t *ab, mat4 dest, mat4 mv_dest,
+    const vec2 pan_offset, float distance, float model_scale, float aspect,
+    float fov_rad, float near_plane, float far_plane)
 {
   mat4 view, proj, model, trans;
   vec3 eye_pos, center_pos, up;
@@ -413,6 +414,9 @@ arcball_get_mvp(arcball_state_t *ab, mat4 dest, const vec2 pan_offset,
 
   glm_lookat(eye_pos, center_pos, up, view);
   glm_perspective(fov_rad, aspect, near_plane, far_plane, proj);
+
+  /* Model-view (no projection) for lighting normal/position transforms */
+  glm_mat4_mul(view, model, mv_dest);
 
   glm_mat4_mul(proj, view, dest);
   glm_mat4_mul(dest, model, dest);

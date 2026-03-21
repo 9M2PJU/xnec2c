@@ -18,6 +18,7 @@
  */
 
 #include "opengl_axes.h"
+#include "opengl_view.h"  /* gl_render_params_t */
 #include "../shared.h"
 
 #ifdef HAVE_OPENGL
@@ -356,22 +357,19 @@ opengl_axes_far_extent(void *ctx, float r_max)
 
 /** opengl_axes_render() - Render axes lines and labels
  * @ctx: axes context
- * @mvp: model-view-projection matrix
- * @_alpha: unused
+ * @params: per-frame render parameters (axes use only mvp)
  */
   void
-opengl_axes_render(void *ctx, mat4 mvp, float _alpha)
+opengl_axes_render(void *ctx, const gl_render_params_t *params)
 {
   opengl_axes_t *axes = ctx;
-
-  (void)_alpha;
 
   if( !axes || !axes->initialized || axes->r_max == 0.0f )
     return;
 
   /* Render axis lines */
   glUseProgram(axes->line_shader.program);
-  glUniformMatrix4fv(axes->line_mvp_loc, 1, GL_FALSE, (float*)mvp);
+  glUniformMatrix4fv(axes->line_mvp_loc, 1, GL_FALSE, (float*)params->mvp);
   glUniform1f(axes->line_u_alpha_loc, 1.0f);
 
   glBindVertexArray(axes->lines_vao);
@@ -380,7 +378,7 @@ opengl_axes_render(void *ctx, mat4 mvp, float _alpha)
 
   /* Render labels */
   glUseProgram(axes->label_shader.program);
-  glUniformMatrix4fv(axes->label_mvp_loc, 1, GL_FALSE, (float*)mvp);
+  glUniformMatrix4fv(axes->label_mvp_loc, 1, GL_FALSE, (float*)params->mvp);
   glUniform1i(axes->label_tex_loc, 0);
 
   glActiveTexture(GL_TEXTURE0);

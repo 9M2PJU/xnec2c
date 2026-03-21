@@ -45,6 +45,16 @@ typedef struct
 
 } gl_shader_t;
 
+/* Delete a GL resource (array-style API: glDelete*(GLsizei, const GLuint*))
+ * if non-zero, then zero the handle */
+#define GL_DELETE(fn, id) \
+  do { if( (id) ) { fn(1, &(id)); (id) = 0; } } while(0)
+
+/* Delete a GL resource (single-handle API: glDelete*(GLuint))
+ * if non-zero, then zero the handle */
+#define GL_DELETE_OBJ(fn, id) \
+  do { if( (id) ) { fn(id); (id) = 0; } } while(0)
+
 /* Shader functions */
 gboolean gl_shader_load(gl_shader_t *shader,
   const char *vertex_path, const char *fragment_path);

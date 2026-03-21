@@ -73,9 +73,9 @@ void arcball_set_view(arcball_state_t *ab, float wr_deg, float wi_deg);
 void arcball_begin_drag(arcball_state_t *ab, int button, float x, float y);
 void arcball_drag(arcball_state_t *ab, float x, float y, float viewport_height);
 void arcball_end_drag(arcball_state_t *ab);
-void arcball_get_mvp(arcball_state_t *ab, mat4 dest, const vec2 pan_offset,
-    float distance, float model_scale, float aspect, float fov_rad,
-    float near_plane, float far_plane);
+void arcball_get_mvp(arcball_state_t *ab, mat4 dest, mat4 mv_dest,
+    const vec2 pan_offset, float distance, float model_scale, float aspect,
+    float fov_rad, float near_plane, float far_plane);
 void arcball_add_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data);
 void arcball_remove_callback(arcball_state_t *ab, arcball_callback_fn func, gpointer user_data);
 void arcball_notify_changed(arcball_state_t *ab);

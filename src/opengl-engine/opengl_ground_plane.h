@@ -23,7 +23,7 @@
 #include "common.h"
 
 #ifdef HAVE_OPENGL
-#include "opengl_renderer.h"
+#include "opengl_view.h"
 
 typedef struct
 {
@@ -32,6 +32,7 @@ typedef struct
   gl_shader_t shader;
   GLint mvp_location;
   GLint u_alpha_location;
+  gl_peel_uniform_locs_t peel_locs;
   GLint attrib_locations[3];
   float scale;
   gboolean initialized;
@@ -41,7 +42,7 @@ typedef struct
 opengl_ground_plane_t* opengl_ground_plane_new(void);
 void opengl_ground_plane_free(void *ctx);
 void opengl_ground_plane_prepare(void *ctx, float r_max);
-void opengl_ground_plane_render(void *ctx, mat4 mvp, float alpha);
+void opengl_ground_plane_render(void *ctx, const gl_render_params_t *params);
 float opengl_ground_plane_far_extent(void *ctx, float r_max);
 
 #endif /* HAVE_OPENGL */

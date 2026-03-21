@@ -23,6 +23,7 @@
 #include "opengl_view_input.h"
 #include "opengl_view_render.h"
 #include "opengl_view_msaa.h"
+#include "opengl_view_peel.h"
 #include "opengl_view_tooltip.h"
 #include "opengl_axes.h"
 #include "opengl_cairo_overlay.h"
@@ -89,6 +90,16 @@ gl_view_state_free(gl_view_state_t *state)
 
   if( state->overlay )
     gradient_overlay_free(state->overlay);
+
+  /* Release depth-peel FBO resources (per-resize lifecycle) */
+  gl_view_peel_free(state);
+
+  /* Release composite resources (per-realize lifecycle) */
+  GL_DELETE(glDeleteBuffers, state->composite_vbo);
+  GL_DELETE(glDeleteVertexArrays, state->composite_vao);
+  GL_DELETE_OBJ(glDeleteProgram, state->composite_program);
+  GL_DELETE_OBJ(glDeleteShader, state->composite_vs);
+  GL_DELETE_OBJ(glDeleteShader, state->composite_fs);
 
   gl_view_msaa_free(state);
 
@@ -249,6 +260,50 @@ on_realize(GtkGLArea *area, gpointer user_data)
   /* Initialize MSAA resources after GL context is ready */
   gl_view_recreate_msaa(state, rc_config.opengl_msaa_samples);
 
+  /* Compile depth-peel composite shader and create fullscreen triangle */
+  {
+    gl_shader_t cs = {0};
+    gboolean ok;
+
+    ok = gl_shader_load(&cs,
+        "/gl/peel-composite-vertex.glsl",
+        "/gl/peel-composite-fragment.glsl");
+
+    if( ok )
+    {
+      static const float tri_verts[] = {
+        -1.0f, -1.0f,
+         3.0f, -1.0f,
+        -1.0f,  3.0f
+      };
+      GLint pos_loc;
+
+      state->composite_program = cs.program;
+      state->composite_vs = cs.vertex;
+      state->composite_fs = cs.fragment;
+      state->composite_u_layer =
+        glGetUniformLocation(cs.program, "u_layer");
+
+      pos_loc = glGetAttribLocation(cs.program, "position");
+
+      glGenBuffers(1, &state->composite_vbo);
+      glBindBuffer(GL_ARRAY_BUFFER, state->composite_vbo);
+      glBufferData(GL_ARRAY_BUFFER, sizeof(tri_verts),
+          tri_verts, GL_STATIC_DRAW);
+
+      glGenVertexArrays(1, &state->composite_vao);
+      glBindVertexArray(state->composite_vao);
+      glEnableVertexAttribArray(pos_loc);
+      glVertexAttribPointer(pos_loc, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+      glBindVertexArray(0);
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    else
+    {
+      pr_err("Failed to load peel composite shaders\n");
+    }
+  }
+
 } /* on_realize() */
 
 /*-----------------------------------------------------------------------*/
@@ -301,6 +356,11 @@ on_resize(GtkGLArea *area, int width, int height, gpointer user_data)
   /* Recreate MSAA FBO at new dimensions */
   if( state->msaa_samples > 0 )
     gl_view_recreate_msaa(state, state->msaa_samples);
+
+  /* Recreate depth-peel FBOs at new dimensions (only when
+   * composite shader loaded successfully during realize) */
+  if( state->initialized && state->composite_program )
+    gl_view_peel_recreate(state, width, height);
 
   if( state->overlay )
     gradient_overlay_set_viewport(state->overlay, width, height);

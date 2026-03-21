@@ -119,6 +119,7 @@ xnec2c_SOURCES += \
   opengl-engine/opengl_view_input.c opengl-engine/opengl_view_input.h \
   opengl-engine/opengl_view_tooltip.c opengl-engine/opengl_view_tooltip.h \
   opengl-engine/opengl_view_msaa.c opengl-engine/opengl_view_msaa.h \
+  opengl-engine/opengl_view_peel.c opengl-engine/opengl_view_peel.h \
   opengl-engine/opengl_axes.c opengl-engine/opengl_axes.h \
   opengl-engine/opengl_ground_plane.c opengl-engine/opengl_ground_plane.h \
   opengl-engine/opengl_cairo_overlay.c opengl-engine/opengl_cairo_overlay.h \

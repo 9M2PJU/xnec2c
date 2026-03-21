@@ -18,6 +18,7 @@
  */
 
 #include "opengl_view_scene.h"
+#include "opengl_view_peel.h"
 #include "opengl_gradient_overlay.h"
 #include "../shared.h"
 
@@ -31,17 +32,19 @@ typedef struct
   GLuint vao;
   GLuint vbo;
   GLint mvp_location;
+  GLint u_mv_location;
   GLint u_alpha_location;
   GLint flow_mode_location;
   GLint u_phase_location;
   GLint noise_tex_location;
+  gl_peel_uniform_locs_t peel_locs;
   GLint *attrib_locations;
 
 } gl_scene_ctx_t;
 
 /* Forward declarations for callbacks */
 static void gl_scene_prepare(void *ctx, float r_max);
-static void gl_scene_render(void *ctx, mat4 mvp, float alpha);
+static void gl_scene_render(void *ctx, const gl_render_params_t *params);
 static gboolean gl_scene_is_active(void *ctx);
 static float gl_scene_far_extent(void *ctx, float r_max);
 static void gl_scene_free(void *ctx);
@@ -90,37 +93,40 @@ gl_scene_prepare(void *ctx, float r_max)
 
 /** gl_scene_render() - Render scene geometry using generic draw pass
  * @ctx: scene context
- * @mvp: model-view-projection matrix
- * @alpha: alpha multiplier
+ * @params: per-frame render parameters
  */
   static void
-gl_scene_render(void *ctx, mat4 mvp, float alpha)
+gl_scene_render(void *ctx, const gl_render_params_t *params)
 {
   gl_scene_ctx_t *sc = ctx;
   gl_view_state_t *view = sc->view;
 
   /* Set uniforms before draw pass */
   glUseProgram(sc->shader.program);
-  glUniform1f(sc->u_alpha_location, alpha);
+  glUniformMatrix4fv(sc->u_mv_location, 1, GL_FALSE,
+      (const float *)params->mv);
+  glUniform1f(sc->u_alpha_location, params->alpha);
 
   /* Flow direction mode and phase animation offset.
    * Locations are -1 for shaders without these uniforms (no-op). */
   glUniform1i(sc->flow_mode_location, rc_config.opengl_flow_direction_mode);
-  glUniform1f(sc->u_phase_location, sc->view->flow_phase);
+  glUniform1f(sc->u_phase_location, view->flow_phase);
 
   /* Bind LIC noise texture to unit 1 */
-  if( sc->view->noise_tex != 0 )
+  if( view->noise_tex != 0 )
   {
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, sc->view->noise_tex);
+    glBindTexture(GL_TEXTURE_2D, view->noise_tex);
     glUniform1i(sc->noise_tex_location, 1);
     glActiveTexture(GL_TEXTURE0);
   }
 
+  gl_view_set_peel_uniforms(&sc->peel_locs, params);
+
   gl_view_draw_pass(
       sc->shader.program,
       sc->mvp_location,
-      mvp,
+      (const float *)params->mvp,
       sc->vao,
       view->content.draw_mode,
       view->content.vertex_count);
@@ -225,10 +231,12 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
   }
 
   sc->mvp_location = glGetUniformLocation(sc->shader.program, "mvp");
+  sc->u_mv_location = glGetUniformLocation(sc->shader.program, "u_mv");
   sc->u_alpha_location = glGetUniformLocation(sc->shader.program, "u_alpha");
   sc->flow_mode_location = glGetUniformLocation(sc->shader.program, "flow_mode");
   sc->u_phase_location = glGetUniformLocation(sc->shader.program, "u_phase");
   sc->noise_tex_location = glGetUniformLocation(sc->shader.program, "noise_tex");
+  gl_view_peel_locs_init(&sc->peel_locs, sc->shader.program);
 
   glGenVertexArrays(1, &sc->vao);
   glGenBuffers(1, &sc->vbo);

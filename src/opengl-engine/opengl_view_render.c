@@ -18,6 +18,7 @@
  */
 
 #include "opengl_view_render.h"
+#include "opengl_view_peel.h"
 #include "opengl_view_tooltip.h"
 #include "opengl_gradient_overlay.h"
 #include "../shared.h"
@@ -73,13 +74,13 @@ gl_view_setup_attribs(
 gl_view_draw_pass(
     GLuint shader_program,
     GLint mvp_location,
-    mat4 mvp,
+    const float *mvp,
     GLuint vao,
     GLenum draw_mode,
     int vertex_count)
 {
   glUseProgram(shader_program);
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (float *)mvp);
+  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, mvp);
 
   glBindVertexArray(vao);
   glDrawArrays(draw_mode, 0, vertex_count);
@@ -89,15 +90,7 @@ gl_view_draw_pass(
 
 /*-----------------------------------------------------------------------*/
 
-/* Sorting entry for the transparent render pass */
-typedef struct
-{
-  int index;
-  int sort_order;
-  float alpha;
-  float depth;
-
-} trans_item_t;
+/* gl_trans_item_t defined in opengl_view.h */
 
 /*-----------------------------------------------------------------------*/
 
@@ -111,7 +104,8 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 {
   gl_view_state_t *state;
   gl_view_content_t content = {0};
-  mat4 mvp;
+  gl_render_params_t render_params;
+  mat4 mvp, mv;
   float camera_distance;
   GLint default_fbo = 0;
   guint32 active_mask;
@@ -201,7 +195,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     state->cached_near_plane = near_plane;
     state->cached_far_plane = far_plane;
 
-    arcball_get_mvp(state->arcball, mvp, state->pan_offset,
+    arcball_get_mvp(state->arcball, mvp, mv, state->pan_offset,
         camera_distance, content.model_scale, state->aspect, state->fov_rad,
         near_plane, far_plane);
   }
@@ -232,12 +226,26 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       continue;
 
     r->prepare(r->ctx, content.r_max);
-    r->render(r->ctx, mvp, eff_alpha);
+
+    /* Opaque pass: peel_pass=0 (no discard in shader) */
+    glm_mat4_copy(mvp, render_params.mvp);
+    glm_mat4_copy(mv, render_params.mv);
+    render_params.alpha = eff_alpha;
+    render_params.peel_pass = 0;
+    render_params.viewport_width = state->peel_width;
+    render_params.viewport_height = state->peel_height;
+
+    r->render(r->ctx, &render_params);
   }
 
-  /* Transparent pass — sorted by priority then back-to-front depth */
+  /* Depth-peeled transparent pass — order-independent transparency
+   * via front-to-back depth peeling with under-operator compositing.
+   * Each pass extracts the next-nearest depth layer from all
+   * transparent renderables, then composites it into the
+   * accumulation buffer.  Final result is blended over the opaque
+   * framebuffer. */
   {
-    trans_item_t items[MAX_RENDERABLES];
+    gl_trans_item_t items[MAX_RENDERABLES];
     int trans_count, j, k;
 
     trans_count = 0;
@@ -257,24 +265,27 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
       items[trans_count].alpha = eff_alpha;
       items[trans_count].sort_order = r->transparent_sort_order;
-      {
-        float view_z[3];
 
-        arcball_get_rotation_col(state->arcball, 2, view_z);
-        items[trans_count].depth =
-            view_z[0] * r->origin[0] +
-            view_z[1] * r->origin[1] +
-            view_z[2] * r->origin[2];
+      /* Depth from effective extent: smaller extent (inner geometry)
+       * sorts first so it renders before outer geometry.  This
+       * adapts to user scaling of the overlay without a static
+       * sort_order assumption about containment direction. */
+      if( r->far_extent )
+      {
+        items[trans_count].depth = r->far_extent(r->ctx, content.r_max);
+      }
+      else
+      {
+        items[trans_count].depth = 0.0f;
       }
       items[trans_count].index = (int)i;
       trans_count++;
     }
 
-    /* Insertion sort: ascending sort_order, then ascending depth
-     * (farthest first within same priority) */
+    /* Insertion sort: ascending sort_order, then ascending depth */
     for( j = 1; j < trans_count; j++ )
     {
-      trans_item_t key = items[j];
+      gl_trans_item_t key = items[j];
 
       k = j - 1;
 
@@ -290,25 +301,20 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       items[k + 1] = key;
     }
 
-    /* Depth writes ON so transparent shells self-occlude.
-     * Interior objects render first (lower sort_order) and
-     * write depth; enclosing shells depth-test against them. */
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    for( j = 0; j < trans_count; j++ )
+    if( trans_count > 0 && state->peel_fbo[0] )
     {
-      gl_renderable_t *r = &g_array_index(
-          state->renderables, gl_renderable_t, items[j].index);
+      GLuint active_fbo;
 
-      r->prepare(r->ctx, content.r_max);
-      r->render(r->ctx, mvp, items[j].alpha);
+      active_fbo = state->msaa_fbo
+        ? state->msaa_fbo : (GLuint)default_fbo;
 
-      /* Re-assert blend in case renderable modified GL state */
-      glEnable(GL_BLEND);
+      gl_view_peel_render(state, active_fbo, mvp, mv,
+          items, trans_count, content.r_max);
     }
-
-    glDisable(GL_BLEND);
+    else if( trans_count > 0 )
+    {
+      pr_warn("Transparent renderables skipped: peel FBOs unavailable\n");
+    }
   }
 
   /* Post-3D callbacks */

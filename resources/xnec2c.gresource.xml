@@ -16,6 +16,8 @@
 
     <file>gl/ground-plane-vertex.glsl</file>
     <file>gl/ground-plane-fragment.glsl</file>
+    <file>gl/peel-composite-vertex.glsl</file>
+    <file>gl/peel-composite-fragment.glsl</file>
   </gresource>
 </gresources>
 

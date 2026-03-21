@@ -1,0 +1,349 @@
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ *  The official website and doumentation for xnec2c is available here:
+ *    https://www.xnec2c.org/
+ */
+
+#include "opengl_view_peel.h"
+#include "../shared.h"
+
+#ifdef HAVE_OPENGL
+
+/*-----------------------------------------------------------------------*/
+
+/** gl_view_peel_free() - Release depth-peel FBO, texture, accumulation, and composite resources
+ * @state: view state containing peel resources to free
+ */
+  void
+gl_view_peel_free(gl_view_state_t *state)
+{
+  int i;
+
+  if( !state )
+    return;
+
+  for( i = 0; i < 2; i++ )
+  {
+    GL_DELETE(glDeleteFramebuffers, state->peel_fbo[i]);
+    GL_DELETE(glDeleteTextures, state->peel_depth_tex[i]);
+  }
+
+  GL_DELETE(glDeleteTextures, state->peel_color_tex);
+  GL_DELETE(glDeleteFramebuffers, state->accum_fbo);
+  GL_DELETE(glDeleteTextures, state->accum_color_tex);
+
+  state->peel_width = 0;
+  state->peel_height = 0;
+
+} /* gl_view_peel_free() */
+
+/*-----------------------------------------------------------------------*/
+
+/** create_peel_texture() - Allocate a 2D texture with nearest filter and clamp-to-edge wrap
+ * @ifmt: internal format (e.g. GL_RGBA8, GL_DEPTH_COMPONENT24)
+ * @width: texture width in pixels
+ * @height: texture height in pixels
+ * @fmt: pixel format (e.g. GL_RGBA, GL_DEPTH_COMPONENT)
+ * @type: pixel type (e.g. GL_UNSIGNED_BYTE, GL_FLOAT)
+ *
+ * Returns texture handle; leaves texture bound to GL_TEXTURE_2D.
+ */
+  static GLuint
+create_peel_texture(GLenum ifmt, int width, int height, GLenum fmt, GLenum type)
+{
+  GLuint tex;
+
+  glGenTextures(1, &tex);
+  glBindTexture(GL_TEXTURE_2D, tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, ifmt, width, height, 0, fmt, type, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  return tex;
+
+} /* create_peel_texture() */
+
+/*-----------------------------------------------------------------------*/
+
+/** gl_view_peel_recreate() - Recreate depth-peel FBO resources at given dimensions
+ * @state: view state to update with new peel resources
+ * @width: viewport width in pixels
+ * @height: viewport height in pixels
+ *
+ * Creates 2 ping-pong FBOs each with a GL_DEPTH_COMPONENT24 depth texture
+ * and a shared GL_RGBA8 color texture, plus an accumulation FBO with its
+ * own GL_RGBA8 color texture for the under-operator composite.
+ */
+  void
+gl_view_peel_recreate(gl_view_state_t *state, int width, int height)
+{
+  int i;
+
+  if( !state )
+    return;
+
+  gl_view_peel_free(state);
+
+  if( width == 0 || height == 0 )
+    return;
+
+  state->peel_width = width;
+  state->peel_height = height;
+
+  /* Shared color texture — attached to both peel FBOs */
+  state->peel_color_tex = create_peel_texture(
+      GL_RGBA8, width, height, GL_RGBA, GL_UNSIGNED_BYTE);
+
+  /* Ping-pong depth textures and FBOs */
+  glGenFramebuffers(2, state->peel_fbo);
+
+  for( i = 0; i < 2; i++ )
+  {
+    state->peel_depth_tex[i] = create_peel_texture(
+        GL_DEPTH_COMPONENT24, width, height, GL_DEPTH_COMPONENT, GL_FLOAT);
+
+    /* FBO: depth texture + shared color texture */
+    glBindFramebuffer(GL_FRAMEBUFFER, state->peel_fbo[i]);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+        GL_TEXTURE_2D, state->peel_depth_tex[i], 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+        GL_TEXTURE_2D, state->peel_color_tex, 0);
+
+    if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+    {
+      pr_err("Peel FBO %d incomplete\n", i);
+      gl_view_peel_free(state);
+      return;
+    }
+  }
+
+  /* Accumulation FBO + color texture */
+  state->accum_color_tex = create_peel_texture(
+      GL_RGBA8, width, height, GL_RGBA, GL_UNSIGNED_BYTE);
+
+  glGenFramebuffers(1, &state->accum_fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, state->accum_fbo);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+      GL_TEXTURE_2D, state->accum_color_tex, 0);
+
+  if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+  {
+    pr_err("Peel accumulation FBO incomplete\n");
+    gl_view_peel_free(state);
+    return;
+  }
+
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+} /* gl_view_peel_recreate() */
+
+/*-----------------------------------------------------------------------*/
+
+/** gl_view_peel_locs_init() - Look up depth-peel uniform locations for a shader program
+ * @locs: output location struct
+ * @program: GL shader program handle
+ */
+  void
+gl_view_peel_locs_init(gl_peel_uniform_locs_t *locs, GLuint program)
+{
+  locs->peel_depth = glGetUniformLocation(program, "u_peel_depth");
+  locs->viewport_size = glGetUniformLocation(program, "u_viewport_size");
+  locs->peel_pass = glGetUniformLocation(program, "u_peel_pass");
+
+} /* gl_view_peel_locs_init() */
+
+/*-----------------------------------------------------------------------*/
+
+/** gl_view_set_peel_uniforms() - Set depth-peel uniforms for the current peel pass
+ * @locs: uniform locations obtained from gl_view_peel_locs_init()
+ * @params: per-frame render parameters (peel_pass, viewport dimensions)
+ */
+  void
+gl_view_set_peel_uniforms(const gl_peel_uniform_locs_t *locs,
+    const gl_render_params_t *params)
+{
+  glUniform1i(locs->peel_pass, params->peel_pass);
+  glUniform2f(locs->viewport_size,
+      (float)params->viewport_width, (float)params->viewport_height);
+  glUniform1i(locs->peel_depth, PEEL_DEPTH_TEX_UNIT);
+
+} /* gl_view_set_peel_uniforms() */
+
+/*-----------------------------------------------------------------------*/
+
+/** gl_view_peel_render() - Run depth-peel transparency passes
+ * @state: view state with peel FBO resources
+ * @active_fbo: opaque-pass FBO (source for depth blit, target for final composite)
+ * @mvp: model-view-projection matrix
+ * @mv: model-view matrix (no projection)
+ * @items: sorted transparent items (index, alpha, sort_order, depth)
+ * @count: number of transparent items
+ * @r_max: maximum radius for renderable prepare callbacks
+ *
+ * Prepares each transparent renderable, then runs PEEL_PASSES front-to-back
+ * depth-peel iterations.  Each pass extracts the next-nearest depth layer,
+ * composites it into an accumulation buffer via the under operator, then
+ * blends the final accumulated color over the opaque framebuffer.
+ */
+  void
+gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
+    mat4 mvp, mat4 mv,
+    const gl_trans_item_t *items, int count, float r_max)
+{
+  gl_render_params_t render_params;
+  int pw, ph;
+  int j, k;
+
+  pw = state->peel_width;
+  ph = state->peel_height;
+
+  /* Prepare all transparent renderables once */
+  for( j = 0; j < count; j++ )
+  {
+    gl_renderable_t *r = &g_array_index(
+        state->renderables, gl_renderable_t, items[j].index);
+
+    r->prepare(r->ctx, r_max);
+  }
+
+  /* Clear accumulation buffer to fully transparent */
+  glBindFramebuffer(GL_FRAMEBUFFER, state->accum_fbo);
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  /* Depth-peel passes: each extracts the next-nearest layer.
+   * Peel FBOs are always single-sample; when MSAA is active
+   * the opaque depth blit performs an implicit resolve. */
+  for( k = 0; k < PEEL_PASSES; k++ )
+  {
+    int cur = k % 2;
+    int prev = (k + 1) % 2;
+
+    /* Blit opaque depth into this pass's peel FBO.
+     * When MSAA is active, glBlitFramebuffer resolves the
+     * multisampled opaque depth to the single-sample peel
+     * depth texture (sample-0 resolve).  Transparent fragments
+     * behind opaque surfaces fail GL_LESS and are rejected. */
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, active_fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, state->peel_fbo[cur]);
+    glBlitFramebuffer(0, 0, pw, ph, 0, 0, pw, ph,
+        GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+    /* Clear color only — depth was just blitted from opaque */
+    glBindFramebuffer(GL_FRAMEBUFFER, state->peel_fbo[cur]);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    /* Bind previous pass's depth texture to unit 2.
+     * Fragment shader discards fragments at z <= prev_z,
+     * peeling away already-rendered layers. */
+    glActiveTexture(GL_TEXTURE0 + PEEL_DEPTH_TEX_UNIT);
+    glBindTexture(GL_TEXTURE_2D, state->peel_depth_tex[prev]);
+    glActiveTexture(GL_TEXTURE0);
+
+    /* Build render params for this peel pass */
+    glm_mat4_copy(mvp, render_params.mvp);
+    glm_mat4_copy(mv, render_params.mv);
+    render_params.peel_pass = k;
+    render_params.viewport_width = pw;
+    render_params.viewport_height = ph;
+
+    /* Render all transparent renderables into peel layer.
+     * Depth writes ON so this layer's depth is recorded
+     * for the next pass's discard test.
+     *
+     * glBlendFuncSeparate with GL_ZERO dest factor: each
+     * fragment that passes GL_LESS replaces the previous
+     * color entirely.  Only the nearest surviving fragment's
+     * premultiplied output remains per pixel.
+     *
+     * Without GL_ZERO, a nearer fragment from a later
+     * renderable would BLEND with a farther fragment from
+     * an earlier renderable, mixing two depth layers into
+     * one pass.  The inflated alpha consumes the budget
+     * for subsequent under-composite passes, making deeper
+     * layers (e.g. radiation pattern behind structure
+     * patches) nearly invisible. */
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_BLEND);
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ZERO,
+        GL_ONE, GL_ZERO);
+
+    for( j = 0; j < count; j++ )
+    {
+      gl_renderable_t *r = &g_array_index(
+          state->renderables, gl_renderable_t, items[j].index);
+
+      render_params.alpha = items[j].alpha;
+      r->render(r->ctx, &render_params);
+    }
+
+    /* Under-composite this peel layer into accumulation buffer.
+     * Under operator: dst = src * (1 - dst.a) + dst
+     * Achieved via glBlendFunc(ONE_MINUS_DST_ALPHA, ONE). */
+    glBindFramebuffer(GL_FRAMEBUFFER, state->accum_fbo);
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, state->peel_color_tex);
+
+    glUseProgram(state->composite_program);
+    glUniform1i(state->composite_u_layer, 0);
+
+    glBindVertexArray(state->composite_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindVertexArray(0);
+
+  } /* for each peel pass */
+
+  /* Final composite: blend accumulated transparent color
+   * over the opaque framebuffer using premultiplied alpha.
+   * dst = src * 1 + dst * (1 - src.a) */
+  glBindFramebuffer(GL_FRAMEBUFFER, active_fbo);
+  glViewport(0, 0, pw, ph);
+  glDisable(GL_DEPTH_TEST);
+  glDepthMask(GL_FALSE);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, state->accum_color_tex);
+
+  glUseProgram(state->composite_program);
+  glUniform1i(state->composite_u_layer, 0);
+
+  glBindVertexArray(state->composite_vao);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glBindVertexArray(0);
+
+  /* Restore GL state for subsequent passes (tooltip, MSAA blit) */
+  glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+} /* gl_view_peel_render() */
+
+/*-----------------------------------------------------------------------*/
+
+#endif /* HAVE_OPENGL */
