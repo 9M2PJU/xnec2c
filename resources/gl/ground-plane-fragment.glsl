@@ -25,13 +25,16 @@ const vec3 LIGHT_GREEN = vec3(0.20, 0.32, 0.15);
 
 void main() {
   /* Depth-peel discard: for passes > 0, reject fragments at or
-   * nearer than the previous layer's depth.  Epsilon bias prevents
-   * 24-bit depth quantization from re-rendering the same fragment
-   * in multiple passes (see lit-color-fragment.glsl for details). */
+   * nearer than the previous layer's depth.  Derivative-based
+   * epsilon covers both 24-bit quantization and MSAA resolve
+   * offset (see lit-color-fragment.glsl for details). */
   if (u_peel_pass > 0) {
     float prev_z = texture2D(u_peel_depth,
         gl_FragCoord.xy / u_viewport_size).r;
-    if (gl_FragCoord.z <= prev_z + PEEL_DEPTH_EPSILON) discard;
+    float dz = max(abs(dFdx(gl_FragCoord.z)),
+                   abs(dFdy(gl_FragCoord.z)));
+    float eps = max(PEEL_DEPTH_EPSILON, dz);
+    if (gl_FragCoord.z <= prev_z + eps) discard;
   }
 
   vec3 lightDir = normalize(LIGHT_DIR_RAW);

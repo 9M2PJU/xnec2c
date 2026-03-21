@@ -360,12 +360,15 @@ on_resize(GtkGLArea *area, int width, int height, gpointer user_data)
   /* Recreate depth-peel FBOs at new dimensions (only when
    * composite shader loaded successfully during realize) */
   if( state->initialized && state->composite_program )
-    gl_view_peel_recreate(state, width, height);
+    gl_view_peel_recreate(state, width, height, state->msaa_samples);
 
   if( state->overlay )
     gradient_overlay_set_viewport(state->overlay, width, height);
 
   glViewport(0, 0, width, height);
+
+  /* Force redraw so the window does not remain black after resize */
+  gtk_widget_queue_draw(GTK_WIDGET(area));
 
 } /* on_resize() */
 

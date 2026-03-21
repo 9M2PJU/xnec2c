@@ -243,11 +243,17 @@ typedef struct gl_view_state_s
   int msaa_height;
 
   /* Depth-peel transparency state */
-  GLuint peel_fbo[2];          /* ping-pong FBOs for depth peeling */
+  GLuint peel_fbo[2];          /* ping-pong FBOs for depth peeling (single-sample resolve targets) */
   GLuint peel_depth_tex[2];    /* depth textures attached to peel FBOs */
   GLuint peel_color_tex;       /* shared color texture for current layer */
   GLuint accum_fbo;            /* accumulation FBO (under-operator) */
   GLuint accum_color_tex;      /* RGBA accumulation texture */
+
+  /* Multisampled peel FBOs — used for rasterization when MSAA is active,
+   * then blit-resolved to single-sample peel_fbo[] for shader reads */
+  GLuint peel_ms_fbo[2];      /* multisampled ping-pong FBOs */
+  GLuint peel_ms_color_rbo[2]; /* MS color renderbuffers */
+  GLuint peel_ms_depth_rbo[2]; /* MS depth renderbuffers */
   GLuint composite_program;    /* fullscreen quad shader program */
   GLuint composite_vs;         /* composite vertex shader */
   GLuint composite_fs;         /* composite fragment shader */

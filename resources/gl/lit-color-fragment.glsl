@@ -54,18 +54,25 @@ void main() {
    * nearer than the previous layer's depth.  Pass 0 renders the
    * nearest transparent layer with no discard.
    *
-   * Epsilon bias: gl_FragCoord.z (float32) written to a 24-bit
-   * depth texture gets quantized.  The quantized value read back
-   * via texture2D can be slightly less than the original, causing
-   * the same fragment to survive the discard in subsequent passes.
-   * At grazing angles many fragments hit this boundary, rendering
-   * in all 4 passes and accumulating alpha toward 1.0 (opaque).
-   * A bias of 1e-5 exceeds one 24-bit depth step (~6e-6 for
-   * typical near/far) without merging genuinely distinct layers. */
+   * Epsilon bias: two sources of depth mismatch between the value
+   * written in pass N and the value read back in pass N+1:
+   *   1. 24-bit depth texture quantization (~6e-8 per step)
+   *   2. MSAA resolve offset — the resolved depth comes from one
+   *      sample position, but gl_FragCoord.z is evaluated at pixel
+   *      center.  The difference is proportional to the depth
+   *      gradient across the pixel and the sample-to-center offset
+   *      (up to ~0.5 pixels for typical MSAA patterns).
+   *
+   * The derivative-based epsilon adapts to the actual depth
+   * gradient so steep surfaces get sufficient bias while
+   * near-parallel surfaces retain tight layer separation. */
   if (u_peel_pass > 0) {
     float prev_z = texture2D(u_peel_depth,
         gl_FragCoord.xy / u_viewport_size).r;
-    if (gl_FragCoord.z <= prev_z + PEEL_DEPTH_EPSILON) discard;
+    float dz = max(abs(dFdx(gl_FragCoord.z)),
+                   abs(dFdy(gl_FragCoord.z)));
+    float eps = max(PEEL_DEPTH_EPSILON, dz);
+    if (gl_FragCoord.z <= prev_z + eps) discard;
   }
 
   vec3 lightDir = normalize(LIGHT_DIR_RAW);

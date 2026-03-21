@@ -22,6 +22,7 @@
 #include "opengl_structure.h"
 #include "../opengl-engine/opengl_view.h"
 #include "../opengl-engine/opengl_view_msaa.h"
+#include "../opengl-engine/opengl_view_peel.h"
 #include "../shared.h"
 
 #ifdef HAVE_OPENGL
@@ -59,6 +60,13 @@ msaa_update_view(GtkWidget *(*get_widget)(void), int samples)
 
   gtk_gl_area_make_current(GTK_GL_AREA(w));
   gl_view_recreate_msaa(state, samples);
+
+  /* Rebuild peel FBOs with matching MSAA sample count so
+   * transparent geometry rasterizes with multisampling */
+  if( state->composite_program )
+    gl_view_peel_recreate(state, state->msaa_width, state->msaa_height,
+        state->msaa_samples);
+
   gtk_widget_queue_draw(w);
 
 } /* msaa_update_view() */

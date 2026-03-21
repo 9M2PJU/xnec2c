@@ -39,6 +39,11 @@ gl_view_peel_free(gl_view_state_t *state)
   {
     GL_DELETE(glDeleteFramebuffers, state->peel_fbo[i]);
     GL_DELETE(glDeleteTextures, state->peel_depth_tex[i]);
+
+    /* Multisampled peel resources (no-op when MSAA inactive) */
+    GL_DELETE(glDeleteFramebuffers, state->peel_ms_fbo[i]);
+    GL_DELETE(glDeleteRenderbuffers, state->peel_ms_color_rbo[i]);
+    GL_DELETE(glDeleteRenderbuffers, state->peel_ms_depth_rbo[i]);
   }
 
   GL_DELETE(glDeleteTextures, state->peel_color_tex);
@@ -84,13 +89,20 @@ create_peel_texture(GLenum ifmt, int width, int height, GLenum fmt, GLenum type)
  * @state: view state to update with new peel resources
  * @width: viewport width in pixels
  * @height: viewport height in pixels
+ * @msaa_samples: MSAA sample count (0 = single-sample peel FBOs)
  *
  * Creates 2 ping-pong FBOs each with a GL_DEPTH_COMPONENT24 depth texture
  * and a shared GL_RGBA8 color texture, plus an accumulation FBO with its
  * own GL_RGBA8 color texture for the under-operator composite.
+ *
+ * When msaa_samples > 0, also creates multisampled renderbuffer FBOs for
+ * rasterization.  After each peel pass, the MS FBO is blit-resolved to
+ * the single-sample FBO so the depth texture is readable by the next
+ * pass's peel discard shader and the color texture is compositable.
  */
   void
-gl_view_peel_recreate(gl_view_state_t *state, int width, int height)
+gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
+    int msaa_samples)
 {
   int i;
 
@@ -109,7 +121,7 @@ gl_view_peel_recreate(gl_view_state_t *state, int width, int height)
   state->peel_color_tex = create_peel_texture(
       GL_RGBA8, width, height, GL_RGBA, GL_UNSIGNED_BYTE);
 
-  /* Ping-pong depth textures and FBOs */
+  /* Ping-pong depth textures and single-sample FBOs (resolve targets) */
   glGenFramebuffers(2, state->peel_fbo);
 
   for( i = 0; i < 2; i++ )
@@ -129,6 +141,41 @@ gl_view_peel_recreate(gl_view_state_t *state, int width, int height)
       pr_err("Peel FBO %d incomplete\n", i);
       gl_view_peel_free(state);
       return;
+    }
+  }
+
+  /* Multisampled peel FBOs for rasterization when MSAA is active.
+   * Transparent geometry renders into these with full multisampling,
+   * then each pass blit-resolves to the single-sample peel_fbo[]
+   * for shader depth reads and color compositing. */
+  if( msaa_samples >= 2 )
+  {
+    glGenFramebuffers(2, state->peel_ms_fbo);
+
+    for( i = 0; i < 2; i++ )
+    {
+      glGenRenderbuffers(1, &state->peel_ms_color_rbo[i]);
+      glBindRenderbuffer(GL_RENDERBUFFER, state->peel_ms_color_rbo[i]);
+      glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa_samples,
+          GL_RGBA8, width, height);
+
+      glGenRenderbuffers(1, &state->peel_ms_depth_rbo[i]);
+      glBindRenderbuffer(GL_RENDERBUFFER, state->peel_ms_depth_rbo[i]);
+      glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa_samples,
+          GL_DEPTH_COMPONENT24, width, height);
+
+      glBindFramebuffer(GL_FRAMEBUFFER, state->peel_ms_fbo[i]);
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+          GL_RENDERBUFFER, state->peel_ms_color_rbo[i]);
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+          GL_RENDERBUFFER, state->peel_ms_depth_rbo[i]);
+
+      if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+      {
+        pr_err("Peel MSAA FBO %d incomplete\n", i);
+        gl_view_peel_free(state);
+        return;
+      }
     }
   }
 
@@ -207,11 +254,13 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
     const gl_trans_item_t *items, int count, float r_max)
 {
   gl_render_params_t render_params;
+  gboolean use_ms;
   int pw, ph;
   int j, k;
 
   pw = state->peel_width;
   ph = state->peel_height;
+  use_ms = (state->peel_ms_fbo[0] != 0);
 
   /* Prepare all transparent renderables once */
   for( j = 0; j < count; j++ )
@@ -228,31 +277,39 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
   glClear(GL_COLOR_BUFFER_BIT);
 
   /* Depth-peel passes: each extracts the next-nearest layer.
-   * Peel FBOs are always single-sample; when MSAA is active
-   * the opaque depth blit performs an implicit resolve. */
+   * When MSAA is active, rendering targets multisampled peel
+   * FBOs for proper edge coverage, then blit-resolves to the
+   * single-sample peel FBOs for depth texture reads and color
+   * compositing.  Without MSAA, renders directly into the
+   * single-sample peel FBOs. */
   for( k = 0; k < PEEL_PASSES; k++ )
   {
     int cur = k % 2;
     int prev = (k + 1) % 2;
+    GLuint render_fbo;
 
-    /* Blit opaque depth into this pass's peel FBO.
-     * When MSAA is active, glBlitFramebuffer resolves the
-     * multisampled opaque depth to the single-sample peel
-     * depth texture (sample-0 resolve).  Transparent fragments
-     * behind opaque surfaces fail GL_LESS and are rejected. */
+    render_fbo = use_ms ? state->peel_ms_fbo[cur] : state->peel_fbo[cur];
+
+    /* Blit opaque depth into this pass's render FBO.
+     * When MSAA, both source (active_fbo) and target
+     * (peel_ms_fbo) are multisampled with matching sample
+     * count — glBlitFramebuffer copies per-sample.
+     * Without MSAA, resolves MS opaque depth to single-sample. */
     glBindFramebuffer(GL_READ_FRAMEBUFFER, active_fbo);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, state->peel_fbo[cur]);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, render_fbo);
     glBlitFramebuffer(0, 0, pw, ph, 0, 0, pw, ph,
         GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
     /* Clear color only — depth was just blitted from opaque */
-    glBindFramebuffer(GL_FRAMEBUFFER, state->peel_fbo[cur]);
+    glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     /* Bind previous pass's depth texture to unit 2.
      * Fragment shader discards fragments at z <= prev_z,
-     * peeling away already-rendered layers. */
+     * peeling away already-rendered layers.  Always reads
+     * from the single-sample resolve texture regardless of
+     * MSAA — the comparison is per-fragment, not per-sample. */
     glActiveTexture(GL_TEXTURE0 + PEEL_DEPTH_TEX_UNIT);
     glBindTexture(GL_TEXTURE_2D, state->peel_depth_tex[prev]);
     glActiveTexture(GL_TEXTURE0);
@@ -293,6 +350,19 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
 
       render_params.alpha = items[j].alpha;
       r->render(r->ctx, &render_params);
+    }
+
+    /* Resolve multisampled peel layer to single-sample textures.
+     * Depth resolves for the next pass's peel discard shader read;
+     * color resolves for the under-composite fullscreen blit.
+     * Without MSAA this step is skipped — rendering already
+     * targeted the single-sample peel_fbo. */
+    if( use_ms )
+    {
+      glBindFramebuffer(GL_READ_FRAMEBUFFER, state->peel_ms_fbo[cur]);
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, state->peel_fbo[cur]);
+      glBlitFramebuffer(0, 0, pw, ph, 0, 0, pw, ph,
+          GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     }
 
     /* Under-composite this peel layer into accumulation buffer.

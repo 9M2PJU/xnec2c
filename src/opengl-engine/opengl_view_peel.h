@@ -29,8 +29,12 @@
  * Recreate depth-peel FBO resources at the given dimensions.
  * Creates 2 ping-pong FBOs with depth textures, a shared color
  * texture, and an accumulation FBO for the under-operator.
+ * When msaa_samples > 0, also creates multisampled renderbuffer
+ * FBOs for rasterization, resolved to single-sample textures
+ * for shader reads and compositing.
  */
-void gl_view_peel_recreate(gl_view_state_t *state, int width, int height);
+void gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
+    int msaa_samples);
 
 /* gl_view_peel_free()
  *
