@@ -42,10 +42,9 @@
 #define LINE_ARROW_SHAFT_HW     0.024f
 #define LINE_ARROW_HEAD_HS      0.096f
 
-/* Sub-visual per-patch normal offset to resolve z-fighting between
- * overlapping coplanar patches drawn in the same draw call.
- * 1e-4 is too small on vertical patches. */
-#define PATCH_DEPTH_BIAS 2e-4f
+/* Per-patch NDC depth offset for coplanar z-fighting resolution.
+ * Applied in fragment shader via gl_FragDepth; scales by patch index. */
+#define PATCH_DEPTH_BIAS_NDC 1e-6f
 
 
 /* Shared geometry buffer accessible by both structure window and overlay */
@@ -264,7 +263,8 @@ set_structure_vertex(structure_vertex_t *sv,
     float nx, float ny, float nz,
     float cr, float cg, float cb, float ca,
     float u, float v_coord,
-    float fd0, float fd1, float fd2, float fd3)
+    float fd0, float fd1, float fd2, float fd3,
+    float dbias)
 {
   sv->point.x = px;
   sv->point.y = py;
@@ -282,6 +282,7 @@ set_structure_vertex(structure_vertex_t *sv,
   sv->flow_data[1] = fd1;
   sv->flow_data[2] = fd2;
   sv->flow_data[3] = fd3;
+  sv->depth_bias = dbias;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -598,14 +599,14 @@ opengl_structure_generate_geometry(
       set_structure_vertex(&structure_vertices[vidx],
           (float)data.x1[idx], (float)data.y1[idx], (float)data.z1[idx],
           nx, ny, nz, r, g, b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
 
       /* Endpoint 2 */
       set_structure_vertex(&structure_vertices[vidx],
           (float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx],
           nx, ny, nz, r, g, b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
       vidx++;
     }
 
@@ -618,6 +619,7 @@ opengl_structure_generate_geometry(
       float p_r, p_g, p_b;
       float c0x, c0y, c0z, c1x, c1y, c1z;
       float c2x, c2y, c2z, c3x, c3y, c3z;
+      float dbias = (float)(idx + 1) * PATCH_DEPTH_BIAS_NDC;
 
       get_patch_normal(idx, &nx, &ny, &nz);
       get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
@@ -636,53 +638,41 @@ opengl_structure_generate_geometry(
       c3y = (float)(save.ytemp[j] + s * data.t1y[idx] - s * data.t2y[idx]);
       c3z = (float)(save.ztemp[j] + s * data.t1z[idx] - s * data.t2z[idx]);
 
-      /* Per-patch depth bias along normal to resolve z-fighting
-       * between overlapping coplanar patches (e.g. GR-rotated caps) */
-      {
-        float bias = (float)(idx + 1) * PATCH_DEPTH_BIAS * (float)r_max;
-        float bx = bias * nx, by = bias * ny, bz = bias * nz;
-
-        c0x += bx; c0y += by; c0z += bz;
-        c1x += bx; c1y += by; c1z += bz;
-        c2x += bx; c2y += by; c2z += bz;
-        c3x += bx; c3y += by; c3z += bz;
-      }
-
       /* Box outline: 4 edges as GL_LINES pairs (8 vertices) */
       set_structure_vertex(&structure_vertices[vidx],
           c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
       vidx++;
 
       set_structure_vertex(&structure_vertices[vidx],
           c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
       vidx++;
 
       set_structure_vertex(&structure_vertices[vidx],
           c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
       vidx++;
 
       set_structure_vertex(&structure_vertices[vidx],
           c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+          0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
       vidx++;
 
       /* Interior fill: chevron V-marks or stipple dots */
@@ -772,11 +762,11 @@ opengl_structure_generate_geometry(
             /* Double-ended shaft: single line through center */
             set_structure_vertex(&structure_vertices[vidx],
                 e0x, e0y, e0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-                0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
             vidx++;
             set_structure_vertex(&structure_vertices[vidx],
                 e1x, e1y, e1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-                0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
             vidx++;
           }
           else
@@ -823,71 +813,71 @@ opengl_structure_generate_geometry(
           /* Shaft top edge: s0 to s1 */
           set_structure_vertex(&structure_vertices[vidx],
               s0x, s0y, s0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               s1x, s1y, s1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
 
           /* Shaft bottom edge: s3 to s2 */
           set_structure_vertex(&structure_vertices[vidx],
               s3x, s3y, s3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               s2x, s2y, s2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
 
           /* Tail cap: s0 to s3 */
           set_structure_vertex(&structure_vertices[vidx],
               s0x, s0y, s0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               s3x, s3y, s3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
 
           /* Top notch: s1 to a_left */
           set_structure_vertex(&structure_vertices[vidx],
               s1x, s1y, s1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               alx, aly, alz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
 
           /* Top arm: a_left to tip */
           set_structure_vertex(&structure_vertices[vidx],
               alx, aly, alz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               tipx, tipy, tipz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
 
           /* Bottom notch: s2 to a_right */
           set_structure_vertex(&structure_vertices[vidx],
               s2x, s2y, s2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               arx, ary, arz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
 
           /* Bottom arm: a_right to tip */
           set_structure_vertex(&structure_vertices[vidx],
               arx, ary, arz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
           set_structure_vertex(&structure_vertices[vidx],
               tipx, tipy, tipz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+              0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
           vidx++;
           } /* end unidirectional arrow else block */
         }
@@ -948,6 +938,7 @@ opengl_structure_generate_geometry(
         structure_vertices[vidx].flow_data[1] = 0.0f;
         structure_vertices[vidx].flow_data[2] = 0.0f;
         structure_vertices[vidx].flow_data[3] = 0.0f;
+        structure_vertices[vidx].depth_bias = 0.0f;
         vidx++;
       }
     }
@@ -963,6 +954,7 @@ opengl_structure_generate_geometry(
       float p_r, p_g, p_b;
       float fd[4];
       float c0x, c0y, c0z, c1x, c1y, c1z, c2x, c2y, c2z, c3x, c3y, c3z;
+      float dbias = (float)(idx + 1) * PATCH_DEPTH_BIAS_NDC;
 
       get_patch_normal(idx, &nx, &ny, &nz);
 
@@ -980,47 +972,35 @@ opengl_structure_generate_geometry(
       c3y = (float)(save.ytemp[j] + s * data.t1y[idx] - s * data.t2y[idx]);
       c3z = (float)(save.ztemp[j] + s * data.t1z[idx] - s * data.t2z[idx]);
 
-      /* Per-patch depth bias along normal to resolve z-fighting
-       * between overlapping coplanar patches (e.g. GR-rotated caps) */
-      {
-        float bias = (float)(idx + 1) * PATCH_DEPTH_BIAS * (float)r_max;
-        float bx = bias * nx, by = bias * ny, bz = bias * nz;
-
-        c0x += bx; c0y += by; c0z += bz;
-        c1x += bx; c1y += by; c1z += bz;
-        c2x += bx; c2y += by; c2z += bz;
-        c3x += bx; c3y += by; c3z += bz;
-      }
-
       get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
       get_patch_flow_data(idx, mode, cmax, fd);
 
       /* Triangle 1: c0(1,1), c1(0,1), c2(0,0) */
       set_structure_vertex(&structure_vertices[vidx],
           c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          1.0f, 1.0f, fd[0], fd[1], fd[2], fd[3]);
+          1.0f, 1.0f, fd[0], fd[1], fd[2], fd[3], dbias);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 1.0f, fd[0], fd[1], fd[2], fd[3]);
+          0.0f, 1.0f, fd[0], fd[1], fd[2], fd[3], dbias);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, fd[0], fd[1], fd[2], fd[3]);
+          0.0f, 0.0f, fd[0], fd[1], fd[2], fd[3], dbias);
       vidx++;
 
       /* Triangle 2: c0(1,1), c2(0,0), c3(1,0) */
       set_structure_vertex(&structure_vertices[vidx],
           c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          1.0f, 1.0f, fd[0], fd[1], fd[2], fd[3]);
+          1.0f, 1.0f, fd[0], fd[1], fd[2], fd[3], dbias);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          0.0f, 0.0f, fd[0], fd[1], fd[2], fd[3]);
+          0.0f, 0.0f, fd[0], fd[1], fd[2], fd[3], dbias);
       vidx++;
       set_structure_vertex(&structure_vertices[vidx],
           c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-          1.0f, 0.0f, fd[0], fd[1], fd[2], fd[3]);
+          1.0f, 0.0f, fd[0], fd[1], fd[2], fd[3], dbias);
       vidx++;
     }
 

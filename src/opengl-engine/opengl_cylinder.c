@@ -22,9 +22,8 @@
 
 #ifdef HAVE_OPENGL
 
-/* Sub-visual inset of end cap vertices along cylinder axis to prevent
- * z-fighting when a wire endpoint lies on a surface patch */
-#define CYLINDER_CAP_INSET 1e-6
+/* Cap z-fighting against patches is resolved by glPolygonOffset in the
+ * renderer; no world-space inset needed. */
 
 /*-----------------------------------------------------------------------*/
 
@@ -230,15 +229,14 @@ opengl_lit_cylinder_append(
   float cap_ny_top = (float)(dy);
   float cap_nz_top = (float)(dz);
 
-  /* Inset cap vertices along the axis to prevent z-fighting
-   * when a wire endpoint lies on a surface patch */
-  double cap_inset = length * CYLINDER_CAP_INSET;
-  double bot_cx = x1 + cap_inset * dx;
-  double bot_cy = y1 + cap_inset * dy;
-  double bot_cz = z1 + cap_inset * dz;
-  double top_cx = x2 - cap_inset * dx;
-  double top_cy = y2 - cap_inset * dy;
-  double top_cz = z2 - cap_inset * dz;
+  /* Cap centers at actual endpoints; glPolygonOffset resolves
+   * depth ties against coplanar patches. */
+  double bot_cx = x1;
+  double bot_cy = y1;
+  double bot_cz = z1;
+  double top_cx = x2;
+  double top_cy = y2;
+  double top_cz = z2;
 
   /* Generate end cap triangles */
   for( i = 0; i < segments; i++ )

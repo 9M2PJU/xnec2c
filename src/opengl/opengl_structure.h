@@ -85,6 +85,7 @@ typedef struct
   rgba_f_t color;
   float uv[2];
   float flow_data[4];   /* Re(ct1), Im(ct1), Re(ct2), Im(ct2) */
+  float depth_bias;     /* NDC depth offset for coplanar z-fighting */
 
 } structure_vertex_t;
 
@@ -92,7 +93,7 @@ typedef struct
 extern const gl_vertex_attrib_t opengl_structure_attribs[3];
 
 /* Vertex attribute layout for chevron shader (5 attribs: pos/norm/color/uv/flow) */
-extern const gl_vertex_attrib_t opengl_chevron_attribs[5];
+extern const gl_vertex_attrib_t opengl_chevron_attribs[6];
 
 arcball_state_t* opengl_structure_get_arcball(void);
 GtkWidget* opengl_structure_get_widget(void);
