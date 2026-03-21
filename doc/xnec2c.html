@@ -1091,9 +1091,15 @@ If your name or country is not represented in the way that you would like to see
 Window</a></li>
 <li><a href="#FrequencyWindow">Frequency Data Plots</a></li>
 <li><a href="#Nec2Treeview">NEC2 Input File Editor</a></li>
-<li><a href="#Optimization">Antenna Geometry Optimization (ie, high gain, low VSWR)</a></li>
-<li><a href="#Optimizers">External Optimizers</a></li>
 <li><a href="#SymbolicVariables">Symbolic Variables (SY) and Live Parameter Tuning</a></li>
+<li><a href="#Optimization">Antenna Geometry Optimization</a>
+  <ul>
+    <li><a href="#OptTutorial">Quick Start: Optimizing an Example Antenna</a></li>
+    <li><a href="#FitnessGoals">Fitness Goals and Measurement Types</a></li>
+    <li><a href="#OptAlgorithms">Algorithm Selection and Advanced Settings</a></li>
+    <li><a href="#Optimizers">External Optimizers</a></li>
+  </ul>
+</li>
 </ul>
 </li>
 <li><a href="#InputFile">Input File Considerations and NEC2 Card Reference</a></li>
@@ -1875,107 +1881,6 @@ produce an output file. The buttons in the bottom row of the
 Command Editors function in the same way as the Wire editor
 described above.</p>
 
-<h3 id="Optimization">Antenna Geometry Optimization</h3>
-
-<p>
-Neoklis, 5B4AZ explains Antenna Optimization in xnec2c on his page <a target="_blank" rel="noopener noreferrer"
-href="https://www.5b4az.org/pages/antenna_designs.html">here</a> as follows:</p>
-
-<blockquote>
-<p>Xnec2c monitors its <span class="fileext">.nec</span> input file for changes and re-runs the frequency
-stepping loop which recalculates new data and prints to the <span class="fileext">.csv</span> file. It is
-therefore possible to arrange the optimizer program to read the <span class="fileext">.csv</span> data file,
-recalculate antenna parameters and save them to the <span class="fileext">.nec</span> input file. xnec2c
-will then recalculate and save new frequency-dependent data to the <span class="fileext">.csv</span> file.</p>
-
-<p>If the optimizer program is arranged to monitor changes to the <span class="fileext">.csv</span> file, then
-a continuous loop can be created in which new antenna parameters are calculated
-and saved to the <span class="fileext">.nec</span> file, new frequency dependent data are calculated and
-saved to the <span class="fileext">.csv</span> file and the loop repeated until the desired results
-(optimization) are obtained.</p>
-
-<footer><cite>Neoklis, 5B4AZ</cite></footer>
-</blockquote>
-
-<p>
-This optimization feedback mechanism was first implemented in Xnec2c <span class="version-tag">v4.2</span> and
-has been refined over the past couple of versions to be very effective at
-optimizing antenna geometry.
-</p>
-
-<h3 id="Optimizers">External Optimizers</h3>
-
-<p>
-As explained above, you need to use an external optimizer to optimize with
-xnec2c.  The following external optimization packages are available.  Click one
-of the packages for more information:
-</p>
-
-<ul>
-	<li>
-		<strong><a target="_blank" rel="noopener noreferrer" href="https://github.com/polyrod/xnec2c-gao/">Xnec2c-gao</a></strong>
-		is an external optimizer that uses a genetic algorithm to find
-		solutions in a multidimensional search space.  It is written in Haskell
-		by <span class="contact" data-callsign="DC1MDP">Maurizio Di Pietro</span> and hosted on github.
-	</li>
-	<li>
-		<strong><a target="_blank" rel="noopener noreferrer" href="https://github.com/KJ7LNW/xnec2c-optimize/">Xnec2c-optimize</a></strong>
-		is written in Perl by <span class="contact" data-callsign="KJ7LNW" data-role="maintainer">Eric Wheeler</span> and hosted on github.</li>
-	</ul>
-
-<h4>Activating <span class="fileext">.NEC</span> File Monitoring for Optimization</h4>
-
-<p>
-Xnec2c will monitor the currently open <span class="fileext">.NEC</span> file when you select
-<span class="menu-path">File → Optimization Settings</span> and select "Reload and write data on <span class="fileext">.NEC</span> file
-changes".  Additionally, you need to tell xnec2c where to write its output
-file.  You can do that with one of the <code>--write-*</code> command-line options
-or by checking one of the boxes in <span class="menu-path">File → Optimization Settings</span> such as
-"After calculation, write &lt;file&gt;<span class="fileext">.csv</span>".</p>
-
-<p>
-Finally you need to enable the frequency sweep if it is not already turned on as follows:
-<ol>
-<li>From the main window: select <span class="menu-path">View → Frequency Plots</span></li>
-<li>From the Frequency Data Plots window: Enable a graph, like VSWR. Configure
-	whatever you would like to see during optimization.  </li>
-<li>Click the triangular "Play" button to run a frequency sweep.  This is a
-persistent setting that will auto-sweep each time xnec2c loads and it must be
-active in order for the optimizer loop to function.</li>
-</ol>
-
-<p>
-Frequency loop timing information is available on the console when you increase
-verbosity with <code>-v</code>.  Specify  <code>-v</code> multiple times to increase
-verbosity.  For example, with <code>-vv</code> using <span class="filepath">examples/2m_yagi.nec</span>:
-
-<pre><code class="language-bash">[info] 140.000000&nbsp;MHz: 0.045850 seconds. (ATLAS, Threaded)
-[info] 141.500000&nbsp;MHz: 0.054378 seconds. (ATLAS, Threaded)
-[info] 140.000000&nbsp;MHz: 0.063772 seconds. (ATLAS, Threaded)
-[info] 140.500000&nbsp;MHz: 0.066472 seconds. (ATLAS, Threaded)
-[info] 141.000000&nbsp;MHz: 0.078861 seconds. (ATLAS, Threaded)
-[info] 142.000000&nbsp;MHz: 0.047910 seconds. (ATLAS, Threaded)
-[info] 143.000000&nbsp;MHz: 0.068066 seconds. (ATLAS, Threaded)
-[info] 143.500000&nbsp;MHz: 0.076449 seconds. (ATLAS, Threaded)
-[info] 144.000000&nbsp;MHz: 0.068083 seconds. (ATLAS, Threaded)
-[info] 142.500000&nbsp;MHz: 0.113185 seconds. (ATLAS, Threaded)
-[info] 146.000000&nbsp;MHz: 0.050178 seconds. (ATLAS, Threaded)
-[info] 144.500000&nbsp;MHz: 0.051486 seconds. (ATLAS, Threaded)
-[info] 145.000000&nbsp;MHz: 0.058897 seconds. (ATLAS, Threaded)
-[info] 145.500000&nbsp;MHz: 0.060019 seconds. (ATLAS, Threaded)
-[info] 147.000000&nbsp;MHz: 0.057313 seconds. (ATLAS, Threaded)
-[info] 146.500000&nbsp;MHz: 0.070968 seconds. (ATLAS, Threaded)
-[info] 148.000000&nbsp;MHz: 0.071760 seconds. (ATLAS, Threaded)
-[info] 147.500000&nbsp;MHz: 0.080575 seconds. (ATLAS, Threaded)
-[info] 148.500000&nbsp;MHz: 0.051870 seconds. (ATLAS, Threaded)
-[info] 149.500000&nbsp;MHz: 0.058890 seconds. (ATLAS, Threaded)
-[info] 150.000000&nbsp;MHz: 0.056449 seconds. (ATLAS, Threaded)
-[info] 149.000000&nbsp;MHz: 0.071011 seconds. (ATLAS, Threaded)
-[notice] Frequency loop elapsed time: 0.467847 seconds. (ATLAS, Threaded)
-</code></pre>
-
-</p>
-
 <h3 id="SymbolicVariables">Symbolic Variables (SY) and Live Parameter Tuning</h3>
 <figure>
 <img src="images/sy_overrides.png" class="float-left" alt="Symbol Overrides window tuning wire radius on a parametric Yagi" loading="lazy">
@@ -2110,8 +2015,559 @@ LAMBDA: min_value=1.0 max_value=4.0 override_value=2.05 override_active=0</code>
 Override persistence means tuning sessions survive application restarts. The
 <span class="fileext">.sy</span> file loads before <code class="nec-card">SY</code> card
 processing begins, pre-populating bounds and override values so that subsequent symbol
-definitions merge with existing tuning state rather than replacing it.
+definitions merge with existing tuning state rather than replacing it. The
+<code>opt_active</code> field marks whether each variable is included in built-in
+optimizer runs.
 </p>
+
+<h4>Expressions in Card Editors</h4>
+<p>
+When SY symbols are defined, their expressions appear directly in geometry and command
+card fields. Right-click a card row (such as a GW wire definition) in the NEC2 editor
+treeview and select <strong>Edit</strong>, or double-click the row. The card editor dialog
+shows coordinate fields populated with expressions — <code>X1</code>,
+<code>L1/2</code>, <code>-L1/2</code> — rather than raw numeric values. The editor
+preserves these expressions through the edit cycle: changing a value and clicking OK
+writes the expression back to the model.
+</p>
+
+<p>
+Expression errors during editing are batched and shown in a single consolidated dialog
+rather than one popup per field.
+</p>
+
+<!-- Placeholder: GW card editor with expression fields.
+     Provide doc/images/gw_card_expressions.png and uncomment:
+<figure>
+<img src="images/gw_card_expressions.png"
+alt="GW card editor dialog showing symbolic expressions in coordinate fields"
+loading="lazy">
+<figcaption>GW tag 1 card editor showing symbolic expressions (<code>X1</code>,
+<code>L1/2</code>) in the coordinate fields rather than numeric values</figcaption>
+</figure>
+-->
+
+<h3 id="Optimization">Antenna Geometry Optimization</h3>
+
+<p>
+Xnec2c includes a built-in optimizer that adjusts SY symbolic variable values to improve
+antenna performance across the frequency sweep. The optimizer evaluates each candidate
+geometry by running a full NEC2 frequency sweep, computing a weighted fitness score from
+user-defined goals, and converging toward designs that minimize that score. This works
+directly with the <a href="#SymbolicVariables">Symbol Overrides</a> window — variables
+marked for optimization are the search dimensions, and the override min/max bounds define
+the search space.
+</p>
+
+<p>
+Three windows provide live feedback during optimization. Open all three before starting:
+</p>
+
+<ul>
+<li><span class="menu-path">View → Frequency Plots</span> — watch VSWR and gain evolve
+across the band as the optimizer tests candidates</li>
+<li><span class="menu-path">View → Radiation Pattern</span> — observe beam shape changes
+in real time</li>
+<li>The main <strong>Structure</strong> window — see geometry adjust as variables change</li>
+</ul>
+
+<p>
+For the historical external-optimizer approach (where a separate program modifies the
+<span class="fileext">.nec</span> file while xnec2c monitors for changes), see
+<a href="#Optimizers">External Optimizers</a> below.
+</p>
+
+<h4 id="OptTutorial">Quick Start: Optimizing an Example Antenna</h4>
+
+<p>
+This walkthrough uses <span class="filepath">examples/5el_yagi_SY_parametric.nec</span>,
+which ships with a pre-configured
+<span class="fileext">.opt</span> file containing fitness goals for VSWR, gain, and beam
+direction. The companion <span class="fileext">.sy</span> file is created automatically
+the first time you interact with Symbol Overrides.
+</p>
+
+<h5>Understanding the Parametric Model</h5>
+
+<p>
+The antenna's shape emerges from a chain of symbolic relationships. Each variable controls
+one aspect of the physical structure:
+</p>
+
+<dl>
+<dt><code>R0</code>, <code>R1</code>, <code>R2</code>, <code>R3</code> — element length ratios</dt>
+<dd>Each director derives its length from the preceding element multiplied by its R factor:
+<code>L1=L0*R0</code>, <code>L2=L1*R1</code>, and so on. Values of R below 1.0 enforce
+the forward tapering required of a Yagi — each director shorter than the one behind it.
+Without this constraint the optimizer could produce geometries where a forward director
+grows longer than the reflector, violating the fundamental operating principle of a
+Yagi-Uda array. The expressions that define the geometry must represent the intended
+physical outcome, because the optimizer will find and exploit any freedom the model
+leaves unconstrained.</dd>
+
+<dt><code>S0</code>, <code>S1</code>, <code>S2</code>, <code>S3</code> — element spacing (wavelength fractions)</dt>
+<dd>Spacing between adjacent elements as fractions of wavelength, accumulated from the
+preceding element: <code>X1=X0+S0*LAMBDA</code>, <code>X2=X1+S1*LAMBDA</code>, etc.
+Absolute positions would allow the optimizer to place a director behind the reflector or
+reverse the element order entirely — geometries that have no meaning as Yagi designs.
+Cumulative offsets prevent this while directly controlling the coupling between adjacent
+elements, which determines impedance matching, bandwidth, and gain distribution across
+the sweep.</dd>
+
+<dt><code>X0</code> — reflector position</dt>
+<dd>Fixed at 0, serving as the coordinate origin. Moving the entire antenna through space
+changes nothing about its electrical properties, so this variable is not checked for
+optimization.</dd>
+
+<dt><code>L_REF_SCALE</code> — reflector half-length scale factor</dt>
+<dd>Scales the reflector: <code>L0=0.5*LAMBDA*L_REF_SCALE</code>. Because L0 is the root
+of the multiplicative length chain — every director length ultimately derives from it
+through successive R factors — adjusting this single value rescales the entire antenna
+proportionally. Left at 1.0 in this example, though it can be optimized when the
+reflector length needs independent adjustment relative to the wavelength-scaled
+default.</dd>
+
+<dt><code>RADIUS</code> — wire radius</dt>
+<dd>Unchecked in this example. Wire radius affects impedance and bandwidth but is
+typically determined by available tubing stock rather than optimization. For designs
+where wire diameter is a significant fraction of segment length, see the
+<a href="#EK-card"><code class="nec-card">EK</code> card</a>.</dd>
+</dl>
+
+<h5>Tutorial Steps</h5>
+
+<ol>
+<li>Open <span class="filepath">examples/5el_yagi_SY_parametric.nec</span>.</li>
+
+<li>Enable the frequency sweep and open plot windows: select
+<span class="menu-path">View → Frequency Plots</span>, enable VSWR and Max Gain graphs,
+and click the triangular Play button. Also open
+<span class="menu-path">View → Radiation Pattern</span>.</li>
+
+<li>Note the baseline performance: maximum gain is approximately 10.57 dBi, but worst-case
+VSWR across the band reaches 5.68. Even at the peak gain frequency, VSWR is nearly
+3.0 — far above the 2.0 threshold where most transmitters begin folding back power.</li>
+
+<li>Open <span class="menu-path">View → Symbol Overrides</span>.</li>
+
+<li>Check the <strong>Opt</strong> checkbox for <code>R0</code>, <code>R1</code>,
+<code>R2</code>, <code>R3</code>, <code>S0</code>, <code>S1</code>, <code>S2</code>,
+<code>S3</code> — these are the design variables the optimizer will adjust.</li>
+
+<li>In the <strong>Optimization</strong> expander, the <span class="fileext">.opt</span>
+file has pre-configured fitness goals: minimize VSWR (target 1, weight 5), maximize Max
+Gain (target 12, weight 10), and minimize Gain Dev +X (target 1, weight 10). The third
+goal constrains the direction of maximum gain to lie along the +X boom axis. Without it,
+the optimizer could produce geometries where gain is high but the beam points off-axis —
+a parasitic array resembling a dipole with reflector wires on either side, or a design
+that radiates strongly in elevation rather than toward the horizon. Directional
+constraint ensures the optimizer pursues high gain only in the intended forward
+direction.</li>
+
+<li>Select <strong>Particle Swarm</strong> (PSO) and click <strong>Start
+Optimization</strong>. Watch all three windows update as the swarm explores the design
+space. The status bar reports progress:
+<code>Pass N/M  Iter  Evals  Fitness  Best  Stagnant  Cache</code>.</li>
+
+<li>When PSO completes, switch to <strong>Simplex</strong> and click <strong>Start
+Optimization</strong> again. Simplex refines the best solution PSO discovered, descending
+precisely into the nearest minimum — a complementary strategy to the broad search that
+preceded it.</li>
+
+<li>After Simplex completes: worst-case VSWR has dropped to approximately 1.19, with most
+of the band below 1.07, and maximum gain measures about 10.14 dBi. The peak gain decreased slightly
+from the unoptimized value because the optimizer found a geometry that distributes
+performance evenly across the band rather than concentrating it at a single frequency.
+The antenna is now usable from end to end. Optimization is stochastic — both PSO and
+Simplex involve random initial conditions — so exact results will vary between runs,
+but should fall in the same general range.</li>
+</ol>
+
+<figure>
+<img src="images/sy_2m_yagi_SY_parametric-optimizer.png"
+alt="Symbol Overrides window showing optimization variables and fitness goals for the parametric Yagi"
+loading="lazy">
+<figcaption>Symbol Overrides window with optimization controls configured for the
+5-element parametric Yagi</figcaption>
+</figure>
+
+<figure>
+<img src="images/sy_2m_yagi_SY_parametric-after-optimized.png"
+alt="Symbol Overrides window showing optimized variable values after Simplex refinement"
+loading="lazy">
+<figcaption>Symbol Overrides after optimization — variable values adjusted by PSO and
+refined by Simplex</figcaption>
+</figure>
+
+<!-- Placeholder: frequency plot screenshot showing VSWR before/after optimization.
+     Provide doc/images/freq_vswr_optimization.png and uncomment:
+<figure>
+<img src="images/freq_vswr_optimization.png"
+alt="Frequency plot comparing VSWR across band before and after optimization"
+loading="lazy">
+<figcaption>VSWR across the 2m band: before optimization showing peaks above 5.0,
+and after optimization with all points below 1.2</figcaption>
+</figure>
+-->
+
+<h5>Iterative Refinement</h5>
+
+<p>
+The weight and exponent values for each fitness goal determine how the optimizer balances
+competing objectives. Increasing VSWR weight prioritizes impedance match quality at the
+expense of gain; increasing gain weight does the reverse. Higher exponents penalize large
+deviations more severely than small ones — an exponent of 2 squares the penalty, making a
+measurement twice as far from target four times as costly.
+</p>
+
+<p>
+Subsequent passes of the same algorithm start from the current best values and often
+discover nearby improvements the first pass missed. When switching between algorithms,
+the key parameter to adjust is the search region: reduce PSO's <strong>Search size</strong>
+on later passes to concentrate the swarm near the current solution instead of scattering
+particles across the full range. For Simplex, the <strong>Sizes</strong> list already
+defines a sequence of decreasing perturbations — each pass automatically uses the next
+smaller entry.
+</p>
+
+<p>
+<strong>Performance note:</strong> optimization runs faster when near-field calculations
+are disabled. Uncheck NH/NE output in the command cards or disable current display in the
+structure window. Near-field computation adds overhead to every frequency step and is
+unnecessary when only gain pattern and VSWR matter.
+</p>
+
+<h4 id="FitnessGoals">Fitness Goals and Measurement Types</h4>
+
+<p>
+Each optimization objective occupies one row in the fitness goals grid, defining what the
+optimizer should improve and how aggressively it should pursue that improvement. The total
+fitness score — the single number the optimizer minimizes — is the weighted sum of all
+enabled goals evaluated across the frequency sweep.
+</p>
+
+<p>
+Use the <kbd>+ Add Metric</kbd> button to append a new goal row, or the <kbd>−</kbd>
+button on any existing row to remove it. The formula display at the bottom shows the
+complete fitness calculation:
+<code>F = W1*reduce((transform)^exp) + W2*... = total</code>.
+</p>
+
+<h5>Goal Row Columns</h5>
+
+<dl>
+<dt><strong>Enable</strong> (checkbox)</dt>
+<dd>Include or exclude this goal from the fitness calculation. Disabled goals remain
+configured but contribute nothing to the score.</dd>
+
+<dt><strong>Measurement</strong> (combo box)</dt>
+<dd>The antenna parameter to evaluate. See the measurement reference table below.</dd>
+
+<dt><strong>Value</strong> (read-only)</dt>
+<dd>The current measured result, updated live during optimization from the best
+candidate's frequency sweep.</dd>
+
+<dt><strong>Transform</strong> (direction combo box)</dt>
+<dd>How the raw measurement converts to a penalty score:
+<ul>
+<li><strong>min score</strong> — <code>score = (value / target)<sup>exp</sup></code>.
+Lower measurement values produce lower penalties. Appropriate for VSWR, angular
+deviation, and any metric where smaller readings indicate better performance.</li>
+<li><strong>max score</strong> — <code>score = (|target| / max(|value|, ε))<sup>exp</sup></code>.
+Higher measurement values produce lower penalties. Appropriate for gain, front-to-back
+ratio, return loss, and metrics where larger readings indicate improvement.</li>
+<li><strong>± target</strong> — <code>score = |value − target|<sup>exp</sup></code>.
+Values closer to the target produce scores approaching zero. Appropriate for impedance,
+phase angle, beam pointing, and metrics that should converge on a specific number rather
+than an extreme.</li>
+</ul>
+</dd>
+
+<dt><strong>Target</strong></dt>
+<dd>The goal value for the selected measurement. Its meaning depends on the transform
+direction: for <em>min score</em>, the reference divisor; for <em>max score</em>,
+the reference dividend; for <em>± target</em>, the center point of zero penalty.</dd>
+
+<dt><strong>Exp</strong> (exponent)</dt>
+<dd>Applied to the transform result before reduction. Controls penalty steepness: an
+exponent of 1 produces linear scaling, 2 produces quadratic growth that penalizes large
+deviations disproportionately, and 0.5 compresses the range so that large and small
+deviations contribute more equally.</dd>
+
+<dt><strong>Reduce</strong> (reduction combo box)</dt>
+<dd>How scores from individual frequency steps combine into a single value for this goal:
+<ul>
+<li><strong>sum</strong> — adds every frequency step's score; total grows with the number
+of steps, weighting broadband compliance heavily</li>
+<li><strong>avg</strong> — averages across steps; normalizes for step count, balancing
+contribution across the band</li>
+<li><strong>min</strong> — selects the lowest-penalty step. This isolates the single
+frequency where performance is strongest, which suits single-frequency or narrow-band
+designs where only the best operating point matters and the rest of the sweep serves as
+context rather than constraint</li>
+<li><strong>max</strong> — selects the highest-penalty step, forcing the optimizer to
+improve the worst point in the band; effective for ensuring minimum performance
+everywhere</li>
+<li><strong>mag</strong> — root of summed squared scores:
+<code>sqrt(Σ score²)</code>; emphasizes large outliers without ignoring small ones</li>
+<li><strong>diff</strong> — spread between largest and smallest scores; penalizes uneven
+performance across the band, pushing toward flat response</li>
+</ul>
+</dd>
+
+<dt><strong>Weight</strong></dt>
+<dd>Multiplier applied after reduction. Determines relative importance when multiple goals
+compete — a goal with weight 10 has twice the influence of one with weight 5.</dd>
+
+<dt><strong>MHz lo / MHz hi</strong></dt>
+<dd>Optional frequency band filter. When set, only frequency steps within this range
+contribute to the goal's score. Empty values include all frequencies from the FR card.
+Filtering allows different objectives for different portions of the band — for example,
+strict VSWR within a 500 kHz operating segment while allowing relaxed gain tolerance
+across the full sweep.</dd>
+
+<dt><strong>Score</strong> (read-only)</dt>
+<dd>Current penalty score for this objective, updated live.</dd>
+</dl>
+
+<h5>Measurement Reference</h5>
+
+<table>
+<thead>
+<tr><th>Measurement</th><th>Description</th><th>Default Direction</th><th>Default Target</th></tr>
+</thead>
+<tbody>
+<tr><td>Z Real</td><td>Real part of feed-point impedance (Ω)</td><td>± target</td><td>50.0</td></tr>
+<tr><td>Z Imaginary</td><td>Imaginary part of feed-point impedance (Ω)</td><td>± target</td><td>0.0</td></tr>
+<tr><td>Z Magnitude</td><td>Magnitude of feed-point impedance (Ω)</td><td>± target</td><td>50.0</td></tr>
+<tr><td>Z Phase</td><td>Phase angle of feed-point impedance (°)</td><td>± target</td><td>0.0</td></tr>
+<tr><td>VSWR</td><td>Voltage standing wave ratio (1.0 = perfect match)</td><td>min score</td><td>1.0</td></tr>
+<tr><td>S11</td><td>Return loss in dB (more negative = better match)</td><td>max score</td><td>−15.0</td></tr>
+<tr><td>S11 Real</td><td>Real part of S11 in dB</td><td>max score</td><td>−15.0</td></tr>
+<tr><td>S11 Imaginary</td><td>Imaginary part of S11 in dB</td><td>± target</td><td>0.0</td></tr>
+<tr><td>S11 Angle</td><td>Phase angle of reflection coefficient (°)</td><td>± target</td><td>0.0</td></tr>
+<tr><td>Max Gain</td><td>Peak gain across all angles (dBi)</td><td>max score</td><td>12.0</td></tr>
+<tr><td>Net Gain</td><td>Peak gain adjusted for mismatch loss (dBi)</td><td>max score</td><td>6.0</td></tr>
+<tr><td>Gain Theta</td><td>Elevation angle of peak gain (°)</td><td>± target</td><td>90.0</td></tr>
+<tr><td>Gain Phi</td><td>Azimuth angle of peak gain (°)</td><td>± target</td><td>0.0</td></tr>
+<tr><td>Viewer Gain</td><td>Gain toward current viewer angle (dBi)</td><td>max score</td><td>6.0</td></tr>
+<tr><td>Viewer Net Gain</td><td>Viewer gain adjusted for mismatch loss (dBi)</td><td>max score</td><td>6.0</td></tr>
+<tr><td>F/B Ratio</td><td>Front-to-back ratio (dB)</td><td>max score</td><td>20.0</td></tr>
+<tr><td>Gain Dev +X</td><td>Angular deviation of peak gain from +X axis (°)</td><td>min score</td><td>1.0</td></tr>
+<tr><td>Gain Dev −X</td><td>Angular deviation of peak gain from −X axis (°)</td><td>min score</td><td>1.0</td></tr>
+<tr><td>Gain Dev +Y</td><td>Angular deviation of peak gain from +Y axis (°)</td><td>min score</td><td>1.0</td></tr>
+<tr><td>Gain Dev −Y</td><td>Angular deviation of peak gain from −Y axis (°)</td><td>min score</td><td>1.0</td></tr>
+<tr><td>Gain Dev +Z</td><td>Angular deviation of peak gain from +Z (zenith) (°)</td><td>min score</td><td>1.0</td></tr>
+<tr><td>Gain Dev −Z</td><td>Angular deviation of peak gain from −Z (nadir) (°)</td><td>min score</td><td>1.0</td></tr>
+</tbody>
+</table>
+
+<h4 id="OptAlgorithms">Algorithm Selection and Advanced Settings</h4>
+
+<p>
+The algorithm selector in the Optimization expander offers two choices. A <kbd>?</kbd>
+button beside the selector opens context-sensitive help describing the currently selected
+algorithm's parameters.
+</p>
+
+<h5>Common Settings</h5>
+
+<dl>
+<dt><strong>Stagnation count</strong> (default: 30)</dt>
+<dd>Iterations without improvement before the current pass ends.</dd>
+
+<dt><strong>Tolerance</strong> (default: 0.001)</dt>
+<dd>Minimum improvement threshold — changes smaller than this are not counted as
+progress toward the stagnation limit.</dd>
+
+<dt><strong>Max iterations</strong> (default: 100)</dt>
+<dd>Hard cap per pass regardless of improvement rate.</dd>
+</dl>
+
+<h5>Simplex (Nelder-Mead)</h5>
+
+<p>
+The Simplex algorithm constructs a geometric shape (simplex) in the space of optimization
+variables and iteratively moves its vertices toward lower-fitness regions through
+reflection, expansion, and contraction operations. It excels at refining a solution that
+is already near a good region.
+</p>
+
+<dl>
+<dt><strong>Sizes</strong></dt>
+<dd>Comma-separated initial simplex sizes for multi-pass operation (e.g.,
+<code>0.09, 0.075, 0.05, 0.025</code>). Each pass uses the next entry, producing
+progressively finer refinement. The number of entries determines the number of passes.</dd>
+
+<dt><strong>Min size</strong> (default: 1e-06)</dt>
+<dd>Convergence threshold for simplex diameter. When the simplex contracts below this
+size, the pass ends — the algorithm has exhausted the region it can usefully explore.</dd>
+
+<dt><strong>Temperature</strong> (default: 0)</dt>
+<dd>Simulated annealing temperature. At 0, the algorithm runs as pure Nelder-Mead,
+accepting only improvements. Positive values introduce random uphill moves proportional
+to the temperature, intended to escape shallow local minima. In practice this is
+difficult to tune effectively — PSO with an appropriate search size is generally a more
+reliable approach to escaping local minima, since the swarm naturally covers a wider
+region without requiring temperature calibration.</dd>
+</dl>
+
+<h5>PSO (Particle Swarm Optimization)</h5>
+
+<p>
+PSO distributes a swarm of candidate solutions across the search space. Each particle
+tracks its own best-found position and is attracted toward both that personal best and
+the best position found by its neighborhood. The balance between exploration (inertia)
+and convergence (cognitive and social attraction) determines how quickly the swarm
+collapses toward a solution.
+</p>
+
+<dl>
+<dt><strong>Particles</strong> (default: 0 = auto)</dt>
+<dd>Swarm size. When set to 0, the count is calculated automatically from the number of
+optimization variables. Larger swarms explore more thoroughly at the cost of more
+function evaluations per iteration.</dd>
+
+<dt><strong>Neighbors</strong> (default: 0 = auto)</dt>
+<dd>Neighborhood size for the social component. Each particle is influenced by the best
+position within its neighborhood rather than the global best, which preserves diversity
+and reduces premature convergence.</dd>
+
+<dt><strong>Inertia</strong> (default: 0.9)</dt>
+<dd>Velocity decay factor. Values near 1.0 maintain momentum and favor exploration;
+lower values increase damping and favor convergence.</dd>
+
+<dt><strong>Cognitive</strong> (default: 0.5)</dt>
+<dd>Attraction strength toward each particle's personal best position.</dd>
+
+<dt><strong>Social</strong> (default: 0.5)</dt>
+<dd>Attraction strength toward the neighborhood best position.</dd>
+
+<dt><strong>Search size</strong> (default: 0.25)</dt>
+<dd>Initial random spread for particle positions, expressed as a fraction of each
+variable's min-max range and applied as a ± offset from the starting point. A value of
+0.25 places particles within 50% of the total range centered on the current values. If
+the resulting positions exceed a variable's bounds, they are clamped to the boundary. On
+subsequent passes, reducing this value concentrates the swarm near the current best
+solution rather than scattering across the full range.</dd>
+</dl>
+
+<h5>Status Bar</h5>
+
+<p>
+During optimization the status bar displays:
+<code>Pass 4/4  Iter 47  Evals 330  Fitness 19.9103  Best 19.9103  Stagnant 46  Cache 0/330  [Complete]</code>
+</p>
+
+<h5 id="OptFileFormat">Optimizer Configuration Files (.opt)</h5>
+
+<p>
+The optimizer stores its configuration in a
+<span class="fileext">.opt</span> file alongside the
+<span class="fileext">.nec</span> file, using GKeyFile INI format. The file is auto-saved
+on every widget change and auto-loaded when opening a
+<span class="fileext">.nec</span> file if a matching
+<span class="fileext">.opt</span> file exists. See
+<span class="filepath">examples/5el_yagi_SY_parametric.opt</span> for an annotated
+example of the format.
+</p>
+
+<h4 id="Optimizers">External Optimizers</h4>
+
+<p>
+As an alternative to the built-in optimizer, external programs can optimize antenna
+geometry through a file-monitoring feedback loop. Neoklis, 5B4AZ first described this
+approach:
+</p>
+
+<blockquote>
+<p>Xnec2c monitors its <span class="fileext">.nec</span> input file for changes and re-runs the frequency
+stepping loop which recalculates new data and prints to the <span class="fileext">.csv</span> file. It is
+therefore possible to arrange the optimizer program to read the <span class="fileext">.csv</span> data file,
+recalculate antenna parameters and save them to the <span class="fileext">.nec</span> input file. xnec2c
+will then recalculate and save new frequency-dependent data to the <span class="fileext">.csv</span> file.</p>
+
+<p>If the optimizer program is arranged to monitor changes to the <span class="fileext">.csv</span> file, then
+a continuous loop can be created in which new antenna parameters are calculated
+and saved to the <span class="fileext">.nec</span> file, new frequency dependent data are calculated and
+saved to the <span class="fileext">.csv</span> file and the loop repeated until the desired results
+(optimization) are obtained.</p>
+
+<footer><cite>Neoklis, 5B4AZ — <a target="_blank" rel="noopener noreferrer"
+href="https://www.5b4az.org/pages/antenna_designs.html">Antenna Designs</a></cite></footer>
+</blockquote>
+
+<p>
+This mechanism was first implemented in Xnec2c <span class="version-tag">v4.2</span>.
+External optimizers remain useful for custom fitness functions, genetic algorithms, or
+specialized workflows not covered by the built-in optimizer. The following packages are
+available:
+</p>
+
+<ul>
+	<li>
+		<strong><a target="_blank" rel="noopener noreferrer" href="https://github.com/polyrod/xnec2c-gao/">Xnec2c-gao</a></strong>
+		is an external optimizer that uses a genetic algorithm to find
+		solutions in a multidimensional search space.  It is written in Haskell
+		by <span class="contact" data-callsign="DC1MDP">Maurizio Di Pietro</span> and hosted on github.
+	</li>
+	<li>
+		<strong><a target="_blank" rel="noopener noreferrer" href="https://github.com/KJ7LNW/xnec2c-optimize/">Xnec2c-optimize</a></strong>
+		is written in Perl by <span class="contact" data-callsign="KJ7LNW" data-role="maintainer">Eric Wheeler</span> and hosted on github.</li>
+</ul>
+
+<h5>Activating <span class="fileext">.NEC</span> File Monitoring</h5>
+
+<p>
+Xnec2c will monitor the currently open <span class="fileext">.NEC</span> file when you select
+<span class="menu-path">File → Optimization Settings</span> and select "Reload and write data on <span class="fileext">.NEC</span> file
+changes".  Additionally, you need to tell xnec2c where to write its output
+file.  You can do that with one of the <code>--write-*</code> command-line options
+or by checking one of the boxes in <span class="menu-path">File → Optimization Settings</span> such as
+"After calculation, write &lt;file&gt;<span class="fileext">.csv</span>".</p>
+
+<p>
+Enable the frequency sweep if it is not already turned on:
+</p>
+<ol>
+<li>From the main window: select <span class="menu-path">View → Frequency Plots</span></li>
+<li>From the Frequency Data Plots window: enable a graph such as VSWR, and configure
+whatever you would like to see during optimization.</li>
+<li>Click the triangular "Play" button to run a frequency sweep.  This is a
+persistent setting that will auto-sweep each time xnec2c loads and it must be
+active in order for the optimizer loop to function.</li>
+</ol>
+
+<p>
+Frequency loop timing information is available on the console when you increase
+verbosity with <code>-v</code>.  Specify <code>-v</code> multiple times to increase
+verbosity.  For example, with <code>-vv</code> using <span class="filepath">examples/2m_yagi.nec</span>:
+</p>
+
+<pre><code class="language-bash">[info] 140.000000&nbsp;MHz: 0.045850 seconds. (ATLAS, Threaded)
+[info] 141.500000&nbsp;MHz: 0.054378 seconds. (ATLAS, Threaded)
+[info] 140.000000&nbsp;MHz: 0.063772 seconds. (ATLAS, Threaded)
+[info] 140.500000&nbsp;MHz: 0.066472 seconds. (ATLAS, Threaded)
+[info] 141.000000&nbsp;MHz: 0.078861 seconds. (ATLAS, Threaded)
+[info] 142.000000&nbsp;MHz: 0.047910 seconds. (ATLAS, Threaded)
+[info] 143.000000&nbsp;MHz: 0.068066 seconds. (ATLAS, Threaded)
+[info] 143.500000&nbsp;MHz: 0.076449 seconds. (ATLAS, Threaded)
+[info] 144.000000&nbsp;MHz: 0.068083 seconds. (ATLAS, Threaded)
+[info] 142.500000&nbsp;MHz: 0.113185 seconds. (ATLAS, Threaded)
+[info] 146.000000&nbsp;MHz: 0.050178 seconds. (ATLAS, Threaded)
+[info] 144.500000&nbsp;MHz: 0.051486 seconds. (ATLAS, Threaded)
+[info] 145.000000&nbsp;MHz: 0.058897 seconds. (ATLAS, Threaded)
+[info] 145.500000&nbsp;MHz: 0.060019 seconds. (ATLAS, Threaded)
+[info] 147.000000&nbsp;MHz: 0.057313 seconds. (ATLAS, Threaded)
+[info] 146.500000&nbsp;MHz: 0.070968 seconds. (ATLAS, Threaded)
+[info] 148.000000&nbsp;MHz: 0.071760 seconds. (ATLAS, Threaded)
+[info] 147.500000&nbsp;MHz: 0.080575 seconds. (ATLAS, Threaded)
+[info] 148.500000&nbsp;MHz: 0.051870 seconds. (ATLAS, Threaded)
+[info] 149.500000&nbsp;MHz: 0.058890 seconds. (ATLAS, Threaded)
+[info] 150.000000&nbsp;MHz: 0.056449 seconds. (ATLAS, Threaded)
+[info] 149.000000&nbsp;MHz: 0.071011 seconds. (ATLAS, Threaded)
+[notice] Frequency loop elapsed time: 0.467847 seconds. (ATLAS, Threaded)
+</code></pre>
 
 <h2 id="InputFile">Input File Considerations</h2>
 <p>
@@ -2150,6 +2606,19 @@ Here is a list of commands or command options not supported by xnec2c:
 
 <dt><code class="nec-card">SOMNEC</code></dt>
 <dd>The separate SOMNEC code has been incorporated in nec2c and hence in xnec2c also.</dd>
+
+<dt id="EK-card"><code class="nec-card">EK</code></dt>
+<dd>Activates the extended thin-wire kernel. The standard kernel treats each wire segment
+as an infinitely thin current filament — current flows along a line at the wire axis and
+the boundary condition is enforced approximately at the surface. The extended kernel
+incorporates the wire's finite radius into the field evaluation, accounting for the
+cylindrical geometry when computing interactions between nearby segments. This produces
+more accurate results when the segment length-to-radius ratio is small: the standard
+kernel requires a ratio of at least 8 for 1% field accuracy (minimum usable: 2),
+while the extended kernel achieves 1% accuracy at a ratio of 2 (minimum usable: 0.5).
+The additional computation per segment is negligible on modern hardware, so enabling EK
+is generally recommended. Xnec2c reports accuracy warnings when geometry violates the
+active kernel's validity conditions.</dd>
 
 <dt><code class="nec-card">EX</code></dt>
 <dd>When Incident Wave or Elementary Current Source Excitation is specified, xnec2c can only calculate and render the re-radiated field, produced by the current induced onto the structure. Only the initial values of the <var>θ</var> and <var>φ</var> angles are used and no stepping of these angles is performed. Therefore it is better to specify only one step for <var>θ</var> and <var>φ</var> in the <code class="nec-card">EX</code> card.</dd>

@@ -1,0 +1,80 @@
+Optimizer Configuration Files (.opt)
+=====================================
+
+GKeyFile INI format. Named to match the .nec file (e.g., 5el_yagi_SY_parametric.opt
+accompanies 5el_yagi_SY_parametric.nec). Auto-saved on every widget change in the
+Symbol Overrides optimization section. Auto-loaded when opening a matching .nec file.
+
+Sections
+--------
+
+[optimizer]
+  algorithm         Algorithm name: "simplex" or "pso"
+  max_iter          Maximum iterations per pass (default: 100)
+  stagnant_count    Iterations without improvement before pass ends (default: 30)
+  stagnant_tol      Minimum improvement threshold (default: 0.001)
+
+[simplex]
+  sizes             Semicolon-separated initial simplex sizes for multi-pass
+                    refinement (e.g., 0.09;0.075;0.05;0.025). Each pass uses
+                    the next smaller size.
+  min_size          Convergence threshold for simplex diameter (default: 1e-06)
+  temperature       Simulated annealing temperature (0 = pure Nelder-Mead)
+
+[pso]
+  particles         Swarm size (0 = auto-calculated from variable count)
+  neighbors         Neighborhood size (0 = auto-calculated)
+  inertia           Velocity decay factor (default: 0.9)
+  cognitive         Attraction to personal best (default: 0.5)
+  social            Attraction to neighborhood best (default: 0.5)
+  search_size       Initial random spread as fraction of variable range
+                    (default: 0.25). This is ±value from the starting point,
+                    so 0.25 covers 50% of the min-max range. Values exceeding
+                    the variable bounds are clamped.
+
+[goal N]
+  enabled           "true" or "false"
+  metric            Measurement key (see below)
+  direction         Transform: "min score", "max score", or "± target"
+  target            Target value for the measurement
+  exponent          Penalty exponent (default: 2)
+  reduce            Reduction: "sum", "avg", "min", "max", "mag", "diff"
+  weight            Multiplier applied after reduction
+  mhz_lo            Optional lower frequency filter (omit for no filter)
+  mhz_hi            Optional upper frequency filter (omit for no filter)
+
+Goals numbered from 0.
+
+Metric Keys
+-----------
+
+  Key               Display Name        Description
+  ----              ------------        -----------
+  zreal             Z Real              Real part of feed-point impedance (ohms)
+  zimag             Z Imaginary         Imaginary part of feed-point impedance (ohms)
+  zmag              Z Magnitude         Magnitude of feed-point impedance (ohms)
+  zphase            Z Phase             Phase angle of feed-point impedance (degrees)
+  vswr              VSWR                Voltage standing wave ratio
+  s11               S11                 Return loss in dB
+  s11_real          S11 Real            Real part of S11 in dB
+  s11_imag          S11 Imaginary       Imaginary part of S11 in dB
+  s11_ang           S11 Angle           Phase angle of reflection coefficient (degrees)
+  gain_max          Max Gain            Peak gain across all angles in dBi
+  gain_net          Net Gain            Peak gain adjusted for mismatch loss in dBi
+  gain_theta        Gain Theta          Elevation angle of peak gain (degrees)
+  gain_phi          Gain Phi            Azimuth angle of peak gain (degrees)
+  gain_viewer       Viewer Gain         Gain toward current viewer angle in dBi
+  gain_viewer_net   Viewer Net Gain     Viewer gain adjusted for mismatch loss in dBi
+  fb_ratio          F/B Ratio           Front-to-back ratio in dB
+  gain_dev_px       Gain Dev +X         Angular deviation of peak gain from +X (degrees)
+  gain_dev_nx       Gain Dev -X         Angular deviation of peak gain from -X (degrees)
+  gain_dev_py       Gain Dev +Y         Angular deviation of peak gain from +Y (degrees)
+  gain_dev_ny       Gain Dev -Y         Angular deviation of peak gain from -Y (degrees)
+  gain_dev_pz       Gain Dev +Z         Angular deviation of peak gain from +Z (degrees)
+  gain_dev_nz       Gain Dev -Z         Angular deviation of peak gain from -Z (degrees)
+
+Reference
+---------
+
+Working example: examples/5el_yagi_SY_parametric.opt
+Full documentation: doc/xnec2c.html#FitnessGoals and doc/xnec2c.html#OptAlgorithms
