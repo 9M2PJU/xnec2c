@@ -42,15 +42,16 @@
 #define LINE_ARROW_SHAFT_HW     0.024f
 #define LINE_ARROW_HEAD_HS      0.096f
 
-/* Per-patch NDC depth offset for coplanar z-fighting resolution.
- * Applied in fragment shader via gl_FragDepth; scales by patch index. */
-#define PATCH_DEPTH_BIAS_NDC 1e-6f
+/* Per-patch window-space depth offset for coplanar z-fighting resolution.
+ * Applied in fragment shader via gl_FragDepth; scales by patch index.
+ * 1e-7 provides ~1.7 depth buffer steps per patch at 24-bit precision,
+ * supporting ~1000 patches within the far plane headroom margin. */
+#define PATCH_DEPTH_BIAS 1e-7f
 
 
 /* Shared geometry buffer accessible by both structure window and overlay */
 static structure_vertex_t *structure_vertices = NULL;
 static int structure_vertex_count = 0;
-static int structure_wire_vertex_count = 0;
 static unsigned int structure_geometry_generation = 1;
 static structure_draw_mode_t structure_last_mode = STRUCTURE_DRAW_GEOMETRY;
 static float structure_view_scale = 1.0f;
@@ -438,7 +439,6 @@ opengl_structure_generate_geometry(
 {
   int idx, vidx;
   int total_vertices;
-  int wire_vertex_count;
   size_t mreq;
   double cmax;
   double r_max;
@@ -619,7 +619,7 @@ opengl_structure_generate_geometry(
       float p_r, p_g, p_b;
       float c0x, c0y, c0z, c1x, c1y, c1z;
       float c2x, c2y, c2z, c3x, c3y, c3z;
-      float dbias = (float)(idx + 1) * PATCH_DEPTH_BIAS_NDC;
+      float dbias = (float)(idx + 1) * PATCH_DEPTH_BIAS;
 
       get_patch_normal(idx, &nx, &ny, &nz);
       get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
@@ -885,7 +885,6 @@ opengl_structure_generate_geometry(
     }
 
     structure_draw_mode = GL_LINES;
-    wire_vertex_count = vidx;
   }
   else
   {
@@ -943,8 +942,6 @@ opengl_structure_generate_geometry(
       }
     }
 
-    wire_vertex_count = vidx;
-
     /* Patch quads in cylinder mode: 2 triangles per patch with UV + flow data */
     for( idx = 0; idx < data.m; idx++ )
     {
@@ -954,7 +951,7 @@ opengl_structure_generate_geometry(
       float p_r, p_g, p_b;
       float fd[4];
       float c0x, c0y, c0z, c1x, c1y, c1z, c2x, c2y, c2z, c3x, c3y, c3z;
-      float dbias = (float)(idx + 1) * PATCH_DEPTH_BIAS_NDC;
+      float dbias = (float)(idx + 1) * PATCH_DEPTH_BIAS;
 
       get_patch_normal(idx, &nx, &ny, &nz);
 
@@ -1008,7 +1005,6 @@ opengl_structure_generate_geometry(
   }
 
   structure_vertex_count = vidx;
-  structure_wire_vertex_count = wire_vertex_count;
   structure_last_radius_scale = cylinder_radius_scale;
   structure_geometry_generation++;
 
@@ -1054,7 +1050,6 @@ opengl_structure_update_shared_geometry(void)
     /* Update shared overlay data after regeneration */
     shared_overlay_data.vertices = structure_vertices;
     shared_overlay_data.vertex_count = structure_vertex_count;
-    shared_overlay_data.wire_vertex_count = structure_wire_vertex_count;
     shared_overlay_data.vertex_stride = (int)sizeof(structure_vertex_t);
     shared_overlay_data.view_scale = structure_view_scale;
     shared_overlay_data.draw_mode = structure_draw_mode;

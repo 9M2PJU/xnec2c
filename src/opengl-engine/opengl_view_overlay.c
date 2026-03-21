@@ -160,36 +160,17 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
 
   gl_view_set_peel_uniforms(&ovl->peel_locs, params);
 
-  /* Split draw: wires without polygon offset, patches with offset.
-   * Mirrors the scene renderable split for consistent depth priority.
-   * MVP set before split so both branches have valid projection. */
+  /* Depth priority handled uniformly by gl_FragDepth in the fragment
+   * shader via per-vertex depth_bias: wires carry 0 (natural depth),
+   * patches carry per-index positive bias (pushed behind wires). */
   glUniformMatrix4fv(ovl->mvp_location, 1, GL_FALSE,
       (const float *)ovl->cached_mvp);
 
+  if( ovl->ovl_content.vertex_count > 0 )
   {
-    int wire_count = ovl->ovl_content.wire_vertex_count;
-    int patch_count = ovl->ovl_content.vertex_count - wire_count;
-
-    /* Wire geometry: no polygon offset */
-    if( wire_count > 0 )
-    {
-      glBindVertexArray(ovl->vao);
-      glDrawArrays(ovl->ovl_content.draw_mode, 0, wire_count);
-      glBindVertexArray(0);
-    }
-
-    /* Patch geometry: offset pushes patches behind wires */
-    if( patch_count > 0 )
-    {
-      glEnable(GL_POLYGON_OFFSET_FILL);
-      glPolygonOffset(1.0f, 1.0f);
-
-      glBindVertexArray(ovl->vao);
-      glDrawArrays(ovl->ovl_content.draw_mode, wire_count, patch_count);
-      glBindVertexArray(0);
-
-      glDisable(GL_POLYGON_OFFSET_FILL);
-    }
+    glBindVertexArray(ovl->vao);
+    glDrawArrays(ovl->ovl_content.draw_mode, 0, ovl->ovl_content.vertex_count);
+    glBindVertexArray(0);
   }
 
 } /* gl_overlay_render() */

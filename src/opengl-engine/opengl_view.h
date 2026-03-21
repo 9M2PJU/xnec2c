@@ -55,11 +55,6 @@ typedef struct
   gboolean show_gradient;
   unsigned int generation;
 
-  /* Vertex boundary between wire and patch geometry.
-   * Renderer draws [0, wire_vertex_count) without polygon offset,
-   * then [wire_vertex_count, vertex_count) with offset. */
-  int wire_vertex_count;
-
   /* When TRUE, engine uses model_scale as-is (no ovl_model_scale_adj) */
   gboolean scale_adj_locked;
 

@@ -153,7 +153,9 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     nearest_point = camera_distance - content.clip_extent;
     farthest_point = camera_distance + effective_far;
 
-    far_plane = farthest_point * 1.2f;
+    /* Extra margin provides window-space headroom for per-patch
+     * gl_FragDepth bias without pushing fragments past 1.0. */
+    far_plane = farthest_point * 1.5f;
 
     if( nearest_point > 0.0f )
     {

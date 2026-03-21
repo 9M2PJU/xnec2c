@@ -12,11 +12,17 @@ uniform int u_peel_pass;
  * peel passes (see peel discard block below).
  * Shared with ground-plane-fragment.glsl. */
 const float PEEL_DEPTH_EPSILON = 0.00001;
+
+/* Maximum gl_FragDepth value: one 24-bit depth step below 1.0.
+ * Prevents per-patch bias from pushing fragments to the clear
+ * depth (1.0), which would fail GL_LESS and discard them. */
+const float DEPTH_CLAMP_MAX = 1.0 - 6e-8;
 varying vec4 vertexColor;
 varying vec3 viewNormal;
 varying vec3 viewPos;
 varying vec2 vUV;
 varying vec4 vFlowData;
+varying float vDepthBias;
 
 /* Lighting constants */
 const vec3 LIGHT_DIR_RAW = vec3(-0.3, 0.5, 1.0);
@@ -72,7 +78,7 @@ void main() {
     float dz = max(abs(dFdx(gl_FragCoord.z)),
                    abs(dFdy(gl_FragCoord.z)));
     float eps = max(PEEL_DEPTH_EPSILON, dz);
-    if (gl_FragCoord.z <= prev_z + eps) discard;
+    if (gl_FragCoord.z + vDepthBias <= prev_z + eps) discard;
   }
 
   vec3 lightDir = normalize(LIGHT_DIR_RAW);
@@ -249,6 +255,11 @@ void main() {
       color = mix(color, color * 0.4, chevron * contrast);
     }
   }
+
+  /* Per-patch depth offset in window space [0,1].
+   * Pushes patches behind wires and separates coplanar patches.
+   * Operates post-clipping so geometry position is unaffected. */
+  gl_FragDepth = min(gl_FragCoord.z + vDepthBias, DEPTH_CLAMP_MAX);
 
   gl_FragColor = vec4(clamp(color, 0.0, 1.0),
                       vertexColor.a * u_alpha);

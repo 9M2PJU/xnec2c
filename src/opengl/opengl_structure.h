@@ -51,11 +51,6 @@ typedef struct
   unsigned int draw_mode;
   unsigned int generation;
 
-  /* Vertex index where wire geometry ends and patch geometry begins.
-   * Used by the renderer to issue separate draw calls with different
-   * polygon offset settings for wire vs patch depth priority. */
-  int wire_vertex_count;
-
   /* Excitation center coordinates in structure space */
   gboolean has_excitation_center;
   double excitation_center_x;

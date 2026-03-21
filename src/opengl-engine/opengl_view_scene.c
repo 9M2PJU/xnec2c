@@ -123,40 +123,17 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
 
   gl_view_set_peel_uniforms(&sc->peel_locs, params);
 
-  /* Split draw: wires first (no offset), then patches (with offset).
-   * Polygon offset gives wire geometry depth priority over coplanar
-   * patch surfaces, and the slope-dependent factor handles grazing
-   * angles where object-space bias alone collapses.
-   *
-   * MVP set before the split so both branches have a valid projection
-   * regardless of which is taken — rdpattern scenes have wire_vertex_count=0. */
+  /* Depth priority handled uniformly by gl_FragDepth in the fragment
+   * shader via per-vertex depth_bias: wires carry 0 (natural depth),
+   * patches carry per-index positive bias (pushed behind wires). */
   glUniformMatrix4fv(sc->mvp_location, 1, GL_FALSE,
       (const float *)params->mvp);
 
+  if( view->content.vertex_count > 0 )
   {
-    int wire_count = view->content.wire_vertex_count;
-    int patch_count = view->content.vertex_count - wire_count;
-
-    /* Wire geometry: no polygon offset */
-    if( wire_count > 0 )
-    {
-      glBindVertexArray(sc->vao);
-      glDrawArrays(view->content.draw_mode, 0, wire_count);
-      glBindVertexArray(0);
-    }
-
-    /* Patch geometry: offset pushes patches behind wires */
-    if( patch_count > 0 )
-    {
-      glEnable(GL_POLYGON_OFFSET_FILL);
-      glPolygonOffset(1.0f, 1.0f);
-
-      glBindVertexArray(sc->vao);
-      glDrawArrays(view->content.draw_mode, wire_count, patch_count);
-      glBindVertexArray(0);
-
-      glDisable(GL_POLYGON_OFFSET_FILL);
-    }
+    glBindVertexArray(sc->vao);
+    glDrawArrays(view->content.draw_mode, 0, view->content.vertex_count);
+    glBindVertexArray(0);
   }
 
 } /* gl_scene_render() */
