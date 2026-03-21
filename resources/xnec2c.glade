@@ -56,9 +56,9 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
     <property name="page-increment">10</property>
   </object>
   <object class="GtkAdjustment" id="animate_steps_adjustment">
-    <property name="lower">12</property>
-    <property name="upper">360</property>
-    <property name="value">36</property>
+    <property name="lower">1</property>
+    <property name="upper">120</property>
+    <property name="value">30</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
@@ -86,13 +86,11 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
             <property name="layout-style">end</property>
             <child>
               <object class="GtkButton" id="animation_applybutton">
-                <property name="label">gtk-apply</property>
+                <property name="label">Start</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="can-default">True</property>
                 <property name="receives-default">False</property>
-                <property name="use-stock">True</property>
-                <property name="always-show-image">True</property>
                 <signal name="clicked" handler="on_animation_applybutton_clicked" swapped="no"/>
               </object>
               <packing>
@@ -103,13 +101,11 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
             </child>
             <child>
               <object class="GtkButton" id="animation_cancelbutton">
-                <property name="label">gtk-cancel</property>
+                <property name="label">Stop</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="can-default">True</property>
                 <property name="receives-default">False</property>
-                <property name="use-stock">True</property>
-                <property name="always-show-image">True</property>
                 <signal name="clicked" handler="on_animation_cancelbutton_clicked" swapped="no"/>
               </object>
               <packing>
@@ -120,13 +116,11 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
             </child>
             <child>
               <object class="GtkButton" id="animation_okbutton">
-                <property name="label">gtk-ok</property>
+                <property name="label">Close</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="can-default">True</property>
                 <property name="receives-default">False</property>
-                <property name="use-stock">True</property>
-                <property name="always-show-image">True</property>
                 <signal name="clicked" handler="on_animation_okbutton_clicked" swapped="no"/>
               </object>
               <packing>
@@ -156,7 +150,7 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Steps/Cycle</property>
+                <property name="label" translatable="yes">Frames/Sec</property>
                 <property name="single-line-mode">True</property>
                 <property name="track-visited-links">False</property>
               </object>

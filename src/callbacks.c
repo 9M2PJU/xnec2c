@@ -2971,16 +2971,16 @@ update_animation_parameters(void)
 {
   GtkSpinButton *spinbutton;
   guint intval;
-  gdouble freq, steps;
+  gdouble freq, fps;
 
   spinbutton = GTK_SPIN_BUTTON(
       Builder_Get_Object(animate_dialog_builder, "animate_freq_spinbutton") );
   freq = gtk_spin_button_get_value( spinbutton );
   spinbutton = GTK_SPIN_BUTTON(
       Builder_Get_Object(animate_dialog_builder, "animate_steps_spinbutton") );
-  steps = gtk_spin_button_get_value( spinbutton );
-  intval = (guint)(1000.0 / steps / freq);
-  near_field.anim_step = (double)M_2PI / steps;
+  fps = gtk_spin_button_get_value( spinbutton );
+  intval = (guint)(1000.0 / fps);
+  near_field.anim_step = (double)M_2PI * freq / fps;
 
   if( anim_tag > 0 )
     g_source_remove( anim_tag );
@@ -3083,12 +3083,7 @@ on_animation_okbutton_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  SetFlag( FLOW_ANIMATE );
-
-  if( isFlagSet(DRAW_EHFIELD) && Validate_Nearfield_Animation() )
-    SetFlag( NEAREH_ANIMATE );
-
-  update_animation_parameters();
+  gtk_widget_destroy( animate_dialog );
 }
 
 
