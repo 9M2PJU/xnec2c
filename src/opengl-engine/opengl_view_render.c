@@ -62,34 +62,6 @@ gl_view_setup_attribs(
 
 /*-----------------------------------------------------------------------*/
 
-/** gl_view_draw_pass() - Execute a rendering pass
- * @shader_program: GL shader program handle
- * @mvp_location: uniform location for the MVP matrix
- * @mvp: model-view-projection matrix
- * @vao: vertex array object to draw
- * @draw_mode: GL primitive type (GL_TRIANGLES, GL_LINES, etc.)
- * @vertex_count: number of vertices to draw
- */
-  void
-gl_view_draw_pass(
-    GLuint shader_program,
-    GLint mvp_location,
-    const float *mvp,
-    GLuint vao,
-    GLenum draw_mode,
-    int vertex_count)
-{
-  glUseProgram(shader_program);
-  glUniformMatrix4fv(mvp_location, 1, GL_FALSE, mvp);
-
-  glBindVertexArray(vao);
-  glDrawArrays(draw_mode, 0, vertex_count);
-  glBindVertexArray(0);
-
-} /* gl_view_draw_pass() */
-
-/*-----------------------------------------------------------------------*/
-
 /* gl_trans_item_t defined in opengl_view.h */
 
 /*-----------------------------------------------------------------------*/
@@ -189,7 +161,9 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     }
     else
     {
-      near_plane = 0.001f;
+      /* Bound near/far ratio to ~10000:1 for usable depth precision.
+       * Fixed 0.001f caused extreme ratios with large scenes. */
+      near_plane = far_plane / 10000.0f;
     }
 
     state->cached_near_plane = near_plane;

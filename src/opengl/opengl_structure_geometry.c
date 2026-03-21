@@ -42,10 +42,16 @@
 #define LINE_ARROW_SHAFT_HW     0.024f
 #define LINE_ARROW_HEAD_HS      0.096f
 
+/* Sub-visual per-patch normal offset to resolve z-fighting between
+ * overlapping coplanar patches drawn in the same draw call.
+ * 1e-4 is too small on vertical patches. */
+#define PATCH_DEPTH_BIAS 2e-4f
+
 
 /* Shared geometry buffer accessible by both structure window and overlay */
 static structure_vertex_t *structure_vertices = NULL;
 static int structure_vertex_count = 0;
+static int structure_wire_vertex_count = 0;
 static unsigned int structure_geometry_generation = 1;
 static structure_draw_mode_t structure_last_mode = STRUCTURE_DRAW_GEOMETRY;
 static float structure_view_scale = 1.0f;
@@ -431,6 +437,7 @@ opengl_structure_generate_geometry(
 {
   int idx, vidx;
   int total_vertices;
+  int wire_vertex_count;
   size_t mreq;
   double cmax;
   double r_max;
@@ -628,6 +635,18 @@ opengl_structure_generate_geometry(
       c3x = (float)(save.xtemp[j] + s * data.t1x[idx] - s * data.t2x[idx]);
       c3y = (float)(save.ytemp[j] + s * data.t1y[idx] - s * data.t2y[idx]);
       c3z = (float)(save.ztemp[j] + s * data.t1z[idx] - s * data.t2z[idx]);
+
+      /* Per-patch depth bias along normal to resolve z-fighting
+       * between overlapping coplanar patches (e.g. GR-rotated caps) */
+      {
+        float bias = (float)(idx + 1) * PATCH_DEPTH_BIAS * (float)r_max;
+        float bx = bias * nx, by = bias * ny, bz = bias * nz;
+
+        c0x += bx; c0y += by; c0z += bz;
+        c1x += bx; c1y += by; c1z += bz;
+        c2x += bx; c2y += by; c2z += bz;
+        c3x += bx; c3y += by; c3z += bz;
+      }
 
       /* Box outline: 4 edges as GL_LINES pairs (8 vertices) */
       set_structure_vertex(&structure_vertices[vidx],
@@ -876,6 +895,7 @@ opengl_structure_generate_geometry(
     }
 
     structure_draw_mode = GL_LINES;
+    wire_vertex_count = vidx;
   }
   else
   {
@@ -932,6 +952,8 @@ opengl_structure_generate_geometry(
       }
     }
 
+    wire_vertex_count = vidx;
+
     /* Patch quads in cylinder mode: 2 triangles per patch with UV + flow data */
     for( idx = 0; idx < data.m; idx++ )
     {
@@ -957,6 +979,18 @@ opengl_structure_generate_geometry(
       c3x = (float)(save.xtemp[j] + s * data.t1x[idx] - s * data.t2x[idx]);
       c3y = (float)(save.ytemp[j] + s * data.t1y[idx] - s * data.t2y[idx]);
       c3z = (float)(save.ztemp[j] + s * data.t1z[idx] - s * data.t2z[idx]);
+
+      /* Per-patch depth bias along normal to resolve z-fighting
+       * between overlapping coplanar patches (e.g. GR-rotated caps) */
+      {
+        float bias = (float)(idx + 1) * PATCH_DEPTH_BIAS * (float)r_max;
+        float bx = bias * nx, by = bias * ny, bz = bias * nz;
+
+        c0x += bx; c0y += by; c0z += bz;
+        c1x += bx; c1y += by; c1z += bz;
+        c2x += bx; c2y += by; c2z += bz;
+        c3x += bx; c3y += by; c3z += bz;
+      }
 
       get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
       get_patch_flow_data(idx, mode, cmax, fd);
@@ -994,6 +1028,7 @@ opengl_structure_generate_geometry(
   }
 
   structure_vertex_count = vidx;
+  structure_wire_vertex_count = wire_vertex_count;
   structure_last_radius_scale = cylinder_radius_scale;
   structure_geometry_generation++;
 
@@ -1039,6 +1074,7 @@ opengl_structure_update_shared_geometry(void)
     /* Update shared overlay data after regeneration */
     shared_overlay_data.vertices = structure_vertices;
     shared_overlay_data.vertex_count = structure_vertex_count;
+    shared_overlay_data.wire_vertex_count = structure_wire_vertex_count;
     shared_overlay_data.vertex_stride = (int)sizeof(structure_vertex_t);
     shared_overlay_data.view_scale = structure_view_scale;
     shared_overlay_data.draw_mode = structure_draw_mode;

@@ -22,6 +22,10 @@
 
 #ifdef HAVE_OPENGL
 
+/* Sub-visual inset of end cap vertices along cylinder axis to prevent
+ * z-fighting when a wire endpoint lies on a surface patch */
+#define CYLINDER_CAP_INSET 1e-6
+
 /*-----------------------------------------------------------------------*/
 
 /** set_lit_vertex() - Set all fields of a lit vertex (position, normal, color)
@@ -226,6 +230,16 @@ opengl_lit_cylinder_append(
   float cap_ny_top = (float)(dy);
   float cap_nz_top = (float)(dz);
 
+  /* Inset cap vertices along the axis to prevent z-fighting
+   * when a wire endpoint lies on a surface patch */
+  double cap_inset = length * CYLINDER_CAP_INSET;
+  double bot_cx = x1 + cap_inset * dx;
+  double bot_cy = y1 + cap_inset * dy;
+  double bot_cz = z1 + cap_inset * dz;
+  double top_cx = x2 - cap_inset * dx;
+  double top_cy = y2 - cap_inset * dy;
+  double top_cz = z2 - cap_inset * dz;
+
   /* Generate end cap triangles */
   for( i = 0; i < segments; i++ )
   {
@@ -244,26 +258,26 @@ opengl_lit_cylinder_append(
     double py1 = radius * (cos1 * ay + sin1 * by);
     double pz1 = radius * (cos1 * az + sin1 * bz);
 
-    /* Bottom cap triangle */
+    /* Bottom cap triangle (inset along axis) */
     set_lit_vertex(&v[vidx++],
-        (float)x1, (float)y1, (float)z1,
+        (float)bot_cx, (float)bot_cy, (float)bot_cz,
         cap_nx_bot, cap_ny_bot, cap_nz_bot, r, g, b, a);
     set_lit_vertex(&v[vidx++],
-        (float)(x1 + px1), (float)(y1 + py1), (float)(z1 + pz1),
+        (float)(bot_cx + px1), (float)(bot_cy + py1), (float)(bot_cz + pz1),
         cap_nx_bot, cap_ny_bot, cap_nz_bot, r, g, b, a);
     set_lit_vertex(&v[vidx++],
-        (float)(x1 + px0), (float)(y1 + py0), (float)(z1 + pz0),
+        (float)(bot_cx + px0), (float)(bot_cy + py0), (float)(bot_cz + pz0),
         cap_nx_bot, cap_ny_bot, cap_nz_bot, r, g, b, a);
 
-    /* Top cap triangle */
+    /* Top cap triangle (inset along axis) */
     set_lit_vertex(&v[vidx++],
-        (float)x2, (float)y2, (float)z2,
+        (float)top_cx, (float)top_cy, (float)top_cz,
         cap_nx_top, cap_ny_top, cap_nz_top, r, g, b, a);
     set_lit_vertex(&v[vidx++],
-        (float)(x2 + px0), (float)(y2 + py0), (float)(z2 + pz0),
+        (float)(top_cx + px0), (float)(top_cy + py0), (float)(top_cz + pz0),
         cap_nx_top, cap_ny_top, cap_nz_top, r, g, b, a);
     set_lit_vertex(&v[vidx++],
-        (float)(x2 + px1), (float)(y2 + py1), (float)(z2 + pz1),
+        (float)(top_cx + px1), (float)(top_cy + py1), (float)(top_cz + pz1),
         cap_nx_top, cap_ny_top, cap_nz_top, r, g, b, a);
   }
 

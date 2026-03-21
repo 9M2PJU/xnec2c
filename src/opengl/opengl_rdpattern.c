@@ -393,6 +393,7 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
 
   out->vertices = geom->vertices;
   out->vertex_count = geom->vertex_count;
+  out->wire_vertex_count = geom->wire_vertex_count;
   out->vertex_stride = geom->vertex_stride;
   out->draw_mode = geom->draw_mode;
   out->show_gradient = FALSE;

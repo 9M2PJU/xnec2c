@@ -204,6 +204,7 @@ structure_scene_generate(gl_view_content_t *out)
 
   out->vertices = geom->vertices;
   out->vertex_count = geom->vertex_count;
+  out->wire_vertex_count = geom->wire_vertex_count;
   out->vertex_stride = geom->vertex_stride;
   out->draw_mode = (GLenum)geom->draw_mode;
   out->r_max = (geom->vertex_count > 0) ? geom->view_scale : 1.5f;

@@ -55,6 +55,11 @@ typedef struct
   gboolean show_gradient;
   unsigned int generation;
 
+  /* Vertex boundary between wire and patch geometry.
+   * Renderer draws [0, wire_vertex_count) without polygon offset,
+   * then [wire_vertex_count, vertex_count) with offset. */
+  int wire_vertex_count;
+
   /* When TRUE, engine uses model_scale as-is (no ovl_model_scale_adj) */
   gboolean scale_adj_locked;
 
@@ -301,17 +306,6 @@ void gl_view_setup_attribs(
     int attrib_count,
     int vertex_stride);
 
-/* gl_view_draw_pass()
- *
- * Execute a rendering pass. VAO already has attrib config from prepare.
- */
-void gl_view_draw_pass(
-    GLuint shader_program,
-    GLint mvp_location,
-    const float *mvp,
-    GLuint vao,
-    GLenum draw_mode,
-    int vertex_count);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_VIEW_H */
