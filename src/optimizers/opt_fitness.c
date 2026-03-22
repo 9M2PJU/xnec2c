@@ -232,6 +232,33 @@ const meas_fitness_default_t meas_fitness_defaults[MEAS_COUNT] =
 		.default_weight   = 10.0,
 		.default_exponent = 2.0,
 	},
+
+	[MEAS_ANT_TEMP] =
+	{
+		.direction        = FIT_DIR_MINIMIZE,
+		.default_reduce   = FIT_REDUCE_AVG,
+		.default_target   = 1000.0,
+		.default_weight   = 1.0,
+		.default_exponent = 1.0,
+	},
+
+	[MEAS_ANT_TEMP_TOT] =
+	{
+		.direction        = FIT_DIR_MINIMIZE,
+		.default_reduce   = FIT_REDUCE_AVG,
+		.default_target   = 1000.0,
+		.default_weight   = 1.0,
+		.default_exponent = 1.0,
+	},
+
+	[MEAS_GT] =
+	{
+		.direction        = FIT_DIR_MAXIMIZE,
+		.default_reduce   = FIT_REDUCE_AVG,
+		.default_target   = 0.0,
+		.default_weight   = 1.0,
+		.default_exponent = 2.0,
+	},
 };
 
 /*------------------------------------------------------------------------*/

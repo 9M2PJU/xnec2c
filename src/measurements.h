@@ -30,6 +30,9 @@ enum MEASUREMENT_INDEXES
 	MEAS_GAIN_DEV_NY,
 	MEAS_GAIN_DEV_PZ,
 	MEAS_GAIN_DEV_NZ,
+	MEAS_ANT_TEMP,
+	MEAS_ANT_TEMP_TOT,
+	MEAS_GT,
 
 	MEAS_COUNT
 };
@@ -38,6 +41,9 @@ enum MEASUREMENT_INDEXES
 extern const char *meas_names[];
 extern const char *meas_display_names[];
 extern const char *meas_descriptions[];
+
+#define ANT_TEMP_ENV_COUNT 8
+extern const char *ant_temp_env_names[ANT_TEMP_ENV_COUNT];
 
 typedef struct
 {
@@ -57,6 +63,8 @@ typedef struct
 			double gain_dev_px, gain_dev_nx;
 			double gain_dev_py, gain_dev_ny;
 			double gain_dev_pz, gain_dev_nz;
+			double ant_temp, ant_temp_tot;
+			double gt;
 		};
 
 		double a[MEAS_COUNT];
@@ -65,6 +73,8 @@ typedef struct
 } measurement_t;
 
 
+int ant_temp_resolve(double freq_mhz, int env,
+	double *t_sky, double *t_earth);
 void meas_calc(measurement_t *m, int idx);
 int meas_name_idx(char *name, int len);
 void meas_format(measurement_t *m, char *format, char *out, int outlen);

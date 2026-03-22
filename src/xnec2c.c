@@ -389,6 +389,14 @@ Radiation_Pattern( void )
     fpat.pinr= netcx.pin;
     fpat.pnlr= netcx.pnls;
     rdpat();
+
+    /* Store radiation efficiency per frequency step */
+    int fstep = calc_data.freq_step;
+    if (fstep >= 0 && fpat.pinr > 0.0)
+    {
+      rad_pattern[fstep].efficiency =
+        (fpat.pinr - fpat.ploss - fpat.pnlr) / fpat.pinr;
+    }
   }
 
 } /* Radiation_Pattern() */

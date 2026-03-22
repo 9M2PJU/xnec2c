@@ -162,7 +162,8 @@ typedef struct Segment
 #define PLOT_ENABLED        0x0000000000080000ll
 #define PLOT_QUIT           0x0000000000100000ll
 #define PLOT_SMITH          0x0000000000200000ll
-#define PLOT_FLAGS          0x00400000003FFC00ll
+#define PLOT_ANT_TEMP       0x0100000000000000ll
+#define PLOT_FLAGS          0x01400000003FFC00ll
 
 /* Radiation Pattern Control flags */
 #define DRAW_GAIN           0x0000000000400000ll
@@ -306,6 +307,8 @@ typedef struct
     freqplots_zrlzim_togglebutton,
     freqplots_zmgzph_togglebutton,
     freqplots_smith_togglebutton,
+    freqplots_ant_temp_togglebutton,
+    freqplots_show_ant_temp,
     freqplots_min_max,
     freqplots_s11,
     freqplots_clamp_vswr,
@@ -374,6 +377,11 @@ typedef struct
   int sy_overrides_y;
   int sy_overrides_width;
   int sy_overrides_height;
+
+  /* Antenna temperature calculation */
+  int ant_temp_env;       /* ANT_TEMP_ENV_* index from measurements.h */
+  double ant_temp_ext_loss;  /* External loss temperature (K), e.g. feedline */
+  double ant_temp_elevation; /* Antenna elevation tilt (degrees), +=up */
 } rc_config_t;
 
 typedef struct {
@@ -388,6 +396,8 @@ enum GAIN_SCALE
   GS_LINV,
   GS_ARRL,
   GS_LOG,
+  GS_NOISE,
+  GS_NOISE_LOG,
   NUM_SCALES
 };
 
@@ -901,6 +911,9 @@ typedef struct
     *tilt,          /* Tilt angle of polarization ellipse  */
     *axrt;          /* Elliptic axial ratio of pol ellipse */
 
+  double
+    efficiency;     /* Radiation efficiency = prad / pinr, per freq step */
+
   int
     *max_gain_idx,  /* Where in rad_pattern.gtot the max value occurs */
     *min_gain_idx,  /* Where in rad_pattern.gtot the min value occurs */
@@ -1060,6 +1073,7 @@ void on_rdpattern_linear_power_activate(GtkMenuItem *menuitem, gpointer user_dat
 void on_rdpattern_linear_voltage_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_arrl_style_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_logarithmic_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_rdpattern_noise_temp_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_e_field_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_h_field_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_poynting_vector_activate(GtkMenuItem *menuitem, gpointer user_data);

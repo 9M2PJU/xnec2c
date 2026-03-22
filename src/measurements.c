@@ -3,6 +3,147 @@
 
 #define clog10(z) (clog(z) / log(10))
 
+/* Antenna temperature environment models */
+typedef enum
+{
+	ANT_TEMP_ENV_VE7BQH_RURAL       = 0,
+	ANT_TEMP_ENV_VE7BQH_RESIDENTIAL = 1,
+	ANT_TEMP_ENV_VE7BQH_CITY        = 2,
+	ANT_TEMP_ENV_G4CQM_BASELINE     = 3,
+	ANT_TEMP_ENV_ITU_BUSINESS       = 4,
+	ANT_TEMP_ENV_ITU_RESIDENTIAL    = 5,
+	ANT_TEMP_ENV_ITU_RURAL          = 6,
+	ANT_TEMP_ENV_ITU_QUIET_RURAL    = 7,
+} ant_temp_env_t;
+
+const char *ant_temp_env_names[ANT_TEMP_ENV_COUNT] = {
+	"VE7BQH Rural",
+	"VE7BQH Residential",
+	"VE7BQH City",
+	"G4CQM Baseline",
+	"ITU-R Business",
+	"ITU-R Residential",
+	"ITU-R Rural",
+	"ITU-R Quiet Rural",
+};
+
+/* VE7BQH 2024 — [env][band]: 0=Rural 1=Residential 2=City;
+ * 0=50MHz 1=144MHz 2=432MHz */
+static const double ve7bqh_sky[3]    = { 5640.0,  290.0,  27.0 };
+static const double ve7bqh_mhz[3]    = {   50.0,  144.0, 432.0 };
+static const double ve7bqh_earth[3][3] = {
+	/* Rural */       {  29640.0,  1600.0,  460.0 },
+	/* Residential */ { 100600.0,  5400.0, 1800.0 },
+	/* City */        { 271000.0, 14500.0, 7900.0 },
+};
+
+/* G4CQM historical baseline — single environment */
+#define G4CQM_NPTS 5
+static const double g4cqm_mhz[G4CQM_NPTS]   = {   50.0, 144.0, 222.0,  432.0, 1296.0 };
+static const double g4cqm_sky[G4CQM_NPTS]    = { 2200.0, 250.0,  70.0,   20.0,   10.0 };
+static const double g4cqm_earth[G4CQM_NPTS]  = { 3000.0,1000.0, 600.0,  350.0,  290.0 };
+
+/* ITU-R P.372 formula coefficients
+ * T_earth(K) = 290 * (pow(10, (c - d*log10(f_MHz))/10) - 1)
+ * Valid 0.3–250 MHz */
+typedef struct { double c; double d; } itu_coeffs_t;
+static const itu_coeffs_t itu_coeffs[4] = {
+	/* Business    */ { 76.8, 27.7 },
+	/* Residential */ { 72.5, 27.7 },
+	/* Rural       */ { 67.2, 27.7 },
+	/* Quiet Rural */ { 53.6, 28.6 },
+};
+
+/**
+ * ant_temp_log_interp() - log-log interpolation on a table
+ * @freq_mhz:  operating frequency in MHz
+ * @tbl_mhz:   anchor frequency array
+ * @tbl_val:   anchor value array
+ * @n:         number of table entries
+ *
+ * Clamps to endpoint values for out-of-range frequencies.
+ * Returns interpolated value.
+ */
+static double ant_temp_log_interp(double freq_mhz,
+	const double *tbl_mhz, const double *tbl_val, int n)
+{
+	double lf = log10(freq_mhz);
+
+	/* Clamp below table */
+	if (lf <= log10(tbl_mhz[0]))
+		return tbl_val[0];
+
+	/* Clamp above table */
+	if (lf >= log10(tbl_mhz[n - 1]))
+		return tbl_val[n - 1];
+
+	/* Find bracketing interval */
+	int i = 0;
+	while (i < n - 2 && log10(tbl_mhz[i + 1]) < lf)
+		i++;
+
+	double t = (lf - log10(tbl_mhz[i]))
+		/ (log10(tbl_mhz[i + 1]) - log10(tbl_mhz[i]));
+
+	return pow(10.0, log10(tbl_val[i])
+		+ t * (log10(tbl_val[i + 1]) - log10(tbl_val[i])));
+}
+
+/**
+ * ant_temp_resolve() - resolve sky and earth brightness temperatures
+ * @freq_mhz:  operating frequency in MHz
+ * @env:       ANT_TEMP_ENV_* index
+ * @t_sky:     output sky brightness temperature (K)
+ * @t_earth:   output earth/man-made noise temperature (K)
+ *
+ * Returns 0 on success, -1 if env/freq combination is invalid.
+ */
+int ant_temp_resolve(double freq_mhz, int env,
+	double *t_sky, double *t_earth)
+{
+	if (env < 0 || env >= ANT_TEMP_ENV_COUNT)
+		return -1;
+
+	ant_temp_env_t e = (ant_temp_env_t)env;
+
+	/* VE7BQH: nearest band anchor */
+	if (e <= ANT_TEMP_ENV_VE7BQH_CITY)
+	{
+		int b = 0;
+		double best = fabs(freq_mhz - ve7bqh_mhz[0]);
+		for (int i = 1; i < 3; i++)
+		{
+			double d = fabs(freq_mhz - ve7bqh_mhz[i]);
+			if (d < best)
+			{
+				best = d;
+				b = i;
+			}
+		}
+		*t_sky   = ve7bqh_sky[b];
+		*t_earth = ve7bqh_earth[e][b];
+		return 0;
+	}
+
+	/* G4CQM: log-log interpolation, single environment */
+	if (e == ANT_TEMP_ENV_G4CQM_BASELINE)
+	{
+		*t_sky   = ant_temp_log_interp(freq_mhz, g4cqm_mhz, g4cqm_sky, G4CQM_NPTS);
+		*t_earth = ant_temp_log_interp(freq_mhz, g4cqm_mhz, g4cqm_earth, G4CQM_NPTS);
+		return 0;
+	}
+
+	/* ITU-R P.372: formula-derived T_earth, G4CQM sky anchors */
+	if (freq_mhz < 0.3 || freq_mhz > 250.0)
+		return -1;
+
+	int ci = e - ANT_TEMP_ENV_ITU_BUSINESS;
+	double fam = itu_coeffs[ci].c - itu_coeffs[ci].d * log10(freq_mhz);
+	*t_earth = 290.0 * (pow(10.0, fam / 10.0) - 1.0);
+	*t_sky   = ant_temp_log_interp(freq_mhz, g4cqm_mhz, g4cqm_sky, G4CQM_NPTS);
+	return 0;
+}
+
 // Ordering doesn't matter here because we use [] indexes,
 // but it still would be nice to keep the same order as the
 // enum MEASUREMENT_INDEXES.
@@ -30,6 +171,9 @@ const char *meas_names[] = {
 	[MEAS_GAIN_DEV_NY]     =  "gain_dev_ny",
 	[MEAS_GAIN_DEV_PZ]     =  "gain_dev_pz",
 	[MEAS_GAIN_DEV_NZ]     =  "gain_dev_nz",
+	[MEAS_ANT_TEMP]        =  "ant_temp",
+	[MEAS_ANT_TEMP_TOT]   =  "ant_temp_tot",
+	[MEAS_GT]              =  "gt",
 	[MEAS_COUNT]            =  NULL
 };
 
@@ -57,6 +201,9 @@ const char *meas_display_names[] = {
 	[MEAS_GAIN_DEV_NY]     =  "Gain Dev \xe2\x88\x92Y",
 	[MEAS_GAIN_DEV_PZ]     =  "Gain Dev +Z",
 	[MEAS_GAIN_DEV_NZ]     =  "Gain Dev \xe2\x88\x92Z",
+	[MEAS_ANT_TEMP]        =  "Ant Temp",
+	[MEAS_ANT_TEMP_TOT]   =  "Ant Temp Total",
+	[MEAS_GT]              =  "G/T",
 	[MEAS_COUNT]            =  NULL
 };
 
@@ -84,6 +231,9 @@ const char *meas_descriptions[] = {
 	[MEAS_GAIN_DEV_NY]     =  "Angular deviation of peak gain from -Y axis (degrees)",
 	[MEAS_GAIN_DEV_PZ]     =  "Angular deviation of peak gain from +Z axis (degrees)",
 	[MEAS_GAIN_DEV_NZ]     =  "Angular deviation of peak gain from -Z axis (degrees)",
+	[MEAS_ANT_TEMP]        =  "Antenna noise temperature from sky/earth brightness (K)",
+	[MEAS_ANT_TEMP_TOT]   =  "Total antenna noise temperature including loss (K)",
+	[MEAS_GT]              =  "Gain-to-noise-temperature ratio (dB)",
 	[MEAS_COUNT]            =  NULL
 };
 
@@ -205,6 +355,48 @@ void meas_calc(measurement_t *m, int idx)
 			}
 
 			m->a[MEAS_GAIN_DEV_PX + ax] = acos(cos_delta) * 180.0 / M_PI;
+		}
+	}
+
+	/* Antenna temperature: spherical integration of gain-weighted brightness */
+	if (fpat.dth != 0.0 && fpat.dph != 0.0 && fpat.nth > 0 && fpat.nph > 0)
+	{
+		double t_sky, t_earth;
+		if (ant_temp_resolve(save.freq[idx], rc_config.ant_temp_env,
+				&t_sky, &t_earth) == 0)
+		{
+			double t_pattern = 0.0;
+			double dth_rad = fpat.dth * M_PI / 180.0;
+			double dph_rad = fpat.dph * M_PI / 180.0;
+
+			for (int iph = 0; iph < fpat.nph; iph++)
+			{
+				for (int ith = 0; ith < fpat.nth; ith++)
+				{
+					double tht_rad = (fpat.thets + ith * fpat.dth) * M_PI / 180.0;
+					double g_lin = pow(10.0,
+						rad_pattern[idx].gtot[ith + iph * fpat.nth] / 10.0);
+					double t_bright = (tht_rad < M_PI / 2.0) ? t_sky : t_earth;
+
+					t_pattern += g_lin * t_bright * sin(tht_rad) * dth_rad * dph_rad;
+				}
+			}
+
+			m->ant_temp     = t_pattern / (4.0 * M_PI);
+			/* NEC2-computed ohmic loss temperature from radiation efficiency */
+			double eta = rad_pattern[idx].efficiency;
+			double t_loss_nec2 = (eta > 0.0 && eta < 1.0)
+				? 290.0 * (1.0 - eta) / eta : 0.0;
+
+			m->ant_temp_tot = m->ant_temp + t_loss_nec2 + rc_config.ant_temp_ext_loss;
+
+			/* G/T ratio — primary figure of merit for low-noise antenna systems */
+			if (m->ant_temp_tot > 0.0)
+			{
+				double gmax_dbi = rad_pattern[idx].gtot[
+					rad_pattern[idx].max_gain_idx[POL_TOTAL]];
+				m->gt = gmax_dbi - 10.0 * log10(m->ant_temp_tot);
+			}
 		}
 	}
 
