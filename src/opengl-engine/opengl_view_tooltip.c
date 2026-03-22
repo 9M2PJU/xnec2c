@@ -131,6 +131,7 @@ gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height)
   {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
+    glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
 
     /* Modulate alpha for fade: scale source by constant alpha */
     glBlendColor(0.0f, 0.0f, 0.0f, (float)state->tooltip_alpha);
@@ -143,8 +144,7 @@ gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height)
 
     cairo_gl_overlay_render(state->tooltip_overlay);
 
-    /* Restore standard blend func */
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
   }
@@ -287,6 +287,7 @@ gl_view_render_status_message(gl_view_state_t *state,
   {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
+    glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -297,6 +298,7 @@ gl_view_render_status_message(gl_view_state_t *state,
 
     cairo_gl_overlay_render(state->status_overlay);
 
+    glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
   }

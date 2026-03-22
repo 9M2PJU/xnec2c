@@ -208,18 +208,11 @@ cairo_gl_overlay_render(cairo_gl_overlay_t *overlay)
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, overlay->texture);
 
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable(GL_DEPTH_TEST);
-  glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
-
+  /* Caller owns blend/depth/coverage state */
   glBindVertexArray(overlay->vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   glBindVertexArray(0);
 
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_BLEND);
-  glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
   glBindTexture(GL_TEXTURE_2D, 0);
   glUseProgram(0);
 

@@ -153,7 +153,16 @@ gradient_overlay_render(gradient_overlay_t *overlay)
   if( overlay->needs_update )
     update_overlay_texture(overlay);
 
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+
   cairo_gl_overlay_render(overlay->base);
+
+  glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
+  glDisable(GL_BLEND);
+  glEnable(GL_DEPTH_TEST);
 
 } /* gradient_overlay_render() */
 
