@@ -1,6 +1,6 @@
 #version 130
 uniform float u_alpha;
-in vec4 vertexColor;
+centroid in vec4 vertexColor;
 out vec4 fragColor;
 
 void main() {

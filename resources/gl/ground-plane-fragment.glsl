@@ -1,15 +1,14 @@
 #version 130
 uniform float u_alpha;
 uniform sampler2D u_peel_depth;
-uniform vec2 u_viewport_size;
 uniform int u_peel_pass;
 
 /* Depth-peel epsilon bias — must match lit-color-fragment.glsl */
 const float PEEL_DEPTH_EPSILON = 0.00001;
-in vec4 vertexColor;
-in vec3 viewNormal;
-in vec3 viewPos;
-in vec3 worldPos;
+centroid in vec4 vertexColor;
+centroid in vec3 viewNormal;
+centroid in vec3 viewPos;
+centroid in vec3 worldPos;
 out vec4 fragColor;
 
 /* Lighting constants — normalize(vec3(-0.3, 0.5, 1.0)) precomputed */
@@ -31,8 +30,8 @@ void main() {
    * epsilon covers both 24-bit quantization and MSAA resolve
    * offset (see lit-color-fragment.glsl for details). */
   if (u_peel_pass > 0) {
-    float prev_z = texture(u_peel_depth,
-        gl_FragCoord.xy / u_viewport_size).r;
+    float prev_z = texelFetch(u_peel_depth,
+        ivec2(gl_FragCoord.xy), 0).r;
     float dz = max(abs(dFdx(gl_FragCoord.z)),
                    abs(dFdy(gl_FragCoord.z)));
     float eps = max(PEEL_DEPTH_EPSILON, dz);

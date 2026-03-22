@@ -11,7 +11,6 @@ uniform int flow_mode;
 uniform float u_phase;
 uniform sampler2D noise_tex;
 uniform sampler2D u_peel_depth;
-uniform vec2 u_viewport_size;
 uniform int u_peel_pass;
 
 /* Bias exceeding one 24-bit depth step (~6e-6) to prevent
@@ -24,12 +23,12 @@ const float PEEL_DEPTH_EPSILON = 0.00001;
  * Prevents per-patch bias from pushing fragments to the clear
  * depth (1.0), which would fail GL_LESS and discard them. */
 const float DEPTH_CLAMP_MAX = 1.0 - 6e-8;
-in vec4 vertexColor;
-in vec3 viewNormal;
-in vec3 viewPos;
-in vec2 vUV;
-in vec4 vFlowData;
-in float vDepthBias;
+centroid in vec4 vertexColor;
+centroid in vec3 viewNormal;
+centroid in vec3 viewPos;
+centroid in vec2 vUV;
+centroid in vec4 vFlowData;
+flat in float vDepthBias;
 out vec4 fragColor;
 
 /* Lighting constants — normalize(vec3(-0.3, 0.5, 1.0)) precomputed */
@@ -81,8 +80,8 @@ void main() {
    * gradient so steep surfaces get sufficient bias while
    * near-parallel surfaces retain tight layer separation. */
   if (u_peel_pass > 0) {
-    float prev_z = texture(u_peel_depth,
-        gl_FragCoord.xy / u_viewport_size).r;
+    float prev_z = texelFetch(u_peel_depth,
+        ivec2(gl_FragCoord.xy), 0).r;
     float dz = max(abs(dFdx(gl_FragCoord.z)),
                    abs(dFdy(gl_FragCoord.z)));
     float eps = max(PEEL_DEPTH_EPSILON, dz);
@@ -141,39 +140,50 @@ void main() {
 
     float angle;
 
-    /* Mode 1 (polarization tilt): tilt axis of current ellipse.
-     * psi = 0.5 * atan2(2*Re(ct1*conj(ct2)), |ct1|^2 - |ct2|^2) */
-    if (flow_mode == FLOW_DIR_POLARIZATION_TILT) {
-      float ct1_sq = vFlowData.x * vFlowData.x + vFlowData.y * vFlowData.y;
-      float ct2_sq = vFlowData.z * vFlowData.z + vFlowData.w * vFlowData.w;
+    switch (flow_mode)
+    {
+      /* Mode 1 (polarization tilt): tilt axis of current ellipse.
+       * psi = 0.5 * atan2(2*Re(ct1*conj(ct2)), |ct1|^2 - |ct2|^2) */
+      case FLOW_DIR_POLARIZATION_TILT:
+      {
+        float ct1_sq = vFlowData.x * vFlowData.x + vFlowData.y * vFlowData.y;
+        float ct2_sq = vFlowData.z * vFlowData.z + vFlowData.w * vFlowData.w;
 
-      /* Re(ct1 * conj(ct2)) = Re1*Re2 + Im1*Im2 */
-      float cross = vFlowData.x * vFlowData.z + vFlowData.y * vFlowData.w;
-      angle = 0.5 * atan(2.0 * cross, ct1_sq - ct2_sq);
-    }
-    /* Mode 2 (peak magnitude): phase maximizing |j(alpha)|.
-     * P = ct1^2 + ct2^2, alpha0 = -0.5 * arg(P)
-     * ct^2 = (Re + j*Im)^2 = Re^2 - Im^2 + j*2*Re*Im */
-    else if (flow_mode == FLOW_DIR_PEAK_MAGNITUDE) {
-      float p_re = (vFlowData.x * vFlowData.x - vFlowData.y * vFlowData.y)
-                 + (vFlowData.z * vFlowData.z - vFlowData.w * vFlowData.w);
-      float p_im = 2.0 * (vFlowData.x * vFlowData.y + vFlowData.z * vFlowData.w);
-      float alpha0 = -0.5 * atan(p_im, p_re);
+        /* Re(ct1 * conj(ct2)) = Re1*Re2 + Im1*Im2 */
+        float cross = vFlowData.x * vFlowData.z + vFlowData.y * vFlowData.w;
+        angle = 0.5 * atan(2.0 * cross, ct1_sq - ct2_sq);
+        break;
+      }
 
-      float ca0 = cos(alpha0);
-      float sa0 = sin(alpha0);
-      float peak_re1 = vFlowData.x * ca0 - vFlowData.y * sa0;
-      float peak_re2 = vFlowData.z * ca0 - vFlowData.w * sa0;
-      angle = atan(peak_re2, peak_re1);
-    }
-    /* Modes 0 and 3 (reference phase / LIC): instantaneous direction at u_phase.
-     * Re(ct * e^(j*phi)) = Re(ct)*cos(phi) - Im(ct)*sin(phi) */
-    else {
-      float cp = cos(u_phase);
-      float sp = sin(u_phase);
-      float re1 = vFlowData.x * cp - vFlowData.y * sp;
-      float re2 = vFlowData.z * cp - vFlowData.w * sp;
-      angle = atan(re2, re1);
+      /* Mode 2 (peak magnitude): phase maximizing |j(alpha)|.
+       * P = ct1^2 + ct2^2, alpha0 = -0.5 * arg(P)
+       * ct^2 = (Re + j*Im)^2 = Re^2 - Im^2 + j*2*Re*Im */
+      case FLOW_DIR_PEAK_MAGNITUDE:
+      {
+        float p_re = (vFlowData.x * vFlowData.x - vFlowData.y * vFlowData.y)
+                   + (vFlowData.z * vFlowData.z - vFlowData.w * vFlowData.w);
+        float p_im = 2.0 * (vFlowData.x * vFlowData.y + vFlowData.z * vFlowData.w);
+        float alpha0 = -0.5 * atan(p_im, p_re);
+
+        float ca0 = cos(alpha0);
+        float sa0 = sin(alpha0);
+        float peak_re1 = vFlowData.x * ca0 - vFlowData.y * sa0;
+        float peak_re2 = vFlowData.z * ca0 - vFlowData.w * sa0;
+        angle = atan(peak_re2, peak_re1);
+        break;
+      }
+
+      /* Modes 0 and 3 (reference phase / LIC): instantaneous direction at u_phase.
+       * Re(ct * e^(j*phi)) = Re(ct)*cos(phi) - Im(ct)*sin(phi) */
+      default:
+      {
+        float cp = cos(u_phase);
+        float sp = sin(u_phase);
+        float re1 = vFlowData.x * cp - vFlowData.y * sp;
+        float re2 = vFlowData.z * cp - vFlowData.w * sp;
+        angle = atan(re2, re1);
+        break;
+      }
     }
 
     if (flow_mode == FLOW_DIR_LIC) {

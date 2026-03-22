@@ -2,7 +2,7 @@
 in vec3 position;
 in vec2 texcoord;
 uniform mat4 mvp;
-out vec2 v_texcoord;
+centroid out vec2 v_texcoord;
 
 void main() {
   gl_Position = mvp * vec4(position, 1.0);

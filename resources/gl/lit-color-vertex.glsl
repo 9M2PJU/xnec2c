@@ -7,12 +7,12 @@ in vec4 flow_data;
 in float depth_bias;
 uniform mat4 mvp;
 uniform mat4 u_mv;
-out vec4 vertexColor;
-out vec3 viewNormal;
-out vec3 viewPos;
-out vec2 vUV;
-out vec4 vFlowData;
-out float vDepthBias;
+centroid out vec4 vertexColor;
+centroid out vec3 viewNormal;
+centroid out vec3 viewPos;
+centroid out vec2 vUV;
+centroid out vec4 vFlowData;
+flat out float vDepthBias;
 
 void main() {
   gl_Position = mvp * vec4(position, 1.0);

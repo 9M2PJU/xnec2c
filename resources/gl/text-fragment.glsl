@@ -1,6 +1,6 @@
 #version 130
 uniform sampler2D tex;
-in vec2 v_texcoord;
+centroid in vec2 v_texcoord;
 out vec4 fragColor;
 
 void main() {
