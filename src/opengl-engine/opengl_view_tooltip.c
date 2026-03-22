@@ -112,12 +112,15 @@ gl_view_render_tooltip_surface(gl_view_state_t *state, int surf_width, int surf_
   void
 gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height)
 {
+  gboolean needs_upload = FALSE;
+
   /* Regenerate surface if invalidated or dimensions changed */
   if( !state->tooltip_surface_valid ||
       state->tooltip_surf_width != surf_width ||
       state->tooltip_surf_height != surf_height )
   {
     gl_view_render_tooltip_surface(state, surf_width, surf_height);
+    needs_upload = TRUE;
   }
 
   /* Lazily allocate cached tooltip overlay */
@@ -134,7 +137,10 @@ gl_view_render_tooltip(gl_view_state_t *state, int surf_width, int surf_height)
     glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     cairo_gl_overlay_set_size(state->tooltip_overlay, surf_width, surf_height);
-    cairo_gl_overlay_upload(state->tooltip_overlay, state->tooltip_surface);
+
+    if( needs_upload )
+      cairo_gl_overlay_upload(state->tooltip_overlay, state->tooltip_surface);
+
     cairo_gl_overlay_render(state->tooltip_overlay);
 
     /* Restore standard blend func */
@@ -250,6 +256,8 @@ gl_view_show_tooltip(GtkWidget *widget, const char *text, int duration_ms)
 gl_view_render_status_message(gl_view_state_t *state,
     const char *message, int surf_width, int surf_height)
 {
+  gboolean needs_upload = FALSE;
+
   /* Regenerate surface if message or dimensions changed.
    * status_last_text is compared by pointer — valid only for string literals,
    * which are guaranteed unique addresses per translation unit. */
@@ -268,6 +276,7 @@ gl_view_render_status_message(gl_view_state_t *state,
     state->status_surf_width = surf_width;
     state->status_surf_height = surf_height;
     state->status_last_text = message;
+    needs_upload = TRUE;
   }
 
   /* Lazily allocate cached status overlay */
@@ -282,7 +291,10 @@ gl_view_render_status_message(gl_view_state_t *state,
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     cairo_gl_overlay_set_size(state->status_overlay, surf_width, surf_height);
-    cairo_gl_overlay_upload(state->status_overlay, state->status_surface);
+
+    if( needs_upload )
+      cairo_gl_overlay_upload(state->status_overlay, state->status_surface);
+
     cairo_gl_overlay_render(state->status_overlay);
 
     glDisable(GL_BLEND);

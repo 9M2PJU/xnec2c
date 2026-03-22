@@ -51,6 +51,8 @@ typedef struct
   GLint texcoord_location;
   int width;
   int height;
+  int tex_width;   /* Current texture allocation dimensions */
+  int tex_height;
   gboolean initialized;
 
 } cairo_gl_overlay_t;

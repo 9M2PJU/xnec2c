@@ -163,8 +163,21 @@ cairo_gl_overlay_upload(cairo_gl_overlay_t *overlay, cairo_surface_t *surface)
   height = cairo_image_surface_get_height(surface);
 
   glBindTexture(GL_TEXTURE_2D, overlay->texture);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-    GL_BGRA, GL_UNSIGNED_BYTE, data);
+
+  /* Reuse existing allocation when dimensions match */
+  if( width == overlay->tex_width && height == overlay->tex_height )
+  {
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+        GL_BGRA, GL_UNSIGNED_BYTE, data);
+  }
+  else
+  {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+        GL_BGRA, GL_UNSIGNED_BYTE, data);
+    overlay->tex_width = width;
+    overlay->tex_height = height;
+  }
+
   glBindTexture(GL_TEXTURE_2D, 0);
 
 } /* cairo_gl_overlay_upload() */
@@ -198,6 +211,7 @@ cairo_gl_overlay_render(cairo_gl_overlay_t *overlay)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glDisable(GL_DEPTH_TEST);
+  glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
 
   glBindVertexArray(overlay->vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -205,6 +219,7 @@ cairo_gl_overlay_render(cairo_gl_overlay_t *overlay)
 
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
+  glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
   glBindTexture(GL_TEXTURE_2D, 0);
   glUseProgram(0);
 
