@@ -80,8 +80,6 @@ typedef struct gl_render_params_s
   mat4 mv;
   float alpha;
   int peel_pass;
-  int viewport_width;
-  int viewport_height;
 
 } gl_render_params_t;
 
@@ -89,7 +87,6 @@ typedef struct gl_render_params_s
 typedef struct
 {
   GLint peel_depth;
-  GLint viewport_size;
   GLint peel_pass;
 
 } gl_peel_uniform_locs_t;
@@ -262,6 +259,7 @@ typedef struct gl_view_state_s
   GLint  composite_u_layer;    /* sampler uniform: current peel layer */
   int peel_width;              /* current peel texture dimensions */
   int peel_height;
+  int peel_msaa_samples;       /* MSAA sample count at last peel creation */
 
   gboolean initialized;
 

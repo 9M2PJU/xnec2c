@@ -257,9 +257,6 @@ on_realize(GtkGLArea *area, gpointer user_data)
     }
   }
 
-  /* Initialize MSAA resources after GL context is ready */
-  gl_view_recreate_msaa(state, rc_config.opengl_msaa_samples);
-
   /* Compile depth-peel composite shader and create fullscreen triangle */
   {
     gl_shader_t cs = {0};
@@ -349,13 +346,22 @@ on_resize(GtkGLArea *area, int width, int height, gpointer user_data)
   state->aspect = aspect;
   state->viewport_height = (float)height;
 
+  /* Dimensions unchanged — skip FBO resize.
+   * Update aspect/viewport in case GTK fires redundantly. */
+  if( width == state->msaa_width && height == state->msaa_height )
+  {
+    glViewport(0, 0, width, height);
+    gtk_widget_queue_draw(GTK_WIDGET(area));
+    return;
+  }
+
   /* Store dimensions for MSAA recreation */
   state->msaa_width = width;
   state->msaa_height = height;
 
   /* Recreate MSAA FBO at new dimensions */
-  if( state->msaa_samples > 0 )
-    gl_view_recreate_msaa(state, state->msaa_samples);
+  if( rc_config.opengl_msaa_samples > 0 )
+    gl_view_recreate_msaa(state, rc_config.opengl_msaa_samples);
 
   /* Recreate depth-peel FBOs at new dimensions (only when
    * composite shader loaded successfully during realize) */

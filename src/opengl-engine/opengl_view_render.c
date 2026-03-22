@@ -208,9 +208,6 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     glm_mat4_copy(mv, render_params.mv);
     render_params.alpha = eff_alpha;
     render_params.peel_pass = 0;
-    render_params.viewport_width = state->peel_width;
-    render_params.viewport_height = state->peel_height;
-
     r->render(r->ctx, &render_params);
   }
 

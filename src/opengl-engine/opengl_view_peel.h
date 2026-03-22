@@ -52,7 +52,6 @@ void gl_view_peel_locs_init(gl_peel_uniform_locs_t *locs, GLuint program);
 /* gl_view_set_peel_uniforms()
  *
  * Set depth-peel uniforms for the current peel pass.
- * Reads viewport dimensions and peel_pass from render params.
  */
 void gl_view_set_peel_uniforms(const gl_peel_uniform_locs_t *locs,
     const gl_render_params_t *params);
