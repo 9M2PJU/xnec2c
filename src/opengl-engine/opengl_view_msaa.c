@@ -57,61 +57,80 @@ gl_view_msaa_free(gl_view_state_t *state)
 
 /*-----------------------------------------------------------------------*/
 
-/** gl_view_recreate_msaa() - Recreate MSAA resources without destroying GL widget
+/** gl_view_recreate_msaa() - Resize MSAA resources, creating handles only on first call
  * @state: view state to update with new MSAA resources
  * @requested_samples: number of MSAA samples to use (clamped to hardware limit)
+ *
+ * Separates handle lifecycle from storage allocation: glGen + FBO attach
+ * run once, glRenderbufferStorageMultisample runs on every resize.
  */
   void
 gl_view_recreate_msaa(gl_view_state_t *state, int requested_samples)
 {
   GLint max_samples;
   int width, height;
+  int samples;
 
   if( !state || !state->initialized )
     return;
 
-  /* Release existing MSAA resources */
-  gl_view_msaa_free(state);
-
   if( requested_samples == 0 )
-    return;
-
-  /* Query hardware limit and clamp */
-  glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
-  state->msaa_samples = (requested_samples > max_samples) ? max_samples : requested_samples;
-
-  if( state->msaa_samples < 2 )
   {
-    state->msaa_samples = 0;
+    gl_view_msaa_free(state);
     return;
   }
 
-  /* Get current viewport dimensions */
+  /* Query hardware limit and clamp */
+  glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+  samples = (requested_samples > max_samples) ? max_samples : requested_samples;
+
+  if( samples < 2 )
+  {
+    gl_view_msaa_free(state);
+    return;
+  }
+
   width = state->msaa_width;
   height = state->msaa_height;
 
   if( width == 0 || height == 0 )
     return;
 
-  /* Create multisampled color renderbuffer */
-  glGenRenderbuffers(1, &state->msaa_color_rbo);
+  /* Sample count changed — delete stale handles.
+   * Some drivers reject in-place glRenderbufferStorageMultisample
+   * at a different sample count on an attached RBO. */
+  if( state->msaa_fbo && state->msaa_samples != samples )
+    gl_view_msaa_free(state);
+
+  /* Create handles and FBO attachments (first call or after free) */
+  if( !state->msaa_fbo )
+  {
+    glGenRenderbuffers(1, &state->msaa_color_rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, state->msaa_color_rbo);
+    glGenRenderbuffers(1, &state->msaa_depth_rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, state->msaa_depth_rbo);
+    glGenFramebuffers(1, &state->msaa_fbo);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, state->msaa_fbo);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+        GL_RENDERBUFFER, state->msaa_color_rbo);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+        GL_RENDERBUFFER, state->msaa_depth_rbo);
+  }
+
+  /* Resize storage in place (valid on both fresh and existing RBOs) */
   glBindRenderbuffer(GL_RENDERBUFFER, state->msaa_color_rbo);
-  glRenderbufferStorageMultisample(GL_RENDERBUFFER, state->msaa_samples,
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples,
       GL_RGBA8, width, height);
 
-  /* Create multisampled depth renderbuffer */
-  glGenRenderbuffers(1, &state->msaa_depth_rbo);
   glBindRenderbuffer(GL_RENDERBUFFER, state->msaa_depth_rbo);
-  glRenderbufferStorageMultisample(GL_RENDERBUFFER, state->msaa_samples,
+  glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples,
       GL_DEPTH_COMPONENT24, width, height);
 
-  /* Create FBO and attach renderbuffers */
-  glGenFramebuffers(1, &state->msaa_fbo);
+  state->msaa_samples = samples;
+
+  /* Verify completeness after resize */
   glBindFramebuffer(GL_FRAMEBUFFER, state->msaa_fbo);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-      GL_RENDERBUFFER, state->msaa_color_rbo);
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-      GL_RENDERBUFFER, state->msaa_depth_rbo);
 
   if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
   {

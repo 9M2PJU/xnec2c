@@ -52,28 +52,26 @@ gl_view_peel_free(gl_view_state_t *state)
 
   state->peel_width = 0;
   state->peel_height = 0;
+  state->peel_msaa_samples = 0;
 
 } /* gl_view_peel_free() */
 
 /*-----------------------------------------------------------------------*/
 
-/** create_peel_texture() - Allocate a 2D texture with nearest filter and clamp-to-edge wrap
- * @ifmt: internal format (e.g. GL_RGBA8, GL_DEPTH_COMPONENT24)
- * @width: texture width in pixels
- * @height: texture height in pixels
- * @fmt: pixel format (e.g. GL_RGBA, GL_DEPTH_COMPONENT)
- * @type: pixel type (e.g. GL_UNSIGNED_BYTE, GL_FLOAT)
+/** create_peel_texture_handle() - Create a 2D texture with nearest filter and clamp-to-edge wrap
+ *
+ * Allocates the GL name and sets sampling parameters.  Does not allocate
+ * storage — call resize_peel_texture() afterward.
  *
  * Returns texture handle; leaves texture bound to GL_TEXTURE_2D.
  */
   static GLuint
-create_peel_texture(GLenum ifmt, int width, int height, GLenum fmt, GLenum type)
+create_peel_texture_handle(void)
 {
   GLuint tex;
 
   glGenTextures(1, &tex);
   glBindTexture(GL_TEXTURE_2D, tex);
-  glTexImage2D(GL_TEXTURE_2D, 0, ifmt, width, height, 0, fmt, type, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -81,60 +79,159 @@ create_peel_texture(GLenum ifmt, int width, int height, GLenum fmt, GLenum type)
 
   return tex;
 
-} /* create_peel_texture() */
+} /* create_peel_texture_handle() */
 
 /*-----------------------------------------------------------------------*/
 
-/** gl_view_peel_recreate() - Recreate depth-peel FBO resources at given dimensions
+/** resize_peel_texture() - Reallocate texture storage at given dimensions
+ * @tex: texture handle (must already exist)
+ * @ifmt: internal format (e.g. GL_RGBA8, GL_DEPTH_COMPONENT24)
+ * @width: texture width in pixels
+ * @height: texture height in pixels
+ * @fmt: pixel format (e.g. GL_RGBA, GL_DEPTH_COMPONENT)
+ * @type: pixel type (e.g. GL_UNSIGNED_BYTE, GL_FLOAT)
+ */
+  static void
+resize_peel_texture(GLuint tex, GLenum ifmt, int width, int height,
+    GLenum fmt, GLenum type)
+{
+  glBindTexture(GL_TEXTURE_2D, tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, ifmt, width, height, 0, fmt, type, NULL);
+
+} /* resize_peel_texture() */
+
+/*-----------------------------------------------------------------------*/
+
+/** gl_view_peel_recreate() - Resize depth-peel FBO resources, creating handles only on first call
  * @state: view state to update with new peel resources
  * @width: viewport width in pixels
  * @height: viewport height in pixels
  * @msaa_samples: MSAA sample count (0 = single-sample peel FBOs)
  *
- * Creates 2 ping-pong FBOs each with a GL_DEPTH_COMPONENT24 depth texture
- * and a shared GL_RGBA8 color texture, plus an accumulation FBO with its
- * own GL_RGBA8 color texture for the under-operator composite.
+ * Separates handle lifecycle from storage allocation.  Texture handles,
+ * FBOs, and FBO attachments are created once.  Storage (glTexImage2D,
+ * glRenderbufferStorageMultisample) is resized in place on every call.
  *
- * When msaa_samples > 0, also creates multisampled renderbuffer FBOs for
- * rasterization.  After each peel pass, the MS FBO is blit-resolved to
- * the single-sample FBO so the depth texture is readable by the next
- * pass's peel discard shader and the color texture is compositable.
+ * Multisampled renderbuffer handles are created/destroyed only when
+ * transitioning between MSAA 0 and >0, tracked via peel_msaa_samples.
  */
   void
 gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
     int msaa_samples)
 {
   int i;
+  int eff_msaa;
 
   if( !state )
     return;
 
-  gl_view_peel_free(state);
-
   if( width == 0 || height == 0 )
+  {
+    gl_view_peel_free(state);
     return;
+  }
 
+  eff_msaa = (msaa_samples >= 2) ? msaa_samples : 0;
+
+  /* Create texture handles and FBO attachments once */
+  if( !state->peel_color_tex )
+  {
+    state->peel_color_tex = create_peel_texture_handle();
+
+    for( i = 0; i < 2; i++ )
+      state->peel_depth_tex[i] = create_peel_texture_handle();
+
+    state->accum_color_tex = create_peel_texture_handle();
+
+    /* Single-sample FBOs with texture attachments */
+    glGenFramebuffers(2, state->peel_fbo);
+
+    for( i = 0; i < 2; i++ )
+    {
+      glBindFramebuffer(GL_FRAMEBUFFER, state->peel_fbo[i]);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+          GL_TEXTURE_2D, state->peel_depth_tex[i], 0);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+          GL_TEXTURE_2D, state->peel_color_tex, 0);
+    }
+
+    /* Accumulation FBO */
+    glGenFramebuffers(1, &state->accum_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, state->accum_fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+        GL_TEXTURE_2D, state->accum_color_tex, 0);
+  }
+
+  /* Resize texture storage in place */
   state->peel_width = width;
   state->peel_height = height;
 
-  /* Shared color texture — attached to both peel FBOs */
-  state->peel_color_tex = create_peel_texture(
+  resize_peel_texture(state->peel_color_tex,
       GL_RGBA8, width, height, GL_RGBA, GL_UNSIGNED_BYTE);
-
-  /* Ping-pong depth textures and single-sample FBOs (resolve targets) */
-  glGenFramebuffers(2, state->peel_fbo);
 
   for( i = 0; i < 2; i++ )
   {
-    state->peel_depth_tex[i] = create_peel_texture(
+    resize_peel_texture(state->peel_depth_tex[i],
         GL_DEPTH_COMPONENT24, width, height, GL_DEPTH_COMPONENT, GL_FLOAT);
+  }
 
-    /* FBO: depth texture + shared color texture */
+  resize_peel_texture(state->accum_color_tex,
+      GL_RGBA8, width, height, GL_RGBA, GL_UNSIGNED_BYTE);
+
+  /* MSAA transition or sample-count change: destroy stale MS handles.
+   * Some drivers reject in-place glRenderbufferStorageMultisample
+   * at a different sample count on an attached RBO. */
+  if( state->peel_msaa_samples > 0 && eff_msaa != state->peel_msaa_samples )
+  {
+    for( i = 0; i < 2; i++ )
+    {
+      GL_DELETE(glDeleteFramebuffers, state->peel_ms_fbo[i]);
+      GL_DELETE(glDeleteRenderbuffers, state->peel_ms_color_rbo[i]);
+      GL_DELETE(glDeleteRenderbuffers, state->peel_ms_depth_rbo[i]);
+    }
+  }
+
+  /* Create MS handles when transitioning to MSAA */
+  if( !state->peel_ms_fbo[0] && eff_msaa > 0 )
+  {
+    /* Transition to MSAA: create MS handles and attach */
+    glGenFramebuffers(2, state->peel_ms_fbo);
+
+    for( i = 0; i < 2; i++ )
+    {
+      glGenRenderbuffers(1, &state->peel_ms_color_rbo[i]);
+      glBindRenderbuffer(GL_RENDERBUFFER, state->peel_ms_color_rbo[i]);
+      glGenRenderbuffers(1, &state->peel_ms_depth_rbo[i]);
+      glBindRenderbuffer(GL_RENDERBUFFER, state->peel_ms_depth_rbo[i]);
+
+      glBindFramebuffer(GL_FRAMEBUFFER, state->peel_ms_fbo[i]);
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+          GL_RENDERBUFFER, state->peel_ms_color_rbo[i]);
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+          GL_RENDERBUFFER, state->peel_ms_depth_rbo[i]);
+    }
+  }
+  /* Resize MS renderbuffer storage in place when MSAA active */
+  if( eff_msaa > 0 && state->peel_ms_fbo[0] )
+  {
+    for( i = 0; i < 2; i++ )
+    {
+      glBindRenderbuffer(GL_RENDERBUFFER, state->peel_ms_color_rbo[i]);
+      glRenderbufferStorageMultisample(GL_RENDERBUFFER, eff_msaa,
+          GL_RGBA8, width, height);
+
+      glBindRenderbuffer(GL_RENDERBUFFER, state->peel_ms_depth_rbo[i]);
+      glRenderbufferStorageMultisample(GL_RENDERBUFFER, eff_msaa,
+          GL_DEPTH_COMPONENT24, width, height);
+    }
+  }
+
+  state->peel_msaa_samples = eff_msaa;
+
+  /* Verify completeness of all FBOs after resize */
+  for( i = 0; i < 2; i++ )
+  {
     glBindFramebuffer(GL_FRAMEBUFFER, state->peel_fbo[i]);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-        GL_TEXTURE_2D, state->peel_depth_tex[i], 0);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-        GL_TEXTURE_2D, state->peel_color_tex, 0);
 
     if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
     {
@@ -142,33 +239,10 @@ gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
       gl_view_peel_free(state);
       return;
     }
-  }
 
-  /* Multisampled peel FBOs for rasterization when MSAA is active.
-   * Transparent geometry renders into these with full multisampling,
-   * then each pass blit-resolves to the single-sample peel_fbo[]
-   * for shader depth reads and color compositing. */
-  if( msaa_samples >= 2 )
-  {
-    glGenFramebuffers(2, state->peel_ms_fbo);
-
-    for( i = 0; i < 2; i++ )
+    if( eff_msaa > 0 && state->peel_ms_fbo[i] )
     {
-      glGenRenderbuffers(1, &state->peel_ms_color_rbo[i]);
-      glBindRenderbuffer(GL_RENDERBUFFER, state->peel_ms_color_rbo[i]);
-      glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa_samples,
-          GL_RGBA8, width, height);
-
-      glGenRenderbuffers(1, &state->peel_ms_depth_rbo[i]);
-      glBindRenderbuffer(GL_RENDERBUFFER, state->peel_ms_depth_rbo[i]);
-      glRenderbufferStorageMultisample(GL_RENDERBUFFER, msaa_samples,
-          GL_DEPTH_COMPONENT24, width, height);
-
       glBindFramebuffer(GL_FRAMEBUFFER, state->peel_ms_fbo[i]);
-      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-          GL_RENDERBUFFER, state->peel_ms_color_rbo[i]);
-      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-          GL_RENDERBUFFER, state->peel_ms_depth_rbo[i]);
 
       if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
       {
@@ -179,14 +253,7 @@ gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
     }
   }
 
-  /* Accumulation FBO + color texture */
-  state->accum_color_tex = create_peel_texture(
-      GL_RGBA8, width, height, GL_RGBA, GL_UNSIGNED_BYTE);
-
-  glGenFramebuffers(1, &state->accum_fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, state->accum_fbo);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-      GL_TEXTURE_2D, state->accum_color_tex, 0);
 
   if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
   {
@@ -210,7 +277,6 @@ gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
 gl_view_peel_locs_init(gl_peel_uniform_locs_t *locs, GLuint program)
 {
   locs->peel_depth = glGetUniformLocation(program, "u_peel_depth");
-  locs->viewport_size = glGetUniformLocation(program, "u_viewport_size");
   locs->peel_pass = glGetUniformLocation(program, "u_peel_pass");
 
 } /* gl_view_peel_locs_init() */
@@ -226,8 +292,6 @@ gl_view_set_peel_uniforms(const gl_peel_uniform_locs_t *locs,
     const gl_render_params_t *params)
 {
   glUniform1i(locs->peel_pass, params->peel_pass);
-  glUniform2f(locs->viewport_size,
-      (float)params->viewport_width, (float)params->viewport_height);
   glUniform1i(locs->peel_depth, PEEL_DEPTH_TEX_UNIT);
 
 } /* gl_view_set_peel_uniforms() */
@@ -318,8 +382,6 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
     glm_mat4_copy(mvp, render_params.mvp);
     glm_mat4_copy(mv, render_params.mv);
     render_params.peel_pass = k;
-    render_params.viewport_width = pw;
-    render_params.viewport_height = ph;
 
     /* Render all transparent renderables into peel layer.
      * Depth writes ON so this layer's depth is recorded
