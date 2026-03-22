@@ -1,8 +1,8 @@
-#version 120
-attribute vec3 position;
-attribute vec2 texcoord;
+#version 130
+in vec3 position;
+in vec2 texcoord;
 uniform mat4 mvp;
-varying vec2 v_texcoord;
+out vec2 v_texcoord;
 
 void main() {
   gl_Position = mvp * vec4(position, 1.0);

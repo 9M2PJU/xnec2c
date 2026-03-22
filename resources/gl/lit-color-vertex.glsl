@@ -1,18 +1,18 @@
-#version 120
-attribute vec3 position;
-attribute vec3 normal;
-attribute vec4 color;
-attribute vec2 uv;
-attribute vec4 flow_data;
-attribute float depth_bias;
+#version 130
+in vec3 position;
+in vec3 normal;
+in vec4 color;
+in vec2 uv;
+in vec4 flow_data;
+in float depth_bias;
 uniform mat4 mvp;
 uniform mat4 u_mv;
-varying vec4 vertexColor;
-varying vec3 viewNormal;
-varying vec3 viewPos;
-varying vec2 vUV;
-varying vec4 vFlowData;
-varying float vDepthBias;
+out vec4 vertexColor;
+out vec3 viewNormal;
+out vec3 viewPos;
+out vec2 vUV;
+out vec4 vFlowData;
+out float vDepthBias;
 
 void main() {
   gl_Position = mvp * vec4(position, 1.0);

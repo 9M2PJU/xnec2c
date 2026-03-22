@@ -1,8 +1,8 @@
-#version 120
+#version 130
 /* Fullscreen triangle via VBO-supplied positions.
  * Three vertices at (-1,-1), (3,-1), (-1,3) cover the screen. */
-attribute vec2 position;
-varying vec2 vUV;
+in vec2 position;
+out vec2 vUV;
 
 void main() {
   vUV = position * 0.5 + 0.5;

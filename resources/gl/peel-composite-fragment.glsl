@@ -1,6 +1,7 @@
-#version 120
+#version 130
 uniform sampler2D u_layer;
-varying vec2 vUV;
+in vec2 vUV;
+out vec4 fragColor;
 
 void main() {
   /* Mode 0: under-accumulate — output layer color for GL blend unit.
@@ -10,5 +11,5 @@ void main() {
    * Mode 1: final composite — output accumulated transparent color.
    *   Blend state: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
    *   Premultiplied alpha over opaque background. */
-  gl_FragColor = texture2D(u_layer, vUV);
+  fragColor = texture(u_layer, vUV);
 }

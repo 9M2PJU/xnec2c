@@ -1,4 +1,11 @@
-#version 120
+#version 130
+#extension GL_ARB_conservative_depth : enable
+
+/* vDepthBias >= 0 always (wires: 0, patches: positive per-index bias),
+ * so gl_FragDepth = min(gl_FragCoord.z + vDepthBias, DEPTH_CLAMP_MAX)
+ * >= gl_FragCoord.z.  This re-enables early-z/Hi-Z rejection. */
+layout(depth_greater) out float gl_FragDepth;
+
 uniform float u_alpha;
 uniform int flow_mode;
 uniform float u_phase;
@@ -17,15 +24,16 @@ const float PEEL_DEPTH_EPSILON = 0.00001;
  * Prevents per-patch bias from pushing fragments to the clear
  * depth (1.0), which would fail GL_LESS and discard them. */
 const float DEPTH_CLAMP_MAX = 1.0 - 6e-8;
-varying vec4 vertexColor;
-varying vec3 viewNormal;
-varying vec3 viewPos;
-varying vec2 vUV;
-varying vec4 vFlowData;
-varying float vDepthBias;
+in vec4 vertexColor;
+in vec3 viewNormal;
+in vec3 viewPos;
+in vec2 vUV;
+in vec4 vFlowData;
+in float vDepthBias;
+out vec4 fragColor;
 
-/* Lighting constants */
-const vec3 LIGHT_DIR_RAW = vec3(-0.3, 0.5, 1.0);
+/* Lighting constants — normalize(vec3(-0.3, 0.5, 1.0)) precomputed */
+const vec3 LIGHT_DIR = vec3(-0.2592106738356498, 0.4320177897260830, 0.8640355794521660);
 const float SPECULAR_POWER = 32.0;
 const float SPECULAR_INTENSITY = 0.7;
 const float RIM_POWER = 2.0;
@@ -73,7 +81,7 @@ void main() {
    * gradient so steep surfaces get sufficient bias while
    * near-parallel surfaces retain tight layer separation. */
   if (u_peel_pass > 0) {
-    float prev_z = texture2D(u_peel_depth,
+    float prev_z = texture(u_peel_depth,
         gl_FragCoord.xy / u_viewport_size).r;
     float dz = max(abs(dFdx(gl_FragCoord.z)),
                    abs(dFdy(gl_FragCoord.z)));
@@ -81,7 +89,7 @@ void main() {
     if (gl_FragCoord.z + vDepthBias <= prev_z + eps) discard;
   }
 
-  vec3 lightDir = normalize(LIGHT_DIR_RAW);
+  vec3 lightDir = LIGHT_DIR;
   vec3 norm = normalize(viewNormal);
   vec3 viewDir = normalize(-viewPos);
   vec3 baseColor = vertexColor.rgb;
@@ -113,7 +121,7 @@ void main() {
   color = mix(vec3(luma), color, SATURATION_BOOST);
 
   /* Add specular and rim */
-  color += vec3(1.0) * spec * SPECULAR_INTENSITY;
+  color += vec3(spec * SPECULAR_INTENSITY);
   color += baseColor * rim;
 
   /* Final brightness boost */
@@ -204,10 +212,11 @@ void main() {
       vec2 phase_offset = flow_screen * u_phase * DLIC_SPEED / 256.0;
       float acc = 0.0;
 
-      for (int k = -LIC_STEPS; k <= LIC_STEPS; k++)
+      vec2 pos = noise_uv + phase_offset - step * float(LIC_STEPS);
+      for (int k = 0; k < 2 * LIC_STEPS + 1; k++)
       {
-        acc += texture2D(noise_tex,
-            noise_uv + phase_offset + step * float(k)).r;
+        acc += texture(noise_tex, pos).r;
+        pos += step;
       }
 
       acc /= float(2 * LIC_STEPS + 1);
@@ -261,6 +270,6 @@ void main() {
    * Operates post-clipping so geometry position is unaffected. */
   gl_FragDepth = min(gl_FragCoord.z + vDepthBias, DEPTH_CLAMP_MAX);
 
-  gl_FragColor = vec4(clamp(color, 0.0, 1.0),
-                      vertexColor.a * u_alpha);
+  fragColor = vec4(clamp(color, 0.0, 1.0),
+                   vertexColor.a * u_alpha);
 }

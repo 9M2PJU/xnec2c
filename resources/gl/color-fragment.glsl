@@ -1,7 +1,8 @@
-#version 120
+#version 130
 uniform float u_alpha;
-varying vec4 vertexColor;
+in vec4 vertexColor;
+out vec4 fragColor;
 
 void main() {
-  gl_FragColor = vec4(vertexColor.rgb, vertexColor.a * u_alpha);
+  fragColor = vec4(vertexColor.rgb, vertexColor.a * u_alpha);
 }
