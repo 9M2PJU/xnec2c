@@ -9,6 +9,8 @@ layout(depth_greater) out float gl_FragDepth;
 uniform float u_alpha;
 uniform int flow_mode;
 uniform float u_phase;
+uniform float u_cos_phase;
+uniform float u_sin_phase;
 uniform sampler2D noise_tex;
 uniform sampler2D u_peel_depth;
 uniform int u_peel_pass;
@@ -96,20 +98,31 @@ void main() {
   /* Two-sided lighting: flip normal for back-facing fragments so
    * thin surfaces (patches) illuminate identically from both sides.
    * For closed surfaces (cylinders), back faces are depth-occluded
-   * by front faces, so the flip has no visual effect. */
-  if (dot(norm, viewDir) < 0.0)
+   * by front faces, so the flip has no visual effect.
+   * NdotV reused below for rim lighting (guaranteed >= 0 after flip). */
+  float NdotV = dot(norm, viewDir);
+  if (NdotV < 0.0)
+  {
     norm = -norm;
+    NdotV = -NdotV;
+  }
 
   /* Diffuse lighting */
   float diff = max(dot(norm, lightDir), 0.0);
 
-  /* Specular highlight */
+  /* Specular highlight — explicit squaring chain guarantees 5 multiplies
+   * on all drivers (pow may fall back to exp2/log2 transcendentals) */
   vec3 halfDir = normalize(lightDir + viewDir);
-  float spec = pow(max(dot(norm, halfDir), 0.0), SPECULAR_POWER);
+  float NdotH = max(dot(norm, halfDir), 0.0);
+  float spec = NdotH * NdotH;
+  spec *= spec;
+  spec *= spec;
+  spec *= spec;
+  spec *= spec;
 
-  /* Rim lighting */
-  float rim = 1.0 - max(dot(viewDir, norm), 0.0);
-  rim = pow(rim, RIM_POWER) * RIM_INTENSITY;
+  /* Rim lighting — NdotV from two-sided flip, already >= 0 */
+  float rim = 1.0 - NdotV;
+  rim = rim * rim * RIM_INTENSITY;
 
   /* Shading - never below SHADE_MIN to preserve vibrancy */
   float shade = SHADE_MIN + diff * SHADE_RANGE;
@@ -177,10 +190,10 @@ void main() {
        * Re(ct * e^(j*phi)) = Re(ct)*cos(phi) - Im(ct)*sin(phi) */
       default:
       {
-        float cp = cos(u_phase);
-        float sp = sin(u_phase);
-        float re1 = vFlowData.x * cp - vFlowData.y * sp;
-        float re2 = vFlowData.z * cp - vFlowData.w * sp;
+        /* Phase trig precomputed on CPU as u_cos_phase / u_sin_phase
+         * to avoid per-fragment transcendentals */
+        float re1 = vFlowData.x * u_cos_phase - vFlowData.y * u_sin_phase;
+        float re2 = vFlowData.z * u_cos_phase - vFlowData.w * u_sin_phase;
         angle = atan(re2, re1);
         break;
       }

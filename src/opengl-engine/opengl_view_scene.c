@@ -36,6 +36,8 @@ typedef struct
   GLint u_alpha_location;
   GLint flow_mode_location;
   GLint u_phase_location;
+  GLint u_cos_phase_location;
+  GLint u_sin_phase_location;
   GLint noise_tex_location;
   gl_peel_uniform_locs_t peel_locs;
   GLint *attrib_locations;
@@ -111,6 +113,8 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
    * Locations are -1 for shaders without these uniforms (no-op). */
   glUniform1i(sc->flow_mode_location, rc_config.opengl_flow_direction_mode);
   glUniform1f(sc->u_phase_location, view->flow_phase);
+  glUniform1f(sc->u_cos_phase_location, cosf(view->flow_phase));
+  glUniform1f(sc->u_sin_phase_location, sinf(view->flow_phase));
 
   /* Bind LIC noise texture to unit 1 */
   if( view->noise_tex != 0 )
@@ -240,6 +244,8 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
   sc->u_alpha_location = glGetUniformLocation(sc->shader.program, "u_alpha");
   sc->flow_mode_location = glGetUniformLocation(sc->shader.program, "flow_mode");
   sc->u_phase_location = glGetUniformLocation(sc->shader.program, "u_phase");
+  sc->u_cos_phase_location = glGetUniformLocation(sc->shader.program, "u_cos_phase");
+  sc->u_sin_phase_location = glGetUniformLocation(sc->shader.program, "u_sin_phase");
   sc->noise_tex_location = glGetUniformLocation(sc->shader.program, "noise_tex");
   gl_view_peel_locs_init(&sc->peel_locs, sc->shader.program);
 
