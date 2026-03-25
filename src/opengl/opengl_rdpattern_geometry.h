@@ -42,6 +42,15 @@ lit_color_point_t* opengl_rdpattern_get_nf_lines(int *count);
 /* Return far-field triangle buffer and count */
 lit_color_triangle_t* opengl_rdpattern_get_triangles(int *count);
 
+/* Tessellate point_3d buffer into colored line pairs for wireframe.
+ * Returns line count, or -1 on invalid input. */
+int opengl_rdpattern_generate_lines(
+    point_3d_t *points, int nth, int nph,
+    double r_min, double r_range);
+
+/* Return far-field wireframe line buffer and count */
+lit_color_point_t* opengl_rdpattern_get_lines(int *count);
+
 /* Return current far-field generation counter */
 unsigned int opengl_rdpattern_get_ff_generation(void);
 

@@ -12514,6 +12514,49 @@ Save NEC2 Editor data first?
                           </object>
                         </child>
                         <child>
+                          <object class="GtkMenuItem" id="rdpattern_draw_style_menu_item">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">Draw St_yle</property>
+                            <property name="use-underline">True</property>
+                            <child type="submenu">
+                              <object class="GtkMenu" id="rdpattern_draw_style_menu">
+                                <property name="can-focus">False</property>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_style_surface">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">S_urface</property>
+                                    <property name="use-underline">True</property>
+                                    <signal name="activate" handler="on_rdpattern_draw_style_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_style_wireframe">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_Wireframe</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="group">rdpattern_style_surface</property>
+                                    <signal name="activate" handler="on_rdpattern_draw_style_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_style_both">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_Both</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="active">True</property>
+                                    <property name="group">rdpattern_style_surface</property>
+                                    <signal name="activate" handler="on_rdpattern_draw_style_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkMenuItem" id="near_field">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>

@@ -666,6 +666,24 @@ on_main_rdpattern_activate(
       ClearFlag( OVERLAY_STRUCT );
     }
 
+    /* Restore radiation pattern draw style radio state */
+    {
+      static gchar *style_ids[] = {
+        "rdpattern_style_surface",
+        "rdpattern_style_wireframe",
+        "rdpattern_style_both",
+      };
+
+      int style = rc_config.rdpattern_draw_style;
+      if( style >= 0 && style < NUM_RDPAT_STYLES )
+      {
+        widget = Builder_Get_Object(
+            rdpattern_window_builder, style_ids[style]);
+        gtk_check_menu_item_set_active(
+            GTK_CHECK_MENU_ITEM(widget), TRUE);
+      }
+    }
+
     /* Sync rdpattern common projection widget from main window state */
     widget = Builder_Get_Object(
         rdpattern_window_builder, "rdpattern_common_projection" );
@@ -3146,6 +3164,52 @@ on_flow_direction_activate(
   }
 }
 
+
+/** on_rdpattern_draw_style_activate() - Callback for radiation pattern draw style radio menu items
+ * @menuitem: activated radio menu item
+ * @user_data: unused
+ *
+ * Determines style from widget identity in rdpattern window builder.
+ * Skips inactive radio emissions to avoid double-fire on group switches.
+ */
+  void
+on_rdpattern_draw_style_activate(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+  static const struct
+  {
+    gchar *id;
+    int style;
+  } items[] = {
+    { "rdpattern_style_surface",   RDPAT_STYLE_SURFACE },
+    { "rdpattern_style_wireframe", RDPAT_STYLE_WIREFRAME },
+    { "rdpattern_style_both",      RDPAT_STYLE_BOTH },
+  };
+
+  int i;
+
+  if( GTK_IS_CHECK_MENU_ITEM(menuitem) &&
+      !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    return;
+
+  for( i = 0; i < (int)(sizeof(items) / sizeof(items[0])); i++ )
+  {
+    GtkWidget *w = Builder_Get_Object(
+        rdpattern_window_builder, items[i].id);
+
+    if( GTK_WIDGET(menuitem) == w )
+    {
+      rc_config.rdpattern_draw_style = items[i].style;
+
+      /* Force geometry regeneration by resetting staleness tracker */
+      opengl_rdpattern_queue_draw();
+      return;
+    }
+  }
+}
+
+/*-----------------------------------------------------------------------*/
 
   void
 on_animate_dialog_destroy(

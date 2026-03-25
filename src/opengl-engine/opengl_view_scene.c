@@ -41,6 +41,7 @@ typedef struct
   GLint noise_tex_location;
   gl_peel_uniform_locs_t peel_locs;
   GLint *attrib_locations;
+  GLint depth_bias_attrib_loc;
 
 } gl_scene_ctx_t;
 
@@ -149,6 +150,14 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
       if( view->content.batches[i].vertex_count > 0 )
       {
         glBindVertexArray(sc->vao[i]);
+
+        /* Set per-batch depth bias as generic vertex attribute.
+         * When the VAO has no depth_bias bound (e.g. rdpattern
+         * 3-attrib layout), this sets the shader input directly. */
+        if( sc->depth_bias_attrib_loc >= 0 )
+          glVertexAttrib1f(sc->depth_bias_attrib_loc,
+              view->content.batches[i].depth_bias);
+
         glDrawArrays(view->content.batches[i].draw_mode, 0,
             view->content.batches[i].vertex_count);
       }
@@ -286,6 +295,10 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
     if( flow_loc >= 0 )
       glVertexAttrib4f(flow_loc, 0.0f, 0.0f, 0.0f, 0.0f);
   }
+
+  /* Cache depth_bias attribute location for per-batch generic attrib */
+  sc->depth_bias_attrib_loc =
+    glGetAttribLocation(sc->shader.program, "depth_bias");
 
   r = (gl_renderable_t){
     .render               = gl_scene_render,

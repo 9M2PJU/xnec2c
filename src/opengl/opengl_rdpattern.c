@@ -32,8 +32,21 @@
 /* Default structure overlay extent as multiple of radiation pattern r_max */
 #define OVERLAY_DEFAULT_EXTENT 1.25f
 
+/* Depth bias for surface triangles in "both" mode.
+ * Pushes surface behind wireframe lines to prevent z-fighting.
+ * 100x PATCH_DEPTH_BIAS (1e-7f) — well within 24-bit depth precision. */
+#define RDPAT_SURFACE_DEPTH_BIAS 1e-5f
+
+/* Surface color dimming: surface-only is slightly brighter;
+ * with wireframe overlay the surface recedes further. */
+#define RDPAT_SURFACE_DIM      0.47f
+#define RDPAT_SURFACE_BOTH_DIM 0.3f
+
 /* Last far-field NEC generation seen — staleness detection */
 static unsigned int rdpat_last_ff_gen = 0;
+
+/* Last draw style seen — forces regeneration on style change */
+static int rdpat_last_draw_style = -1;
 
 /* Track translation state to detect changes */
 static gboolean rdpat_last_translate_state = FALSE;
@@ -243,34 +256,133 @@ rdpattern_scene_generate(gl_view_content_t *out)
       points_to_use = rdpat_translated_points;
     }
 
-    /* Regenerate triangles on data change or translation state change or scale change */
+    /* Regenerate geometry on data change, translation state change,
+     * scale change, or draw style change */
     if( current_gen != rdpat_last_ff_gen ||
+        rc_config.rdpattern_draw_style != rdpat_last_draw_style ||
         translate_to_excitation != rdpat_last_translate_state ||
         (translate_to_excitation && rdpat_ovl_scale_adj != rdpat_last_ovl_scale_adj) )
     {
-      int tri_count = opengl_rdpattern_generate_triangles(
-          points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
+      gboolean need_tris =
+        (rc_config.rdpattern_draw_style == RDPAT_STYLE_SURFACE ||
+         rc_config.rdpattern_draw_style == RDPAT_STYLE_BOTH);
+      gboolean need_lines =
+        (rc_config.rdpattern_draw_style == RDPAT_STYLE_WIREFRAME ||
+         rc_config.rdpattern_draw_style == RDPAT_STYLE_BOTH);
 
-      if( tri_count <= 0 )
-        return( FALSE );
+      if( need_tris )
+      {
+        int tri_count = opengl_rdpattern_generate_triangles(
+            points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
+
+        if( tri_count <= 0 )
+          return( FALSE );
+      }
+
+      if( need_lines )
+      {
+        int line_count = opengl_rdpattern_generate_lines(
+            points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
+
+        if( line_count <= 0 )
+          return( FALSE );
+      }
 
       rdpat_last_ff_gen = current_gen;
+      rdpat_last_draw_style = rc_config.rdpattern_draw_style;
       rdpat_last_translate_state = translate_to_excitation;
       rdpat_last_ovl_scale_adj = rdpat_ovl_scale_adj;
     }
 
+    /* Populate batches per draw style */
+    switch( rc_config.rdpattern_draw_style )
     {
-      int tri_count;
-      lit_color_triangle_t *tri_buf = opengl_rdpattern_get_triangles(&tri_count);
+      case RDPAT_STYLE_SURFACE:
+      {
+        int tri_count;
+        lit_color_triangle_t *tri_buf =
+          opengl_rdpattern_get_triangles(&tri_count);
 
-      if( tri_count == 0 )
+        if( tri_count == 0 )
+          return( FALSE );
+
+        out->batches[0].vertices = tri_buf;
+        out->batches[0].vertex_count = tri_count * 3;
+        out->batches[0].draw_mode = GL_TRIANGLES;
+        out->batches[0].depth_bias = 0.0f;
+        out->batch_count = 1;
+        break;
+      }
+
+      case RDPAT_STYLE_WIREFRAME:
+      {
+        int line_count;
+        lit_color_point_t *line_buf =
+          opengl_rdpattern_get_lines(&line_count);
+
+        if( line_count == 0 )
+          return( FALSE );
+
+        out->batches[0].vertices = line_buf;
+        out->batches[0].vertex_count = line_count * 2;
+        out->batches[0].draw_mode = GL_LINES;
+        out->batches[0].depth_bias = 0.0f;
+        out->batch_count = 1;
+        break;
+      }
+
+      case RDPAT_STYLE_BOTH:
+      {
+        int tri_count, line_count;
+        lit_color_triangle_t *tri_buf =
+          opengl_rdpattern_get_triangles(&tri_count);
+        lit_color_point_t *line_buf =
+          opengl_rdpattern_get_lines(&line_count);
+
+        if( tri_count == 0 || line_count == 0 )
+          return( FALSE );
+
+        /* Surface pushed behind wireframe via depth bias */
+        out->batches[0].vertices = tri_buf;
+        out->batches[0].vertex_count = tri_count * 3;
+        out->batches[0].draw_mode = GL_TRIANGLES;
+        out->batches[0].depth_bias = RDPAT_SURFACE_DEPTH_BIAS;
+
+        out->batches[1].vertices = line_buf;
+        out->batches[1].vertex_count = line_count * 2;
+        out->batches[1].draw_mode = GL_LINES;
+        out->batches[1].depth_bias = 0.0f;
+        out->batch_count = 2;
+        break;
+      }
+
+      default:
+        pr_err("rdpattern: invalid draw style %d, using surface\n",
+            rc_config.rdpattern_draw_style);
+        rc_config.rdpattern_draw_style = RDPAT_STYLE_SURFACE;
         return( FALSE );
-
-      out->batches[0].vertices = tri_buf;
-      out->batches[0].vertex_count = tri_count * 3;
     }
-    out->batches[0].draw_mode = GL_TRIANGLES;
-    out->batch_count = 1;
+
+    /* Dim surface triangle vertex colors for subdued appearance.
+     * Applies to SURFACE and BOTH modes (batch[0] holds triangles).
+     * Safe to modify buffer: staleness tracker forces regeneration
+     * on any style or data change, restoring full-brightness colors. */
+    if( rc_config.rdpattern_draw_style != RDPAT_STYLE_WIREFRAME )
+    {
+      int vi;
+      int nverts = out->batches[0].vertex_count;
+      lit_color_point_t *verts = (lit_color_point_t *)out->batches[0].vertices;
+      float dim = (rc_config.rdpattern_draw_style == RDPAT_STYLE_BOTH)
+        ? RDPAT_SURFACE_BOTH_DIM
+        : RDPAT_SURFACE_DIM;
+
+      for( vi = 0; vi < nverts; vi++ )
+      {
+        verts[vi].color.r *= dim;
+        verts[vi].color.g *= dim;
+        verts[vi].color.b *= dim;
+      }
+    }
     out->vertex_stride = (int)sizeof(lit_color_point_t);
 
     out->r_max = r_max;

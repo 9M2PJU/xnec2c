@@ -411,12 +411,24 @@ typedef struct
 
   /* Whether transparency is triggered by click/drag (1) or always on (0) */
   int opengl_transparent_on_click;
+
+  /* See enum RDPAT_STYLE */
+  int rdpattern_draw_style;
 } rc_config_t;
 
 typedef struct {
 	void (*callback)(char *);
 	char *extension;
 } filechooser_t;
+
+/* Radiation pattern draw style */
+enum RDPAT_STYLE
+{
+  RDPAT_STYLE_SURFACE = 0,
+  RDPAT_STYLE_WIREFRAME,
+  RDPAT_STYLE_BOTH,
+  NUM_RDPAT_STYLES
+};
 
 /* Gain Scaling style */
 enum GAIN_SCALE
@@ -466,6 +478,7 @@ typedef struct
   void *vertices;
   int vertex_count;
   unsigned int draw_mode;
+  float depth_bias;
 
 } gl_draw_batch_t;
 
@@ -1236,6 +1249,7 @@ void on_near_snapshot_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_structure_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_flow_direction_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_rdpattern_draw_style_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_animate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 gboolean on_animate_spinbutton_focus_out_event(GtkWidget *widget, GdkEventFocus *event, gpointer user_data);
 void on_animation_applybutton_clicked(GtkButton *button, gpointer user_data);

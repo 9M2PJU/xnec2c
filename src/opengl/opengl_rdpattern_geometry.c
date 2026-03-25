@@ -29,6 +29,10 @@
 static lit_color_triangle_t *rdpat_triangles = NULL;
 static int rdpat_triangle_count = 0;
 
+/* Far-field wireframe line buffer */
+static lit_color_point_t *rdpat_lines = NULL;
+static int rdpat_line_count = 0;
+
 /* Near-field line buffer */
 static lit_color_point_t *nf_lines = NULL;
 static int nf_line_count = 0;
@@ -225,6 +229,126 @@ opengl_rdpattern_generate_nf_lines(void)
   return( nf_line_count );
 
 } /* opengl_rdpattern_generate_nf_lines() */
+
+/*-----------------------------------------------------------------------*/
+
+/** rdpat_line_edge() - Emit one wireframe edge as two colored vertices
+ * @buf: vertex buffer
+ * @vi: starting index in buf
+ * @pt0: first endpoint
+ * @pt1: second endpoint
+ * @r_min: minimum radius for color normalization
+ * @r_range: radius range for color normalization
+ *
+ * Color derived from average normalized radius of both endpoints.
+ * Returns vi advanced by 2.
+ */
+  static int
+rdpat_line_edge(
+    lit_color_point_t *buf, int vi,
+    point_3d_t *pt0, point_3d_t *pt1,
+    double r_min, double r_range)
+{
+  double avg_r = ((pt0->r - r_min) + (pt1->r - r_min))
+    / (2.0 * r_range);
+  double red, grn, blu;
+
+  Value_to_Color(&red, &grn, &blu, avg_r, 1.0);
+
+  set_lit_vertex(&buf[vi],
+      (float)pt0->x, (float)pt0->y, (float)pt0->z,
+      0.0f, 0.0f, 1.0f,
+      (float)red, (float)grn, (float)blu, 1.0f);
+
+  set_lit_vertex(&buf[vi + 1],
+      (float)pt1->x, (float)pt1->y, (float)pt1->z,
+      0.0f, 0.0f, 1.0f,
+      (float)red, (float)grn, (float)blu, 1.0f);
+
+  return( vi + 2 );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** opengl_rdpattern_generate_lines() - Generate wireframe line pairs from radiation pattern grid
+ * @points: array of radiation pattern sample points
+ * @nth: number of theta samples
+ * @nph: number of phi samples
+ * @r_min: minimum radius for color normalization
+ * @r_range: radius range for color normalization
+ *
+ * Produces line pairs matching Cairo wireframe topology:
+ *   Theta direction: (nth-1) * nph edges within each phi ring
+ *   Phi direction:   nth * (nph-1) edges across adjacent phi rings
+ * Color per edge: Value_to_Color on average of endpoint radii.
+ * Returns line count, or -1 on invalid input.
+ */
+  int
+opengl_rdpattern_generate_lines(
+    point_3d_t *points, int nth, int nph,
+    double r_min, double r_range)
+{
+  int nph_idx, nth_idx, vi;
+  int theta_edges, phi_edges, total_lines;
+  size_t mreq;
+
+  if( !points || nth < 2 || nph < 1 )
+    return( -1 );
+
+  /* Edge counts matching Cairo wireframe topology */
+  theta_edges = (nth - 1) * nph;
+  phi_edges = nth * (nph - 1);
+  total_lines = theta_edges + phi_edges;
+
+  mreq = (size_t)total_lines * 2 * sizeof(lit_color_point_t);
+  mem_realloc((void **)&rdpat_lines, mreq, __LOCATION__);
+
+  vi = 0;
+
+  /* Theta-direction edges: adjacent theta within each phi ring */
+  for( nph_idx = 0; nph_idx < nph; nph_idx++ )
+  {
+    for( nth_idx = 0; nth_idx < nth - 1; nth_idx++ )
+    {
+      int p0 = nth_idx + nph_idx * nth;
+      int p1 = (nth_idx + 1) + nph_idx * nth;
+
+      vi = rdpat_line_edge(rdpat_lines, vi,
+          &points[p0], &points[p1], r_min, r_range);
+    }
+  }
+
+  /* Phi-direction edges: same theta across adjacent phi rings */
+  for( nth_idx = 0; nth_idx < nth; nth_idx++ )
+  {
+    for( nph_idx = 0; nph_idx < nph - 1; nph_idx++ )
+    {
+      int p0 = nth_idx + nph_idx * nth;
+      int p1 = nth_idx + (nph_idx + 1) * nth;
+
+      vi = rdpat_line_edge(rdpat_lines, vi,
+          &points[p0], &points[p1], r_min, r_range);
+    }
+  }
+
+  rdpat_line_count = total_lines;
+  rdpat_ff_generation++;
+
+  return( rdpat_line_count );
+
+} /* opengl_rdpattern_generate_lines() */
+
+/*-----------------------------------------------------------------------*/
+
+/** opengl_rdpattern_get_lines() - Return far-field wireframe line buffer and count
+ * @count: output line count
+ */
+  lit_color_point_t*
+opengl_rdpattern_get_lines(int *count)
+{
+  *count = rdpat_line_count;
+  return( rdpat_lines );
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -452,6 +576,9 @@ opengl_rdpattern_geometry_cleanup(void)
 {
   free_ptr((void **)&rdpat_triangles);
   rdpat_triangle_count = 0;
+
+  free_ptr((void **)&rdpat_lines);
+  rdpat_line_count = 0;
 
   free_ptr((void **)&nf_lines);
   nf_line_count = 0;

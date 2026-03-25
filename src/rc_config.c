@@ -139,6 +139,9 @@ rc_config_vars_t rc_config_vars[] = {
 		.builder_window = &rdpattern_window_builder,
 		.builder_check_menu_item_id = "rdpattern_overlay_structure" },
 
+	{ .desc = "Radiation Pattern Draw Style", .format = "%d",
+		.vars = { &rc_config.rdpattern_draw_style } },
+
 	{ .desc = "OpenGL Drag Transparency Level", .format = "%d",
 		.vars = { &rc_config.opengl_drag_transparency_level } },
 
@@ -587,6 +590,9 @@ Create_Default_Config( void )
   rc_config.opengl_drag_transparency_level = 50;
   rc_config.opengl_transparent_on_click = 1;
   rc_config.opengl_cylinder_radius_scale = 1.0;
+
+  /* See enum RDPAT_STYLE */
+  rc_config.rdpattern_draw_style = RDPAT_STYLE_BOTH;
 
   /* Common projection default on, overlay structure default off */
   rc_config.main_common_projection = 1;
