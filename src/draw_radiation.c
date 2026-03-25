@@ -67,7 +67,23 @@ double Scale_Gain( double gain, int fstep, int idx )
 
   gain += Polarization_Factor( calc_data.pol_type, fstep, idx );
 
-  switch( rc_config.gain_style )
+  /* Clamp unrecognized gain styles to linear power.
+   * Future styles (e.g. 5+) will add cases below;
+   * callers with older Scale_Gain get safe fallback. */
+  int gs = rc_config.gain_style;
+  if( gs < 0 || gs >= NUM_SCALES )
+  {
+    static gboolean warned = FALSE;
+    if( !warned )
+    {
+      pr_err("gain_style %d out of range [0..%d], defaulting to GS_LINP\n",
+          gs, NUM_SCALES - 1);
+      warned = TRUE;
+    }
+    gs = GS_LINP;
+  }
+
+  switch( gs )
   {
     case GS_LINP:
       scaled_rad = pow(10.0, (gain/10.0));
