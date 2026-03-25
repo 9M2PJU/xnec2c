@@ -30,7 +30,9 @@ window.addEventListener('load', function() {
   const countryInfo = {
     '5B': { flag: '🇨🇾', name: 'Cyprus' },
     'DC': { flag: '🇩🇪', name: 'Germany' },
+    'DE': { flag: '🇩🇪', name: 'Germany' },
     'DF': { flag: '🇩🇪', name: 'Germany' },
+    'DG': { flag: '🇩🇪', name: 'Germany' },
     'DL': { flag: '🇩🇪', name: 'Germany' },
     'EI': { flag: '🇮🇪', name: 'Ireland' },
     'A': { flag: '🇺🇸', name: 'United States' },
@@ -1235,6 +1237,20 @@ buttons to select fixed viewing angles of the structure or the
 radiation pattern, as well as spin buttons to input specific
 viewing angles.
 
+<h3 id="NoiseTemp">Noise Temperature Visualization</h3>
+<p>
+The <a href="#RadiationWindow">Radiation Pattern window</a> can render
+each solid-angle cell of the pattern by its gain-weighted brightness
+temperature (K/sr) under a selectable RF noise environment, showing
+where noise enters the antenna. Eight
+<a href="#NoiseEnvModels">environment models</a> provide
+T<sub>sky</sub> and T<sub>earth</sub> values spanning quiet rural to
+dense urban conditions. An
+<a href="#ElevationOffset">elevation control</a> shifts the sky/earth
+horizon boundary. The <a href="#FrequencyWindow">Frequency Plots
+window</a> displays T<sub>ant</sub>, T<sub>total</sub>, and
+G/T<sub>ant</sub> across the operating band.</p>
+
 <h3 id="Color">Color Coding</h3>
 <p>
 Xnec2c uses color coding to visualize the Current or Charge
@@ -1587,6 +1603,206 @@ stem of the filename is given, xnec2c will automatically add the
 &lt;<var>filename</var>&gt; with lines</code> command, although the plot can be
 enhanced with some of the style etc commands available in
 gnuplot.</p>
+<h4 id="NoiseTempDisplay">Noise Temperature Display</h4>
+<p>
+Two additional entries in the
+<span class="menu-path">View &rarr; Gain Scaling</span> submenu render the
+radiation pattern by noise temperature rather than gain magnitude.
+<span class="ui-button">Noise Temperature</span> colors each
+solid-angle cell by its gain-weighted brightness temperature in
+K/sr (Kelvin per steradian), using a linear scale. Cells receiving
+high brightness temperature from the environment appear at the red
+end of the color bar; those contributing little noise appear at the
+magenta end. <span class="ui-button">Noise Temp (log scale)</span>
+applies logarithmic compression, revealing low-level sidelobe
+contributions that the linear mapping compresses into a narrow color
+band.</p>
+
+<p>
+The color legend adapts to show the K/sr range of the current
+pattern rather than dB gain values. Relative dB marks along the
+legend are suppressed, since they have no meaning in temperature
+units. The gain readout below the color bar likewise displays K/sr.
+To verify correct operation, observe that the highest-temperature
+cell corresponds to the direction facing the warmer hemisphere
+(earth, when elevation is 0&deg; or positive) with the strongest
+pattern gain in that direction.</p>
+
+<p>
+Noise temperature computation requires gain data over the full
+sphere. Xnec2c displays a one-time warning when it detects
+conditions that compromise the result. Two such conditions exist:
+a ground-plane model provides gain data for only the upper
+hemisphere, leaving the lower hemisphere&mdash;where earth noise
+would normally dominate&mdash;without computed values; and a beam
+maximum that lies significantly off the model's forward axis can
+distort the G/T<sub>ant</sub> figure of merit, since the reference
+gain no longer represents the intended receive direction.</p>
+
+<figure>
+<img src="images/yagi-antenna-noise-pattern.png" alt="Radiation pattern of a 5-element Yagi at 151 MHz in Noise Temp (log scale) mode at 30° elevation" loading="lazy">
+<figcaption>A parametric 5-element Yagi for 2m viewed from the side (Y axis)
+in Noise Temp (log scale) mode at 30&deg; elevation tilt.
+T<sub>total</sub> reads 1214&nbsp;K. The main beam (forward along X)
+appears blue, capturing cold sky; rear and downward lobes glow
+green through red where they intercept the warm earth hemisphere.
+The color legend spans 0&ndash;2294&nbsp;K/sr. The Noise readout
+shows &minus;999.99&nbsp;K/sr because the viewer direction is
+perpendicular to the boom, where pattern gain is near zero.</figcaption>
+</figure>
+
+<h4 id="NoiseEnvModels">Noise Environment Models</h4>
+<p>
+The <span class="menu-path">View &rarr; Noise Environment</span> submenu
+selects which brightness temperatures are assigned to the sky and
+earth hemispheres. Eight models are available, drawn from three
+independent sources. Each defines T<sub>sky</sub> and
+T<sub>earth</sub> as functions of frequency.</p>
+
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Source</th>
+<th>Character</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VE7BQH Rural</td>
+<td>VE7BQH antenna comparison tables</td>
+<td>Low man-made noise</td>
+</tr>
+<tr>
+<td>VE7BQH Residential</td>
+<td>VE7BQH antenna comparison tables</td>
+<td>Moderate man-made noise (default)</td>
+</tr>
+<tr>
+<td>VE7BQH City</td>
+<td>VE7BQH antenna comparison tables</td>
+<td>High man-made noise</td>
+</tr>
+<tr>
+<td>G4CQM Baseline</td>
+<td>G4CQM reference data</td>
+<td>Interpolated baseline independent of other category schemes</td>
+</tr>
+<tr>
+<td>ITU-R Business</td>
+<td>ITU-R P.372</td>
+<td>High urban and industrial noise</td>
+</tr>
+<tr>
+<td>ITU-R Residential</td>
+<td>ITU-R P.372</td>
+<td>Suburban residential</td>
+</tr>
+<tr>
+<td>ITU-R Rural</td>
+<td>ITU-R P.372</td>
+<td>Low-density rural</td>
+</tr>
+<tr>
+<td>ITU-R Quiet Rural</td>
+<td>ITU-R P.372</td>
+<td>Minimal man-made noise</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+The VE7BQH models use tabulated T<sub>sky</sub> and T<sub>earth</sub>
+values at discrete amateur band frequencies, interpolated
+logarithmically between points. These are the standard temperatures
+used in the widely-referenced VE7BQH antenna comparison tables,
+making VE7BQH Residential the natural default when comparing results
+against published data. For worst-case urban or contest scenarios,
+VE7BQH City or ITU-R Business represents the noisiest conditions.
+For remote EME or radio astronomy sites, ITU-R Quiet Rural represents
+the lowest terrestrial noise floor.</p>
+
+<p>
+The ITU-R models derive T<sub>earth</sub> from the man-made noise
+coefficients in ITU-R Recommendation P.372. At higher VHF frequencies
+in quieter environments, this formula can yield values below the
+physical ambient temperature; xnec2c clamps T<sub>earth</sub> to a
+290&nbsp;K floor in these cases, since no terrestrial environment can
+be colder than its physical surroundings. To observe the clamping,
+select ITU-R Quiet Rural and increase frequency above 200&nbsp;MHz
+while watching the reported T<sub>earth</sub>.</p>
+
+<p>
+The selected environment is persisted in the configuration file and
+restored on next startup.</p>
+
+<h4 id="ElevationOffset">Elevation Offset</h4>
+<p>
+The <span class="ui-button">T Elev&deg;</span> spin button in the
+toolbar shifts the boundary between sky and earth hemispheres. The
+range is &minus;90&deg; to +90&deg;.
+At 0&deg; (the default) the horizon lies perpendicular to the zenith;
+positive values tilt it upward, modeling an antenna pointed above the
+horizon where more of the pattern sees cold sky; negative values tilt
+downward, increasing earth hemisphere coverage.</p>
+
+<p>
+This offset affects both the 3D noise temperature coloring and the
+scalar T<sub>ant</sub> computation. To confirm the relationship, set
+elevation to +90&deg; and observe that T<sub>ant</sub> approaches
+T<sub>sky</sub> (the entire sphere becomes sky hemisphere). At
+&minus;90&deg; it approaches T<sub>earth</sub>. At exactly 0&deg;,
+an isotropic antenna always produces
+T<sub>ant</sub>&nbsp;=&nbsp;(T<sub>sky</sub>&nbsp;+&nbsp;T<sub>earth</sub>)&nbsp;/&nbsp;2,
+since the two hemispheres subtend equal solid angle and every cell
+has identical gain.</p>
+
+<p>
+The elevation value is persisted in the configuration file.</p>
+
+<h4 id="NoiseTempConcepts">Understanding Antenna Temperature</h4>
+<p>
+Every physical object emits radio-frequency energy in proportion to
+its temperature. An antenna captures this emission through its
+radiation pattern; the total captured amount, expressed in Kelvin, is
+the antenna temperature&mdash;equivalent to the temperature of a
+resistor producing identical noise power at the receiver input.
+Xnec2c models the environment as two hemispheres (sky above the
+horizon, earth below), each carrying a brightness temperature set by
+the selected <a href="#NoiseEnvModels">environment model</a>. The
+<code class="nec-card">RP</code> command's angular step size
+partitions the pattern into solid-angle cells; each cell's gain
+determines how much brightness temperature it contributes, and
+summing over the full sphere yields the pattern temperature
+T<sub>ant</sub>. Ohmic losses in the elements generate Nyquist noise
+that adds a loss temperature T<sub>loss</sub>, giving
+T<sub>total</sub>&nbsp;=&nbsp;T<sub>ant</sub>&nbsp;+&nbsp;T<sub>loss</sub>.
+T<sub>ant</sub> quantifies geometric noise rejection (sidelobe and
+backlobe suppression); T<sub>loss</sub> is determined by conductor
+material and cross-section. The figure of merit
+G/T<sub>ant</sub>&mdash;forward gain divided by antenna temperature,
+in dB/K&mdash;captures both.</p>
+
+<p>
+The Y-factor
+(T<sub>earth</sub>&nbsp;/&nbsp;T<sub>sky</sub>) determines how much
+leverage pattern optimization provides. Strong contrast between hot
+earth and cold sky means pattern shaping has a pronounced effect on
+captured noise. The environment models display T<sub>sky</sub> and
+T<sub>earth</sub> at the operating frequency; the ratio between them
+indicates how much G/T<sub>ant</sub> improvement is available through
+pattern shaping at that frequency.</p>
+
+<p>
+For further reading on antenna temperature evaluation, noise
+environment models, and G/T system analysis for VHF/UHF weak-signal
+design, see the
+<a target="_blank" rel="noopener noreferrer"
+href="https://dg7ybn.de/Ant_Temp/Ant_Temp.htm">Antenna Temperature
+and G/T</a> reference by
+<span class="contact" data-callsign="DG7YBN">Hartmut
+Kl&uuml;ver</span>, DG7YBN.</p>
+
 <h3 id="FrequencyWindow">Frequency Data Plots window</h3>
 <figure>
 <img src="images/freq_plots.png" class="float-left" alt="Frequency plots window showing VSWR and gain graphs" loading="lazy">
@@ -1664,6 +1880,11 @@ to select data to be plotted against frequency. These are:</p>
 <td><kbd class="shortcut">p</kbd></td>
 <td>The scalar magnitude and phase of the input impedance.</td>
 </tr>
+<tr>
+<td><span class="ui-button">T_ant</span></td>
+<td></td>
+<td>G/T<sub>ant</sub> (right axis) with T<sub>ant</sub> or T<sub>total</sub> as the secondary curve, selectable via <span class="menu-path">View &rarr; Show T_ant instead of T_total</span>. Requires a <a href="#NoiseEnvModels">noise environment</a> and radiation pattern data.</td>
+</tr>
 </tbody>
 </table>
 <p>The <span class="menu-path">View → Net Gain</span> menu item changes the second plotted
@@ -1676,8 +1897,12 @@ to Start, Pause or Reset the loop. As the loop progresses, more
 data will be presented in the graphs and in the text entry widgets
 above the graph drawing area. These widgets display the current
 frequency in&nbsp;MHz, the maximum gain in the radiation pattern for
-that frequency, the VSWR for the Z<sub>0</sub> value in the spin button above
-and the real and imaginary parts of the input impedance.</p>
+that frequency, the VSWR for the Z<sub>0</sub> value in the spin
+button above, the real and imaginary parts of the input impedance,
+and&mdash;when noise temperature data is available&mdash;the
+T<sub>total</sub>, T<sub>ant</sub>, and G/T<sub>ant</sub> readouts
+described in the <a href="#AntTempReadouts">Antenna Temperature and
+G/T Readouts</a> section below.</p>
 <p>The <span class="menu-path">File → Save</span> menu <kbd class="shortcut">s</kbd> and <span class="menu-path">File → Save As</span> menu <kbd class="shortcut">Ctrl+s</kbd> items can be used to save the graphs in the drawing
 area as PNG image files, with a default file name or one of the
 user's choice respectively. The <span class="menu-path">View → Polarization</span>
@@ -1697,6 +1922,46 @@ some of the style etc commands available in gnuplot. In this example
 it plots columns 2 and 3 (zreal and zimag) against column 1 (MHz).
 Change 2:3 to 2:16 to see all columns, though 16 plots will make the
 graph very busy.</p>
+
+<h4 id="AntTempReadouts">Antenna Temperature and G/T Readouts</h4>
+<p>
+Three additional readout fields appear in the status bar when noise
+temperature data is available.
+<span class="ui-button">T_total</span> shows the total antenna
+temperature (pattern plus loss) in Kelvin.
+<span class="ui-button">T_ant</span> shows the pattern temperature
+alone.
+<span class="ui-button">G/T_ant</span> shows the receive figure of
+merit in dB/K. All three update as the frequency changes, whether by
+advancing the frequency loop or by clicking in the plot area.</p>
+
+<p>
+The <span class="ui-button">T_ant</span> toggle button in the toolbar
+enables plotting of G/T<sub>ant</sub> against frequency on the graph,
+using the right-axis scale. The
+<span class="menu-path">View &rarr; Show T_ant instead of T_total</span>
+menu item switches the secondary curve between T<sub>ant</sub> and
+T<sub>total</sub>, allowing direct comparison of pattern temperature
+versus total temperature across the operating band. Pattern
+temperature isolates the geometric contribution&mdash;how well the
+design rejects environmental noise through sidelobe suppression. Total
+temperature adds the ohmic loss component, determined by element
+material and construction quality.</p>
+
+<p>
+G/T<sub>ant</sub> versus frequency reveals the figure of merit across
+the band. When using VE7BQH Residential as the environment, values at
+the design frequency can be compared directly against published
+VE7BQH table entries. A rising T<sub>ant</sub> toward band edges
+indicates growing sidelobe levels, since more of the pattern
+intercepts the warmer earth hemisphere. The gap between
+T<sub>total</sub> and T<sub>ant</sub> quantifies the ohmic loss
+contribution, which at 432&nbsp;MHz and above can become significant
+relative to the pattern temperature depending on element material and
+cross-section.</p>
+
+<p>
+Both display settings are persisted in the configuration file.</p>
 
 <h4>Touchstone Files</h4>
 <p>
@@ -2359,6 +2624,9 @@ across the full sweep.</dd>
 <tr><td>Gain Dev −Y</td><td>Angular deviation of peak gain from −Y axis (°)</td><td>min score</td><td>1.0</td></tr>
 <tr><td>Gain Dev +Z</td><td>Angular deviation of peak gain from +Z (zenith) (°)</td><td>min score</td><td>1.0</td></tr>
 <tr><td>Gain Dev −Z</td><td>Angular deviation of peak gain from −Z (nadir) (°)</td><td>min score</td><td>1.0</td></tr>
+<tr><td>Ant Temp</td><td>Antenna noise temperature from sky/earth brightness (K)</td><td>min score</td><td>1000.0</td></tr>
+<tr><td>Ant Temp Total</td><td>Total antenna noise temperature including ohmic loss (K)</td><td>min score</td><td>1000.0</td></tr>
+<tr><td>G/T_ant</td><td>Gain-to-antenna-temperature ratio (dB), excludes loss</td><td>max score</td><td>0.0</td></tr>
 </tbody>
 </table>
 
