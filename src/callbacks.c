@@ -3108,6 +3108,7 @@ on_flow_direction_activate(
     { "main_flow_dir_pol_axis",  FLOW_DIR_POLARIZATION_TILT },
     { "main_flow_dir_peak_mag",  FLOW_DIR_PEAK_MAGNITUDE },
     { "main_flow_dir_lic",       FLOW_DIR_LIC },
+    { "main_flow_dir_wireframe", FLOW_DIR_WIREFRAME },
   };
 
   int i;
@@ -3125,13 +3126,15 @@ on_flow_direction_activate(
       rc_config.opengl_flow_direction_mode = items[i].mode;
       opengl_structure_invalidate();
       opengl_structure_queue_draw();
+      opengl_rdpattern_queue_draw();
 
       /* Animation produces no visible change for phase-invariant modes.
        * Grey out Animate menu item for Polarization Tilt and Peak Magnitude. */
       {
         gboolean animatable =
           (items[i].mode == FLOW_DIR_REFERENCE_PHASE ||
-           items[i].mode == FLOW_DIR_LIC);
+           items[i].mode == FLOW_DIR_LIC ||
+           items[i].mode == FLOW_DIR_WIREFRAME);
 
         GtkWidget *anim_w = Builder_Get_Object(
             main_window_builder, "main_structure_animate");

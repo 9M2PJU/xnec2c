@@ -55,6 +55,7 @@ const int FLOW_DIR_REFERENCE_PHASE = 0;
 const int FLOW_DIR_POLARIZATION_TILT = 1;
 const int FLOW_DIR_PEAK_MAGNITUDE = 2;
 const int FLOW_DIR_LIC = 3;
+const int FLOW_DIR_WIREFRAME = 4;
 
 /* LIC parameters: screen-space integration with 1-pixel steps.
  * 41 samples (±20 steps) produce streaks ~40 pixels long.

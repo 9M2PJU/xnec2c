@@ -58,7 +58,7 @@ static const gl_overlay_config_t rdpattern_overlay_config = {
   .vertex_shader_path = "/gl/lit-color-vertex.glsl",
   .fragment_shader_path = "/gl/lit-color-fragment.glsl",
   .attribs = opengl_chevron_attribs,
-  .attrib_count = 6
+  .attrib_count = 8
 };
 
 
@@ -89,7 +89,7 @@ rdpattern_overlay_base_scale(float r_max, float view_scale)
   static void
 rdpattern_init_empty_scene(gl_view_content_t *out, float zoom)
 {
-  out->draw_mode = GL_TRIANGLES;
+  out->batch_count = 0;
   out->r_max = 1.0f;
   out->clip_extent = 1.0f;
   out->zoom = zoom;
@@ -151,10 +151,11 @@ rdpattern_scene_generate(gl_view_content_t *out)
      * no translation needed (excitation already aligned) */
 
     nf_buf = opengl_rdpattern_get_nf_lines(&nf_count);
-    out->vertices = nf_buf;
-    out->vertex_count = nf_count * 2;
+    out->batches[0].vertices = nf_buf;
+    out->batches[0].vertex_count = nf_count * 2;
+    out->batches[0].draw_mode = GL_LINES;
+    out->batch_count = 1;
     out->vertex_stride = (int)sizeof(lit_color_point_t);
-    out->draw_mode = GL_LINES;
     out->r_max = r_max;
     out->clip_extent = r_max;
     out->zoom = zoom;
@@ -265,11 +266,12 @@ rdpattern_scene_generate(gl_view_content_t *out)
       if( tri_count == 0 )
         return( FALSE );
 
-      out->vertices = tri_buf;
-      out->vertex_count = tri_count * 3;
+      out->batches[0].vertices = tri_buf;
+      out->batches[0].vertex_count = tri_count * 3;
     }
+    out->batches[0].draw_mode = GL_TRIANGLES;
+    out->batch_count = 1;
     out->vertex_stride = (int)sizeof(lit_color_point_t);
-    out->draw_mode = GL_TRIANGLES;
 
     out->r_max = r_max;
 
@@ -388,13 +390,13 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
   opengl_structure_update_shared_geometry();
   geom = opengl_structure_get_shared_geometry();
 
-  if( !geom || geom->vertex_count <= 0 )
+  if( !geom || geom->batch_count <= 0 )
     return( FALSE );
 
-  out->vertices = geom->vertices;
-  out->vertex_count = geom->vertex_count;
+  memcpy(out->batches, geom->batches,
+      (size_t)geom->batch_count * sizeof(geom->batches[0]));
+  out->batch_count = geom->batch_count;
   out->vertex_stride = geom->vertex_stride;
-  out->draw_mode = geom->draw_mode;
   out->show_gradient = FALSE;
 
   /* Scale structure to match radiation pattern space for far-field,

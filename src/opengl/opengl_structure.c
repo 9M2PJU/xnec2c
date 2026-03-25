@@ -50,13 +50,15 @@ const gl_vertex_attrib_t opengl_structure_attribs[3] = {
 };
 
 /* Vertex attribute layout for chevron shader (structure_vertex_t) */
-const gl_vertex_attrib_t opengl_chevron_attribs[6] = {
+const gl_vertex_attrib_t opengl_chevron_attribs[8] = {
   { "position",   3, 0 },
   { "normal",     3, 4 * (int)sizeof(float) },
   { "color",      4, 8 * (int)sizeof(float) },
   { "uv",         2, 12 * (int)sizeof(float) },
   { "flow_data",  4, 14 * (int)sizeof(float) },
-  { "depth_bias", 1, 18 * (int)sizeof(float) }
+  { "depth_bias", 1, 18 * (int)sizeof(float) },
+  { "tangent1",   3, 19 * (int)sizeof(float) },
+  { "tangent2",   3, 22 * (int)sizeof(float) }
 };
 
 /*-----------------------------------------------------------------------*/
@@ -203,11 +205,11 @@ structure_scene_generate(gl_view_content_t *out)
   if( zoom < 0.01f )
     zoom = 0.01f;
 
-  out->vertices = geom->vertices;
-  out->vertex_count = geom->vertex_count;
+  memcpy(out->batches, geom->batches,
+      (size_t)geom->batch_count * sizeof(geom->batches[0]));
+  out->batch_count = geom->batch_count;
   out->vertex_stride = geom->vertex_stride;
-  out->draw_mode = (GLenum)geom->draw_mode;
-  out->r_max = (geom->vertex_count > 0) ? geom->view_scale : 1.5f;
+  out->r_max = (geom->batch_count > 0) ? geom->view_scale : 1.5f;
   out->clip_extent = out->r_max;
   out->zoom = zoom;
   out->model_scale = 1.0f;
@@ -234,7 +236,7 @@ static gl_view_config_t structure_view_config = {
   .vertex_shader_path = "/gl/lit-color-vertex.glsl",
   .fragment_shader_path = "/gl/lit-color-fragment.glsl",
   .attribs = opengl_chevron_attribs,
-  .attrib_count = 6,
+  .attrib_count = 8,
   .vertex_stride = (int)sizeof(structure_vertex_t),
   .has_gradient = FALSE,
   .gradient_draw = NULL
@@ -465,8 +467,6 @@ advance_view_flow_phase(GtkWidget *w, float step)
   gboolean
 Animate_Flow_Phase(gpointer udata)
 {
-  float new_phase;
-  gboolean line_mode;
 
   if( isFlagClear(FLOW_ANIMATE) )
   {
@@ -474,18 +474,8 @@ Animate_Flow_Phase(gpointer udata)
     return( FALSE );
   }
 
-  new_phase = advance_view_flow_phase(
+  advance_view_flow_phase(
       structure_gl_widget, (float)near_field.anim_step);
-
-  /* Line-mode arrows are baked into vertex positions on the CPU.
-   * Update the geometry module's phase and force regeneration. */
-  line_mode = (cylinder_radius_scale < CYLINDER_SCALE_LINE_THRESHOLD);
-
-  if( line_mode )
-  {
-    opengl_structure_geometry_set_flow_phase(new_phase);
-    opengl_structure_geometry_invalidate();
-  }
 
   if( structure_gl_widget )
     xnec2_widget_queue_draw(structure_gl_widget);
@@ -514,9 +504,6 @@ Animate_Flow_Phase(gpointer udata)
 opengl_structure_reset_flow_phase(void)
 {
 #ifdef HAVE_OPENGL
-  opengl_structure_geometry_set_flow_phase(0.0f);
-  opengl_structure_geometry_invalidate();
-
   set_view_flow_phase(structure_gl_widget, 0.0f);
   set_view_flow_phase(opengl_rdpattern_get_widget(), 0.0f);
 #endif

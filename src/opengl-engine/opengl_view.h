@@ -44,10 +44,9 @@
 /* View content provided by scene generator */
 typedef struct
 {
-  void *vertices;
-  int vertex_count;
+  gl_draw_batch_t batches[GL_VIEW_MAX_BATCHES];
+  int batch_count;
   int vertex_stride;
-  GLenum draw_mode;
   float r_max;
   float clip_extent;
   float zoom;

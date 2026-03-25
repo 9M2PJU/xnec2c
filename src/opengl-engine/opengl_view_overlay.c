@@ -28,13 +28,15 @@ typedef struct
 {
   gl_view_state_t *view;
   gl_shader_t shader;
-  GLuint vao;
-  GLuint vbo;
+  GLuint vao[GL_VIEW_MAX_BATCHES];
+  GLuint vbo[GL_VIEW_MAX_BATCHES];
   GLint mvp_location;
   GLint u_mv_location;
   GLint u_alpha_location;
   GLint flow_mode_location;
   GLint u_phase_location;
+  GLint u_cos_phase_location;
+  GLint u_sin_phase_location;
   GLint noise_tex_location;
   gl_peel_uniform_locs_t peel_locs;
   GLint *attrib_locations;
@@ -87,26 +89,30 @@ gl_overlay_prepare(void *ctx, float r_max)
   if( !ovl->initialized )
     return;
 
-  if( ovl->ovl_content.vertex_count <= 0 )
+  if( ovl->ovl_content.batch_count <= 0 )
     return;
 
   /* Upload overlay vertices on generation change */
   if( ovl->ovl_content.generation != ovl->last_generation )
   {
-    glBindBuffer(GL_ARRAY_BUFFER, ovl->vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-        ovl->ovl_content.vertex_count * ovl->ovl_content.vertex_stride,
-        ovl->ovl_content.vertices,
-        GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    const gl_overlay_config_t *ocfg = view->scene->overlay_config;
+    int i;
 
-    /* Reconfigure VAO attrib pointers for new VBO layout */
+    for( i = 0; i < ovl->ovl_content.batch_count; i++ )
     {
-      const gl_overlay_config_t *ocfg = view->scene->overlay_config;
+      if( ovl->ovl_content.batches[i].vertex_count > 0 )
+      {
+        glBindBuffer(GL_ARRAY_BUFFER, ovl->vbo[i]);
+        glBufferData(GL_ARRAY_BUFFER,
+            ovl->ovl_content.batches[i].vertex_count * ovl->ovl_content.vertex_stride,
+            ovl->ovl_content.batches[i].vertices,
+            GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-      gl_view_setup_attribs(ovl->vao, ovl->vbo,
-          ocfg->attribs, ovl->attrib_locations,
-          ocfg->attrib_count, ovl->ovl_content.vertex_stride);
+        gl_view_setup_attribs(ovl->vao[i], ovl->vbo[i],
+            ocfg->attribs, ovl->attrib_locations,
+            ocfg->attrib_count, ovl->ovl_content.vertex_stride);
+      }
     }
 
     ovl->last_generation = ovl->ovl_content.generation;
@@ -137,7 +143,7 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
 {
   gl_overlay_ctx_t *ovl = ctx;
 
-  if( ovl->ovl_content.vertex_count <= 0 )
+  if( ovl->ovl_content.batch_count <= 0 )
     return;
 
   /* Set uniforms before draw pass.
@@ -148,6 +154,8 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
   glUniform1f(ovl->u_alpha_location, params->alpha);
   glUniform1i(ovl->flow_mode_location, rc_config.opengl_flow_direction_mode);
   glUniform1f(ovl->u_phase_location, ovl->view->flow_phase);
+  glUniform1f(ovl->u_cos_phase_location, cosf(ovl->view->flow_phase));
+  glUniform1f(ovl->u_sin_phase_location, sinf(ovl->view->flow_phase));
 
   /* Bind LIC noise texture to unit 1 (shared with scene via view state) */
   if( ovl->view->noise_tex != 0 )
@@ -166,10 +174,20 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
   glUniformMatrix4fv(ovl->mvp_location, 1, GL_FALSE,
       (const float *)ovl->cached_mvp);
 
-  if( ovl->ovl_content.vertex_count > 0 )
+  /* Draw each batch with its own VAO and GL mode */
   {
-    glBindVertexArray(ovl->vao);
-    glDrawArrays(ovl->ovl_content.draw_mode, 0, ovl->ovl_content.vertex_count);
+    int i;
+
+    for( i = 0; i < ovl->ovl_content.batch_count; i++ )
+    {
+      if( ovl->ovl_content.batches[i].vertex_count > 0 )
+      {
+        glBindVertexArray(ovl->vao[i]);
+        glDrawArrays(ovl->ovl_content.batches[i].draw_mode, 0,
+            ovl->ovl_content.batches[i].vertex_count);
+      }
+    }
+
     glBindVertexArray(0);
   }
 
@@ -206,7 +224,7 @@ gl_overlay_generate(void *ctx)
   gl_view_state_t *view = ovl->view;
 
   /* Reset before generation attempt */
-  ovl->ovl_content.vertex_count = 0;
+  ovl->ovl_content.batch_count = 0;
 
   if( !ovl->initialized )
     return;
@@ -232,7 +250,7 @@ gl_overlay_far_extent(void *ctx, float r_max)
   gl_overlay_ctx_t *ovl = ctx;
   float ovl_model_scale, scaled_extent;
 
-  if( ovl->ovl_content.vertex_count <= 0 )
+  if( ovl->ovl_content.batch_count <= 0 )
     return( r_max );
 
   ovl_model_scale = gl_overlay_effective_scale(ovl);
@@ -262,11 +280,8 @@ gl_overlay_free(void *ctx)
   if( ovl->view->scene && ovl->view->scene->overlay_cleanup )
     ovl->view->scene->overlay_cleanup();
 
-  if( ovl->vbo )
-    glDeleteBuffers(1, &ovl->vbo);
-
-  if( ovl->vao )
-    glDeleteVertexArrays(1, &ovl->vao);
+  glDeleteBuffers(GL_VIEW_MAX_BATCHES, ovl->vbo);
+  glDeleteVertexArrays(GL_VIEW_MAX_BATCHES, ovl->vao);
 
   gl_shader_destroy(&ovl->shader);
 
@@ -321,12 +336,16 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
     glGetUniformLocation(ovl->shader.program, "flow_mode");
   ovl->u_phase_location =
     glGetUniformLocation(ovl->shader.program, "u_phase");
+  ovl->u_cos_phase_location =
+    glGetUniformLocation(ovl->shader.program, "u_cos_phase");
+  ovl->u_sin_phase_location =
+    glGetUniformLocation(ovl->shader.program, "u_sin_phase");
   ovl->noise_tex_location =
     glGetUniformLocation(ovl->shader.program, "noise_tex");
   gl_view_peel_locs_init(&ovl->peel_locs, ovl->shader.program);
 
-  glGenVertexArrays(1, &ovl->vao);
-  glGenBuffers(1, &ovl->vbo);
+  glGenVertexArrays(GL_VIEW_MAX_BATCHES, ovl->vao);
+  glGenBuffers(GL_VIEW_MAX_BATCHES, ovl->vbo);
 
   ovl->attrib_locations = g_new(GLint, ocfg->attrib_count);
   for( i = 0; i < ocfg->attrib_count; i++ )

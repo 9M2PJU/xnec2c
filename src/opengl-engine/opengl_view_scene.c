@@ -29,8 +29,8 @@ typedef struct
 {
   gl_view_state_t *view;
   gl_shader_t shader;
-  GLuint vao;
-  GLuint vbo;
+  GLuint vao[GL_VIEW_MAX_BATCHES];
+  GLuint vbo[GL_VIEW_MAX_BATCHES];
   GLint mvp_location;
   GLint u_mv_location;
   GLint u_alpha_location;
@@ -69,19 +69,26 @@ gl_scene_prepare(void *ctx, float r_max)
   if( c->generation == view->last_generation )
     return;
 
-  if( c->vertex_count > 0 )
+  /* Upload each batch to its own VBO and configure its VAO */
   {
-    glBindBuffer(GL_ARRAY_BUFFER, sc->vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-        c->vertex_count * c->vertex_stride,
-        c->vertices,
-        GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    int i;
 
-    /* Reconfigure VAO attrib pointers for new VBO layout */
-    gl_view_setup_attribs(sc->vao, sc->vbo,
-        view->config->attribs, sc->attrib_locations,
-        view->config->attrib_count, c->vertex_stride);
+    for( i = 0; i < c->batch_count; i++ )
+    {
+      if( c->batches[i].vertex_count > 0 )
+      {
+        glBindBuffer(GL_ARRAY_BUFFER, sc->vbo[i]);
+        glBufferData(GL_ARRAY_BUFFER,
+            c->batches[i].vertex_count * c->vertex_stride,
+            c->batches[i].vertices,
+            GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        gl_view_setup_attribs(sc->vao[i], sc->vbo[i],
+            view->config->attribs, sc->attrib_locations,
+            view->config->attrib_count, c->vertex_stride);
+      }
+    }
   }
 
   if( view->overlay )
@@ -133,10 +140,20 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
   glUniformMatrix4fv(sc->mvp_location, 1, GL_FALSE,
       (const float *)params->mvp);
 
-  if( view->content.vertex_count > 0 )
+  /* Draw each batch with its own VAO and GL mode */
   {
-    glBindVertexArray(sc->vao);
-    glDrawArrays(view->content.draw_mode, 0, view->content.vertex_count);
+    int i;
+
+    for( i = 0; i < view->content.batch_count; i++ )
+    {
+      if( view->content.batches[i].vertex_count > 0 )
+      {
+        glBindVertexArray(sc->vao[i]);
+        glDrawArrays(view->content.batches[i].draw_mode, 0,
+            view->content.batches[i].vertex_count);
+      }
+    }
+
     glBindVertexArray(0);
   }
 
@@ -152,7 +169,7 @@ gl_scene_is_active(void *ctx)
 {
   gl_scene_ctx_t *sc = ctx;
 
-  return( sc->view->content.vertex_count > 0 );
+  return( sc->view->content.batch_count > 0 );
 
 } /* gl_scene_is_active() */
 
@@ -198,11 +215,8 @@ gl_scene_free(void *ctx)
   if( sc->view->scene && sc->view->scene->cleanup )
     sc->view->scene->cleanup();
 
-  if( sc->vbo )
-    glDeleteBuffers(1, &sc->vbo);
-
-  if( sc->vao )
-    glDeleteVertexArrays(1, &sc->vao);
+  glDeleteBuffers(GL_VIEW_MAX_BATCHES, sc->vbo);
+  glDeleteVertexArrays(GL_VIEW_MAX_BATCHES, sc->vao);
 
   gl_shader_destroy(&sc->shader);
 
@@ -249,8 +263,8 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
   sc->noise_tex_location = glGetUniformLocation(sc->shader.program, "noise_tex");
   gl_view_peel_locs_init(&sc->peel_locs, sc->shader.program);
 
-  glGenVertexArrays(1, &sc->vao);
-  glGenBuffers(1, &sc->vbo);
+  glGenVertexArrays(GL_VIEW_MAX_BATCHES, sc->vao);
+  glGenBuffers(GL_VIEW_MAX_BATCHES, sc->vbo);
 
   sc->attrib_locations = g_new(GLint, state->config->attrib_count);
 

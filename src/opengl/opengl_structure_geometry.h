@@ -30,9 +30,6 @@ void opengl_structure_geometry_cleanup(void);
 /* Mark cached geometry stale so next render regenerates from NEC2 data */
 void opengl_structure_geometry_invalidate(void);
 
-/* Set the flow phase used by line-mode arrow angle computation.
- * Called by Animate_Flow_Phase before invalidating geometry. */
-void opengl_structure_geometry_set_flow_phase(float phase);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_STRUCTURE_GEOMETRY_H */

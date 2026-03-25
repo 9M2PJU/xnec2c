@@ -11086,6 +11086,14 @@ Save NEC2 Editor data first?
                                   </object>
                                 </child>
                                 <child>
+                                  <object class="GtkMenuItem">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="sensitive">False</property>
+                                    <property name="label" translatable="yes">Animated</property>
+                                  </object>
+                                </child>
+                                <child>
                                   <object class="GtkRadioMenuItem" id="main_flow_dir_ref_phase">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -11094,6 +11102,42 @@ Save NEC2 Editor data first?
                                     <property name="active">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <signal name="activate" handler="on_flow_direction_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_flow_dir_lic">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_LIC Texture</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_flow_dir_ref_phase</property>
+                                    <signal name="activate" handler="on_flow_direction_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_flow_dir_wireframe">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_Wireframe</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_flow_dir_ref_phase</property>
+                                    <signal name="activate" handler="on_flow_direction_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkSeparatorMenuItem">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkMenuItem">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="sensitive">False</property>
+                                    <property name="label" translatable="yes">Static</property>
                                   </object>
                                 </child>
                                 <child>
@@ -11112,17 +11156,6 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="label" translatable="yes">Peak _Magnitude</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="draw-as-radio">True</property>
-                                    <property name="group">main_flow_dir_ref_phase</property>
-                                    <signal name="activate" handler="on_flow_direction_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="main_flow_dir_lic">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">_LIC Texture</property>
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">main_flow_dir_ref_phase</property>

@@ -455,6 +455,23 @@ enum POL_TYPE
   NUM_POL
 };
 
+/** gl_draw_batch_t - Self-contained vertex batch for a single glDrawArrays call
+ * @vertices: owned vertex allocation (caller manages lifetime)
+ * @vertex_count: number of vertices to draw
+ * @draw_mode: GL primitive mode (GL_TRIANGLES, GL_LINES, etc.) as unsigned int
+ *             to avoid GL header dependency outside HAVE_OPENGL scope
+ */
+typedef struct
+{
+  void *vertices;
+  int vertex_count;
+  unsigned int draw_mode;
+
+} gl_draw_batch_t;
+
+/* Maximum independent draw batches per view content */
+#define GL_VIEW_MAX_BATCHES 2
+
 /* OpenGL types */
 #ifdef HAVE_OPENGL
 typedef struct
