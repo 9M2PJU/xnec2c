@@ -288,67 +288,9 @@ get_patch_flow_data(int idx, structure_draw_mode_t mode, double cmax,
 
 /*-----------------------------------------------------------------------*/
 
-/** set_structure_vertex() - Set all fields of a structure vertex with tangent frame
- * @t1x..t1z: tangent1 (s*t1 scaled tangent)
- * @t2x..t2z: tangent2 (s*t2 scaled tangent)
- */
-  static void
-set_structure_vertex(structure_vertex_t *sv,
-    float px, float py, float pz,
-    float nx, float ny, float nz,
-    float cr, float cg, float cb, float ca,
-    float u, float v_coord,
-    float fd0, float fd1, float fd2, float fd3,
-    float dbias,
-    float t1x, float t1y, float t1z,
-    float t2x, float t2y, float t2z)
-{
-  sv->point.x = px;
-  sv->point.y = py;
-  sv->point.z = pz;
-  sv->normal.x = nx;
-  sv->normal.y = ny;
-  sv->normal.z = nz;
-  sv->color.r = cr;
-  sv->color.g = cg;
-  sv->color.b = cb;
-  sv->color.a = ca;
-  sv->uv[0] = u;
-  sv->uv[1] = v_coord;
-  sv->flow_data[0] = fd0;
-  sv->flow_data[1] = fd1;
-  sv->flow_data[2] = fd2;
-  sv->flow_data[3] = fd3;
-  sv->depth_bias = dbias;
-  sv->tangent1[0] = t1x;
-  sv->tangent1[1] = t1y;
-  sv->tangent1[2] = t1z;
-  sv->tangent2[0] = t2x;
-  sv->tangent2[1] = t2y;
-  sv->tangent2[2] = t2z;
-}
-
-/*-----------------------------------------------------------------------*/
-
-/** set_structure_vertex_flat() - Set structure vertex fields with zero tangent frame
- *
- * Convenience wrapper for vertices that do not participate in GPU-driven
- * arrow rotation (segments, patch outlines, filled patch quads).
- */
-  static void
-set_structure_vertex_flat(structure_vertex_t *sv,
-    float px, float py, float pz,
-    float nx, float ny, float nz,
-    float cr, float cg, float cb, float ca,
-    float u, float v_coord,
-    float fd0, float fd1, float fd2, float fd3,
-    float dbias)
-{
-  set_structure_vertex(sv, px, py, pz, nx, ny, nz,
-      cr, cg, cb, ca, u, v_coord,
-      fd0, fd1, fd2, fd3, dbias,
-      0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-}
+/* Vertices are initialized via C99 compound literal assignment:
+ *   verts[vidx++] = (structure_vertex_t){ .point = {…}, .normal = {…}, … };
+ * Omitted fields default to zero (tangent1/tangent2 for flat vertices). */
 
 /*-----------------------------------------------------------------------*/
 
@@ -519,18 +461,18 @@ generate_segments_lines(gl_draw_batch_t *batch, structure_draw_mode_t mode, doub
     }
 
     /* Endpoint 1 */
-    set_structure_vertex_flat(&verts[vidx],
-        (float)data.x1[idx], (float)data.y1[idx], (float)data.z1[idx],
-        nx, ny, nz, r, g, b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-    vidx++;
+    verts[vidx++] = (structure_vertex_t){
+        .point  = {(float)data.x1[idx], (float)data.y1[idx], (float)data.z1[idx]},
+        .normal = {nx, ny, nz},
+        .color  = {r, g, b, 1.0f},
+    };
 
     /* Endpoint 2 */
-    set_structure_vertex_flat(&verts[vidx],
-        (float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx],
-        nx, ny, nz, r, g, b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-    vidx++;
+    verts[vidx++] = (structure_vertex_t){
+        .point  = {(float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx]},
+        .normal = {nx, ny, nz},
+        .color  = {r, g, b, 1.0f},
+    };
   }
 
   batch->vertex_count = vidx;
@@ -581,41 +523,41 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
     c3z = (float)(save.ztemp[j] + s * data.t1z[idx] - s * data.t2z[idx]);
 
     /* Box outline: 4 edges as GL_LINES pairs (8 vertices) */
-    set_structure_vertex_flat(&verts[vidx],
-        c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
-    vidx++;
-    set_structure_vertex_flat(&verts[vidx],
-        c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
-    vidx++;
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c0x, c0y, c0z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+    };
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c1x, c1y, c1z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+    };
 
-    set_structure_vertex_flat(&verts[vidx],
-        c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
-    vidx++;
-    set_structure_vertex_flat(&verts[vidx],
-        c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
-    vidx++;
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c1x, c1y, c1z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+    };
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c2x, c2y, c2z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+    };
 
-    set_structure_vertex_flat(&verts[vidx],
-        c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
-    vidx++;
-    set_structure_vertex_flat(&verts[vidx],
-        c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
-    vidx++;
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c2x, c2y, c2z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+    };
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c3x, c3y, c3z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+    };
 
-    set_structure_vertex_flat(&verts[vidx],
-        c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
-    vidx++;
-    set_structure_vertex_flat(&verts[vidx],
-        c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, dbias);
-    vidx++;
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c3x, c3y, c3z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+    };
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c0x, c0y, c0z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+    };
 
     /* GPU-driven arrow: store template UV + tangent frame + flow data.
      * The vertex shader rotates template UVs by the phase-derived flow
@@ -654,12 +596,15 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
 
         for( k = 0; k < ARROW_VERTEX_COUNT; k++ )
         {
-          set_structure_vertex(&verts[vidx],
-              acx, acy, acz, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-              arrow_template_uvs[k][0], arrow_template_uvs[k][1],
-              fd[0], fd[1], fd[2], fd[3], dbias,
-              st1x, st1y, st1z, st2x, st2y, st2z);
-          vidx++;
+          verts[vidx++] = (structure_vertex_t){
+              .point = {acx, acy, acz}, .normal = {nx, ny, nz},
+              .color = {p_r, p_g, p_b, 1.0f},
+              .uv = {arrow_template_uvs[k][0], arrow_template_uvs[k][1]},
+              .flow_data = {fd[0], fd[1], fd[2], fd[3]},
+              .depth_bias = dbias,
+              .tangent1 = {st1x, st1y, st1z},
+              .tangent2 = {st2x, st2y, st2z},
+          };
         }
       }
     }
@@ -783,32 +728,44 @@ generate_patches_triangles(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
     get_patch_flow_data(idx, mode, cmax, fd);
 
     /* Triangle 1: c0(1,1), c1(0,1), c2(0,0) */
-    set_structure_vertex_flat(&verts[vidx],
-        c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        1.0f, 1.0f, fd[0], fd[1], fd[2], fd[3], dbias);
-    vidx++;
-    set_structure_vertex_flat(&verts[vidx],
-        c1x, c1y, c1z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 1.0f, fd[0], fd[1], fd[2], fd[3], dbias);
-    vidx++;
-    set_structure_vertex_flat(&verts[vidx],
-        c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, fd[0], fd[1], fd[2], fd[3], dbias);
-    vidx++;
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c0x, c0y, c0z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f},
+        .uv = {1.0f, 1.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
+        .depth_bias = dbias,
+    };
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c1x, c1y, c1z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f},
+        .uv = {0.0f, 1.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
+        .depth_bias = dbias,
+    };
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c2x, c2y, c2z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f},
+        .uv = {0.0f, 0.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
+        .depth_bias = dbias,
+    };
 
     /* Triangle 2: c0(1,1), c2(0,0), c3(1,0) */
-    set_structure_vertex_flat(&verts[vidx],
-        c0x, c0y, c0z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        1.0f, 1.0f, fd[0], fd[1], fd[2], fd[3], dbias);
-    vidx++;
-    set_structure_vertex_flat(&verts[vidx],
-        c2x, c2y, c2z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        0.0f, 0.0f, fd[0], fd[1], fd[2], fd[3], dbias);
-    vidx++;
-    set_structure_vertex_flat(&verts[vidx],
-        c3x, c3y, c3z, nx, ny, nz, p_r, p_g, p_b, 1.0f,
-        1.0f, 0.0f, fd[0], fd[1], fd[2], fd[3], dbias);
-    vidx++;
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c0x, c0y, c0z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f},
+        .uv = {1.0f, 1.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
+        .depth_bias = dbias,
+    };
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c2x, c2y, c2z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f},
+        .uv = {0.0f, 0.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
+        .depth_bias = dbias,
+    };
+    verts[vidx++] = (structure_vertex_t){
+        .point = {c3x, c3y, c3z}, .normal = {nx, ny, nz},
+        .color = {p_r, p_g, p_b, 1.0f},
+        .uv = {1.0f, 0.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
+        .depth_bias = dbias,
+    };
   }
 
   batch->vertex_count = vidx;
