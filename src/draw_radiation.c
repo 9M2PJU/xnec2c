@@ -349,6 +349,23 @@ Update_Rdpattern_UI(void)
   if( calc_data.freq_step >= 0 )
     Display_Fstep( rdpattern_fstep_entry, calc_data.freq_step );
 
+  /* Update T_total readout in toolbar */
+  {
+    measurement_t meas = { .a = {0} };
+    meas_calc(&meas, fstep);
+    GtkWidget *temp_entry = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_ant_temp_entry");
+    if (temp_entry)
+    {
+      char buf[24];
+      if (meas.ant_temp_tot >= 0.0)
+        snprintf(buf, sizeof(buf), "%.0f K", meas.ant_temp_tot);
+      else
+        snprintf(buf, sizeof(buf), "— K");
+      gtk_entry_set_text(GTK_ENTRY(temp_entry), buf);
+    }
+  }
+
 } /* Update_Rdpattern_UI() */
 
 /*-----------------------------------------------------------------------*/
@@ -532,25 +549,8 @@ Draw_Radiation_Pattern( cairo_t *cr )
   if( rc_config.rdpattern_gradient_key )
     Draw_Color_Legend_Overlay( cr );
 
-  /* Update UI elements */
+  /* Update UI elements (includes T_total readout) */
   Update_Rdpattern_UI();
-
-  /* Update T_total readout in toolbar */
-  {
-    measurement_t meas = { .a = {0} };
-    meas_calc(&meas, fstep);
-    GtkWidget *temp_entry = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_ant_temp_entry");
-    if (temp_entry)
-    {
-      char buf[24];
-      if (meas.ant_temp_tot >= 0.0)
-        snprintf(buf, sizeof(buf), "%.0f K", meas.ant_temp_tot);
-      else
-        snprintf(buf, sizeof(buf), "— K");
-      gtk_entry_set_text(GTK_ENTRY(temp_entry), buf);
-    }
-  }
 
 } /* Draw_Radiation_Pattern() */
 
