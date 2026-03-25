@@ -18,6 +18,7 @@
  */
 
 #include "draw_radiation.h"
+#include "measurements.h"
 #include "shared.h"
 
 /* Constants for display layout */
@@ -76,6 +77,47 @@ double Scale_Gain( double gain, int fstep, int idx )
         scaled_rad = 0.0;
       else
         scaled_rad = scaled_rad /40.0 + 1.0;
+      break;
+
+    /* Noise temperature gain scales */
+    case GS_NOISE:
+    case GS_NOISE_LOG:
+      {
+        double t_sky, t_earth;
+        if (ant_temp_resolve(save.freq[fstep], rc_config.ant_temp_env,
+              &t_sky, &t_earth) < 0)
+        {
+          static gboolean warned = FALSE;
+          if (!warned)
+          {
+            warned = TRUE;
+            pr_warn("Scale_Gain: ant_temp_resolve failed for %.3f MHz env %d\n",
+                save.freq[fstep], rc_config.ant_temp_env);
+          }
+          scaled_rad = 0.0;
+          break;
+        }
+
+        int ith = idx % fpat.nth;
+        double tht = (fpat.thets + ith * fpat.dth) * M_PI / 180.0;
+        double horizon = ANT_TEMP_HORIZON_RAD();
+        double t_bright = (tht < horizon) ? t_sky : t_earth;
+        double g_lin = pow(10.0, gain / 10.0);
+
+        /* Noise temperature density (K/sr): resolution-independent */
+        double cell_k = g_lin * t_bright * sin(tht) / (4.0 * M_PI);
+
+        if (rc_config.gain_style == GS_NOISE)
+          scaled_rad = cell_k;
+        else
+          /* Log-compressed for visualization; recoverable to K */
+          scaled_rad = log10(1.0 + cell_k);
+      }
+      break;
+
+    default:
+      scaled_rad = 0.0;
+      break;
 
   } /* switch( rc_config.gain_style ) */
 
@@ -195,6 +237,33 @@ Draw_Radiation_Pattern( cairo_t *cr )
       /* Step phi in rads */
       phi += dph;
     } /* for( nph = 0; nph < fpat.nph; nph++ ) */
+
+    /* Noise modes: scan all cells for true scaled min/max.
+     * In noise mode Scale_Gain depends on gain, t_bright, and sin(θ),
+     * so the dBi peak index does not determine the noise density peak. */
+    if (IS_NOISE_MODE(rc_config.gain_style))
+    {
+      int total = fpat.nth * fpat.nph;
+      double nmax = point_3d[0].r;
+      double nmin = point_3d[0].r;
+      for (int i = 1; i < total; i++)
+      {
+        if (point_3d[i].r > nmax)
+          nmax = point_3d[i].r;
+        if (point_3d[i].r < nmin)
+          nmin = point_3d[i].r;
+      }
+      rad_pattern[fstep].noise_scaled_max = nmax;
+      rad_pattern[fstep].noise_scaled_min = nmin;
+      rdpattern_proj_params.r_max = nmax;
+      r_min = nmin;
+      r_range = nmax - nmin;
+
+      New_Projection_Parameters(
+          rdpattern_width,
+          rdpattern_height,
+          &rdpattern_proj_params);
+    }
 
     /* Calculate RGB value for rad pattern seg.
      * The average gain value of the two points
@@ -347,6 +416,23 @@ Draw_Radiation_Pattern( cairo_t *cr )
       rdpattern_window_builder,
       "rdpattern_viewer_gain",
       rdpattern_proj_params );
+
+  /* Update T_total readout in toolbar */
+  {
+    measurement_t meas = { .a = {0} };
+    meas_calc(&meas, fstep);
+    GtkWidget *temp_entry = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_ant_temp_entry");
+    if (temp_entry)
+    {
+      char buf[24];
+      if (meas.ant_temp_tot >= 0.0)
+        snprintf(buf, sizeof(buf), "%.0f K", meas.ant_temp_tot);
+      else
+        snprintf(buf, sizeof(buf), "— K");
+      gtk_entry_set_text(GTK_ENTRY(temp_entry), buf);
+    }
+  }
 
 } /* Draw_Radiation_Pattern() */
 
@@ -861,7 +947,9 @@ Set_Gain_Style( int gs )
 	  "rdpattern_linear_power",
 	  "rdpattern_linear_voltage",
 	  "rdpattern_arrl_style",
-	  "rdpattern_logarithmic"
+	  "rdpattern_logarithmic",
+	  "rdpattern_noise_temp",
+	  "rdpattern_noise_temp_log",
 	  };
 
   GtkWidget *widget;
@@ -874,6 +962,53 @@ Set_Gain_Style( int gs )
 
   widget = Builder_Get_Object( rdpattern_window_builder, scale_widget_names[rc_config.gain_style] );
   gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
+
+  /* Update units label and row label for noise vs gain modes */
+  widget = Builder_Get_Object( rdpattern_window_builder, "rdpattern_gain_units_label" );
+  if (widget)
+    gtk_label_set_text( GTK_LABEL(widget),
+        IS_NOISE_MODE(gs) ? "K/sr" : "dB" );
+
+  widget = Builder_Get_Object( rdpattern_window_builder, "rdpattern_gain_row_label" );
+  if (widget)
+    gtk_label_set_text( GTK_LABEL(widget),
+        IS_NOISE_MODE(gs) ? "Noise" : "Gain" );
+
+  /* Desensitize noise-specific controls when not in noise mode */
+  gboolean noise = IS_NOISE_MODE(gs);
+
+  static const struct {
+    const char *widget_id;
+    const char *tooltip;
+  } noise_widgets[] = {
+    { "rdpattern_elevation_spinbutton",
+      N_("Observation elevation angle. Shifts sky/earth "
+         "boundary for antenna temperature evaluation. "
+         "0° = horizon.") },
+    { "rdpattern_elevation_label",
+      N_("Observation elevation angle. Shifts sky/earth "
+         "boundary for antenna temperature evaluation. "
+         "0° = horizon.") },
+    { "rdpattern_noise_env_menu",
+      N_("Select brightness temperature model "
+         "for T_sky and T_earth.") },
+  };
+
+  int n_noise_widgets = sizeof(noise_widgets) / sizeof(noise_widgets[0]);
+  for (int i = 0; i < n_noise_widgets; i++)
+  {
+    widget = Builder_Get_Object(
+        rdpattern_window_builder, (gchar *)noise_widgets[i].widget_id);
+    if (widget)
+    {
+      gtk_widget_set_sensitive(widget, noise);
+      gtk_widget_set_tooltip_text(widget, _(noise_widgets[i].tooltip));
+    }
+  }
+
+  /* Check for model compatibility warnings when entering noise mode */
+  if (noise)
+    Check_Noise_Warnings(calc_data.freq_step);
 
   Set_Window_Labels();
 
@@ -906,15 +1041,22 @@ New_Radiation_Projection_Angle(void)
 
   need_rdpat_redraw = 1;
 
+  /* Noise modes require full recomputation of scaled min/max */
+  if (IS_NOISE_MODE(rc_config.gain_style))
+  {
+    SetFlag( DRAW_NEW_RDPAT );
+  }
+
   /* Trigger a redraw of radiation drawingarea */
   if( isFlagSet(DRAW_ENABLED) )
   {
     xnec2_widget_queue_draw( rdpattern_drawingarea );
   }
 
-  /* Trigger a redraw of plots drawingarea if doing "viewer" gain */
+  /* Trigger a redraw of plots drawingarea if doing "viewer" gain
+   * or antenna temperature (noise env / elevation changes affect T_ant) */
   if( isFlagSet(PLOT_ENABLED) &&
-      isFlagSet(PLOT_GVIEWER) &&
+      (isFlagSet(PLOT_GVIEWER) || isFlagSet(PLOT_ANT_TEMP)) &&
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
     xnec2_widget_queue_draw( freqplots_drawingarea );
@@ -1061,7 +1203,9 @@ Set_Window_Labels( void )
     _("Linear Power"),
     _("Linear Voltage"),
     _("ARRL Scale"),
-    _("Logarithmic Scale")
+    _("Logarithmic Scale"),
+    _("Noise Temperature"),
+    _("Noise Temp (log scale)"),
   };
 
   char txt[64];
@@ -1267,6 +1411,16 @@ Inverse_Scale_Gain(double scaled_val)
     case GS_LOG:
       db_val = (scaled_val - 1.0) * 40.0;
       break;
+
+    /* Gain-weighted brightness temperature in Kelvin */
+    case GS_NOISE:
+      db_val = scaled_val;
+      break;
+
+    /* Log-compressed: recover Kelvin from log10(1 + G_lin*T_bright) */
+    case GS_NOISE_LOG:
+      db_val = pow(10.0, scaled_val) - 1.0;
+      break;
   }
 
   return db_val;
@@ -1324,9 +1478,21 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
   color_min = (min_gain < COLOR_MIN_GAIN) ? COLOR_MIN_GAIN : min_gain;
 
   /* Scale the gains for color mapping */
-  double scaled_max = Scale_Gain(max_gain, fstep, rad_pattern[fstep].max_gain_idx[pol]);
-  double scaled_min = Scale_Gain(color_min, fstep, rad_pattern[fstep].min_gain_idx[pol]);
-  double scaled_range = scaled_max - scaled_min;
+  int noise_legend = IS_NOISE_MODE(rc_config.gain_style);
+  double scaled_max, scaled_min, scaled_range;
+
+  if (noise_legend)
+  {
+    /* Use true noise extremes computed during cell scan */
+    scaled_max = rad_pattern[fstep].noise_scaled_max;
+    scaled_min = rad_pattern[fstep].noise_scaled_min;
+  }
+  else
+  {
+    scaled_max = Scale_Gain(max_gain, fstep, rad_pattern[fstep].max_gain_idx[pol]);
+    scaled_min = Scale_Gain(color_min, fstep, rad_pattern[fstep].min_gain_idx[pol]);
+  }
+  scaled_range = scaled_max - scaled_min;
 
   /* Calculate relative gain points starting at -3dB and stepping by -6dB */
   int num_rel_marks = 0;
@@ -1374,18 +1540,22 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
       y + height <= rdpattern_proj_params.height)
   {
     /* Draw headings */
+    int noise_mode = IS_NOISE_MODE(rc_config.gain_style);
     cairo_set_source_rgb(cr, WHITE);
     cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-    
-    /* Right-justify "Rel." */
-    cairo_text_extents_t rel_extents;
-    cairo_text_extents(cr, "Rel.", &rel_extents);
-    cairo_move_to(cr, x - 5 - rel_extents.width, y - 7);  /* Moved up 2px */
-    cairo_show_text(cr, "Rel.");
-    
-    /* Left-justify "Abs." */
+
+    if (!noise_mode)
+    {
+      /* Right-justify "Rel." */
+      cairo_text_extents_t rel_extents;
+      cairo_text_extents(cr, "Rel.", &rel_extents);
+      cairo_move_to(cr, x - 5 - rel_extents.width, y - 7);  /* Moved up 2px */
+      cairo_show_text(cr, "Rel.");
+    }
+
+    /* Left-justify heading: "K" for noise, "Abs." for gain */
     cairo_move_to(cr, x + width + 5, y - 7);  /* Moved up 2px */
-    cairo_show_text(cr, "Abs.");
+    cairo_show_text(cr, noise_mode ? "K/sr" : "Abs.");
 
     /* Draw color gradient with proper scaling (min at bottom, max at top) */
     for (i = 0; i < height; i++)
@@ -1430,16 +1600,19 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
       cairo_line_to(cr, x + width + TEXT_GRADIENT_SPACING, grad_y);
       cairo_stroke(cr);
 
-      /* Show gain value in text */
+      /* Show value in text */
       if (db_val < -999.99) db_val = -999.99;
       /* First measure width of numeric part */
       char num_txt[16];
       snprintf(num_txt, sizeof(num_txt)-1, "%.2f", db_val);
       cairo_text_extents_t num_extents;
       cairo_text_extents(cr, num_txt, &num_extents);
-      
-      /* Then format full text with dBi */
-      snprintf(txt, sizeof(txt)-1, "%.2f dBi", db_val);
+
+      /* Format with appropriate units */
+      if (noise_mode)
+        snprintf(txt, sizeof(txt)-1, "%.0f", db_val);
+      else
+        snprintf(txt, sizeof(txt)-1, "%.2f dBi", db_val);
       cairo_set_source_rgb(cr, WHITE);
       /* Right-justify absolute gain values with normal weight */
       cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
@@ -1449,8 +1622,8 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
       cairo_show_text(cr, txt);
     }
 
-    /* Draw relative gain marks on left side */
-    for (i = 0; i < num_rel_marks; i++) {
+    /* Draw relative gain marks on left side (gain modes only) */
+    for (i = 0; !noise_mode && i < num_rel_marks; i++) {
       int mark_y = y + (int)((1.0 - positions[i]) * (height - 1));
       
       /* Draw mark */

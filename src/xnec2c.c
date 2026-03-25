@@ -75,7 +75,14 @@ int set_freq_step(void)
 	// If we didn't find the frequency, then use the "extra" frequency
 	// allocated as +1 at the end of all per-frequency data indexes:
 	if (!found)
+	{
 		calc_data.freq_step = calc_data.steps_total;
+
+		/* Populate the extra slot so consumers reading save.freq[steps_total]
+		 * (e.g., Scale_Gain noise mode, meas_calc antenna temperature) get
+		 * the actual operating frequency instead of uninitialized memory. */
+		save.freq[calc_data.steps_total] = calc_data.freq_mhz;
+	}
 
 	if (calc_data.freq_step != prev_freq_step)
 		SetFlag( DRAW_NEW_RDPAT );

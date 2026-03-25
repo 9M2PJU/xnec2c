@@ -20,6 +20,7 @@
 #include "callbacks.h"
 #include "shared.h"
 #include "opt_ui.h"
+#include "measurements.h"
 #include <pthread.h>
 
 /* Action flag for NEC2 "card" editors */
@@ -27,6 +28,55 @@ static int editor_action = EDITOR_NEW;
 
 static int saveas_width;
 static int saveas_height;
+
+/* One-shot flags for noise mode compatibility warnings */
+static gboolean noise_ground_warned = FALSE;
+static gboolean noise_offaxis_warned = FALSE;
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * Check_Noise_Warnings() - emit one-shot Notice() dialogs when the
+ * NEC model is incompatible with antenna temperature conventions.
+ *
+ * Called when entering a noise gain style or when restoring one at
+ * program start.
+ */
+  void
+Check_Noise_Warnings(int fstep)
+{
+  if (fstep < 0 || isFlagClear(ENABLE_RDPAT))
+    return;
+
+  /* Ground plane detected */
+  if (!noise_ground_warned && gnd.ksymp == 2)
+  {
+    noise_ground_warned = TRUE;
+    Notice(GTK_BUTTONS_OK,
+        _("Antenna Temperature"),
+        _("Ground plane detected in model. "
+          "T_ant results will overcount ground effects. "
+          "Free-space models are standard for antenna "
+          "temperature evaluation."));
+  }
+
+  /* Beam not in XY plane */
+  int pol = calc_data.pol_type;
+  double off_axis = fabs(
+      rad_pattern[fstep].max_gain_tht[pol] - 90.0);
+  if (!noise_offaxis_warned && fpat.dth > 0.0
+      && off_axis > fpat.dth)
+  {
+    noise_offaxis_warned = TRUE;
+    Notice(GTK_BUTTONS_OK,
+        _("Antenna Temperature"),
+        _("Max gain at θ=%.0f° (%.0f° from XY plane). "
+          "Convention assumes beam in XY plane with "
+          "observation elevation set by spinbutton."),
+        rad_pattern[fstep].max_gain_tht[pol],
+        off_axis);
+  }
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -506,6 +556,24 @@ on_main_rdpattern_activate(
     /* Restore gain style */
     Set_Gain_Style(rc_config.gain_style);
 
+    /* Restore noise environment radio item */
+    {
+      int env = rc_config.ant_temp_env;
+      if (env >= 0 && env < ANT_TEMP_ENV_COUNT)
+      {
+        widget = Builder_Get_Object(
+            rdpattern_window_builder, (gchar *)noise_env_widget_ids[env]);
+        gtk_check_menu_item_set_active(
+            GTK_CHECK_MENU_ITEM(widget), TRUE);
+      }
+    }
+
+    /* Restore elevation spinbutton */
+    widget = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_elevation_spinbutton");
+    gtk_spin_button_set_value(
+        GTK_SPIN_BUTTON(widget), rc_config.ant_temp_elevation);
+
   } /* if( gtk_check_menu_item_get_active(...) ) */
   else if( isFlagSet(DRAW_ENABLED) )
     Gtk_Widget_Destroy( &rdpattern_window );
@@ -603,6 +671,13 @@ on_main_freqplots_activate(
         gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
       }
 
+      if( rc_config.freqplots_ant_temp_togglebutton )
+      {
+        widget = Builder_Get_Object(
+            freqplots_window_builder, "freqplots_ant_temp_togglebutton" );
+        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
+      }
+
       if( rc_config.freqplots_net_gain )
       {
         widget = Builder_Get_Object(
@@ -628,6 +703,13 @@ on_main_freqplots_activate(
       {
         widget = Builder_Get_Object(
             freqplots_window_builder, "freqplots_clamp_vswr" );
+        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
+      }
+
+      if( rc_config.freqplots_show_ant_temp )
+      {
+        widget = Builder_Get_Object(
+            freqplots_window_builder, "freqplots_show_ant_temp" );
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
       }
 
@@ -1263,6 +1345,16 @@ on_freqplots_smith_togglebutton_toggled(
 
 
   void
+on_freqplots_ant_temp_togglebutton_toggled(
+    GtkToggleButton *togglebutton,
+    gpointer         user_data)
+{
+  /* Enable or not antenna temperature plotting */
+  Plot_Select( togglebutton, PLOT_ANT_TEMP );
+}
+
+
+  void
 on_freqplots_zmgzph_togglebutton_toggled(
     GtkToggleButton *togglebutton,
     gpointer         user_data)
@@ -1487,6 +1579,62 @@ on_rdpattern_logarithmic_activate(
 {
   if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
     Set_Gain_Style( GS_LOG );
+}
+
+
+  void
+on_rdpattern_noise_temp_activate(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    Set_Gain_Style( GS_NOISE );
+}
+
+
+  void
+on_rdpattern_noise_temp_log_activate(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    Set_Gain_Style( GS_NOISE_LOG );
+}
+
+/* Noise environment radio menu item callback — single handler for all models */
+
+  void
+on_rdpattern_noise_env_activate(
+    GtkMenuItem *menuitem, gpointer user_data)
+{
+  if( !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    return;
+
+  /* Match activated widget against known radio items */
+  for (int i = 0; i < ANT_TEMP_ENV_COUNT; i++)
+  {
+    GtkWidget *w = Builder_Get_Object(
+        rdpattern_window_builder, (gchar *)noise_env_widget_ids[i]);
+    if (GTK_WIDGET(menuitem) == w)
+    {
+      rc_config.ant_temp_env = i;
+      New_Radiation_Projection_Angle();
+      return;
+    }
+  }
+
+  pr_warn("noise env activate: no matching widget found\n");
+}
+
+
+/* Elevation spin button callback */
+
+  void
+on_rdpattern_elevation_spinbutton_value_changed(
+    GtkSpinButton *spinbutton, gpointer user_data)
+{
+  rc_config.ant_temp_elevation = gtk_spin_button_get_value(spinbutton);
+  New_Radiation_Projection_Angle();
 }
 
 
@@ -4720,6 +4868,22 @@ on_freqplots_clamp_vswr_activate(
     rc_config.freqplots_clamp_vswr = 1;
   else
     rc_config.freqplots_clamp_vswr = 0;
+
+  /* Trigger a redraw of frequency plots drawingarea */
+  if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
+  {
+    xnec2_widget_queue_draw( freqplots_drawingarea );
+  }
+}
+
+  void
+on_freqplots_show_ant_temp_activate(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+  /* Toggle showing T_ant instead of T_total on right axis */
+  rc_config.freqplots_show_ant_temp =
+    gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem));
 
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )

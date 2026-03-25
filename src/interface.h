@@ -126,6 +126,9 @@ NULL
 "freqplots_vswr_entry", \
 "freqplots_zreal_entry", \
 "freqplots_zimag_entry", \
+"freqplots_ant_temp_tot_entry", \
+"freqplots_ant_temp_entry", \
+"freqplots_gt_entry", \
 "freqplots_zo_spinbutton", \
 "freqplots_drawingarea", \
 "freqplots_label", \
@@ -530,6 +533,12 @@ NULL
 "rdpattern_incline_adjustment", \
 "rdpattern_rotate_adjustment", \
 "rdpattern_zoom_adjustment", \
+"rdpattern_elevation_adjustment", \
+"rdpattern_elevation_label", \
+"rdpattern_gain_row_label", \
+"rdpattern_ant_temp_header", \
+"rdpattern_ant_temp_entry", \
+"rdpattern_noise_env_menu", \
 "rdpattern_window", \
 "rdpattern_box", \
 "menuitem9_menu", \

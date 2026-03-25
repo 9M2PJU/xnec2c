@@ -303,6 +303,28 @@ Display_Frequency_Data( void )
   gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(
           freqplots_window_builder, "freqplots_zimag_entry")), txt );
 
+  /* Display antenna temperature values */
+  if (meas.ant_temp_tot >= 0.0)
+    snprintf( txt, sizeof(txt)-1, "%.0f K", meas.ant_temp_tot );
+  else
+    snprintf( txt, sizeof(txt)-1, "— K" );
+  gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(
+          freqplots_window_builder, "freqplots_ant_temp_tot_entry")), txt );
+
+  if (meas.ant_temp >= 0.0)
+    snprintf( txt, sizeof(txt)-1, "%.0f K", meas.ant_temp );
+  else
+    snprintf( txt, sizeof(txt)-1, "— K" );
+  gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(
+          freqplots_window_builder, "freqplots_ant_temp_entry")), txt );
+
+  if (meas.gt > -999.0)
+    snprintf( txt, sizeof(txt)-1, "%.1f", meas.gt );
+  else
+    snprintf( txt, sizeof(txt)-1, "— dB" );
+  gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(
+          freqplots_window_builder, "freqplots_gt_entry")), txt );
+
 } /* Display_Frequency_Data() */
 
 /*-----------------------------------------------------------------------*/
@@ -1396,7 +1418,8 @@ _Plot_Frequency_Data( cairo_t *cr )
        isFlagClear(PLOT_VSWR)         &&
        isFlagClear(PLOT_ZREAL_ZIMAG)  &&
        isFlagClear(PLOT_ZMAG_ZPHASE)  &&
-       isFlagClear(PLOT_SMITH)) )
+       isFlagClear(PLOT_SMITH)        &&
+       isFlagClear(PLOT_ANT_TEMP)) )
   {
     return;
   }
@@ -1618,6 +1641,46 @@ _Plot_Frequency_Data( cairo_t *cr )
                        save.freq, num_fsteps, posn++);
 
   } /* if( isFlagSet(PLOT_SMITH) ) */
+
+  /* Plot G/T_A and antenna temperature vs frequency */
+  if( isFlagSet(PLOT_ANT_TEMP) && isFlagSet(ENABLE_RDPAT) )
+  {
+    static double *gt_buf = NULL;
+    static double *temp_buf = NULL;
+
+    size_t mreq = (size_t)num_fsteps * sizeof(double);
+    mem_realloc( (void **)&gt_buf, mreq, "in plot_freqdata.c" );
+    mem_realloc( (void **)&temp_buf, mreq, "in plot_freqdata.c" );
+
+    for( idx = 0; idx < num_fsteps; idx++ )
+    {
+      meas_calc( &meas, idx );
+      gt_buf[idx] = (meas.gt > -999.0) ? meas.gt : 0.0;
+
+      /* Right axis: T_ant when View toggle active, T_total otherwise */
+      if( rc_config.freqplots_show_ant_temp )
+        temp_buf[idx] = (meas.ant_temp >= 0.0) ? meas.ant_temp : 0.0;
+      else
+        temp_buf[idx] = (meas.ant_temp_tot >= 0.0) ? meas.ant_temp_tot : 0.0;
+    }
+
+    titles[0] = _("G/T_ant (dB)");
+    if( rc_config.freqplots_show_ant_temp )
+    {
+      titles[1] = _("G/T_ant & T_ant");
+      titles[2] = _("T_ant (K)");
+    }
+    else
+    {
+      titles[1] = _("G/T_ant & T_total");
+      titles[2] = _("T_total (K)");
+    }
+
+    if( num_fsteps > 0 )
+      Plot_Graph( cr, gt_buf, temp_buf,
+                  save.freq, num_fsteps, titles, posn++ );
+
+  } /* if( isFlagSet(PLOT_ANT_TEMP) ) */
 
   /* Display freq data in entry widgets */
   Display_Frequency_Data();

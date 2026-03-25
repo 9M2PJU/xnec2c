@@ -9310,6 +9310,13 @@ Save NEC2 Editor data first?
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
+  <object class="GtkAdjustment" id="rdpattern_elevation_adjustment">
+    <property name="lower">-90</property>
+    <property name="upper">90</property>
+    <property name="value">0</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">5</property>
+  </object>
   <object class="GtkAdjustment" id="rdpattern_zoom_adjustment">
     <property name="lower">10</property>
     <property name="upper">99999</property>
@@ -9862,6 +9869,15 @@ Save NEC2 Editor data first?
                           </object>
                         </child>
                         <child>
+                          <object class="GtkCheckMenuItem" id="freqplots_show_ant_temp">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">Show T_ant instead of T_total</property>
+                            <property name="use-underline">True</property>
+                            <signal name="activate" handler="on_freqplots_show_ant_temp_activate" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
                           <object class="GtkCheckMenuItem" id="freqplots_round_x_axis">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
@@ -9992,6 +10008,20 @@ Save NEC2 Editor data first?
                     <property name="position">6</property>
                   </packing>
                 </child>
+                <child>
+                  <object class="GtkToggleButton" id="freqplots_ant_temp_togglebutton">
+                    <property name="label" translatable="yes">T_ant</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">False</property>
+                    <signal name="toggled" handler="on_freqplots_ant_temp_togglebutton_toggled" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">7</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -10007,7 +10037,7 @@ Save NEC2 Editor data first?
           </packing>
         </child>
         <child>
-          <!-- n-columns=7 n-rows=2 -->
+          <!-- n-columns=10 n-rows=2 -->
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
@@ -10238,7 +10268,7 @@ Save NEC2 Editor data first?
                 <property name="track-visited-links">False</property>
               </object>
               <packing>
-                <property name="left-attach">6</property>
+                <property name="left-attach">9</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -10319,7 +10349,109 @@ Save NEC2 Editor data first?
                 </child>
               </object>
               <packing>
+                <property name="left-attach">9</property>
+                <property name="top-attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="label" translatable="yes">T_total</property>
+                <property name="single-line-mode">True</property>
+              </object>
+              <packing>
                 <property name="left-attach">6</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="freqplots_ant_temp_tot_entry">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="hexpand">True</property>
+                <property name="editable">False</property>
+                <property name="max-length">9</property>
+                <property name="invisible-char">●</property>
+                <property name="width-chars">6</property>
+                <property name="max-width-chars">6</property>
+                <property name="text" translatable="yes"> - - -</property>
+                <property name="xalign">1</property>
+                <property name="shadow-type">etched-in</property>
+                <property name="caps-lock-warning">False</property>
+                <property name="input-purpose">number</property>
+              </object>
+              <packing>
+                <property name="left-attach">6</property>
+                <property name="top-attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="label" translatable="yes">T_ant</property>
+                <property name="single-line-mode">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">7</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="freqplots_ant_temp_entry">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="hexpand">True</property>
+                <property name="editable">False</property>
+                <property name="max-length">9</property>
+                <property name="invisible-char">●</property>
+                <property name="width-chars">6</property>
+                <property name="max-width-chars">6</property>
+                <property name="text" translatable="yes"> - - -</property>
+                <property name="xalign">1</property>
+                <property name="shadow-type">etched-in</property>
+                <property name="caps-lock-warning">False</property>
+                <property name="input-purpose">number</property>
+              </object>
+              <packing>
+                <property name="left-attach">7</property>
+                <property name="top-attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="label" translatable="yes">G/T_ant</property>
+                <property name="single-line-mode">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">8</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="freqplots_gt_entry">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="hexpand">True</property>
+                <property name="editable">False</property>
+                <property name="max-length">9</property>
+                <property name="invisible-char">●</property>
+                <property name="width-chars">6</property>
+                <property name="max-width-chars">6</property>
+                <property name="text" translatable="yes"> - - -</property>
+                <property name="xalign">1</property>
+                <property name="shadow-type">etched-in</property>
+                <property name="caps-lock-warning">False</property>
+                <property name="input-purpose">number</property>
+              </object>
+              <packing>
+                <property name="left-attach">8</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>
@@ -11968,6 +12100,135 @@ Save NEC2 Editor data first?
                                     <signal name="activate" handler="on_rdpattern_logarithmic_activate" swapped="no"/>
                                   </object>
                                 </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_noise_temp">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">_Noise Temperature</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">rdpattern_linear_power</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_temp_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_noise_temp_log">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">Noise Temp (_log scale)</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">rdpattern_linear_power</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_temp_log_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkMenuItem" id="rdpattern_noise_env_menu">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">Noise _Environment</property>
+                            <property name="use-underline">True</property>
+                            <child type="submenu">
+                              <object class="GtkMenu" id="rdpattern_noise_env_menu_menu">
+                                <property name="can-focus">False</property>
+                                <child>
+                                  <object class="GtkTearoffMenuItem" id="rdpattern_noise_env_tearoff">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_env_ve7bqh_rural">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">VE7BQH _Rural</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_env_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_env_ve7bqh_residential">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">VE7BQH Resi_dential</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="active">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">rdpattern_env_ve7bqh_rural</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_env_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_env_ve7bqh_city">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">VE7BQH _City</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">rdpattern_env_ve7bqh_rural</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_env_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_env_g4cqm_baseline">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">G4CQM _Baseline</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">rdpattern_env_ve7bqh_rural</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_env_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_env_itu_business">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">ITU-R _Business</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">rdpattern_env_ve7bqh_rural</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_env_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_env_itu_residential">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">ITU-R Reside_ntial</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">rdpattern_env_ve7bqh_rural</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_env_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_env_itu_rural">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">ITU-R Ru_ral</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">rdpattern_env_ve7bqh_rural</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_env_activate" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="rdpattern_env_itu_quiet_rural">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">ITU-R _Quiet Rural</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">rdpattern_env_ve7bqh_rural</property>
+                                    <signal name="activate" handler="on_rdpattern_noise_env_activate" swapped="no"/>
+                                  </object>
+                                </child>
                               </object>
                             </child>
                           </object>
@@ -12344,6 +12605,43 @@ Save NEC2 Editor data first?
               </packing>
             </child>
             <child>
+              <object class="GtkLabel" id="rdpattern_elevation_label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">end</property>
+                <property name="margin-left">4</property>
+                <property name="label" translatable="yes">T Elev° </property>
+                <property name="single-line-mode">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">11</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSpinButton" id="rdpattern_elevation_spinbutton">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="max-length">4</property>
+                <property name="width-chars">4</property>
+                <property name="max-width-chars">4</property>
+                <property name="xalign">1</property>
+                <property name="shadow-type">etched-in</property>
+                <property name="input-purpose">number</property>
+                <property name="adjustment">rdpattern_elevation_adjustment</property>
+                <property name="climb-rate">1</property>
+                <property name="numeric">True</property>
+                <property name="update-policy">if-valid</property>
+                <signal name="value-changed" handler="on_rdpattern_elevation_spinbutton_value_changed" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">12</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkButton" id="rdpattern_plus_button">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -12364,7 +12662,7 @@ Save NEC2 Editor data first?
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">11</property>
+                <property name="position">13</property>
               </packing>
             </child>
             <child>
@@ -12388,7 +12686,7 @@ Save NEC2 Editor data first?
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">12</property>
+                <property name="position">14</property>
               </packing>
             </child>
             <child>
@@ -12412,7 +12710,7 @@ Save NEC2 Editor data first?
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">13</property>
+                <property name="position">15</property>
               </packing>
             </child>
           </object>
@@ -12423,7 +12721,7 @@ Save NEC2 Editor data first?
           </packing>
         </child>
         <child>
-          <!-- n-columns=7 n-rows=2 -->
+          <!-- n-columns=8 n-rows=2 -->
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
@@ -12505,12 +12803,12 @@ Save NEC2 Editor data first?
                 </child>
               </object>
               <packing>
-                <property name="left-attach">5</property>
+                <property name="left-attach">6</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="rdpattern_gain_row_label">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">end</property>
@@ -12554,7 +12852,7 @@ Save NEC2 Editor data first?
                 <property name="caps-lock-warning">False</property>
               </object>
               <packing>
-                <property name="left-attach">6</property>
+                <property name="left-attach">7</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>
@@ -12569,7 +12867,7 @@ Save NEC2 Editor data first?
                 <property name="track-visited-links">False</property>
               </object>
               <packing>
-                <property name="left-attach">6</property>
+                <property name="left-attach">7</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -12584,7 +12882,7 @@ Save NEC2 Editor data first?
                 <property name="track-visited-links">False</property>
               </object>
               <packing>
-                <property name="left-attach">5</property>
+                <property name="left-attach">6</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -12606,7 +12904,7 @@ Save NEC2 Editor data first?
                 <accelerator key="a" signal="clicked"/>
               </object>
               <packing>
-                <property name="left-attach">4</property>
+                <property name="left-attach">5</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>
@@ -12621,7 +12919,7 @@ Save NEC2 Editor data first?
                 <property name="draw-indicator">True</property>
               </object>
               <packing>
-                <property name="left-attach">4</property>
+                <property name="left-attach">5</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -12636,7 +12934,7 @@ Save NEC2 Editor data first?
                 <property name="track-visited-links">False</property>
               </object>
               <packing>
-                <property name="left-attach">3</property>
+                <property name="left-attach">4</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -12661,12 +12959,12 @@ Save NEC2 Editor data first?
                 <signal name="value-changed" handler="on_rdpattern_freq_spinbutton_value_changed" swapped="no"/>
               </object>
               <packing>
-                <property name="left-attach">3</property>
+                <property name="left-attach">4</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="rdpattern_gain_units_label">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
@@ -12675,6 +12973,38 @@ Save NEC2 Editor data first?
               </object>
               <packing>
                 <property name="left-attach">2</property>
+                <property name="top-attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="rdpattern_ant_temp_header">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="hexpand">True</property>
+                <property name="label" translatable="yes">T_total</property>
+                <property name="single-line-mode">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">3</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="rdpattern_ant_temp_entry">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="editable">False</property>
+                <property name="max-length">9</property>
+                <property name="invisible-char">●</property>
+                <property name="width-chars">6</property>
+                <property name="max-width-chars">6</property>
+                <property name="text" translatable="yes">— K</property>
+                <property name="xalign">1</property>
+                <property name="shadow-type">etched-in</property>
+              </object>
+              <packing>
+                <property name="left-attach">3</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>

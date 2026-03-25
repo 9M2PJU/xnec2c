@@ -42,8 +42,14 @@ extern const char *meas_names[];
 extern const char *meas_display_names[];
 extern const char *meas_descriptions[];
 
+/* Horizon angle (radians) for sky/earth boundary in antenna temperature.
+ * 0° elevation → π/2; positive elevation tilts horizon upward. */
+#define ANT_TEMP_HORIZON_RAD() \
+	(M_PI / 2.0 + rc_config.ant_temp_elevation * M_PI / 180.0)
+
 #define ANT_TEMP_ENV_COUNT 8
 extern const char *ant_temp_env_names[ANT_TEMP_ENV_COUNT];
+extern const char *noise_env_widget_ids[ANT_TEMP_ENV_COUNT];
 
 typedef struct
 {

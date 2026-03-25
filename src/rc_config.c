@@ -22,6 +22,7 @@
 #include "shared.h"
 #include "rc_config.h"
 #include "mathlib.h"
+#include "measurements.h"
 
 
 /* Add configuration options here. To add new variables:
@@ -132,6 +133,12 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Frequency Plots Window Smith toggle button state", .format = "%d",
 		.vars = { &rc_config.freqplots_smith_togglebutton } },
 
+	{ .desc = "Freqplots Ant Temp Toggle", .format = "%d",
+		.vars = { &rc_config.freqplots_ant_temp_togglebutton } },
+
+	{ .desc = "Freqplots Show Ant Temp (T_ant instead of T_total)", .format = "%d",
+		.vars = { &rc_config.freqplots_show_ant_temp } },
+
 	{ .desc = "Frequency Plots Window Net Gain checkbutton state", .format = "%d",
 		.vars = { &rc_config.freqplots_net_gain } },
 
@@ -224,6 +231,13 @@ rc_config_vars_t rc_config_vars[] = {
 
 	{ .desc = "Symbol Overrides Window Position (root x and y)", .format = "%d,%d",
 		.vars = { &rc_config.sy_overrides_x, &rc_config.sy_overrides_y } },
+
+	{ .desc = "Antenna Temp Environment (0=VE7BQH Rural .. 7=ITU Quiet Rural)", .format = "%d",
+		.vars = { &rc_config.ant_temp_env } },
+
+	{ .desc = "Antenna Temp Elevation (deg, +=up)", .format = "%lf",
+		.vars = { &rc_config.ant_temp_elevation } },
+
 };
 
 
@@ -524,6 +538,8 @@ Create_Default_Config( void )
   rc_config.freqplots_zrlzim_togglebutton  = 0;
   rc_config.freqplots_zmgzph_togglebutton  = 0;
   rc_config.freqplots_smith_togglebutton   = 0;
+  rc_config.freqplots_ant_temp_togglebutton = 0;
+  rc_config.freqplots_show_ant_temp = 0;
   rc_config.freqplots_net_gain = 0;
   rc_config.freqplots_min_max = 0;
   rc_config.freqplots_s11 = 0;
@@ -537,6 +553,10 @@ Create_Default_Config( void )
 
   rc_config.freqplots_clamp_vswr = 1;
   rc_config.freqplots_round_x_axis = 0;
+
+  /* Antenna temperature defaults */
+  rc_config.ant_temp_env = 1;   /* ANT_TEMP_ENV_VE7BQH_RESIDENTIAL */
+  rc_config.ant_temp_elevation = 0.0;
 
   /* For NEC2 editor window */
   rc_config.nec2_edit_width  = 0;
@@ -916,6 +936,24 @@ Get_GUI_State( void )
     gtk_spin_button_update( GTK_SPIN_BUTTON(widget) );
     rc_config.rdpattern_zoom_spinbutton =
       gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(widget) );
+
+    /* Antenna temperature elevation */
+    widget = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_elevation_spinbutton" );
+    gtk_spin_button_update( GTK_SPIN_BUTTON(widget) );
+    rc_config.ant_temp_elevation =
+      gtk_spin_button_get_value(GTK_SPIN_BUTTON(widget) );
+
+    /* Noise environment — find active radio item */
+    for (int i = 0; i < ANT_TEMP_ENV_COUNT; i++)
+    {
+      widget = Builder_Get_Object(rdpattern_window_builder, (gchar *)noise_env_widget_ids[i]);
+      if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
+      {
+        rc_config.ant_temp_env = i;
+        break;
+      }
+    }
   }
 
   /* Get geometry of frequency plots window */
@@ -933,8 +971,10 @@ Get_GUI_State( void )
     rc_config.freqplots_zrlzim_togglebutton  = 0;
     rc_config.freqplots_zmgzph_togglebutton  = 0;
     rc_config.freqplots_smith_togglebutton   = 0;
+    rc_config.freqplots_ant_temp_togglebutton = 0;
     rc_config.freqplots_net_gain = 0;
     rc_config.freqplots_clamp_vswr = 0;
+    rc_config.freqplots_show_ant_temp = 0;
     rc_config.freqplots_min_max = 0;
     rc_config.freqplots_round_x_axis = 0;
 
@@ -989,9 +1029,19 @@ Get_GUI_State( void )
       rc_config.freqplots_round_x_axis = 1;
 
     widget = Builder_Get_Object(
+        freqplots_window_builder, "freqplots_show_ant_temp" );
+    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
+      rc_config.freqplots_show_ant_temp = 1;
+
+    widget = Builder_Get_Object(
         freqplots_window_builder, "freqplots_smith_togglebutton" );
     if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
       rc_config.freqplots_smith_togglebutton = 1;
+
+    widget = Builder_Get_Object(
+        freqplots_window_builder, "freqplots_ant_temp_togglebutton" );
+    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
+      rc_config.freqplots_ant_temp_togglebutton = 1;
   }
 
   /* Get geometry of NEC2 editor window */

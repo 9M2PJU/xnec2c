@@ -380,7 +380,6 @@ typedef struct
 
   /* Antenna temperature calculation */
   int ant_temp_env;       /* ANT_TEMP_ENV_* index from measurements.h */
-  double ant_temp_ext_loss;  /* External loss temperature (K), e.g. feedline */
   double ant_temp_elevation; /* Antenna elevation tilt (degrees), +=up */
 } rc_config_t;
 
@@ -400,6 +399,8 @@ enum GAIN_SCALE
   GS_NOISE_LOG,
   NUM_SCALES
 };
+
+#define IS_NOISE_MODE(gs) ((gs) == GS_NOISE || (gs) == GS_NOISE_LOG)
 
 /* Minimum gain value used for color mapping */
 #define COLOR_MIN_GAIN -60.0
@@ -914,6 +915,10 @@ typedef struct
   double
     efficiency;     /* Radiation efficiency = prad / pinr, per freq step */
 
+  double
+    noise_scaled_max,  /* True max of Scale_Gain in noise mode (K/sr) */
+    noise_scaled_min;  /* True min of Scale_Gain in noise mode (K/sr) */
+
   int
     *max_gain_idx,  /* Where in rad_pattern.gtot the max value occurs */
     *min_gain_idx,  /* Where in rad_pattern.gtot the min value occurs */
@@ -1074,6 +1079,10 @@ void on_rdpattern_linear_voltage_activate(GtkMenuItem *menuitem, gpointer user_d
 void on_rdpattern_arrl_style_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_logarithmic_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_noise_temp_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_rdpattern_noise_temp_log_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_rdpattern_noise_env_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_rdpattern_elevation_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
+void Check_Noise_Warnings(int fstep);
 void on_rdpattern_e_field_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_h_field_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_poynting_vector_activate(GtkMenuItem *menuitem, gpointer user_data);

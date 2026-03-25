@@ -27,6 +27,19 @@ const char *ant_temp_env_names[ANT_TEMP_ENV_COUNT] = {
 	"ITU-R Quiet Rural",
 };
 
+/* Glade widget IDs for noise environment radio menu items,
+ * indexed by ant_temp_env_t (0..ANT_TEMP_ENV_COUNT-1) */
+const char *noise_env_widget_ids[ANT_TEMP_ENV_COUNT] = {
+	"rdpattern_env_ve7bqh_rural",
+	"rdpattern_env_ve7bqh_residential",
+	"rdpattern_env_ve7bqh_city",
+	"rdpattern_env_g4cqm_baseline",
+	"rdpattern_env_itu_business",
+	"rdpattern_env_itu_residential",
+	"rdpattern_env_itu_rural",
+	"rdpattern_env_itu_quiet_rural",
+};
+
 /* VE7BQH 2024 — [env][band]: 0=Rural 1=Residential 2=City;
  * 0=50MHz 1=144MHz 2=432MHz */
 static const double ve7bqh_sky[3]    = { 5640.0,  290.0,  27.0 };
@@ -140,6 +153,14 @@ int ant_temp_resolve(double freq_mhz, int env,
 	int ci = e - ANT_TEMP_ENV_ITU_BUSINESS;
 	double fam = itu_coeffs[ci].c - itu_coeffs[ci].d * log10(freq_mhz);
 	*t_earth = 290.0 * (pow(10.0, fam / 10.0) - 1.0);
+
+	/* Clamp to thermodynamic floor: earth brightness cannot fall below
+	 * ground thermal emission (~290 K).  The ITU-R Fa formula models
+	 * man-made noise and goes negative when Fa < 0 dB, which occurs
+	 * at higher VHF for quieter environments (Quiet Rural above ~85 MHz). */
+	if (*t_earth < 290.0)
+		*t_earth = 290.0;
+
 	*t_sky   = ant_temp_log_interp(freq_mhz, g4cqm_mhz, g4cqm_sky, G4CQM_NPTS);
 	return 0;
 }
@@ -203,7 +224,7 @@ const char *meas_display_names[] = {
 	[MEAS_GAIN_DEV_NZ]     =  "Gain Dev \xe2\x88\x92Z",
 	[MEAS_ANT_TEMP]        =  "Ant Temp",
 	[MEAS_ANT_TEMP_TOT]   =  "Ant Temp Total",
-	[MEAS_GT]              =  "G/T",
+	[MEAS_GT]              =  "G/T_ant",
 	[MEAS_COUNT]            =  NULL
 };
 
@@ -233,7 +254,7 @@ const char *meas_descriptions[] = {
 	[MEAS_GAIN_DEV_NZ]     =  "Angular deviation of peak gain from -Z axis (degrees)",
 	[MEAS_ANT_TEMP]        =  "Antenna noise temperature from sky/earth brightness (K)",
 	[MEAS_ANT_TEMP_TOT]   =  "Total antenna noise temperature including loss (K)",
-	[MEAS_GT]              =  "Gain-to-noise-temperature ratio (dB)",
+	[MEAS_GT]              =  "Gain-to-antenna-temperature ratio (dB), excludes loss",
 	[MEAS_COUNT]            =  NULL
 };
 
@@ -368,6 +389,7 @@ void meas_calc(measurement_t *m, int idx)
 			double t_pattern = 0.0;
 			double dth_rad = fpat.dth * M_PI / 180.0;
 			double dph_rad = fpat.dph * M_PI / 180.0;
+			double horizon_rad = ANT_TEMP_HORIZON_RAD();
 
 			for (int iph = 0; iph < fpat.nph; iph++)
 			{
@@ -376,7 +398,7 @@ void meas_calc(measurement_t *m, int idx)
 					double tht_rad = (fpat.thets + ith * fpat.dth) * M_PI / 180.0;
 					double g_lin = pow(10.0,
 						rad_pattern[idx].gtot[ith + iph * fpat.nth] / 10.0);
-					double t_bright = (tht_rad < M_PI / 2.0) ? t_sky : t_earth;
+					double t_bright = (tht_rad < horizon_rad) ? t_sky : t_earth;
 
 					t_pattern += g_lin * t_bright * sin(tht_rad) * dth_rad * dph_rad;
 				}
@@ -388,14 +410,15 @@ void meas_calc(measurement_t *m, int idx)
 			double t_loss_nec2 = (eta > 0.0 && eta < 1.0)
 				? 290.0 * (1.0 - eta) / eta : 0.0;
 
-			m->ant_temp_tot = m->ant_temp + t_loss_nec2 + rc_config.ant_temp_ext_loss;
+			m->ant_temp_tot = m->ant_temp + t_loss_nec2;
 
-			/* G/T ratio — primary figure of merit for low-noise antenna systems */
-			if (m->ant_temp_tot > 0.0)
+			/* G/T_ant ratio — figure of merit using antenna temperature only,
+			 * excluding ohmic and external losses */
+			if (m->ant_temp > 0.0)
 			{
 				double gmax_dbi = rad_pattern[idx].gtot[
 					rad_pattern[idx].max_gain_idx[POL_TOTAL]];
-				m->gt = gmax_dbi - 10.0 * log10(m->ant_temp_tot);
+				m->gt = gmax_dbi - 10.0 * log10(m->ant_temp);
 			}
 		}
 	}
