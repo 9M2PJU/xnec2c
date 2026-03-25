@@ -228,6 +228,8 @@ Pass_Freq_Data( void )
       (size_t)(2 * NUM_POL) * sizeof(int) +
       /* Polarization sens */
       (size_t)(fpat.nph * fpat.nth) * sizeof(int) +
+      /* Radiation efficiency */
+      sizeof(double) +
       /* New pattern flag */
       sizeof( char );
   }
@@ -308,6 +310,9 @@ Pass_Freq_Data( void )
 
     cnt = (size_t)(fpat.nph * fpat.nth) * sizeof(int);
     Mem_Copy( buff, (char *)rad_pattern[0].sens, cnt, WRITE );
+
+    cnt = sizeof(double);
+    Mem_Copy( buff, (char *)&rad_pattern[0].efficiency, cnt, WRITE );
 
     if( isFlagSet(DRAW_NEW_RDPAT) )
       flag = 1;
@@ -600,6 +605,8 @@ Get_Freq_Data( int idx, int fstep )
       (size_t)(2 * NUM_POL) * sizeof(int) +
       /* Polarization sens */
       (size_t)(fpat.nph * fpat.nth) * sizeof(int) +
+      /* Radiation efficiency */
+      sizeof(double) +
       /* New pattern flag */
       sizeof( char );
   }
@@ -688,6 +695,9 @@ Get_Freq_Data( int idx, int fstep )
 
     cnt = (size_t)(fpat.nph * fpat.nth) * sizeof(int);
     Mem_Copy( buff, (char *)rad_pattern[fstep].sens, cnt, READ );
+
+    cnt = sizeof(double);
+    Mem_Copy( buff, (char *)&rad_pattern[fstep].efficiency, cnt, READ );
 
     Mem_Copy( buff, &flag, sizeof(flag), READ );
     if( flag ) SetFlag( DRAW_NEW_RDPAT );
