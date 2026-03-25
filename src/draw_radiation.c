@@ -1538,12 +1538,13 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
   int fstep = calc_data.freq_step;
   int pol = calc_data.pol_type;
 
-  /* Get dimensions from Cairo surface for positioning.
-   * This allows the function to work with both the Cairo renderer
-   * and OpenGL overlay without depending on global state. */
-  cairo_surface_t *surface = cairo_get_target(cr);
-  int surf_width = cairo_image_surface_get_width(surface);
-  int surf_height = cairo_image_surface_get_height(surface);
+  /* Get drawable area dimensions via clip extents.
+   * Works for both image surfaces (OpenGL overlay) and
+   * window surfaces (Cairo renderer) without depending on global state. */
+  double clip_x1, clip_y1, clip_x2, clip_y2;
+  cairo_clip_extents(cr, &clip_x1, &clip_y1, &clip_x2, &clip_y2);
+  int surf_width = (int)(clip_x2 - clip_x1);
+  int surf_height = (int)(clip_y2 - clip_y1);
 
   double max_gain, min_gain, color_min;
   double grad_pos, pos, db_val;
