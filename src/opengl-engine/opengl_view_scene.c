@@ -34,6 +34,7 @@ typedef struct
   GLint mvp_location;
   GLint u_mv_location;
   GLint u_alpha_location;
+  GLint u_color_dim_location;
   GLint flow_mode_location;
   GLint u_phase_location;
   GLint u_cos_phase_location;
@@ -158,6 +159,9 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
           glVertexAttrib1f(sc->depth_bias_attrib_loc,
               view->content.batches[i].depth_bias);
 
+        glUniform1f(sc->u_color_dim_location,
+            view->content.batches[i].color_dim);
+
         glDrawArrays(view->content.batches[i].draw_mode, 0,
             view->content.batches[i].vertex_count);
       }
@@ -265,6 +269,7 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
   sc->mvp_location = glGetUniformLocation(sc->shader.program, "mvp");
   sc->u_mv_location = glGetUniformLocation(sc->shader.program, "u_mv");
   sc->u_alpha_location = glGetUniformLocation(sc->shader.program, "u_alpha");
+  sc->u_color_dim_location = glGetUniformLocation(sc->shader.program, "u_color_dim");
   sc->flow_mode_location = glGetUniformLocation(sc->shader.program, "flow_mode");
   sc->u_phase_location = glGetUniformLocation(sc->shader.program, "u_phase");
   sc->u_cos_phase_location = glGetUniformLocation(sc->shader.program, "u_cos_phase");

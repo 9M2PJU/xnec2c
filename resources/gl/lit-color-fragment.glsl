@@ -7,6 +7,7 @@
 layout(depth_greater) out float gl_FragDepth;
 
 uniform float u_alpha;
+uniform float u_color_dim;
 uniform int flow_mode;
 uniform float u_phase;
 uniform float u_cos_phase;
@@ -94,7 +95,9 @@ void main() {
   vec3 lightDir = LIGHT_DIR;
   vec3 norm = normalize(viewNormal);
   vec3 viewDir = normalize(-viewPos);
-  vec3 baseColor = vertexColor.rgb;
+  /* Default to full brightness when u_color_dim is unset (GL defaults to 0.0) */
+  float dim = (u_color_dim > 0.0) ? u_color_dim : 1.0;
+  vec3 baseColor = vertexColor.rgb * dim;
 
   /* Two-sided lighting: flip normal for back-facing fragments so
    * thin surfaces (patches) illuminate identically from both sides.

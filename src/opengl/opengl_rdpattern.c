@@ -37,8 +37,9 @@
  * 100x PATCH_DEPTH_BIAS (1e-7f) — well within 24-bit depth precision. */
 #define RDPAT_SURFACE_DEPTH_BIAS 1e-5f
 
-/* Surface color dimming: surface-only is slightly brighter;
- * with wireframe overlay the surface recedes further. */
+/* Surface color dim values: surface-only is slightly brighter;
+ * with wireframe overlay the surface recedes further.
+ * Applied via u_color_dim shader uniform in the engine. */
 #define RDPAT_SURFACE_DIM      0.47f
 #define RDPAT_SURFACE_BOTH_DIM 0.3f
 
@@ -312,6 +313,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
         out->batches[0].vertex_count = tri_count * 3;
         out->batches[0].draw_mode = GL_TRIANGLES;
         out->batches[0].depth_bias = 0.0f;
+        out->batches[0].color_dim = RDPAT_SURFACE_DIM;
         out->batch_count = 1;
         break;
       }
@@ -349,6 +351,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
         out->batches[0].vertex_count = tri_count * 3;
         out->batches[0].draw_mode = GL_TRIANGLES;
         out->batches[0].depth_bias = RDPAT_SURFACE_DEPTH_BIAS;
+        out->batches[0].color_dim = RDPAT_SURFACE_BOTH_DIM;
 
         out->batches[1].vertices = line_buf;
         out->batches[1].vertex_count = line_count * 2;
@@ -365,26 +368,6 @@ rdpattern_scene_generate(gl_view_content_t *out)
         return( FALSE );
     }
 
-    /* Dim surface triangle vertex colors for subdued appearance.
-     * Applies to SURFACE and BOTH modes (batch[0] holds triangles).
-     * Safe to modify buffer: staleness tracker forces regeneration
-     * on any style or data change, restoring full-brightness colors. */
-    if( rc_config.rdpattern_draw_style != RDPAT_STYLE_WIREFRAME )
-    {
-      int vi;
-      int nverts = out->batches[0].vertex_count;
-      lit_color_point_t *verts = (lit_color_point_t *)out->batches[0].vertices;
-      float dim = (rc_config.rdpattern_draw_style == RDPAT_STYLE_BOTH)
-        ? RDPAT_SURFACE_BOTH_DIM
-        : RDPAT_SURFACE_DIM;
-
-      for( vi = 0; vi < nverts; vi++ )
-      {
-        verts[vi].color.r *= dim;
-        verts[vi].color.g *= dim;
-        verts[vi].color.b *= dim;
-      }
-    }
     out->vertex_stride = (int)sizeof(lit_color_point_t);
 
     out->r_max = r_max;

@@ -33,6 +33,7 @@ typedef struct
   GLint mvp_location;
   GLint u_mv_location;
   GLint u_alpha_location;
+  GLint u_color_dim_location;
   GLint flow_mode_location;
   GLint u_phase_location;
   GLint u_cos_phase_location;
@@ -183,6 +184,10 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
       if( ovl->ovl_content.batches[i].vertex_count > 0 )
       {
         glBindVertexArray(ovl->vao[i]);
+
+        glUniform1f(ovl->u_color_dim_location,
+            ovl->ovl_content.batches[i].color_dim);
+
         glDrawArrays(ovl->ovl_content.batches[i].draw_mode, 0,
             ovl->ovl_content.batches[i].vertex_count);
       }
@@ -332,6 +337,8 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
     glGetUniformLocation(ovl->shader.program, "u_mv");
   ovl->u_alpha_location =
     glGetUniformLocation(ovl->shader.program, "u_alpha");
+  ovl->u_color_dim_location =
+    glGetUniformLocation(ovl->shader.program, "u_color_dim");
   ovl->flow_mode_location =
     glGetUniformLocation(ovl->shader.program, "flow_mode");
   ovl->u_phase_location =

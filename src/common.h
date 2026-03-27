@@ -480,6 +480,9 @@ typedef struct
   unsigned int draw_mode;
   float depth_bias;
 
+  /* Per-batch RGB multiplier (0.0 treated as 1.0 by shader) */
+  float color_dim;
+
 } gl_draw_batch_t;
 
 /* Maximum independent draw batches per view content */
