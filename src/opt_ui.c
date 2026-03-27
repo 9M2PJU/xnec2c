@@ -50,11 +50,12 @@ GtkWidget *cancel_button          = NULL;
 GtkWidget *status_label           = NULL;
 
 /* Formula display */
-GtkWidget *formula_display        = NULL;
 GtkWidget *formula_help_button    = NULL;
+GtkWidget *totals_formula_label   = NULL;
+GtkWidget *totals_score_label     = NULL;
 
-/* Cached formula markup (expression only, without score suffix) */
-GString *formula_base_markup = NULL;
+/* Formula markup for totals row (points to string literal) */
+const char *formula_base_markup = NULL;
 
 /* Pre-allocated buffers for timer-driven best-measurement display */
 measurement_t *timer_meas = NULL;
@@ -88,7 +89,6 @@ static const struct
 	{ &start_button,           "opt_start_button"           },
 	{ &cancel_button,          "opt_cancel_button"          },
 	{ &status_label,           "opt_status_label"           },
-	{ &formula_display,        "opt_formula_display"        },
 	{ &formula_help_button,    "opt_formula_help_button"    },
 };
 
@@ -273,14 +273,12 @@ void opt_ui_cleanup(void)
 		*widget_map[i].ptr = NULL;
 	}
 
-	/* goals_grid is created programmatically, not in the builder table */
+	/* goals_grid and totals row are created programmatically */
 	goals_grid = NULL;
+	totals_formula_label = NULL;
+	totals_score_label = NULL;
 
-	if (formula_base_markup != NULL)
-	{
-		g_string_free(formula_base_markup, TRUE);
-		formula_base_markup = NULL;
-	}
+	formula_base_markup = NULL;
 
 	free_ptr((void **)&timer_meas);
 	free_ptr((void **)&timer_freq);

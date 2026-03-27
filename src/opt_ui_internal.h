@@ -29,6 +29,7 @@ enum goal_row_col
 	GR_WEIGHT,
 	GR_MHZ_MIN,
 	GR_MHZ_MAX,
+	GR_FORMULA,
 	GR_SCORE,
 	GR_REMOVE,
 
@@ -68,9 +69,10 @@ extern GtkWidget *max_iter_entry;
 extern GtkWidget *start_button;
 extern GtkWidget *cancel_button;
 extern GtkWidget *status_label;
-extern GtkWidget *formula_display;
 extern GtkWidget *formula_help_button;
-extern GString *formula_base_markup;
+extern GtkWidget *totals_formula_label;
+extern GtkWidget *totals_score_label;
+extern const char *formula_base_markup;
 extern measurement_t *timer_meas;
 extern double *timer_freq;
 

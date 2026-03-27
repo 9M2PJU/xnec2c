@@ -51,7 +51,21 @@ static void rebuild_grid_rows(void)
 		}
 	}
 
-	/* Re-attach in order */
+	/* Remove totals row so it can be repositioned */
+	if (totals_formula_label != NULL)
+	{
+		g_object_ref(totals_formula_label);
+		gtk_container_remove(GTK_CONTAINER(goals_grid),
+			totals_formula_label);
+	}
+	if (totals_score_label != NULL)
+	{
+		g_object_ref(totals_score_label);
+		gtk_container_remove(GTK_CONTAINER(goals_grid),
+			totals_score_label);
+	}
+
+	/* Re-attach goal rows in order */
 	row = 1;
 	for (iter = goal_row_list; iter != NULL; iter = iter->next)
 	{
@@ -65,6 +79,20 @@ static void rebuild_grid_rows(void)
 		}
 
 		row++;
+	}
+
+	/* Totals row always last */
+	if (totals_formula_label != NULL)
+	{
+		gtk_grid_attach(GTK_GRID(goals_grid),
+			totals_formula_label, GR_FORMULA, row, 1, 1);
+		g_object_unref(totals_formula_label);
+	}
+	if (totals_score_label != NULL)
+	{
+		gtk_grid_attach(GTK_GRID(goals_grid),
+			totals_score_label, GR_SCORE, row, 1, 1);
+		g_object_unref(totals_score_label);
 	}
 
 	gtk_widget_show_all(goals_grid);
@@ -187,7 +215,14 @@ static opt_goal_row_t *create_goal_row(int meas_index, int enabled)
 	g_signal_connect(gr->w[GR_MHZ_MAX], "changed",
 		G_CALLBACK(on_goal_param_changed), gr);
 
-	/* Score display (read-only, shows weight * reduce(transform(...))) */
+	/* Formula fragment (read-only, Pango markup showing this row's term) */
+	gr->w[GR_FORMULA] = gtk_label_new("—");
+	gtk_label_set_use_markup(GTK_LABEL(gr->w[GR_FORMULA]), TRUE);
+	gtk_label_set_xalign(GTK_LABEL(gr->w[GR_FORMULA]), 1.0);
+	gtk_widget_set_tooltip_text(gr->w[GR_FORMULA],
+		"Formula term for this objective");
+
+	/* Score display (read-only, shows weight × reduce(transform(...))) */
 	gr->w[GR_SCORE] = gtk_label_new("—");
 	gtk_label_set_xalign(GTK_LABEL(gr->w[GR_SCORE]), 1.0);
 	gtk_label_set_width_chars(GTK_LABEL(gr->w[GR_SCORE]), OPT_UI_ENTRY_WIDTH);
@@ -290,6 +325,7 @@ void build_goals_grid(void)
 			[GR_WEIGHT]    = "Weight",
 			[GR_MHZ_MIN]   = "MHz lo",
 			[GR_MHZ_MAX]   = "MHz hi →",
+			[GR_FORMULA]   = "Formula →",
 			[GR_SCORE]     = "Score",
 			[GR_REMOVE]    = "",
 		};
@@ -307,6 +343,19 @@ void build_goals_grid(void)
 			gtk_grid_attach(GTK_GRID(goals_grid), label, col, 0, 1, 1);
 		}
 	}
+
+	/* Totals row: formula summary and total score */
+	totals_formula_label = gtk_label_new(NULL);
+	gtk_label_set_use_markup(GTK_LABEL(totals_formula_label), TRUE);
+	gtk_label_set_xalign(GTK_LABEL(totals_formula_label), 1.0);
+
+	totals_score_label = gtk_label_new("—");
+	gtk_label_set_use_markup(GTK_LABEL(totals_score_label), TRUE);
+	gtk_label_set_xalign(GTK_LABEL(totals_score_label), 1.0);
+	gtk_label_set_width_chars(GTK_LABEL(totals_score_label),
+		OPT_UI_ENTRY_WIDTH);
+	gtk_widget_set_tooltip_text(totals_score_label,
+		"Optimizer minimizes this value");
 
 	/* Default rows: VSWR, gain_max */
 	add_goal_row(MEAS_VSWR, 1);

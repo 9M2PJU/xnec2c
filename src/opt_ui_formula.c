@@ -13,20 +13,43 @@
 #include "optimizers/opt_session.h"
 #include "shared.h"
 
-/* Format strings for each FIT_DIR_* value.
- * Arguments in order: weight_str, reduce_name, val1, val2, target_str, exp_str
- * MINIMIZE: val1=metric, val2=target; shows (metric − target)⁺/√(target²+1)
- * MAXIMIZE: val1=target, val2=metric; shows (target − metric)⁺/√(target²+1)
- * DEVIATE:  val1=metric, val2=target; shows |metric − target| (target_str ignored) */
+/* Display format strings for each FIT_DIR_* value.
+ * All directions use 5 args: weight_str, reduce_name, val1, val2, exp_str.
+ * MINIMIZE/MAXIMIZE use 𝑛 for √(t²+1); full formula in per-row tooltip.
+ * Trailing " =" aligns with the Score column. */
 static const char *formula_dir_fmts[FIT_DIR_COUNT] = {
 	[FIT_DIR_MINIMIZE] =
 		"<b>%s</b>·%s(((%s−<b>%s</b>)<sup>+</sup>"
-		"/√(<b>%s</b>²+1))<sup><b>%s</b></sup>)",
+		"/𝑛)<sup><b>%s</b></sup>) =",
 	[FIT_DIR_MAXIMIZE] =
 		"<b>%s</b>·%s(((<b>%s</b>−%s)<sup>+</sup>"
-		"/√(<b>%s</b>²+1))<sup><b>%s</b></sup>)",
+		"/𝑛)<sup><b>%s</b></sup>) =",
 	[FIT_DIR_DEVIATE]  =
-		"<b>%s</b>·%s(|%s−<b>%s</b>|<sup><b>%s</b></sup>)",
+		"<b>%s</b>·%s(|%s−<b>%s</b>|<sup><b>%s</b></sup>) =",
+};
+
+/* Per-direction tooltip format strings with full formula and tension term.
+ * Arg counts vary per direction; see tooltip construction in
+ * update_goal_rows() for the per-direction arg lists. */
+static const char *formula_tooltip_fmts[FIT_DIR_COUNT] = {
+	[FIT_DIR_MINIMIZE] =
+		"<b>minimize</b>: penalizes <i>%s</i> above <b>%s</b>\n\n"
+		"score = (max(%s − <b>%s</b>, 0) / 𝑛)<sup><b>%s</b></sup>\n"
+		"            + τ / (1 + max(<b>%s</b> − %s, 0) / 𝑛)\n\n"
+		"𝑛 = √(<b>%s</b>² + 1)  (normalization)\n"
+		"τ = (10<sup>−4</sup>)<sup><b>%s</b></sup>"
+		"  (tension: residual gradient past target)",
+	[FIT_DIR_MAXIMIZE] =
+		"<b>maximize</b>: penalizes <i>%s</i> below <b>%s</b>\n\n"
+		"score = (max(<b>%s</b> − %s, 0) / 𝑛)<sup><b>%s</b></sup>\n"
+		"            + τ / (1 + max(%s − <b>%s</b>, 0) / 𝑛)\n\n"
+		"𝑛 = √(<b>%s</b>² + 1)  (normalization)\n"
+		"τ = (10<sup>−4</sup>)<sup><b>%s</b></sup>"
+		"  (tension: residual gradient past target)",
+	[FIT_DIR_DEVIATE] =
+		"<b>deviate</b>: penalizes <i>%s</i> away from <b>%s</b>\n\n"
+		"score = |%s − <b>%s</b>|<sup><b>%s</b></sup>\n\n"
+		"No normalization or tension term.",
 };
 
 /*------------------------------------------------------------------------*/
@@ -40,29 +63,39 @@ static const char *formula_dir_fmts[FIT_DIR_COUNT] = {
  */
 void set_formula_with_score(double total_score)
 {
-	GString *full;
-
-	if (formula_display == NULL || formula_base_markup == NULL)
+	if (formula_base_markup == NULL)
 	{
 		return;
 	}
 
-	full = g_string_new(formula_base_markup->str);
-
-	if (!isnan(total_score))
+	/* Update totals row in the goals grid */
+	if (totals_formula_label != NULL)
 	{
-		gchar score_str[32];
-
-		snprintf(score_str, sizeof(score_str), "%.6g", total_score);
-		g_string_append_printf(full,
-			" = <b>%s</b>", score_str);
+		gtk_label_set_markup(GTK_LABEL(totals_formula_label),
+			formula_base_markup);
 	}
 
-	g_string_append(full,
-		"\n<small><i>Optimizer minimizes this value</i></small>");
+	if (totals_score_label != NULL)
+	{
+		if (!isnan(total_score))
+		{
+			gchar score_str[32];
+			gchar *markup;
 
-	gtk_label_set_markup(GTK_LABEL(formula_display), full->str);
-	g_string_free(full, TRUE);
+			snprintf(score_str, sizeof(score_str),
+				"%.6g", total_score);
+			markup = g_strdup_printf("<b>%s</b>", score_str);
+			gtk_label_set_markup(
+				GTK_LABEL(totals_score_label), markup);
+			g_free(markup);
+		}
+		else
+		{
+			gtk_label_set_text(
+				GTK_LABEL(totals_score_label), "—");
+		}
+	}
+
 }
 
 /*------------------------------------------------------------------------*/
@@ -81,74 +114,35 @@ void opt_ui_update_formula(void)
 	int m;
 	fitness_config_t cfg;
 
-	if (formula_display == NULL)
+	if (totals_formula_label == NULL)
 	{
 		return;
 	}
 
 	opt_ui_get_fitness_config(&cfg);
 
-	/* Initialize or reset cached base markup */
-	if (formula_base_markup == NULL)
-	{
-		formula_base_markup = g_string_new(NULL);
-	}
-
-	g_string_assign(formula_base_markup,
-		"<b>Current Configuration:</b> F = ");
+	/* Count enabled objectives */
 	term_count = 0;
-
 	for (m = 0; m < cfg.num_obj; m++)
 	{
-		const fitness_objective_t *obj;
-		const char *reduce_name;
-		const char *metric_name;
-		const char *val1;
-		const char *val2;
-		gchar weight_str[32];
-		gchar exp_str[32];
-		gchar target_str[32];
-
-		obj = &cfg.obj[m];
-
-		if (!obj->enabled)
+		if (cfg.obj[m].enabled)
 		{
-			continue;
+			term_count++;
 		}
-
-		if (term_count > 0)
-		{
-			g_string_append(formula_base_markup, " + ");
-		}
-
-		metric_name = meas_display_names[obj->meas_index];
-		reduce_name = fitness_reduce_names[obj->reduce];
-
-		snprintf(weight_str, sizeof(weight_str), "%.4g", obj->weight);
-		snprintf(exp_str, sizeof(exp_str), "%.4g", obj->exponent);
-		snprintf(target_str, sizeof(target_str), "%.4g", obj->target);
-
-		/* MAXIMIZE shows target − metric; others show metric − target */
-		val1 = (obj->direction == FIT_DIR_MAXIMIZE) ? target_str : metric_name;
-		val2 = (obj->direction == FIT_DIR_MAXIMIZE) ? metric_name : target_str;
-
-		g_string_append_printf(formula_base_markup,
-			formula_dir_fmts[obj->direction],
-			weight_str, reduce_name, val1, val2, target_str, exp_str);
-
-		term_count++;
 	}
 
 	if (term_count == 0)
 	{
-		g_string_assign(formula_base_markup, "<i>No goals enabled</i>");
-		gtk_label_set_markup(GTK_LABEL(formula_display),
-			formula_base_markup->str);
+		formula_base_markup = "<i>No goals enabled</i>";
+		gtk_label_set_markup(GTK_LABEL(totals_formula_label),
+			formula_base_markup);
 	}
 	else
 	{
-		/* Display formula without score; score added by
-		 * opt_ui_update_values() when data is available */
+		/* Summary: individual terms are in per-row Formula column */
+		formula_base_markup =
+			"<b>F = Σ(scores) =</b>\n"
+			"<small><i>Optimizer minimizes F</i></small>";
 		set_formula_with_score(NAN);
 	}
 
@@ -294,6 +288,102 @@ double update_goal_rows(const measurement_t *meas,
 			snprintf(buf, sizeof(buf), "(%.4g)", score);
 		}
 		gtk_label_set_text(GTK_LABEL(gr->w[GR_SCORE]), buf);
+
+		/* Per-row formula fragment with Pango markup */
+		{
+			const char *reduce_name;
+			const char *val1;
+			const char *val2;
+			gchar weight_str[32];
+			gchar exp_str[32];
+			gchar target_str[32];
+			gchar *metric_compact;
+			gchar *fragment;
+			const gchar *src;
+			gchar *dst;
+
+			/* Strip spaces from metric name for compact notation */
+			metric_compact = g_strdup(
+				meas_display_names[obj.meas_index]);
+			dst = metric_compact;
+			for (src = metric_compact; *src != '\0'; src++)
+			{
+				if (*src != ' ')
+				{
+					*dst++ = *src;
+				}
+			}
+			*dst = '\0';
+
+			reduce_name = fitness_reduce_names[obj.reduce];
+
+			snprintf(weight_str, sizeof(weight_str),
+				"%.4g", obj.weight);
+			snprintf(exp_str, sizeof(exp_str),
+				"%.4g", obj.exponent);
+			snprintf(target_str, sizeof(target_str),
+				"%.4g", obj.target);
+
+			val1 = (obj.direction == FIT_DIR_MAXIMIZE)
+				? target_str : metric_compact;
+			val2 = (obj.direction == FIT_DIR_MAXIMIZE)
+				? metric_compact : target_str;
+
+			fragment = g_strdup_printf(
+				formula_dir_fmts[obj.direction],
+				weight_str, reduce_name,
+				val1, val2, exp_str);
+
+			gtk_label_set_markup(
+				GTK_LABEL(gr->w[GR_FORMULA]), fragment);
+			g_free(fragment);
+
+			/* Verbose tooltip with full formula and tension */
+			if (obj.direction == FIT_DIR_DEVIATE)
+			{
+				fragment = g_strdup_printf(
+					formula_tooltip_fmts[obj.direction],
+					metric_compact, target_str,
+					metric_compact, target_str, exp_str);
+			}
+			else
+			{
+				/* MINIMIZE: metric, target in penalty;
+				 *   target, metric in tension overshoot.
+				 * MAXIMIZE: target, metric in penalty;
+				 *   metric, target in tension overshoot. */
+				const char *p1;
+				const char *p2;
+				const char *t1;
+				const char *t2;
+
+				if (obj.direction == FIT_DIR_MINIMIZE)
+				{
+					p1 = metric_compact;
+					p2 = target_str;
+					t1 = target_str;
+					t2 = metric_compact;
+				}
+				else
+				{
+					p1 = target_str;
+					p2 = metric_compact;
+					t1 = metric_compact;
+					t2 = target_str;
+				}
+
+				fragment = g_strdup_printf(
+					formula_tooltip_fmts[obj.direction],
+					metric_compact, target_str,
+					p1, p2, exp_str,
+					t1, t2,
+					target_str, exp_str);
+			}
+			gtk_widget_set_tooltip_markup(
+				gr->w[GR_FORMULA], fragment);
+			g_free(fragment);
+			g_free(metric_compact);
+		}
 	}
 
 	return total_score;
