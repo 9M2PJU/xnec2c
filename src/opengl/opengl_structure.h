@@ -112,6 +112,10 @@ void opengl_structure_set_radius_scale(double scale);
 gboolean opengl_structure_on_ctrl_scroll(
     GtkWidget *widget, GdkEventScroll *event, gpointer view_state);
 
+/* Show ctrl+scroll notice once per session.
+ * Called from scene_generate; shared guard across all views. */
+void opengl_structure_show_ctrl_notice(GtkWidget *widget);
+
 /* Update shared geometry buffer from global data/crnt/flags.
  * Call before reading shared geometry to ensure freshness. */
 void opengl_structure_update_shared_geometry(void);

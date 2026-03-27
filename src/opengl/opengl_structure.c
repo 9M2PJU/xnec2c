@@ -25,7 +25,7 @@
 
 #include "opengl_structure_geometry.h"
 #include "../opengl-engine/opengl_view.h"
-#include "../opengl-engine/opengl_view_tooltip.h"
+#include "../opengl-engine/opengl_view_notice.h"
 
 /* Maximum allowed radius scale */
 #define CYLINDER_RADIUS_SCALE_MAX 100.0
@@ -33,8 +33,6 @@
 /* Mutable cylinder radius scale factor (user-adjustable via Ctrl+scroll) */
 static double cylinder_radius_scale = 1.0;
 
-/* Tooltip shown once per session */
-static gboolean ctrl_scroll_tooltip_shown = FALSE;
 
 /* Widget pointer for queue_redraw */
 static GtkWidget *structure_gl_widget = NULL;
@@ -155,13 +153,6 @@ opengl_structure_on_ctrl_scroll(
 
   opengl_structure_set_radius_scale(new_scale);
 
-  /* Show tooltip on first use */
-  if( !ctrl_scroll_tooltip_shown )
-  {
-    gl_view_show_tooltip(widget, "Ctrl+Scroll: Wire Radius", 2500);
-    ctrl_scroll_tooltip_shown = TRUE;
-  }
-
   /* Queue redraw on the event source widget */
   gtk_widget_queue_draw(widget);
 
@@ -179,7 +170,27 @@ opengl_structure_on_ctrl_scroll(
 
 } /* opengl_structure_on_ctrl_scroll() */
 
+/*-----------------------------------------------------------------------*/
 
+/** opengl_structure_show_ctrl_notice() - Show ctrl+scroll notice once per session
+ * @widget: GL area widget to display notice on
+ *
+ * Shared guard across all views so the message appears only once
+ * regardless of which view renders first.
+ */
+  void
+opengl_structure_show_ctrl_notice(GtkWidget *widget)
+{
+  static gboolean shown = FALSE;
+
+  if( shown || !widget )
+    return;
+
+  gl_view_show_notice(widget, "Ctrl+Scroll: Wire Radius",
+      2500, GL_NOTICE_BOTTOM_LEFT);
+  shown = TRUE;
+
+} /* opengl_structure_show_ctrl_notice() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -193,6 +204,8 @@ structure_scene_generate(gl_view_content_t *out)
 {
   const structure_overlay_data_t *geom;
   float zoom;
+
+  opengl_structure_show_ctrl_notice(structure_gl_widget);
 
   opengl_structure_update_shared_geometry();
   geom = opengl_structure_get_shared_geometry();

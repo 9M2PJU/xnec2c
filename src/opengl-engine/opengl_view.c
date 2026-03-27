@@ -24,7 +24,7 @@
 #include "opengl_view_render.h"
 #include "opengl_view_msaa.h"
 #include "opengl_view_peel.h"
-#include "opengl_view_tooltip.h"
+#include "opengl_view_notice.h"
 #include "opengl_axes.h"
 #include "opengl_cairo_overlay.h"
 #include "opengl_ground_plane.h"
@@ -43,25 +43,19 @@ gl_view_state_free(gl_view_state_t *state)
   if( !state )
     return;
 
-  if( state->tooltip_timeout_id )
+  if( state->notice_timeout_id )
   {
-    g_source_remove(state->tooltip_timeout_id);
-    state->tooltip_timeout_id = 0;
+    g_source_remove(state->notice_timeout_id);
+    state->notice_timeout_id = 0;
   }
 
-  g_free(state->tooltip_text);
+  g_free(state->notice_text);
 
-  if( state->tooltip_surface )
-    cairo_surface_destroy(state->tooltip_surface);
+  if( state->notice_surface )
+    cairo_surface_destroy(state->notice_surface);
 
-  if( state->tooltip_overlay )
-    cairo_gl_overlay_free(state->tooltip_overlay);
-
-  if( state->status_surface )
-    cairo_surface_destroy(state->status_surface);
-
-  if( state->status_overlay )
-    cairo_gl_overlay_free(state->status_overlay);
+  if( state->notice_overlay )
+    cairo_gl_overlay_free(state->notice_overlay);
 
   /* Release shared noise texture before renderables */
   if( state->noise_tex )
@@ -421,12 +415,12 @@ gl_view_create_widget(
   state->drag_alpha_factor =
       DRAG_ALPHA_FROM_LEVEL(rc_config.opengl_drag_transparency_level);
 
-  /* Initialize tooltip state */
-  state->tooltip_active = FALSE;
-  state->tooltip_text = NULL;
-  state->tooltip_alpha = 0.0;
-  state->tooltip_start_time = 0;
-  state->tooltip_timeout_id = 0;
+  /* Initialize notice state */
+  state->notice_active = FALSE;
+  state->notice_text = NULL;
+  state->notice_alpha = 0.0;
+  state->notice_start_time = 0;
+  state->notice_timeout_id = 0;
 
   gl_area = gtk_gl_area_new();
 

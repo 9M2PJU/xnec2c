@@ -27,7 +27,7 @@
 #ifdef HAVE_OPENGL
 
 #include "../opengl-engine/opengl_view.h"
-#include "../opengl-engine/opengl_view_tooltip.h"
+#include "../opengl-engine/opengl_view_notice.h"
 
 /* Default structure overlay extent as multiple of radiation pattern r_max */
 #define OVERLAY_DEFAULT_EXTENT 1.25f
@@ -119,6 +119,8 @@ rdpattern_scene_generate(gl_view_content_t *out)
   gboolean translate_to_excitation;
   float offset_x, offset_y, offset_z;
   const structure_overlay_data_t *geom = NULL;
+
+  opengl_structure_show_ctrl_notice(rdpattern_gl_widget);
 
   /* Zoom from rdpattern spinbutton, normalized to multiplier */
   zoom = 1.0f;
@@ -400,9 +402,27 @@ rdpattern_scene_generate(gl_view_content_t *out)
   }
 
   /* Neither near-field nor far-field is active; return a minimal scene so
-   * the render loop proceeds to clear the framebuffer to black */
+   * the render loop proceeds to clear the framebuffer to black.
+   * Include card availability diagnostics so the user knows what
+   * capabilities the NEC file provides on initial window load. */
   rdpattern_init_empty_scene(out, zoom);
-  out->status_message = "Select Gain Pattern or Near Field";
+
+  if( isFlagClear(ENABLE_RDPAT) && isFlagClear(ENABLE_NEAREH) )
+  {
+    out->status_message = "No RP or NE/NH cards in the NEC file";
+  }
+  else if( isFlagClear(ENABLE_RDPAT) )
+  {
+    out->status_message = "Select Near Field (no RP card for gain pattern)";
+  }
+  else if( isFlagClear(ENABLE_NEAREH) )
+  {
+    out->status_message = "Select Gain Pattern (no NE/NH cards for near field)";
+  }
+  else
+  {
+    out->status_message = "Select Gain Pattern or Near Field";
+  }
 
   return( TRUE );
 }
@@ -486,16 +506,17 @@ rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer vie
 rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *out)
 {
   const structure_overlay_data_t *geom;
-  static gboolean tooltip_shown = FALSE;
+  static gboolean notice_shown = FALSE;
 
   if( isFlagClear(OVERLAY_STRUCT) || (data.n <= 0 && data.m <= 0) || !primary )
     return( FALSE );
 
-  /* Show tooltip on first activation */
-  if( !tooltip_shown && rdpattern_gl_widget )
+  /* Show notice on first activation */
+  if( !notice_shown && rdpattern_gl_widget )
   {
-    gl_view_show_tooltip(rdpattern_gl_widget, "Shift Scroll to Scale Structure", 2500);
-    tooltip_shown = TRUE;
+    gl_view_show_notice(rdpattern_gl_widget, "Shift+Scroll to Scale Structure",
+        2500, GL_NOTICE_BOTTOM_LEFT);
+    notice_shown = TRUE;
   }
 
   /* Ensure shared geometry is fresh */

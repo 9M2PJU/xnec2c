@@ -62,6 +62,14 @@ typedef struct
 
 } gl_view_content_t;
 
+/* Notice position within the GL viewport */
+typedef enum
+{
+  GL_NOTICE_CENTER,
+  GL_NOTICE_BOTTOM_LEFT
+
+} gl_notice_position_t;
+
 /* Overlay configuration for second rendering pass */
 typedef struct
 {
@@ -200,25 +208,19 @@ typedef struct gl_view_state_s
   /* Overlay scale adjustment (user-controlled via shift+scroll) */
   float ovl_model_scale_adj;
 
-  /* Tooltip state for transient messages */
-  gboolean tooltip_active;
-  char *tooltip_text;
-  double tooltip_alpha;
-  gint64 tooltip_start_time;
-  guint tooltip_timeout_id;
-  int tooltip_hold_ms;
-  cairo_gl_overlay_t *tooltip_overlay;
-  cairo_surface_t *tooltip_surface;
-  int tooltip_surf_width;
-  int tooltip_surf_height;
-  gboolean tooltip_surface_valid;
-
-  /* Status message overlay (persistent, no fade) */
-  cairo_gl_overlay_t *status_overlay;
-  cairo_surface_t *status_surface;
-  int status_surf_width;
-  int status_surf_height;
-  const char *status_last_text;
+  /* Notice overlay state (unified transient + persistent) */
+  gboolean notice_active;
+  char *notice_text;
+  double notice_alpha;
+  gint64 notice_start_time;
+  guint notice_timeout_id;
+  int notice_hold_ms;
+  gl_notice_position_t notice_position;
+  cairo_gl_overlay_t *notice_overlay;
+  cairo_surface_t *notice_surface;
+  int notice_surf_width;
+  int notice_surf_height;
+  gboolean notice_surface_valid;
 
   /* Patch current flow phase animation offset (radians) */
   float flow_phase;

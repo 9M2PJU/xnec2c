@@ -468,7 +468,7 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
   glDrawArrays(GL_TRIANGLES, 0, 3);
   glBindVertexArray(0);
 
-  /* Restore GL state for subsequent passes (tooltip, MSAA blit) */
+  /* Restore GL state for subsequent passes (notice overlay, MSAA blit) */
   glEnable(GL_DEPTH_TEST);
   glDepthMask(GL_TRUE);
   glDisable(GL_BLEND);
