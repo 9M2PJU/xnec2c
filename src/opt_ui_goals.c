@@ -113,7 +113,7 @@ static opt_goal_row_t *create_goal_row(int meas_index, int enabled)
 		G_CALLBACK(on_metric_changed), gr);
 
 	/* Value display (read-only, shows current NEC2 value) */
-	gr->w[GR_VALUE] = gtk_label_new("\xe2\x80\x94");
+	gr->w[GR_VALUE] = gtk_label_new("—");
 	gtk_label_set_xalign(GTK_LABEL(gr->w[GR_VALUE]), 1.0);
 	gtk_label_set_width_chars(GTK_LABEL(gr->w[GR_VALUE]), OPT_UI_ENTRY_WIDTH);
 	gtk_widget_set_tooltip_text(gr->w[GR_VALUE],
@@ -129,7 +129,7 @@ static opt_goal_row_t *create_goal_row(int meas_index, int enabled)
 	}
 	gtk_combo_box_set_active(GTK_COMBO_BOX(gr->w[GR_TRANSFORM]),
 		def->direction);
-	gtk_widget_set_tooltip_text(gr->w[GR_TRANSFORM],
+	gtk_widget_set_tooltip_markup(gr->w[GR_TRANSFORM],
 		fitness_direction_tooltips[def->direction]);
 	g_signal_connect(gr->w[GR_TRANSFORM], "changed",
 		G_CALLBACK(on_goal_param_changed), gr);
@@ -160,7 +160,7 @@ static opt_goal_row_t *create_goal_row(int meas_index, int enabled)
 	}
 	gtk_combo_box_set_active(GTK_COMBO_BOX(gr->w[GR_REDUCE]),
 		def->default_reduce);
-	gtk_widget_set_tooltip_text(gr->w[GR_REDUCE],
+	gtk_widget_set_tooltip_markup(gr->w[GR_REDUCE],
 		fitness_reduce_tooltips[def->default_reduce]);
 	g_signal_connect(gr->w[GR_REDUCE], "changed",
 		G_CALLBACK(on_goal_param_changed), gr);
@@ -188,14 +188,14 @@ static opt_goal_row_t *create_goal_row(int meas_index, int enabled)
 		G_CALLBACK(on_goal_param_changed), gr);
 
 	/* Score display (read-only, shows weight * reduce(transform(...))) */
-	gr->w[GR_SCORE] = gtk_label_new("\xe2\x80\x94");
+	gr->w[GR_SCORE] = gtk_label_new("—");
 	gtk_label_set_xalign(GTK_LABEL(gr->w[GR_SCORE]), 1.0);
 	gtk_label_set_width_chars(GTK_LABEL(gr->w[GR_SCORE]), OPT_UI_ENTRY_WIDTH);
 	gtk_widget_set_tooltip_text(gr->w[GR_SCORE],
-		"Computed: weight \xc3\x97 reduce(transform(value, target, exp))");
+		"Computed: weight × reduce(transform(value, target, exp))");
 
 	/* Remove button */
-	gr->w[GR_REMOVE] = gtk_button_new_with_label("\xe2\x88\x92");
+	gr->w[GR_REMOVE] = gtk_button_new_with_label("−");
 	gtk_widget_set_tooltip_text(gr->w[GR_REMOVE], "Remove this objective");
 	g_signal_connect(gr->w[GR_REMOVE], "clicked",
 		G_CALLBACK(on_remove_row_clicked), gr);
@@ -283,13 +283,13 @@ void build_goals_grid(void)
 			[GR_ENABLED]   = "\u2713",
 			[GR_METRIC]    = "Measurement",
 			[GR_VALUE]     = "Value",
-			[GR_TRANSFORM] = "Transform \xe2\x86\x92",
+			[GR_TRANSFORM] = "Transform →",
 			[GR_TARGET]    = "Target",
-			[GR_EXP]       = "Exp \xe2\x86\x92",
-			[GR_REDUCE]    = "Reduce \xe2\x86\x92",
+			[GR_EXP]       = "Exp →",
+			[GR_REDUCE]    = "Reduce →",
 			[GR_WEIGHT]    = "Weight",
 			[GR_MHZ_MIN]   = "MHz lo",
-			[GR_MHZ_MAX]   = "MHz hi \xe2\x86\x92",
+			[GR_MHZ_MAX]   = "MHz hi →",
 			[GR_SCORE]     = "Score",
 			[GR_REMOVE]    = "",
 		};
@@ -359,7 +359,7 @@ static void on_goal_param_changed(GtkWidget *widget, gpointer user_data)
 			GTK_COMBO_BOX(gr->w[GR_TRANSFORM]));
 		if (dir_idx >= 0 && dir_idx < FIT_DIR_COUNT)
 		{
-			gtk_widget_set_tooltip_text(gr->w[GR_TRANSFORM],
+			gtk_widget_set_tooltip_markup(gr->w[GR_TRANSFORM],
 				fitness_direction_tooltips[dir_idx]);
 		}
 
@@ -367,7 +367,7 @@ static void on_goal_param_changed(GtkWidget *widget, gpointer user_data)
 			GTK_COMBO_BOX(gr->w[GR_REDUCE]));
 		if (red_idx >= 0 && red_idx < FIT_REDUCE_COUNT)
 		{
-			gtk_widget_set_tooltip_text(gr->w[GR_REDUCE],
+			gtk_widget_set_tooltip_markup(gr->w[GR_REDUCE],
 				fitness_reduce_tooltips[red_idx]);
 		}
 	}
@@ -407,7 +407,7 @@ static void on_metric_changed(GtkComboBox *combo, gpointer user_data)
 	/* Auto-fill defaults */
 	gtk_combo_box_set_active(GTK_COMBO_BOX(gr->w[GR_TRANSFORM]),
 		def->direction);
-	gtk_widget_set_tooltip_text(gr->w[GR_TRANSFORM],
+	gtk_widget_set_tooltip_markup(gr->w[GR_TRANSFORM],
 		fitness_direction_tooltips[def->direction]);
 
 	snprintf(buf, sizeof(buf), "%.4g", def->default_weight);
@@ -421,7 +421,7 @@ static void on_metric_changed(GtkComboBox *combo, gpointer user_data)
 
 	gtk_combo_box_set_active(GTK_COMBO_BOX(gr->w[GR_REDUCE]),
 		def->default_reduce);
-	gtk_widget_set_tooltip_text(gr->w[GR_REDUCE],
+	gtk_widget_set_tooltip_markup(gr->w[GR_REDUCE],
 		fitness_reduce_tooltips[def->default_reduce]);
 }
 

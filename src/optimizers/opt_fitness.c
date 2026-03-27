@@ -82,7 +82,7 @@ const meas_fitness_default_t meas_fitness_defaults[MEAS_COUNT] =
 
 	[MEAS_S11] =
 	{
-		.direction        = FIT_DIR_MAXIMIZE,
+		.direction        = FIT_DIR_MINIMIZE,
 		.default_reduce   = FIT_REDUCE_AVG,
 		.default_target   = -15.0,
 		.default_weight   = 1.0,
@@ -91,7 +91,7 @@ const meas_fitness_default_t meas_fitness_defaults[MEAS_COUNT] =
 
 	[MEAS_S11_REAL] =
 	{
-		.direction        = FIT_DIR_MAXIMIZE,
+		.direction        = FIT_DIR_MINIMIZE,
 		.default_reduce   = FIT_REDUCE_AVG,
 		.default_target   = -15.0,
 		.default_weight   = 1.0,
@@ -255,7 +255,7 @@ const meas_fitness_default_t meas_fitness_defaults[MEAS_COUNT] =
 	{
 		.direction        = FIT_DIR_MAXIMIZE,
 		.default_reduce   = FIT_REDUCE_AVG,
-		.default_target   = 0.0,
+		.default_target   = 5.0,
 		.default_weight   = 1.0,
 		.default_exponent = 2.0,
 	},
@@ -279,18 +279,23 @@ const char *fitness_direction_names[FIT_DIR_COUNT] =
 {
 	[FIT_DIR_MINIMIZE] = "min score",
 	[FIT_DIR_MAXIMIZE] = "max score",
-	[FIT_DIR_DEVIATE]  = "\xc2\xb1 target",
+	[FIT_DIR_DEVIATE]  = "± target",
 };
 
 /* Direction tooltip strings for UI combo boxes */
 const char *fitness_direction_tooltips[FIT_DIR_COUNT] =
 {
-	[FIT_DIR_MINIMIZE] = "Score = (value / target)^exp\n"
-		"Lower measurement values produce lower scores",
-	[FIT_DIR_MAXIMIZE] = "Score = (target / value)^exp\n"
-		"Higher measurement values produce lower scores",
-	[FIT_DIR_DEVIATE]  = "Score = |value \xe2\x88\x92 target|^exp\n"
-		"Values closer to target produce lower scores",
+	[FIT_DIR_MINIMIZE] =
+		"Score = (max(v − t, 0) / √(t² + 1))<sup>exp</sup>"
+		" + τ / (1 + max(t − v, 0) / √(t² + 1))\n"
+		"Penalizes values above target; score approaches zero below target",
+	[FIT_DIR_MAXIMIZE] =
+		"Score = (max(t − v, 0) / √(t² + 1))<sup>exp</sup>"
+		" + τ / (1 + max(v − t, 0) / √(t² + 1))\n"
+		"Penalizes values below target; score approaches zero above target",
+	[FIT_DIR_DEVIATE]  =
+		"Score = |value − target|<sup>exp</sup>\n"
+		"Penalizes deviation from target; score=0 when value = target",
 };
 
 /* Reduction tooltip strings for UI combo boxes */
@@ -300,7 +305,7 @@ const char *fitness_reduce_tooltips[FIT_REDUCE_COUNT] =
 	[FIT_REDUCE_AVG]  = "Averages the score across all NEC2 frequency steps",
 	[FIT_REDUCE_MIN]  = "Selects the smallest score among all frequency steps",
 	[FIT_REDUCE_MAX]  = "Selects the largest score among all frequency steps",
-	[FIT_REDUCE_MAG]  = "Root of summed squared scores: sqrt(sum(score\xc2\xb2))",
+	[FIT_REDUCE_MAG]  = "Root of summed squared scores: sqrt(sum(score<sup>2</sup>))",
 	[FIT_REDUCE_DIFF] = "Spread between largest and smallest scores across frequency steps",
 };
 
@@ -430,29 +435,48 @@ void fitness_config_free(fitness_config_t *cfg)
 double fitness_transform(enum fitness_direction direction,
 	double value, double target, double exponent)
 {
-	double ratio;
-	double deviation;
+	double norm;
+	double penalty;
 
 	switch (direction)
 	{
 		case FIT_DIR_MINIMIZE:
-			/* pow(value / target, exp) */
-			if (fabs(target) < FITNESS_EPSILON)
-			{
-				return pow(fabs(value) + 1.0, exponent);
-			}
-			ratio = value / target;
-			return pow(ratio, exponent);
+		{
+			/* Normalize by √(t²+1): behaves as |target| for large
+			 * targets, transitions to absolute error (denominator=1)
+			 * near target=0 where relative error is undefined. */
+			double shortfall = value - target;
+			double tau = pow(FITNESS_TENSION, exponent);
+
+			norm = hypot(target, 1.0);
+			penalty = fmax(shortfall, 0.0);
+
+			/* Tension term: monotonically decreasing residual past
+			 * target so the optimizer keeps improving met objectives.
+			 * Bounded by tau, negligible vs. real penalties. */
+			return pow(penalty / norm, exponent)
+				+ tau / (1.0 + fmax(-shortfall, 0.0) / norm);
+		}
 
 		case FIT_DIR_MAXIMIZE:
-			/* pow(|target| / max(|value|, epsilon), exp) */
-			ratio = fabs(target) / fmax(fabs(value), FITNESS_EPSILON);
-			return pow(ratio, exponent);
+		{
+			/* Mirror of MINIMIZE: penalizes value below target.
+			 * No sign-aware branch needed; subtraction on the number
+			 * line is inherently sign-agnostic. */
+			double shortfall = target - value;
+			double tau = pow(FITNESS_TENSION, exponent);
+
+			norm = hypot(target, 1.0);
+			penalty = fmax(shortfall, 0.0);
+
+			return pow(penalty / norm, exponent)
+				+ tau / (1.0 + fmax(-shortfall, 0.0) / norm);
+		}
 
 		case FIT_DIR_DEVIATE:
-			/* pow(|value - target|, exp) */
-			deviation = fabs(value - target);
-			return pow(deviation, exponent);
+			/* |v − t|^exp — no normalization or tension */
+			penalty = fabs(value - target);
+			return pow(penalty, exponent);
 
 		default:
 			break;

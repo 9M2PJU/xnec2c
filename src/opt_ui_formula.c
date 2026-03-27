@@ -14,15 +14,19 @@
 #include "shared.h"
 
 /* Format strings for each FIT_DIR_* value.
- * Arguments in order: weight_str, reduce_name, val1, val2, exp_str
- * val1/val2 swap for FIT_DIR_MAXIMIZE (target/metric instead of metric/target). */
+ * Arguments in order: weight_str, reduce_name, val1, val2, target_str, exp_str
+ * MINIMIZE: val1=metric, val2=target; shows (metric − target)⁺/√(target²+1)
+ * MAXIMIZE: val1=target, val2=metric; shows (target − metric)⁺/√(target²+1)
+ * DEVIATE:  val1=metric, val2=target; shows |metric − target| (target_str ignored) */
 static const char *formula_dir_fmts[FIT_DIR_COUNT] = {
 	[FIT_DIR_MINIMIZE] =
-		"<b>%s</b>\xc2\xb7%s((%s/<b>%s</b>)<sup><b>%s</b></sup>)",
+		"<b>%s</b>·%s(((%s−<b>%s</b>)<sup>+</sup>"
+		"/√(<b>%s</b>²+1))<sup><b>%s</b></sup>)",
 	[FIT_DIR_MAXIMIZE] =
-		"<b>%s</b>\xc2\xb7%s((<b>%s</b>/%s)<sup><b>%s</b></sup>)",
+		"<b>%s</b>·%s(((<b>%s</b>−%s)<sup>+</sup>"
+		"/√(<b>%s</b>²+1))<sup><b>%s</b></sup>)",
 	[FIT_DIR_DEVIATE]  =
-		"<b>%s</b>\xc2\xb7%s(|%s\xe2\x88\x92<b>%s</b>|<sup><b>%s</b></sup>)",
+		"<b>%s</b>·%s(|%s−<b>%s</b>|<sup><b>%s</b></sup>)",
 };
 
 /*------------------------------------------------------------------------*/
@@ -124,13 +128,13 @@ void opt_ui_update_formula(void)
 		snprintf(exp_str, sizeof(exp_str), "%.4g", obj->exponent);
 		snprintf(target_str, sizeof(target_str), "%.4g", obj->target);
 
-		/* maximize swaps metric and target in the fraction */
+		/* MAXIMIZE shows target − metric; others show metric − target */
 		val1 = (obj->direction == FIT_DIR_MAXIMIZE) ? target_str : metric_name;
 		val2 = (obj->direction == FIT_DIR_MAXIMIZE) ? metric_name : target_str;
 
 		g_string_append_printf(formula_base_markup,
 			formula_dir_fmts[obj->direction],
-			weight_str, reduce_name, val1, val2, exp_str);
+			weight_str, reduce_name, val1, val2, target_str, exp_str);
 
 		term_count++;
 	}
@@ -270,7 +274,7 @@ double update_goal_rows(const measurement_t *meas,
 		if (raw_value == -1.0)
 		{
 			gtk_label_set_text(GTK_LABEL(gr->w[GR_VALUE]),
-				"\xe2\x80\x94");
+				"—");
 		}
 		else
 		{
@@ -400,14 +404,14 @@ void on_opt_formula_help_clicked(GtkButton *button, gpointer user_data)
 	help_text =
 		"<span size='large' weight='bold'>Transform Directions</span>\n\n"
 		"<b>minimize:</b> Lower values are better\n"
-		"    Penalty = (value/target)\xe1\xb5\x89\xcb\xa3\xe1\xb5\x96\n"
-		"    <i>Use for VSWR, noise, or metrics where smaller is optimal</i>\n\n"
+		"    Penalty = ((value − target)<sup>+</sup> / √(target²+1))<sup>exp</sup>\n"
+		"    <i>Score approaches zero below target; penalizes excess above target</i>\n\n"
 		"<b>maximize:</b> Higher values are better\n"
-		"    Penalty = (target/value)\xe1\xb5\x89\xcb\xa3\xe1\xb5\x96\n"
-		"    <i>Use for gain, efficiency, F/B ratio</i>\n\n"
+		"    Penalty = ((target − value)<sup>+</sup> / √(target²+1))<sup>exp</sup>\n"
+		"    <i>Score approaches zero above target; works for positive and negative targets</i>\n\n"
 		"<b>deviate:</b> Target a specific value\n"
-		"    Penalty = |value \xe2\x88\x92 target|\xe1\xb5\x89\xcb\xa3\xe1\xb5\x96\n"
-		"    <i>Use for angle, impedance, or frequency alignment</i>\n\n\n"
+		"    Penalty = |value − target|<sup>exp</sup>\n"
+		"    <i>Penalizes deviation from target; score=0 when value = target</i>\n\n\n"
 		"<span size='large' weight='bold'>Reduction Functions</span>\n\n"
 		"<b>avg:</b> Average penalty across band\n"
 		"    <i>Balances all frequencies equally</i>\n\n"
@@ -423,7 +427,7 @@ void on_opt_formula_help_clicked(GtkButton *button, gpointer user_data)
 		"<b>sum:</b> Total penalty sum across all frequencies\n"
 		"    <i>Emphasizes overall error magnitude</i>\n\n"
 		"<b>mag:</b> Root mean square magnitude\n"
-		"    sqrt(sum(penalty\xc2\xb2))\n"
+		"    sqrt(sum(penalty<sup>2</sup>))\n"
 		"    <i>Emphasizes large deviations more than average</i>\n\n\n"
 		"<span size='large' weight='bold'>Gain Direction Metrics</span>\n\n"
 		"The gain_dev_* metrics measure angular deviation (in degrees)\n"

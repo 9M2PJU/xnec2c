@@ -2535,23 +2535,29 @@ candidate's frequency sweep.</dd>
 <dt><strong>Transform</strong> (direction combo box)</dt>
 <dd>How the raw measurement converts to a penalty score:
 <ul>
-<li><strong>min score</strong> — <code>score = (value / target)<sup>exp</sup></code>.
-Lower measurement values produce lower penalties. Appropriate for VSWR, angular
-deviation, and any metric where smaller readings indicate better performance.</li>
-<li><strong>max score</strong> — <code>score = (|target| / max(|value|, ε))<sup>exp</sup></code>.
-Higher measurement values produce lower penalties. Appropriate for gain, front-to-back
-ratio, return loss, and metrics where larger readings indicate improvement.</li>
+<li><strong>min score</strong> — <code>score = (max(v − t, 0) / √(t² + 1))<sup>exp</sup> + τ / (1 + max(t − v, 0) / √(t² + 1))</code>.
+Penalizes values above target; score approaches zero as value improves below target.
+A small tension term τ provides a residual gradient so the optimizer continues to
+improve met objectives. Appropriate for VSWR, angular deviation, S11 return loss,
+and any metric where smaller readings indicate better performance.</li>
+<li><strong>max score</strong> — <code>score = (max(t − v, 0) / √(t² + 1))<sup>exp</sup> + τ / (1 + max(v − t, 0) / √(t² + 1))</code>.
+Penalizes values below target; score approaches zero as value improves above target.
+Works correctly for both positive and negative targets. Appropriate for gain,
+front-to-back ratio, G/T, and metrics where larger readings indicate improvement.</li>
 <li><strong>± target</strong> — <code>score = |value − target|<sup>exp</sup></code>.
-Values closer to the target produce scores approaching zero. Appropriate for impedance,
-phase angle, beam pointing, and metrics that should converge on a specific number rather
-than an extreme.</li>
+Penalizes deviation from target; score is zero when value equals target. Appropriate for
+impedance, phase angle, beam pointing, and metrics that converge on a specific number
+rather than an extreme.</li>
 </ul>
 </dd>
 
 <dt><strong>Target</strong></dt>
 <dd>The goal value for the selected measurement. Its meaning depends on the transform
-direction: for <em>min score</em>, the reference divisor; for <em>max score</em>,
-the reference dividend; for <em>± target</em>, the center point of zero penalty.</dd>
+direction: for <em>min score</em>, the upper threshold (score approaches zero below this
+value); for <em>max score</em>, the lower threshold (score approaches zero above this
+value); for <em>± target</em>, the center point of zero penalty. The √(t² + 1)
+normalization smoothly transitions between relative error for large targets and
+absolute error near target zero, with the crossover at |target| = 1.</dd>
 
 <dt><strong>Exp</strong> (exponent)</dt>
 <dd>Applied to the transform result before reduction. Controls penalty steepness: an
@@ -2607,8 +2613,8 @@ across the full sweep.</dd>
 <tr><td>Z Magnitude</td><td>Magnitude of feed-point impedance (Ω)</td><td>± target</td><td>50.0</td></tr>
 <tr><td>Z Phase</td><td>Phase angle of feed-point impedance (°)</td><td>± target</td><td>0.0</td></tr>
 <tr><td>VSWR</td><td>Voltage standing wave ratio (1.0 = perfect match)</td><td>min score</td><td>1.0</td></tr>
-<tr><td>S11</td><td>Return loss in dB (more negative = better match)</td><td>max score</td><td>−15.0</td></tr>
-<tr><td>S11 Real</td><td>Real part of S11 in dB</td><td>max score</td><td>−15.0</td></tr>
+<tr><td>S11</td><td>Return loss in dB (more negative = better match)</td><td>min score</td><td>−15.0</td></tr>
+<tr><td>S11 Real</td><td>Real part of S11 in dB</td><td>min score</td><td>−15.0</td></tr>
 <tr><td>S11 Imaginary</td><td>Imaginary part of S11 in dB</td><td>± target</td><td>0.0</td></tr>
 <tr><td>S11 Angle</td><td>Phase angle of reflection coefficient (°)</td><td>± target</td><td>0.0</td></tr>
 <tr><td>Max Gain</td><td>Peak gain across all angles (dBi)</td><td>max score</td><td>12.0</td></tr>
@@ -2624,9 +2630,9 @@ across the full sweep.</dd>
 <tr><td>Gain Dev −Y</td><td>Angular deviation of peak gain from −Y axis (°)</td><td>min score</td><td>1.0</td></tr>
 <tr><td>Gain Dev +Z</td><td>Angular deviation of peak gain from +Z (zenith) (°)</td><td>min score</td><td>1.0</td></tr>
 <tr><td>Gain Dev −Z</td><td>Angular deviation of peak gain from −Z (nadir) (°)</td><td>min score</td><td>1.0</td></tr>
-<tr><td>Ant Temp</td><td>Antenna noise temperature from sky/earth brightness (K)</td><td>min score</td><td>1000.0</td></tr>
-<tr><td>Ant Temp Total</td><td>Total antenna noise temperature including ohmic loss (K)</td><td>min score</td><td>1000.0</td></tr>
-<tr><td>G/T_ant</td><td>Gain-to-antenna-temperature ratio (dB), excludes loss</td><td>max score</td><td>0.0</td></tr>
+<tr><td>T_ant</td><td>Antenna noise temperature T_ant from sky/earth brightness (K)</td><td>min score</td><td>1000.0</td></tr>
+<tr><td>T_total</td><td>Total system noise temperature T_total including ohmic loss (K)</td><td>min score</td><td>1000.0</td></tr>
+<tr><td>G/T_ant</td><td>Gain-to-antenna-temperature ratio (dB), excludes loss</td><td>max score</td><td>5.0</td></tr>
 </tbody>
 </table>
 

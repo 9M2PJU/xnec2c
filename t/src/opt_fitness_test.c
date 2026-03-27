@@ -79,22 +79,54 @@ static void build_meas(int n, int field_idx, const double *values,
 static void test_transform_minimize(void)
 {
 	double result;
+	double norm;
+	double tau;
 
-	/* At target: score = 1.0 */
+	/* At target: penalty=0, tension at maximum τ
+	 * norm = hypot(1.5, 1) = √(3.25), tau = pow(1e-4, 2) = 1e-8 */
+	norm = hypot(1.5, 1.0);
+	tau = pow(FITNESS_TENSION, 2.0);
 	result = fitness_transform(FIT_DIR_MINIMIZE, 1.5, 1.5, 2.0);
-	ASSERT_NEAR(result, 1.0, 1e-10, "MINIMIZE at target");
+	ASSERT_NEAR(result, tau, 1e-12, "MINIMIZE at target");
 
-	/* Worse than target (VSWR 3.0, target 1.5): score = (3.0/1.5)^2 = 4.0 */
+	/* Above target (VSWR 3.0, target 1.5):
+	 * excess = 1.5, score = (1.5/norm)^2 + tau */
 	result = fitness_transform(FIT_DIR_MINIMIZE, 3.0, 1.5, 2.0);
-	ASSERT_NEAR(result, 4.0, 1e-10, "MINIMIZE worse than target");
+	ASSERT_NEAR(result, pow(1.5 / norm, 2.0) + tau, 1e-10,
+		"MINIMIZE above target");
 
-	/* Better than target (VSWR 1.2, target 1.5): score = (1.2/1.5)^2 = 0.64 */
+	/* Below target (VSWR 1.2, target 1.5): met, tension decreasing
+	 * overshoot = 0.3, score = tau / (1 + 0.3/norm) */
 	result = fitness_transform(FIT_DIR_MINIMIZE, 1.2, 1.5, 2.0);
-	ASSERT_NEAR(result, 0.64, 1e-10, "MINIMIZE better than target");
+	ASSERT_NEAR(result, tau / (1.0 + 0.3 / norm), 1e-12,
+		"MINIMIZE below target");
 
-	/* Exponent 1.0: linear */
+	/* Exponent 1.0: linear excess
+	 * excess = 1.5, tau = pow(1e-4, 1) = 1e-4 */
+	tau = pow(FITNESS_TENSION, 1.0);
 	result = fitness_transform(FIT_DIR_MINIMIZE, 3.0, 1.5, 1.0);
-	ASSERT_NEAR(result, 2.0, 1e-10, "MINIMIZE linear exponent");
+	ASSERT_NEAR(result, 1.5 / norm + tau, 1e-10,
+		"MINIMIZE linear exponent");
+
+	/* Negative target: value above target is penalized
+	 * norm = hypot(-15, 1), excess = 10 */
+	norm = hypot(-15.0, 1.0);
+	tau = pow(FITNESS_TENSION, 2.0);
+	result = fitness_transform(FIT_DIR_MINIMIZE, -5.0, -15.0, 2.0);
+	ASSERT_NEAR(result, pow(10.0 / norm, 2.0) + tau, 1e-10,
+		"MINIMIZE negative target, above");
+
+	/* Negative target: value below target is met
+	 * overshoot = 5 */
+	result = fitness_transform(FIT_DIR_MINIMIZE, -20.0, -15.0, 2.0);
+	ASSERT_NEAR(result, tau / (1.0 + 5.0 / norm), 1e-12,
+		"MINIMIZE negative target, below");
+
+	/* Cross-sign: positive value, negative target
+	 * excess = 20 */
+	result = fitness_transform(FIT_DIR_MINIMIZE, 5.0, -15.0, 2.0);
+	ASSERT_NEAR(result, pow(20.0 / norm, 2.0) + tau, 1e-10,
+		"MINIMIZE cross-sign");
 }
 
 /*------------------------------------------------------------------------*/
@@ -102,30 +134,88 @@ static void test_transform_minimize(void)
 static void test_transform_maximize(void)
 {
 	double result;
+	double norm;
+	double tau;
 
-	/* At target: score = 1.0 */
+	/* At target: penalty=0, tension at maximum τ
+	 * norm = hypot(8, 1), tau = pow(1e-4, 0.5) */
+	norm = hypot(8.0, 1.0);
+	tau = pow(FITNESS_TENSION, 0.5);
 	result = fitness_transform(FIT_DIR_MAXIMIZE, 8.0, 8.0, 0.5);
-	ASSERT_NEAR(result, 1.0, 1e-10, "MAXIMIZE at target");
+	ASSERT_NEAR(result, tau, 1e-10, "MAXIMIZE at target");
 
-	/* Better than target (gain 10, target 8): score = (8/10)^0.5 */
+	/* Above target (gain 10, target 8): met, overshoot = 2
+	 * score = tau / (1 + 2/norm) */
 	result = fitness_transform(FIT_DIR_MAXIMIZE, 10.0, 8.0, 0.5);
-	ASSERT_NEAR(result, pow(0.8, 0.5), 1e-10, "MAXIMIZE better than target");
+	ASSERT_NEAR(result, tau / (1.0 + 2.0 / norm), 1e-10,
+		"MAXIMIZE above target");
 
-	/* Worse than target (gain 4, target 8): score = (8/4)^0.5 */
+	/* Below target (gain 4, target 8):
+	 * shortfall = 4, score = (4/norm)^0.5 + tau */
 	result = fitness_transform(FIT_DIR_MAXIMIZE, 4.0, 8.0, 0.5);
-	ASSERT_NEAR(result, pow(2.0, 0.5), 1e-10, "MAXIMIZE worse than target");
+	ASSERT_NEAR(result, pow(4.0 / norm, 0.5) + tau, 1e-10,
+		"MAXIMIZE below target");
 
-	/* S11: target -15, value -20 (better): |15|/|20| = 0.75 */
-	result = fitness_transform(FIT_DIR_MAXIMIZE, -20.0, -15.0, 2.0);
-	ASSERT_NEAR(result, pow(0.75, 2.0), 1e-10, "MAXIMIZE S11 better");
-
-	/* S11: target -15, value -10 (worse): |15|/|10| = 1.5 */
+	/* G/T-style: negative target -15, value -10 (above on number line, met)
+	 * norm = hypot(-15, 1), overshoot = 5 */
+	norm = hypot(-15.0, 1.0);
+	tau = pow(FITNESS_TENSION, 2.0);
 	result = fitness_transform(FIT_DIR_MAXIMIZE, -10.0, -15.0, 2.0);
-	ASSERT_NEAR(result, pow(1.5, 2.0), 1e-10, "MAXIMIZE S11 worse");
+	ASSERT_NEAR(result, tau / (1.0 + 5.0 / norm), 1e-12,
+		"MAXIMIZE negative target, met");
 
-	/* Near-zero value: epsilon guard */
+	/* Negative target -15, value -20 (below on number line, not met)
+	 * shortfall = -15 - (-20) = 5 */
+	result = fitness_transform(FIT_DIR_MAXIMIZE, -20.0, -15.0, 2.0);
+	ASSERT_NEAR(result, pow(5.0 / norm, 2.0) + tau, 1e-10,
+		"MAXIMIZE negative target, not met");
+
+	/* Value at zero, positive target:
+	 * norm = hypot(8, 1), shortfall = 8, tau for exp=1 */
+	norm = hypot(8.0, 1.0);
+	tau = pow(FITNESS_TENSION, 1.0);
 	result = fitness_transform(FIT_DIR_MAXIMIZE, 0.0, 8.0, 1.0);
-	ASSERT_TRUE(result > 1e6, "MAXIMIZE near-zero value gives large penalty");
+	ASSERT_NEAR(result, 8.0 / norm + tau, 1e-10,
+		"MAXIMIZE value at zero");
+
+	/* Cross-sign: positive value, negative target (met, overshoot=20)
+	 * norm = hypot(-15, 1) */
+	norm = hypot(-15.0, 1.0);
+	tau = pow(FITNESS_TENSION, 2.0);
+	result = fitness_transform(FIT_DIR_MAXIMIZE, 5.0, -15.0, 2.0);
+	ASSERT_NEAR(result, tau / (1.0 + 20.0 / norm), 1e-12,
+		"MAXIMIZE cross-sign positive value (met)");
+
+	/* Cross-sign: negative value, positive target (not met, shortfall=13)
+	 * norm = hypot(8, 1) */
+	norm = hypot(8.0, 1.0);
+	result = fitness_transform(FIT_DIR_MAXIMIZE, -5.0, 8.0, 2.0);
+	ASSERT_NEAR(result, pow(13.0 / norm, 2.0) + tau, 1e-10,
+		"MAXIMIZE cross-sign negative value");
+
+	/* G/T with target=5: value=10 (met, overshoot=5)
+	 * norm = hypot(5, 1) */
+	norm = hypot(5.0, 1.0);
+	result = fitness_transform(FIT_DIR_MAXIMIZE, 10.0, 5.0, 2.0);
+	ASSERT_NEAR(result, tau / (1.0 + 5.0 / norm), 1e-12,
+		"MAXIMIZE G/T met");
+
+	/* G/T with target=5: value=-3 (not met, shortfall=8) */
+	result = fitness_transform(FIT_DIR_MAXIMIZE, -3.0, 5.0, 2.0);
+	ASSERT_NEAR(result, pow(8.0 / norm, 2.0) + tau, 1e-10,
+		"MAXIMIZE G/T not met");
+
+	/* G/T with target=0: value=5 (met, overshoot=5)
+	 * norm = hypot(0, 1) = 1.0 — no epsilon guard needed */
+	norm = hypot(0.0, 1.0);
+	result = fitness_transform(FIT_DIR_MAXIMIZE, 5.0, 0.0, 2.0);
+	ASSERT_NEAR(result, tau / (1.0 + 5.0 / norm), 1e-12,
+		"MAXIMIZE target zero, met");
+
+	/* G/T with target=0: value=-5 (not met, shortfall=5) */
+	result = fitness_transform(FIT_DIR_MAXIMIZE, -5.0, 0.0, 2.0);
+	ASSERT_NEAR(result, pow(5.0 / norm, 2.0) + tau, 1e-10,
+		"MAXIMIZE target zero, not met");
 }
 
 /*------------------------------------------------------------------------*/
@@ -259,15 +349,24 @@ static void test_compute_vswr_only(void)
 
 	result = fitness_compute(&cfg, meas, 4, freq);
 
-	/* avg of pow(val/1.0, 2.0) for each step:
-	 * step 0: (1.5/1.0)^2 = 2.25
-	 * step 1: (2.0/1.0)^2 = 4.0
-	 * step 2: (1.8/1.0)^2 = 3.24
-	 * step 3: (1.5/1.0)^2 = 2.25
-	 * avg = (2.25 + 4.0 + 3.24 + 2.25) / 4 = 2.935
-	 * weight 5.0 * 2.935 = 14.675
+	/* avg of fitness_transform(MINIMIZE, val, 1.0, 2.0) for each step:
+	 * norm = hypot(1.0, 1.0) = sqrt(2), tau = pow(1e-4, 2) = 1e-8
+	 * step 0: val=1.5, excess=0.5, (0.5/sqrt(2))^2 + tau
+	 * step 1: val=2.0, excess=1.0, (1.0/sqrt(2))^2 + tau
+	 * step 2: val=1.8, excess=0.8, (0.8/sqrt(2))^2 + tau
+	 * step 3: val=1.5, excess=0.5, (0.5/sqrt(2))^2 + tau
+	 * weight 5.0 * avg
 	 */
-	expected = 5.0 * (pow(1.5/1.0, 2.0) + pow(2.0/1.0, 2.0) + pow(1.8/1.0, 2.0) + pow(1.5/1.0, 2.0)) / 4.0;
+	{
+		double n = hypot(1.0, 1.0);
+		double tau = pow(FITNESS_TENSION, 2.0);
+		double s0 = pow(0.5 / n, 2.0) + tau;
+		double s1 = pow(1.0 / n, 2.0) + tau;
+		double s2 = pow(0.8 / n, 2.0) + tau;
+		double s3 = pow(0.5 / n, 2.0) + tau;
+
+		expected = 5.0 * (s0 + s1 + s2 + s3) / 4.0;
+	}
 	ASSERT_NEAR(result, expected, 1e-6, "VSWR-only compute");
 
 	fitness_config_free(&cfg);
@@ -293,14 +392,20 @@ static void test_compute_gain_only(void)
 
 	result = fitness_compute(&cfg, meas, 3, freq);
 
-	/* avg of pow(|12.0|/max(|val|,eps), 0.5):
-	 * step 0: (12/8)^0.5 = 1.2247
-	 * step 1: (12/10)^0.5 = 1.0954
-	 * step 2: (12/6)^0.5 = 1.4142
-	 * avg = (1.2247 + 1.0954 + 1.4142) / 3
+	/* avg of fitness_transform(MAXIMIZE, val, 12.0, 0.5):
+	 * norm = hypot(12.0, 1.0), tau = pow(1e-4, 0.5)
+	 * step 0: val=8,  shortfall=4,  (4/norm)^0.5 + tau
+	 * step 1: val=10, shortfall=2,  (2/norm)^0.5 + tau
+	 * step 2: val=6,  shortfall=6,  (6/norm)^0.5 + tau
 	 * weight 10.0 * avg
 	 */
-	expected = 10.0 * (pow(12.0/8.0, 0.5) + pow(12.0/10.0, 0.5) + pow(12.0/6.0, 0.5)) / 3.0;
+	{
+		double n = hypot(12.0, 1.0);
+		double tau = pow(FITNESS_TENSION, 0.5);
+
+		expected = 10.0 * (pow(4.0/n, 0.5) + pow(2.0/n, 0.5)
+			+ pow(6.0/n, 0.5) + 3.0 * tau) / 3.0;
+	}
 	ASSERT_NEAR(result, expected, 1e-6, "GAIN-only compute");
 
 	fitness_config_free(&cfg);
@@ -338,8 +443,17 @@ static void test_compute_combined(void)
 
 	result = fitness_compute(&cfg, meas, 2, freq);
 
-	vswr_contrib = 5.0 * (pow(1.5/1.0, 2.0) + pow(2.0/1.0, 2.0)) / 2.0;
-	gain_contrib = 10.0 * (pow(12.0/8.0, 0.5) + pow(12.0/10.0, 0.5)) / 2.0;
+	{
+		double nv = hypot(1.0, 1.0);
+		double tv = pow(FITNESS_TENSION, 2.0);
+		double ng = hypot(12.0, 1.0);
+		double tg = pow(FITNESS_TENSION, 0.5);
+
+		vswr_contrib = 5.0 * (pow(0.5 / nv, 2.0) + tv
+			+ pow(1.0 / nv, 2.0) + tv) / 2.0;
+		gain_contrib = 10.0 * (pow(4.0 / ng, 0.5) + tg
+			+ pow(2.0 / ng, 0.5) + tg) / 2.0;
+	}
 
 	ASSERT_NEAR(result, vswr_contrib + gain_contrib, 1e-6, "combined VSWR+gain");
 
@@ -439,14 +553,16 @@ static void test_reduce_diff(void)
 
 	/* diff reduce: max - min of transformed values
 	 * MINIMIZE direction, target=3.0, exp=1.0
-	 * transformed: 6/3=2.0, 8/3=2.667, 10/3=3.333, 7/3=2.333
-	 * diff = 3.333 - 2.0 = 1.333
-	 * weight = 1.0 * 1.333
+	 * norm = hypot(3, 1) = sqrt(10), tau = pow(1e-4, 1) = 1e-4
+	 * All values > target, so each has penalty + tau:
+	 *   t0 = 3/norm + tau, t1 = 5/norm + tau,
+	 *   t2 = 7/norm + tau, t3 = 4/norm + tau
+	 * diff = t2 - t0 = (7-3)/norm = 4/norm
+	 * weight = 1.0 * diff
 	 */
 	{
-		double t0 = 6.0 / 3.0;
-		double t2 = 10.0 / 3.0;
-		double expected = 1.0 * (t2 - t0);
+		double n = hypot(3.0, 1.0);
+		double expected = 1.0 * (4.0 / n);
 
 		ASSERT_NEAR(result, expected, 1e-6, "diff reduce for gain flatness");
 	}
@@ -473,8 +589,14 @@ static void test_reduce_max(void)
 
 	result = fitness_compute(&cfg, meas, 3, freq);
 
-	/* max reduce picks worst VSWR: (3.0/1.0)^2 = 9.0 */
-	expected = 5.0 * pow(3.0 / 1.0, 2.0);
+	/* max reduce picks worst VSWR step (3.0):
+	 * norm = hypot(1, 1), excess = 2.0, tau = pow(1e-4, 2) */
+	{
+		double n = hypot(1.0, 1.0);
+		double tau = pow(FITNESS_TENSION, 2.0);
+
+		expected = 5.0 * (pow(2.0 / n, 2.0) + tau);
+	}
 
 	ASSERT_NEAR(result, expected, 1e-6, "max reduce picks worst VSWR");
 
@@ -560,11 +682,21 @@ static void test_duplicate_measurement(void)
 
 	result = fitness_compute(&cfg, meas, 3, freq);
 
-	/* First VSWR: avg reduce, target=1.0, weight=5, exp=2 */
-	avg_contrib = 5.0 * (pow(1.5/1.0, 2.0) + pow(3.0/1.0, 2.0) + pow(1.8/1.0, 2.0)) / 3.0;
+	/* First VSWR: avg reduce, target=1.0, weight=5, exp=2
+	 * norm = hypot(1, 1), tau = pow(1e-4, 2) */
+	{
+		double n1 = hypot(1.0, 1.0);
+		double t1 = pow(FITNESS_TENSION, 2.0);
+		double n2 = hypot(2.0, 1.0);
 
-	/* Second VSWR: max reduce, target=2.0, weight=8, exp=2 */
-	max_contrib = 8.0 * pow(3.0/2.0, 2.0);
+		avg_contrib = 5.0 * (pow(0.5 / n1, 2.0) + t1
+			+ pow(2.0 / n1, 2.0) + t1
+			+ pow(0.8 / n1, 2.0) + t1) / 3.0;
+
+		/* Second VSWR: max reduce, target=2.0, weight=8, exp=2
+		 * Only step 1 (3.0) exceeds target: excess=1.0 */
+		max_contrib = 8.0 * (pow(1.0 / n2, 2.0) + t1);
+	}
 
 	ASSERT_NEAR(result, avg_contrib + max_contrib, 1e-6,
 		"duplicate VSWR with different reduce/target");

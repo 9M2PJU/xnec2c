@@ -22,8 +22,13 @@
 
 #include "../measurements.h"
 
-/** Guard value for denominators approaching zero */
-#define FITNESS_EPSILON 1e-12
+/** Tension constant for residual gradient past met objectives.
+ *
+ * Scaled by exponent: tau = pow(FITNESS_TENSION, exp).  At exp=2 this yields
+ * 1e-8, ensuring the tension term is negligible compared to real penalties
+ * while still providing a monotonic gradient for the optimizer to continue
+ * improving past the target. */
+#define FITNESS_TENSION 1e-4
 
 /** Initial allocation capacity for dynamic objective list */
 #define FITNESS_OBJ_INIT_CAP 4
@@ -31,16 +36,28 @@
 /**
  * Internal direction mode, determined by the metric.
  *
- * MINIMIZE: score = pow(value / target, exp)
- *   Score is 1.0 at target.  Values exceeding target are penalized (>1.0),
- *   values better than target are rewarded (<1.0).
+ * Normalization uses n = √(t² + 1) (hypotenuse with unit leg) instead of
+ * |target|.  This smoothly transitions between relative error (|target| >> 1)
+ * and absolute error (target near zero), with the crossover at |target| = 1.
+ * The unit leg means "a shortfall of 1 unit is the natural error scale when
+ * the target itself is near zero."  For antenna parameters measured in dB,
+ * ohms, degrees, and kelvin, this is a reasonable baseline.
  *
- * MAXIMIZE: score = pow(|target| / max(|value|, epsilon), exp)
- *   Score is 1.0 at target.  Values below target are penalized (>1.0),
- *   values above target are rewarded (<1.0).
+ * A small tension term τ = pow(FITNESS_TENSION, exp) provides a monotonically
+ * decreasing residual score past the target so the optimizer continues to
+ * improve met objectives when all hard penalties are zero.  The tension is
+ * bounded by τ and approaches zero as overshoot grows.
  *
- * DEVIATE: score = pow(|value - target|, exp)
- *   Score is 0.0 at target.  Any deviation is penalized symmetrically.
+ * MINIMIZE: score = (max(v − t, 0) / n)ᵉ  +  τ / (1 + max(t − v, 0) / n)
+ *   Penalizes values above target.  Score approaches zero as value improves
+ *   below target.
+ *
+ * MAXIMIZE: score = (max(t − v, 0) / n)ᵉ  +  τ / (1 + max(v − t, 0) / n)
+ *   Penalizes values below target.  Score approaches zero as value improves
+ *   above target.
+ *
+ * DEVIATE: score = |v − t|ᵉ
+ *   Any deviation is penalized symmetrically.  No normalization or tension.
  */
 enum fitness_direction
 {
