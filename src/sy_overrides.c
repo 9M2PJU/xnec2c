@@ -1503,12 +1503,16 @@ on_opt_check_toggled(GtkToggleButton *button, gpointer user_data)
     /* Force override on and lock it */
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(row->override_check), TRUE);
     gtk_widget_set_sensitive(row->override_check, FALSE);
+    gtk_widget_set_tooltip_text(row->override_check,
+        _("Controls whether this parameter overrides the NEC model value.\n"
+          "Uncheck Opt to control independently."));
     set_row_sensitivity(row, TRUE);
   }
   else
   {
     /* Restore override checkbox to user control */
     gtk_widget_set_sensitive(row->override_check, TRUE);
+    gtk_widget_set_tooltip_text(row->override_check, NULL);
     set_row_sensitivity(row,
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(row->override_check)));
   }

@@ -30,7 +30,9 @@
 #define EXPR_FIELD_LEN  256
 
 /* Tooltip text shown on widgets disabled by an SY expression */
-#define EXPR_TOOLTIP _("Controlled by SY expression")
+#define EXPR_TOOLTIP \
+  _("Value is controlled by an SY expression.\n" \
+    "Edit the SY card to change this value.")
 
 /*
  * expr_edit_field_protected - test whether a field carries an expression

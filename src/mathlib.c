@@ -24,6 +24,10 @@
 #include "shared.h"
 #include "mathlib.h"
 
+#define MKL_LOCKED_TOOLTIP \
+  _("Linear algebra library selection.\n" \
+    "Restart to change MKL threading library.")
+
 void mathlib_mkl_set_threading_intel(mathlib_t *lib);
 void set_mathlib_batch(GtkWidget *widget, mathlib_t *lib);
 
@@ -1061,15 +1065,22 @@ void mathlib_lock_intel(const char *locked_id, int batch)
 			if (!CHILD)
 			{
 				if (mathlibs[i].interactive_widget != NULL && !batch)
+				{
 					gtk_widget_set_sensitive(GTK_WIDGET(mathlibs[i].interactive_widget), FALSE);
+					gtk_widget_set_tooltip_text(GTK_WIDGET(mathlibs[i].interactive_widget), MKL_LOCKED_TOOLTIP);
+				}
 
 				if (mathlibs[i].batch_widget != NULL && batch)
+				{
 					gtk_widget_set_sensitive(GTK_WIDGET(mathlibs[i].batch_widget), FALSE);
+					gtk_widget_set_tooltip_text(GTK_WIDGET(mathlibs[i].batch_widget), MKL_LOCKED_TOOLTIP);
+				}
 
 				if (mathlibs[i].benchmark_widget != NULL &&
 					((FORKED && batch) || !FORKED))
 				{
 					gtk_widget_set_sensitive(GTK_WIDGET(mathlibs[i].benchmark_widget), FALSE);
+					gtk_widget_set_tooltip_text(GTK_WIDGET(mathlibs[i].benchmark_widget), MKL_LOCKED_TOOLTIP);
 					gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(mathlibs[i].benchmark_widget), FALSE);
 				}
 			}

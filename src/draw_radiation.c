@@ -980,18 +980,25 @@ Set_Gain_Style( int gs )
   static const struct {
     const char *widget_id;
     const char *tooltip;
+    const char *disabled_tooltip;
   } noise_widgets[] = {
     { "rdpattern_elevation_spinbutton",
       N_("Observation elevation angle. Shifts sky/earth "
          "boundary for antenna temperature evaluation. "
-         "0° = horizon.") },
+         "0° = horizon."),
+      N_("Observation elevation for antenna temperature.\n"
+         "Select Gain Style → Noise Temperature to enable.") },
     { "rdpattern_elevation_label",
       N_("Observation elevation angle. Shifts sky/earth "
          "boundary for antenna temperature evaluation. "
-         "0° = horizon.") },
+         "0° = horizon."),
+      N_("Observation elevation for antenna temperature.\n"
+         "Select Gain Style → Noise Temperature to enable.") },
     { "rdpattern_noise_env_menu",
       N_("Select brightness temperature model "
-         "for T_sky and T_earth.") },
+         "for T_sky and T_earth."),
+      N_("Brightness temperature model for T_sky and T_earth.\n"
+         "Select Gain Style → Noise Temperature to enable.") },
   };
 
   int n_noise_widgets = sizeof(noise_widgets) / sizeof(noise_widgets[0]);
@@ -1002,7 +1009,8 @@ Set_Gain_Style( int gs )
     if (widget)
     {
       gtk_widget_set_sensitive(widget, noise);
-      gtk_widget_set_tooltip_text(widget, _(noise_widgets[i].tooltip));
+      gtk_widget_set_tooltip_text(widget,
+          noise ? _(noise_widgets[i].tooltip) : _(noise_widgets[i].disabled_tooltip));
     }
   }
 
