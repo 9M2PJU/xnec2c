@@ -99,9 +99,17 @@ double Scale_Gain( double gain, int fstep, int idx )
         }
 
         int ith = idx % fpat.nth;
+        int iph = idx / fpat.nth;
         double tht = (fpat.thets + ith * fpat.dth) * M_PI / 180.0;
-        double horizon = ANT_TEMP_HORIZON_RAD();
-        double t_bright = (tht < horizon) ? t_sky : t_earth;
+        double phi = (fpat.phis  + iph * fpat.dph) * M_PI / 180.0;
+
+        int pol = calc_data.pol_type;
+        double tht_mg = rad_pattern[fstep].max_gain_tht[pol] * M_PI / 180.0;
+        double phi_mg = rad_pattern[fstep].max_gain_phi[pol] * M_PI / 180.0;
+        double elev_rad = rc_config.ant_temp_elevation * M_PI / 180.0;
+
+        double z_w = ant_temp_z_world(tht, phi, tht_mg, phi_mg, elev_rad);
+        double t_bright = (z_w > ANT_TEMP_Z_EPSILON) ? t_sky : t_earth;
         double g_lin = pow(10.0, gain / 10.0);
 
         /* Noise temperature density (K/sr): resolution-independent */
@@ -207,6 +215,18 @@ Draw_Radiation_Pattern( cairo_t *cr )
     pts_idx = 0;
     phi = (double)(fpat.phis * TORAD); /* In rads */
 
+    /* Noise-mode rotation parameters: rotate display coordinates so
+     * the pattern visually tilts upward by the elevation angle while
+     * the sky/earth boundary remains at the horizontal plane. */
+    int noise_rotate = IS_NOISE_MODE(rc_config.gain_style);
+    double rot_tht_mg = 0.0, rot_phi_mg = 0.0, rot_elev = 0.0;
+    if (noise_rotate)
+    {
+      rot_tht_mg = rad_pattern[fstep].max_gain_tht[pol] * (double)TORAD;
+      rot_phi_mg = rad_pattern[fstep].max_gain_phi[pol] * (double)TORAD;
+      rot_elev   = rc_config.ant_temp_elevation * (double)TORAD;
+    }
+
     /* Step phi angle */
     for( nph = 0; nph < fpat.nph; nph++ )
     {
@@ -221,11 +241,25 @@ Draw_Radiation_Pattern( cairo_t *cr )
         /* Distance of pattern point from xyz origin */
         point_3d[pts_idx].r = r;
 
-        /* Distance of point's projection on xyz axis, from origin */
-        point_3d[pts_idx].z = r * cos(theta);
-        r *= sin(theta);
-        point_3d[pts_idx].x = r * cos(phi);
-        point_3d[pts_idx].y = r * sin(phi);
+        /* Place cell at rotated position in noise mode so the pattern
+         * visually tilts upward; otherwise use original (θ, φ). */
+        if (noise_rotate && rot_elev != 0.0)
+        {
+          double xr, yr, zr;
+          ant_temp_rotate_point(theta, phi,
+              rot_tht_mg, rot_phi_mg, rot_elev,
+              &xr, &yr, &zr);
+          point_3d[pts_idx].x = r * xr;
+          point_3d[pts_idx].y = r * yr;
+          point_3d[pts_idx].z = r * zr;
+        }
+        else
+        {
+          point_3d[pts_idx].z = r * cos(theta);
+          double r_xy = r * sin(theta);
+          point_3d[pts_idx].x = r_xy * cos(phi);
+          point_3d[pts_idx].y = r_xy * sin(phi);
+        }
 
         /* Step theta in rads */
         theta += dth;

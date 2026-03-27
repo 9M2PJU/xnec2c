@@ -389,16 +389,24 @@ void meas_calc(measurement_t *m, int idx)
 			double t_pattern = 0.0;
 			double dth_rad = fpat.dth * M_PI / 180.0;
 			double dph_rad = fpat.dph * M_PI / 180.0;
-			double horizon_rad = ANT_TEMP_HORIZON_RAD();
+
+			double tht_mg = rad_pattern[idx].max_gain_tht[pol] * M_PI / 180.0;
+			double phi_mg = rad_pattern[idx].max_gain_phi[pol] * M_PI / 180.0;
+			double elev_rad = rc_config.ant_temp_elevation * M_PI / 180.0;
 
 			for (int iph = 0; iph < fpat.nph; iph++)
 			{
+				double phi_rad = (fpat.phis + iph * fpat.dph) * M_PI / 180.0;
 				for (int ith = 0; ith < fpat.nth; ith++)
 				{
+					int cell = ith + iph * fpat.nth;
 					double tht_rad = (fpat.thets + ith * fpat.dth) * M_PI / 180.0;
-					double g_lin = pow(10.0,
-						rad_pattern[idx].gtot[ith + iph * fpat.nth] / 10.0);
-					double t_bright = (tht_rad < horizon_rad) ? t_sky : t_earth;
+					double z_w = ant_temp_z_world(tht_rad, phi_rad,
+							tht_mg, phi_mg, elev_rad);
+					double g_dbi = rad_pattern[idx].gtot[cell]
+							+ Polarization_Factor(pol, idx, cell);
+					double g_lin = pow(10.0, g_dbi / 10.0);
+					double t_bright = (z_w > ANT_TEMP_Z_EPSILON) ? t_sky : t_earth;
 
 					t_pattern += g_lin * t_bright * sin(tht_rad) * dth_rad * dph_rad;
 				}
@@ -416,8 +424,9 @@ void meas_calc(measurement_t *m, int idx)
 			 * excluding ohmic and external losses */
 			if (m->ant_temp > 0.0)
 			{
-				double gmax_dbi = rad_pattern[idx].gtot[
-					rad_pattern[idx].max_gain_idx[POL_TOTAL]];
+				int mg_cell = rad_pattern[idx].max_gain_idx[pol];
+				double gmax_dbi = rad_pattern[idx].gtot[mg_cell]
+						+ Polarization_Factor(pol, idx, mg_cell);
 				m->gt = gmax_dbi - 10.0 * log10(m->ant_temp);
 			}
 		}

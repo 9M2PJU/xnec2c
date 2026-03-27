@@ -1246,8 +1246,8 @@ where noise enters the antenna. Eight
 <a href="#NoiseEnvModels">environment models</a> provide
 T<sub>sky</sub> and T<sub>earth</sub> values spanning quiet rural to
 dense urban conditions. An
-<a href="#ElevationOffset">elevation control</a> shifts the sky/earth
-horizon boundary. The <a href="#FrequencyWindow">Frequency Plots
+<a href="#ElevationOffset">elevation control</a> virtually rotates
+the antenna pattern to the desired observation elevation. The <a href="#FrequencyWindow">Frequency Plots
 window</a> displays T<sub>ant</sub>, T<sub>total</sub>, and
 G/T<sub>ant</sub> across the operating band.</p>
 
@@ -1642,7 +1642,7 @@ gain no longer represents the intended receive direction.</p>
 <figure>
 <img src="images/yagi-antenna-noise-pattern.png" alt="Radiation pattern of a 5-element Yagi at 151 MHz in Noise Temp (log scale) mode at 30° elevation" loading="lazy">
 <figcaption>A parametric 5-element Yagi for 2m viewed from the side (Y axis)
-in Noise Temp (log scale) mode at 30&deg; elevation tilt.
+in Noise Temp (log scale) mode at 30&deg; elevation.
 T<sub>total</sub> reads 1214&nbsp;K. The main beam (forward along X)
 appears blue, capturing cold sky; rear and downward lobes glow
 green through red where they intercept the warm earth hemisphere.
@@ -1739,20 +1739,26 @@ restored on next startup.</p>
 <h4 id="ElevationOffset">Elevation Offset</h4>
 <p>
 The <span class="ui-button">T Elev&deg;</span> spin button in the
-toolbar shifts the boundary between sky and earth hemispheres. The
-range is &minus;90&deg; to +90&deg;.
-At 0&deg; (the default) the horizon lies perpendicular to the zenith;
-positive values tilt it upward, modeling an antenna pointed above the
-horizon where more of the pattern sees cold sky; negative values tilt
-downward, increasing earth hemisphere coverage.</p>
+toolbar sets the observation elevation angle. The range is
+&minus;90&deg; to +90&deg;.
+The antenna pattern is virtually rotated so that its maximum-gain
+direction points at the specified elevation above the horizontal
+plane. The sky/earth boundary remains fixed at the geometric
+horizon: cells facing upward after rotation see T<sub>sky</sub>,
+cells facing downward see T<sub>earth</sub>. In the 3D display
+the pattern visually tilts upward by the elevation amount while
+the ground stays at the bottom.
+Positive values model an antenna pointed above the horizon where
+more of the pattern sees cold sky; negative values point the
+antenna downward, increasing earth hemisphere coverage.</p>
 
 <p>
-This offset affects both the 3D noise temperature coloring and the
+This setting affects both the 3D noise temperature coloring and the
 scalar T<sub>ant</sub> computation. To confirm the relationship, set
 elevation to +90&deg; and observe that T<sub>ant</sub> approaches
-T<sub>sky</sub> (the entire sphere becomes sky hemisphere). At
+T<sub>sky</sub> (the entire pattern faces sky). At
 &minus;90&deg; it approaches T<sub>earth</sub>. At exactly 0&deg;,
-an isotropic antenna always produces
+an isotropic antenna produces
 T<sub>ant</sub>&nbsp;=&nbsp;(T<sub>sky</sub>&nbsp;+&nbsp;T<sub>earth</sub>)&nbsp;/&nbsp;2,
 since the two hemispheres subtend equal solid angle and every cell
 has identical gain.</p>
@@ -2635,6 +2641,26 @@ across the full sweep.</dd>
 <tr><td>G/T_ant</td><td>Gain-to-antenna-temperature ratio (dB), excludes loss</td><td>max score</td><td>5.0</td></tr>
 </tbody>
 </table>
+
+<h5>Noise Optimization Workflow</h5>
+<p>
+T<sub>ant</sub>, T<sub>total</sub>, and G/T<sub>ant</sub> depend on
+the observation elevation set in the
+<a href="#ElevationOffset">T&nbsp;Elev&deg;</a> control and the
+selected <a href="#NoiseEnvModels">noise environment</a>. Set both to
+their intended operating values <em>before</em> starting an
+optimization pass that includes noise objectives.</p>
+
+<p>
+A two-stage approach produces the best results. In the first pass,
+optimize for antenna geometry and pattern behavior&mdash;gain, VSWR,
+F/B ratio, beam direction&mdash;without noise objectives. This
+establishes a sound electrical design. In subsequent passes, add
+T<sub>ant</sub> or G/T<sub>ant</sub> objectives to refine noise
+performance at the intended elevation. Combining both stages in a
+single pass risks the optimizer distorting the pattern geometry to
+chase a noise figure that depends on an elevation angle it cannot
+control.</p>
 
 <h4 id="OptAlgorithms">Algorithm Selection and Advanced Settings</h4>
 
