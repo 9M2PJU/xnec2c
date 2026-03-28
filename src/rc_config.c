@@ -26,6 +26,7 @@
 
 #include "opengl/opengl_structure.h"
 #include "opengl/opengl_msaa.h"
+#include "opengl/opengl_settings.h"
 
 
 /* Add configuration options here. To add new variables:
@@ -115,14 +116,10 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.rdpattern_zoom_spinbutton } },
 
 	{ .desc = "Use OpenGL Renderer for Radiation Patterns", .format = "%d",
-		.vars = { &rc_config.use_opengl_renderer },
-		.builder_window = &main_window_builder,
-		.builder_check_menu_item_id = "main_opengl_renderer" },
+		.vars = { &rc_config.use_opengl_renderer } },
 
 	{ .desc = "Use Constrained Rotation for OpenGL Arcball", .format = "%d",
-		.vars = { &rc_config.arcball_constrained_rotation },
-		.builder_window = &main_window_builder,
-		.builder_check_menu_item_id = "arcball_constrained_rotation" },
+		.vars = { &rc_config.arcball_constrained_rotation } },
 
 	{ .desc = "Main Window Common Projection", .format = "%d",
 		.vars = { &rc_config.main_common_projection },
@@ -142,13 +139,8 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Radiation Pattern Draw Style", .format = "%d",
 		.vars = { &rc_config.rdpattern_draw_style } },
 
-	{ .desc = "OpenGL Drag Transparency Level", .format = "%d",
-		.vars = { &rc_config.opengl_drag_transparency_level } },
-
 	{ .desc = "OpenGL Transparent on Click", .format = "%d",
-		.vars = { &rc_config.opengl_transparent_on_click },
-		.builder_window = &main_window_builder,
-		.builder_check_menu_item_id = "opengl_transparent_on_click" },
+		.vars = { &rc_config.opengl_transparent_on_click } },
 
 	{ .desc = "OpenGL Anti-Aliasing Samples", .format = "%d",
 		.vars = { &rc_config.opengl_msaa_samples } },
@@ -156,8 +148,50 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "OpenGL Cylinder Radius Scale", .format = "%lf",
 		.vars = { &rc_config.opengl_cylinder_radius_scale } },
 
-	{ .desc = "OpenGL Flow Direction Mode", .format = "%d",
-		.vars = { &rc_config.opengl_flow_direction_mode } },
+	{ .desc = "Current Flow Visualization Mode", .format = "%d",
+		.vars = { &rc_config.current_flow_visualization_mode } },
+
+	{ .desc = "Brightness Segments", .format = "%f",
+		.vars = { &rc_config.brightness_segments } },
+
+	{ .desc = "Brightness Patches", .format = "%f",
+		.vars = { &rc_config.brightness_patches } },
+
+	{ .desc = "Brightness Rdpat Surface", .format = "%f",
+		.vars = { &rc_config.brightness_rdpat_surface } },
+
+	{ .desc = "Brightness Rdpat Wire", .format = "%f",
+		.vars = { &rc_config.brightness_rdpat_wire } },
+
+	{ .desc = "Brightness Nearfield", .format = "%f",
+		.vars = { &rc_config.brightness_nearfield } },
+
+	{ .desc = "Brightness Ground Plane", .format = "%f",
+		.vars = { &rc_config.brightness_ground_plane } },
+
+	{ .desc = "Brightness Axes", .format = "%f",
+		.vars = { &rc_config.brightness_axes } },
+
+	{ .desc = "Transparency Segments", .format = "%f",
+		.vars = { &rc_config.transparency_segments } },
+
+	{ .desc = "Transparency Patches", .format = "%f",
+		.vars = { &rc_config.transparency_patches } },
+
+	{ .desc = "Transparency Rdpat Surface", .format = "%f",
+		.vars = { &rc_config.transparency_rdpat_surface } },
+
+	{ .desc = "Transparency Rdpat Wire", .format = "%f",
+		.vars = { &rc_config.transparency_rdpat_wire } },
+
+	{ .desc = "Transparency Nearfield", .format = "%f",
+		.vars = { &rc_config.transparency_nearfield } },
+
+	{ .desc = "Transparency Ground Plane", .format = "%f",
+		.vars = { &rc_config.transparency_ground_plane } },
+
+	{ .desc = "Transparency Axes", .format = "%f",
+		.vars = { &rc_config.transparency_axes } },
 
 	{ .desc = "Frequency Plots Window Size, in pixels", .format = "%d,%d",
 		.vars = { &rc_config.freqplots_width, &rc_config.freqplots_height } },
@@ -377,7 +411,7 @@ int parse_var(rc_config_vars_t *v, char *line, char *locale)
 		check = strlen(line);
 	}
 	else if (strcmp(v->format, "%f") == 0)
-		count = sscanf(line, format, (double *)v->vars[0], &check);
+		count = sscanf(line, format, (float *)v->vars[0], &check);
 	else if (strcmp(v->format, "%lf") == 0)
 		count = sscanf(line, format, (double *)v->vars[0], &check);
 	else if (strcmp(v->format, "%d,%d") == 0)
@@ -425,7 +459,7 @@ int fprint_var(FILE *fp, rc_config_vars_t *v)
 	else if (strcmp(v->format, "%s") == 0)
 		count = fprintf(fp, v->format, (char*)v->vars[0]);
 	else if (strcmp(v->format, "%f") == 0)
-		count = fprintf(fp, v->format, *(double*)v->vars[0]);
+		count = fprintf(fp, v->format, (double)*(float*)v->vars[0]);
 	else if (strcmp(v->format, "%lf") == 0)
 		count = fprintf(fp, v->format, *(double*)v->vars[0]);
 	else if (strcmp(v->format, "%d,%d") == 0)
@@ -512,10 +546,45 @@ int Get_Window_Geometry(
 /* Create_Default_Config()
  *
  * Provide a warning if the version changes.
- * Set defaults, they will be saved later.  Read_Config() is called after 
+ * Set defaults, they will be saved later.  Read_Config() is called after
  * this function so it will override any settings if they are available in the config
  * and save a new file if it is missing using the defaults defined below.
  */
+
+/** opengl_config_set_defaults - Set OpenGL-specific rc_config fields to defaults
+ *
+ * Single point of truth for all OpenGL brightness, transparency,
+ * MSAA, draw style, cylinder scale, and on-click defaults.
+ * Called by Create_Default_Config() and opengl_settings_reset_defaults().
+ */
+  void
+opengl_config_set_defaults( void )
+{
+  /* Per-type brightness defaults (0.0=black, 1.0=full) */
+  rc_config.brightness_segments      = 1.0f;
+  rc_config.brightness_patches       = 1.0f;
+  rc_config.brightness_rdpat_surface = 0.47f;
+  rc_config.brightness_rdpat_wire    = 1.0f;
+  rc_config.brightness_nearfield     = 1.0f;
+  rc_config.brightness_ground_plane  = 1.0f;
+  rc_config.brightness_axes          = 1.0f;
+
+  /* Per-type transparency defaults (0.0=opaque, 1.0=fully transparent) */
+  rc_config.transparency_segments      = 0.5f;
+  rc_config.transparency_patches       = 0.5f;
+  rc_config.transparency_rdpat_surface = 0.5f;
+  rc_config.transparency_rdpat_wire    = 0.5f;
+  rc_config.transparency_nearfield     = 0.0f;
+  rc_config.transparency_ground_plane  = 0.5f;
+  rc_config.transparency_axes          = 0.0f;
+
+  /* Toggle and enum defaults */
+  rc_config.opengl_transparent_on_click = 1;
+  rc_config.opengl_cylinder_radius_scale = 1.0;
+  rc_config.opengl_msaa_samples = MSAA_4X;
+  rc_config.rdpattern_draw_style = RDPAT_STYLE_BOTH;
+}
+
   gboolean
 Create_Default_Config( void )
 {
@@ -587,12 +656,8 @@ Create_Default_Config( void )
 #endif
 
   rc_config.arcball_constrained_rotation = 1;
-  rc_config.opengl_drag_transparency_level = 50;
-  rc_config.opengl_transparent_on_click = 1;
-  rc_config.opengl_cylinder_radius_scale = 1.0;
-
-  /* See enum RDPAT_STYLE */
-  rc_config.rdpattern_draw_style = RDPAT_STYLE_BOTH;
+  rc_config.current_flow_visualization_mode = FLOW_DIR_REFERENCE_PHASE;
+  opengl_config_set_defaults();
 
   /* Common projection default on, overlay structure default off */
   rc_config.main_common_projection = 1;
@@ -779,25 +844,33 @@ Restore_GUI_State( void )
     gtk_button_clicked( GTK_BUTTON(widget) );
   }
 
+#ifdef HAVE_OPENGL
+  /* Restore MSAA menu selection */
+  Set_MSAA_Samples( rc_config.opengl_msaa_samples );
+
   /* Restore flow direction radio selection in main window */
   {
-    gchar *flow_dir_ids[] = {
+    static const gchar *flow_dir_ids[] = {
       "main_flow_dir_ref_phase",
       "main_flow_dir_pol_axis",
       "main_flow_dir_peak_mag",
-      "main_flow_dir_lic"
+      "main_flow_dir_lic",
+      "main_flow_dir_wireframe"
     };
 
-    int fmode = rc_config.opengl_flow_direction_mode;
+    int fmode = rc_config.current_flow_visualization_mode;
 
     if( fmode >= 0 &&
         fmode < (int)(sizeof(flow_dir_ids) / sizeof(flow_dir_ids[0])) )
     {
-      widget = Builder_Get_Object( main_window_builder, flow_dir_ids[fmode] );
+      widget = Builder_Get_Object( main_window_builder, (gchar *)flow_dir_ids[fmode] );
       gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
     }
   }
 
+  /* Sync OpenGL settings window (guards against NULL builder internally) */
+  opengl_settings_sync_from_config();
+#endif
 
   /* Set the "Confirm Quit" menu item */
   widget = Builder_Get_Object( main_window_builder, "confirm_quit" );
@@ -805,33 +878,6 @@ Restore_GUI_State( void )
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
   else
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
-
-#ifdef HAVE_OPENGL
-  /* Restore transparency level radio selection */
-  {
-    gchar *transparency_ids[] = {
-      "opengl_transparency_opaque",
-      "opengl_transparency_25",
-      "opengl_transparency_50",
-      "opengl_transparency_75"
-    };
-
-    int idx;
-    switch( rc_config.opengl_drag_transparency_level )
-    {
-      case 25: idx = 1; break;
-      case 50: idx = 2; break;
-      case 75: idx = 3; break;
-      default: idx = 0; break;
-    }
-
-    widget = Builder_Get_Object( main_window_builder, transparency_ids[idx] );
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-  }
-
-  /* Restore MSAA menu selection */
-  Set_MSAA_Samples( rc_config.opengl_msaa_samples );
-#endif
 
   g_idle_add( Restore_Windows, NULL );
 

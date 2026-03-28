@@ -25,6 +25,14 @@
 
 /*-----------------------------------------------------------------------*/
 
+/** opengl_axes_get_alpha() - Classification alpha from rc_config */
+float
+opengl_axes_get_alpha(void *ctx)
+{
+  (void)ctx;
+  return TRANSPARENCY_TO_ALPHA(rc_config.transparency_axes);
+}
+
 #define NUM_AXES 3
 #define AXIS_LENGTH_SCALE 1.1f
 #define LABEL_OFFSET_SCALE 1.15f
@@ -152,6 +160,7 @@ opengl_axes_new(void)
 
   axes->line_mvp_loc = glGetUniformLocation(axes->line_shader.program, "mvp");
   axes->line_u_alpha_loc = glGetUniformLocation(axes->line_shader.program, "u_alpha");
+  axes->line_u_color_dim_loc = glGetUniformLocation(axes->line_shader.program, "u_color_dim");
   axes->line_pos_loc = glGetAttribLocation(axes->line_shader.program, "position");
   axes->line_col_loc = glGetAttribLocation(axes->line_shader.program, "color");
 
@@ -370,7 +379,9 @@ opengl_axes_render(void *ctx, const gl_render_params_t *params)
   /* Render axis lines */
   glUseProgram(axes->line_shader.program);
   glUniformMatrix4fv(axes->line_mvp_loc, 1, GL_FALSE, (float*)params->mvp);
-  glUniform1f(axes->line_u_alpha_loc, 1.0f);
+  glUniform1f(axes->line_u_alpha_loc,
+      TRANSPARENCY_TO_ALPHA(rc_config.transparency_axes));
+  glUniform1f(axes->line_u_color_dim_loc, rc_config.brightness_axes);
 
   glBindVertexArray(axes->lines_vao);
   glDrawArrays(GL_LINES, 0, NUM_AXES * 2);

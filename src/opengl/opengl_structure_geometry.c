@@ -25,6 +25,7 @@
 #ifdef HAVE_OPENGL
 
 #include "../opengl-engine/opengl_cylinder.h"
+#include "../opengl-engine/opengl_view.h"
 
 /* Minimum radius as fraction of model extent for visible cylinders */
 #define CYLINDER_MIN_VISIBLE_FRACTION 0.0015
@@ -799,7 +800,7 @@ opengl_structure_generate_geometry(
   }
 
   seg_line_mode = (cylinder_radius_scale < CYLINDER_SCALE_LINE_THRESHOLD);
-  patch_wireframe = (rc_config.opengl_flow_direction_mode == FLOW_DIR_WIREFRAME);
+  patch_wireframe = (rc_config.current_flow_visualization_mode == FLOW_DIR_WIREFRAME);
 
   /* Per-batch vertex budgets */
   seg_verts = seg_line_mode
@@ -967,6 +968,27 @@ opengl_structure_update_shared_geometry(void)
             &shared_overlay_data.excitation_center_x,
             &shared_overlay_data.excitation_center_y,
             &shared_overlay_data.excitation_center_z);
+  }
+
+  /* Per-batch visual parameters read from rc_config every frame.
+   * Set unconditionally so brightness/transparency slider changes
+   * take effect without geometry regeneration. */
+  batches[0].color_dim = rc_config.brightness_segments;
+  batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_segments);
+  if( batch_count > 1 )
+  {
+    batches[1].color_dim = rc_config.brightness_patches;
+    batches[1].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_patches);
+  }
+
+  /* Propagate visual params to overlay (cheap field copy) */
+  {
+    int i;
+    for( i = 0; i < batch_count; i++ )
+    {
+      shared_overlay_data.batches[i].color_dim = batches[i].color_dim;
+      shared_overlay_data.batches[i].alpha = batches[i].alpha;
+    }
   }
 }
 

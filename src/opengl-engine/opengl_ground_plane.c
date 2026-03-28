@@ -18,12 +18,21 @@
  */
 
 #include "opengl_ground_plane.h"
+#include "opengl_view.h"
 #include "opengl_view_peel.h"
 #include "../shared.h"
 
 #ifdef HAVE_OPENGL
 
 /*-----------------------------------------------------------------------*/
+
+/** opengl_ground_plane_get_alpha() - Classification alpha from rc_config */
+float
+opengl_ground_plane_get_alpha(void *ctx)
+{
+  (void)ctx;
+  return TRANSPARENCY_TO_ALPHA(rc_config.transparency_ground_plane);
+}
 
 #define GROUND_PLANE_EXTENT 100.0f
 #define GROUND_PLANE_VERTICES 6
@@ -98,6 +107,7 @@ opengl_ground_plane_new(void)
 
   gp->mvp_location = glGetUniformLocation(gp->shader.program, "mvp");
   gp->u_alpha_location = glGetUniformLocation(gp->shader.program, "u_alpha");
+  gp->u_color_dim_location = glGetUniformLocation(gp->shader.program, "u_color_dim");
   gl_view_peel_locs_init(&gp->peel_locs, gp->shader.program);
 
   for( i = 0; i < 3; i++ )
@@ -233,7 +243,9 @@ opengl_ground_plane_render(void *ctx, const gl_render_params_t *params)
     return;
 
   glUseProgram(gp->shader.program);
-  glUniform1f(gp->u_alpha_location, params->alpha);
+  glUniform1f(gp->u_alpha_location,
+      TRANSPARENCY_TO_ALPHA(rc_config.transparency_ground_plane));
+  glUniform1f(gp->u_color_dim_location, rc_config.brightness_ground_plane);
   glUniformMatrix4fv(gp->mvp_location, 1, GL_FALSE, (const float *)params->mvp);
 
   gl_view_set_peel_uniforms(&gp->peel_locs, params);

@@ -2066,15 +2066,10 @@ on_rdpattern_gradient_key_toggled(
 
 
   void
-on_main_opengl_renderer_toggled(
-    GtkCheckMenuItem *menuitem,
-    gpointer          user_data)
+opengl_set_renderer(gboolean enable)
 {
 #ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(menuitem) )
-    rc_config.use_opengl_renderer = 1;
-  else
-    rc_config.use_opengl_renderer = 0;
+  rc_config.use_opengl_renderer = enable ? 1 : 0;
 
   /* Swap renderer if radiation pattern window is open */
   if( rdpattern_window != NULL &&
@@ -2165,84 +2160,14 @@ on_main_opengl_renderer_toggled(
 
 
   void
-on_main_opengl_msaa_off_activate(
-    GtkMenuItem *menuitem,
-    gpointer     user_data)
-{
-#ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    Set_MSAA_Samples(MSAA_OFF);
-#endif
-}
-
-
-  void
-on_main_opengl_msaa_2x_activate(
-    GtkMenuItem *menuitem,
-    gpointer     user_data)
-{
-#ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    Set_MSAA_Samples(MSAA_2X);
-#endif
-}
-
-
-  void
-on_main_opengl_msaa_4x_activate(
-    GtkMenuItem *menuitem,
-    gpointer     user_data)
-{
-#ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    Set_MSAA_Samples(MSAA_4X);
-#endif
-}
-
-
-  void
-on_main_opengl_msaa_8x_activate(
-    GtkMenuItem *menuitem,
-    gpointer     user_data)
-{
-#ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    Set_MSAA_Samples(MSAA_8X);
-#endif
-}
-
-
-  void
-on_main_opengl_msaa_16x_activate(
-    GtkMenuItem *menuitem,
-    gpointer     user_data)
-{
-#ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    Set_MSAA_Samples(MSAA_16X);
-#endif
-}
-
-
-  void
-on_arcball_constrained_rotation_toggled(
-    GtkCheckMenuItem *menuitem,
-    gpointer          user_data)
+opengl_set_constrained_rotation(gboolean constrained)
 {
 #ifdef HAVE_OPENGL
   arcball_state_t *structure_ab, *rdpattern_ab;
   arcball_drag_mode_t mode;
 
-  if( gtk_check_menu_item_get_active(menuitem) )
-  {
-    rc_config.arcball_constrained_rotation = 1;
-    mode = ARCBALL_DRAG_CONSTRAINED;
-  }
-  else
-  {
-    rc_config.arcball_constrained_rotation = 0;
-    mode = ARCBALL_DRAG_FREE;
-  }
+  rc_config.arcball_constrained_rotation = constrained ? 1 : 0;
+  mode = constrained ? ARCBALL_DRAG_CONSTRAINED : ARCBALL_DRAG_FREE;
 
   structure_ab = opengl_structure_get_arcball();
   if( structure_ab )
@@ -2256,147 +2181,11 @@ on_arcball_constrained_rotation_toggled(
   }
 #endif
 
-} /* on_arcball_constrained_rotation_toggled() */
+} /* opengl_set_constrained_rotation() */
 
 
 /*-----------------------------------------------------------------------*/
 
-#ifdef HAVE_OPENGL
-/** update_drag_alpha() - Update drag alpha factor on all GL views
- * @level: transparency percentage (0, 25, 50, or 75)
- */
-  static void
-update_drag_alpha(int level)
-{
-  GtkWidget *w;
-  gl_view_state_t *state;
-  float alpha;
-
-  rc_config.opengl_drag_transparency_level = level;
-  alpha = DRAG_ALPHA_FROM_LEVEL(level);
-
-  w = opengl_structure_get_widget();
-  if( w )
-  {
-    state = gl_view_get_state(w);
-    if( state )
-      state->drag_alpha_factor = alpha;
-    gtk_widget_queue_draw(w);
-  }
-
-  w = opengl_rdpattern_get_widget();
-  if( w )
-  {
-    state = gl_view_get_state(w);
-    if( state )
-      state->drag_alpha_factor = alpha;
-    gtk_widget_queue_draw(w);
-  }
-
-} /* update_drag_alpha() */
-#endif
-
-
-/*-----------------------------------------------------------------------*/
-
-  void
-on_opengl_transparency_opaque_activate(
-    GtkMenuItem *menuitem,
-    gpointer     user_data)
-{
-#ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-  {
-    GtkWidget *checkbox;
-
-    update_drag_alpha(0);
-
-    /* Opaque implies no transparency on click — clear the checkbox.
-     * The toggled callback handles setting rc_config and redraws. */
-    checkbox = Builder_Get_Object( main_window_builder,
-        "opengl_transparent_on_click" );
-    gtk_check_menu_item_set_active(
-        GTK_CHECK_MENU_ITEM(checkbox), FALSE );
-  }
-#endif
-}
-
-
-  void
-on_opengl_transparency_25_activate(
-    GtkMenuItem *menuitem,
-    gpointer     user_data)
-{
-#ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    update_drag_alpha(25);
-#endif
-}
-
-
-  void
-on_opengl_transparency_50_activate(
-    GtkMenuItem *menuitem,
-    gpointer     user_data)
-{
-#ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    update_drag_alpha(50);
-#endif
-}
-
-
-  void
-on_opengl_transparency_75_activate(
-    GtkMenuItem *menuitem,
-    gpointer     user_data)
-{
-#ifdef HAVE_OPENGL
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    update_drag_alpha(75);
-#endif
-}
-
-
-/*-----------------------------------------------------------------------*/
-
-  void
-on_opengl_transparent_on_click_toggled(
-    GtkCheckMenuItem *menuitem,
-    gpointer          user_data)
-{
-#ifdef HAVE_OPENGL
-  GtkWidget *w;
-
-  rc_config.opengl_transparent_on_click =
-      gtk_check_menu_item_get_active(menuitem) ? 1 : 0;
-
-  /* If enabling on-click while Opaque, auto-select 50% so the user
-   * sees an immediate effect rather than a seemingly broken toggle.
-   * Activating the radio fires on_opengl_transparency_50_activate
-   * which calls update_drag_alpha() and queues redraws. */
-  if( rc_config.opengl_transparent_on_click &&
-      rc_config.opengl_drag_transparency_level == 0 )
-  {
-    GtkWidget *radio;
-
-    radio = Builder_Get_Object( main_window_builder,
-        "opengl_transparency_50" );
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(radio), TRUE );
-  }
-  else
-  {
-    w = opengl_structure_get_widget();
-    if( w )
-      gtk_widget_queue_draw(w);
-
-    w = opengl_rdpattern_get_widget();
-    if( w )
-      gtk_widget_queue_draw(w);
-  }
-#endif
-
-} /* on_opengl_transparent_on_click_toggled() */
 
 
 /* rdpattern_set_view_preset()
@@ -3105,11 +2894,11 @@ on_animation_okbutton_clicked(
 }
 
 
-/** on_flow_direction_activate() - Callback for flow direction radio menu items
+/** on_flow_direction_activate - Callback for flow direction radio menu items
  * @menuitem: activated radio menu item
  * @user_data: unused
  *
- * Determines mode from widget identity across both window builders.
+ * Determines mode from widget identity in main window builder.
  * Skips inactive radio emissions to avoid double-fire on group switches.
  */
   void
@@ -3131,6 +2920,8 @@ on_flow_direction_activate(
 
   int i;
 
+  (void)user_data;
+
   if( GTK_IS_CHECK_MENU_ITEM(menuitem) &&
       !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
     return;
@@ -3141,7 +2932,7 @@ on_flow_direction_activate(
 
     if( GTK_WIDGET(menuitem) == w )
     {
-      rc_config.opengl_flow_direction_mode = items[i].mode;
+      rc_config.current_flow_visualization_mode = items[i].mode;
       opengl_structure_invalidate();
       opengl_structure_queue_draw();
       opengl_rdpattern_queue_draw();

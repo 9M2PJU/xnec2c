@@ -59,6 +59,22 @@ static void gl_overlay_free(void *ctx);
 
 /*-----------------------------------------------------------------------*/
 
+/** gl_overlay_get_alpha() - Classification alpha for overlay renderable
+ *
+ * Returns the minimum batch alpha so the overlay enters the
+ * depth-peeled transparent pass when any batch has transparency.
+ */
+static float
+gl_overlay_get_alpha(void *ctx)
+{
+  gl_overlay_ctx_t *ovl = ctx;
+
+  return gl_batch_min_alpha(ovl->ovl_content.batches,
+      ovl->ovl_content.batch_count);
+}
+
+/*-----------------------------------------------------------------------*/
+
 /** gl_overlay_effective_scale() - Compute effective overlay model scale, applying user adjustment unless scale_adj_locked is set by the scene provider
  * @ovl: overlay context
  */
@@ -152,8 +168,7 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
   glUseProgram(ovl->shader.program);
   glUniformMatrix4fv(ovl->u_mv_location, 1, GL_FALSE,
       (float *)ovl->cached_mv);
-  glUniform1f(ovl->u_alpha_location, params->alpha);
-  glUniform1i(ovl->flow_mode_location, rc_config.opengl_flow_direction_mode);
+  glUniform1i(ovl->flow_mode_location, rc_config.current_flow_visualization_mode);
   glUniform1f(ovl->u_phase_location, ovl->view->flow_phase);
   glUniform1f(ovl->u_cos_phase_location, cosf(ovl->view->flow_phase));
   glUniform1f(ovl->u_sin_phase_location, sinf(ovl->view->flow_phase));
@@ -175,16 +190,21 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
   glUniformMatrix4fv(ovl->mvp_location, 1, GL_FALSE,
       (const float *)ovl->cached_mvp);
 
-  /* Draw each batch with its own VAO and GL mode */
+  /* Per-batch alpha and brightness for overlay (structure on rdpattern) */
   {
+    gboolean use_batch_alpha = ovl->view->transparency_active;
     int i;
 
     for( i = 0; i < ovl->ovl_content.batch_count; i++ )
     {
       if( ovl->ovl_content.batches[i].vertex_count > 0 )
       {
+        float batch_alpha = use_batch_alpha
+            ? ovl->ovl_content.batches[i].alpha : 1.0f;
+
         glBindVertexArray(ovl->vao[i]);
 
+        glUniform1f(ovl->u_alpha_location, batch_alpha);
         glUniform1f(ovl->u_color_dim_location,
             ovl->ovl_content.batches[i].color_dim);
 
@@ -382,7 +402,7 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
     .generate             = gl_overlay_generate,
     .far_extent           = gl_overlay_far_extent,
     .ctx                  = ovl,
-    .alpha                = 1.0f,
+    .get_alpha            = gl_overlay_get_alpha,
     .origin               = {0.0f, 0.0f, 0.0f},
     .transparent_sort_order = 1,
     .transparent_on_drag  = TRUE

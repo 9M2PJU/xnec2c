@@ -146,7 +146,8 @@ GtkBuilder
   *gend_editor_builder       = NULL,
   *nec2_editor_builder       = NULL,
   *nec2_save_dialog_builder  = NULL,
-  *sy_overrides_builder      = NULL;
+  *sy_overrides_builder      = NULL,
+  *opengl_settings_builder   = NULL;
 
 /* Motion event handler id */
 gulong rdpattern_motion_handler;

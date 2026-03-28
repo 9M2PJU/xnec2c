@@ -11074,7 +11074,7 @@ Save NEC2 Editor data first?
                           <object class="GtkMenuItem" id="main_flow_dir_menu">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Current _Direction</property>
+                            <property name="label" translatable="yes">Current _Visualization</property>
                             <property name="use-underline">True</property>
                             <child type="submenu">
                               <object class="GtkMenu" id="main_flow_dir_menu_menu">
@@ -11212,161 +11212,12 @@ Save NEC2 Editor data first?
                           </object>
                         </child>
                         <child>
-                          <object class="GtkCheckMenuItem" id="main_opengl_renderer">
+                          <object class="GtkMenuItem" id="main_opengl_settings">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">_OpenGL Renderer</property>
+                            <property name="label" translatable="yes">OpenGL _Settings...</property>
                             <property name="use-underline">True</property>
-                            <property name="active">True</property>
-                            <signal name="toggled" handler="on_main_opengl_renderer_toggled" swapped="no"/>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkCheckMenuItem" id="arcball_constrained_rotation">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Constrained _Rotation</property>
-                            <property name="use-underline">True</property>
-                            <property name="active">True</property>
-                            <signal name="toggled" handler="on_arcball_constrained_rotation_toggled" swapped="no"/>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkSeparatorMenuItem">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">_Transparency</property>
-                            <property name="use-underline">True</property>
-                            <child type="submenu">
-                              <object class="GtkMenu">
-                                <property name="can-focus">False</property>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="opengl_transparency_opaque">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">_Opaque</property>
-                                    <property name="use-underline">True</property>
-                                    <signal name="activate" handler="on_opengl_transparency_opaque_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="opengl_transparency_25">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">_25%</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="group">opengl_transparency_opaque</property>
-                                    <signal name="activate" handler="on_opengl_transparency_25_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="opengl_transparency_50">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">_50%</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="active">True</property>
-                                    <property name="group">opengl_transparency_opaque</property>
-                                    <signal name="activate" handler="on_opengl_transparency_50_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="opengl_transparency_75">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">_75%</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="group">opengl_transparency_opaque</property>
-                                    <signal name="activate" handler="on_opengl_transparency_75_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSeparatorMenuItem">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkCheckMenuItem" id="opengl_transparent_on_click">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">Transparent on _Click</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="active">True</property>
-                                    <signal name="toggled" handler="on_opengl_transparent_on_click_toggled" swapped="no"/>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">OpenGL _MSAA</property>
-                            <property name="use-underline">True</property>
-                            <child type="submenu">
-                              <object class="GtkMenu">
-                                <property name="can-focus">False</property>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_off">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">_Off</property>
-                                    <property name="use-underline">True</property>
-                                    <signal name="activate" handler="on_main_opengl_msaa_off_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_2x">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">_2x</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="group">main_opengl_msaa_off</property>
-                                    <signal name="activate" handler="on_main_opengl_msaa_2x_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_4x">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">_4x</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="active">True</property>
-                                    <property name="group">main_opengl_msaa_off</property>
-                                    <signal name="activate" handler="on_main_opengl_msaa_4x_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_8x">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">_8x</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="group">main_opengl_msaa_off</property>
-                                    <signal name="activate" handler="on_main_opengl_msaa_8x_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="main_opengl_msaa_16x">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="label" translatable="yes">1_6x</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="group">main_opengl_msaa_off</property>
-                                    <signal name="activate" handler="on_main_opengl_msaa_16x_activate" swapped="no"/>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
+                            <signal name="activate" handler="on_opengl_settings_show_activate" swapped="no"/>
                           </object>
                         </child>
                       </object>

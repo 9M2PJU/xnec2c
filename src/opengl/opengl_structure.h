@@ -65,8 +65,8 @@ void opengl_structure_cleanup(void);
 void opengl_structure_invalidate(void);
 void opengl_structure_queue_draw(void);
 
-/* Scale below which segments render as lines instead of cylinders */
-#define CYLINDER_SCALE_LINE_THRESHOLD 1.0
+/* Scale below which segments render as lines instead of cylinders with 0.001 epsilon for slider */
+#define CYLINDER_SCALE_LINE_THRESHOLD 0.101
 
 #ifdef HAVE_OPENGL
 #include "../opengl-engine/opengl_renderer.h"

@@ -37,9 +37,29 @@
 /* Texture unit used for the previous-pass depth texture during depth peeling */
 #define PEEL_DEPTH_TEX_UNIT 2
 
-/* Convert transparency percentage (0/25/50/75) to alpha multiplier */
-#define DRAG_ALPHA_FROM_LEVEL(lvl) \
-    ((lvl) == 0 ? 1.0f : 1.0f - ((lvl) / 100.0f))
+/* Convert transparency fraction (0.0–1.0) to alpha (1.0=opaque, 0.0=invisible) */
+#define TRANSPARENCY_TO_ALPHA(t) (1.0f - (t))
+
+/** gl_batch_min_alpha() - Minimum alpha across a batch array
+ * @batches: array of draw batches
+ * @count: number of batches
+ *
+ * Used for opaque/transparent classification in depth peeling.
+ */
+static inline float
+gl_batch_min_alpha(const gl_draw_batch_t *batches, int count)
+{
+  float min_alpha = 1.0f;
+  int i;
+
+  for( i = 0; i < count; i++ )
+  {
+    if( batches[i].alpha < min_alpha )
+      min_alpha = batches[i].alpha;
+  }
+
+  return min_alpha;
+}
 
 /* View content provided by scene generator */
 typedef struct
@@ -109,6 +129,10 @@ typedef float (*gl_extent_fn)(void *ctx, float r_max);
  * in renderables that must produce data before extent is known */
 typedef void (*gl_generate_fn)(void *ctx);
 
+/* Returns current effective alpha for opaque/transparent classification.
+ * Called each frame so the value always reflects rc_config. */
+typedef float (*gl_alpha_fn)(void *ctx);
+
 /* Unified renderable — all 3D objects implement this */
 typedef struct
 {
@@ -123,7 +147,7 @@ typedef struct
   gl_generate_fn generate;
 
   void *ctx;
-  float alpha;
+  gl_alpha_fn get_alpha;
   vec3 origin;
 
   /* Sort priority for transparent pass (lower value renders first).
@@ -228,9 +252,12 @@ typedef struct gl_view_state_s
   /* LIC noise texture (256x256 grayscale, shared by all renderables) */
   GLuint noise_tex;
 
-  /* Drag transparency state */
+  /* Drag interaction state (transparency active during drag when on-click enabled) */
   gboolean drag_active;
-  float drag_alpha_factor;
+
+  /* Per-frame: TRUE when per-type transparency is in effect.
+   * Set in on_render before renderable iteration. */
+  gboolean transparency_active;
 
   /* MSAA state */
   GLuint msaa_fbo;

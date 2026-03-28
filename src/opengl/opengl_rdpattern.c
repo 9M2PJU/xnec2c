@@ -37,11 +37,14 @@
  * 100x PATCH_DEPTH_BIAS (1e-7f) — well within 24-bit depth precision. */
 #define RDPAT_SURFACE_DEPTH_BIAS 1e-5f
 
-/* Surface color dim values: surface-only is slightly brighter;
- * with wireframe overlay the surface recedes further.
- * Applied via u_color_dim shader uniform in the engine. */
-#define RDPAT_SURFACE_DIM      0.47f
-#define RDPAT_SURFACE_BOTH_DIM 0.3f
+/* Surface color dim values in rc_config.brightness_rdpat_surface
+ * and rc_config.brightness_rdpat_wire (applied via u_color_dim
+ * shader uniform in the engine).
+ *
+ * In "both" mode the surface is dimmed further so wireframe lines
+ * stand out.  The ratio preserves the original relationship between
+ * RDPAT_SURFACE_BOTH_DIM (0.30) and RDPAT_SURFACE_DIM (0.47). */
+#define RDPAT_BOTH_SURFACE_DIM_RATIO 0.64f
 
 /* Last far-field NEC generation seen — staleness detection */
 static unsigned int rdpat_last_ff_gen = 0;
@@ -170,6 +173,8 @@ rdpattern_scene_generate(gl_view_content_t *out)
     out->batches[0].vertices = nf_buf;
     out->batches[0].vertex_count = nf_count * 2;
     out->batches[0].draw_mode = GL_LINES;
+    out->batches[0].color_dim = rc_config.brightness_nearfield;
+    out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_nearfield);
     out->batch_count = 1;
     out->vertex_stride = (int)sizeof(lit_color_point_t);
     out->r_max = r_max;
@@ -313,7 +318,8 @@ rdpattern_scene_generate(gl_view_content_t *out)
         out->batches[0].vertex_count = tri_count * 3;
         out->batches[0].draw_mode = GL_TRIANGLES;
         out->batches[0].depth_bias = 0.0f;
-        out->batches[0].color_dim = RDPAT_SURFACE_DIM;
+        out->batches[0].color_dim = rc_config.brightness_rdpat_surface;
+        out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
         out->batch_count = 1;
         break;
       }
@@ -331,6 +337,8 @@ rdpattern_scene_generate(gl_view_content_t *out)
         out->batches[0].vertex_count = line_count * 2;
         out->batches[0].draw_mode = GL_LINES;
         out->batches[0].depth_bias = 0.0f;
+        out->batches[0].color_dim = rc_config.brightness_rdpat_wire;
+        out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
         out->batch_count = 1;
         break;
       }
@@ -351,12 +359,16 @@ rdpattern_scene_generate(gl_view_content_t *out)
         out->batches[0].vertex_count = tri_count * 3;
         out->batches[0].draw_mode = GL_TRIANGLES;
         out->batches[0].depth_bias = RDPAT_SURFACE_DEPTH_BIAS;
-        out->batches[0].color_dim = RDPAT_SURFACE_BOTH_DIM;
+        out->batches[0].color_dim =
+            rc_config.brightness_rdpat_surface * RDPAT_BOTH_SURFACE_DIM_RATIO;
+        out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
 
         out->batches[1].vertices = line_buf;
         out->batches[1].vertex_count = line_count * 2;
         out->batches[1].draw_mode = GL_LINES;
         out->batches[1].depth_bias = 0.0f;
+        out->batches[1].color_dim = rc_config.brightness_rdpat_wire;
+        out->batches[1].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
         out->batch_count = 2;
         break;
       }

@@ -403,17 +403,32 @@ typedef struct
   /* Rdpattern overlay structure toggle */
   int rdpattern_overlay_structure;
 
-  /* Patch current flow direction visualization mode */
-  int opengl_flow_direction_mode;
-
-  /* OpenGL drag transparency level (0=opaque, 25, 50, 75) */
-  int opengl_drag_transparency_level;
+  /* Patch current flow visualization mode (View menu, not OpenGL settings) */
+  int current_flow_visualization_mode;
 
   /* Whether transparency is triggered by click/drag (1) or always on (0) */
   int opengl_transparent_on_click;
 
   /* See enum RDPAT_STYLE */
   int rdpattern_draw_style;
+
+  /* Per-type brightness (0.0=black, 1.0=full) */
+  float brightness_segments;
+  float brightness_patches;
+  float brightness_rdpat_surface;
+  float brightness_rdpat_wire;
+  float brightness_nearfield;
+  float brightness_ground_plane;
+  float brightness_axes;
+
+  /* Per-type transparency (0.0=opaque, 1.0=fully transparent) */
+  float transparency_segments;
+  float transparency_patches;
+  float transparency_rdpat_surface;
+  float transparency_rdpat_wire;
+  float transparency_nearfield;
+  float transparency_ground_plane;
+  float transparency_axes;
 } rc_config_t;
 
 typedef struct {
@@ -480,8 +495,11 @@ typedef struct
   unsigned int draw_mode;
   float depth_bias;
 
-  /* Per-batch RGB multiplier (0.0 treated as 1.0 by shader) */
+  /* Per-batch RGB brightness multiplier (0.0=black, 1.0=full) */
   float color_dim;
+
+  /* Per-batch transparency (0.0=invisible, 1.0=opaque) */
+  float alpha;
 
 } gl_draw_batch_t;
 
@@ -1211,18 +1229,21 @@ void on_rdpattern_h_field_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_poynting_vector_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_overlay_structure_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_gradient_key_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
-void on_main_opengl_renderer_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
-void on_arcball_constrained_rotation_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
-void on_main_opengl_msaa_off_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_main_opengl_msaa_2x_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_main_opengl_msaa_4x_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_main_opengl_msaa_8x_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_main_opengl_msaa_16x_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_opengl_transparency_opaque_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_opengl_transparency_25_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_opengl_transparency_50_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_opengl_transparency_75_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_opengl_transparent_on_click_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
+void opengl_set_renderer(gboolean enable);
+void opengl_set_constrained_rotation(gboolean constrained);
+void on_flow_direction_activate(GtkMenuItem *menuitem, gpointer user_data);
+
+/* rc_config.c — shared OpenGL defaults */
+void opengl_config_set_defaults(void);
+
+/* opengl_settings.c — OpenGL Settings window */
+void on_opengl_settings_show_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_opengl_settings_changed(GtkWidget *widget, gpointer user_data);
+void on_opengl_settings_close_clicked(GtkButton *button, gpointer user_data);
+void on_opengl_settings_reset_clicked(GtkButton *button, gpointer user_data);
+gboolean on_opengl_settings_window_delete_event(GtkWidget *widget, GdkEvent *event, gpointer user_data);
+void on_opengl_settings_window_destroy(GtkWidget *widget, gpointer user_data);
+
 void on_rdpattern_x_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_y_axis_clicked(GtkButton *button, gpointer user_data);
 void on_rdpattern_z_axis_clicked(GtkButton *button, gpointer user_data);
@@ -1251,7 +1272,6 @@ void on_near_peak_value_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_near_snapshot_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_structure_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_flow_direction_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_draw_style_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_animate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 gboolean on_animate_spinbutton_focus_out_event(GtkWidget *widget, GdkEventFocus *event, gpointer user_data);

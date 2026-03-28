@@ -32,6 +32,7 @@ typedef struct
   gl_shader_t shader;
   GLint mvp_location;
   GLint u_alpha_location;
+  GLint u_color_dim_location;
   gl_peel_uniform_locs_t peel_locs;
   GLint attrib_locations[3];
   float scale;
@@ -44,6 +45,7 @@ void opengl_ground_plane_free(void *ctx);
 void opengl_ground_plane_prepare(void *ctx, float r_max);
 void opengl_ground_plane_render(void *ctx, const gl_render_params_t *params);
 float opengl_ground_plane_far_extent(void *ctx, float r_max);
+float opengl_ground_plane_get_alpha(void *ctx);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_GROUND_PLANE_H */

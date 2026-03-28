@@ -46,6 +46,20 @@ typedef struct
 
 } gl_scene_ctx_t;
 
+/** gl_scene_get_alpha() - Classification alpha for scene renderable
+ *
+ * Returns minimum batch alpha so the scene enters the depth-peeled
+ * transparent pass when any batch has transparency.
+ */
+static float
+gl_scene_get_alpha(void *ctx)
+{
+  gl_scene_ctx_t *sc = ctx;
+
+  return gl_batch_min_alpha(sc->view->content.batches,
+      sc->view->content.batch_count);
+}
+
 /* Forward declarations for callbacks */
 static void gl_scene_prepare(void *ctx, float r_max);
 static void gl_scene_render(void *ctx, const gl_render_params_t *params);
@@ -116,11 +130,10 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
   glUseProgram(sc->shader.program);
   glUniformMatrix4fv(sc->u_mv_location, 1, GL_FALSE,
       (const float *)params->mv);
-  glUniform1f(sc->u_alpha_location, params->alpha);
 
   /* Flow direction mode and phase animation offset.
    * Locations are -1 for shaders without these uniforms (no-op). */
-  glUniform1i(sc->flow_mode_location, rc_config.opengl_flow_direction_mode);
+  glUniform1i(sc->flow_mode_location, rc_config.current_flow_visualization_mode);
   glUniform1f(sc->u_phase_location, view->flow_phase);
   glUniform1f(sc->u_cos_phase_location, cosf(view->flow_phase));
   glUniform1f(sc->u_sin_phase_location, sinf(view->flow_phase));
@@ -142,14 +155,20 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
   glUniformMatrix4fv(sc->mvp_location, 1, GL_FALSE,
       (const float *)params->mvp);
 
-  /* Draw each batch with its own VAO and GL mode */
+  /* Per-batch alpha: use batch.alpha when transparency is active,
+   * otherwise 1.0 (opaque).  On-click mode suppresses transparency
+   * when not dragging for renderables with transparent_on_drag. */
   {
+    gboolean use_batch_alpha = view->transparency_active;
     int i;
 
     for( i = 0; i < view->content.batch_count; i++ )
     {
       if( view->content.batches[i].vertex_count > 0 )
       {
+        float batch_alpha = use_batch_alpha
+            ? view->content.batches[i].alpha : 1.0f;
+
         glBindVertexArray(sc->vao[i]);
 
         /* Set per-batch depth bias as generic vertex attribute.
@@ -159,6 +178,7 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
           glVertexAttrib1f(sc->depth_bias_attrib_loc,
               view->content.batches[i].depth_bias);
 
+        glUniform1f(sc->u_alpha_location, batch_alpha);
         glUniform1f(sc->u_color_dim_location,
             view->content.batches[i].color_dim);
 
@@ -312,7 +332,7 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
     .is_active            = gl_scene_is_active,
     .far_extent           = gl_scene_far_extent,
     .ctx                  = sc,
-    .alpha                = 1.0f,
+    .get_alpha            = gl_scene_get_alpha,
     .origin               = {0.0f, 0.0f, 0.0f},
     .transparent_sort_order = 1,
     .transparent_on_drag  = TRUE

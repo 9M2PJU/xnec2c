@@ -27,17 +27,6 @@
 
 #ifdef HAVE_OPENGL
 
-/* MSAA sample count to menu widget name mapping */
-typedef struct { int samples; const char *name; } msaa_widget_entry_t;
-
-static const msaa_widget_entry_t msaa_widget_map[] = {
-  {  0, "main_opengl_msaa_off" },
-  {  2, "main_opengl_msaa_2x"  },
-  {  4, "main_opengl_msaa_4x"  },
-  {  8, "main_opengl_msaa_8x"  },
-  { 16, "main_opengl_msaa_16x" }
-};
-
 /*-----------------------------------------------------------------------*/
 
 /** msaa_update_view() - Recreate MSAA framebuffer resources for one GL view and queue redraw
@@ -79,22 +68,7 @@ msaa_update_view(GtkWidget *(*get_widget)(void), int samples)
   void
 Set_MSAA_Samples(int samples)
 {
-  GtkWidget *widget;
-  int mi;
-
   rc_config.opengl_msaa_samples = samples;
-
-  /* Update menu selection via struct map linear scan */
-  for( mi = 0; mi < (int)(sizeof(msaa_widget_map) / sizeof(msaa_widget_map[0])); mi++ )
-  {
-    if( msaa_widget_map[mi].samples == samples )
-    {
-      widget = Builder_Get_Object(main_window_builder,
-          (gchar *)msaa_widget_map[mi].name);
-      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget), TRUE);
-      break;
-    }
-  }
 
   msaa_update_view(opengl_structure_get_widget, samples);
   msaa_update_view(opengl_rdpattern_get_widget, samples);

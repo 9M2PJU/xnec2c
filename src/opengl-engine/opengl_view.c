@@ -157,7 +157,7 @@ on_realize(GtkGLArea *area, gpointer user_data)
       .is_active            = opengl_axes_is_active,
       .far_extent           = opengl_axes_far_extent,
       .ctx                  = axes,
-      .alpha                = 1.0f,
+      .get_alpha            = opengl_axes_get_alpha,
       .origin               = {0.0f, 0.0f, 0.0f},
       .transparent_sort_order = 0
     };
@@ -189,7 +189,7 @@ on_realize(GtkGLArea *area, gpointer user_data)
       .is_active            = state->scene->ground_plane_is_active,
       .far_extent           = opengl_ground_plane_far_extent,
       .ctx                  = ground_plane,
-      .alpha                = 0.5f,
+      .get_alpha            = opengl_ground_plane_get_alpha,
       .origin               = {0.0f, 0.0f, 0.0f},
       .transparent_sort_order = 2,
       .transparent_on_drag  = FALSE
@@ -410,10 +410,6 @@ gl_view_create_widget(
 
   /* Initialize overlay scale adjustment (1.0 = default from overlay_generate) */
   state->ovl_model_scale_adj = 1.0f;
-
-  /* Drag transparency: alpha multiplier from rc_config level */
-  state->drag_alpha_factor =
-      DRAG_ALPHA_FROM_LEVEL(rc_config.opengl_drag_transparency_level);
 
   /* Initialize notice state */
   state->notice_active = FALSE;

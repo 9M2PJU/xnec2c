@@ -1,5 +1,6 @@
 #version 130
 uniform float u_alpha;
+uniform float u_color_dim;
 uniform sampler2D u_peel_depth;
 uniform int u_peel_pass;
 
@@ -63,5 +64,5 @@ void main() {
   /* Add subtle specular */
   color += vec3(spec * SPECULAR_INTENSITY);
 
-  fragColor = vec4(clamp(color, 0.0, 1.0), u_alpha);
+  fragColor = vec4(clamp(color * u_color_dim, 0.0, 1.0), u_alpha);
 }

@@ -32,6 +32,7 @@ typedef struct
   gl_shader_t line_shader;
   GLint line_mvp_loc;
   GLint line_u_alpha_loc;
+  GLint line_u_color_dim_loc;
   GLint line_pos_loc;
   GLint line_col_loc;
 
@@ -56,6 +57,7 @@ struct gl_render_params_s;
 void opengl_axes_render(void *ctx, const struct gl_render_params_s *params);
 gboolean opengl_axes_is_active(void *ctx);
 float opengl_axes_far_extent(void *ctx, float r_max);
+float opengl_axes_get_alpha(void *ctx);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_AXES_H */

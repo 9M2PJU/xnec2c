@@ -172,7 +172,8 @@ extern GtkBuilder
   *gend_editor_builder,
   *nec2_editor_builder,
   *nec2_save_dialog_builder,
-  *sy_overrides_builder;
+  *sy_overrides_builder,
+  *opengl_settings_builder;
 
 /* Drawing area widgets */
 extern GtkWidget
