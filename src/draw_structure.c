@@ -29,6 +29,28 @@ int need_structure_redraw = 1;
  *
  *  Draws xyz axes, wire segments and patches
  */
+/**
+ * Draw_Structure_UI() - Update structure-window UI readouts
+ *
+ * Writes the viewer-gain entry and frequency-step label for the main
+ * window.  Called under freq_data_lock by both the Cairo draw path
+ * (_Draw_Structure) and the OpenGL post-render callback.
+ */
+  void
+Draw_Structure_UI(void)
+{
+  Show_Viewer_Gain(
+      main_window_builder,
+      "main_gain_entry",
+      structure_proj_params );
+
+  if( calc_data.freq_step >= 0 )
+    Display_Fstep( structure_fstep_entry, calc_data.freq_step );
+
+} /* Draw_Structure_UI() */
+
+/*-----------------------------------------------------------------------*/
+
   void
 _Draw_Structure( cairo_t *cr )
 {
@@ -47,19 +69,12 @@ _Draw_Structure( cairo_t *cr )
   Draw_Surface_Patches( cr, structure_segs+data.n, data.m );
   Draw_Wire_Segments( cr, structure_segs, data.n );
 
-  /* Show gain in direction of viewer */
-  Show_Viewer_Gain(
-      main_window_builder,
-      "main_gain_entry",
-      structure_proj_params );
+  Draw_Structure_UI();
 
   /* Reset "new current data" flag */
   crnt.newer = 0;
 
-  /* Display frequency step */
-  if (calc_data.freq_step >= 0)
-	  Display_Fstep( structure_fstep_entry, calc_data.freq_step );
-} /* Draw_Structure() */
+} /* _Draw_Structure() */
 
 void Draw_Structure( cairo_t *cr )
 {

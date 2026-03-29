@@ -1559,6 +1559,7 @@ void Free_Draw_Buffers(void);
 double Scale_Gain( double gain, int fstep, int idx );
 /* draw_structure.c */
 void Draw_Structure(cairo_t *cr);
+void Draw_Structure_UI(void);
 void New_Patch_Data(void);
 void Process_Wire_Segments(void);
 void Process_Surface_Patches(void);

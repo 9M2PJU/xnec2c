@@ -246,6 +246,23 @@ structure_scene_cleanup(void)
 
 /*-----------------------------------------------------------------------*/
 
+/** structure_scene_post_render() - Scene provider post-render callback
+ *
+ * Updates structure-window UI readouts (viewer gain, frequency step)
+ * after each rendered frame, matching the Cairo draw path via the
+ * shared Draw_Structure_UI() helper.
+ */
+  static void
+structure_scene_post_render(void)
+{
+  g_mutex_lock(&freq_data_lock);
+  Draw_Structure_UI();
+  g_mutex_unlock(&freq_data_lock);
+
+} /* structure_scene_post_render() */
+
+/*-----------------------------------------------------------------------*/
+
 /* Static scene configuration and provider */
 static gl_view_config_t structure_view_config = {
   .vertex_shader_path = "/gl/lit-color-vertex.glsl",
@@ -276,7 +293,7 @@ opengl_structure_ground_plane_is_active(void *_ctx)
 
 static gl_scene_provider_t structure_scene_provider = {
   .generate                 = structure_scene_generate,
-  .post_render              = NULL,
+  .post_render              = structure_scene_post_render,
   .cleanup                  = structure_scene_cleanup,
   .overlay_config           = NULL,
   .overlay_generate         = NULL,
@@ -323,6 +340,10 @@ structure_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
 
   structure_proj_params.Wr = (double)wr;
   structure_proj_params.Wi = (double)wi;
+
+  /* Sync trig cache, set need_structure_redraw, and queue freqplots
+   * when PLOT_GVIEWER is active — matching Cairo's Motion_Event path. */
+  New_Structure_Projection_Angle();
 
   opengl_update_spin_display( rotate_structure, structure_proj_params.Wr );
   opengl_update_spin_display( incline_structure, structure_proj_params.Wi );

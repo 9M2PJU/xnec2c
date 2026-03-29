@@ -429,7 +429,12 @@ rdpattern_scene_generate(gl_view_content_t *out)
   static void
 rdpattern_scene_post_render(void)
 {
+  /* Cairo's Draw_Radiation holds freq_data_lock when calling
+   * Update_Rdpattern_UI; match that to prevent a transient NULL
+   * max_gain read causing an early return that leaves "---" displayed. */
+  g_mutex_lock(&freq_data_lock);
   Update_Rdpattern_UI();
+  g_mutex_unlock(&freq_data_lock);
 }
 
 /*-----------------------------------------------------------------------*/
