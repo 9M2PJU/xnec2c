@@ -157,7 +157,15 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
      * gl_FragDepth bias without pushing fragments past 1.0. */
     far_plane = farthest_point * 1.5f;
 
-    if( nearest_point > 0.0f )
+    if( rc_config.opengl_orthographic )
+    {
+      /* Orthographic near plane set negative so depth clipping does not
+       * advance with camera_distance as zoom increases.  The camera
+       * position along Z is nominal in parallel projection; the full
+       * scene depth must remain visible at any zoom level. */
+      near_plane = -far_plane;
+    }
+    else if( nearest_point > 0.0f )
     {
       near_plane = nearest_point * 0.8f;
     }
