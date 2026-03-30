@@ -159,30 +159,10 @@ AS_IF([test "x$enable_opengl" != "xno"], [
   AC_CHECK_LIB([GL], [glEnable], [have_libgl=yes], [have_libgl=no])
 
   AS_IF([test "x$have_gl_h" = "xyes" && test "x$have_libgl" = "xyes"], [
-    dnl Check for CGLM via pkg-config first, then fall back to submodule
-    PKG_CHECK_MODULES([CGLM], [cglm], [have_cglm=yes], [
-      dnl Use bundled CGLM submodule
-      AS_IF([test -d "$srcdir/external/cglm"], [
-        AC_MSG_NOTICE([Using bundled CGLM from external/cglm])
-        CGLM_CFLAGS="-I\$(top_srcdir)/external/cglm/include"
-        CGLM_LIBS=""
-        have_cglm=yes
-      ], [
-        AC_MSG_WARN([CGLM not found via pkg-config and external/cglm not present])
-        have_cglm=no
-      ])
-    ])
-
-    AS_IF([test "x$have_cglm" = "xyes"], [
-      AC_DEFINE([HAVE_OPENGL], [1], [OpenGL support available])
-      GL_LIBS="-lGL"
-      AC_SUBST([GL_LIBS])
-      AC_SUBST([CGLM_CFLAGS])
-      AC_SUBST([CGLM_LIBS])
-      have_opengl=yes
-    ], [
-      AC_MSG_WARN([CGLM not found, OpenGL support disabled])
-    ])
+    AC_DEFINE([HAVE_OPENGL], [1], [OpenGL support available])
+    GL_LIBS="-lGL"
+    AC_SUBST([GL_LIBS])
+    have_opengl=yes
   ], [
     AC_MSG_WARN([OpenGL not found, using Cairo fallback only])
   ])
