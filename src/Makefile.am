@@ -132,8 +132,7 @@ xnec2c_SOURCES += \
   opengl/opengl_structure_geometry.c opengl/opengl_structure_geometry.h \
   opengl/opengl_msaa.c opengl/opengl_msaa.h
 
-xnec2c_CPPFLAGS += $(CGLM_CFLAGS)
-xnec2c_LDADD    += $(GL_LIBS) $(CGLM_LIBS)
+xnec2c_LDADD    += $(GL_LIBS)
 endif
 
 

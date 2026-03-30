@@ -11561,6 +11561,27 @@ Save NEC2 Editor data first?
                 <property name="position">13</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkToggleButton" id="main_ortho_button">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="hexpand">True</property>
+                <property name="tooltip-text">Toggle orthographic projection; disables perspective foreshortening. Active when showing orthographic view.</property>
+                <signal name="toggled" handler="on_ortho_toggled" swapped="no"/>
+                <child>
+                  <object class="GtkImage" id="main_ortho_image">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">14</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -12888,6 +12909,27 @@ Save NEC2 Editor data first?
                 <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">15</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToggleButton" id="rdpattern_ortho_button">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="hexpand">True</property>
+                <property name="tooltip-text">Toggle orthographic projection; disables perspective foreshortening. Active when showing orthographic view.</property>
+                <signal name="toggled" handler="on_ortho_toggled" swapped="no"/>
+                <child>
+                  <object class="GtkImage" id="rdpattern_ortho_image">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">16</property>
               </packing>
             </child>
           </object>

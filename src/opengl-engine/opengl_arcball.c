@@ -413,7 +413,19 @@ arcball_get_mvp(arcball_state_t *ab, mat4 dest, mat4 mv_dest,
   glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, up);
 
   glm_lookat(eye_pos, center_pos, up, view);
-  glm_perspective(fov_rad, aspect, near_plane, far_plane, proj);
+
+  /* Match perspective visible height at camera distance so scene size is
+   * unchanged when toggling between projection modes. */
+  if( rc_config.opengl_orthographic )
+  {
+    float half_h = distance * tanf(fov_rad / 2.0f);
+    glm_ortho(-half_h * aspect, half_h * aspect, -half_h, half_h,
+        near_plane, far_plane, proj);
+  }
+  else
+  {
+    glm_perspective(fov_rad, aspect, near_plane, far_plane, proj);
+  }
 
   /* Model-view (no projection) for lighting normal/position transforms */
   glm_mat4_mul(view, model, mv_dest);

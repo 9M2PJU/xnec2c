@@ -409,6 +409,9 @@ typedef struct
   /* Whether transparency is triggered by click/drag (1) or always on (0) */
   int opengl_transparent_on_click;
 
+  /* Orthographic projection toggle (0=perspective, 1=orthographic) */
+  int opengl_orthographic;
+
   /* See enum RDPAT_STYLE */
   int rdpattern_draw_style;
 

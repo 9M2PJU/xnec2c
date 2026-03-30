@@ -28,6 +28,7 @@
 #include "opengl-engine/opengl_view.h"
 #include "opengl/opengl_rdpattern.h"
 #include "opengl/opengl_msaa.h"
+#include "opengl/opengl_settings.h"
 
 static void common_projection_share_arcball(void);
 #endif
@@ -736,6 +737,9 @@ on_main_rdpattern_activate(
       gl_view_sync_arcball(rdpattern_gl_area,
           rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
     }
+
+    /* Sync ortho toolbar button now that rdpattern window builder is ready */
+    opengl_settings_sync_from_config();
 #endif
 
   } /* if( gtk_check_menu_item_get_active(...) ) */

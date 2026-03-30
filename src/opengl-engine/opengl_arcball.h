@@ -24,7 +24,7 @@
 
 #ifdef HAVE_OPENGL
 #include <epoxy/gl.h>
-#include <cglm/cglm.h>
+#include "opengl_math.h"
 
 /* Base distance multiplier for arcball viewing (sqrt(3) * 1.25) */
 #define ARCBALL_BASE_DISTANCE_FACTOR 2.165f

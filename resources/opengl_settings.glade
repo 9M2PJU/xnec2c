@@ -160,6 +160,21 @@
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkCheckButton" id="chk_orthographic">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="label" translatable="yes">Orthographic Projection</property>
+                    <property name="tooltip-text">Use orthographic projection; disables perspective foreshortening.
+Enable for precise angular measurements or flat pattern inspection.</property>
+                    <signal name="toggled" handler="on_opengl_settings_changed" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -182,7 +197,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">2</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
                 <child>
@@ -270,7 +285,7 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                   </packing>
                 </child>
               </object>
