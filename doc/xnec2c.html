@@ -2492,6 +2492,20 @@ measurement twice as far from target four times as costly.
 </p>
 
 <p>
+When an optimization run produces unexpected results — gain that seems too low, or VSWR
+that the optimizer ignores in favor of another metric — the <strong>Score</strong> column
+in the fitness goals grid reveals where the optimizer is spending its effort. A goal with
+a large score relative to the others dominates the total fitness and steers the search;
+goals with small scores have little influence regardless of how far their measurements
+sit from target. To shift the balance, increase the weight or exponent of an
+under-represented goal so its penalty grows large enough to compete, or reduce those
+values on an over-represented goal to loosen its grip on the search. The formula display
+at the bottom of the grid confirms the effect: re-run a pass after adjusting and compare
+the per-goal score breakdown to verify that the optimizer now distributes attention across
+all objectives as intended.
+</p>
+
+<p>
 Subsequent passes of the same algorithm start from the current best values and often
 discover nearby improvements the first pass missed. When switching between algorithms,
 the key parameter to adjust is the search region: reduce PSO's <strong>Search size</strong>
