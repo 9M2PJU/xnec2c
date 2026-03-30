@@ -169,6 +169,54 @@ opengl_settings_reset_defaults(void)
 
 /*------------------------------------------------------------------------*/
 
+/* Ortho toolbar button entries: builder pointer-to-pointer, button id, image id.
+ * Use gtk_builder_get_object directly to avoid fatal errors if a widget is
+ * absent from an older compiled resource. */
+static const struct
+{
+  GtkBuilder **builder;
+  const gchar  *btn_id;
+  const gchar  *img_id;
+} ortho_toolbars[] = {
+  { &main_window_builder,      "main_ortho_button",      "main_ortho_image"      },
+  { &rdpattern_window_builder,  "rdpattern_ortho_button", "rdpattern_ortho_image" },
+};
+
+/**
+ * sync_ortho_toolbar_button - Set ortho toggle button state and image in all toolbars
+ *
+ * Reads rc_config.opengl_orthographic and updates the toggle button active
+ * state and icon in both the main window and rdpattern window toolbars.
+ * Safe to call while syncing; the toolbar handler guards against re-entrant
+ * value changes via a value-equality check.
+ */
+static void
+sync_ortho_toolbar_button(void)
+{
+  const gchar *icon = rc_config.opengl_orthographic
+      ? "/ortho_cube.svg" : "/persp_cube.svg";
+  int i;
+
+  for( i = 0; i < (int)(sizeof(ortho_toolbars) / sizeof(ortho_toolbars[0])); i++ )
+  {
+    GtkWidget *btn, *img;
+
+    if( *ortho_toolbars[i].builder == NULL )
+      continue;
+
+    btn = GTK_WIDGET(gtk_builder_get_object(*ortho_toolbars[i].builder, ortho_toolbars[i].btn_id));
+    img = GTK_WIDGET(gtk_builder_get_object(*ortho_toolbars[i].builder, ortho_toolbars[i].img_id));
+    if( btn != NULL && img != NULL )
+    {
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn),
+          rc_config.opengl_orthographic);
+      gtk_image_set_from_resource(GTK_IMAGE(img), icon);
+    }
+  }
+}
+
+/*------------------------------------------------------------------------*/
+
 /** on_opengl_settings_changed - Unified signal handler for all settings widgets
  *
  * Reads all widget states into rc_config and queues redraws.
@@ -204,6 +252,12 @@ on_opengl_settings_changed(GtkWidget *widget, gpointer user_data)
     if( new_constrained != (gboolean)rc_config.arcball_constrained_rotation )
       opengl_set_constrained_rotation(new_constrained);
   }
+
+  /* Orthographic projection toggle */
+  chk = Builder_Get_Object(opengl_settings_builder, "chk_orthographic");
+  rc_config.opengl_orthographic =
+      gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(chk)) ? 1 : 0;
+  sync_ortho_toolbar_button();
 
   /* Transparency on-click toggle */
   chk = Builder_Get_Object(opengl_settings_builder, "chk_only_on_click");
@@ -261,6 +315,34 @@ on_opengl_settings_changed(GtkWidget *widget, gpointer user_data)
 
 /*------------------------------------------------------------------------*/
 
+/**
+ * on_ortho_toggled - Toolbar toggle handler for orthographic projection
+ *
+ * Shared by both the main window and rdpattern window toolbar buttons.
+ * Writes rc_config.opengl_orthographic, syncs all toolbar buttons and the
+ * settings dialog checkbox, and queues redraws.  Guards against re-entrant
+ * calls by checking whether the value already matches rc_config.
+ */
+void
+on_ortho_toggled(GtkToggleButton *button, gpointer user_data)
+{
+  int new_val = gtk_toggle_button_get_active(button) ? 1 : 0;
+
+  (void)user_data;
+
+  /* Bail if sync_ortho_toolbar_button already set this state */
+  if( new_val == rc_config.opengl_orthographic )
+    return;
+
+  rc_config.opengl_orthographic = new_val;
+  sync_ortho_toolbar_button();
+  opengl_settings_sync_from_config();
+  opengl_structure_queue_draw();
+  opengl_rdpattern_queue_draw();
+}
+
+/*------------------------------------------------------------------------*/
+
 /** opengl_settings_sync_from_config - Populate all widgets from rc_config
  *
  * Called after window creation and when external code changes rc_config
@@ -271,6 +353,9 @@ opengl_settings_sync_from_config(void)
 {
   GtkWidget *w;
   int i;
+
+  /* Toolbar buttons live in main/rdpattern builders; sync them unconditionally */
+  sync_ortho_toolbar_button();
 
   if( opengl_settings_builder == NULL )
     return;
@@ -286,6 +371,10 @@ opengl_settings_sync_from_config(void)
       "chk_constrained_rotation");
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),
       rc_config.arcball_constrained_rotation);
+
+  w = Builder_Get_Object(opengl_settings_builder, "chk_orthographic");
+  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),
+      rc_config.opengl_orthographic);
 
   w = Builder_Get_Object(opengl_settings_builder, "chk_only_on_click");
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),

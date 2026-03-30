@@ -36,5 +36,8 @@ void opengl_settings_hide(void);
 /** opengl_settings_sync_from_config - Update all widgets from rc_config */
 void opengl_settings_sync_from_config(void);
 
+/** on_ortho_toggled - Toolbar toggle handler for orthographic projection (both windows) */
+void on_ortho_toggled(GtkToggleButton *button, gpointer user_data);
+
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_SETTINGS_H */

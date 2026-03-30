@@ -142,6 +142,9 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "OpenGL Transparent on Click", .format = "%d",
 		.vars = { &rc_config.opengl_transparent_on_click } },
 
+	{ .desc = "OpenGL Orthographic Projection", .format = "%d",
+		.vars = { &rc_config.opengl_orthographic } },
+
 	{ .desc = "OpenGL Anti-Aliasing Samples", .format = "%d",
 		.vars = { &rc_config.opengl_msaa_samples } },
 
@@ -580,6 +583,7 @@ opengl_config_set_defaults( void )
 
   /* Toggle and enum defaults */
   rc_config.opengl_transparent_on_click = 1;
+  rc_config.opengl_orthographic = 1;
   rc_config.opengl_cylinder_radius_scale = 1.0;
   rc_config.opengl_msaa_samples = MSAA_4X;
   rc_config.rdpattern_draw_style = RDPAT_STYLE_BOTH;

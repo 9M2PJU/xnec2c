@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="3 2.5 10 11">
+  <!-- front face: large square -->
+  <polygon points="3.5,6 9.5,6 9.5,13 3.5,13"
+           fill="none" stroke="currentColor" stroke-width="1"/>
+  <!-- top face: trapezoid converging toward upper-right vanishing point -->
+  <polygon points="3.5,6 7.5,3 12.5,3 9.5,6"
+           fill="none" stroke="currentColor" stroke-width="1"/>
+  <!-- right face: trapezoid converging toward upper-right vanishing point -->
+  <polygon points="9.5,6 12.5,3 12.5,10 9.5,13"
+           fill="none" stroke="currentColor" stroke-width="1"/>
+</svg>
