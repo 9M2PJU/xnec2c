@@ -135,11 +135,19 @@ double Scale_Gain( double gain, int fstep, int idx )
         double elev_rad = rc_config.ant_temp_elevation * M_PI / 180.0;
 
         double z_w = ant_temp_z_world(tht, phi, tht_mg, phi_mg, elev_rad);
-        double t_bright = (z_w > ANT_TEMP_Z_EPSILON) ? t_sky : t_earth;
+
+        /* Blend t_sky/t_earth across one angular step to avoid a hard
+         * boundary discontinuity that appears as spikes in log-scale mode. */
+        double half_w   = 0.5 * fmax(fpat.dth, fpat.dph) * M_PI / 180.0;
+        double alpha    = fmax(0.0, fmin(1.0, (z_w + half_w) / (2.0 * half_w)));
+        double t_bright = alpha * t_sky + (1.0 - alpha) * t_earth;
         double g_lin = pow(10.0, gain / 10.0);
 
-        /* Noise temperature density (K/sr): resolution-independent */
-        double cell_k = g_lin * t_bright * sin(tht) / (4.0 * M_PI);
+        /* Noise temperature density (K/sr): resolution-independent.
+         * fabs(sin(tht)): NEC2 allows tht > 180 deg as a coordinate convenience;
+         * (360-tht, phi+180) is the same physical direction with positive sin.
+         * The solid angle element dOmega = sin(tht)*dth*dphi must be non-negative. */
+        double cell_k = g_lin * t_bright * fabs(sin(tht)) / (4.0 * M_PI);
 
         if (rc_config.gain_style == GS_NOISE)
           scaled_rad = cell_k;
