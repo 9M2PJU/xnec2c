@@ -572,9 +572,6 @@ typedef struct
 
   complex double *cur; /* Amplitude of basis function */
 
-  char newer; /* New data available */
-  char valid; /* Available data valid */
-
 } crnt_t;
 
 /* common  /data/ (geometry data) */
@@ -1091,9 +1088,6 @@ typedef struct
   /* Animation step in rads */
   double anim_step;
 
-  char newer; /* New data available */
-  char valid; /* Available data valid */
-
 } near_field_t;
 
 /* Forked processes data */
@@ -1537,6 +1531,17 @@ void Zo_Command(int action);
 /* draw.c */
 void Set_Gdk_Segment(Segment_t *segm, projection_parameters_t *params, double x1, double y1, double z1, double x2, double y2, double z2);
 void Draw_XYZ_Axes(cairo_t *cr, projection_parameters_t params);
+/* Availability guards for per-frequency-step data */
+#define CRNT_FSTEP_AVAILABLE(fs) \
+    ((fs) >= 0 && (fs) <= calc_data.steps_total \
+     && save.fstep != NULL && save.fstep[(fs)] \
+     && crnt_fstep != NULL && crnt_fstep[(fs)].cur != NULL)
+
+#define NF_FSTEP_AVAILABLE(fs) \
+    ((fs) >= 0 && (fs) <= calc_data.steps_total \
+     && save.fstep != NULL && save.fstep[(fs)] \
+     && near_field_fstep != NULL && near_field_fstep[(fs)].px != NULL)
+
 void New_Projection_Parameters(int width, int height, projection_parameters_t *params);
 void Value_to_Color(double *red, double *grn, double *blu, double val, double max);
 void Cairo_Draw_Polygon(cairo_t *cr, GdkPoint *points, int npoints);
@@ -1558,6 +1563,9 @@ void Rdpattern_Window_Killed(void);
 void Set_Window_Labels(void);
 void Alloc_Rdpattern_Buffers(int nfrq, int nth, int nph);
 void Alloc_Nearfield_Buffers(int n1, int n2, int n3);
+void Alloc_Nearfield_Fstep_Buffers(int nfrq);
+void Free_Nearfield_Fstep_Buffers(void);
+void Save_Nearfield_Data(int fstep);
 void Free_Draw_Buffers(void);
 double Scale_Gain( double gain, int fstep, int idx );
 /* draw_structure.c */
@@ -1569,6 +1577,9 @@ void Process_Surface_Patches(void);
 void Draw_Wire_Segments(cairo_t *cr, Segment_t *segm, gint nseg);
 void Draw_Surface_Patches(cairo_t *cr, Segment_t *segm, gint npatch);
 gboolean Redo_Currents(gpointer udata);
+void Alloc_Crnt_Fstep_Buffers(int nfrq);
+void Free_Crnt_Fstep_Buffers(void);
+void Save_Crnt_Data(int fstep);
 void New_Structure_Projection_Angle(void);
 void Init_Struct_Drawing(void);
 void Show_Viewer_Gain(GtkBuilder *builder, gchar *widget, projection_parameters_t proj_params);

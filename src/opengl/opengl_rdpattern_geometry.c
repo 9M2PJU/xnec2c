@@ -133,8 +133,11 @@ opengl_rdpattern_generate_nf_lines(void)
   double pov_max;
   size_t mreq;
 
-  if( isFlagClear(ENABLE_NEAREH) || !near_field.valid )
+  int fstep = calc_data.freq_step;
+  if( isFlagClear(ENABLE_NEAREH) || !NF_FSTEP_AVAILABLE(fstep) )
     return( -1 );
+
+  near_field_t *nf = &near_field_fstep[fstep];
 
   npts = fpat.nrx * fpat.nry * fpat.nrz;
 
@@ -178,14 +181,14 @@ opengl_rdpattern_generate_nf_lines(void)
     {
       /* Poynting vector: E x H */
       pov[ipv].x =
-        near_field.ery[ipv] * near_field.hrz[ipv] -
-        near_field.hry[ipv] * near_field.erz[ipv];
+        nf->ery[ipv] * nf->hrz[ipv] -
+        nf->hry[ipv] * nf->erz[ipv];
       pov[ipv].y =
-        near_field.erz[ipv] * near_field.hrx[ipv] -
-        near_field.hrz[ipv] * near_field.erx[ipv];
+        nf->erz[ipv] * nf->hrx[ipv] -
+        nf->hrz[ipv] * nf->erx[ipv];
       pov[ipv].z =
-        near_field.erx[ipv] * near_field.hry[ipv] -
-        near_field.hrx[ipv] * near_field.ery[ipv];
+        nf->erx[ipv] * nf->hry[ipv] -
+        nf->hrx[ipv] * nf->ery[ipv];
       pov[ipv].r = sqrt(
           pov[ipv].x * pov[ipv].x +
           pov[ipv].y * pov[ipv].y +
@@ -204,21 +207,21 @@ opengl_rdpattern_generate_nf_lines(void)
     /* Draw Near E Field */
     if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
       line_idx = nf_field_line(nf_lines, line_idx,
-          near_field.px[idx], near_field.py[idx], near_field.pz[idx],
-          near_field.erx[idx], near_field.ery[idx], near_field.erz[idx],
-          dr, near_field.er[idx], near_field.max_er);
+          nf->px[idx], nf->py[idx], nf->pz[idx],
+          nf->erx[idx], nf->ery[idx], nf->erz[idx],
+          dr, nf->er[idx], nf->max_er);
 
     /* Draw Near H Field */
     if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
       line_idx = nf_field_line(nf_lines, line_idx,
-          near_field.px[idx], near_field.py[idx], near_field.pz[idx],
-          near_field.hrx[idx], near_field.hry[idx], near_field.hrz[idx],
-          dr, near_field.hr[idx], near_field.max_hr);
+          nf->px[idx], nf->py[idx], nf->pz[idx],
+          nf->hrx[idx], nf->hry[idx], nf->hrz[idx],
+          dr, nf->hr[idx], nf->max_hr);
 
     /* Draw Poynting Vector */
     if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
       line_idx = nf_field_line(nf_lines, line_idx,
-          near_field.px[idx], near_field.py[idx], near_field.pz[idx],
+          nf->px[idx], nf->py[idx], nf->pz[idx],
           pov[idx].x, pov[idx].y, pov[idx].z,
           dr, pov[idx].r, pov_max);
   }

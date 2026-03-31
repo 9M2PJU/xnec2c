@@ -1941,6 +1941,8 @@ _Set_Frequency_On_Click( GdkEvent *e)
 
 		calc_data.freq_mhz = fmhz;
 		g_idle_add( Redo_Currents, NULL );
+		if( isFlagSet(DRAW_ENABLED) )
+		  g_idle_add( Redo_Radiation_Pattern, NULL );
 	  }
   }
 

@@ -1716,9 +1716,6 @@ nfpat( int nfeh )
 
   } /* for( i = 0; i < fpat.nrz; i++ ) */
 
-  /* Signal new valid near field data */
-  near_field.newer = near_field.valid = 1;
-
   /* Signal new E/H pattern data */
   SetFlag( DRAW_NEW_EHFIELD );
 

@@ -154,8 +154,11 @@ rdpattern_scene_generate(gl_view_content_t *out)
   }
 
   /* Near-field rendering path */
-  if( isFlagSet(DRAW_EHFIELD) && isFlagSet(ENABLE_NEAREH) && near_field.valid )
+  int fstep = calc_data.freq_step;
+  if( isFlagSet(DRAW_EHFIELD) && isFlagSet(ENABLE_NEAREH)
+      && NF_FSTEP_AVAILABLE(fstep) )
   {
+    near_field_t *nf = &near_field_fstep[fstep];
     int line_count;
     int nf_count;
     lit_color_point_t *nf_buf;
@@ -164,7 +167,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
     if( line_count <= 0 )
       return( FALSE );
 
-    r_max = (float)near_field.r_max;
+    r_max = (float)nf->r_max;
 
     /* Near-field positions directly overlap structure in same coordinate space;
      * no translation needed (excitation already aligned) */

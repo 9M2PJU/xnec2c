@@ -71,9 +71,6 @@ _Draw_Structure( cairo_t *cr )
 
   Draw_Structure_UI();
 
-  /* Reset "new current data" flag */
-  crnt.newer = 0;
-
 } /* _Draw_Structure() */
 
 void Draw_Structure( cairo_t *cr )
@@ -394,8 +391,11 @@ Draw_Wire_Segments( cairo_t *cr, Segment_t *segm, gint nseg )
   /* Draw currents/charges if enabled, return */
   /* Current or charge calculations do not contain wavelength */
   /* factors, since they are drawn normalized to their max value */
-  if( (isFlagSet(DRAW_CURRENTS) || isFlagSet(DRAW_CHARGES)) && crnt.valid )
+  int fstep = calc_data.freq_step;
+  if( (isFlagSet(DRAW_CURRENTS) || isFlagSet(DRAW_CHARGES))
+      && CRNT_FSTEP_AVAILABLE(fstep) )
   {
+    crnt_t *cf = &crnt_fstep[fstep];
     static double cmax; /* Max of seg current/charge */
     /* To color structure segs */
     double red = 0.0, grn = 0.0, blu = 0.0;
@@ -403,32 +403,28 @@ Draw_Wire_Segments( cairo_t *cr, Segment_t *segm, gint nseg )
     size_t s = sizeof( label )-1;
 
     /* Loop over all wire segs, find max current/charge */
-    if( crnt.newer )
+    cmax = 0.0;
+    for( idx = 0; idx < nseg; idx++ )
     {
-      cmax = 0.0;
-      for( idx = 0; idx < nseg; idx++ )
-      {
-        if( isFlagSet(DRAW_CURRENTS) )
-          /* Calculate segment current magnitude */
-          cmag[idx] = (double)cabs( crnt.cur[idx] );
-        else
-          /* Calculate segment charge density */
-          cmag[idx] = (double)cabs( cmplx(crnt.bir[idx], crnt.bii[idx]) );
-
-        /* Find max current/charge magnitude */
-        if( cmag[idx] > cmax )
-          cmax = cmag[idx];
-      }
-
-      /* Show max value in color code label */
       if( isFlagSet(DRAW_CURRENTS) )
-        snprintf( label, s, "%8.2E", cmax * (double)data.wlam );
+        /* Calculate segment current magnitude */
+        cmag[idx] = (double)cabs( cf->cur[idx] );
       else
-        snprintf( label, s, "%8.2E", cmax * 1.0E-6 / (double)calc_data.freq_mhz );
-      gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
-              main_window_builder, "main_colorcode_maxlabel")), label );
+        /* Calculate segment charge density */
+        cmag[idx] = (double)cabs( cmplx(cf->bir[idx], cf->bii[idx]) );
 
-    } /* if( crnt.newer ) */
+      /* Find max current/charge magnitude */
+      if( cmag[idx] > cmax )
+        cmax = cmag[idx];
+    }
+
+    /* Show max value in color code label */
+    if( isFlagSet(DRAW_CURRENTS) )
+      snprintf( label, s, "%8.2E", cmax * (double)data.wlam );
+    else
+      snprintf( label, s, "%8.2E", cmax * 1.0E-6 / (double)calc_data.freq_mhz );
+    gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
+            main_window_builder, "main_colorcode_maxlabel")), label );
 
     /* Draw segments in color code according to current */
     for( idx = 0; idx < nseg; idx++ )
@@ -527,8 +523,11 @@ Draw_Surface_Patches( cairo_t *cr, Segment_t *segm, gint npatch )
   if( ! npatch ) return;
 
   /* Draw currents if enabled, return */
-  if( isFlagSet(DRAW_CURRENTS) && crnt.valid )
+  int fstep = calc_data.freq_step;
+  if( isFlagSet(DRAW_CURRENTS)
+      && CRNT_FSTEP_AVAILABLE(fstep) )
   {
+    crnt_t *cf = &crnt_fstep[fstep];
     /* Buffers for t1,t2 currents below */
     static double cmax;
 
@@ -540,39 +539,35 @@ Draw_Surface_Patches( cairo_t *cr, Segment_t *segm, gint npatch )
     int i, j;
 
     /* Find max value of patch current magnitude */
-    if( crnt.newer )
+    j= data.n;
+    cmax = 0.0;
+
+    for( i = 0; i < npatch; i++ )
     {
-      j= data.n;
-      cmax = 0.0;
+      /* Calculate current along x,y,z vectors */
+      cx = cf->cur[j];
+      cy = cf->cur[j+1];
+      cz = cf->cur[j+2];
 
-      for( i = 0; i < npatch; i++ )
-      {
-        /* Calculate current along x,y,z vectors */
-        cx = crnt.cur[j];
-        cy = crnt.cur[j+1];
-        cz = crnt.cur[j+2];
+      /* Calculate current along t1 and t2 tangent vectors */
+      ct1 = cx*(double)data.t1x[i] +
+        cy*(double)data.t1y[i] +
+        cz*(double)data.t1z[i];
+      ct2 = cx*(double)data.t2x[i] +
+        cy*(double)data.t2y[i] +
+        cz*(double)data.t2z[i];
 
-        /* Calculate current along t1 and t2 tangent vectors */
-        ct1 = cx*(double)data.t1x[i] +
-          cy*(double)data.t1y[i] +
-          cz*(double)data.t1z[i];
-        ct2 = cx*(double)data.t2x[i] +
-          cy*(double)data.t2y[i] +
-          cz*(double)data.t2z[i];
+      /* Save current magnitudes */
+      ct1m[i] = (double)cabs( ct1 );
+      ct2m[i] = (double)cabs( ct2 );
 
-        /* Save current magnitudes */
-        ct1m[i] = (double)cabs( ct1 );
-        ct2m[i] = (double)cabs( ct2 );
+      /* Find current magnitude max */
+      if( ct1m[i] > cmax ) cmax = ct1m[i];
+      if( ct2m[i] > cmax ) cmax = ct2m[i];
 
-        /* Find current magnitude max */
-        if( ct1m[i] > cmax ) cmax = ct1m[i];
-        if( ct2m[i] > cmax ) cmax = ct2m[i];
+      j += 3;
 
-        j += 3;
-
-      } /* for( i = 0; i < npatch; i++ ) */
-
-    } /* if( crnt.newer ) */
+    } /* for( i = 0; i < npatch; i++ ) */
 
     /* Draw patches in color code according to current */
     for( i = 0; i < npatch; i++ )
@@ -629,6 +624,102 @@ Draw_Surface_Patches( cairo_t *cr, Segment_t *segm, gint npatch )
 
 /*-----------------------------------------------------------------------*/
 
+/**
+ * Alloc_Crnt_Fstep_Buffers() - Allocate per-frequency-step crnt storage
+ *
+ * @nfrq: Number of frequency steps (steps_total + 1)
+ *
+ * Allocates crnt_fstep[] array so each frequency step can store
+ * its computed current/charge data for later restoration.
+ */
+  void
+Alloc_Crnt_Fstep_Buffers( int nfrq )
+{
+  size_t mreq;
+
+  /* Outer array — zero so realloc of sub-fields receives NULL, not garbage */
+  mreq = (size_t)nfrq * sizeof(crnt_t);
+  mem_realloc( (void **)&crnt_fstep, mreq, "in draw_structure.c" );
+  memset( crnt_fstep, 0, mreq );
+
+  for( int i = 0; i < nfrq; i++ )
+  {
+    /* Basis function coefficients: npm elements each */
+    mreq = (size_t)data.npm * sizeof(double);
+    mem_realloc( (void **)&crnt_fstep[i].air, mreq, "in draw_structure.c" );
+    mem_realloc( (void **)&crnt_fstep[i].aii, mreq, "in draw_structure.c" );
+    mem_realloc( (void **)&crnt_fstep[i].bir, mreq, "in draw_structure.c" );
+    mem_realloc( (void **)&crnt_fstep[i].bii, mreq, "in draw_structure.c" );
+    mem_realloc( (void **)&crnt_fstep[i].cir, mreq, "in draw_structure.c" );
+    mem_realloc( (void **)&crnt_fstep[i].cii, mreq, "in draw_structure.c" );
+
+    /* Solved current amplitudes: np3m elements */
+    mreq = (size_t)data.np3m * sizeof(complex double);
+    mem_realloc( (void **)&crnt_fstep[i].cur, mreq, "in draw_structure.c" );
+
+  }
+
+} /* Alloc_Crnt_Fstep_Buffers() */
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * Free_Crnt_Fstep_Buffers() - Free per-frequency-step crnt storage
+ */
+  void
+Free_Crnt_Fstep_Buffers( void )
+{
+  if( crnt_fstep == NULL )
+    return;
+
+  int nfrq = calc_data.steps_total + 1;
+  for( int i = 0; i < nfrq; i++ )
+  {
+    free_ptr( (void **)&crnt_fstep[i].air );
+    free_ptr( (void **)&crnt_fstep[i].aii );
+    free_ptr( (void **)&crnt_fstep[i].bir );
+    free_ptr( (void **)&crnt_fstep[i].bii );
+    free_ptr( (void **)&crnt_fstep[i].cir );
+    free_ptr( (void **)&crnt_fstep[i].cii );
+    free_ptr( (void **)&crnt_fstep[i].cur );
+  }
+
+  free_ptr( (void **)&crnt_fstep );
+
+} /* Free_Crnt_Fstep_Buffers() */
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * Save_Crnt_Data() - Save current crnt data for a frequency step
+ *
+ * @fstep: Frequency step index
+ *
+ * Copies the global crnt struct arrays into crnt_fstep[fstep].
+ */
+  void
+Save_Crnt_Data( int fstep )
+{
+  if( crnt_fstep == NULL
+      || fstep < 0 || fstep > calc_data.steps_total
+      || crnt_fstep[fstep].cur == NULL )
+    return;
+
+  size_t npm = (size_t)data.npm;
+  size_t np3m = (size_t)data.np3m;
+
+  memcpy( crnt_fstep[fstep].air, crnt.air, npm * sizeof(double) );
+  memcpy( crnt_fstep[fstep].aii, crnt.aii, npm * sizeof(double) );
+  memcpy( crnt_fstep[fstep].bir, crnt.bir, npm * sizeof(double) );
+  memcpy( crnt_fstep[fstep].bii, crnt.bii, npm * sizeof(double) );
+  memcpy( crnt_fstep[fstep].cir, crnt.cir, npm * sizeof(double) );
+  memcpy( crnt_fstep[fstep].cii, crnt.cii, npm * sizeof(double) );
+  memcpy( crnt_fstep[fstep].cur, crnt.cur, np3m * sizeof(complex double) );
+
+} /* Save_Crnt_Data() */
+
+/*-----------------------------------------------------------------------*/
+
 /* Redo_Currents()
  *
  * Refreshes plots on new frequency in spinbutton
@@ -641,12 +732,8 @@ Redo_Currents( gpointer udata )
       isFlagClear(ENABLE_EXCITN) )
     return FALSE;
 
-  // Only re-calculate if the set_freq_step() determines that
-  // the selected frequency has not been calculated.
-  // FIXME: the global structure `crnt` is not per-frequency
-  // so it must always re-calculate if DRAW_CURRENTS or DRAW_CHARGES is enabled:
-  if (!set_freq_step() || isFlagSet(DRAW_CURRENTS) || isFlagSet(DRAW_CHARGES))
-	  New_Frequency();
+  if( !set_freq_step() )
+    New_Frequency();
 
   /* Display freq data in entry widgets */
   if( isFlagSet(PLOT_FREQ_LINE) )

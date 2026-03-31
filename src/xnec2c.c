@@ -412,14 +412,12 @@ Radiation_Pattern( void )
 
 /* Near_Field_Pattern()
  *
- * Calculates near field pattern if enabled/needed
+ * Calculates near field pattern if enabled
  */
   void
 Near_Field_Pattern( void )
 {
-  if( near_field.valid ||
-      isFlagClear(DRAW_EHFIELD) ||
-      isFlagClear(ENABLE_NEAREH) )
+  if( isFlagClear(ENABLE_NEAREH) )
     return;
 
   if( fpat.nfeh & NEAR_EFIELD )
@@ -487,7 +485,6 @@ New_Frequency( void )
   Set_Excitation();
 
   /* Matrix solving (netwk calls solves) */
-  crnt.valid = 0;
   Set_Network_Data();
 
   /* Calculate power loss */
@@ -497,10 +494,17 @@ New_Frequency( void )
   Radiation_Pattern();
 
   /* Near field calculation */
-  near_field.valid = 0;
   Near_Field_Pattern();
 
   g_mutex_unlock(&freq_data_lock);
+
+  /* Save per-frequency-step crnt and near field data */
+  Save_Crnt_Data( calc_data.freq_step );
+  Save_Nearfield_Data( calc_data.freq_step );
+
+  /* Mark this step as available to UI consumers */
+  if( save.fstep != NULL && calc_data.freq_step >= 0 )
+    save.fstep[calc_data.freq_step] = 1;
 
   // Calculate elapsed time
   clock_gettime(CLOCK_MONOTONIC, &end);
@@ -647,9 +651,10 @@ gboolean Frequency_Loop( gpointer udata )
     else
       freq -= calc_data.freq_loop_data[0].delta_freq;
 
-    /* Clear list of "valid" (processed) loop steps */
+    /* Clear list of "valid" (processed) loop steps, including extra slot */
     for( idx = 0; idx < calc_data.steps_total; idx++ )
       save.fstep[idx] = 0;
+    save.fstep[calc_data.steps_total] = 0;
 
     /* Clear the index to current FR card and steps total */
     calc_data.FR_index = 0;
@@ -843,6 +848,10 @@ gboolean Frequency_Loop( gpointer udata )
             g_mutex_unlock(&global_lock);
             return FALSE;
           }
+
+          /* Save per-frequency-step crnt and near field data */
+          Save_Crnt_Data( forked_proc_data[idx]->fstep );
+          Save_Nearfield_Data( forked_proc_data[idx]->fstep );
 
           /* Clear "last-used-frequency" buffer, the local version of the data is
            * no longer what New_Frequency() set it to: */

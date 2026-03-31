@@ -678,17 +678,13 @@ Open_Input_File( gpointer arg )
   SetFlag( MAIN_NEW_FREQ );
   if( isFlagSet(PLOT_ENABLED) ) SetFlag( FREQ_LOOP_INIT );
   floop_tag = 0;
-  crnt.newer = 0;
-  crnt.valid = 0;
-  near_field.newer = 0;
-  near_field.valid = 0;
 
   New_Frequency_Reset_Prev();
 
   /* Scale geometry for current frequency before potential loop start.
    * During forked frequency loop, children scale geometry independently,
    * but parent's data.bi[] must be wavelength-normalized for any
-   * intermediate renders triggered by crnt.newer updates from children. */
+   * intermediate renders from children. */
   New_Frequency();
 
   /* Allow re-draws on expose events etc */

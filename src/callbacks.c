@@ -2698,9 +2698,6 @@ on_near_peak_value_activate(
     /* Redraw radiation pattern drawingarea */
     if( isFlagSet(DRAW_EHFIELD) )
     {
-      near_field.valid = 0;
-      Near_Field_Pattern();
-
       xnec2_widget_queue_draw( rdpattern_drawingarea );
     }
   }
@@ -2723,9 +2720,6 @@ on_near_snapshot_activate(
     /* Redraw radiation pattern drawingarea */
     if( isFlagSet(DRAW_EHFIELD) )
     {
-      near_field.valid = 0;
-      Near_Field_Pattern();
-
       xnec2_widget_queue_draw( rdpattern_drawingarea );
     }
   }

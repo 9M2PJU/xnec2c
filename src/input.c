@@ -1164,7 +1164,7 @@ Read_Commands( void )
           mem_realloc( (void **) &(impedance_data.zphase), mreq, "in input.c" );
           mem_realloc( (void **) &(save.freq), mreq, "in input.c" );
 
-          mreq = (size_t)calc_data.steps_total * sizeof(char);
+          mreq = (size_t)(calc_data.steps_total+1) * sizeof(char);
           mem_realloc( (void **) &(save.fstep), mreq, "in input.c" );
         }
 
@@ -1628,6 +1628,11 @@ Read_Commands( void )
     {
       /* Allocate radiation pattern buffers FIXME */
       Alloc_Rdpattern_Buffers( calc_data.steps_total + 1, fpat.nth, fpat.nph );
+      Alloc_Crnt_Fstep_Buffers( calc_data.steps_total + 1 );
+      if( isFlagSet(ENABLE_NEAREH) )
+      {
+        Alloc_Nearfield_Fstep_Buffers( calc_data.steps_total + 1 );
+      }
       SetFlag( ENABLE_RDPAT );
     }
 

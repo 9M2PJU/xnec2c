@@ -91,8 +91,6 @@ netwk( complex double *cmx, int *ip, complex double *einc )
     mem_alloc( (void **)&ipnt,  mreq, "in network.c");
   }
 
-  /* Signal new and valid current data */
-  crnt.newer = crnt.valid = 1;
 
   if( netcx.ntsol == 0)
   {

@@ -127,14 +127,17 @@ opengl_structure_get_draw_mode(void)
   static double
 get_segment_magnitude(int idx, structure_draw_mode_t mode)
 {
-  if( !crnt.valid || idx < 0 )
+  int fstep = calc_data.freq_step;
+  if( idx < 0 || !CRNT_FSTEP_AVAILABLE(fstep) )
     return( 0.0 );
 
-  if( mode == STRUCTURE_DRAW_CURRENTS && crnt.cur != NULL )
-    return( cabs(crnt.cur[idx]) );
+  crnt_t *cf = &crnt_fstep[fstep];
 
-  if( mode == STRUCTURE_DRAW_CHARGES && crnt.bir != NULL && crnt.bii != NULL )
-    return( cabs(cmplx(crnt.bir[idx], crnt.bii[idx])) );
+  if( mode == STRUCTURE_DRAW_CURRENTS )
+    return( cabs(cf->cur[idx]) );
+
+  if( mode == STRUCTURE_DRAW_CHARGES )
+    return( cabs(cmplx(cf->bir[idx], cf->bii[idx])) );
 
   return( 0.0 );
 }
@@ -147,16 +150,18 @@ get_segment_magnitude(int idx, structure_draw_mode_t mode)
  * @ct2: output complex projection onto t2
  *
  * Preserves phase information needed for polarization analysis.
- * Caller must ensure crnt.cur is valid and idx is in range.
+ * Caller must ensure crnt_fstep[fstep] is valid and idx is in range.
  */
   static void
 get_patch_tangent_projections(int idx,
     complex double *ct1, complex double *ct2)
 {
+  int fstep = calc_data.freq_step;
+  crnt_t *cf = &crnt_fstep[fstep];
   int ci = data.n + idx * 3;
-  complex double cur_x = crnt.cur[ci];
-  complex double cur_y = crnt.cur[ci + 1];
-  complex double cur_z = crnt.cur[ci + 2];
+  complex double cur_x = cf->cur[ci];
+  complex double cur_y = cf->cur[ci + 1];
+  complex double cur_z = cf->cur[ci + 2];
 
   *ct1 = cur_x * data.t1x[idx] + cur_y * data.t1y[idx] + cur_z * data.t1z[idx];
   *ct2 = cur_x * data.t2x[idx] + cur_y * data.t2y[idx] + cur_z * data.t2z[idx];
@@ -221,7 +226,9 @@ get_patch_normal(int idx, float *nx, float *ny, float *nz)
 get_patch_color(int idx, structure_draw_mode_t mode, double cmax,
     float *out_r, float *out_g, float *out_b)
 {
-  if( mode == STRUCTURE_DRAW_CURRENTS && cmax > 0.0 && crnt.valid && crnt.cur != NULL )
+  int fstep = calc_data.freq_step;
+  if( mode == STRUCTURE_DRAW_CURRENTS && cmax > 0.0
+      && CRNT_FSTEP_AVAILABLE(fstep) )
   {
     double mag = get_patch_current_magnitude(idx);
     double red, grn, blu;
@@ -262,8 +269,9 @@ get_patch_color(int idx, structure_draw_mode_t mode, double cmax,
 get_patch_flow_data(int idx, structure_draw_mode_t mode, double cmax,
     float *fd)
 {
-  if( mode == STRUCTURE_DRAW_CURRENTS && cmax > 0.0 &&
-      crnt.valid && crnt.cur != NULL )
+  int fstep = calc_data.freq_step;
+  if( mode == STRUCTURE_DRAW_CURRENTS && cmax > 0.0
+      && CRNT_FSTEP_AVAILABLE(fstep) )
   {
     complex double ct1, ct2;
     double scale;
@@ -820,7 +828,9 @@ opengl_structure_generate_geometry(
 
   /* Find max magnitude for color scaling (wires + patch currents) */
   cmax = 0.0;
-  if( (mode == STRUCTURE_DRAW_CURRENTS || mode == STRUCTURE_DRAW_CHARGES) && crnt.valid )
+  int fstep = calc_data.freq_step;
+  if( (mode == STRUCTURE_DRAW_CURRENTS || mode == STRUCTURE_DRAW_CHARGES)
+      && CRNT_FSTEP_AVAILABLE(fstep) )
   {
     for( idx = 0; idx < data.n; idx++ )
     {
@@ -830,7 +840,7 @@ opengl_structure_generate_geometry(
     }
 
     /* Patch current magnitudes (currents mode only; no patch charge data) */
-    if( mode == STRUCTURE_DRAW_CURRENTS && crnt.cur != NULL )
+    if( mode == STRUCTURE_DRAW_CURRENTS )
     {
       for( idx = 0; idx < data.m; idx++ )
       {
@@ -940,18 +950,32 @@ opengl_structure_update_shared_geometry(void)
     (current_mode == STRUCTURE_DRAW_CURRENTS ||
      current_mode == STRUCTURE_DRAW_CHARGES);
 
+  static int last_fstep = -1;
+
+  /* Track freq_mhz separately: freq_step stays at steps_total for all
+   * left-click (arbitrary) frequencies, so step index alone is not sufficient
+   * to detect data changes in the extra slot. */
+  static double last_freq_mhz = -1.0;
+
+  gboolean extra_slot_changed =
+    (calc_data.freq_step == calc_data.steps_total &&
+     calc_data.freq_mhz != last_freq_mhz);
+
   /* Regenerate on mode change, empty buffer, or new current data */
   if( current_mode != structure_last_mode ||
       batch_count == 0 ||
       cylinder_radius_scale != structure_last_radius_scale ||
-      (is_current_mode && crnt.newer) )
+      (is_current_mode && (calc_data.freq_step != last_fstep || extra_slot_changed)) )
   {
     structure_last_mode = current_mode;
     opengl_structure_generate_geometry(current_mode, cylinder_radius_scale);
 
     /* Prevent redundant regeneration on subsequent expose events */
-    if( crnt.newer && is_current_mode )
-      crnt.newer = 0;
+    if( is_current_mode )
+    {
+      last_fstep = calc_data.freq_step;
+      last_freq_mhz = calc_data.freq_mhz;
+    }
 
     /* Clear redraw flag for SUPPRESS_INTERMEDIATE_REDRAWS guard */
     need_structure_redraw = 0;

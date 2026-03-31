@@ -485,7 +485,8 @@ Main_Rdpattern_Activate( gboolean from_menu )
 
   /* Redo currents if not reaching this function
    * from the menu callback (e.g. not user action) */
-  if( !crnt.valid && !from_menu ) Redo_Currents( NULL );
+  int fstep = calc_data.freq_step;
+  if( !CRNT_FSTEP_AVAILABLE(fstep) && !from_menu ) Redo_Currents( NULL );
 
   /* Display frequency in freq spinbutton */
   if( from_menu && calc_data.FR_cards )
@@ -578,7 +579,8 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
     /* Redraw radiation pattern drawingarea */
     if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
     {
-      if( !crnt.valid ) Redo_Currents( NULL );
+      int fstep = calc_data.freq_step;
+      if( !CRNT_FSTEP_AVAILABLE(fstep) ) Redo_Currents( NULL );
       SetFlag( DRAW_NEW_RDPAT );
 
       xnec2_widget_queue_draw( rdpattern_drawingarea );
@@ -647,8 +649,9 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
     /* Redraw radiation pattern drawingarea */
     if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
     {
-      if( !near_field.valid || !crnt.valid ) Redo_Currents( NULL );
-      Near_Field_Pattern();
+      int fstep = calc_data.freq_step;
+      if( !NF_FSTEP_AVAILABLE(fstep) )
+        Redo_Currents( NULL );
       SetFlag( DRAW_NEW_EHFIELD );
 
       xnec2_widget_queue_draw( rdpattern_drawingarea );
@@ -728,7 +731,6 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
   {
     SetFlag( DRAW_CURRENTS );
     ClearFlag( DRAW_CHARGES );
-    crnt.newer = 1;
     Alloc_Crnt_Buffs();
 
     gtk_toggle_button_set_active(
@@ -737,12 +739,11 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
     gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
             main_window_builder, "struct_label")), _("View Currents") );
 
-    if( !crnt.valid && isFlagClear(FREQ_LOOP_RUNNING) )
+    int fstep = calc_data.freq_step;
+    if( !CRNT_FSTEP_AVAILABLE(fstep) && isFlagClear(FREQ_LOOP_RUNNING) )
       Redo_Currents( NULL );
-    else if( crnt.valid )
-    {
+    else
       xnec2_widget_queue_draw( structure_drawingarea );
-    }
 
     if( isFlagSet(OVERLAY_STRUCT) )
     {
@@ -787,7 +788,6 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
   {
     SetFlag( DRAW_CHARGES );
     ClearFlag( DRAW_CURRENTS );
-    crnt.newer = 1;
     Alloc_Crnt_Buffs();
 
     gtk_toggle_button_set_active(
@@ -798,12 +798,11 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
           Builder_Get_Object(main_window_builder, "struct_label")),
         _("View Charges") );
 
-    if( !crnt.valid && isFlagClear(FREQ_LOOP_RUNNING) )
+    int fstep = calc_data.freq_step;
+    if( !CRNT_FSTEP_AVAILABLE(fstep) && isFlagClear(FREQ_LOOP_RUNNING) )
       Redo_Currents( NULL );
-    else if( crnt.valid )
-    {
+    else
       xnec2_widget_queue_draw( structure_drawingarea );
-    }
 
     if( isFlagSet(OVERLAY_STRUCT) )
     {

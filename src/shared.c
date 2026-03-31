@@ -206,6 +206,9 @@ rad_pattern_t *rad_pattern = NULL;
 /* Near E/H field data */
 near_field_t near_field;
 
+/* Per-frequency-step near field storage */
+near_field_t *near_field_fstep = NULL;
+
 /* Segments for drawing structure */
 Segment_t *structure_segs = NULL;
 
@@ -237,6 +240,9 @@ double
 
 /* common  /crnt/ */
 crnt_t crnt;
+
+/* Per-frequency-step crnt storage */
+crnt_t *crnt_fstep = NULL;
 
 /* common  /dataj/ */
 dataj_t dataj;

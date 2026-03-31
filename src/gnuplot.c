@@ -200,9 +200,12 @@ Save_RadPattern_Gnuplot_Data( char *filename )
 
   FILE *fp = NULL;
 
+  int fstep = calc_data.freq_step;
+
   /* Draw near field pattern if possible */
-  if( isFlagSet(ENABLE_NEAREH) && near_field.valid )
+  if( isFlagSet(ENABLE_NEAREH) && NF_FSTEP_AVAILABLE(fstep) )
   {
+    near_field_t *nf = &near_field_fstep[fstep];
     /* Open gplot file, abort on error */
     if( !Open_File(&fp, filename, "w") )
       return;
@@ -228,19 +231,19 @@ Save_RadPattern_Gnuplot_Data( char *filename )
       /* Write e-field out to file [DJS] */
       for( idx = 0; idx < npts; idx++ )
       {
-        fscale = dr / near_field.er[idx];
-        fx = near_field.px[idx] + near_field.erx[idx] * fscale;
-        fy = near_field.py[idx] + near_field.ery[idx] * fscale;
-        fz = near_field.pz[idx] + near_field.erz[idx] * fscale;
+        fscale = dr / nf->er[idx];
+        fx = nf->px[idx] + nf->erx[idx] * fscale;
+        fy = nf->py[idx] + nf->ery[idx] * fscale;
+        fz = nf->pz[idx] + nf->erz[idx] * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
-            near_field.px[idx],
-            near_field.py[idx],
-            near_field.pz[idx],
-            fx - near_field.px[idx],
-            fy - near_field.py[idx],
-            fz - near_field.pz[idx] );
+            nf->px[idx],
+            nf->py[idx],
+            nf->pz[idx],
+            fx - nf->px[idx],
+            fy - nf->py[idx],
+            fz - nf->pz[idx] );
       }
     } /* if( isFlagSet(DRAW_EFIELD) */
 
@@ -251,19 +254,19 @@ Save_RadPattern_Gnuplot_Data( char *filename )
       /* Write h-field out to file [DJS] */
       for( idx = 0; idx < npts; idx++ )
       {
-        fscale = dr / near_field.hr[idx];
-        fx = near_field.px[idx] + near_field.hrx[idx] * fscale;
-        fy = near_field.py[idx] + near_field.hry[idx] * fscale;
-        fz = near_field.pz[idx] + near_field.hrz[idx] * fscale;
+        fscale = dr / nf->hr[idx];
+        fx = nf->px[idx] + nf->hrx[idx] * fscale;
+        fy = nf->py[idx] + nf->hry[idx] * fscale;
+        fz = nf->pz[idx] + nf->hrz[idx] * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
-            near_field.px[idx],
-            near_field.py[idx],
-            near_field.pz[idx],
-            fx - near_field.px[idx],
-            fy - near_field.py[idx],
-            fz - near_field.pz[idx] );
+            nf->px[idx],
+            nf->py[idx],
+            nf->pz[idx],
+            fx - nf->px[idx],
+            fy - nf->py[idx],
+            fz - nf->pz[idx] );
       }
     } /* if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) ) */
 
@@ -301,14 +304,14 @@ Save_RadPattern_Gnuplot_Data( char *filename )
         for( ipv = 0; ipv < npts; ipv++ )
         {
           pov_x[ipv] =
-            near_field.ery[ipv] * near_field.hrz[ipv] -
-            near_field.hry[ipv] * near_field.erz[ipv];
+            nf->ery[ipv] * nf->hrz[ipv] -
+            nf->hry[ipv] * nf->erz[ipv];
           pov_y[ipv] =
-            near_field.erz[ipv] * near_field.hrx[ipv] -
-            near_field.hrz[ipv] * near_field.erx[ipv];
+            nf->erz[ipv] * nf->hrx[ipv] -
+            nf->hrz[ipv] * nf->erx[ipv];
           pov_z[ipv] =
-            near_field.erx[ipv] * near_field.hry[ipv] -
-            near_field.hrx[ipv] * near_field.ery[ipv];
+            nf->erx[ipv] * nf->hry[ipv] -
+            nf->hrx[ipv] * nf->ery[ipv];
           pov_r[ipv] = sqrt(
               pov_x[ipv] * pov_x[ipv] +
               pov_y[ipv] * pov_y[ipv] +
@@ -325,22 +328,22 @@ Save_RadPattern_Gnuplot_Data( char *filename )
         /* Scaled field values are used to set one end of a
          * line segment that represents direction of field.
          * The other end is set by the field point co-ordinates */
-        fx = near_field.px[idx] + pov_x[idx] * fscale;
-        fy = near_field.py[idx] + pov_y[idx] * fscale;
-        fz = near_field.pz[idx] + pov_z[idx] * fscale;
+        fx = nf->px[idx] + pov_x[idx] * fscale;
+        fy = nf->py[idx] + pov_y[idx] * fscale;
+        fz = nf->pz[idx] + pov_z[idx] * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
-            near_field.px[idx],
-            near_field.py[idx],
-            near_field.pz[idx],
-            fx - near_field.px[idx],
-            fy - near_field.py[idx],
-            fz - near_field.pz[idx] );
+            nf->px[idx],
+            nf->py[idx],
+            nf->pz[idx],
+            fx - nf->px[idx],
+            fy - nf->py[idx],
+            fz - nf->pz[idx] );
       } /* for( idx = 0; idx < npts; idx++ ) */
 
     } /* if( isFlagSet(DRAW_POYNTING) ) */
-  } /* if( isFlagSet(ENABLE_NEAREH) && near_field.valid ) */
+  } /* if( isFlagSet(ENABLE_NEAREH) && NF_FSTEP_AVAILABLE(fstep) ) */
 
   /* Save radiation pattern data if possible */
   if( isFlagSet(ENABLE_RDPAT) && (calc_data.freq_step >= 0) )
@@ -560,13 +563,16 @@ void Save_Currents_CSV(char *filename)
 {
 	FILE *fp = NULL;
 
-	if (!crnt.valid)
+	int fstep = calc_data.freq_step;
+	if( !CRNT_FSTEP_AVAILABLE(fstep) )
 	{
 		Notice(GTK_BUTTONS_OK, _("Save Currents and Charges to CSV"),
 			_("You must enable current data by clicking \"Currents\" or \"Charges\""
 			"in the main xnec2c window."));
 		return;
 	}
+
+	crnt_t *cf = &crnt_fstep[fstep];
 
 	if (!Open_File(&fp, filename, "w"))
 		return;
@@ -592,14 +598,14 @@ void Save_Currents_CSV(char *filename)
 			idx+1, data.itag[idx],
 
 			// Currents
-			creal(crnt.cur[idx]) * wavelength,
-			cimag(crnt.cur[idx]) * wavelength,
-			cabs(crnt.cur[idx]) * wavelength,
+			creal(cf->cur[idx]) * wavelength,
+			cimag(cf->cur[idx]) * wavelength,
+			cabs(cf->cur[idx]) * wavelength,
 
 			// Charges
-			crnt.bir[idx] * charge_scale,
-			crnt.bii[idx] * charge_scale,
-			cabs(cmplx(crnt.bir[idx], crnt.bii[idx])) * charge_scale,
+			cf->bir[idx] * charge_scale,
+			cf->bii[idx] * charge_scale,
+			cabs(cmplx(cf->bir[idx], cf->bii[idx])) * charge_scale,
 
 			// Segment endpoints
 			data.x1[idx], data.y1[idx], data.z1[idx],
@@ -621,13 +627,16 @@ void Save_Patch_Currents_CSV(char *filename)
 {
 	FILE *fp = NULL;
 
-	if (!crnt.valid)
+	int fstep = calc_data.freq_step;
+	if( !CRNT_FSTEP_AVAILABLE(fstep) )
 	{
 		Notice(GTK_BUTTONS_OK, _("Save Patch Currents to CSV"),
 			_("You must enable current data by clicking \"Currents\" or \"Charges\" "
 			"in the main xnec2c window."));
 		return;
 	}
+
+	crnt_t *cf = &crnt_fstep[fstep];
 
 	if (data.m == 0)
 	{
@@ -653,9 +662,9 @@ void Save_Patch_Currents_CSV(char *filename)
 	{
 		/* Patch current stored as 3 consecutive xyz components starting at data.n */
 		j = data.n + idx * 3;
-		cx = crnt.cur[j];
-		cy = crnt.cur[j + 1];
-		cz = crnt.cur[j + 2];
+		cx = cf->cur[j];
+		cy = cf->cur[j + 1];
+		cz = cf->cur[j + 2];
 
 		/* Project current onto t1 and t2 tangent vectors */
 		ct1 = cx * (double)data.t1x[idx] +

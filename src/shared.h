@@ -228,6 +228,9 @@ extern rad_pattern_t *rad_pattern ;
 /* Near E/H field data */
 extern near_field_t near_field;
 
+/* Per-frequency-step near field storage */
+extern near_field_t *near_field_fstep;
+
 /* Segments for drawing structure */
 extern Segment_t *structure_segs ;
 
@@ -260,6 +263,9 @@ extern double *cmag, *ct1m, *ct2m;
 
 /* common  /crnt/ */
 extern crnt_t crnt;
+
+/* Per-frequency-step crnt storage */
+extern crnt_t *crnt_fstep;
 
 /* common  /dataj/ */
 extern dataj_t dataj;

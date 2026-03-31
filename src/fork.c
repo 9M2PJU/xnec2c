@@ -47,7 +47,6 @@ Child_Input_File( void )
 
   /* Initialize xnec2c child */
   New_Frequency_Reset_Prev();
-  crnt.newer = crnt.valid = 0;
 
 } /* Child_Input_FIle() */
 
@@ -234,8 +233,8 @@ Pass_Freq_Data( void )
       sizeof( char );
   }
 
-  /* Near field data if enabled */
-  if( isFlagSet(DRAW_EHFIELD) )
+  /* Near field data if NE/NH cards present in NEC file */
+  if( isFlagSet(ENABLE_NEAREH) )
   {
     /* Notify parent to read near field data */
     Write_Pipe( num_child_procs, "nfeh", 4, TRUE );
@@ -274,10 +273,6 @@ Pass_Freq_Data( void )
 
   cnt = (size_t)data.np3m * sizeof( complex double );
   Mem_Copy( buff, (char *)crnt.cur, cnt, WRITE );
-
-  cnt = sizeof( char );
-  Mem_Copy( buff, &crnt.newer, cnt, WRITE );
-  Mem_Copy( buff, &crnt.valid, cnt, WRITE );
 
   /* Impedance data */
   cnt = sizeof(double);
@@ -323,7 +318,7 @@ Pass_Freq_Data( void )
   }
 
   /* Near field data */
-  if( isFlagSet(DRAW_EHFIELD) )
+  if( isFlagSet(ENABLE_NEAREH) )
   {
     /* Magnitude and phase of E field */
     if( fpat.nfeh & NEAR_EFIELD )
@@ -369,11 +364,8 @@ Pass_Freq_Data( void )
     cnt = sizeof(double);
     Mem_Copy( buff, (char *)&near_field.r_max, cnt, WRITE );
 
-    cnt = sizeof( char );
-    Mem_Copy( buff, &near_field.newer, cnt, WRITE );
-    Mem_Copy( buff, &near_field.valid, cnt, WRITE );
 
-  } /* if( isFlagSet(DRAW_EHFIELD) ) */
+  } /* if( isFlagSet(ENABLE_NEAREH) ) */
 
   /* Pass data accumulated in buffer if child */
   Write_Pipe( num_child_procs, buff, (ssize_t)buff_size, TRUE );
@@ -660,10 +652,6 @@ Get_Freq_Data( int idx, int fstep )
   cnt = (size_t)data.np3m * sizeof( complex double );
   Mem_Copy( buff, (char *)crnt.cur, cnt, READ );
 
-  cnt = sizeof( char );
-  Mem_Copy( buff, &crnt.newer, cnt, READ );
-  Mem_Copy( buff, &crnt.valid, cnt, READ );
-
   /* Get impedance data */
   cnt = sizeof(double);
   Mem_Copy( buff, (char *)&impedance_data.zreal[fstep],  cnt, READ );
@@ -750,11 +738,8 @@ Get_Freq_Data( int idx, int fstep )
     cnt = sizeof(double);
     Mem_Copy( buff, (char *)&near_field.r_max, cnt, READ );
 
-    cnt = sizeof( char );
-    Mem_Copy( buff, &near_field.newer, cnt, READ );
-    Mem_Copy( buff, &near_field.valid, cnt, READ );
 
-  } /*if( isFlagSet(DRAW_EHFIELD) ) */
+  } /* if nfeh */
 
   free_ptr( (void **)&buff );
 

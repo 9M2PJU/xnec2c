@@ -73,6 +73,44 @@ Alloc_Nearfield_Buffers(int nrx, int nry, int nrz)
 {
 }
 
+/* Stub for per-frequency-step crnt buffer allocation */
+void
+Alloc_Crnt_Fstep_Buffers(int nfrq)
+{
+}
+
+/* Stub for per-frequency-step crnt buffer free */
+void
+Free_Crnt_Fstep_Buffers(void)
+{
+}
+
+/* Stub for per-frequency-step crnt save */
+void
+Save_Crnt_Data(int fstep)
+{
+}
+
+
+/* Stub for per-frequency-step nearfield buffer allocation */
+void
+Alloc_Nearfield_Fstep_Buffers(int nfrq)
+{
+}
+
+/* Stub for per-frequency-step nearfield buffer free */
+void
+Free_Nearfield_Fstep_Buffers(void)
+{
+}
+
+/* Stub for per-frequency-step nearfield save */
+void
+Save_Nearfield_Data(int fstep)
+{
+}
+
+
 /* Stub for frequency loop */
 gboolean
 Frequency_Loop(gpointer udata)
