@@ -2693,18 +2693,12 @@ on_near_peak_value_activate(
 {
   if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
   {
-    ClearFlag( NEAREH_SNAPSHOT );
-
-    /* Redraw radiation pattern drawingarea */
+    int fstep = calc_data.freq_step;
+    Recompute_Near_Field_Vectors( fstep, FALSE );
     if( isFlagSet(DRAW_EHFIELD) )
-    {
       xnec2_widget_queue_draw( rdpattern_drawingarea );
-    }
   }
-  else SetFlag( NEAREH_SNAPSHOT );
-
-  /* Reset child near field flags */
-  Pass_EH_Flags();
+  /* else: on_near_snapshot_activate fires for the newly-selected item */
 }
 
 
@@ -2713,20 +2707,14 @@ on_near_snapshot_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
 {
-  if( gtk_check_menu_item_get_active(
-        GTK_CHECK_MENU_ITEM(menuitem)) )
+  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
   {
-    SetFlag( NEAREH_SNAPSHOT );
-    /* Redraw radiation pattern drawingarea */
+    int fstep = calc_data.freq_step;
+    Recompute_Near_Field_Vectors( fstep, TRUE );
     if( isFlagSet(DRAW_EHFIELD) )
-    {
       xnec2_widget_queue_draw( rdpattern_drawingarea );
-    }
   }
-  else ClearFlag( NEAREH_SNAPSHOT );
-
-  /* Reset child near field flags */
-  Pass_EH_Flags();
+  /* else: on_near_peak_value_activate fires for the newly-selected item */
 }
 
 

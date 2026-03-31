@@ -208,8 +208,6 @@ Pass_Freq_Data( void )
     (size_t)(6 * data.npm) * sizeof( double ) +
     /* Complex current (crnt.cur) */
     (size_t)data.np3m * sizeof( complex double ) +
-    /* newer and valid flags */
-    2 * sizeof(char) +
     /* Impedance data */
     4 * sizeof(double) +
     /* Network data */
@@ -249,9 +247,7 @@ Pass_Freq_Data( void )
         (size_t)( 10 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
     /* Co-ordinates of field points */
     buff_size +=
-      (size_t)( 3 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double) +
-      /* newer & valid flags */
-      2 * sizeof(char);
+      (size_t)( 3 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
   }
   else /* Notify parent not to read near field data */
     Write_Pipe( num_child_procs, "noeh", 4, TRUE );
@@ -453,36 +449,6 @@ Child_Process( int num_child )
         Pass_Freq_Data();
         break;
 
-      case EHFIELD: /* Calculate near field E/H data */
-        {
-          /* Get near field flags */
-          char flag;
-
-          /* Set near field flags */
-          cnt = sizeof( flag );
-          Read_Pipe( num_child, &flag, (ssize_t)cnt, TRUE );
-
-          if( flag & E_HFIELD )
-            SetFlag( DRAW_EHFIELD );
-          else
-            ClearFlag( DRAW_EHFIELD );
-
-          if( flag & SNAPSHOT )
-            SetFlag( NEAREH_SNAPSHOT );
-          else
-            ClearFlag( NEAREH_SNAPSHOT );
-
-          if( flag & EFIELD )
-            SetFlag( DRAW_EFIELD );
-          else
-            ClearFlag( DRAW_EFIELD );
-
-          if( flag & HFIELD )
-            SetFlag( DRAW_HFIELD );
-          else
-            ClearFlag( DRAW_HFIELD );
-        }
-
     } /* switch( Command(cmnd) ) */
   } /* while( TRUE ) */
 
@@ -578,8 +544,6 @@ Get_Freq_Data( int idx, int fstep )
     (size_t)(6 * data.npm) * sizeof( double ) +
     /* Complex current (crnt.cur) */
     (size_t)data.np3m * sizeof( complex double ) +
-    /* newer and valid flags */
-    2 * sizeof(char) +
     /* Impedance data */
     4 * sizeof(double) +
     /* Network data */
@@ -622,9 +586,7 @@ Get_Freq_Data( int idx, int fstep )
         (size_t)( 10 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
     /* Co-ordinates of field points */
     buff_size +=
-      (size_t)( 3 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double) +
-      /* newer & valid flags */
-      2 * sizeof(char);
+      (size_t)( 3 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
   }
 
   /* Allocate data buffer */

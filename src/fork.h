@@ -25,22 +25,15 @@
 /* Parent/child commands
  * Note: these must be 7 bytes long.  This is hard-coded!
  */
-#define FORK_CMNDS { "inpfile", "frqdata", "nearehf", "mathlib" }
+#define FORK_CMNDS { "inpfile", "frqdata", "mathlib" }
 
 /* Indices for parent/child commands */
 enum P2CH_COMND
 {
   INFILE = 0,
   FRQDATA,
-  EHFIELD,
   MATHLIB,
   NUM_FKCMNDS
 };
-
-/* Near Field select flags */
-#define E_HFIELD    0x01
-#define SNAPSHOT    0x02
-#define EFIELD      0x04
-#define HFIELD      0x08
 
 #endif

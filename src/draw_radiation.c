@@ -1301,6 +1301,84 @@ Free_Nearfield_Fstep_Buffers( void )
 /*-----------------------------------------------------------------------*/
 
 /**
+ * Recompute_Near_Field_Vectors() - Recompute rendered near-field vectors from cached amplitude+phase
+ *
+ * @fstep: Frequency step index
+ * @snapshot: TRUE for instantaneous (phase=0), FALSE for peak envelope
+ *
+ * Overwrites erx/ery/erz/er and hrx/hry/hrz/hr in near_field_fstep[fstep]
+ * from the immutable amplitude (ex/ey/ez) and phase (fex/fey/fez) arrays.
+ * Phase values are stored in radians.
+ */
+  void
+Recompute_Near_Field_Vectors( int fstep, gboolean snapshot )
+{
+  int i, npts;
+
+  if( !NF_FSTEP_AVAILABLE(fstep) )
+    return;
+
+  near_field_t *nf = &near_field_fstep[fstep];
+  npts = fpat.nrx * fpat.nry * fpat.nrz;
+
+  if( fpat.nfeh & NEAR_EFIELD )
+  {
+    nf->max_er = 0.0;
+    for( i = 0; i < npts; i++ )
+    {
+      if( snapshot )
+      {
+        /* Instantaneous field at phase=0: real part of E*exp(j*0) */
+        nf->erx[i] = nf->ex[i] * cos( nf->fex[i] );
+        nf->ery[i] = nf->ey[i] * cos( nf->fey[i] );
+        nf->erz[i] = nf->ez[i] * cos( nf->fez[i] );
+        nf->er[i]  = sqrt( nf->erx[i]*nf->erx[i] +
+                           nf->ery[i]*nf->ery[i] +
+                           nf->erz[i]*nf->erz[i] );
+      }
+      else
+      {
+        Nf_Peak_Vector( nf->ex[i], nf->ey[i], nf->ez[i],
+                        nf->fex[i], nf->fey[i], nf->fez[i],
+                        &nf->erx[i], &nf->ery[i], &nf->erz[i], &nf->er[i] );
+      }
+
+      if( nf->max_er < nf->er[i] )
+        nf->max_er = nf->er[i];
+    }
+  }
+
+  if( fpat.nfeh & NEAR_HFIELD )
+  {
+    nf->max_hr = 0.0;
+    for( i = 0; i < npts; i++ )
+    {
+      if( snapshot )
+      {
+        nf->hrx[i] = nf->hx[i] * cos( nf->fhx[i] );
+        nf->hry[i] = nf->hy[i] * cos( nf->fhy[i] );
+        nf->hrz[i] = nf->hz[i] * cos( nf->fhz[i] );
+        nf->hr[i]  = sqrt( nf->hrx[i]*nf->hrx[i] +
+                           nf->hry[i]*nf->hry[i] +
+                           nf->hrz[i]*nf->hrz[i] );
+      }
+      else
+      {
+        Nf_Peak_Vector( nf->hx[i], nf->hy[i], nf->hz[i],
+                        nf->fhx[i], nf->fhy[i], nf->fhz[i],
+                        &nf->hrx[i], &nf->hry[i], &nf->hrz[i], &nf->hr[i] );
+      }
+
+      if( nf->max_hr < nf->hr[i] )
+        nf->max_hr = nf->hr[i];
+    }
+  }
+
+} /* Recompute_Near_Field_Vectors() */
+
+/*-----------------------------------------------------------------------*/
+
+/**
  * Save_Nearfield_Data() - Save current near field data for a frequency step
  *
  * @fstep: Frequency step index

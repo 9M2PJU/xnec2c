@@ -12505,7 +12505,7 @@ Save NEC2 Editor data first?
                                           <object class="GtkRadioMenuItem" id="near_snapshot">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
-                                            <property name="label" translatable="yes">_Snapshot</property>
+                                            <property name="label" translatable="yes">_Instantaneous (φ=0)</property>
                                             <property name="use-underline">True</property>
                                             <property name="draw-as-radio">True</property>
                                             <property name="group">near_peak_value</property>

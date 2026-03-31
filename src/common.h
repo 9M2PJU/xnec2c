@@ -176,7 +176,6 @@ typedef struct Segment
 #define DRAW_NEW_RDPAT      0x0000000020000000ll
 #define DRAW_NEW_EHFIELD    0x0000000040000000ll
 #define OVERLAY_STRUCT      0x0000000080000000ll
-#define NEAREH_SNAPSHOT     0x0000000100000000ll
 #define NEAREH_ANIMATE      0x0000000200000000ll
 #define ENABLE_RDPAT        0x0000000400000000ll
 #define ENABLE_NEAREH       0x0000000800000000ll
@@ -1147,7 +1146,8 @@ void Filechooser_Response(GtkDialog *dialog, gint response_id, int saveas_width,
 void Open_Nec2_Editor(int action);
 gboolean Nec2_Apply_Checkbutton(void);
 void Gtk_Quit(void);
-void Pass_EH_Flags(void);
+void Nf_Peak_Vector(double exm, double eym, double ezm, double fx, double fy, double fz, double *rx, double *ry, double *rz, double *r);
+void Recompute_Near_Field_Vectors(int fstep, gboolean snapshot);
 void Draw_Colorcode(cairo_t *cr);
 void Gtk_Widget_Destroy(GtkWidget **widget);
 /* callbacks.c */

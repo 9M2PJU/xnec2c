@@ -643,7 +643,6 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
     if( FORKED )
     {
       Alloc_Nearfield_Buffers(fpat.nrx, fpat.nry, fpat.nrz);
-      Pass_EH_Flags();
     }
 
     /* Redraw radiation pattern drawingarea */
@@ -670,9 +669,6 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
       xnec2_widget_queue_draw( rdpattern_drawingarea );
     }
 
-    /* Disable near field calculations
-     * by child processes if forked */
-    Pass_EH_Flags();
   }
 
 } /* Rdpattern_EH_Togglebutton_Toggled() */
@@ -1141,37 +1137,6 @@ Gtk_Quit( void )
 
 /*-----------------------------------------------------------------------*/
 
-/* Pass_EH_Flags
- *
- * Passes near field related flags to child processes
- */
-  void
-Pass_EH_Flags( void )
-{
-  char flag;
-  size_t cnt;
-  int idx;
-
-  /* Abort if not forked */
-  if( !FORKED ) return;
-
-  /* Tell child process to calculate near field data */
-  cnt = strlen( fork_commands[EHFIELD] );
-  for( idx = 0; idx < calc_data.num_jobs; idx++ )
-    Write_Pipe( idx, fork_commands[EHFIELD], (ssize_t)cnt, TRUE );
-
-  /* Tell child to set near field flags */
-  flag = 0;
-  if( isFlagSet(DRAW_EHFIELD) )    flag |= 0x01;
-  if( isFlagSet(NEAREH_SNAPSHOT) ) flag |= 0x02;
-  if( isFlagSet(DRAW_EFIELD) )     flag |= 0x04;
-  if( isFlagSet(DRAW_HFIELD) )     flag |= 0x08;
-
-  cnt = sizeof( flag );
-  for( idx = 0; idx < calc_data.num_jobs; idx++ )
-    Write_Pipe( idx, &flag, (ssize_t)cnt, TRUE );
-
-} /* Pass_EH_Flags */
 
 /*-----------------------------------------------------------------------*/
 

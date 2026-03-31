@@ -1492,6 +1492,43 @@ nhfld( double xob, double yob,
 
 /*-----------------------------------------------------------------------*/
 
+/**
+ * Nf_Peak_Vector() - Compute peak near-field vector from amplitude and phase
+ *
+ * @exm: Field magnitude in x; @eym: in y; @ezm: in z
+ * @fx: Phase in radians in x; @fy: in y; @fz: in z
+ * @rx: Peak component in x (out); @ry: in y (out); @rz: in z (out)
+ * @r: Peak total magnitude (out)
+ *
+ * Computes the optimal-phase peak envelope vector. Phase values must be
+ * in radians. Used during sweep and for on-demand parent-side recomputation.
+ */
+  void
+Nf_Peak_Vector(
+    double exm, double eym, double ezm,
+    double fx,  double fy,  double fz,
+    double *rx, double *ry, double *rz, double *r )
+{
+  double exm2, eym2, ezm2, cp, sp, tp, wt;
+
+  exm2 = exm*exm;
+  eym2 = eym*eym;
+  ezm2 = ezm*ezm;
+
+  cp = exm2*cos(2*fx) + eym2*cos(2*fy) + ezm2*cos(2*fz);
+  sp = exm2*sin(2*fx) + eym2*sin(2*fy) + ezm2*sin(2*fz);
+  tp = sqrt(cp*cp + sp*sp);
+  wt = atan2(-sp, cp) / 2.0;
+
+  *rx = exm * cos(wt + fx);
+  *ry = eym * cos(wt + fy);
+  *rz = ezm * cos(wt + fz);
+  *r  = sqrt( (exm2 + eym2 + ezm2 + tp) / 2.0 );
+
+} /* Nf_Peak_Vector() */
+
+/*-----------------------------------------------------------------------*/
+
 /* Near_Field_Total()
  *
  * Calculates the value of Total Near Field vector
@@ -1503,93 +1540,30 @@ Near_Field_Total(
     complex double ez,
     int nfeh, int idx )
 {
-  /* Display a time-frozen "snapshot" of near field */
-  if( isFlagSet(NEAREH_SNAPSHOT) )
+  /* Display Total near field vector peak */
   {
-    if( nfeh == 1 ) /* Magnetic field */
-    {
-      /* Near magnetic field components */
-      near_field.hrx[idx] = (double)creal(ex);
-      near_field.hry[idx] = (double)creal(ey);
-      near_field.hrz[idx] = (double)creal(ez);
-
-      /* Near total magnetic field vector*/
-      near_field.hr[idx]  = sqrt(
-          near_field.hrx[idx] * near_field.hrx[idx] +
-          near_field.hry[idx] * near_field.hry[idx] +
-          near_field.hrz[idx] * near_field.hrz[idx] );
-      if( near_field.max_hr < near_field.hr[idx] )
-        near_field.max_hr = near_field.hr[idx];
-    }
-    else /* Electric field */
-    {
-      /* Near electric field components */
-      /* Near electric field components */
-      near_field.erx[idx] = (double)creal(ex);
-      near_field.ery[idx] = (double)creal(ey);
-      near_field.erz[idx] = (double)creal(ez);
-
-      /* Near total electric field vector */
-      near_field.er[idx]  = sqrt(
-          near_field.erx[idx] * near_field.erx[idx] +
-          near_field.ery[idx] * near_field.ery[idx] +
-          near_field.erz[idx] * near_field.erz[idx] );
-      if( near_field.max_er < near_field.er[idx] )
-        near_field.max_er = near_field.er[idx];
-    } /* if( nfeh == 1 ) */
-
-  } /* if( isFlagSet(NEAREH_SNAPSHOT) ) */
-  else /* Display Total near field vector peak */
-  {
-    double
-      exm, eym, ezm,    /* Near field magnitude in x, y, z    */
-      exm2, eym2, ezm2, /* Near field magnitude^2 in x, y, z  */
-      fx, fy, fz,       /* Time phase of near field vectors   */
-      fx2, fy2, fz2,    /* Time phase of near field vectors*2 */
-      cp, sp, tp, wt;   /* Some values needed in calculations */
+    double exm, eym, ezm, fx, fy, fz;
 
     exm = (double)cabs(ex);
     eym = (double)cabs(ey);
     ezm = (double)cabs(ez);
-    /* Near total electric field vector */
     fx  = (double)cang(ex)/(double)TODEG;
     fy  = (double)cang(ey)/(double)TODEG;
     fz  = (double)cang(ez)/(double)TODEG;
 
-    fx2 = fx * 2.0;
-    fy2 = fy * 2.0;
-    fz2 = fz * 2.0;
-
-    exm2 = exm*exm;
-    eym2 = eym*eym;
-    ezm2 = ezm*ezm;
-
-    cp = exm2*cos(fx2) + eym2*cos(fy2) + ezm2*cos(fz2);
-    sp = exm2*sin(fx2) + eym2*sin(fy2) + ezm2*sin(fz2);
-    tp = sqrt(cp*cp + sp*sp);
-    wt = atan2(-sp, cp)/2.0;
-
     if( nfeh == 1 ) /* Magnetic field */
     {
-      /* Near magnetic field components */
-      near_field.hrx[idx] = exm * cos(wt + fx);
-      near_field.hry[idx] = eym * cos(wt + fy);
-      near_field.hrz[idx] = ezm * cos(wt + fz);
-
-      /* Near total magnetic field vector, peak value */
-      near_field.hr[idx]  = sqrt( (exm2 + eym2 + ezm2 + tp)/2.0 );
+      Nf_Peak_Vector( exm, eym, ezm, fx, fy, fz,
+                      &near_field.hrx[idx], &near_field.hry[idx],
+                      &near_field.hrz[idx], &near_field.hr[idx] );
       if( near_field.max_hr < near_field.hr[idx] )
         near_field.max_hr = near_field.hr[idx];
     }
     else /* Electric field */
     {
-      /* Near electric field components */
-      near_field.erx[idx] = exm * cos(wt + fx);
-      near_field.ery[idx] = eym * cos(wt + fy);
-      near_field.erz[idx] = ezm * cos(wt + fz);
-
-      /* Near total electric field vector, peak value */
-      near_field.er[idx]  = sqrt( (exm2 + eym2 + ezm2 + tp)/2.0 );
+      Nf_Peak_Vector( exm, eym, ezm, fx, fy, fz,
+                      &near_field.erx[idx], &near_field.ery[idx],
+                      &near_field.erz[idx], &near_field.er[idx] );
       if( near_field.max_er < near_field.er[idx] )
         near_field.max_er = near_field.er[idx];
     }
