@@ -173,8 +173,8 @@ gulong structure_motion_handler;
 /* Commands between parent and child processes */
 char *fork_commands[] = FORK_CMNDS;
 
-/* Forked process data */
-forked_proc_data_t **forked_proc_data = NULL;
+/* Child process descriptors */
+child_proc_t **child_procs = NULL;
 
 /* Number of forked child processes */
 int num_child_procs = 0;

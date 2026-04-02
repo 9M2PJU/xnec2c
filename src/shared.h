@@ -82,8 +82,8 @@ extern int need_structure_redraw;
 /* Commands between parent and child processes */
 extern char *fork_commands[];
 
-/* Forked process data */
-extern forked_proc_data_t **forked_proc_data;
+/* Child process descriptors */
+extern child_proc_t **child_procs;
 
 extern projection_parameters_t
   rdpattern_proj_params,

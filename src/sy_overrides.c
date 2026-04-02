@@ -469,25 +469,6 @@ is_calculation_busy(void)
   {
     return TRUE;
   }
-  else
-  {
-    /* Check child processes for busy state */
-  }
-
-  for( i = 0; i < num_child_procs; i++ )
-  {
-    if( forked_proc_data != NULL &&
-        forked_proc_data[i] != NULL &&
-        forked_proc_data[i]->busy )
-    {
-      return TRUE;
-    }
-    else
-    {
-      /* Process not busy or does not exist */
-    }
-  }
-
   return FALSE;
 }
 

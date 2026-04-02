@@ -265,7 +265,6 @@ int inotify_open(struct pollfd *pfd)
 Optimizer_Output( void *arg )
 {
   int fd = -1, poll_num;
-  int job_num, num_busy_procs;
   struct pollfd pfd;
   char buf[256] __attribute__ ((aligned(__alignof__(struct inotify_event))));
   const struct inotify_event *event;
@@ -340,18 +339,6 @@ Optimizer_Output( void *arg )
 				isFlagSet(FREQ_LOOP_INIT) ? 1 : 0,
 				isFlagSet(INPUT_PENDING) ? 1 : 0,
 				isFlagSet(FREQ_LOOP_DONE) ? 1 : 0);
-			continue;
-		}
-
-		num_busy_procs = 0;
-		for (job_num = 0; job_num < calc_data.num_jobs; job_num++)
-			if (forked_proc_data != NULL && forked_proc_data[job_num] != NULL && forked_proc_data[job_num]->busy)
-				num_busy_procs++;
-
-		if (num_busy_procs)
-		{
-			pr_debug("inotify: SKIP all events (%d busy children)\n", num_busy_procs);
-			usleep(100000);
 			continue;
 		}
 

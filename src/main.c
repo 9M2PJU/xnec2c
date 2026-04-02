@@ -411,21 +411,24 @@ main (int argc, char *argv[])
   /* Allocate buffers for fork data */
   if( calc_data.num_jobs >= 1 && enable_forking )
   {
-    size_t mreq = (size_t)calc_data.num_jobs * sizeof(forked_proc_data_t *);
-    mem_alloc( (void **)&forked_proc_data, mreq, "in main.c" );
+    size_t mreq = (size_t)calc_data.num_jobs * sizeof(child_proc_t *);
+    mem_alloc( (void **)&child_procs, mreq, "in main.c" );
     for( idx = 0; idx < calc_data.num_jobs; idx++ )
     {
-      forked_proc_data[idx] = NULL;
-      mreq = sizeof(forked_proc_data_t);
-      mem_alloc( (void **)&forked_proc_data[idx], mreq, "in main.c" );
+      child_procs[idx] = NULL;
+      mreq = sizeof(child_proc_t);
+      mem_alloc( (void **)&child_procs[idx], mreq, "in main.c" );
     }
 
     pr_info("Forking %d jobs.\n", calc_data.num_jobs);
     /* Fork child processes */
     for( idx = 0; idx < calc_data.num_jobs; idx++ )
     {
+      child_procs[idx]->idx           = idx;
+      child_procs[idx]->assigned_step = -1;
+
       /* Make pipes to transfer data */
-      err = pipe( forked_proc_data[idx]->pnt2child_pipe );
+      err = pipe( child_procs[idx]->to_child );
       if( err )
       {
         perror( "pipe()" );
@@ -433,7 +436,7 @@ main (int argc, char *argv[])
         exit(-1);
       }
 
-      err = pipe( forked_proc_data[idx]->child2pnt_pipe );
+      err = pipe( child_procs[idx]->from_child );
       if( err )
       {
         perror( "pipe()" );
@@ -442,32 +445,21 @@ main (int argc, char *argv[])
       }
 
       /* Fork child process */
-      forked_proc_data[idx]->child_pid = fork();
-      if( forked_proc_data[idx]->child_pid == -1 )
+      child_procs[idx]->pid = fork();
+      if( child_procs[idx]->pid == -1 )
       {
         perror( "fork()" );
         pr_crit("exiting after fatal error: fork() failed");
         exit(-1);
       }
-      else child_pid = forked_proc_data[idx]->child_pid;
+      else child_pid = child_procs[idx]->pid;
 
       /* Child get out of forking loop! */
       if( CHILD ) Child_Process( idx );
 
-      /* Ready to accept a job */
-      forked_proc_data[idx]->busy = FALSE;
-
-      /* Close unwanted pipe ends */
-      close( forked_proc_data[idx]->pnt2child_pipe[READ] );
-      close( forked_proc_data[idx]->child2pnt_pipe[WRITE] );
-
-      /* Set file descriptors for select() */
-      FD_ZERO( &forked_proc_data[idx]->read_fds );
-      FD_SET( forked_proc_data[idx]->child2pnt_pipe[READ],
-          &forked_proc_data[idx]->read_fds );
-      FD_ZERO( &forked_proc_data[idx]->write_fds );
-      FD_SET( forked_proc_data[idx]->pnt2child_pipe[WRITE],
-          &forked_proc_data[idx]->write_fds );
+      /* Close unwanted pipe ends (parent keeps to_child[WRITE] and from_child[READ]) */
+      close( child_procs[idx]->to_child[READ] );
+      close( child_procs[idx]->from_child[WRITE] );
 
       /* Count child processes */
       num_child_procs++;
@@ -620,9 +612,7 @@ Open_Input_File( gpointer arg )
   g_mutex_lock(&freq_data_lock);
   calc_data.freq_step = -1;
   calc_data.FR_cards    = 0;
-  calc_data.FR_index    = 0;
   calc_data.steps_total = 0;
-  calc_data.last_step   = 0;
 
   free_ptr((void**)&fr_plots);
   g_mutex_unlock(&freq_data_lock);
@@ -895,7 +885,7 @@ static void sig_handler( int signal )
         else
         {
           for( idx = 0; idx < calc_data.num_jobs; idx++ )
-            if( forked_proc_data[idx]->child_pid == pid )
+            if( child_procs[idx]->pid == pid )
             {
               pr_crit("child process pid %d exited\n", pid);
               if( isFlagSet(MAIN_QUIT) ) return;
@@ -914,7 +904,7 @@ static void sig_handler( int signal )
     while( num_child_procs )
     {
       num_child_procs--;
-      kill( forked_proc_data[num_child_procs]->child_pid, SIGKILL );
+      kill( child_procs[num_child_procs]->pid, SIGKILL );
     }
 
   Close_File( &input_fp );

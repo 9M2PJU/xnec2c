@@ -811,10 +811,6 @@ _Draw_Radiation( cairo_t *cr )
   if( isFlagClear(ENABLE_EXCITN) )
     return FALSE;
 
-  // Try to hold the lock to prevent drawing the radiation pattern
-  // since it could be drawing while inotify triggers a new freqloop:
-  int locked = g_mutex_trylock(&global_lock);
-
   /* Draw rad pattern or E/H fields */
   if( isFlagSet(DRAW_GAIN) )
     Draw_Radiation_Pattern( cr );
@@ -824,9 +820,6 @@ _Draw_Radiation( cairo_t *cr )
   /* Display frequency step */
   if (calc_data.freq_step >= 0)
 	  Display_Fstep( rdpattern_fstep_entry, calc_data.freq_step );
-
-  if (locked)
-	  g_mutex_unlock(&global_lock);
 
   return TRUE;
 

@@ -1406,11 +1406,26 @@ _Plot_Frequency_Data( cairo_t *cr )
       (double)freqplots_height );
   cairo_fill( cr );
   
-  /* Limit freq stepping to last freq step */
-  num_fsteps = calc_data.last_step + 1;
+  /* Build compact index list; out-of-order arrivals appear immediately */
+  static int    *valid_steps_map = NULL;
+  static double *fplot       = NULL;
+  size_t vstep_mreq = (size_t)calc_data.steps_total * sizeof(int);
+  size_t fplot_mreq = (size_t)calc_data.steps_total * sizeof(double);
+  mem_realloc( (void **)&valid_steps_map, vstep_mreq, "in plot_freqdata.c" );
+  mem_realloc( (void **)&fplot,       fplot_mreq, "in plot_freqdata.c" );
+
+  num_fsteps = 0;
+  for( idx = 0; idx < calc_data.steps_total; idx++ )
+  {
+    if( !save.fstep[idx] )
+      continue;
+    valid_steps_map[num_fsteps] = idx;
+    fplot[num_fsteps]       = save.freq[idx];
+    num_fsteps++;
+  }
 
   /* Abort if plotting is not possible FIXME */
-  if( (num_fsteps < 0) || isFlagClear(FREQ_LOOP_READY) ||
+  if( (num_fsteps <= 0) || isFlagClear(FREQ_LOOP_READY) ||
       (isFlagClear(FREQ_LOOP_RUNNING) && isFlagClear(FREQ_LOOP_DONE)) ||
 
       (isFlagClear(PLOT_GMAX)         &&
@@ -1454,7 +1469,7 @@ _Plot_Frequency_Data( cairo_t *cr )
     /* When freq loop is done, calcs are done for all freq steps */
     for( idx = 0; idx < num_fsteps; idx++ )
     {
-	  meas_calc(&meas, idx);
+	  meas_calc(&meas, valid_steps_map[idx]);
 
 	  gmax[idx] = meas.gain_max;
 	  if( isFlagSet(PLOT_NETGAIN) )
@@ -1478,14 +1493,14 @@ _Plot_Frequency_Data( cairo_t *cr )
         titles[1] = _("Max Gain & Net Gain vs Frequency");
         titles[2] = _("Net Gain dBi");
         if (num_fsteps > 0)
-          Plot_Graph(cr, gmax, netgain, save.freq, num_fsteps, titles, posn++);
+          Plot_Graph(cr, gmax, netgain, fplot, num_fsteps, titles, posn++);
       }
       else
       {
         titles[1] = _("Max Gain & F/B Ratio vs Frequency");
         titles[2] = "        ";
         if (num_fsteps > 0)
-          Plot_Graph(cr, gmax, NULL, save.freq, num_fsteps, titles, posn++);
+          Plot_Graph(cr, gmax, NULL, fplot, num_fsteps, titles, posn++);
       }
     }
     else
@@ -1495,7 +1510,7 @@ _Plot_Frequency_Data( cairo_t *cr )
       titles[1] = _("Max Gain & F/B Ratio vs Frequency");
       titles[2] = _("F/B Ratio dB");
       if (num_fsteps > 0)
-        Plot_Graph(cr, gmax, fbratio, save.freq, num_fsteps, titles, posn++);
+        Plot_Graph(cr, gmax, fbratio, fplot, num_fsteps, titles, posn++);
     }
 
     /* Plot max gain direction if enabled */
@@ -1506,7 +1521,7 @@ _Plot_Frequency_Data( cairo_t *cr )
       titles[1] = _("Max Gain Direction vs Frequency");
       titles[2] = _("Phi - deg");
       if (num_fsteps > 0)
-        Plot_Graph(cr, gdir_tht, gdir_phi, save.freq, num_fsteps, titles,
+        Plot_Graph(cr, gdir_tht, gdir_phi, fplot, num_fsteps, titles,
                    posn++);
     }
 
@@ -1525,7 +1540,7 @@ _Plot_Frequency_Data( cairo_t *cr )
 
     /* Calcs are done for all freq steps */
     for( idx = 0; idx < num_fsteps; idx++ )
-      vgain[idx] = Viewer_Gain( structure_proj_params, idx );
+      vgain[idx] = Viewer_Gain( structure_proj_params, valid_steps_map[idx] );
 
     /* Plot net gain if selected */
     if( isFlagSet(PLOT_NETGAIN) )
@@ -1535,20 +1550,20 @@ _Plot_Frequency_Data( cairo_t *cr )
 
       for( idx = 0; idx < num_fsteps; idx++ )
       {
-		  meas_calc(&meas, idx);
+		  meas_calc(&meas, valid_steps_map[idx]);
 		  netgain[idx] = meas.gain_viewer_net;
       }
 
       /* Plot net gain if selected */
       titles[2] = _("Net gain dBi");
       if (num_fsteps > 0)
-        Plot_Graph(cr, vgain, netgain, save.freq, num_fsteps, titles, posn++);
+        Plot_Graph(cr, vgain, netgain, fplot, num_fsteps, titles, posn++);
     } /* if( isFlagSet(PLOT_NETGAIN) ) */
     else
     {
       titles[2] = "        ";
       if (num_fsteps > 0)
-        Plot_Graph(cr, vgain, NULL, save.freq, num_fsteps, titles, posn++);
+        Plot_Graph(cr, vgain, NULL, fplot, num_fsteps, titles, posn++);
     }
   } /* isFlagSet(PLOT_GVIEWER) && isFlagSet(ENABLE_RDPAT) */
 
@@ -1588,10 +1603,10 @@ _Plot_Frequency_Data( cairo_t *cr )
 
     for(idx = 0; idx < num_fsteps; idx++ )
     {
-      meas_calc(&meas, idx);
-      
+      meas_calc(&meas, valid_steps_map[idx]);
+
       vswr[idx] = meas.vswr;
-      
+
       if (rc_config.freqplots_s11)
           s11[idx] = meas.s11;
 
@@ -1600,7 +1615,7 @@ _Plot_Frequency_Data( cairo_t *cr )
     }
 
     if (num_fsteps > 0)
-      Plot_Graph(cr, vswr, (rc_config.freqplots_s11 ? s11 : NULL), save.freq,
+      Plot_Graph(cr, vswr, (rc_config.freqplots_s11 ? s11 : NULL), fplot,
                  num_fsteps, titles, posn++);
 
     free_ptr( (void **)&vswr );
@@ -1608,39 +1623,48 @@ _Plot_Frequency_Data( cairo_t *cr )
   } /* if( isFlagSet(PLOT_VSWR) ) */
 
   /* Plot z-real and z-imag */
-  if( isFlagSet(PLOT_ZREAL_ZIMAG) )
+  if( isFlagSet(PLOT_ZREAL_ZIMAG) || isFlagSet(PLOT_ZMAG_ZPHASE) || isFlagSet(PLOT_SMITH) )
   {
-    /* Plotting frame titles */
-    titles[0] = _("Z-real");
-    titles[1] = _("Impedance vs Frequency");
-    titles[2] = _("Z-imag");
-    if (num_fsteps > 0)
-      Plot_Graph(cr, impedance_data.zreal, impedance_data.zimag, save.freq,
-                 num_fsteps, titles, posn++);
+    static double *zreal_c = NULL, *zimag_c = NULL;
+    static double *zmagn_c = NULL, *zphase_c = NULL;
+    size_t zmreq = (size_t)num_fsteps * sizeof(double);
+    mem_realloc( (void **)&zreal_c,  zmreq, "in plot_freqdata.c" );
+    mem_realloc( (void **)&zimag_c,  zmreq, "in plot_freqdata.c" );
+    mem_realloc( (void **)&zmagn_c,  zmreq, "in plot_freqdata.c" );
+    mem_realloc( (void **)&zphase_c, zmreq, "in plot_freqdata.c" );
+    for( idx = 0; idx < num_fsteps; idx++ )
+    {
+      int s = valid_steps_map[idx];
+      zreal_c[idx]  = impedance_data.zreal[s];
+      zimag_c[idx]  = impedance_data.zimag[s];
+      zmagn_c[idx]  = impedance_data.zmagn[s];
+      zphase_c[idx] = impedance_data.zphase[s];
+    }
 
-  } /* if( isFlagSet(PLOT_ZREAL_ZIMAG) ) */
+    if( isFlagSet(PLOT_ZREAL_ZIMAG) )
+    {
+      titles[0] = _("Z-real");
+      titles[1] = _("Impedance vs Frequency");
+      titles[2] = _("Z-imag");
+      if (num_fsteps > 0)
+        Plot_Graph(cr, zreal_c, zimag_c, fplot, num_fsteps, titles, posn++);
+    } /* if( isFlagSet(PLOT_ZREAL_ZIMAG) ) */
 
-  /* Plot z-magn and z-phase */
-  if( isFlagSet(PLOT_ZMAG_ZPHASE) )
-  {
-    /* Plotting frame titles */
-    titles[0] = _("Z-magn");
-    titles[1] = _("Impedance vs Frequency");
-    titles[2] = _("Z-phase");
-    if (num_fsteps > 0)
-      Plot_Graph(cr, impedance_data.zmagn, impedance_data.zphase, save.freq,
-                 num_fsteps, titles, posn++);
+    if( isFlagSet(PLOT_ZMAG_ZPHASE) )
+    {
+      titles[0] = _("Z-magn");
+      titles[1] = _("Impedance vs Frequency");
+      titles[2] = _("Z-phase");
+      if (num_fsteps > 0)
+        Plot_Graph(cr, zmagn_c, zphase_c, fplot, num_fsteps, titles, posn++);
+    } /* if( isFlagSet(PLOT_ZMAG_ZPHASE) ) */
 
-  } /* if( isFlagSet(PLOT_ZREAL_ZIMAG) ) */
-
-  /* Plot smith chart */
-  if( isFlagSet(PLOT_SMITH) )
-  {
-    if (num_fsteps > 0)
-      Plot_Graph_Smith(cr, impedance_data.zreal, impedance_data.zimag,
-                       save.freq, num_fsteps, posn++);
-
-  } /* if( isFlagSet(PLOT_SMITH) ) */
+    if( isFlagSet(PLOT_SMITH) )
+    {
+      if (num_fsteps > 0)
+        Plot_Graph_Smith(cr, zreal_c, zimag_c, fplot, num_fsteps, posn++);
+    } /* if( isFlagSet(PLOT_SMITH) ) */
+  }
 
   /* Plot G/T_A and antenna temperature vs frequency */
   if( isFlagSet(PLOT_ANT_TEMP) && isFlagSet(ENABLE_RDPAT) )
@@ -1654,7 +1678,7 @@ _Plot_Frequency_Data( cairo_t *cr )
 
     for( idx = 0; idx < num_fsteps; idx++ )
     {
-      meas_calc( &meas, idx );
+      meas_calc( &meas, valid_steps_map[idx] );
       gt_buf[idx] = (meas.gt > -999.0) ? meas.gt : 0.0;
 
       /* Right axis: T_ant when View toggle active, T_total otherwise */
@@ -1678,7 +1702,7 @@ _Plot_Frequency_Data( cairo_t *cr )
 
     if( num_fsteps > 0 )
       Plot_Graph( cr, gt_buf, temp_buf,
-                  save.freq, num_fsteps, titles, posn++ );
+                  fplot, num_fsteps, titles, posn++ );
 
   } /* if( isFlagSet(PLOT_ANT_TEMP) ) */
 
@@ -1946,19 +1970,11 @@ _Set_Frequency_On_Click( GdkEvent *e)
 	  }
   }
 
-  // Only redraw the plots window if we hold the lock
-  // to minimize flicker during optimization.
-  //
   // If prev_click_event is set then we are being called from Plot_Frequency_Data()
   // to update fmhz so don't redraw because Plot_Frequency_Data() is going to draw
   // after we return.
-  // 
-  if (draw_freqplot && prev_click_event == NULL && g_mutex_trylock(&global_lock))
-  {
+  if (draw_freqplot && prev_click_event == NULL)
     xnec2_widget_queue_draw( freqplots_drawingarea );
-
-	g_mutex_unlock(&global_lock);
-  }
 
   // Free the prev_click_event since it was serviced.
   if (prev_click_event != NULL)

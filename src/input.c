@@ -996,9 +996,7 @@ Read_Commands( void )
   zload.nldseg = 0;
   zload.nload  = 0;
   calc_data.FR_cards    = 0;
-  calc_data.FR_index    = 0;
   calc_data.steps_total = 0;
-  calc_data.last_step   = 0;
 
   /* Allocate some buffers */
   mreq = (size_t)data.np2m * sizeof(int);

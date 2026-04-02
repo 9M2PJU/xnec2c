@@ -137,11 +137,14 @@ Read_Pipe( int idx, char *str, ssize_t len, gboolean err )
 
   do {
 	  if(CHILD)
-		pipefd = forked_proc_data[idx]->pnt2child_pipe[READ];
+		pipefd = child_procs[idx]->to_child[READ];
 	  else
-		pipefd = forked_proc_data[idx]->child2pnt_pipe[READ];
+		pipefd = child_procs[idx]->from_child[READ];
 
-	  retval = select( 1024, &forked_proc_data[idx]->read_fds, NULL, NULL, NULL );
+	  fd_set rds;
+	  FD_ZERO( &rds );
+	  FD_SET( pipefd, &rds );
+	  retval = select( 1024, &rds, NULL, NULL, NULL );
 
 	  if (retval == -1 && errno != EINTR)
 	  {
@@ -387,19 +390,8 @@ Child_Process( int num_child )
   size_t cnt;       /* Size of data buffers for read()/write() */
 
   /* Close unwanted pipe ends */
-  close( forked_proc_data[num_child]->pnt2child_pipe[WRITE] );
-  close( forked_proc_data[num_child]->child2pnt_pipe[READ] );
-
-  /* Watch read/write pipe for i/o */
-  FD_ZERO( &forked_proc_data[num_child]->read_fds );
-
-  FD_SET( forked_proc_data[num_child]->pnt2child_pipe[READ],
-      &forked_proc_data[num_child]->read_fds );
-
-  FD_ZERO( &forked_proc_data[num_child]->write_fds );
-
-  FD_SET( forked_proc_data[num_child]->child2pnt_pipe[WRITE],
-      &forked_proc_data[num_child]->write_fds );
+  close( child_procs[num_child]->to_child[WRITE] );
+  close( child_procs[num_child]->from_child[READ] );
 
   // Scale the OpenMP resources based on the number of parallel forked jobs.
   xnec2c_set_omp_cpus();
@@ -433,6 +425,10 @@ Child_Process( int num_child )
         break;
 
       case FRQDATA: /* Calculate currents and pass on */
+        /* Dedup cache persists across sweeps in child address space;
+         * reset ensures every dispatched frequency is recomputed */
+        New_Frequency_Reset_Prev();
+
         /* Get new frequency */
         buff = (char *) &calc_data.freq_mhz;
         cnt = sizeof( double );
@@ -444,7 +440,7 @@ Child_Process( int num_child )
         /* Set flags */
         SetFlag( FREQ_LOOP_RUNNING );
 
-        /* Calculate freq data and pass to parent */
+        /* Calculate freq data */
         New_Frequency();
         Pass_Freq_Data();
         break;
@@ -468,11 +464,14 @@ Write_Pipe( int idx, char *str, ssize_t len, gboolean err )
 
   do {
 	  if( CHILD )
-		pipefd = forked_proc_data[idx]->child2pnt_pipe[WRITE];
+		pipefd = child_procs[idx]->from_child[WRITE];
 	  else
-		pipefd = forked_proc_data[idx]->pnt2child_pipe[WRITE];
+		pipefd = child_procs[idx]->to_child[WRITE];
 
-	  retval = select( 1024, NULL, &forked_proc_data[idx]->write_fds, NULL, NULL );
+	  fd_set wds;
+	  FD_ZERO( &wds );
+	  FD_SET( pipefd, &wds );
+	  retval = select( 1024, NULL, &wds, NULL, NULL );
 
 	  if (retval == -1 && errno != EINTR)
 	  {
@@ -505,7 +504,7 @@ static ssize_t PRead_Pipe(int idx, char *str, ssize_t len, gboolean err)
 	ssize_t retval;
 
 	// Repeat read() if not all data returned 
-	retval = read_exact(forked_proc_data[idx]->child2pnt_pipe[READ], str, (size_t) len);
+	retval = read_exact(child_procs[idx]->from_child[READ], str, (size_t) len);
 	if (retval < 0)
 	{
 		perror("read()");

@@ -1014,10 +1014,8 @@ typedef struct
 
   int
     FR_cards,     /* Number of FR cards in input file */
-    FR_index,     /* Index to FR card data in use */
     freq_step,    /* Frequency step in frequency loop */
-    steps_total,  /* Total number of frequency steps */
-    last_step;    /* Last frequency step */
+    steps_total;  /* Total number of frequency steps */
 
   double
     fmhz_save,  /* Saved value of frequency clicked on by user in plots window */
@@ -1089,20 +1087,17 @@ typedef struct
 
 } near_field_t;
 
-/* Forked processes data */
+/* Child process descriptor */
 typedef struct
 {
-  pid_t child_pid;          /* Child pid */
-  int pnt2child_pipe[2];    /* Parent-to-child write pipe */
-  int child2pnt_pipe[2];    /* Child-to-parent write pipe */
-  char busy;                /* Child process busy flag */
-  int fstep;                /* Frequency step assigned to child */
+  int   idx;             /* Index into child_procs[]; used by Write_Pipe/Get_Freq_Data */
+  pid_t pid;             /* Child PID */
+  int   to_child[2];     /* Pipe parent→child: [READ]=child reads, [WRITE]=parent writes */
+  int   from_child[2];   /* Pipe child→parent: [READ]=parent reads, [WRITE]=child writes */
+  int   assigned_step;   /* Frequency step in progress; -1 = idle */
 
-  /* File descriptor sets for select() */
-  fd_set read_fds;
-  fd_set write_fds;
+} child_proc_t;
 
-} forked_proc_data_t;
 
 enum
 {

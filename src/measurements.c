@@ -323,9 +323,9 @@ void meas_calc(measurement_t *m, int idx)
 	// It should be fixed in commit 42afbe3a3, but just in case:
 	if (mgidx < 0)
 	{
-		BUG("BUG: invalid mgidx=%d: idx=%d pol=%d fstep=%d last_step=%d freq_step=%d\n",
-			mgidx, idx, pol, calc_data.last_step + 1,
-			calc_data.last_step, calc_data.freq_step);
+		BUG("BUG: invalid mgidx=%d: idx=%d pol=%d num_fsteps=%d freq_step=%d\n",
+			mgidx, idx, pol, calc_data.freq_step + 1,
+			calc_data.freq_step);
 		BUG("BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d\n", idx,
 			save.fstep[idx], isFlagSet(FREQ_LOOP_STOP));
 		mem_backtrace(rad_pattern[idx].max_gain_idx);

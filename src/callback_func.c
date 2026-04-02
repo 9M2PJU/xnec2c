@@ -1125,7 +1125,7 @@ Gtk_Quit( void )
     while( num_child_procs )
     {
       num_child_procs--;
-      kill( forked_proc_data[num_child_procs]->child_pid, SIGKILL );
+      kill( child_procs[num_child_procs]->pid, SIGKILL );
     }
 
   /* Kill possibly nested loops */
