@@ -39,5 +39,12 @@ void opengl_settings_sync_from_config(void);
 /** on_ortho_toggled - Toolbar toggle handler for orthographic projection (both windows) */
 void on_ortho_toggled(GtkToggleButton *button, gpointer user_data);
 
+/* Returns TRUE if GL context creation failed at realize time */
+gboolean opengl_gl_context_failed(void);
+
+/* GSourceOnceFunc: disable OpenGL renderer when GL context creation fails.
+ * Shared by structure and rdpattern view configs as on_gl_init_failed. */
+void opengl_gl_init_failed(gpointer _unused);
+
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_SETTINGS_H */

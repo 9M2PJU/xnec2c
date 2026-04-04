@@ -120,7 +120,9 @@ on_realize(GtkGLArea *area, gpointer user_data)
 
   if( gtk_gl_area_get_error(area) != NULL )
   {
-    pr_err("GL context error\n");
+    pr_err("OpenGL context error — no OpenGL implementation available on this display\n");
+    if( state->config->on_gl_init_failed )
+      g_idle_add_once(state->config->on_gl_init_failed, NULL);
     return;
   }
 

@@ -343,6 +343,47 @@ on_ortho_toggled(GtkToggleButton *button, gpointer user_data)
 
 /*------------------------------------------------------------------------*/
 
+/* Set when GL context creation fails; prevents re-enable attempts */
+static gboolean opengl_context_failed = FALSE;
+
+/*------------------------------------------------------------------------*/
+
+/** opengl_gl_context_failed() - Return TRUE if OpenGL context creation failed
+ *
+ * Used by the settings dialog to disable the renderer toggle checkbox
+ * and by opengl_set_renderer() to refuse re-enable attempts.
+ */
+gboolean
+opengl_gl_context_failed(void)
+{
+  return( opengl_context_failed );
+
+} /* opengl_gl_context_failed() */
+
+/*------------------------------------------------------------------------*/
+
+/** opengl_gl_init_failed() - GSourceOnceFunc: disable OpenGL renderer on GL context failure
+ * @_unused: unused idle data pointer
+ *
+ * Queued via g_idle_add_once when GtkGLArea realize fails (e.g., no GLX under XNest).
+ * Switches both structure and rdpattern views to Cairo fallback and permanently
+ * disables the OpenGL renderer toggle.
+ */
+void
+opengl_gl_init_failed(gpointer _unused)
+{
+  if( opengl_context_failed )
+    return;
+
+  (void)_unused;
+  opengl_context_failed = TRUE;
+  pr_warn("OpenGL is not available on this display; switching to Cairo renderer. See 'OpenGL Renderer' in View > OpenGL Settings.\n");
+  opengl_set_renderer(FALSE);
+
+} /* opengl_gl_init_failed() */
+
+/*------------------------------------------------------------------------*/
+
 /** opengl_settings_sync_from_config - Populate all widgets from rc_config
  *
  * Called after window creation and when external code changes rc_config
@@ -366,6 +407,20 @@ opengl_settings_sync_from_config(void)
   w = Builder_Get_Object(opengl_settings_builder, "chk_opengl_renderer");
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),
       rc_config.use_opengl_renderer);
+
+  /* Disable toggle when OpenGL is unavailable on this display */
+  if( opengl_gl_context_failed() )
+  {
+    gtk_widget_set_sensitive(w, FALSE);
+    gtk_widget_set_tooltip_text(w,
+        "OpenGL is not available on this display.\n"
+        "Cairo rendering is active.");
+  }
+  else
+  {
+    gtk_widget_set_sensitive(w, TRUE);
+    gtk_widget_set_tooltip_text(w, NULL);
+  }
 
   w = Builder_Get_Object(opengl_settings_builder,
       "chk_constrained_rotation");

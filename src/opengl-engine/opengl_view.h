@@ -201,6 +201,10 @@ typedef struct
   gboolean has_gradient;
   void (*gradient_draw)(cairo_t *cr);
 
+  /* Called via g_idle_add_once when GL context creation fails at realize time.
+   * Implementations disable the OpenGL renderer and switch to Cairo fallback. */
+  GSourceOnceFunc on_gl_init_failed;
+
 } gl_view_config_t;
 
 /* View state (engine-internal) */

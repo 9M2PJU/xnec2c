@@ -19,6 +19,7 @@
 
 #include "opengl_rdpattern.h"
 #include "opengl_rdpattern_geometry.h"
+#include "opengl_settings.h"
 #include "opengl_structure.h"
 #include "opengl_structure_geometry.h"
 #include "../shared.h"
@@ -582,7 +583,8 @@ static gl_view_config_t rdpattern_view_config = {
   .attrib_count = 3,
   .vertex_stride = (int)sizeof(lit_color_point_t),
   .has_gradient = TRUE,
-  .gradient_draw = Draw_Color_Legend_Overlay
+  .gradient_draw = Draw_Color_Legend_Overlay,
+  .on_gl_init_failed = opengl_gl_init_failed
 };
 
 static gl_scene_provider_t rdpattern_scene_provider = {

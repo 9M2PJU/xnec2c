@@ -24,6 +24,7 @@
 #include <pthread.h>
 
 #include "opengl/opengl_structure.h"
+#include "opengl/opengl_settings.h"
 #ifdef HAVE_OPENGL
 #include "opengl-engine/opengl_view.h"
 #include "opengl/opengl_rdpattern.h"
@@ -2093,6 +2094,13 @@ on_rdpattern_gradient_key_toggled(
 opengl_set_renderer(gboolean enable)
 {
 #ifdef HAVE_OPENGL
+  /* Refuse to enable OpenGL when context creation already failed */
+  if( enable && opengl_gl_context_failed() )
+  {
+    pr_warn("OpenGL is not available on this display; cannot enable renderer.\n");
+    return;
+  }
+
   rc_config.use_opengl_renderer = enable ? 1 : 0;
 
   /* Swap renderer if radiation pattern window is open */

@@ -271,7 +271,8 @@ static gl_view_config_t structure_view_config = {
   .attrib_count = 8,
   .vertex_stride = (int)sizeof(structure_vertex_t),
   .has_gradient = FALSE,
-  .gradient_draw = NULL
+  .gradient_draw = NULL,
+  .on_gl_init_failed = opengl_gl_init_failed
 };
 
 /** opengl_structure_ground_plane_is_active() - Report whether ground plane should render
