@@ -180,14 +180,12 @@ Motion_Event(
 
     if( params->type == STRUCTURE_DRAWINGAREA )
     {
-      need_structure_redraw = 1;
-      xnec2_widget_queue_draw( structure_drawingarea );
+      xnec2_widget_queue_draw( structure_drawingarea, TRUE );
     }
 
     if( params->type == RDPATTERN_DRAWINGAREA )
     {
-      need_rdpat_redraw = 1;
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
     }
   }
 
@@ -218,7 +216,7 @@ Plot_Select( GtkToggleButton *togglebutton, unsigned long long int flag )
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 
 } /* Plot_Select() */
@@ -554,7 +552,7 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
      * skip data operations that require valid radiation pattern data */
     if( isFlagClear(ENABLE_RDPAT) )
     {
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
       return;
     }
 
@@ -581,7 +579,7 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
     /* Clear radiation pattern drawingarea */
     if( isFlagClear(DRAW_EHFIELD) && isFlagSet(DRAW_ENABLED) )
     {
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
     }
     Free_Draw_Buffers();
   }
@@ -610,7 +608,7 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
      * skip data operations that require valid near-field configuration */
     if( !fpat.nfeh )
     {
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
       return;
     }
 
@@ -649,7 +647,7 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
     /* Clear radiation pattern drawingarea */
     if( isFlagClear(DRAW_GAIN) && isFlagSet(DRAW_ENABLED) )
     {
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
     }
 
   }
@@ -719,12 +717,12 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
             main_window_builder, "struct_label")), _("View Currents") );
 
     if( fetch_freq_data() )
-      xnec2_widget_queue_draw( structure_drawingarea );
+      xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
     if( isFlagSet(OVERLAY_STRUCT) )
     {
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
-      xnec2_widget_queue_draw( rdpattern_gl_area );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
+      xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
     }
   }
   else
@@ -738,14 +736,14 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
           _("View Geometry") );
       if( isFlagClear(FREQ_LOOP_RUNNING) )
       {
-        xnec2_widget_queue_draw( structure_drawingarea );
+        xnec2_widget_queue_draw( structure_drawingarea, TRUE );
       }
       Free_Crnt_Buffs();
     }
     if( isFlagSet(OVERLAY_STRUCT) )
     {
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
-      xnec2_widget_queue_draw( rdpattern_gl_area );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
+      xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
     }
   }
 
@@ -775,12 +773,12 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
         _("View Charges") );
 
     if( fetch_freq_data() )
-      xnec2_widget_queue_draw( structure_drawingarea );
+      xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
     if( isFlagSet(OVERLAY_STRUCT) )
     {
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
-      xnec2_widget_queue_draw( rdpattern_gl_area );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
+      xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
     }
   }
   else
@@ -795,7 +793,7 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
 
       if( isFlagClear(FREQ_LOOP_RUNNING) )
       {
-        xnec2_widget_queue_draw( structure_drawingarea );
+        xnec2_widget_queue_draw( structure_drawingarea, TRUE );
       }
 
       Free_Crnt_Buffs();
@@ -803,8 +801,8 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
 
     if( isFlagSet(OVERLAY_STRUCT) )
     {
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
-      xnec2_widget_queue_draw( rdpattern_gl_area );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
+      xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
     }
   }
 
@@ -942,7 +940,7 @@ Filechooser_Response(
       /* Save screen shots after redraw and when GTK is finished tasks */
       static save_data_t save_data;
 
-      xnec2_widget_queue_draw( saveas_drawingarea );
+      xnec2_widget_queue_draw( saveas_drawingarea, TRUE );
 
       save_data.drawingarea = saveas_drawingarea;
       save_data.width  = saveas_width;

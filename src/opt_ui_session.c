@@ -53,9 +53,9 @@ static gboolean check_opt_complete(gpointer user_data)
 	/* Restore green-line display state skipped during optimization.
 	 * Use steps_total slot when valid, otherwise fall back to last sweep step. */
 	if( save.fstep && save.fstep[calc_data.steps_total] )
-		freq_step_update_ui( calc_data.steps_total );
+		freq_step_update_ui( calc_data.steps_total, TRUE );
 	else if( calc_data.freq_step >= 0 )
-		freq_step_update_ui( calc_data.freq_step );
+		freq_step_update_ui( calc_data.freq_step, TRUE );
 
 	/* Final status: preserve full running metrics, append completion */
 	opt_ui_update_status();

@@ -21,8 +21,6 @@
 #include "shared.h"
 #include "opengl/opengl_structure.h"
 
-int need_structure_redraw = 1;
-
 /*-----------------------------------------------------------------------*/
 
 /*  Draw_Structure()
@@ -77,8 +75,6 @@ void Draw_Structure( cairo_t *cr )
 {
 	if (isFlagSet(ERROR_CONDX))
 		return;
-
-	need_structure_redraw = 0;
 
 	g_mutex_lock(&freq_data_lock);
 	_Draw_Structure( cr );
@@ -736,12 +732,10 @@ New_Structure_Projection_Angle(void)
   structure_proj_params.sin_wi = sin(structure_proj_params.Wi/(double)TODEG);
   structure_proj_params.cos_wi = cos(structure_proj_params.Wi/(double)TODEG);
 
-  need_structure_redraw = 1;
-
   /* Trigger a redraw of structure drawingarea */
   if( structure_drawingarea && isFlagClear(INPUT_PENDING) )
   {
-    xnec2_widget_queue_draw( structure_drawingarea );
+    xnec2_widget_queue_draw( structure_drawingarea, TRUE );
   }
 
   /* Trigger a redraw of plots drawingarea */
@@ -749,7 +743,7 @@ New_Structure_Projection_Angle(void)
       isFlagSet(PLOT_GVIEWER) &&
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 
 } /* New_Structure_Projection_Angle() */

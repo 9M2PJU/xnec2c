@@ -156,16 +156,16 @@ opengl_structure_on_ctrl_scroll(
   opengl_settings_sync_from_config();
 
   /* Queue redraw on the event source widget */
-  gtk_widget_queue_draw(widget);
+  xnec2_widget_queue_draw(widget, TRUE);
 
   /* Queue redraw on cross-window GL areas */
   if( structure_gl_widget && widget != structure_gl_widget )
-    gtk_widget_queue_draw(structure_gl_widget);
+    xnec2_widget_queue_draw(structure_gl_widget, TRUE);
 
   {
     GtkWidget *rdpat_w = opengl_rdpattern_get_widget();
     if( rdpat_w && widget != rdpat_w )
-      gtk_widget_queue_draw(rdpat_w);
+      xnec2_widget_queue_draw(rdpat_w, TRUE);
   }
 
   return( TRUE );
@@ -341,8 +341,8 @@ structure_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
   structure_proj_params.Wr = (double)wr;
   structure_proj_params.Wi = (double)wi;
 
-  /* Sync trig cache, set need_structure_redraw, and queue freqplots
-   * when PLOT_GVIEWER is active — matching Cairo's Motion_Event path. */
+  /* Sync trig cache and queue freqplots when PLOT_GVIEWER is active,
+   * matching Cairo's Motion_Event path. */
   New_Structure_Projection_Angle();
 
   opengl_update_spin_display( rotate_structure, structure_proj_params.Wr );
@@ -460,7 +460,7 @@ set_view_flow_phase(GtkWidget *w, float phase)
   if( state )
     state->flow_phase = phase;
 
-  xnec2_widget_queue_draw(w);
+  xnec2_widget_queue_draw(w, TRUE);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -514,7 +514,7 @@ Animate_Flow_Phase(gpointer udata)
       structure_gl_widget, (float)near_field.anim_step);
 
   if( structure_gl_widget )
-    xnec2_widget_queue_draw(structure_gl_widget);
+    xnec2_widget_queue_draw(structure_gl_widget, TRUE);
 
   /* Advance phase on rdpattern overlay view */
   {
@@ -522,7 +522,7 @@ Animate_Flow_Phase(gpointer udata)
 
     advance_view_flow_phase(rdpat_w, (float)near_field.anim_step);
     if( rdpat_w )
-      xnec2_widget_queue_draw(rdpat_w);
+      xnec2_widget_queue_draw(rdpat_w, TRUE);
   }
 
   return( TRUE );
@@ -595,6 +595,6 @@ opengl_structure_queue_draw(void)
 {
 #ifdef HAVE_OPENGL
   if( structure_gl_widget != NULL )
-    xnec2_widget_queue_draw( structure_gl_widget );
+    xnec2_widget_queue_draw( structure_gl_widget, TRUE );
 #endif
 }

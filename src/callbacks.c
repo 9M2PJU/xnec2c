@@ -964,7 +964,7 @@ common_projection_arcball_cb(arcball_state_t *ab, gpointer user_data)
   widget = (GtkWidget *)user_data;
 
   if( widget )
-    gtk_widget_queue_draw(widget);
+    xnec2_widget_queue_draw(widget, TRUE);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -995,7 +995,7 @@ common_projection_share_arcball(void)
     arcball_add_callback(struct_ab,
         common_projection_arcball_cb, structure_gl_area);
 
-  gtk_widget_queue_draw(rdpat_widget);
+  xnec2_widget_queue_draw(rdpat_widget, TRUE);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -1650,7 +1650,7 @@ on_freqplots_zo_spinbutton_value_changed(
   calc_data.zo = gtk_spin_button_get_value(spinbutton);
   if( isFlagSet(PLOT_ENABLED) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 
   gtk_spin_button_update( spinbutton );
@@ -1987,7 +1987,7 @@ on_rdpattern_e_field_activate(
     ClearFlag( DRAW_EFIELD );
   Set_Window_Labels();
   if( isFlagSet(DRAW_EHFIELD) )
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
 
@@ -2002,7 +2002,7 @@ on_rdpattern_h_field_activate(
     ClearFlag( DRAW_HFIELD );
   Set_Window_Labels();
   if( isFlagSet(DRAW_EHFIELD) )
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
 
@@ -2017,7 +2017,7 @@ on_rdpattern_poynting_vector_activate(
     ClearFlag( DRAW_POYNTING );
   Set_Window_Labels();
   if( isFlagSet(DRAW_EHFIELD) )
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
 
@@ -2031,8 +2031,8 @@ on_rdpattern_overlay_structure_activate(
   else
     ClearFlag( OVERLAY_STRUCT );
 
-  xnec2_widget_queue_draw( rdpattern_drawingarea );
-  xnec2_widget_queue_draw( rdpattern_gl_area );
+  xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
+  xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
 }
 
 
@@ -2046,7 +2046,7 @@ on_rdpattern_gradient_key_toggled(
   else
     rc_config.rdpattern_gradient_key = 0;
 
-  xnec2_widget_queue_draw( rdpattern_drawingarea );
+  xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
 
@@ -2108,7 +2108,7 @@ opengl_set_renderer(gboolean enable)
       /* No active pattern mode; redraw will show empty state */
     }
 
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
 
   /* Swap renderer for structure view in main window */
@@ -2138,7 +2138,7 @@ opengl_set_renderer(gboolean enable)
           structure_proj_params.xy_scale1 * structure_proj_params.xy_zoom;
     }
 
-    xnec2_widget_queue_draw( structure_drawingarea );
+    xnec2_widget_queue_draw( structure_drawingarea, TRUE );
   }
 #endif
 }
@@ -2196,7 +2196,7 @@ rdpattern_set_view_preset(double wr, double wi)
 
     gtk_spin_button_set_value(rotate_rdpattern, wr);
     gtk_spin_button_set_value(incline_rdpattern, wi);
-    gtk_widget_queue_draw(rdpattern_drawingarea);
+    xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
 #endif
   }
   else
@@ -2279,7 +2279,7 @@ on_rdpattern_rotate_spinbutton_value_changed(
 #ifdef HAVE_OPENGL
     gl_view_sync_arcball(rdpattern_drawingarea,
         rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
-    gtk_widget_queue_draw(rdpattern_drawingarea);
+    xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
 #endif
   }
   else
@@ -2323,7 +2323,7 @@ on_rdpattern_incline_spinbutton_value_changed(
 #ifdef HAVE_OPENGL
     gl_view_sync_arcball(rdpattern_drawingarea,
         rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
-    gtk_widget_queue_draw(rdpattern_drawingarea);
+    xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
 #endif
   }
   else
@@ -2662,7 +2662,7 @@ on_near_peak_value_activate(
     int fstep = calc_data.freq_step;
     Recompute_Near_Field_Vectors( fstep, FALSE );
     if( isFlagSet(DRAW_EHFIELD) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
   /* else: on_near_snapshot_activate fires for the newly-selected item */
 }
@@ -2678,7 +2678,7 @@ on_near_snapshot_activate(
     int fstep = calc_data.freq_step;
     Recompute_Near_Field_Vectors( fstep, TRUE );
     if( isFlagSet(DRAW_EHFIELD) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
   /* else: on_near_peak_value_activate fires for the newly-selected item */
 }
@@ -5545,7 +5545,7 @@ on_freqplots_min_max_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 }
 
@@ -5564,7 +5564,7 @@ on_freqplots_s11_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 }
 
@@ -5583,7 +5583,7 @@ on_freqplots_clamp_vswr_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 }
 
@@ -5599,7 +5599,7 @@ on_freqplots_show_ant_temp_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 }
 
@@ -5618,7 +5618,7 @@ on_freqplots_round_x_axis_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 }
 
@@ -5635,7 +5635,7 @@ on_freqplots_net_gain_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 }
 
@@ -5664,8 +5664,7 @@ on_main_zoom_spinbutton_value_changed(
   /* Trigger a redraw of structure drawingarea */
   if( structure_drawingarea )
   {
-    need_structure_redraw = 1;
-    xnec2_widget_queue_draw( structure_drawingarea );
+    xnec2_widget_queue_draw( structure_drawingarea, TRUE );
   }
 }
 
@@ -5710,7 +5709,7 @@ on_structure_one_button_clicked(
       structure_height,
       &structure_proj_params );
 
-  xnec2_widget_queue_draw( structure_drawingarea );
+  xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 }
 
 
@@ -5736,8 +5735,7 @@ on_rdpattern_zoom_spinbutton_value_changed(
     rdpattern_proj_params.xy_scale1 * rdpattern_proj_params.xy_zoom;
 
   /* Trigger a redraw of rdpattern drawingarea */
-  need_rdpat_redraw = 1;
-  xnec2_widget_queue_draw( rdpattern_drawingarea );
+  xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
 
@@ -5790,8 +5788,7 @@ on_rdpattern_one_button_clicked(
         &rdpattern_proj_params );
   }
 
-  need_rdpat_redraw = 1;
-  xnec2_widget_queue_draw( rdpattern_drawingarea );
+  xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
 

@@ -930,28 +930,37 @@ guint g_idle_add_once_sync(GSourceOnceFunc function, gpointer data)
 }
 
 
-/* This is a hook to centrally control the redraw of widgets based on state
- * Also it uses g_idle_add so it is thread-safe. */
-void xnec2_widget_queue_draw(GtkWidget *w)
+/**
+ * xnec2_widget_queue_draw - schedule a widget redraw through the optimizer gate
+ * @w:     widget to redraw
+ * @force: TRUE for user-interaction draws that must always render;
+ *         FALSE for intermediate frequency-sweep draws that are
+ *         suppressed during optimizer runs to avoid screen flicker
+ *
+ * Centralizes redraw scheduling so SUPPRESS_INTERMEDIATE_REDRAWS applies
+ * uniformly to all widgets.  All callers operating on structure_drawingarea
+ * or rdpattern_drawingarea must use this function rather than calling
+ * gtk_widget_queue_draw() directly: those globals are swapped to GL widgets
+ * when OpenGL rendering is enabled, so a direct call on any structure or
+ * rdpattern GL area bypasses this gate.
+ *
+ * Exception: the opengl-engine/ view layer (opengl_view.c,
+ * opengl_view_input.c, opengl_view_notice.c) calls gtk_widget_queue_draw()
+ * directly because it redraws its own GL area for engine-internal reasons
+ * (MSAA rebuild, input event repaints) that are below this gate's
+ * abstraction level.
+ */
+void xnec2_widget_queue_draw(GtkWidget *w, gboolean force)
 {
-	// Only redraw the rdpattern when FREQ_LOOP_DONE or it the window will flash grey:
-	if (w == rdpattern_drawingarea &&
+	if( !force &&
 	    isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) &&
-	    isFlagSet(FREQ_LOOP_RUNNING) &&
-	    !need_rdpat_redraw)
+	    isFlagSet(FREQ_LOOP_RUNNING) )
 	{
-		pr_debug("Optimizer loop incomplete, skipping radiation pattern redraw.\n");
+		pr_debug("Optimizer loop incomplete, suppressing intermediate redraw.\n");
+		return;
 	}
-	else if (w == structure_drawingarea &&
-	    isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) &&
-	    isFlagSet(FREQ_LOOP_RUNNING) &&
-	    !need_structure_redraw)
-	{
-		pr_debug("Optimizer loop incomplete, skipping structure redraw.\n");
-	}
-	else
-		g_idle_add_once((GSourceOnceFunc)gtk_widget_queue_draw, w);
 
+	g_idle_add_once((GSourceOnceFunc)gtk_widget_queue_draw, w);
 }
 /*------------------------------------------------------------------*/
 

@@ -1746,7 +1746,7 @@ void Strlcat(char *dest, const char *src, size_t n);
 double Strtod(char *nptr, char **endptr);
 char *str_append(char *dst, char *a, char *b, size_t n);
 void Get_Dirname(char *fpath, char *dirname, int *fname_idx);
-void xnec2_widget_queue_draw(GtkWidget *w);
+void xnec2_widget_queue_draw(GtkWidget *w, gboolean force);
 #if GLIB_VERSION_CUR_STABLE < G_ENCODE_VERSION(2,74)
 guint g_idle_add_once(GSourceOnceFunc function, gpointer data);
 #endif
@@ -1755,7 +1755,7 @@ void print_backtrace(char *msg);
 void Update_Window_Titles(void);
 
 /* xnec2c.c */
-void freq_step_update_ui(int new_step);
+void freq_step_update_ui(int new_step, gboolean force);
 void Near_Field_Pattern(void);
 void New_Frequency(void);
 void New_Frequency_Reset_Prev(void);

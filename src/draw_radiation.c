@@ -38,8 +38,6 @@ static const char *nearfield_animation_error_msg =
 /* For coloring rad pattern */
 static double *red = NULL, *grn = NULL, *blu = NULL;
 
-int need_rdpat_redraw = 1;
-
 /* Buffered points in 3d (xyz) space
  * forming the radiation pattern */
 static point_3d_t *point_3d = NULL;
@@ -832,8 +830,6 @@ int Draw_Radiation( cairo_t *cr )
 	if (isFlagSet(ERROR_CONDX))
 		return FALSE;
 
-	need_rdpat_redraw = 0;
-
 	g_mutex_lock(&freq_data_lock);
 	ret = _Draw_Radiation( cr );
 	g_mutex_unlock(&freq_data_lock);
@@ -959,7 +955,7 @@ Animate_Near_Field( gpointer udata )
   if( wt >= (double)M_2PI )
     wt = 0.0;
 
-  xnec2_widget_queue_draw( rdpattern_drawingarea );
+  xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 
   return( TRUE );
 
@@ -1040,12 +1036,12 @@ Set_Polarization( int pol )
   /* Trigger a redraw of drawingareas */
   if( isFlagSet(DRAW_ENABLED) )
   {
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
 
   if( isFlagSet(PLOT_ENABLED) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 
 } /* Set_Polarization() */
@@ -1142,7 +1138,7 @@ Set_Gain_Style( int gs )
     /* Enable redraw of rad pattern */
     SetFlag( DRAW_NEW_RDPAT );
 
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
 
 } /* Set_Gain_Style() */
@@ -1163,8 +1159,6 @@ New_Radiation_Projection_Angle(void)
   rdpattern_proj_params.sin_wi = sin(rdpattern_proj_params.Wi/(double)TODEG);
   rdpattern_proj_params.cos_wi = cos(rdpattern_proj_params.Wi/(double)TODEG);
 
-  need_rdpat_redraw = 1;
-
   /* Noise modes require full recomputation of scaled min/max */
   if (IS_NOISE_MODE(rc_config.gain_style))
   {
@@ -1174,7 +1168,7 @@ New_Radiation_Projection_Angle(void)
   /* Trigger a redraw of radiation drawingarea */
   if( isFlagSet(DRAW_ENABLED) )
   {
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
 
   /* Trigger a redraw of plots drawingarea if doing "viewer" gain
@@ -1183,7 +1177,7 @@ New_Radiation_Projection_Angle(void)
       (isFlagSet(PLOT_GVIEWER) || isFlagSet(PLOT_ANT_TEMP)) &&
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 
 } /* New_Radiation_Projection_Angle() */

@@ -1871,7 +1871,7 @@ _Set_Frequency_On_Click( GdkEvent *e)
 
 	  draw_freqplot = 1;
 	  set_fmhz = 1;
-      xnec2_widget_queue_draw( freqplots_drawingarea );
+      xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
       break;
 
     case 2: /* Disable drawing of freq line */
@@ -1971,7 +1971,7 @@ _Set_Frequency_On_Click( GdkEvent *e)
   // to update fmhz so don't redraw because Plot_Frequency_Data() is going to draw
   // after we return.
   if (draw_freqplot && prev_click_event == NULL)
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
 
   // Free the prev_click_event since it was serviced.
   if (prev_click_event != NULL)

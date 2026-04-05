@@ -26,6 +26,9 @@
 /* Only nec2_eval_signal() is called from xnec2c.c; avoid pulling
  * gsl headers (via opt_simple.h) which conflict with openblas cblas. */
 extern void nec2_eval_signal(void);
+/* opengl_structure_invalidate() is called here; forward-declared to avoid
+ * pulling opengl_structure.h (and its GL/GLEW chain) into the NEC engine file. */
+extern void opengl_structure_invalidate(void);
 
 static pthread_t *pth_freq_loop = NULL;
 
@@ -90,7 +93,7 @@ int set_freq_step(void)
 }
 
 /* Forward declaration: defined after the freq-loop helpers below */
-void freq_step_update_ui( int new_step );
+void freq_step_update_ui( int new_step, gboolean force );
 
 /**
  * fetch_freq_data - retrieve frequency data from cache or dispatch computation
@@ -113,14 +116,14 @@ fetch_freq_data( void )
 
   if( set_freq_step() )
   {
-    freq_step_update_ui( calc_data.freq_step );
+    freq_step_update_ui( calc_data.freq_step, TRUE );
     return TRUE;
   }
 
   if( save.fstep[calc_data.steps_total] &&
       FREQ_EQ(save.freq[calc_data.steps_total], calc_data.freq_mhz) )
   {
-    freq_step_update_ui( calc_data.steps_total );
+    freq_step_update_ui( calc_data.steps_total, TRUE );
     return TRUE;
   }
 
@@ -604,7 +607,7 @@ freq_loop_display_step( void )
  * idempotent.  Must be called on the GTK main thread.
  */
 void
-freq_step_update_ui( int new_step )
+freq_step_update_ui( int new_step, gboolean force )
 {
   char txt[16];
 
@@ -625,28 +628,37 @@ freq_step_update_ui( int new_step )
     gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(
         freqplots_window_builder, "freqplots_fmhz_entry")), txt );
 
-    xnec2_widget_queue_draw( freqplots_drawingarea );
+    xnec2_widget_queue_draw( freqplots_drawingarea, force );
   }
 
   /* Vertex colors are baked per freq_step; invalidate so the next render
    * rebuilds them from crnt_fstep[new_step] rather than cached stale data. */
   opengl_structure_invalidate();
-  xnec2_widget_queue_draw( structure_drawingarea );
+
+  xnec2_widget_queue_draw( structure_drawingarea, force );
 
   if( isFlagSet(DRAW_ENABLED) )
   {
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
-    xnec2_widget_queue_draw( rdpattern_gl_area );
+    xnec2_widget_queue_draw( rdpattern_drawingarea, force );
+    xnec2_widget_queue_draw( rdpattern_gl_area, force );
   }
 
   opt_ui_update_values();
 }
 
-/* Idle wrapper for marshaling freq_step_update_ui from the loop thread */
+/* Idle wrapper: intermediate loop step — draws suppressed during optimizer */
 static gboolean
 freq_step_update_ui_idle( gpointer p )
 {
-  freq_step_update_ui( GPOINTER_TO_INT(p) );
+  freq_step_update_ui( GPOINTER_TO_INT(p), FALSE );
+  return G_SOURCE_REMOVE;
+}
+
+/* Idle wrapper: terminal step — draws forced through SUPPRESS gate */
+static gboolean
+freq_step_update_ui_idle_force( gpointer p )
+{
+  freq_step_update_ui( GPOINTER_TO_INT(p), TRUE );
   return G_SOURCE_REMOVE;
 }
 
@@ -828,6 +840,8 @@ freq_loop_dispatch( freq_loop_state_t *state, child_proc_t *child,
   }
 
   g_mutex_lock(&freq_data_lock);
+  /* Non-forked: write freq_mhz and freq_step for the NEC engine here;
+   * freq_step_update_ui overwrites both on the GTK thread for display. */
   calc_data.freq_mhz  = freq;
   calc_data.freq_step = fstep;
   g_mutex_unlock(&freq_data_lock);
@@ -971,15 +985,9 @@ freq_loop_finalize( freq_loop_state_t *state )
   if( calc_data.fmhz_save > 0.0 && save.fstep[calc_data.steps_total] )
     SetFlag( PLOT_FREQ_LINE );
 
-  /* Force final draws through the SUPPRESS_INTERMEDIATE_REDRAWS gate;
-   * intermediate draws leave the flags at 0 (suppressed), but the
-   * terminal update must always render the completed sweep. */
-  need_structure_redraw = 1;
-  need_rdpat_redraw = 1;
-
   int display = freq_loop_display_step();
   if( display >= 0 )
-    g_idle_add_once_sync( (GSourceOnceFunc)freq_step_update_ui_idle,
+    g_idle_add_once_sync( (GSourceOnceFunc)freq_step_update_ui_idle_force,
                           GINT_TO_POINTER(display) );
 
   if( (rc_config.batch_mode || isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS)) &&
@@ -1199,12 +1207,8 @@ freq_loop_start_internal( void )
   SetFlag( FREQ_LOOP_INIT );
   SetFlag( FREQ_LOOP_RUNNING );
 
-  /* Allow SUPPRESS guard to block first-iteration redraw */
-  if( isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
-  {
-    need_structure_redraw = 0;
-    need_rdpat_redraw = 0;
-  }
+  /* Intermediate-step draws use force=FALSE and are gated by
+   * SUPPRESS_INTERMEDIATE_REDRAWS inside xnec2_widget_queue_draw. */
 
   if( !rc_config.disable_pthread_freqloop )
   {

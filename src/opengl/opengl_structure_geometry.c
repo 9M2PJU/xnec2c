@@ -977,9 +977,6 @@ opengl_structure_update_shared_geometry(void)
       last_freq_mhz = calc_data.freq_mhz;
     }
 
-    /* Clear redraw flag for SUPPRESS_INTERMEDIATE_REDRAWS guard */
-    need_structure_redraw = 0;
-
     /* Update shared overlay data after regeneration */
     memcpy(shared_overlay_data.batches, batches,
         (size_t)batch_count * sizeof(batches[0]));

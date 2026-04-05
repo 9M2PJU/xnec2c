@@ -491,7 +491,7 @@ rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer vie
   /* Cache for use in translation calculation */
   rdpat_ovl_scale_adj = state->ovl_model_scale_adj;
 
-  gtk_widget_queue_draw(widget);
+  xnec2_widget_queue_draw(widget, TRUE);
 
   return( TRUE );
 }
@@ -742,6 +742,6 @@ opengl_rdpattern_queue_draw(void)
 {
 #ifdef HAVE_OPENGL
   if( rdpattern_gl_widget != NULL )
-    xnec2_widget_queue_draw( rdpattern_gl_widget );
+    xnec2_widget_queue_draw( rdpattern_gl_widget, TRUE );
 #endif
 }
