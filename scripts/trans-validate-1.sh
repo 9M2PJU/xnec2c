@@ -8,8 +8,9 @@
 
 l="$1"
 
-MODEL=opus
-export MAX_THINKING_TOKENS=31999
+#MODEL=opus
+MODEL=sonnet
+export MAX_THINKING_TOKENS=2048
 
 # Build scope: untranslated + fuzzy entries with line numbers
 scope="po/.translate-scope-$(basename "$l" .po).txt"
