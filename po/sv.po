@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-03-26 17:05-0700\n"
+"POT-Creation-Date: 2026-04-02 15:50-0700\n"
 "PO-Revision-Date: 2025-12-28 20:37-0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -44,7 +44,7 @@ msgstr "Segmentanslutningsfel i sbf()"
 msgid "Segment connection error in trio()"
 msgstr "Segmentanslutningsfel i trio()"
 
-#: src/callback_func.c:263
+#: src/callback_func.c:265
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
@@ -52,7 +52,7 @@ msgstr ""
 "Frekvensslingan körs\n"
 "Är du säker på att du vill avsluta beräkningen?"
 
-#: src/callback_func.c:267
+#: src/callback_func.c:269
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
@@ -60,7 +60,7 @@ msgstr ""
 "Frekvensslingan körs\n"
 "Är du säker på att du vill stänga detta fönster?"
 
-#: src/callback_func.c:520
+#: src/callback_func.c:523
 #, c-format
 msgid ""
 "Frequency plots window closed: excitation type %d is incompatible.\n"
@@ -69,7 +69,7 @@ msgstr ""
 "Fönstret för frekvensdiagram stängt: excitationstyp %d är inkompatibel.\n"
 "Använd typ 0 (Applicerat E-fält) eller 5 (Strömdiskontinuitet) istället."
 
-#: src/callback_func.c:526
+#: src/callback_func.c:529
 #, c-format
 msgid ""
 "Frequency plots are not available with excitation type %d.\n"
@@ -81,47 +81,47 @@ msgstr ""
 "strömkälla.\n"
 "Ändra EX-kortet till typ 0 (Applicerat E-fält) eller 5 (Strömdiskontinuitet)."
 
-#: src/callback_func.c:705
+#: src/callback_func.c:736
 msgid "View Currents"
 msgstr "Visa strömmar"
 
-#: src/callback_func.c:727 src/callback_func.c:786
+#: src/callback_func.c:758 src/callback_func.c:817
 msgid "View Geometry"
 msgstr "Visa geometri"
 
-#: src/callback_func.c:764
+#: src/callback_func.c:795
 msgid "View Charges"
 msgstr "Visa laddningar"
 
-#: src/callback_func.c:829
+#: src/callback_func.c:861
 msgid "PNG images (*.png)"
 msgstr "PNG-bilder (*.png)"
 
-#: src/callback_func.c:831
+#: src/callback_func.c:863
 msgid "GNUplot files (*.gplot)"
 msgstr "GNUplot-filer (*.gplot)"
 
-#: src/callback_func.c:833
+#: src/callback_func.c:865
 msgid "NEC2 files (*.nec)"
 msgstr "NEC2-filer (*.nec)"
 
-#: src/callback_func.c:835
+#: src/callback_func.c:867
 msgid "Touchstone 1-port files (*.s1p)"
 msgstr "Touchstone 1-portsfiler (*.s1p)"
 
-#: src/callback_func.c:837
+#: src/callback_func.c:869
 msgid "Touchstone 2-port files (*.s2p)"
 msgstr "Touchstone 2-portsfiler (*.s2p)"
 
-#: src/callback_func.c:839
+#: src/callback_func.c:871
 msgid "Comma-separated CSV files (*.csv)"
 msgstr "Kommaseparerade CSV-filer (*.csv)"
 
-#: src/callbacks.c:56 src/callbacks.c:72
+#: src/callbacks.c:135 src/callbacks.c:151
 msgid "Antenna Temperature"
 msgstr "Antenntemperatur"
 
-#: src/callbacks.c:57
+#: src/callbacks.c:136
 msgid ""
 "Ground plane detected in model. T_ant results will overcount ground effects. "
 "Free-space models are standard for antenna temperature evaluation."
@@ -130,7 +130,7 @@ msgstr ""
 "markeffekter. Frirumsmodeller är standard för utvärdering av "
 "antenntemperatur."
 
-#: src/callbacks.c:73
+#: src/callbacks.c:152
 #, c-format
 msgid ""
 "Max gain at θ=%.0f° (%.0f° from XY plane). Convention assumes beam in XY "
@@ -139,12 +139,12 @@ msgstr ""
 "Maxförstärkning vid θ=%.0f° (%.0f° från XY-planet). Konventionen antar "
 "stråle i XY-planet med observationselevation inställd via spinknapp."
 
-#: src/callbacks.c:139 src/callbacks.c:440 src/callbacks.c:1984
-#: src/callbacks.c:2345
+#: src/callbacks.c:218 src/callbacks.c:517 src/callbacks.c:2556
+#: src/callbacks.c:3088
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "Är du säker på att du vill avsluta xnec2c?"
 
-#: src/callbacks.c:182
+#: src/callbacks.c:261
 msgid ""
 "A new NEC2 input file may not be created\n"
 "while the Frequency Loop is running"
@@ -152,7 +152,7 @@ msgstr ""
 "En ny NEC2-indatafil kan inte skapas\n"
 "medan frekvensslingan körs"
 
-#: src/callbacks.c:222
+#: src/callbacks.c:299
 msgid ""
 "A new NEC2 input file may not be opened\n"
 "while the Frequency Loop is running"
@@ -160,20 +160,20 @@ msgstr ""
 "En ny NEC2-indatafil kan inte öppnas\n"
 "medan frekvensslingan körs"
 
-#: src/callbacks.c:342
+#: src/callbacks.c:419
 msgid "xnec2c geometry optimizer"
 msgstr "xnec2c geometrioptimerare"
 
-#: src/callbacks.c:343
+#: src/callbacks.c:420
 msgid ""
 "xnec2c was built without inotify support: the optimizer cannot be enabled."
 msgstr "xnec2c byggdes utan inotify-stöd: optimeraren kan inte aktiveras."
 
-#: src/callbacks.c:367
+#: src/callbacks.c:444
 msgid "Xnec2c Optimizer"
 msgstr "Xnec2c Optimerare"
 
-#: src/callbacks.c:367
+#: src/callbacks.c:444
 msgid ""
 "No files are selected for writing. However, xnec2c will still reload and "
 "recalculate the input file on modification when triggered by inotify.Select "
@@ -183,23 +183,23 @@ msgstr ""
 "om och beräkna om indatafilen vid ändring när den triggas av inotify. Välj "
 "filer för skrivning i \"Arkiv->Optimeringsinställningar\"."
 
-#: src/callbacks.c:378
+#: src/callbacks.c:455
 msgid "failed to create Optimizer Output thread\n"
 msgstr "misslyckades att skapa tråd för optimerarens utdata\n"
 
-#: src/callbacks.c:1134 src/callbacks.c:1460 src/callbacks.c:2371
+#: src/callbacks.c:1483 src/callbacks.c:1815 src/callbacks.c:3114
 msgid "Are you sure you wish to close this window?"
 msgstr "Är du säker på att du vill stänga detta fönster?"
 
-#: src/callbacks.c:1626
+#: src/callbacks.c:1981
 msgid "noise env activate: no matching widget found\n"
 msgstr "noise env activate: ingen matchande widget hittades\n"
 
-#: src/callbacks.c:2309
+#: src/callbacks.c:3052
 msgid "No open NEC2 input file"
 msgstr "Ingen öppen NEC2-indatafil"
 
-#: src/callbacks.c:2402 src/callbacks.c:2432
+#: src/callbacks.c:3145 src/callbacks.c:3175
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -207,11 +207,11 @@ msgstr ""
 "NEC2-editorns data kan inte sparas\n"
 "medan frekvensslingan körs"
 
-#: src/callbacks.c:2414 src/callbacks.c:2440
+#: src/callbacks.c:3157 src/callbacks.c:3183
 msgid "untitled.nec"
 msgstr "namnlös.nec"
 
-#: src/callbacks.c:2905 src/callbacks.c:2925 src/callbacks.c:2945
+#: src/callbacks.c:3648 src/callbacks.c:3668 src/callbacks.c:3688
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
@@ -236,12 +236,12 @@ msgstr ""
 "Set_Command_Data(): Fel vid skrivning av raddata\n"
 "Välj rad igen"
 
-#: src/cmnd_edit.c:488 resources/xnec2c.glade:314 resources/xnec2c.glade:1349
-#: resources/xnec2c.glade:3776 resources/xnec2c.glade:14618
+#: src/cmnd_edit.c:488 resources/xnec2c.glade:312 resources/xnec2c.glade:1347
+#: resources/xnec2c.glade:3774 resources/xnec2c.glade:14837
 msgid "Tag Number"
 msgstr "Taggnummer"
 
-#: src/cmnd_edit.c:489 resources/xnec2c.glade:1362
+#: src/cmnd_edit.c:489 resources/xnec2c.glade:1360
 msgid "Segment Number"
 msgstr "Segmentnummer"
 
@@ -335,15 +335,15 @@ msgstr "Inkrement i Z"
 msgid "Field Point R (m)"
 msgstr "Fältpunkt R (m)"
 
-#: src/cmnd_edit.c:1762 resources/xnec2c.glade:9000
+#: src/cmnd_edit.c:1762 resources/xnec2c.glade:8998
 msgid "Points in Phi"
 msgstr "Punkter i Phi"
 
-#: src/cmnd_edit.c:1763 resources/xnec2c.glade:8918
+#: src/cmnd_edit.c:1763 resources/xnec2c.glade:8916
 msgid "Initial Theta (deg)"
 msgstr "Initialt Theta (deg)"
 
-#: src/cmnd_edit.c:1764 src/cmnd_edit.c:2709 resources/xnec2c.glade:8931
+#: src/cmnd_edit.c:1764 src/cmnd_edit.c:2709 resources/xnec2c.glade:8929
 msgid "Increment in Theta"
 msgstr "Inkrement i Theta"
 
@@ -383,8 +383,8 @@ msgstr "Kapacitans pF/m"
 msgid "Reactance Ohm"
 msgstr "Reaktans Ohm"
 
-#: src/cmnd_edit.c:2024 resources/xnec2c.glade:480 resources/xnec2c.glade:4012
-#: resources/xnec2c.glade:14970
+#: src/cmnd_edit.c:2024 resources/xnec2c.glade:478 resources/xnec2c.glade:4010
+#: resources/xnec2c.glade:15189
 msgid "Conductivity S/m"
 msgstr "Konduktivitet S/m"
 
@@ -452,11 +452,11 @@ msgstr "Första punkt Theta"
 msgid "Increment in R (m)"
 msgstr "Inkrement i R (m)"
 
-#: src/cmnd_edit.c:2708 resources/xnec2c.glade:9026
+#: src/cmnd_edit.c:2708 resources/xnec2c.glade:9024
 msgid "Increment in Phi"
 msgstr "Inkrement i Phi"
 
-#: src/draw_radiation.c:29
+#: src/draw_radiation.c:33
 msgid ""
 "Animation requires near field data.\n"
 "\n"
@@ -470,22 +470,30 @@ msgstr ""
 "H-fältsanimering: Lägg till NH-kort i NEC-filen\n"
 "Poyntingvektor: Lägg till både NE- och NH-kort"
 
-#: src/draw_radiation.c:94
+#: src/draw_radiation.c:79
+#, c-format
+msgid "gain_style %d out of range [0..%d], defaulting to GS_LINP\n"
+msgstr "gain_style %d utanför intervallet [0..%d], standard GS_LINP\n"
+
+#: src/draw_radiation.c:120
 #, c-format
 msgid "Scale_Gain: ant_temp_resolve failed for %.3f MHz env %d\n"
 msgstr "Scale_Gain: ant_temp_resolve misslyckades för %.3f MHz env %d\n"
 
-#: src/draw_radiation.c:754 src/draw_radiation.c:764 resources/xnec2c.glade:69
+#: src/draw_radiation.c:852 src/draw_radiation.c:860 src/draw_radiation.c:870
+#: resources/xnec2c.glade:69
 msgid "Near Field Animation"
 msgstr "Närfältsanimering"
 
-#: src/draw_radiation.c:754 src/draw_radiation.c:764 src/geometry.c:812
-#: src/input.c:1616 src/input.c:1617 src/utils.c:525 src/utils.c:571
+#: src/draw_radiation.c:852 src/draw_radiation.c:860 src/draw_radiation.c:870
+#: src/geometry.c:812 src/input.c:1614 src/input.c:1615 src/mathlib.c:759
+#: src/mathlib.c:1003 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:525
+#: src/utils.c:571
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: src/draw_radiation.c:985 src/draw_radiation.c:989
+#: src/draw_radiation.c:1102 src/draw_radiation.c:1108
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
@@ -493,86 +501,117 @@ msgstr ""
 "Observationselevationsvinkel. Flyttar gränsen mellan himmel och jord för "
 "utvärdering av antenntemperatur. 0° = horisont."
 
-#: src/draw_radiation.c:993
+#: src/draw_radiation.c:1105 src/draw_radiation.c:1111
+msgid ""
+"Observation elevation for antenna temperature.\n"
+"Select Gain Style → Noise Temperature to enable."
+msgstr ""
+"Observationselevation för antenntemperatur.\n"
+"Välj Förstärkningsstil → Brustemperatur för att aktivera."
+
+#: src/draw_radiation.c:1114
 msgid "Select brightness temperature model for T_sky and T_earth."
 msgstr "Välj ljustemperaturmodell för T_sky och T_earth."
 
-#: src/draw_radiation.c:1194
+#: src/draw_radiation.c:1116
+msgid ""
+"Brightness temperature model for T_sky and T_earth.\n"
+"Select Gain Style → Noise Temperature to enable."
+msgstr ""
+"Ljustemperaturmodell för T_sky och T_earth.\n"
+"Välj Förstärkningsstil → Brustemperatur för att aktivera."
+
+#: src/draw_radiation.c:1555
 msgid "Total Gain"
 msgstr "Total förstärkning"
 
-#: src/draw_radiation.c:1195
+#: src/draw_radiation.c:1556
 msgid "Horizontal Polarization"
 msgstr "Horisontell polarisering"
 
-#: src/draw_radiation.c:1196
+#: src/draw_radiation.c:1557
 msgid "Vertical Polarization"
 msgstr "Vertikal polarisering"
 
-#: src/draw_radiation.c:1197
+#: src/draw_radiation.c:1558
 msgid "RH Circular Polarization"
 msgstr "Högercirkulär polarisering"
 
-#: src/draw_radiation.c:1198
+#: src/draw_radiation.c:1559
 msgid "LH Circular Polarization"
 msgstr "Vänstercirkulär polarisering"
 
-#: src/draw_radiation.c:1203
+#: src/draw_radiation.c:1564
 msgid "Linear Power"
 msgstr "Linjär effekt"
 
-#: src/draw_radiation.c:1204
+#: src/draw_radiation.c:1565
 msgid "Linear Voltage"
 msgstr "Linjär spänning"
 
-#: src/draw_radiation.c:1205
+#: src/draw_radiation.c:1566
 msgid "ARRL Scale"
 msgstr "ARRL-skala"
 
-#: src/draw_radiation.c:1206
+#: src/draw_radiation.c:1567
 msgid "Logarithmic Scale"
 msgstr "Logaritmisk skala"
 
-#: src/draw_radiation.c:1207
+#: src/draw_radiation.c:1568
 msgid "Noise Temperature"
 msgstr "Brustemperatur"
 
-#: src/draw_radiation.c:1208
+#: src/draw_radiation.c:1569
 msgid "Noise Temp (log scale)"
 msgstr "Brustemperatur (log-skala)"
 
-#: src/draw_radiation.c:1217 resources/xnec2c.glade:13102
+#: src/draw_radiation.c:1578 resources/xnec2c.glade:13321
 msgid "Radiation Patterns"
 msgstr "Strålningsdiagram"
 
-#: src/draw_radiation.c:1220
+#: src/draw_radiation.c:1581
 msgid "Radiation Pattern: - "
 msgstr "Strålningsdiagram: - "
 
-#: src/draw_radiation.c:1227
+#: src/draw_radiation.c:1588
 msgid "Near Fields:"
 msgstr "Närfält:"
 
-#: src/draw_radiation.c:1229
+#: src/draw_radiation.c:1590
 msgid " - E Field"
 msgstr " - E-fält"
 
-#: src/draw_radiation.c:1231
+#: src/draw_radiation.c:1592
 msgid " - H Field"
 msgstr " - H-fält"
 
-#: src/draw_radiation.c:1233
+#: src/draw_radiation.c:1594
 msgid " - Poynting Vector"
 msgstr " - Poyntingvektor"
 
-#: src/draw_radiation.c:1243
+#: src/draw_radiation.c:1604
 msgid "Frequency Data Plots - "
 msgstr "Frekvensdiagram - "
 
-#: src/draw_radiation.c:1461
+#: src/draw_radiation.c:1830
 #, c-format
 msgid "fstep=%d is out of bounds. calc_data.steps_total=%d"
 msgstr "fstep=%d är utanför gränserna. calc_data.steps_total=%d"
+
+#: src/fields.c:925
+#, c-format
+msgid "step size limited at z= %10.5f"
+msgstr "stegstorlek begränsad vid Z= %10.5f"
+
+#: src/fork.c:161 src/fork.c:512
+#, c-format
+msgid "child %d  length %d  return %d\n"
+msgstr "barn %d  längd %d  retur %d\n"
+
+#: src/fork.c:518
+#, c-format
+msgid "early EOF?, child %d  length %d  return %d\n"
+msgstr "tidigt EOF?, barn %d  längd %d  retur %d\n"
 
 #: src/geom_edit.c:108 src/geom_edit.c:2000 src/geom_edit.c:2272
 #: src/geom_edit.c:2703
@@ -651,27 +690,27 @@ msgstr ""
 msgid "No SC card after an SM card"
 msgstr "Inget SC-kort efter ett SM-kort"
 
-#: src/geom_edit.c:1157 resources/xnec2c.glade:7713
+#: src/geom_edit.c:1157 resources/xnec2c.glade:7711
 msgid "Center - X"
 msgstr "Centrum - X"
 
-#: src/geom_edit.c:1159 resources/xnec2c.glade:7777
+#: src/geom_edit.c:1159 resources/xnec2c.glade:7775
 msgid "Center - Y"
 msgstr "Centrum - Y"
 
-#: src/geom_edit.c:1161 resources/xnec2c.glade:7841
+#: src/geom_edit.c:1161 resources/xnec2c.glade:7839
 msgid "Center - Z"
 msgstr "Centrum - Z"
 
-#: src/geom_edit.c:1163 resources/xnec2c.glade:7745
+#: src/geom_edit.c:1163 resources/xnec2c.glade:7743
 msgid "Normal - Elev."
 msgstr "Normal - Elev."
 
-#: src/geom_edit.c:1165 resources/xnec2c.glade:7809
+#: src/geom_edit.c:1165 resources/xnec2c.glade:7807
 msgid "Normal - Azim."
 msgstr "Normal - Azim."
 
-#: src/geom_edit.c:1167 resources/xnec2c.glade:7873
+#: src/geom_edit.c:1167 resources/xnec2c.glade:7871
 msgid "Patch Area"
 msgstr "Patcharea"
 
@@ -703,11 +742,11 @@ msgstr "Hörn 2 - Z"
 msgid "SY Card Editor"
 msgstr "SY-kortredigerare"
 
-#: src/geom_edit.c:2865
+#: src/geom_edit.c:2865 resources/sy_overrides.glade:729
 msgid "_Cancel"
 msgstr "_Avbryt"
 
-#: src/geom_edit.c:2866
+#: src/geom_edit.c:2866 resources/sy_overrides.glade:714
 msgid "_Apply"
 msgstr "_Tillämpa"
 
@@ -1084,37 +1123,37 @@ msgstr "! Referensimpedans Z0 = %.2f Ohm\n"
 msgid "This should never happen. touchstone type=%d\n"
 msgstr "Detta borde aldrig hända. touchstone type=%d\n"
 
-#: src/gnuplot.c:227
+#: src/gnuplot.c:230
 #, c-format
 msgid "# Near E field\n"
 msgstr "# Nära E-fält\n"
 
-#: src/gnuplot.c:250
+#: src/gnuplot.c:253
 #, c-format
 msgid "# Near H field\n"
 msgstr "# Nära H-fält\n"
 
-#: src/gnuplot.c:297
+#: src/gnuplot.c:300
 #, c-format
 msgid "# Poynting Vector\n"
 msgstr "# Poyntingvektor\n"
 
-#: src/gnuplot.c:369
+#: src/gnuplot.c:372
 #, c-format
 msgid "# Radiation Pattern\n"
 msgstr "# Strålningsdiagram\n"
 
-#: src/gnuplot.c:505
+#: src/gnuplot.c:508
 #, c-format
 msgid "# structure patch segments\n"
 msgstr "# struktur patchsegment\n"
 
-#: src/gnuplot.c:528
+#: src/gnuplot.c:531
 #, c-format
 msgid "# structure wire segments\n"
 msgstr "# struktur trådsegment\n"
 
-#: src/gnuplot.c:554
+#: src/gnuplot.c:557
 #, c-format
 msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
@@ -1123,11 +1162,11 @@ msgstr ""
 "Visa med: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
 "close\"\n"
 
-#: src/gnuplot.c:565
+#: src/gnuplot.c:569
 msgid "Save Currents and Charges to CSV"
 msgstr "Spara strömmar och laddningar till CSV"
 
-#: src/gnuplot.c:566
+#: src/gnuplot.c:570
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
@@ -1135,11 +1174,11 @@ msgstr ""
 "Du måste aktivera strömdata genom att klicka på \"Strömmar\" eller "
 "\"Laddningar\" i huvudfönstret för xnec2c."
 
-#: src/gnuplot.c:626 src/gnuplot.c:634
+#: src/gnuplot.c:633 src/gnuplot.c:643
 msgid "Save Patch Currents to CSV"
 msgstr "Spara patchströmmar till CSV"
 
-#: src/gnuplot.c:627
+#: src/gnuplot.c:634
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
@@ -1147,7 +1186,7 @@ msgstr ""
 "Du måste aktivera strömdata genom att klicka på \"Strömmar\" eller "
 "\"Laddningar\" i huvudfönstret för xnec2c."
 
-#: src/gnuplot.c:635
+#: src/gnuplot.c:644
 msgid "No surface patches in this model."
 msgstr "Inga ytpatchar i denna modell."
 
@@ -1347,15 +1386,15 @@ msgstr "Misslyckades att initiera symboltabell\n"
 msgid "Failed to initialize symbol table"
 msgstr "Misslyckades att initiera symboltabell"
 
-#: src/input.c:1034
+#: src/input.c:1032
 msgid "ignoring CM card in commands\n"
 msgstr "ignorerar CM-kort i kommandon\n"
 
-#: src/input.c:1035
+#: src/input.c:1033
 msgid "Ignoring CM card in commands"
 msgstr "Ignorerar CM-kort i kommandon"
 
-#: src/input.c:1039
+#: src/input.c:1037
 msgid ""
 "CP card is ignored\n"
 "Coupling calculation not implemented"
@@ -1363,11 +1402,11 @@ msgstr ""
 "CP-kort ignoreras\n"
 "Kopplingsberäkning är inte implementerad"
 
-#: src/input.c:1217
+#: src/input.c:1215
 msgid "Max frequency <= Min frequency in FR card\n"
 msgstr "Maxfrekvens <= Minfrekvens i FR-kort\n"
 
-#: src/input.c:1218
+#: src/input.c:1216
 msgid ""
 "Max frequency <= Min frequency in FR card\n"
 "Please check FR card data and correct"
@@ -1375,7 +1414,7 @@ msgstr ""
 "Maxfrekvens <= Minfrekvens i FR-kort\n"
 "Kontrollera FR-kortdata och korrigera"
 
-#: src/input.c:1241
+#: src/input.c:1239
 msgid ""
 "Fix the GE/GN cards:\n"
 "The GE card specifies that a ground is present, but the GN indicates "
@@ -1384,11 +1423,11 @@ msgstr ""
 "Fixa GE/GN-korten:\n"
 "GE-kortet anger att en jordplan finns, men GN indikerar motsatsen."
 
-#: src/input.c:1255
+#: src/input.c:1253
 msgid "theta > 90 deg. with ground specified\n"
 msgstr "theta > 90 grader med angiven jordplan\n"
 
-#: src/input.c:1256 src/radiation.c:671
+#: src/input.c:1254 src/radiation.c:671
 msgid ""
 "Theta > 90 deg with ground specified\n"
 "Please check RP card data and correct"
@@ -1396,7 +1435,7 @@ msgstr ""
 "Theta > 90 grader med angiven jordplan\n"
 "Kontrollera RP-kortdata och korrigera"
 
-#: src/input.c:1265
+#: src/input.c:1263
 msgid ""
 "radial wire g.s. approximation: may not be used with Sommerfeld ground "
 "option\n"
@@ -1404,7 +1443,7 @@ msgstr ""
 "radiell tråd g.s.-approximation: kan inte användas med Sommerfeld-"
 "jordalternativ\n"
 
-#: src/input.c:1266
+#: src/input.c:1264
 msgid ""
 "radial wire g.s. approximation\n"
 "may not be used with Sommerfeld ground option"
@@ -1412,7 +1451,7 @@ msgstr ""
 "radiell tråd g.s.-approximation\n"
 "kan inte användas med Sommerfeld-jordalternativ"
 
-#: src/input.c:1317
+#: src/input.c:1315
 #, c-format
 msgid ""
 "data fault on loading card no %d: itag step1 %d is greater than itag step2 "
@@ -1420,7 +1459,7 @@ msgid ""
 msgstr ""
 "datafel på belastningskort nr %d: itag step1 %d är större än itag step2 %d\n"
 
-#: src/input.c:1319
+#: src/input.c:1317
 msgid ""
 "Data fault on loading card\n"
 "itag step1 is greater than itag step2"
@@ -1428,13 +1467,13 @@ msgstr ""
 "Datafel på belastningskort\n"
 "itag step1 är större än itag step2"
 
-#: src/input.c:1452
+#: src/input.c:1450
 msgid ""
 "Transmission Line impedance = 0: is not valid. Please correct NT or TL card\n"
 msgstr ""
 "Transmissionsledningsimpedans = 0: är ogiltigt. Korrigera NT- eller TL-kort\n"
 
-#: src/input.c:1453
+#: src/input.c:1451
 msgid ""
 "Transmission Line impedance = 0\n"
 "is not valid. Please correct NT or TL card"
@@ -1442,11 +1481,11 @@ msgstr ""
 "Transmissionsledningsimpedans = 0\n"
 "är ogiltigt. Korrigera NT- eller TL-kort"
 
-#: src/input.c:1462
+#: src/input.c:1460
 msgid "Segment number error in TL or NT card\n"
 msgstr "Segmentnummerfel i TL- eller NT-kort\n"
 
-#: src/input.c:1463
+#: src/input.c:1461
 msgid ""
 "Segment number\n"
 "error in NT or TL card"
@@ -1454,11 +1493,11 @@ msgstr ""
 "Segmentnummer-\n"
 "fel i NT- eller TL-kort"
 
-#: src/input.c:1484
+#: src/input.c:1482
 msgid "PQ and PT cards are ignored: Printing to file not implemented\n"
 msgstr "PQ- och PT-kort ignoreras: Utskrift till fil är inte implementerad\n"
 
-#: src/input.c:1485
+#: src/input.c:1483
 msgid ""
 "PQ and PT cards are ignored\n"
 "Printing to file not implemented"
@@ -1466,11 +1505,11 @@ msgstr ""
 "PQ- och PT-kort ignoreras\n"
 "Utskrift till fil är inte implementerad"
 
-#: src/input.c:1492
+#: src/input.c:1490
 msgid "Surface wave option (I1=1): of RP command not implemented\n"
 msgstr "Ytvågsalternativ (I1=1): av RP-kommando är inte implementerat\n"
 
-#: src/input.c:1493
+#: src/input.c:1491
 msgid ""
 "Surface wave option (I1=1)\n"
 "of RP command not implemented"
@@ -1478,24 +1517,24 @@ msgstr ""
 "Ytvågsalternativ (I1=1)\n"
 "av RP-kommando är inte implementerat"
 
-#: src/input.c:1518
+#: src/input.c:1516
 msgid "Average gain diagnostic enabled (use --skip-verify to disable)\n"
 msgstr ""
 "Diagnostik för medelförstärkning aktiverad (använd --skip-verify för att "
 "inaktivera)\n"
 
-#: src/input.c:1527
+#: src/input.c:1525
 #, c-format
 msgid "Average power gain disabled: nth=%d nph=%d (both must be >= 2)\n"
 msgstr ""
 "Medeleffektförstärkning inaktiverad: nth=%d nph=%d (båda måste vara >= 2)\n"
 
-#: src/input.c:1532
+#: src/input.c:1530
 #, c-format
 msgid "Average power gain calculation enabled (XNDA A=%d)\n"
 msgstr "Beräkning av medeleffektförstärkning aktiverad (XNDA A=%d)\n"
 
-#: src/input.c:1548
+#: src/input.c:1546
 msgid ""
 "Theta > 90 deg. with ground specified: Please check RP card data and "
 "correct\n"
@@ -1503,7 +1542,7 @@ msgstr ""
 "Theta > 90 grader med angiven jordplan: Kontrollera RP-kortdata och "
 "korrigera\n"
 
-#: src/input.c:1549
+#: src/input.c:1547
 msgid ""
 "Theta > 90 deg. with ground specified\n"
 "Please check RP card data and correct"
@@ -1511,11 +1550,11 @@ msgstr ""
 "Theta > 90 grader med angiven jordplan\n"
 "Kontrollera RP-kortdata och korrigera"
 
-#: src/input.c:1614
+#: src/input.c:1612
 msgid "Faulty data card"
 msgstr "Felaktigt datakort"
 
-#: src/input.c:1624
+#: src/input.c:1622
 msgid ""
 "Missing or surface-wave RP card: Radiation pattern and gain calculations "
 "disabled\n"
@@ -1523,11 +1562,11 @@ msgstr ""
 "Saknat eller ytvågs-RP-kort: Strålningsdiagram och förstärkningsberäkningar "
 "inaktiverade\n"
 
-#: src/input.c:1638
+#: src/input.c:1641
 msgid "Unexpected exit from while loop"
 msgstr "Oväntat avslut från while-loop"
 
-#: src/input.c:1729
+#: src/input.c:1732
 msgid ""
 "command data card error: Unexpected EOF while reading input file - appending "
 "EN card\n"
@@ -1535,7 +1574,7 @@ msgstr ""
 "fel på kommandodatakort: Oväntat filslut vid läsning av indatafil - lägger "
 "till EN-kort\n"
 
-#: src/input.c:1730
+#: src/input.c:1733
 msgid ""
 "Command data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -1545,11 +1584,11 @@ msgstr ""
 "Oväntat filslut vid läsning av indatafil\n"
 "Lägger till ett standard EN-kort"
 
-#: src/input.c:1744
+#: src/input.c:1747
 msgid "command data card error: card's mnemonic code too short or missing\n"
 msgstr "fel på kommandodatakort: kortets mnemonik är för kort eller saknas\n"
 
-#: src/input.c:1745
+#: src/input.c:1748
 msgid ""
 "Command data card error\n"
 "Mnemonic code too short or missing"
@@ -1557,7 +1596,7 @@ msgstr ""
 "Kommandodatakortfel\n"
 "Mnemonik är för kort eller saknas"
 
-#: src/input.c:1938
+#: src/input.c:1941
 msgid ""
 "geometry data card error: Unexpected EOF while reading input file - "
 "appending GE card\n"
@@ -1565,7 +1604,7 @@ msgstr ""
 "fel på geometridatakort: Oväntat filslut vid läsning av indatafil - lägger "
 "till GE-kort\n"
 
-#: src/input.c:1939
+#: src/input.c:1942
 msgid ""
 "Geometry data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -1575,11 +1614,11 @@ msgstr ""
 "Oväntat filslut vid läsning av indatafil\n"
 "Lägger till ett standard GE-kort"
 
-#: src/input.c:1953
+#: src/input.c:1956
 msgid "geometry data card error: card's mnemonic code too short or missing\n"
 msgstr "fel på geometridatakort: kortets mnemonik är för kort eller saknas\n"
 
-#: src/input.c:1954
+#: src/input.c:1957
 msgid ""
 "Geometry data card error\n"
 "Card's mnemonic code too short or missing"
@@ -1587,125 +1626,504 @@ msgstr ""
 "Geometridatakortfel\n"
 "Kortets mnemonik är för kort eller saknas"
 
-#: src/main.c:129
+#: src/interface.c:116
+#, c-format
+msgid "xnec2c Main: %s"
+msgstr "xnec2c Huvud: %s"
+
+#: src/interface.c:122
+#, c-format
+msgid "xnec2c Editor: %s"
+msgstr "xnec2c Redigerare: %s"
+
+#: src/interface.c:128
+#, c-format
+msgid "xnec2c Frequency Plots: %s"
+msgstr "xnec2c Frekvensdiagram: %s"
+
+#: src/interface.c:134
+#, c-format
+msgid "xnec2c Radiation Pattern: %s"
+msgstr "xnec2c Strålningsdiagram: %s"
+
+#: src/interface.c:149
+#, c-format
+msgid "Fatal Error: builder could not find object '%s'"
+msgstr "Allvarligt fel: gränssnittsbyggaren kunde inte hitta objektet '%s'"
+
+#: src/interface.c:174
+#, c-format
+msgid "failed to add objects to builder: %s\n"
+msgstr "Misslyckades att lägga till objekt i byggaren: %s\n"
+
+#: src/interface.c:176
+msgid "Listing Object Ids:\n"
+msgstr "Listar objekt-ID:n:\n"
+
+#: src/interface.c:180 src/utils.c:159 src/utils.c:163 src/utils.c:173
+#: src/utils.c:175
+#, c-format
+msgid "%s\n"
+msgstr "%s\n"
+
+#: src/interface.c:191 src/interface.c:194
+msgid ""
+"libgmodule not supported: xnec2c may not function properly on this "
+"platform.\n"
+msgstr ""
+"libgmodule stöds inte: xnec2c kanske inte fungerar korrekt på den här "
+"plattformen.\n"
+
+#: src/main.c:133
 #, c-format
 msgid "%s requires a positive integer argument\n"
 msgstr "%s kräver ett positivt heltalsargument\n"
 
-#: src/main.c:187
+#: src/main.c:191
 #, c-format
 msgid "Detected %d CPUs\n"
 msgstr "Upptäckte %d CPU:er\n"
 
-#: src/main.c:198
+#: src/main.c:202
 msgid "config file path too long\n"
 msgstr "konfigurationsfilsökväg för lång\n"
 
-#: src/main.c:217
+#: src/main.c:221
 #, c-format
 msgid "config file does not exist or is not readable: %s\n"
 msgstr "konfigurationsfil finns inte eller är inte läsbar: %s\n"
 
-#: src/main.c:226
+#: src/main.c:230
 #, c-format
 msgid "config file path too long ( > %d char )\n"
 msgstr "konfigurationsfilsökväg för lång ( > %d tecken )\n"
 
-#: src/main.c:238
+#: src/main.c:242
 #, c-format
 msgid "input file name too long ( > %d char )\n"
 msgstr "indatafilnamn för långt ( > %d tecken )\n"
 
-#: src/main.c:265
+#: src/main.c:269
 msgid "Forking disabled!\n"
 msgstr "Förgrening inaktiverad!\n"
 
-#: src/main.c:273
+#: src/main.c:277
 msgid "pthread freqloop disabled!\n"
 msgstr "pthread freqloop inaktiverad!\n"
 
-#: src/main.c:277
+#: src/main.c:281
 msgid "batch mode enabled, will exit after first loop\n"
 msgstr "batchläge aktiverat, avslutar efter första slingan\n"
 
-#: src/main.c:343
+#: src/main.c:347
 msgid "verify segments check disabled\n"
 msgstr "segmentkontroll inaktiverad\n"
 
-#: src/main.c:348
+#: src/main.c:352
 msgid "forcing overlap check on large models\n"
 msgstr "tvingar överlappningskontroll på stora modeller\n"
 
-#: src/main.c:362
+#: src/main.c:366
 msgid "--batch and --optimize are mutual exclusive.\n"
 msgstr "--batch och --optimize är ömsesidigt uteslutande.\n"
 
-#: src/main.c:378
+#: src/main.c:382
 #, c-format
 msgid "input file path name too long ( > %d char )\n"
 msgstr "indatafilsökväg för lång ( > %d tecken )\n"
 
-#: src/main.c:385
+#: src/main.c:389
 #, c-format
 msgid "unexpected argument '%s' does not appear to be a .nec file\n"
 msgstr "oväntat argument '%s' verkar inte vara en .nec-fil\n"
 
-#: src/main.c:392
+#: src/main.c:396
 #, c-format
 msgid "unexpected argument: %s\n"
 msgstr "oväntat argument: %s\n"
 
-#: src/main.c:398
+#: src/main.c:402
 msgid "batch mode requires an input file\n"
 msgstr "batchläge kräver en indatafil\n"
 
-#: src/main.c:419
+#: src/main.c:423
 #, c-format
 msgid "Forking %d jobs.\n"
 msgstr "Förgrenar %d jobb.\n"
 
-#: src/main.c:428 src/main.c:436
+#: src/main.c:435 src/main.c:443
 msgid "exiting after fatal error: pipe() failed"
 msgstr "avslutar efter allvarligt fel: pipe() misslyckades"
 
-#: src/main.c:445
+#: src/main.c:452
 msgid "exiting after fatal error: fork() failed"
 msgstr "avslutar efter allvarligt fel: fork() misslyckades"
 
-#: src/main.c:798
+#: src/main.c:874
 msgid "exiting via user interrupt\n"
 msgstr "avslutar via användaravbrott\n"
 
-#: src/main.c:802
+#: src/main.c:878
 msgid "segmentation fault, exiting\n"
 msgstr "segmenteringsfel, avslutar\n"
 
-#: src/main.c:806
+#: src/main.c:882
 msgid "floating point exception, exiting\n"
 msgstr "flyttalsundantag, avslutar\n"
 
-#: src/main.c:810
+#: src/main.c:886
 msgid "abort signal received, exiting\n"
 msgstr "avbrottssignal mottagen, avslutar\n"
 
-#: src/main.c:814
+#: src/main.c:890
 msgid "termination request received, exiting\n"
 msgstr "avslutningsbegäran mottagen, avslutar\n"
 
-#: src/main.c:824
+#: src/main.c:900
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
 msgstr "inte förgrenad, ignorerar SIGCHLD från pid %d\n"
 
-#: src/main.c:832
+#: src/main.c:908
 #, c-format
 msgid "child process pid %d exited\n"
 msgstr "barnprocess pid %d avslutades\n"
 
-#: src/main.c:841
+#: src/main.c:917
 #, c-format
 msgid "default exit with signal: %d\n"
 msgstr "standardavslut med signal: %d\n"
+
+#: src/mathlib.c:28
+msgid ""
+"Linear algebra library selection.\n"
+"Restart to change MKL threading library."
+msgstr ""
+"Val av linjärt algebrabibliotek.\n"
+"Starta om för att ändra MKL-trådningsbibliotek."
+
+#: src/mathlib.c:296
+msgid "open_mathlib: lib is NULL\n"
+msgstr "open_mathlib: lib är NULL\n"
+
+#: src/mathlib.c:306
+#, c-format
+msgid "setenv(%s, %s): %s\n"
+msgstr "setenv(%s, %s): %s\n"
+
+#: src/mathlib.c:320 src/utils.c:575
+#, c-format
+msgid "%s: %s\n"
+msgstr "%s: %s\n"
+
+#: src/mathlib.c:325
+#, c-format
+msgid "%s: opened %s\n"
+msgstr "%s: öppnade %s\n"
+
+#: src/mathlib.c:333
+#, c-format
+msgid "%s: library not found or nonfunctional, skipping: %s\n"
+msgstr "%s: biblioteket hittades inte eller fungerar inte, hoppar över: %s\n"
+
+#: src/mathlib.c:358
+#, c-format
+msgid "  %s: unable to bind %s: %s\n"
+msgstr "  %s: kan inte binda %s: %s\n"
+
+#: src/mathlib.c:394
+#, c-format
+msgid "%s: loaded\n"
+msgstr "%s: inläst\n"
+
+#: src/mathlib.c:464
+#, c-format
+msgid "Migrated legacy mathlib index %d to ID '%s'\n"
+msgstr "Migrerade äldre mathlib-index %d till ID '%s'\n"
+
+#: src/mathlib.c:469
+#, c-format
+msgid ""
+"Legacy mathlib index %d out of range [0-%d], triggering first-run scan\n"
+msgstr ""
+"Äldre mathlib-index %d utanför intervallet [0-%d], utlöser inledande "
+"skanning\n"
+
+#: src/mathlib.c:498
+#, c-format
+msgid "Mathlib ID '%s' not found in available libraries.\n"
+msgstr "Mathlib-ID '%s' hittades inte i tillgängliga bibliotek.\n"
+
+#: src/mathlib.c:500
+#, c-format
+msgid "Mathlib '%s' is not available.\n"
+msgstr "Mathlib '%s' är inte tillgängligt.\n"
+
+#: src/mathlib.c:505
+#, c-format
+msgid "Selected first available mathlib: %s\n"
+msgstr "Valde det första tillgängliga mathlib: %s\n"
+
+#: src/mathlib.c:596
+msgid "set_mathlib_interactive: lib == NULL\n"
+msgstr "set_mathlib_interactive: lib == NULL\n"
+
+#: src/mathlib.c:605
+#, c-format
+msgid "set_mathlib_interactive[%d]: mathlib.available=0, skipping: %s\n"
+msgstr "set_mathlib_interactive[%d]: mathlib.available=0, hoppar över: %s\n"
+
+#: src/mathlib.c:630
+msgid ""
+"mathlib: You cannot change the math library while the freq loop is running."
+msgstr ""
+"mathlib: Du kan inte ändra matematikbiblioteket medan frekvensslingan körs."
+
+#: src/mathlib.c:643
+msgid "set_mathlib_batch: lib == NULL\n"
+msgstr "set_mathlib_batch: lib == NULL\n"
+
+#: src/mathlib.c:648
+msgid "Batch Math Library"
+msgstr "Batch-matematikbibliotek"
+
+#: src/mathlib.c:649
+msgid ""
+"Selecting a batched math library has no effect unless -j is specified on the "
+"command line. (However, this selection will be saved for next time xnec2c is "
+"opened.)\n"
+msgstr ""
+"Att välja ett batch-matematikbibliotek har ingen effekt om inte -j anges på "
+"kommandoraden. (Detta val sparas dock till nästa gång xnec2c öppnas.)\n"
+
+#: src/mathlib.c:688
+#, c-format
+msgid "%s: benchmark=%d\n"
+msgstr "%s: prestandatest=%d\n"
+
+#: src/mathlib.c:759
+msgid "Mathlib Help"
+msgstr "Mathlib-hjälp"
+
+#: src/mathlib.c:795
+msgid "Mathlib Benchmark Help"
+msgstr "Mathlib-prestandatesthjälp"
+
+#: src/mathlib.c:797
+msgid ""
+"Jobs are forked and run in parallel by xnec2c, whereas threads are used by "
+"the mathlib implementation to parallelize the linear algebra calculation of "
+"one job.  For parallel algorithms you can reduce the number of threads in "
+"use by the algorithm with the following environment variables:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS thread limit\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP thread limit\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL thread limit\n"
+"\n"
+"Each benchmark specifies a complexity to indicate approximately how long it "
+"will take to run.  For example, O(N) means the time will scale with N and "
+"O(N*J) means it will scale with N*J:\n"
+"  * N is the number of mathlibs selected here:\n"
+"      File->Mathlib Benchmarks->Selected Mathlibs\n"
+"  * J is the number of jobs specified on the command line with -j (eg, -j "
+"8)\n"
+"\n"
+"Higher complexity options run more benchmarks to provide additional "
+"information about how you might optimize your xnec2c runtime.  The benchmark "
+"menu options are as follows:  \n"
+"\n"
+"* Parallel (-j N): O(N/J) time: Benchmark each mathlib in parallel with the "
+"number of jobs specified on the command line with -j.\n"
+"\n"
+"* Single Job (-j 1): O(N) time: Benchmark each mathlib with a single job "
+"even if -j was specified on the command line. This is useful to find the "
+"fastest interactive mathlib that is used when the frequency is changed in "
+"the UI by changing a Frequency MHz +/- widget or (right-)clicking on the "
+"frequency plot\n"
+"\n"
+"* Iterate -j N/=2: O(N*log2(J)) time: Benchmark each mathlib in parallel "
+"initially with the number of jobs specified on the command line with -j, and "
+"then reduce the number jobs by half for each subsequent iteration until only "
+"one job remains.  This is useful to find a balance between the number of "
+"parallel jobs specified by -j and the number of threads used by the linear "
+"algebra library as modified by the environment variables listed above.\n"
+"\n"
+"* Iterate -j N-=2: O(N*J) time: Same as -j N/=2 above, but instead decrement "
+"the number of jobs by 1.  This takes the longest to run.\n"
+msgstr ""
+"Jobb förgrenar och körs parallellt av xnec2c, medan trådar används av "
+"mathlib-implementationen för att parallelisera den linjära "
+"algebraberäkningen för ett jobb.  För parallella algoritmer kan du minska "
+"antalet trådar som används av algoritmen med följande miljövariabler:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS trådgräns\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP trådgräns\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL trådgräns\n"
+"\n"
+"Varje prestandatest anger en komplexitet för att indikera ungefär hur lång "
+"tid det tar att köra.  Till exempel betyder O(N) att tiden skalar med N och "
+"O(N*J) att den skalar med N*J:\n"
+"  * N är antalet mathlibs som valts här:\n"
+"      Fil->Mathlib-prestandatester->Valda Mathlibs\n"
+"  * J är antalet jobb som anges på kommandoraden med -j (t.ex. -j 8)\n"
+"\n"
+"Alternativ med högre komplexitet kör fler prestandatester för att ge "
+"ytterligare information om hur du kan optimera din xnec2c-körtid.  "
+"Prestandatestmenyalternativen är följande:  \n"
+"\n"
+"* Parallellt (-j N): O(N/J) tid: Testa varje mathlib parallellt med antalet "
+"jobb som anges på kommandoraden med -j.\n"
+"\n"
+"* Enskilt jobb (-j 1): O(N) tid: Testa varje mathlib med ett enskilt jobb "
+"även om -j angavs på kommandoraden. Detta är användbart för att hitta det "
+"snabbaste interaktiva mathlib som används när frekvensen ändras i "
+"gränssnittet genom att ändra en Frekvens MHz +/- widget eller (höger-)klicka "
+"på frekvensdiagrammet\n"
+"\n"
+"* Iterera -j N/=2: O(N*log2(J)) tid: Testa varje mathlib parallellt "
+"inledningsvis med antalet jobb som anges på kommandoraden med -j, och minska "
+"sedan antalet jobb med hälften för varje efterföljande iteration tills bara "
+"ett jobb återstår.  Detta är användbart för att hitta en balans mellan "
+"antalet parallella jobb som anges med -j och antalet trådar som används av "
+"det linjära algebrabiblioteket enligt de ovan angivna miljövariablerna.\n"
+"\n"
+"* Iterera -j N-=2: O(N*J) tid: Samma som -j N/=2 ovan, men minskar istället "
+"antalet jobb med 1.  Detta tar längst tid att köra.\n"
+
+#: src/mathlib.c:846 src/mathlib.c:853 src/mathlib.c:859 src/mathlib.c:876
+#: src/mathlib.c:881 src/mathlib.c:1003
+msgid "Mathlib Benchmark"
+msgstr "Mathlib-prestandatest"
+
+#: src/mathlib.c:847
+msgid "Benchmarks are disabled while optimization is activated."
+msgstr "Prestandatester är inaktiverade medan optimering är aktiv."
+
+#: src/mathlib.c:854
+msgid "You must load a NEC2 input file before running benchmarks."
+msgstr "Du måste läsa in en NEC2-indatafil innan du kör prestandatester."
+
+#: src/mathlib.c:860
+msgid ""
+"Choosing a benchmark other than \"Single Job\" has no effect unless -j is "
+"specified on the command line."
+msgstr ""
+"Att välja ett annat prestandatest än \"Enskilt jobb\" har ingen effekt om "
+"inte -j anges på kommandoraden."
+
+#: src/mathlib.c:877
+msgid "You must select at least one math library to benchmark"
+msgstr "Du måste välja minst ett matematikbibliotek för prestandatestning"
+
+#: src/mathlib.c:882
+#, c-format
+msgid ""
+"This will run a frequency loop benchmark for each detected linear algebra "
+"library and then provide a summary.  It may take some time to complete "
+"depending on how big and how many frequencies your NEC2 will use. Detailed "
+"timing will be provided in the terminal.\n"
+"\n"
+"Notes:\n"
+"* Only one Intel MKL library can be tested without restarting xnec2c, so "
+"select which one you wishto benchmark before proceeding or it will choose "
+"the first in the list and skip the rest.\n"
+"\n"
+"* Thread congestion will occur for multi-threaded libraries when using the -"
+"j N option if there are not enough CPUs available to accommodate the forked "
+"processes in combination with library threads.  Consider reducing the value "
+"of -j N for benchmarking to find what library works best with a mix of "
+"forking and threading; you can use `top` to monitor your CPU usageand if it "
+"reaches 0% idle then you might consider reducing -j N.\n"
+"\n"
+"You may wish to experiment setting these environment variables:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS thread limit\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP thread limit\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL thread limit\n"
+"\n"
+"Click OK to proceed, this dialog will close when complete."
+msgstr ""
+"Detta kör ett frekvensloop-prestandatest för varje detekterat linjärt "
+"algebrabibliotek och ger sedan en sammanfattning.  Det kan ta en stund att "
+"slutföra beroende på hur stor och hur många frekvenser din NEC2 kommer att "
+"använda. Detaljerad tidmätning ges i terminalen.\n"
+"\n"
+"Observera:\n"
+"* Bara ett Intel MKL-bibliotek kan testas utan att starta om xnec2c, så välj "
+"vilket du vill testa innan du fortsätter, annars väljs det första i listan "
+"och resten hoppas över.\n"
+"\n"
+"* Trådträngsel uppstår för flertrådiga bibliotek vid användning av "
+"alternativet -j N om det inte finns tillräckligt med CPU:er tillgängliga för "
+"att hantera de förgrenade processerna i kombination med bibliotekstrådar.  "
+"Överväg att minska värdet på -j N för prestandatestning för att hitta vilket "
+"bibliotek som fungerar bäst med en blandning av förgrening och trådning; du "
+"kan använda `top` för att övervaka CPU-användning och om den når 0% inaktiv "
+"kan du överväga att minska -j N.\n"
+"\n"
+"Du kanske vill experimentera med att ange dessa miljövariabler:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS trådgräns\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP trådgräns\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL trådgräns\n"
+"\n"
+"Klicka OK för att fortsätta, denna dialog stängs när det är klart."
+
+#: src/mathlib.c:939
+#, c-format
+msgid "Starting %s benchmark (-j %d)\n"
+msgstr "Startar %s prestandatest (-j %d)\n"
+
+#: src/mathlib.c:1036
+#, c-format
+msgid "mathlib_lock_intel: Cannot find library for mathlib ID='%s'\n"
+msgstr "mathlib_lock_intel: Kan inte hitta bibliotek för mathlib-ID='%s'\n"
+
+#: src/mathlib.c:1047
+#, c-format
+msgid ""
+"\n"
+"* Notice: \"%s\" was selected, but you can only change to a\n"
+"* different Intel MKL threading library by restarting xnec2c.\n"
+"* \n"
+"* However, you may continue to select any other Linear Algebra library\n"
+"* without restart, including this same Intel MKL library.  All other\n"
+"* Intel MKL threading libraries are disabled until restart because of an \n"
+"* MKL limitation where the MKL threading library can only be dynamically\n"
+"* linked only once per runtime.\n"
+"* \n"
+"* See Intel's documentation on mkl_set_threading_layer() for more detail.\n"
+msgstr ""
+"\n"
+"* Obs: \"%s\" valdes, men du kan bara byta till ett\n"
+"* annat Intel MKL-trådningsbibliotek genom att starta om xnec2c.\n"
+"* \n"
+"* Du kan dock fortsätta att välja vilket annat linjärt algebrabibliotek\n"
+"* som helst utan omstart, inklusive samma Intel MKL-bibliotek.  Alla andra\n"
+"* Intel MKL-trådningsbibliotek är inaktiverade tills omstart på grund av en\n"
+"* MKL-begränsning där MKL-trådningsbiblioteket bara kan länkas dynamiskt\n"
+"* en gång per körtillfälle.\n"
+"* \n"
+"* Se Intels dokumentation om mkl_set_threading_layer() för mer detaljer.\n"
+
+#: src/mathlib.c:1122
+msgid "zgetrf: current_mathlib is NULL, this should never happen.\n"
+msgstr "zgetrf: current_mathlib är NULL, detta ska aldrig inträffa.\n"
+
+#: src/mathlib.c:1146 src/mathlib.c:1191
+#, c-format
+msgid "%s: unsupported mathlib type %d\n"
+msgstr "%s: mathlib-typ %d stöds inte\n"
+
+#: src/mathlib.c:1159
+msgid "zgetrs: current_mathlib is NULL, this should never happen.\n"
+msgstr "zgetrs: current_mathlib är NULL, detta ska aldrig inträffa.\n"
+
+#: src/mathlib.c:1184
+#, c-format
+msgid "zgetrs warning: lda(%d) != ldb(%d)\n"
+msgstr "zgetrs varning: lda(%d) != ldb(%d)\n"
+
+#: src/mathlib.c:1219
+#, c-format
+msgid "dlsym(mkl_set_threading_layer): %s\n"
+msgstr "dlsym(mkl_set_threading_layer): %s\n"
 
 #: src/matrix.c:1216
 #, c-format
@@ -1731,11 +2149,30 @@ msgstr "Symmetrifel"
 msgid "Solving Failed: %d\n"
 msgstr "Lösning misslyckades: %d\n"
 
+#: src/measurements.c:326
+#, c-format
+msgid "BUG: invalid mgidx=%d: idx=%d pol=%d num_fsteps=%d freq_step=%d\n"
+msgstr "BUG: ogiltigt mgidx=%d: idx=%d pol=%d num_fsteps=%d freq_step=%d\n"
+
+#: src/measurements.c:329
+#, c-format
+msgid "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d\n"
+msgstr "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d\n"
+
+#: src/measurements.c:492
+#, c-format
+msgid "meas_name_idx: Invalid name with length=%d: %s\n"
+msgstr "meas_name_idx: Ogiltigt namn med längd=%d: %s\n"
+
+#: src/measurements.c:519
+msgid "meas_format: output overflow\n"
+msgstr "meas_format: utdataöverflöde\n"
+
 #: src/nec2_model.c:278 src/nec2_model.c:282 src/nec2_model.c:286
 msgid "Card"
 msgstr "Kort"
 
-#: src/nec2_model.c:278 resources/xnec2c.glade:6183
+#: src/nec2_model.c:278 resources/xnec2c.glade:6181
 msgid "Comments"
 msgstr "Kommentarer"
 
@@ -1781,27 +2218,174 @@ msgstr ""
 "Använd knappen Spara\n"
 "för att ange en filsökväg"
 
-#: src/network.c:648
+#: src/network.c:646
 #, c-format
 msgid "improper load type chosen, requested type is %d\n"
 msgstr "felaktig lasttyp vald, begärd typ är %d\n"
 
-#: src/network.c:649
+#: src/network.c:647
 msgid "Improper load type chose"
 msgstr "Felaktig lasttyp vald"
 
-#: src/network.c:737
+#: src/network.c:735
 #, c-format
 msgid "loading data card error, no segment has an itag = %d\n"
 msgstr "fel vid laddning av datakort, inget segment har itag = %d\n"
 
-#: src/network.c:738
+#: src/network.c:736
 msgid ""
 "Loading data card\n"
 "Tag number mismatch error"
 msgstr ""
 "Laddar datakort\n"
 "Fel vid matchning av taggnummer"
+
+#: src/opt_file.c:342
+#, c-format
+msgid "opt_file_save: %s\n"
+msgstr "opt_file_save: %s\n"
+
+#: src/opt_file.c:533
+#, c-format
+msgid "opt_file_load: unknown metric in [%s]\n"
+msgstr "opt_file_load: okänt mätvärde i [%s]\n"
+
+#: src/opt_file.c:615
+#, c-format
+msgid "Loaded %d optimizer goals\n"
+msgstr "Laddade %d optimeringsmål\n"
+
+#: src/opt_file.c:651
+#, c-format
+msgid "opt_file_load: %s\n"
+msgstr "opt_file_load: %s\n"
+
+#: src/opt_ui_session.c:70
+#, c-format
+msgid "opt_ui: optimization finished, best fitness: %.6g\n"
+msgstr "opt_ui: optimering klar, bästa fitness: %.6g\n"
+
+#: src/opt_ui_session.c:106 src/opt_ui_session.c:139 src/opt_ui_session.c:169
+#: src/opt_ui_session.c:268
+msgid "Optimization"
+msgstr "Optimering"
+
+#: src/optimize.c:83
+#, c-format
+msgid "saving %s: %s\n"
+msgstr "sparar %s: %s\n"
+
+#: src/optimize.c:100
+msgid "xnec2c was built without inotify.\n"
+msgstr "xnec2c byggdes utan inotify.\n"
+
+#: src/optimize.c:157
+#, c-format
+msgid "inotify: matched companion file: %s\n"
+msgstr "inotify: matchade kompanjonfil: %s\n"
+
+#: src/optimize.c:198
+#, c-format
+msgid "Unable to configure file modification detection to %s: %s\n"
+msgstr "Kan inte konfigurera filändringsdetektering för %s: %s\n"
+
+#: src/optimize.c:203
+#, c-format
+msgid "Monitoring directory for %s: %s\n"
+msgstr "Övervakar katalog för %s: %s\n"
+
+#: src/optimize.c:301
+msgid "Exited optimizer thread.\n"
+msgstr "Optimeringstråd avslutad.\n"
+
+#: src/optimize.c:307
+msgid "optimize.c: exit because this is a child process.\n"
+msgstr "optimize.c: avslutar eftersom detta är en barnprocess.\n"
+
+#: src/optimize.c:333
+#, c-format
+msgid "inotify: read %zd bytes from inotify fd\n"
+msgstr "inotify: läste %zd byte från inotify fd\n"
+
+#: src/optimize.c:337
+#, c-format
+msgid ""
+"inotify: SKIP all events (flags) - FREQ_LOOP_RUNNING=%d FREQ_LOOP_INIT=%d "
+"INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n"
+msgstr ""
+"inotify: HOPPAR ÖVER alla händelser (flaggor) - FREQ_LOOP_RUNNING=%d "
+"FREQ_LOOP_INIT=%d INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n"
+
+#: src/optimize.c:356
+#, c-format
+msgid "inotify: EVENT @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
+msgstr ""
+"inotify: HÄNDELSE @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
+
+#: src/optimize.c:360
+#, c-format
+msgid ""
+"inotify: EVENT flags: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
+"IN_CREATE=%d IN_DELETE=%d IN_MODIFY=%d\n"
+msgstr ""
+"inotify: HÄNDELSEFLAGGOR: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
+"IN_CREATE=%d IN_DELETE=%d IN_MODIFY=%d\n"
+
+#: src/optimize.c:368
+#, c-format
+msgid "inotify: FILTER: target='%s' event_name='%s' match=%d\n"
+msgstr "inotify: FILTER: target='%s' event_name='%s' match=%d\n"
+
+#: src/optimize.c:375
+msgid "inotify: SKIP event (filename mismatch)\n"
+msgstr "inotify: HOPPAR ÖVER händelse (filnamnet stämmer inte)\n"
+
+#: src/optimize.c:382
+msgid "inotify: IN_MODIFY on target, setting modify_seen=TRUE\n"
+msgstr "inotify: IN_MODIFY på mål, sätter modify_seen=TRUE\n"
+
+#: src/optimize.c:390
+msgid ""
+"inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n"
+msgstr ""
+"inotify: IN_MOVED_TO på mål (atomär skrivning klar), utlöser omladdning\n"
+
+#: src/optimize.c:401 src/optimize.c:436
+#, c-format
+msgid ""
+"inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), "
+"retrying\n"
+msgstr ""
+"inotify: fil-stat misslyckades eller noll byte (ret=%d size=%ld errno=%s), "
+"försöker igen\n"
+
+#: src/optimize.c:407 src/optimize.c:442
+#, c-format
+msgid "inotify: file stat OK - size=%ld bytes\n"
+msgstr "inotify: fil-stat OK - storlek=%ld byte\n"
+
+#: src/optimize.c:425
+msgid ""
+"inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
+"triggering reload\n"
+msgstr ""
+"inotify: IN_CLOSE_WRITE efter modify_seen=TRUE (direktskrivning klar), "
+"utlöser omladdning\n"
+
+#: src/optimize.c:455
+msgid ""
+"inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
+"skipping\n"
+msgstr ""
+"inotify: IN_CLOSE_WRITE utan modify_seen (falsk stängning, gammal inode), "
+"hoppar över\n"
+
+#: src/optimize.c:462
+#, c-format
+msgid "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
+msgstr ""
+"inotify: HOPPAR ÖVER händelse (inte MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x"
+"%08x)\n"
 
 #: src/plot_freqdata.c:132
 #, c-format
@@ -1833,112 +2417,112 @@ msgstr "Draw_Graph():Minnesallokering för punkter misslyckades"
 msgid "Smith Chart"
 msgstr "Smith-diagram"
 
-#: src/plot_freqdata.c:1475 src/plot_freqdata.c:1494 src/plot_freqdata.c:1519
+#: src/plot_freqdata.c:1490 src/plot_freqdata.c:1509 src/plot_freqdata.c:1534
 msgid "Raw Gain dBi"
 msgstr "Råförstärkning dBi"
 
-#: src/plot_freqdata.c:1478
+#: src/plot_freqdata.c:1493
 msgid "Max Gain & Net Gain vs Frequency"
 msgstr "Maxförstärkning & nettoförstärkning mot frekvens"
 
-#: src/plot_freqdata.c:1479
+#: src/plot_freqdata.c:1494
 msgid "Net Gain dBi"
 msgstr "Nettoförstärkning dBi"
 
-#: src/plot_freqdata.c:1485 src/plot_freqdata.c:1495
+#: src/plot_freqdata.c:1500 src/plot_freqdata.c:1510
 msgid "Max Gain & F/B Ratio vs Frequency"
 msgstr "Maxförstärkning & F/B-förhållande mot frekvens"
 
-#: src/plot_freqdata.c:1496
+#: src/plot_freqdata.c:1511
 msgid "F/B Ratio dB"
 msgstr "F/B-förhållande dB"
 
-#: src/plot_freqdata.c:1505
+#: src/plot_freqdata.c:1520
 msgid "Rad Angle - deg"
 msgstr "Strålningsvinkel - deg"
 
-#: src/plot_freqdata.c:1506
+#: src/plot_freqdata.c:1521
 msgid "Max Gain Direction vs Frequency"
 msgstr "Maxförstärkningsriktning mot frekvens"
 
-#: src/plot_freqdata.c:1507
+#: src/plot_freqdata.c:1522
 msgid "Phi - deg"
 msgstr "Phi - deg"
 
-#: src/plot_freqdata.c:1520
+#: src/plot_freqdata.c:1535
 msgid "Gain in Viewer Direction vs Frequency"
 msgstr "Förstärkning i betraktningsriktning mot frekvens"
 
-#: src/plot_freqdata.c:1543
+#: src/plot_freqdata.c:1558
 msgid "Net gain dBi"
 msgstr "Nettoförstärkning dBi"
 
-#: src/plot_freqdata.c:1561 resources/xnec2c.glade:9953
-#: resources/xnec2c.glade:10177
+#: src/plot_freqdata.c:1576 resources/xnec2c.glade:9951
+#: resources/xnec2c.glade:10175
 msgid "VSWR"
 msgstr "VSWR"
 
-#: src/plot_freqdata.c:1564
+#: src/plot_freqdata.c:1579
 msgid "VSWR & S11 vs Frequency"
 msgstr "VSWR & S11 mot frekvens"
 
-#: src/plot_freqdata.c:1565
+#: src/plot_freqdata.c:1580
 msgid "S11 dB"
 msgstr "S11 dB"
 
-#: src/plot_freqdata.c:1569
+#: src/plot_freqdata.c:1584
 msgid "VSWR vs Frequency"
 msgstr "VSWR mot frekvens"
 
-#: src/plot_freqdata.c:1583
+#: src/plot_freqdata.c:1598
 msgid "memory allocation for vswr/s11 failed\n"
 msgstr "minnesallokering för vswr/s11 misslyckades\n"
 
-#: src/plot_freqdata.c:1584
+#: src/plot_freqdata.c:1599
 msgid "Plot_Frequency_Data():Memory allocation for vswr/s11 failed"
 msgstr "Plot_Frequency_Data():Minnesallokering för vswr/s11 misslyckades"
 
-#: src/plot_freqdata.c:1614 resources/xnec2c.glade:10142
+#: src/plot_freqdata.c:1646 resources/xnec2c.glade:10140
 msgid "Z-real"
 msgstr "Z-real"
 
-#: src/plot_freqdata.c:1615 src/plot_freqdata.c:1628
+#: src/plot_freqdata.c:1647 src/plot_freqdata.c:1656
 msgid "Impedance vs Frequency"
 msgstr "Impedans mot frekvens"
 
-#: src/plot_freqdata.c:1616 resources/xnec2c.glade:10107
+#: src/plot_freqdata.c:1648 resources/xnec2c.glade:10105
 msgid "Z-imag"
 msgstr "Z-imag"
 
-#: src/plot_freqdata.c:1627
+#: src/plot_freqdata.c:1655
 msgid "Z-magn"
 msgstr "Z-magn"
 
-#: src/plot_freqdata.c:1629
+#: src/plot_freqdata.c:1657
 msgid "Z-phase"
 msgstr "Z-fas"
 
-#: src/plot_freqdata.c:1667
+#: src/plot_freqdata.c:1691
 msgid "G/T_ant (dB)"
 msgstr "G/T_ant (dB)"
 
-#: src/plot_freqdata.c:1670
+#: src/plot_freqdata.c:1694
 msgid "G/T_ant & T_ant"
 msgstr "G/T_ant & T_ant"
 
-#: src/plot_freqdata.c:1671
+#: src/plot_freqdata.c:1695
 msgid "T_ant (K)"
 msgstr "T_ant (K)"
 
-#: src/plot_freqdata.c:1675
+#: src/plot_freqdata.c:1699
 msgid "G/T_ant & T_total"
 msgstr "G/T_ant & T_total"
 
-#: src/plot_freqdata.c:1676
+#: src/plot_freqdata.c:1700
 msgid "T_total (K)"
 msgstr "T_total (K)"
 
-#: src/plot_freqdata.c:1918
+#: src/plot_freqdata.c:1942
 #, c-format
 msgid "mouse button: unknown button %d\n"
 msgstr "musknapp: okänd knapp %d\n"
@@ -1959,6 +2543,95 @@ msgstr ""
 "Medelförstärkning: %.4f (%.2f dBi), verkningsgrad: %.1f%%, rymdvinkel: %.4f "
 "* pi sr\n"
 
+#: src/rc_config.c:344
+#, c-format
+msgid "unable to getcwd(): %s\n"
+msgstr "kan inte köra getcwd(): %s\n"
+
+#: src/rc_config.c:348
+#, c-format
+msgid "environment variable HOME is undefined, using %s\n"
+msgstr "miljövariabeln HOME är odefinierad, använder %s\n"
+
+#: src/rc_config.c:433
+#, c-format
+msgid ""
+"%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
+msgstr ""
+"%s (locale=%s): matchade bara %d av %lu tecken, provar ett annat locale: %s\n"
+
+#: src/rc_config.c:494
+#, c-format
+msgid ""
+"rc_config: %s: builder_check_menu_item_id is NULL but builder_window is "
+"defined.\n"
+msgstr ""
+"rc_config: %s: builder_check_menu_item_id är NULL men builder_window är "
+"definierat.\n"
+
+#: src/rc_config.c:497
+#, c-format
+msgid ""
+"rc_config: %s: builder_window is NULL but builder_check_menu_item_id is "
+"defined.\n"
+msgstr ""
+"rc_config: %s: builder_window är NULL men builder_check_menu_item_id är "
+"definierat.\n"
+
+#: src/rc_config.c:510
+#, c-format
+msgid "match: %s\n"
+msgstr "matchning: %s\n"
+
+#: src/rc_config.c:535
+#, c-format
+msgid "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
+msgstr "fönster: x=%-5d y=%-5d w=%-5d h=%-5d  titel: \"%s\"\n"
+
+#: src/rc_config.c:605
+#, c-format
+msgid "%s: EOF reading application version.\n"
+msgstr "%s: EOF vid läsning av programversion.\n"
+
+#: src/rc_config.c:611
+#, c-format
+msgid "existing config file version differs: %s != %s\n"
+msgstr "befintlig konfigurationsfilversion skiljer sig: %s != %s\n"
+
+#: src/rc_config.c:921
+#, c-format
+msgid "stat failed for %s: %s\n"
+msgstr "stat misslyckades för %s: %s\n"
+
+#: src/rc_config.c:927
+#, c-format
+msgid ""
+"Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
+"4e62893b.\n"
+msgstr ""
+"Rättade %s katalogrättigheter från 0%o till 0%o från bugg introducerad i "
+"4e62893b.\n"
+
+#: src/rc_config.c:958
+#, c-format
+msgid "%s:%d: Line not parsed: %s\n"
+msgstr "%s:%d: Rad ej tolkad: %s\n"
+
+#: src/rc_config.c:964
+#, c-format
+msgid "%s:%d: Early end of file for %s: %s \n"
+msgstr "%s:%d: Tidigt filslut för %s: %s \n"
+
+#: src/rc_config.c:989
+#, c-format
+msgid "%s:%d: parse error (%s): %s \n"
+msgstr "%s:%d: tolkningsfel (%s): %s \n"
+
+#: src/rc_config.c:1254
+#, c-format
+msgid "cannot open xnec2c's config file %s: %s\n"
+msgstr "kan inte öppna xnec2cs konfigurationsfil %s: %s\n"
+
 #: src/somnec.c:238
 msgid "Hankel not valid for z = 0"
 msgstr "Hankel ej giltig för Z = 0"
@@ -1966,6 +2639,101 @@ msgstr "Hankel ej giltig för Z = 0"
 #: src/somnec.c:749
 msgid "No convergence"
 msgstr "Ingen konvergens"
+
+#: src/sy_expr.c:137
+msgid "(further errors suppressed)\n"
+msgstr "(fler fel döljs)\n"
+
+#: src/sy_expr.c:583
+msgid "Expression syntax error: unexpected character"
+msgstr "Uttryckets syntaxfel: oväntat tecken"
+
+#: src/sy_expr.c:720
+msgid "Expression parsing error: unexpected token"
+msgstr "Uttryckets tolkningsfel: oväntad symbol"
+
+#: src/sy_expr.c:732
+msgid "Expression error: mismatched parentheses"
+msgstr "Uttrycksfel: oparade parenteser"
+
+#: src/sy_expr.c:814
+#, c-format
+msgid "Undefined symbol: %s"
+msgstr "Odefinierad symbol: %s"
+
+#: src/sy_expr.c:839 src/sy_expr.c:849
+msgid "Expression error: missing operand"
+msgstr "Uttrycksfel: saknar operand"
+
+#: src/sy_expr.c:861
+msgid "Unknown operator"
+msgstr "Okänd operator"
+
+#: src/sy_expr.c:873
+msgid "Division by zero"
+msgstr "Division med noll"
+
+#: src/sy_expr.c:896
+#, c-format
+msgid "Unknown function: %s"
+msgstr "Okänd funktion: %s"
+
+#: src/sy_expr.c:908 src/sy_expr.c:926 src/sy_expr.c:936
+msgid "Function error: missing argument"
+msgstr "Funktionsfel: saknar argument"
+
+#: src/sy_expr.c:953
+msgid "Function error: invalid arity"
+msgstr "Funktionsfel: ogiltigt antal argument"
+
+#: src/sy_expr.c:967
+msgid "Expression error: unexpected token type in RPN"
+msgstr "Uttrycksfel: oväntad symboltyp i RPN"
+
+#: src/sy_expr.c:975
+msgid "Expression error: invalid result"
+msgstr "Uttrycksfel: ogiltigt resultat"
+
+#: src/sy_expr.c:1123
+msgid "Invalid arguments to sy_evaluate"
+msgstr "Ogiltiga argument till sy_evaluate"
+
+#: src/sy_expr.c:1246
+#, c-format
+msgid "sy_load_overrides: malformed line (no colon): %s"
+msgstr "sy_load_overrides: felaktig rad (inget kolon): %s"
+
+#: src/sy_expr.c:1336
+#, c-format
+msgid "Loaded %d symbol overrides from %s\n"
+msgstr "Laddade %d symbolåsidosättningar från %s\n"
+
+#: src/sy_expr.c:1453
+#, c-format
+msgid "sy_save_overrides: cannot open %s for writing: %s\n"
+msgstr "sy_save_overrides: kan inte öppna %s för skrivning: %s\n"
+
+#: src/sy_expr.c:1475
+#, c-format
+msgid "Saved %d symbol overrides to %s\n"
+msgstr "Sparade %d symbolåsidosättningar till %s\n"
+
+#: src/sy_overrides.c:1093
+#, c-format
+msgid "sy_overrides_init: failed to load glade: %s\n"
+msgstr "sy_overrides_init: misslyckades att läsa in glade: %s\n"
+
+#: src/sy_overrides.c:1107
+msgid "sy_overrides_init: failed to get widgets from glade\n"
+msgstr "sy_overrides_init: misslyckades att hämta widgetar från glade\n"
+
+#: src/sy_overrides.c:1486
+msgid ""
+"Controls whether this parameter overrides the NEC model value.\n"
+"Uncheck Opt to control independently."
+msgstr ""
+"Styr om denna parameter åsidosätter NEC-modellvärdet.\n"
+"Avmarkera Opt för att styra oberoende."
 
 #: src/utils.c:45
 #, c-format
@@ -2062,11 +2830,6 @@ msgstr ""
 msgid "Stop: %s\n"
 msgstr "Stopp: %s\n"
 
-#: src/utils.c:159 src/utils.c:163 src/utils.c:173 src/utils.c:175
-#, c-format
-msgid "%s\n"
-msgstr "%s\n"
-
 #: src/utils.c:188 src/utils.c:190
 #, c-format
 msgid "Stop during freq loop, deadlock prevented: %s\n"
@@ -2119,11 +2882,6 @@ msgstr "%s: Begärt minne %lu\n"
 msgid "xnec2c[%d]: %s: Failed to open file: %s\n"
 msgstr "xnec2c[%d]: %s: Kunde inte öppna fil: %s\n"
 
-#: src/utils.c:575
-#, c-format
-msgid "%s: %s\n"
-msgstr "%s: %s\n"
-
 #: src/utils.c:943
 msgid "Optimizer loop incomplete, skipping radiation pattern redraw.\n"
 msgstr ""
@@ -2160,39 +2918,276 @@ msgstr ""
 msgid "Ground_Parameters():Error in ground parameters"
 msgstr "Ground_Parameters():Fel i jordparametrar"
 
-#: src/xnec2c.c:509
+#: src/xnec2c.c:516
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
 msgstr "%.6f MHz: %f sekunder. (%s)\n"
 
-#: src/xnec2c.c:840
+#: src/xnec2c.c:802 src/xnec2c.c:854
+#, c-format
+msgid ""
+"step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
+msgstr ""
+"steg %d racetillstånd: skickade %.6f MHz, nuvarande %.6f MHz; beräknar om\n"
+
+#: src/xnec2c.c:842
 msgid "Failed to read data from forked child\n"
 msgstr "Kunde inte läsa data från förgrenad barnprocess\n"
 
-#: src/xnec2c.c:876
-#, c-format
-msgid ""
-"Frequency_Loop is done with all steps but num_busy_procs=%d (calc_data."
-"freq_step=%d calc_data.steps_total=%d)?\n"
-msgstr ""
-"Frequency_Loop är klar med alla steg men num_busy_procs=%d (calc_data."
-"freq_step=%d calc_data.steps_total=%d)?\n"
-
-#: src/xnec2c.c:883
-#, c-format
-msgid "  busy job[%d]: fstep=%d freq=%f\n"
-msgstr "  upptaget jobb[%d]: fstep=%d freq=%f\n"
-
-#: src/xnec2c.c:945
+#: src/xnec2c.c:941
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
 msgstr "Frekvensloop förfluten tid: %f sekunder. (%s)\n"
 
-#: src/xnec2c.c:1090
+#: src/xnec2c.c:1211
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "kunde inte starta Frequency_Loop_Thread\n"
 
-#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:1964
+#: src/opengl/opengl_rdpattern.c:380
+#, c-format
+msgid "rdpattern: invalid draw style %d, using surface\n"
+msgstr "rdpattern: ogiltig ritstil %d, använder yta\n"
+
+#: src/opengl/opengl_settings.c:428
+#, c-format
+msgid "opengl_settings_init: failed to load glade: %s\n"
+msgstr "opengl_settings_init: misslyckades att läsa in glade: %s\n"
+
+#: src/opengl/opengl_settings.c:441
+msgid "opengl_settings_init: failed to get opengl_settings_window from glade\n"
+msgstr ""
+"opengl_settings_init: misslyckades att hämta opengl_settings_window från "
+"glade\n"
+
+#: src/opengl-engine/opengl_axes.c:132
+#, c-format
+msgid "Generated label texture atlas (ID=%u)\n"
+msgstr "Genererade etikettexturatlas (ID=%u)\n"
+
+#: src/opengl-engine/opengl_axes.c:156
+msgid "Failed to load axes line shader\n"
+msgstr "Misslyckades att läsa in axellinjeshader\n"
+
+#: src/opengl-engine/opengl_axes.c:189
+msgid "Axes renderer initialized\n"
+msgstr "Axelrenderare initialiserad\n"
+
+#: src/opengl-engine/opengl_axes.c:193
+msgid "Failed to load text shaders\n"
+msgstr "Misslyckades att läsa in textshaders\n"
+
+#: src/opengl-engine/opengl_cairo_overlay.c:60
+msgid "Failed to load cairo overlay shaders\n"
+msgstr "Misslyckades att läsa in cairo-överlagshaders\n"
+
+#: src/opengl-engine/opengl_gradient_overlay.c:80
+msgid "Failed to create cairo overlay base\n"
+msgstr "Misslyckades att skapa cairo-överlägsbas\n"
+
+#: src/opengl-engine/opengl_ground_plane.c:103
+msgid "Failed to load ground plane shaders\n"
+msgstr "Misslyckades att läsa in markplanshaders\n"
+
+#: src/opengl-engine/opengl_renderer.c:55
+#, c-format
+msgid "Failed to load shader: %s (%s)\n"
+msgstr "Misslyckades att läsa in shader: %s (%s)\n"
+
+#: src/opengl-engine/opengl_renderer.c:84
+#, c-format
+msgid "Shader compile error: %s\n"
+msgstr "Shader-kompileringsfel: %s\n"
+
+#: src/opengl-engine/opengl_renderer.c:126
+msgid "Shader link failed\n"
+msgstr "Shader-länkning misslyckades\n"
+
+#: src/opengl-engine/opengl_view.c:123
+msgid "GL context error\n"
+msgstr "GL-kontextfel\n"
+
+#: src/opengl-engine/opengl_view.c:149
+msgid "Failed to create axes renderer\n"
+msgstr "Misslyckades att skapa axelrenderare\n"
+
+#: src/opengl-engine/opengl_view.c:181
+msgid "Failed to create ground plane renderer\n"
+msgstr "Misslyckades att skapa markplanrenderare\n"
+
+#: src/opengl-engine/opengl_view.c:202
+#, c-format
+msgid "Renderable count %u exceeds MAX_RENDERABLES (%d)\n"
+msgstr "Renderbart antal %u överstiger MAX_RENDERABLES (%d)\n"
+
+#: src/opengl-engine/opengl_view.c:246
+msgid "Failed to create gradient overlay\n"
+msgstr "Misslyckades att skapa gradientöverlägg\n"
+
+#: src/opengl-engine/opengl_view.c:294
+msgid "Failed to load peel composite shaders\n"
+msgstr "Misslyckades att läsa in peel-kompositshaders\n"
+
+#: src/opengl-engine/opengl_view_msaa.c:137
+msgid "MSAA framebuffer incomplete\n"
+msgstr "MSAA-framebuffer ofullständig\n"
+
+#: src/opengl-engine/opengl_view_overlay.c:348
+msgid "Failed to load overlay shaders\n"
+msgstr "Misslyckades att läsa in överlägsshaders\n"
+
+#: src/opengl-engine/opengl_view_peel.c:238
+#, c-format
+msgid "Peel FBO %d incomplete\n"
+msgstr "Peel-FBO %d ofullständig\n"
+
+#: src/opengl-engine/opengl_view_peel.c:249
+#, c-format
+msgid "Peel MSAA FBO %d incomplete\n"
+msgstr "Peel-MSAA-FBO %d ofullständig\n"
+
+#: src/opengl-engine/opengl_view_peel.c:260
+msgid "Peel accumulation FBO incomplete\n"
+msgstr "Peel-ackumulerings-FBO ofullständig\n"
+
+#: src/opengl-engine/opengl_view_render.c:297
+msgid "Transparent renderables skipped: peel FBOs unavailable\n"
+msgstr ""
+"Transparenta renderingsobjekt hoppades över: peel-FBO:er ej tillgängliga\n"
+
+#: src/opengl-engine/opengl_view_scene.c:283
+msgid "Failed to load shaders\n"
+msgstr "Misslyckades att läsa in shaders\n"
+
+#: src/optimizers/opt_fitness.c:347
+#, c-format
+msgid "fitness_config_add: invalid meas_index %d\n"
+msgstr "fitness_config_add: ogiltigt meas_index %d\n"
+
+#: src/optimizers/opt_fitness.c:485
+#, c-format
+msgid "fitness_transform: unknown direction %d\n"
+msgstr "fitness_transform: okänd riktning %d\n"
+
+#: src/optimizers/opt_fitness.c:558
+#, c-format
+msgid "reduce_values: unknown reduction method %d\n"
+msgstr "reduce_values: okänd reduktionsmetod %d\n"
+
+#: src/optimizers/opt_nec2_eval.c:189
+msgid "nec2_eval_run: not initialized\n"
+msgstr "nec2_eval_run: ej initialiserad\n"
+
+#: src/optimizers/opt_session.c:96
+#, c-format
+msgid ""
+"opt: pass %d/%d iter %d fitness %.6g best %.6g ssize %.4g stagnant %d cache "
+"%d/%d\n"
+msgstr ""
+"opt: pass %d/%d iter %d fitness %.6g bästa %.6g sstorlek %.4g stagnant %d "
+"cache %d/%d\n"
+
+#: src/optimizers/opt_session.c:120
+#, c-format
+msgid "opt: optimization complete, best fitness: %.6g\n"
+msgstr "opt: optimering klar, bästa fitness: %.6g\n"
+
+#: src/optimizers/opt_session.c:158
+msgid "opt_start: optimizer already running\n"
+msgstr "opt_start: optimeraren körs redan\n"
+
+#: src/optimizers/opt_session.c:225
+msgid "opt_start: simple_new failed\n"
+msgstr "opt_start: simple_new misslyckades\n"
+
+#: src/optimizers/opt_session.c:234
+#, c-format
+msgid "opt_start: pthread_create failed: %d\n"
+msgstr "opt_start: pthread_create misslyckades: %d\n"
+
+#: src/optimizers/opt_simple.c:297
+#, c-format
+msgid "simple_config_init: unknown algorithm %d\n"
+msgstr "simple_config_init: okänd algoritm %d\n"
+
+#: src/optimizers/opt_simple_var.c:42
+#, c-format
+msgid "var[%d] name is NULL or empty\n"
+msgstr "var[%d] namn är NULL eller tomt\n"
+
+#: src/optimizers/opt_simple_var.c:48
+#, c-format
+msgid "var '%s' values is NULL or empty\n"
+msgstr "var '%s' värden är NULL eller tomt\n"
+
+#: src/optimizers/opt_simple_var.c:59
+#, c-format
+msgid "var '%s' enabled->size (%zu) != values->size (%zu)\n"
+msgstr "var '%s' enabled->size (%zu) != values->size (%zu)\n"
+
+#: src/optimizers/opt_simple_var.c:69
+#, c-format
+msgid "var '%s' enabled[%zu] = %g (must be 0.0 or 1.0)\n"
+msgstr "var '%s' enabled[%zu] = %g (måste vara 0.0 eller 1.0)\n"
+
+#: src/optimizers/opt_simple_var.c:79
+#, c-format
+msgid "var '%s' min and max must both be set or both NULL\n"
+msgstr "var '%s' min och max måste båda vara satta eller båda NULL\n"
+
+#: src/optimizers/opt_simple_var.c:88
+#, c-format
+msgid "var '%s' min/max size mismatch with values\n"
+msgstr "var '%s' min/max-storlek stämmer inte med värdena\n"
+
+#: src/optimizers/opt_simple_var.c:99
+#, c-format
+msgid "var '%s' min[%zu]=%g >= max[%zu]=%g (zero or negative range)\n"
+msgstr "var '%s' min[%zu]=%g >= max[%zu]=%g (noll eller negativt intervall)\n"
+
+#: src/optimizers/opt_simple_var.c:112
+#, c-format
+msgid "var '%s'[%zu] initial value %g outside [%g, %g]\n"
+msgstr "var '%s'[%zu] initialvärde %g utanför [%g, %g]\n"
+
+#: src/optimizers/opt_simple_var.c:125
+#, c-format
+msgid "var '%s' perturb_scale size mismatch\n"
+msgstr "var '%s' perturb_scale-storlek stämmer inte\n"
+
+#: src/optimizers/opt_simple_var.c:133
+#, c-format
+msgid "var '%s' perturb_scale[%zu] is zero\n"
+msgstr "var '%s' perturb_scale[%zu] är noll\n"
+
+#: src/optimizers/opt_simple_var.c:145
+#, c-format
+msgid "var '%s' round_each size mismatch\n"
+msgstr "var '%s' round_each-storlek stämmer inte\n"
+
+#: src/optimizers/opt_simple_var.c:151
+#, c-format
+msgid "var '%s' round_each has element <= 0\n"
+msgstr "var '%s' round_each har element <= 0\n"
+
+#: src/optimizers/opt_simple_var.c:162
+#, c-format
+msgid "var '%s' round_result size mismatch\n"
+msgstr "var '%s' round_result-storlek stämmer inte\n"
+
+#: src/optimizers/opt_simple_var.c:168
+#, c-format
+msgid "var '%s' round_result has element <= 0\n"
+msgstr "var '%s' round_result har element <= 0\n"
+
+#: src/expr_edit.h:34
+msgid ""
+"Value is controlled by an SY expression.\n"
+"Edit the SY card to change this value."
+msgstr ""
+"Värdet styrs av ett SY-uttryck.\n"
+"Redigera SY-kortet för att ändra detta värde."
+
+#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:1962
 msgid "xnec2c"
 msgstr "xnec2c"
 
@@ -2207,6 +3202,48 @@ msgstr "Numerical Electromagnetics Code-programvara"
 #: files/xnec2c.desktop.in:11
 msgid "nec2;em;simulator;"
 msgstr "nec2;em;simulator;"
+
+#: resources/opengl_settings.glade:90
+msgid "OpenGL Settings"
+msgstr "OpenGL-inställningar"
+
+#: resources/opengl_settings.glade:136
+msgid "OpenGL Renderer"
+msgstr "OpenGL-renderare"
+
+#: resources/opengl_settings.glade:151
+msgid "Constrained Rotation"
+msgstr "Begränsad rotation"
+
+#: resources/opengl_settings.glade:166
+msgid "Orthographic Projection"
+msgstr "Ortografisk projektion"
+
+#: resources/opengl_settings.glade:638
+msgid "Visual only — does not affect NEC2 model calculations."
+msgstr "Visuell endast — påverkar inte NEC2-modellberäkningar."
+
+#: resources/opengl_settings.glade:658
+msgid "Reset to _Defaults"
+msgstr "Återställ till _standard"
+
+#: resources/opengl_settings.glade:675 resources/sy_overrides.glade:744
+msgid "_Close"
+msgstr "_Stäng"
+
+#: resources/sy_overrides.glade:34
+msgid "Symbol Overrides"
+msgstr "Symbolåsidosättningar"
+
+#: resources/sy_overrides.glade:688
+msgid "_Auto Apply"
+msgstr "_Autotillämpa"
+
+#: resources/sy_overrides.glade:693
+msgid "Automatically apply changes and reload model after 300ms delay"
+msgstr ""
+"Tillämpar automatiskt ändringar och laddar om modellen efter 300 ms "
+"fördröjning"
 
 #: resources/xnec2c.glade:14
 msgid "(C) 2007-2022 Neoklis Kyriazis"
@@ -2248,683 +3285,683 @@ msgstr ""
 msgid "translator-credits"
 msgstr "translator-credits"
 
-#: resources/xnec2c.glade:159
-msgid "Steps/Cycle"
-msgstr "Steg/cykel"
+#: resources/xnec2c.glade:153
+msgid "Frames/Sec"
+msgstr "Bilder/sek"
 
-#: resources/xnec2c.glade:172
+#: resources/xnec2c.glade:166
 msgid "Animate Freq (Hz)"
 msgstr "Animeringsfrekvens (Hz)"
 
-#: resources/xnec2c.glade:286
+#: resources/xnec2c.glade:284
 msgid "Arc Element (GA card)"
 msgstr "Bågelement (GA-kort)"
 
-#: resources/xnec2c.glade:327 resources/xnec2c.glade:14713
+#: resources/xnec2c.glade:325 resources/xnec2c.glade:14932
 msgid "No. Segments"
 msgstr "Antal segment"
 
-#: resources/xnec2c.glade:340 resources/xnec2c.glade:3802
-#: resources/xnec2c.glade:14809
+#: resources/xnec2c.glade:338 resources/xnec2c.glade:3800
+#: resources/xnec2c.glade:15028
 msgid "Segs % lambda"
 msgstr "Segment % lambda"
 
-#: resources/xnec2c.glade:353 resources/xnec2c.glade:3815
-#: resources/xnec2c.glade:14905
+#: resources/xnec2c.glade:351 resources/xnec2c.glade:3813
+#: resources/xnec2c.glade:15124
 msgid "Wire Diameter"
 msgstr "Tråddiameter"
 
-#: resources/xnec2c.glade:441
+#: resources/xnec2c.glade:439
 msgid "Radius from Y"
 msgstr "Radie från Y"
 
-#: resources/xnec2c.glade:454
+#: resources/xnec2c.glade:452
 msgid "End 1 Angle"
 msgstr "Ände 1-vinkel"
 
-#: resources/xnec2c.glade:467
+#: resources/xnec2c.glade:465
 msgid "End 2 Angle"
 msgstr "Ände 2-vinkel"
 
-#: resources/xnec2c.glade:578
+#: resources/xnec2c.glade:576
 msgid "Wire Arc Data"
 msgstr "Trådbågdata"
 
-#: resources/xnec2c.glade:640 resources/xnec2c.glade:876
-#: resources/xnec2c.glade:1676 resources/xnec2c.glade:1899
-#: resources/xnec2c.glade:2357 resources/xnec2c.glade:2549
-#: resources/xnec2c.glade:2860 resources/xnec2c.glade:3546
-#: resources/xnec2c.glade:4346 resources/xnec2c.glade:4545
-#: resources/xnec2c.glade:4706 resources/xnec2c.glade:5238
-#: resources/xnec2c.glade:5874 resources/xnec2c.glade:7318
-#: resources/xnec2c.glade:8225 resources/xnec2c.glade:9231
-#: resources/xnec2c.glade:9511 resources/xnec2c.glade:13311
-#: resources/xnec2c.glade:13824 resources/xnec2c.glade:14423
-#: resources/xnec2c.glade:15259 resources/xnec2c.glade:15459
+#: resources/xnec2c.glade:638 resources/xnec2c.glade:874
+#: resources/xnec2c.glade:1674 resources/xnec2c.glade:1897
+#: resources/xnec2c.glade:2355 resources/xnec2c.glade:2547
+#: resources/xnec2c.glade:2858 resources/xnec2c.glade:3544
+#: resources/xnec2c.glade:4344 resources/xnec2c.glade:4543
+#: resources/xnec2c.glade:4704 resources/xnec2c.glade:5236
+#: resources/xnec2c.glade:5872 resources/xnec2c.glade:7316
+#: resources/xnec2c.glade:8223 resources/xnec2c.glade:9229
+#: resources/xnec2c.glade:9509 resources/xnec2c.glade:13530
+#: resources/xnec2c.glade:14043 resources/xnec2c.glade:14642
+#: resources/xnec2c.glade:15478 resources/xnec2c.glade:15678
 msgid "Delete Card"
 msgstr "Ta bort kort"
 
-#: resources/xnec2c.glade:718
+#: resources/xnec2c.glade:716
 msgid "Cylindrical Structure (GR card)"
 msgstr "Cylindrisk struktur (GR-kort)"
 
-#: resources/xnec2c.glade:748 resources/xnec2c.glade:9411
+#: resources/xnec2c.glade:746 resources/xnec2c.glade:9409
 msgid "Tag Number Increment"
 msgstr "Taggnummerökning"
 
-#: resources/xnec2c.glade:761
+#: resources/xnec2c.glade:759
 msgid "Number of Structures"
 msgstr "Antal strukturer"
 
-#: resources/xnec2c.glade:815
+#: resources/xnec2c.glade:813
 msgid "Cylindrical Structure"
 msgstr "Cylindrisk struktur"
 
-#: resources/xnec2c.glade:941
+#: resources/xnec2c.glade:939
 msgid "Xnec2c Error"
 msgstr "Xnec2c-fel"
 
-#: resources/xnec2c.glade:1049
+#: resources/xnec2c.glade:1047
 msgid "Error"
 msgstr "Fel"
 
-#: resources/xnec2c.glade:1128
+#: resources/xnec2c.glade:1126
 msgid "Excitation Command (EX Card)"
 msgstr "Excitationskommando (EX-kort)"
 
-#: resources/xnec2c.glade:1154
+#: resources/xnec2c.glade:1152
 msgid "Incident LH Wave"
 msgstr "Infallande VH-våg"
 
-#: resources/xnec2c.glade:1170
+#: resources/xnec2c.glade:1168
 msgid "Incident Linear Wave "
 msgstr "Infallande linjär våg "
 
-#: resources/xnec2c.glade:1186
+#: resources/xnec2c.glade:1184
 msgid "Current Source"
 msgstr "Strömkälla"
 
-#: resources/xnec2c.glade:1202
+#: resources/xnec2c.glade:1200
 msgid "Incident RH Wave"
 msgstr "Infallande HH-våg"
 
-#: resources/xnec2c.glade:1218
+#: resources/xnec2c.glade:1216
 msgid "Current Slope Discontinuity"
 msgstr "Strömlutningsdiskontinuitet"
 
-#: resources/xnec2c.glade:1234
+#: resources/xnec2c.glade:1232
 msgid "Voltage Source"
 msgstr "Spänningskälla"
 
-#: resources/xnec2c.glade:1256
+#: resources/xnec2c.glade:1254
 msgid "Excitation Type"
 msgstr "Excitationstyp"
 
-#: resources/xnec2c.glade:1281
+#: resources/xnec2c.glade:1279
 msgid "Maximum Admittance Matrix Asymmetry"
 msgstr "Maximal admittansmatrisasymmetri"
 
-#: resources/xnec2c.glade:1297
+#: resources/xnec2c.glade:1295
 msgid "Impedance of Source Segment"
 msgstr "Impedans för källsegment"
 
-#: resources/xnec2c.glade:1319
+#: resources/xnec2c.glade:1317
 msgid "Print Control"
 msgstr "Utskriftskontroll"
 
-#: resources/xnec2c.glade:1411
+#: resources/xnec2c.glade:1409
 msgid "Voltage - Real Part"
 msgstr "Spänning - realdel"
 
-#: resources/xnec2c.glade:1424
+#: resources/xnec2c.glade:1422
 msgid "Voltage - Imaginary Part"
 msgstr "Spänning - imaginärdel"
 
-#: resources/xnec2c.glade:1437
+#: resources/xnec2c.glade:1435
 msgid "Eta"
 msgstr "Eta"
 
-#: resources/xnec2c.glade:1507
+#: resources/xnec2c.glade:1505
 msgid "Theta"
 msgstr "Theta"
 
-#: resources/xnec2c.glade:1520
+#: resources/xnec2c.glade:1518
 msgid "Phi"
 msgstr "Phi"
 
-#: resources/xnec2c.glade:1533
+#: resources/xnec2c.glade:1531
 msgid "Ratio"
 msgstr "Förhållande"
 
-#: resources/xnec2c.glade:1614
+#: resources/xnec2c.glade:1612
 msgid "Excitation Parameters"
 msgstr "Excitationsparametrar"
 
-#: resources/xnec2c.glade:1741
+#: resources/xnec2c.glade:1739
 msgid "Execute Command (XQ Card)"
 msgstr "Exekveringskommando (XQ-kort)"
 
-#: resources/xnec2c.glade:1768
+#: resources/xnec2c.glade:1766
 msgid "No Pattern Cuts"
 msgstr "Inga diagramsnitt"
 
-#: resources/xnec2c.glade:1784
+#: resources/xnec2c.glade:1782
 msgid "Pattern in XZ Plane"
 msgstr "Diagram i XZ-plan"
 
-#: resources/xnec2c.glade:1800
+#: resources/xnec2c.glade:1798
 msgid "Pattern in YZ Plane"
 msgstr "Diagram i YZ-plan"
 
-#: resources/xnec2c.glade:1816
+#: resources/xnec2c.glade:1814
 msgid "Both XZ/YZ Patterns"
 msgstr "Båda XZ/YZ-diagram"
 
-#: resources/xnec2c.glade:1838
+#: resources/xnec2c.glade:1836
 msgid "Execute Command"
 msgstr "Exekveringskommando"
 
-#: resources/xnec2c.glade:2069
+#: resources/xnec2c.glade:2067
 msgid "Frequency Command (FR Card)"
 msgstr "Frekvenskommando (FR-kort)"
 
-#: resources/xnec2c.glade:2094
+#: resources/xnec2c.glade:2092
 msgid "Additive Stepping"
 msgstr "Additiv stegning"
 
-#: resources/xnec2c.glade:2111
+#: resources/xnec2c.glade:2109
 msgid "Multiplicative Stepping"
 msgstr "Multiplikativ stegning"
 
-#: resources/xnec2c.glade:2134
+#: resources/xnec2c.glade:2132
 msgid "Frequency Stepping"
 msgstr "Frekvensstegning"
 
-#: resources/xnec2c.glade:2164
+#: resources/xnec2c.glade:2162
 msgid "No. Frequency Points"
 msgstr "Antal frekvenspunkter"
 
-#: resources/xnec2c.glade:2195
+#: resources/xnec2c.glade:2193
 msgid "Start Frequency (MHz)"
 msgstr "Startfrekvens (MHz)"
 
-#: resources/xnec2c.glade:2227
+#: resources/xnec2c.glade:2225
 msgid "Frequency Step (MHz)"
 msgstr "Frekvenssteg (MHz)"
 
-#: resources/xnec2c.glade:2260
+#: resources/xnec2c.glade:2258
 msgid "End Frequency (MHz)"
 msgstr "Slutfrekvens (MHz)"
 
-#: resources/xnec2c.glade:2296
+#: resources/xnec2c.glade:2294
 msgid "Frequency Stepping Parameters"
 msgstr "Frekvensstegningsparametrar"
 
-#: resources/xnec2c.glade:2422
+#: resources/xnec2c.glade:2420
 msgid "Geometry End (GE Card)"
 msgstr "Geometrislut (GE-kort)"
 
-#: resources/xnec2c.glade:2447
+#: resources/xnec2c.glade:2445
 msgid "No Ground, Free Space condition"
 msgstr "Ingen jord, fritt utrymme"
 
-#: resources/xnec2c.glade:2464
+#: resources/xnec2c.glade:2462
 msgid "Ground present, Structure reflection"
 msgstr "Jord närvarande, strukturreflektion"
 
-#: resources/xnec2c.glade:2481
+#: resources/xnec2c.glade:2479
 msgid "Ground present, no Structure reflection"
 msgstr "Jord närvarande, ingen strukturreflektion"
 
-#: resources/xnec2c.glade:2504
+#: resources/xnec2c.glade:2502
 msgid "Ground Plane type"
 msgstr "Jordplanstyp"
 
-#: resources/xnec2c.glade:2638
+#: resources/xnec2c.glade:2636
 msgid "Ground Parameters (GD Card)"
 msgstr "Jordparametrar (GD-kort)"
 
-#: resources/xnec2c.glade:2667 resources/xnec2c.glade:3136
-#: resources/xnec2c.glade:3222
+#: resources/xnec2c.glade:2665 resources/xnec2c.glade:3134
+#: resources/xnec2c.glade:3220
 msgid "Relative Dielectric Const."
 msgstr "Relativ dielektrisk konst."
 
-#: resources/xnec2c.glade:2699 resources/xnec2c.glade:3255
+#: resources/xnec2c.glade:2697 resources/xnec2c.glade:3253
 msgid "Distance to 2nd Medium"
 msgstr "Avstånd till 2:a medium"
 
-#: resources/xnec2c.glade:2731 resources/xnec2c.glade:3168
-#: resources/xnec2c.glade:3287
+#: resources/xnec2c.glade:2729 resources/xnec2c.glade:3166
+#: resources/xnec2c.glade:3285
 msgid "Ground Conductivity S/m"
 msgstr "Jordkonduktivitet S/m"
 
-#: resources/xnec2c.glade:2763 resources/xnec2c.glade:3319
+#: resources/xnec2c.glade:2761 resources/xnec2c.glade:3317
 msgid "Dist. below 1st Medium"
 msgstr "Avst. under 1:a medium"
 
-#: resources/xnec2c.glade:2799 resources/xnec2c.glade:3355
+#: resources/xnec2c.glade:2797 resources/xnec2c.glade:3353
 msgid "2nd Medium Parameters"
 msgstr "2:a mediets parametrar"
 
-#: resources/xnec2c.glade:2980
+#: resources/xnec2c.glade:2978
 msgid "Ground Parameters (GN & GD Cards)"
 msgstr "Jordparametrar (GN- & GD-kort)"
 
-#: resources/xnec2c.glade:3007
+#: resources/xnec2c.glade:3005
 msgid "Perfect Ground"
 msgstr "Perfekt jord"
 
-#: resources/xnec2c.glade:3023
+#: resources/xnec2c.glade:3021
 msgid "Sommerfeld/Norton"
 msgstr "Sommerfeld/Norton"
 
-#: resources/xnec2c.glade:3039
+#: resources/xnec2c.glade:3037
 msgid "Radial Ground Screen"
 msgstr "Radiellt jordnät"
 
-#: resources/xnec2c.glade:3054
+#: resources/xnec2c.glade:3052
 msgid "Reflection Coeff. Approx"
 msgstr "Reflektionskoeff. approx."
 
-#: resources/xnec2c.glade:3070
+#: resources/xnec2c.glade:3068
 msgid "Nullify Previous Params"
 msgstr "Nollställ tidigare param."
 
-#: resources/xnec2c.glade:3086
+#: resources/xnec2c.glade:3084
 msgid "Second Medium (Cliff)"
 msgstr "Andra medium (klippa)"
 
-#: resources/xnec2c.glade:3107
+#: resources/xnec2c.glade:3105
 msgid "Ground Type"
 msgstr "Jordtyp"
 
-#: resources/xnec2c.glade:3235
+#: resources/xnec2c.glade:3233
 msgid "0.00000"
 msgstr "0.00000"
 
-#: resources/xnec2c.glade:3386
+#: resources/xnec2c.glade:3384
 msgid "Number of Radials"
 msgstr "Antal radialer"
 
-#: resources/xnec2c.glade:3399
+#: resources/xnec2c.glade:3397
 msgid "Radial Screen Radius"
 msgstr "Radialnätets radie"
 
-#: resources/xnec2c.glade:3449
+#: resources/xnec2c.glade:3447
 msgid "Radial Wire Diameter"
 msgstr "Radialtråddiameter"
 
-#: resources/xnec2c.glade:3485
+#: resources/xnec2c.glade:3483
 msgid "Radial Screen Parameters"
 msgstr "Radialnätsparametrar"
 
-#: resources/xnec2c.glade:3685
+#: resources/xnec2c.glade:3683
 msgid "Helical Element (GA card)"
 msgstr "Spiralelement (GA-kort)"
 
-#: resources/xnec2c.glade:3710
+#: resources/xnec2c.glade:3708
 msgid "Right Hand Helix"
 msgstr "Högervriden helix"
 
-#: resources/xnec2c.glade:3726
+#: resources/xnec2c.glade:3724
 msgid "Left Hand Helix"
 msgstr "Vänstervriden helix"
 
-#: resources/xnec2c.glade:3742
+#: resources/xnec2c.glade:3740
 msgid "Right Hand Spiral"
 msgstr "Högervriden spiral"
 
-#: resources/xnec2c.glade:3758
+#: resources/xnec2c.glade:3756
 msgid "Left Hand Spiral"
 msgstr "Vänstervriden spiral"
 
-#: resources/xnec2c.glade:3789
+#: resources/xnec2c.glade:3787
 msgid "Segments/Turn"
 msgstr "Segment/varv"
 
-#: resources/xnec2c.glade:3828
+#: resources/xnec2c.glade:3826
 msgid "0.0100"
 msgstr "0.0100"
 
-#: resources/xnec2c.glade:3849
+#: resources/xnec2c.glade:3847
 msgid "5.00"
 msgstr "5.00"
 
-#: resources/xnec2c.glade:3870
+#: resources/xnec2c.glade:3868
 msgid "8"
 msgstr "8"
 
-#: resources/xnec2c.glade:3890 resources/xnec2c.glade:11611
-#: resources/xnec2c.glade:12849
+#: resources/xnec2c.glade:3888 resources/xnec2c.glade:11746
+#: resources/xnec2c.glade:13068
 msgid "1"
 msgstr "1"
 
-#: resources/xnec2c.glade:3910
+#: resources/xnec2c.glade:3908
 msgid "Number of Turns"
 msgstr "Antal varv"
 
-#: resources/xnec2c.glade:3923
+#: resources/xnec2c.glade:3921
 msgid "8.0000"
 msgstr "8.0000"
 
-#: resources/xnec2c.glade:3944
+#: resources/xnec2c.glade:3942
 msgid "Helix Length (HL)"
 msgstr "Helixlängd (HL)"
 
-#: resources/xnec2c.glade:3957
+#: resources/xnec2c.glade:3955
 msgid "5.0000"
 msgstr "5.0000"
 
-#: resources/xnec2c.glade:3978
+#: resources/xnec2c.glade:3976
 msgid "Turns Spacing"
 msgstr "Varvavstånd"
 
-#: resources/xnec2c.glade:3991 resources/xnec2c.glade:4103
-#: resources/xnec2c.glade:4156 resources/xnec2c.glade:4209
-#: resources/xnec2c.glade:4257
+#: resources/xnec2c.glade:3989 resources/xnec2c.glade:4101
+#: resources/xnec2c.glade:4154 resources/xnec2c.glade:4207
+#: resources/xnec2c.glade:4255
 msgid "1.0000"
 msgstr "1.0000"
 
-#: resources/xnec2c.glade:4025
+#: resources/xnec2c.glade:4023
 msgid "0.0000"
 msgstr "0.0000"
 
-#: resources/xnec2c.glade:4045
+#: resources/xnec2c.glade:4043
 msgid "Radius in X (A1)"
 msgstr "Radie i X (A1)"
 
-#: resources/xnec2c.glade:4058
+#: resources/xnec2c.glade:4056
 msgid "Radius in Y (B1)"
 msgstr "Radie i Y (B1)"
 
-#: resources/xnec2c.glade:4071
+#: resources/xnec2c.glade:4069
 msgid "Radius in X (A2)"
 msgstr "Radie i X (A2)"
 
-#: resources/xnec2c.glade:4084
+#: resources/xnec2c.glade:4082
 msgid "Radius in Y (B2)"
 msgstr "Radie i Y (B2)"
 
-#: resources/xnec2c.glade:4282
+#: resources/xnec2c.glade:4280
 msgid "GH Card"
 msgstr "GH-kort"
 
-#: resources/xnec2c.glade:4419 resources/xnec2c.glade:15333
+#: resources/xnec2c.glade:4417 resources/xnec2c.glade:15552
 msgid "Interaction Approx Range (KH Card)"
 msgstr "Interaktionsapprox. räckvidd (KH-kort)"
 
-#: resources/xnec2c.glade:4446
+#: resources/xnec2c.glade:4444
 msgid "Approximation Range (W/lengths)"
 msgstr "Approximationsräckvidd (våglängder)"
 
-#: resources/xnec2c.glade:4484
+#: resources/xnec2c.glade:4482
 msgid "Interaction Approximation Range"
 msgstr "Interaktionsapproximationsräckvidd"
 
-#: resources/xnec2c.glade:4610
+#: resources/xnec2c.glade:4608
 msgid "Thin Wire Kernel (EK Card)"
 msgstr "Tunntrådskärna (EK-kort)"
 
-#: resources/xnec2c.glade:4628
+#: resources/xnec2c.glade:4626
 msgid "Extended Thin Wire Kernel"
 msgstr "Utökad tunntrådskärna"
 
-#: resources/xnec2c.glade:4645
+#: resources/xnec2c.glade:4643
 msgid "Thin Wire Kernel"
 msgstr "Tunntrådskärna"
 
-#: resources/xnec2c.glade:4808
+#: resources/xnec2c.glade:4806
 msgid "Loading Command (LD Card)"
 msgstr "Belastningskommando (LD-kort)"
 
-#: resources/xnec2c.glade:4834
+#: resources/xnec2c.glade:4832
 msgid "Short all Loads (Nulls previous Loading Cards)"
 msgstr "Kortslut alla belastningar (nollställer tidigare belastningskort)"
 
-#: resources/xnec2c.glade:4851
+#: resources/xnec2c.glade:4849
 msgid "Series, Lumped"
 msgstr "Serie, diskret"
 
-#: resources/xnec2c.glade:4867
+#: resources/xnec2c.glade:4865
 msgid "Parallel, Distributed"
 msgstr "Parallell, fördelad"
 
-#: resources/xnec2c.glade:4883
+#: resources/xnec2c.glade:4881
 msgid "Parallel, Lumped"
 msgstr "Parallell, diskret"
 
-#: resources/xnec2c.glade:4899
+#: resources/xnec2c.glade:4897
 msgid "Resistance & Reactance"
 msgstr "Resistans & reaktans"
 
-#: resources/xnec2c.glade:4915
+#: resources/xnec2c.glade:4913
 msgid "Series, Distributed"
 msgstr "Serie, fördelad"
 
-#: resources/xnec2c.glade:4931
+#: resources/xnec2c.glade:4929
 msgid "Wire Conductivity"
 msgstr "Trådkonduktivitet"
 
-#: resources/xnec2c.glade:4953
+#: resources/xnec2c.glade:4951
 msgid "Loading Type"
 msgstr "Belastningstyp"
 
-#: resources/xnec2c.glade:4983
+#: resources/xnec2c.glade:4981
 msgid "Load Tag Number"
 msgstr "Belastningsetikettnummer"
 
-#: resources/xnec2c.glade:5014
+#: resources/xnec2c.glade:5012
 msgid "Resistance"
 msgstr "Resistans"
 
-#: resources/xnec2c.glade:5046
+#: resources/xnec2c.glade:5044
 msgid "From Segment #"
 msgstr "Från segment nr"
 
-#: resources/xnec2c.glade:5077
+#: resources/xnec2c.glade:5075
 msgid "Inductance"
 msgstr "Induktans"
 
-#: resources/xnec2c.glade:5109
+#: resources/xnec2c.glade:5107
 msgid "To Segment #"
 msgstr "Till segment nr"
 
-#: resources/xnec2c.glade:5140
+#: resources/xnec2c.glade:5138
 msgid "Capacitance"
 msgstr "Kapacitans"
 
-#: resources/xnec2c.glade:5176
+#: resources/xnec2c.glade:5174
 msgid "Loading Parameters"
 msgstr "Belastningsparametrar"
 
-#: resources/xnec2c.glade:5391
+#: resources/xnec2c.glade:5389
 msgid "Near Fields Command (NE/NH Cards)"
 msgstr "Närfältskommando (NE/NH-kort)"
 
-#: resources/xnec2c.glade:5418
+#: resources/xnec2c.glade:5416
 msgid "Near Electric Field"
 msgstr "Elektriskt närfält"
 
-#: resources/xnec2c.glade:5434
+#: resources/xnec2c.glade:5432
 msgid "Rectangular Co-ordinates"
 msgstr "Rektangulära koordinater"
 
-#: resources/xnec2c.glade:5450
+#: resources/xnec2c.glade:5448
 msgid "Near Magnetic Field"
 msgstr "Magnetiskt närfält"
 
-#: resources/xnec2c.glade:5465
+#: resources/xnec2c.glade:5463
 msgid "Spherical Co-ordinates"
 msgstr "Sfäriska koordinater"
 
-#: resources/xnec2c.glade:5493
+#: resources/xnec2c.glade:5491
 msgid "Field Type & Co-ordinates"
 msgstr "Fälttyp & koordinater"
 
-#: resources/xnec2c.glade:5523
+#: resources/xnec2c.glade:5521
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:5554 resources/xnec2c.glade:11183
-#: resources/xnec2c.glade:12406
+#: resources/xnec2c.glade:5552 resources/xnec2c.glade:11295
+#: resources/xnec2c.glade:12602
 msgid "X"
 msgstr "X"
 
-#: resources/xnec2c.glade:5586
+#: resources/xnec2c.glade:5584
 msgid "DX"
 msgstr "DX"
 
-#: resources/xnec2c.glade:5618
+#: resources/xnec2c.glade:5616
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:5649 resources/xnec2c.glade:11198
-#: resources/xnec2c.glade:12421
+#: resources/xnec2c.glade:5647 resources/xnec2c.glade:11310
+#: resources/xnec2c.glade:12617
 msgid "Y"
 msgstr "Y"
 
-#: resources/xnec2c.glade:5681
+#: resources/xnec2c.glade:5679
 msgid "DY"
 msgstr "DY"
 
-#: resources/xnec2c.glade:5713
+#: resources/xnec2c.glade:5711
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:5744 resources/xnec2c.glade:11213
-#: resources/xnec2c.glade:12436
+#: resources/xnec2c.glade:5742 resources/xnec2c.glade:11325
+#: resources/xnec2c.glade:12632
 msgid "Z"
 msgstr "Z"
 
-#: resources/xnec2c.glade:5776
+#: resources/xnec2c.glade:5774
 msgid "DZ"
 msgstr "DZ"
 
-#: resources/xnec2c.glade:5812
+#: resources/xnec2c.glade:5810
 msgid "Field Pattern Parameters"
 msgstr "Fältmönsterparametrar"
 
-#: resources/xnec2c.glade:5939
+#: resources/xnec2c.glade:5937
 msgid "Xnec2c: NEC2 Input File Editor"
 msgstr "Xnec2c: NEC2-indatafileditor"
 
-#: resources/xnec2c.glade:6026
+#: resources/xnec2c.glade:6024
 msgid "Manage Cards"
 msgstr "Hantera kort"
 
-#: resources/xnec2c.glade:6123
+#: resources/xnec2c.glade:6121
 msgid "File Save"
 msgstr "Spara fil"
 
-#: resources/xnec2c.glade:6210
+#: resources/xnec2c.glade:6208
 msgid "Wire"
 msgstr "Tråd"
 
-#: resources/xnec2c.glade:6224
+#: resources/xnec2c.glade:6222
 msgid "Arc"
 msgstr "Båge"
 
-#: resources/xnec2c.glade:6238
+#: resources/xnec2c.glade:6236
 msgid "Helix"
 msgstr "Helix"
 
-#: resources/xnec2c.glade:6252
+#: resources/xnec2c.glade:6250
 msgid "Patch"
 msgstr "Patch"
 
-#: resources/xnec2c.glade:6266
+#: resources/xnec2c.glade:6264
 msgid "Cylinder"
 msgstr "Cylinder"
 
-#: resources/xnec2c.glade:6280
+#: resources/xnec2c.glade:6278
 msgid "Move"
 msgstr "Flytta"
 
-#: resources/xnec2c.glade:6294
+#: resources/xnec2c.glade:6292
 msgid "Reflect"
 msgstr "Spegla"
 
-#: resources/xnec2c.glade:6308
+#: resources/xnec2c.glade:6306
 msgid "Scale"
 msgstr "Skala"
 
-#: resources/xnec2c.glade:6322 resources/xnec2c.glade:6606
+#: resources/xnec2c.glade:6320 resources/xnec2c.glade:6604
 msgid "Add Var (SY)"
 msgstr "Lägg till variabel (SY)"
 
-#: resources/xnec2c.glade:6342
+#: resources/xnec2c.glade:6340
 msgid "Edit Geometry Data"
 msgstr "Redigera geometridata"
 
-#: resources/xnec2c.glade:6396
+#: resources/xnec2c.glade:6394
 msgid "Geometry"
 msgstr "Geometri"
 
-#: resources/xnec2c.glade:6423
+#: resources/xnec2c.glade:6421
 msgid "Excitation"
 msgstr "Matning"
 
-#: resources/xnec2c.glade:6437
+#: resources/xnec2c.glade:6435
 msgid "Radiation"
 msgstr "Strålning"
 
-#: resources/xnec2c.glade:6451
+#: resources/xnec2c.glade:6449
 msgid "Frequency"
 msgstr "Frekvens"
 
-#: resources/xnec2c.glade:6465
+#: resources/xnec2c.glade:6463
 msgid "Near Fields"
 msgstr "Närfält"
 
-#: resources/xnec2c.glade:6479
+#: resources/xnec2c.glade:6477
 msgid "Ground (GN)"
 msgstr "Jord (GN)"
 
-#: resources/xnec2c.glade:6493
+#: resources/xnec2c.glade:6491
 msgid "Ground (GD)"
 msgstr "Jord (GD)"
 
-#: resources/xnec2c.glade:6507
+#: resources/xnec2c.glade:6505
 msgid "Loading"
 msgstr "Belastning"
 
-#: resources/xnec2c.glade:6521
+#: resources/xnec2c.glade:6519
 msgid "Kernel"
 msgstr "Kärna"
 
-#: resources/xnec2c.glade:6535
+#: resources/xnec2c.glade:6533
 msgid "Network"
 msgstr "Nätverk"
 
-#: resources/xnec2c.glade:6549
+#: resources/xnec2c.glade:6547
 msgid "Interaction"
 msgstr "Interaktion"
 
-#: resources/xnec2c.glade:6563
+#: resources/xnec2c.glade:6561
 msgid "Transm. Line"
 msgstr "Transm.-linje"
 
-#: resources/xnec2c.glade:6578
+#: resources/xnec2c.glade:6576
 msgid "Execute"
 msgstr "Utför"
 
-#: resources/xnec2c.glade:6592
+#: resources/xnec2c.glade:6590
 msgid "Zo"
 msgstr "Zo"
 
-#: resources/xnec2c.glade:6626
+#: resources/xnec2c.glade:6624
 msgid "Edit Control Commands"
 msgstr "Redigera styrkommandon"
 
-#: resources/xnec2c.glade:6680
+#: resources/xnec2c.glade:6678
 msgid "Commands"
 msgstr "Kommandon"
 
-#: resources/xnec2c.glade:6699
+#: resources/xnec2c.glade:6697
 msgid "Unsaved Data"
 msgstr "Osparad data"
 
-#: resources/xnec2c.glade:6775
+#: resources/xnec2c.glade:6773
 msgid ""
 "Unsaved data in NEC2 Editor.\n"
 "Save NEC2 Editor data first?\n"
@@ -2932,924 +3969,980 @@ msgstr ""
 "Osparad data i NEC2-editorn.\n"
 "Spara NEC2-editorns data först?\n"
 
-#: resources/xnec2c.glade:6874
+#: resources/xnec2c.glade:6872
 msgid "Network Command (NT Card)"
 msgstr "Nätverkskommando (NT-kort)"
 
-#: resources/xnec2c.glade:6903
+#: resources/xnec2c.glade:6901
 msgid "Tag Number, Port 1  "
 msgstr "Taggnummer, port 1  "
 
-#: resources/xnec2c.glade:6934
+#: resources/xnec2c.glade:6932
 msgid "Tag Number, Port 2  "
 msgstr "Taggnummer, port 2  "
 
-#: resources/xnec2c.glade:6965
+#: resources/xnec2c.glade:6963
 msgid "Segment Num, Port 1"
 msgstr "Segmentnr, port 1"
 
-#: resources/xnec2c.glade:6996
+#: resources/xnec2c.glade:6994
 msgid "Segment Num, Port 2"
 msgstr "Segmentnr, port 2"
 
-#: resources/xnec2c.glade:7031 resources/xnec2c.glade:14119
+#: resources/xnec2c.glade:7029 resources/xnec2c.glade:14338
 msgid "Segment Identity"
 msgstr "Segmentidentitet"
 
-#: resources/xnec2c.glade:7061
+#: resources/xnec2c.glade:7059
 msgid "Element 1,1 Real Part"
 msgstr "Element 1,1 realdel"
 
-#: resources/xnec2c.glade:7093
+#: resources/xnec2c.glade:7091
 msgid "Element 1,2 Real Part"
 msgstr "Element 1,2 realdel"
 
-#: resources/xnec2c.glade:7125
+#: resources/xnec2c.glade:7123
 msgid "Element 2,2 Real Part"
 msgstr "Element 2,2 realdel"
 
-#: resources/xnec2c.glade:7157
+#: resources/xnec2c.glade:7155
 msgid "Element 1,1 Imag Part"
 msgstr "Element 1,1 imaginärdel"
 
-#: resources/xnec2c.glade:7189
+#: resources/xnec2c.glade:7187
 msgid "Element 1,2 Imag Part"
 msgstr "Element 1,2 imaginärdel"
 
-#: resources/xnec2c.glade:7221
+#: resources/xnec2c.glade:7219
 msgid "Element 2,2 Imag Part"
 msgstr "Element 2,2 imaginärdel"
 
-#: resources/xnec2c.glade:7257
+#: resources/xnec2c.glade:7255
 msgid "Admittance Matrix Elements"
 msgstr "Admittansmatriselement"
 
-#: resources/xnec2c.glade:7472
+#: resources/xnec2c.glade:7470
 msgid "Patch Element (SP & SC Cards)"
 msgstr "Patchelement (SP- & SC-kort)"
 
-#: resources/xnec2c.glade:7496
+#: resources/xnec2c.glade:7494
 msgid "Arbitrary"
 msgstr "Godtycklig"
 
-#: resources/xnec2c.glade:7513
+#: resources/xnec2c.glade:7511
 msgid "Rectangle"
 msgstr "Rektangel"
 
-#: resources/xnec2c.glade:7530
+#: resources/xnec2c.glade:7528
 msgid "Triangle"
 msgstr "Triangel"
 
-#: resources/xnec2c.glade:7547
+#: resources/xnec2c.glade:7545
 msgid "Quadrilateral"
 msgstr "Fyrhörning"
 
-#: resources/xnec2c.glade:7564
+#: resources/xnec2c.glade:7562
 msgid "Surface"
 msgstr "Yta"
 
-#: resources/xnec2c.glade:7587
+#: resources/xnec2c.glade:7585
 msgid "Patch Type"
 msgstr "Patchtyp"
 
-#: resources/xnec2c.glade:7617
+#: resources/xnec2c.glade:7615
 msgid "Corners 1-2 sub-division (NX)"
 msgstr "Hörn 1-2-underdelning (NX)"
 
-#: resources/xnec2c.glade:7648
+#: resources/xnec2c.glade:7646
 msgid "Corners 2-3 sub-division (NY)"
 msgstr "Hörn 2-3-underdelning (NY)"
 
-#: resources/xnec2c.glade:7683
+#: resources/xnec2c.glade:7681
 msgid "Surface Sub-division"
 msgstr "Ytunderdelning"
 
-#: resources/xnec2c.glade:7909
+#: resources/xnec2c.glade:7907
 msgid "SP/SM Cards"
 msgstr "SP/SM-kort"
 
-#: resources/xnec2c.glade:7945
+#: resources/xnec2c.glade:7943
 msgid "Corner 3 - X"
 msgstr "Hörn 3 - X"
 
-#: resources/xnec2c.glade:7977
+#: resources/xnec2c.glade:7975
 msgid "Corner 3 - Y"
 msgstr "Hörn 3 - Y"
 
-#: resources/xnec2c.glade:8009
+#: resources/xnec2c.glade:8007
 msgid "Corner 3 - Z"
 msgstr "Hörn 3 - Z"
 
-#: resources/xnec2c.glade:8057
+#: resources/xnec2c.glade:8055
 msgid "Corner 4 - X"
 msgstr "Hörn 4 - X"
 
-#: resources/xnec2c.glade:8089
+#: resources/xnec2c.glade:8087
 msgid "Corner 4 - Y"
 msgstr "Hörn 4 - Y"
 
-#: resources/xnec2c.glade:8121
+#: resources/xnec2c.glade:8119
 msgid "Corner 4 - Z"
 msgstr "Hörn 4 - Z"
 
-#: resources/xnec2c.glade:8164
+#: resources/xnec2c.glade:8162
 msgid "SC Card"
 msgstr "SC-kort"
 
-#: resources/xnec2c.glade:8380
+#: resources/xnec2c.glade:8378
 msgid "Quit xnec2c?"
 msgstr "Avsluta xnec2c?"
 
-#: resources/xnec2c.glade:8459
+#: resources/xnec2c.glade:8457
 msgid "Radiation Pattern (RP Card)"
 msgstr "Strålningsdiagram (RP-kort)"
 
-#: resources/xnec2c.glade:8486
+#: resources/xnec2c.glade:8484
 msgid "Normal (Space) Wave"
 msgstr "Normal (rymd-)våg"
 
-#: resources/xnec2c.glade:8502
+#: resources/xnec2c.glade:8500
 msgid "Space + Ground Wave"
 msgstr "Rymd- + markvåg"
 
-#: resources/xnec2c.glade:8518
+#: resources/xnec2c.glade:8516
 msgid "Linear Cliff"
 msgstr "Linjär klippa"
 
-#: resources/xnec2c.glade:8534
+#: resources/xnec2c.glade:8532
 msgid "Radial wire screen"
 msgstr "Radiellt trådnät"
 
-#: resources/xnec2c.glade:8550
+#: resources/xnec2c.glade:8548
 msgid "Circular Cliff + Radials"
 msgstr "Cirkulär klippa + radialer"
 
-#: resources/xnec2c.glade:8566
+#: resources/xnec2c.glade:8564
 msgid "Circular Cliff"
 msgstr "Cirkulär klippa"
 
-#: resources/xnec2c.glade:8582
+#: resources/xnec2c.glade:8580
 msgid "Linear Cliff + Radials"
 msgstr "Linjär klippa + radialer"
 
-#: resources/xnec2c.glade:8600
+#: resources/xnec2c.glade:8598
 msgid "<b>See GN/GD Card Documentation</b>"
 msgstr "<b>Se GN/GD-kortdokumentation</b>"
 
-#: resources/xnec2c.glade:8618
+#: resources/xnec2c.glade:8616
 msgid "Wave Type and Ground (I1)"
 msgstr "Vågtyp och jord (I1)"
 
-#: resources/xnec2c.glade:8646
+#: resources/xnec2c.glade:8644
 msgid "Major & Minor Axis & Total Gain"
 msgstr "Storaxel & lillaxel & total förstärkning"
 
-#: resources/xnec2c.glade:8662
+#: resources/xnec2c.glade:8660
 msgid "Vertical, Horizontal & Total Gain"
 msgstr "Vertikal, horisontell & total förstärkning"
 
-#: resources/xnec2c.glade:8678
+#: resources/xnec2c.glade:8676
 msgid "Major Axis Gain Normalized"
 msgstr "Storaxelförstärkning normaliserad"
 
-#: resources/xnec2c.glade:8694
+#: resources/xnec2c.glade:8692
 msgid "Vertical Axis Gain Normalized"
 msgstr "Vertikalaxelförstärkning normaliserad"
 
-#: resources/xnec2c.glade:8710
+#: resources/xnec2c.glade:8708
 msgid "Total Gain Normalized"
 msgstr "Total förstärkning normaliserad"
 
-#: resources/xnec2c.glade:8726
+#: resources/xnec2c.glade:8724
 msgid "Print/Normalize Directive Gain"
 msgstr "Skriv ut/normalisera riktningsförstärkning"
 
-#: resources/xnec2c.glade:8742
+#: resources/xnec2c.glade:8740
 msgid "No Normalized Gain"
 msgstr "Ingen normaliserad förstärkning"
 
-#: resources/xnec2c.glade:8758
+#: resources/xnec2c.glade:8756
 msgid "Minor Axis Gain Normalized"
 msgstr "Minoraxelförstärkning normaliserad"
 
-#: resources/xnec2c.glade:8774
+#: resources/xnec2c.glade:8772
 msgid "Horizontal Axis Gain Normalized"
 msgstr "Horisontell axelförstärkning normaliserad"
 
-#: resources/xnec2c.glade:8790
+#: resources/xnec2c.glade:8788
 msgid "Print/Normalize Power Gain"
 msgstr "Skriv ut/Normalisera effektförstärkning"
 
-#: resources/xnec2c.glade:8806
+#: resources/xnec2c.glade:8804
 msgid "No Gain Averaging"
 msgstr "Ingen förstärkningsmedelvärdesbildning"
 
-#: resources/xnec2c.glade:8822
+#: resources/xnec2c.glade:8820
 msgid "Points in Average Not Printed"
 msgstr "Punkter i medelvärde skrivs inte ut"
 
-#: resources/xnec2c.glade:8838
+#: resources/xnec2c.glade:8836
 msgid "Average Gain Computed"
 msgstr "Medelförstärkning beräknad"
 
-#: resources/xnec2c.glade:8856
+#: resources/xnec2c.glade:8854
 msgid "<b>See RP Card Documentation</b>"
 msgstr "<b>Se RP-kortdokumentation</b>"
 
-#: resources/xnec2c.glade:8874
+#: resources/xnec2c.glade:8872
 msgid "Data Output Control (XNDA)"
 msgstr "Datautmatningskontroll (XNDA)"
 
-#: resources/xnec2c.glade:8904
+#: resources/xnec2c.glade:8902
 msgid "Points in Theta"
 msgstr "Punkter i Theta"
 
-#: resources/xnec2c.glade:9013
+#: resources/xnec2c.glade:9011
 msgid "Initial Phi (deg)"
 msgstr "Initial Phi (deg)"
 
-#: resources/xnec2c.glade:9095
+#: resources/xnec2c.glade:9093
 msgid "Field Point Distance"
 msgstr "Fältpunktsavstånd"
 
-#: resources/xnec2c.glade:9127
+#: resources/xnec2c.glade:9125
 msgid "Gain Normalization"
 msgstr "Förstärkningsnormalisering"
 
-#: resources/xnec2c.glade:9169
+#: resources/xnec2c.glade:9167
 msgid "Radiation Pattern Parameters"
 msgstr "Strålningsdiagramparametrar"
 
-#: resources/xnec2c.glade:9336
+#: resources/xnec2c.glade:9334
 msgid "Reflect Structure (GX card)"
 msgstr "Spegla struktur (GX-kort)"
 
-#: resources/xnec2c.glade:9364
+#: resources/xnec2c.glade:9362
 msgid "Reflect in YZ plane"
 msgstr "Spegla i YZ-plan"
 
-#: resources/xnec2c.glade:9379
+#: resources/xnec2c.glade:9377
 msgid "Reflect in XY plane"
 msgstr "Spegla i XY-plan"
 
-#: resources/xnec2c.glade:9394
+#: resources/xnec2c.glade:9392
 msgid "Reflect in XZ plane"
 msgstr "Spegla i XZ-plan"
 
-#: resources/xnec2c.glade:9450
+#: resources/xnec2c.glade:9448
 msgid "Reflect Options"
 msgstr "Speglingsalternativ"
 
-#: resources/xnec2c.glade:9581
+#: resources/xnec2c.glade:9579
 msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: Frekvensdatadiagram"
 
-#: resources/xnec2c.glade:9606 resources/xnec2c.glade:10546
-#: resources/xnec2c.glade:11857
+#: resources/xnec2c.glade:9604 resources/xnec2c.glade:10544
+#: resources/xnec2c.glade:11999
 msgid "_File"
 msgstr "_Arkiv"
 
-#: resources/xnec2c.glade:9668 resources/xnec2c.glade:10608
-#: resources/xnec2c.glade:11919
+#: resources/xnec2c.glade:9666 resources/xnec2c.glade:10606
+#: resources/xnec2c.glade:12061
 msgid "Save as _gnuplot"
 msgstr "Spara som _gnuplot"
 
-#: resources/xnec2c.glade:9679 resources/xnec2c.glade:11929
+#: resources/xnec2c.glade:9677 resources/xnec2c.glade:12071
 msgid "Save as _CSV"
 msgstr "Spara som _CSV"
 
-#: resources/xnec2c.glade:9691
+#: resources/xnec2c.glade:9689
 msgid "Save as _Touchstone (.SnP)"
 msgstr "Spara som _Touchstone (.SnP)"
 
-#: resources/xnec2c.glade:9698
+#: resources/xnec2c.glade:9696
 msgid "Save as S_1P: Reflection Only"
 msgstr "Spara som S_1P: Endast reflektion"
 
-#: resources/xnec2c.glade:9708
+#: resources/xnec2c.glade:9706
 msgid "Save as S2P: _Max Gain (S21)"
 msgstr "Spara som S2P: _Maxförstärkning (S21)"
 
-#: resources/xnec2c.glade:9718
+#: resources/xnec2c.glade:9716
 msgid "Save as S2P: _Viewer Gain (S21)"
 msgstr "Spara som S2P: _Betraktarförstärkning (S21)"
 
-#: resources/xnec2c.glade:9755 resources/xnec2c.glade:10974
-#: resources/xnec2c.glade:11963
+#: resources/xnec2c.glade:9753 resources/xnec2c.glade:10972
+#: resources/xnec2c.glade:12105
 msgid "_View"
 msgstr "_Visa"
 
-#: resources/xnec2c.glade:9764 resources/xnec2c.glade:11004
-#: resources/xnec2c.glade:11973
+#: resources/xnec2c.glade:9762 resources/xnec2c.glade:11002
+#: resources/xnec2c.glade:12115
 msgid "_Polarization"
 msgstr "_Polarisation"
 
-#: resources/xnec2c.glade:9780 resources/xnec2c.glade:11020
-#: resources/xnec2c.glade:11989
+#: resources/xnec2c.glade:9778 resources/xnec2c.glade:11018
+#: resources/xnec2c.glade:12131
 msgid "_Total"
 msgstr "_Total"
 
-#: resources/xnec2c.glade:9791 resources/xnec2c.glade:11031
-#: resources/xnec2c.glade:12000
+#: resources/xnec2c.glade:9789 resources/xnec2c.glade:11029
+#: resources/xnec2c.glade:12142
 msgid "_Horizontal"
 msgstr "_Horisontell"
 
-#: resources/xnec2c.glade:9802 resources/xnec2c.glade:11042
-#: resources/xnec2c.glade:12011
+#: resources/xnec2c.glade:9800 resources/xnec2c.glade:11040
+#: resources/xnec2c.glade:12153
 msgid "_Vertical"
 msgstr "_Vertikal"
 
-#: resources/xnec2c.glade:9813 resources/xnec2c.glade:11053
-#: resources/xnec2c.glade:12022
+#: resources/xnec2c.glade:9811 resources/xnec2c.glade:11051
+#: resources/xnec2c.glade:12164
 msgid "_Right Hand"
 msgstr "_Högerhand"
 
-#: resources/xnec2c.glade:9824 resources/xnec2c.glade:11064
-#: resources/xnec2c.glade:12033
+#: resources/xnec2c.glade:9822 resources/xnec2c.glade:11062
+#: resources/xnec2c.glade:12175
 msgid "_Left Hand"
 msgstr "_Vänsterhand"
 
-#: resources/xnec2c.glade:9839
+#: resources/xnec2c.glade:9837
 msgid "_Net Gain"
 msgstr "_Nettoförstärkning"
 
-#: resources/xnec2c.glade:9848
+#: resources/xnec2c.glade:9846
 msgid "Show _Min/Max Values"
 msgstr "Visa _min/max-värden"
 
-#: resources/xnec2c.glade:9857
+#: resources/xnec2c.glade:9855
 msgid "Show _S11 (dB) Values"
 msgstr "Visa _S11 (dB)-värden"
 
-#: resources/xnec2c.glade:9866
+#: resources/xnec2c.glade:9864
 msgid "Clamp _VSWR Graph to 10"
 msgstr "Begränsa _VSWR-graf till 10"
 
-#: resources/xnec2c.glade:9875
+#: resources/xnec2c.glade:9873
 msgid "Show T_ant instead of T_total"
 msgstr "Visa T_ant istället för T_total"
 
-#: resources/xnec2c.glade:9884
+#: resources/xnec2c.glade:9882
 msgid "Round _X Axis Frequency Values"
 msgstr "Avrunda _X-axelns frekvensvärden"
 
-#: resources/xnec2c.glade:9908 resources/xnec2c.glade:10072
+#: resources/xnec2c.glade:9906 resources/xnec2c.glade:10070
 msgid "Max Gain"
 msgstr "Max förstärkning"
 
-#: resources/xnec2c.glade:9923
+#: resources/xnec2c.glade:9921
 msgid "Direction"
 msgstr "Riktning"
 
-#: resources/xnec2c.glade:9938
+#: resources/xnec2c.glade:9936
 msgid "Viewer"
 msgstr "Betraktare"
 
-#: resources/xnec2c.glade:9968
+#: resources/xnec2c.glade:9966
 msgid "Zr/Zi"
 msgstr "Zr/Zi"
 
-#: resources/xnec2c.glade:9983
+#: resources/xnec2c.glade:9981
 msgid "Zm/Zph"
 msgstr "Zm/Zph"
 
-#: resources/xnec2c.glade:9998
+#: resources/xnec2c.glade:9996
 msgid "Smith"
 msgstr "Smith"
 
-#: resources/xnec2c.glade:10013 resources/xnec2c.glade:10395
+#: resources/xnec2c.glade:10011 resources/xnec2c.glade:10393
 msgid "T_ant"
 msgstr "T_ant"
 
-#: resources/xnec2c.glade:10056 resources/xnec2c.glade:10091
-#: resources/xnec2c.glade:10126 resources/xnec2c.glade:10161
-#: resources/xnec2c.glade:10379 resources/xnec2c.glade:10413
-#: resources/xnec2c.glade:10447 resources/xnec2c.glade:13036
+#: resources/xnec2c.glade:10054 resources/xnec2c.glade:10089
+#: resources/xnec2c.glade:10124 resources/xnec2c.glade:10159
+#: resources/xnec2c.glade:10377 resources/xnec2c.glade:10411
+#: resources/xnec2c.glade:10445 resources/xnec2c.glade:13255
 msgid " - - -"
 msgstr " - - -"
 
-#: resources/xnec2c.glade:10197
+#: resources/xnec2c.glade:10195
 msgid " - - - - "
 msgstr " - - - - "
 
-#: resources/xnec2c.glade:10213
+#: resources/xnec2c.glade:10211
 msgid "Freq MHz"
 msgstr "Frekv MHz"
 
-#: resources/xnec2c.glade:10252
+#: resources/xnec2c.glade:10250
 msgid "Tx Line Zo"
 msgstr "Tx-linje Zo"
 
-#: resources/xnec2c.glade:10266 resources/xnec2c.glade:11626
-#: resources/xnec2c.glade:12880
+#: resources/xnec2c.glade:10264 resources/xnec2c.glade:11761
+#: resources/xnec2c.glade:13099
 msgid "Freq Loop"
 msgstr "Frekvensloop"
 
-#: resources/xnec2c.glade:10361 resources/xnec2c.glade:12985
+#: resources/xnec2c.glade:10359 resources/xnec2c.glade:13204
 msgid "T_total"
 msgstr "T_total"
 
-#: resources/xnec2c.glade:10429
+#: resources/xnec2c.glade:10427
 msgid "G/T_ant"
 msgstr "G/T_ant"
 
-#: resources/xnec2c.glade:10502
+#: resources/xnec2c.glade:10500
 msgid "Frequency Data Plots"
 msgstr "Frekvensdatadiagram"
 
-#: resources/xnec2c.glade:10619
+#: resources/xnec2c.glade:10617
 msgid "Save _Currents/Charges as CSV"
 msgstr "Spara _strömmar/laddningar som CSV"
 
-#: resources/xnec2c.glade:10638
+#: resources/xnec2c.glade:10636
 msgid "Optimization Settings"
 msgstr "Optimeringsinställningar"
 
-#: resources/xnec2c.glade:10653
+#: resources/xnec2c.glade:10651
 msgid "Reload and write data on .NEC file changes"
 msgstr "Ladda om och skriv data vid .NEC-filändringar"
 
-#: resources/xnec2c.glade:10660
+#: resources/xnec2c.glade:10658
 msgid "_Write files selected below, now."
 msgstr "_Skriv valda filer nedan, nu."
 
-#: resources/xnec2c.glade:10675
+#: resources/xnec2c.glade:10673
 msgid "After calculation, write <file>.csv"
 msgstr "Efter beräkning, skriv <file>.csv"
 
-#: resources/xnec2c.glade:10684
+#: resources/xnec2c.glade:10682
 msgid "After calculation, write <file>.s_1p"
 msgstr "Efter beräkning, skriv <file>.s_1p"
 
-#: resources/xnec2c.glade:10693
+#: resources/xnec2c.glade:10691
 msgid "After calculation, write <file>-_maxgain.s2p"
 msgstr "Efter beräkning, skriv <file>-_maxgain.s2p"
 
-#: resources/xnec2c.glade:10702
+#: resources/xnec2c.glade:10700
 msgid "After calculation, write <file>-_viewergain.s2p"
 msgstr "Efter beräkning, skriv <file>-_viewergain.s2p"
 
-#: resources/xnec2c.glade:10711
+#: resources/xnec2c.glade:10709
 msgid "After calculation, write <file>-_radpattern.csv"
 msgstr "Efter beräkning, skriv <file>-_radpattern.csv"
 
-#: resources/xnec2c.glade:10720
+#: resources/xnec2c.glade:10718
 msgid "After calculation, write <file>-_currents.csv"
 msgstr "Efter beräkning, skriv <file>-_currents.csv"
 
-#: resources/xnec2c.glade:10729
+#: resources/xnec2c.glade:10727
 msgid "After calculation, write <file>-_structure.gplot"
 msgstr "Efter beräkning, skriv <file>-_structure.gplot"
 
-#: resources/xnec2c.glade:10738
+#: resources/xnec2c.glade:10736
 msgid "After calculation, write <file>-_patch-currents.csv"
 msgstr "Efter beräkning, skriv <file>-_patch-currents.csv"
 
-#: resources/xnec2c.glade:10753
+#: resources/xnec2c.glade:10751
 msgid "_Math Libraries"
 msgstr "_Matematikbibliotek"
 
-#: resources/xnec2c.glade:10762
+#: resources/xnec2c.glade:10760
 msgid "_Interactive"
 msgstr "_Interaktiv"
 
-#: resources/xnec2c.glade:10782
+#: resources/xnec2c.glade:10780
 msgid "_Batch"
 msgstr "_Batch"
 
-#: resources/xnec2c.glade:10808
+#: resources/xnec2c.glade:10806
 msgid "Mathlib _Help"
 msgstr "Mathlib-_hjälp"
 
-#: resources/xnec2c.glade:10821
+#: resources/xnec2c.glade:10819
 msgid "Mathlib _Benchmarks"
 msgstr "Mathlib-_prestandatest"
 
-#: resources/xnec2c.glade:10832
+#: resources/xnec2c.glade:10830
 msgid "_Selected Mathlibs"
 msgstr "_Valda Mathlibs"
 
-#: resources/xnec2c.glade:10846
+#: resources/xnec2c.glade:10844
 msgid "Select All/None"
 msgstr "Välj alla/inga"
 
-#: resources/xnec2c.glade:10871
+#: resources/xnec2c.glade:10869
 msgid "_Parallel (-j N):\t\tO(N/J)"
 msgstr "_Parallell (-j N):\t\tO(N/J)"
 
-#: resources/xnec2c.glade:10880
+#: resources/xnec2c.glade:10878
 msgid "_Single Job (-j 1):\tO(N)"
 msgstr "_Enkelt jobb (-j 1):\tO(N)"
 
-#: resources/xnec2c.glade:10889
+#: resources/xnec2c.glade:10887
 msgid "_Iterate -j N/=2:\tO(N*log2(J))"
 msgstr "_Iterera -j N/=2:\tO(N*log2(J))"
 
-#: resources/xnec2c.glade:10898
+#: resources/xnec2c.glade:10896
 msgid "_Iterate -j N-=1:\tO(N*J)"
 msgstr "_Iterera -j N-=1:\tO(N*J)"
 
-#: resources/xnec2c.glade:10913
+#: resources/xnec2c.glade:10911
 msgid "Benchmark _Help"
 msgstr "Prestandatest-_hjälp"
 
-#: resources/xnec2c.glade:10932
+#: resources/xnec2c.glade:10930
 msgid "Begin Frequency Loop at Startup"
 msgstr "Starta frekvensloop vid uppstart"
 
-#: resources/xnec2c.glade:10943
+#: resources/xnec2c.glade:10941
 msgid "Confirm Quit"
 msgstr "Bekräfta avslut"
 
-#: resources/xnec2c.glade:10984
+#: resources/xnec2c.glade:10982
 msgid "_Radiation Pattern"
 msgstr "_Strålningsdiagram"
 
-#: resources/xnec2c.glade:10994
+#: resources/xnec2c.glade:10992
 msgid "_Frequency Plots"
 msgstr "_Frekvensdiagram"
 
-#: resources/xnec2c.glade:11079 resources/xnec2c.glade:12332
+#: resources/xnec2c.glade:11077
+msgid "Current _Visualization"
+msgstr "Ström_visualisering"
+
+#: resources/xnec2c.glade:11093
+msgid "Animated"
+msgstr "_Animerad"
+
+#: resources/xnec2c.glade:11100
+msgid "_Reference Phase"
+msgstr "_Referensfas"
+
+#: resources/xnec2c.glade:11111
+msgid "_LIC Texture"
+msgstr "_LIC-textur"
+
+#: resources/xnec2c.glade:11122 resources/xnec2c.glade:12410
+msgid "_Wireframe"
+msgstr "_Trådram"
+
+#: resources/xnec2c.glade:11140
+msgid "Static"
+msgstr "Statisk"
+
+#: resources/xnec2c.glade:11147
+msgid "Polarization _Axis"
+msgstr "Polarisations_axel"
+
+#: resources/xnec2c.glade:11158
+msgid "Peak _Magnitude"
+msgstr "Topp_magnitud"
+
+#: resources/xnec2c.glade:11173
+msgid "A_nimate"
+msgstr "A_nimera"
+
+#: resources/xnec2c.glade:11182 resources/xnec2c.glade:12527
 msgid "Common _Projection"
 msgstr "Gemensam _projektion"
 
-#: resources/xnec2c.glade:11089 resources/xnec2c.glade:12342
+#: resources/xnec2c.glade:11192 resources/xnec2c.glade:12537
 msgid "Common _Frequency"
 msgstr "Gemensam _frekvens"
 
-#: resources/xnec2c.glade:11105
+#: resources/xnec2c.glade:11208
 msgid "_Symbol Overrides"
 msgstr "_Symbolåsidosättningar"
 
-#: resources/xnec2c.glade:11117
+#: resources/xnec2c.glade:11218
+msgid "OpenGL _Settings..."
+msgstr "OpenGL-_inställningar..."
+
+#: resources/xnec2c.glade:11229
 msgid "_Help"
 msgstr "_Hjälp"
 
-#: resources/xnec2c.glade:11126
+#: resources/xnec2c.glade:11238
 msgid "_About"
 msgstr "_Om"
 
-#: resources/xnec2c.glade:11153
+#: resources/xnec2c.glade:11265
 msgid "Currents"
 msgstr "Strömmar"
 
-#: resources/xnec2c.glade:11168
+#: resources/xnec2c.glade:11280
 msgid "Charges"
 msgstr "Laddningar"
 
-#: resources/xnec2c.glade:11349
+#: resources/xnec2c.glade:11463
 msgid " Zoom"
 msgstr " Zoom"
 
-#: resources/xnec2c.glade:11471 resources/xnec2c.glade:12816
+#: resources/xnec2c.glade:11606 resources/xnec2c.glade:13035
 msgid "Gain"
 msgstr "Förstärkning"
 
-#: resources/xnec2c.glade:11486 resources/xnec2c.glade:11502
-#: resources/xnec2c.glade:12829 resources/xnec2c.glade:13018
+#: resources/xnec2c.glade:11621 resources/xnec2c.glade:11637
+#: resources/xnec2c.glade:13048 resources/xnec2c.glade:13237
 msgid "0.0"
 msgstr "0.0"
 
-#: resources/xnec2c.glade:11536
+#: resources/xnec2c.glade:11671
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:11578 resources/xnec2c.glade:12972
+#: resources/xnec2c.glade:11713 resources/xnec2c.glade:13191
 msgid "dB"
 msgstr "dB"
 
-#: resources/xnec2c.glade:11592 resources/xnec2c.glade:12865
+#: resources/xnec2c.glade:11727 resources/xnec2c.glade:13084
 msgid "Step"
 msgstr "Steg"
 
-#: resources/xnec2c.glade:11739 resources/xnec2c.glade:12913
+#: resources/xnec2c.glade:11874 resources/xnec2c.glade:13132
 msgid "Apply"
 msgstr "Tillämpa"
 
-#: resources/xnec2c.glade:11759
+#: resources/xnec2c.glade:11894
 msgid "Frequency Mhz"
 msgstr "Frekvens MHz"
 
-#: resources/xnec2c.glade:11812
+#: resources/xnec2c.glade:11954
 msgid "Structure Geometry"
 msgstr "Strukturgeometri"
 
-#: resources/xnec2c.glade:11831
+#: resources/xnec2c.glade:11973
 msgid "Xnec2c: Radiation Patterns"
 msgstr "Xnec2c: Strålningsdiagram"
 
-#: resources/xnec2c.glade:12048
+#: resources/xnec2c.glade:12190
 msgid "_Gain Scaling"
 msgstr "_Förstärkningsskalning"
 
-#: resources/xnec2c.glade:12063
+#: resources/xnec2c.glade:12205
 msgid "Linear _Power"
 msgstr "Linjär _effekt"
 
-#: resources/xnec2c.glade:12074
+#: resources/xnec2c.glade:12216
 msgid "Linear _Voltage"
 msgstr "Linjär _spänning"
 
-#: resources/xnec2c.glade:12085
+#: resources/xnec2c.glade:12227
 msgid "_ARRL Style"
 msgstr "_ARRL-stil"
 
-#: resources/xnec2c.glade:12096
+#: resources/xnec2c.glade:12238
 msgid "_Logarithmic"
 msgstr "_Logaritmisk"
 
-#: resources/xnec2c.glade:12107
+#: resources/xnec2c.glade:12249
 msgid "_Noise Temperature"
 msgstr "_Brustemperatur"
 
-#: resources/xnec2c.glade:12118
+#: resources/xnec2c.glade:12260
 msgid "Noise Temp (_log scale)"
 msgstr "Brustemperatur (_log-skala)"
 
-#: resources/xnec2c.glade:12133
+#: resources/xnec2c.glade:12275
 msgid "Noise _Environment"
 msgstr "Brus_miljö"
 
-#: resources/xnec2c.glade:12148
+#: resources/xnec2c.glade:12290
 msgid "VE7BQH _Rural"
 msgstr "VE7BQH _Landsbygd"
 
-#: resources/xnec2c.glade:12158
+#: resources/xnec2c.glade:12300
 msgid "VE7BQH Resi_dential"
 msgstr "VE7BQH B_ostadsområde"
 
-#: resources/xnec2c.glade:12170
+#: resources/xnec2c.glade:12312
 msgid "VE7BQH _City"
 msgstr "VE7BQH _Stad"
 
-#: resources/xnec2c.glade:12181
+#: resources/xnec2c.glade:12323
 msgid "G4CQM _Baseline"
 msgstr "G4CQM _Baslinje"
 
-#: resources/xnec2c.glade:12192
+#: resources/xnec2c.glade:12334
 msgid "ITU-R _Business"
 msgstr "ITU-R _Kommersiell"
 
-#: resources/xnec2c.glade:12203
+#: resources/xnec2c.glade:12345
 msgid "ITU-R Reside_ntial"
 msgstr "ITU-R Bostadso_mråde"
 
-#: resources/xnec2c.glade:12214
+#: resources/xnec2c.glade:12356
 msgid "ITU-R Ru_ral"
 msgstr "ITU-R La_ndsbygd"
 
-#: resources/xnec2c.glade:12225
+#: resources/xnec2c.glade:12367
 msgid "ITU-R _Quiet Rural"
 msgstr "ITU-R _Tyst landsbygd"
 
-#: resources/xnec2c.glade:12240
+#: resources/xnec2c.glade:12382
+msgid "_Gradient Key"
+msgstr "_Gradientnyckel"
+
+#: resources/xnec2c.glade:12392
+msgid "Draw St_yle"
+msgstr "_Ritstil"
+
+#: resources/xnec2c.glade:12401
+msgid "S_urface"
+msgstr "_Yta"
+
+#: resources/xnec2c.glade:12420
+msgid "_Both"
+msgstr "_Båda"
+
+#: resources/xnec2c.glade:12435
 msgid "_Near Field"
 msgstr "_Närfält"
 
-#: resources/xnec2c.glade:12255
+#: resources/xnec2c.glade:12450
 msgid "Near _E Field"
 msgstr "Nära _E-fält"
 
-#: resources/xnec2c.glade:12265
+#: resources/xnec2c.glade:12460
 msgid "Near _H Field"
 msgstr "Nära _H-fält"
 
-#: resources/xnec2c.glade:12275
+#: resources/xnec2c.glade:12470
 msgid "_Poynting Vector"
 msgstr "_Poyntingvektor"
 
-#: resources/xnec2c.glade:12284
+#: resources/xnec2c.glade:12479
 msgid "_Animate Dialog"
 msgstr "_Animera dialog"
 
-#: resources/xnec2c.glade:12293
+#: resources/xnec2c.glade:12488
 msgid "_Total Field"
 msgstr "_Totalfält"
 
-#: resources/xnec2c.glade:12302
+#: resources/xnec2c.glade:12497
 msgid "_Peak Value"
 msgstr "_Toppvärde"
 
-#: resources/xnec2c.glade:12313
-msgid "_Snapshot"
-msgstr "_Ögonblicksbild"
+#: resources/xnec2c.glade:12508
+msgid "_Instantaneous (φ=0)"
+msgstr "_Momentan (φ=0)"
 
-#: resources/xnec2c.glade:12352
+#: resources/xnec2c.glade:12547
 msgid "_Overlay Structure"
 msgstr "_Överlagra struktur"
 
-#: resources/xnec2c.glade:12376
+#: resources/xnec2c.glade:12572
 msgid "Gain Pattern"
 msgstr "Förstärkningsmönster"
 
-#: resources/xnec2c.glade:12391
+#: resources/xnec2c.glade:12587
 msgid "E/H Fields"
 msgstr "E/H-fält"
 
-#: resources/xnec2c.glade:12574
+#: resources/xnec2c.glade:12772
 msgid "Zoom % "
 msgstr "Zoom % "
 
-#: resources/xnec2c.glade:12613
+#: resources/xnec2c.glade:12811
 msgid "T Elev° "
 msgstr "T Elev° "
 
-#: resources/xnec2c.glade:12932
+#: resources/xnec2c.glade:13151
 msgid "Frequency MHz"
 msgstr "Frekvens MHz"
 
-#: resources/xnec2c.glade:12949
+#: resources/xnec2c.glade:13168
 msgid "0.010"
 msgstr "0.010"
 
-#: resources/xnec2c.glade:13002
+#: resources/xnec2c.glade:13221
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:13137
+#: resources/xnec2c.glade:13356
 msgid "Scale Structure (GS card)"
 msgstr "Skala struktur (GS-kort)"
 
-#: resources/xnec2c.glade:13168
+#: resources/xnec2c.glade:13387
 msgid "Structure Scale Factor"
 msgstr "Strukturskalfaktor"
 
-#: resources/xnec2c.glade:13181
+#: resources/xnec2c.glade:13400
 msgid "From Tag No."
 msgstr "Från taggnr."
 
-#: resources/xnec2c.glade:13231
+#: resources/xnec2c.glade:13450
 msgid "To Tag No."
 msgstr "Till taggnr."
 
-#: resources/xnec2c.glade:13266
+#: resources/xnec2c.glade:13485
 msgid "Scale Structure"
 msgstr "Skala struktur"
 
-#: resources/xnec2c.glade:13443
+#: resources/xnec2c.glade:13662
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "Koordinattransformation (GM-kort)"
 
-#: resources/xnec2c.glade:13473
+#: resources/xnec2c.glade:13692
 msgid "Tag Increment"
 msgstr "Taggökning"
 
-#: resources/xnec2c.glade:13504
+#: resources/xnec2c.glade:13723
 msgid "Rotate about X"
 msgstr "Rotera runt X"
 
-#: resources/xnec2c.glade:13536
+#: resources/xnec2c.glade:13755
 msgid "Move along X"
 msgstr "Flytta längs X"
 
-#: resources/xnec2c.glade:13568
+#: resources/xnec2c.glade:13787
 msgid "New Structures"
 msgstr "Nya strukturer"
 
-#: resources/xnec2c.glade:13599
+#: resources/xnec2c.glade:13818
 msgid "Rotate about Y"
 msgstr "Rotera runt Y"
 
-#: resources/xnec2c.glade:13631
+#: resources/xnec2c.glade:13850
 msgid "Move along Y"
 msgstr "Flytta längs Y"
 
-#: resources/xnec2c.glade:13663
+#: resources/xnec2c.glade:13882
 msgid "Start From Tag"
 msgstr "Starta från tagg"
 
-#: resources/xnec2c.glade:13695
+#: resources/xnec2c.glade:13914
 msgid "Rotate about Z"
 msgstr "Rotera runt Z"
 
-#: resources/xnec2c.glade:13727
+#: resources/xnec2c.glade:13946
 msgid "Move along Z"
 msgstr "Flytta längs Z"
 
-#: resources/xnec2c.glade:13763
+#: resources/xnec2c.glade:13982
 msgid "Co-ordinate Transformation Data"
 msgstr "Koordinattransformationsdata"
 
-#: resources/xnec2c.glade:13959
+#: resources/xnec2c.glade:14178
 msgid "Trans. Line Command (TL Card)"
 msgstr "Transmissionsledningskommando (TL-kort)"
 
-#: resources/xnec2c.glade:13989
+#: resources/xnec2c.glade:14208
 msgid "Tag Number, End 1  "
 msgstr "Taggnummer, ände 1  "
 
-#: resources/xnec2c.glade:14021
+#: resources/xnec2c.glade:14240
 msgid "Tag Number, End 2  "
 msgstr "Taggnummer, ände 2  "
 
-#: resources/xnec2c.glade:14052
+#: resources/xnec2c.glade:14271
 msgid "Segment Num, End 1"
 msgstr "Segmentnr, ände 1"
 
-#: resources/xnec2c.glade:14084
+#: resources/xnec2c.glade:14303
 msgid "Segment Num, End 2"
 msgstr "Segmentnr, ände 2"
 
-#: resources/xnec2c.glade:14148
+#: resources/xnec2c.glade:14367
 msgid "Crossed Transmission Line"
 msgstr "Korsad transmissionsledning"
 
-#: resources/xnec2c.glade:14166
+#: resources/xnec2c.glade:14385
 msgid "Characteristic Impedance"
 msgstr "Karakteristisk impedans"
 
-#: resources/xnec2c.glade:14198
+#: resources/xnec2c.glade:14417
 msgid "End 1 Y Real Part (S)"
 msgstr "Ände 1 Y realdel (S)"
 
-#: resources/xnec2c.glade:14230
+#: resources/xnec2c.glade:14449
 msgid "End 2 Y Real Part (S)"
 msgstr "Ände 2 Y realdel (S)"
 
-#: resources/xnec2c.glade:14262
+#: resources/xnec2c.glade:14481
 msgid "Length of Tx Line (m)"
 msgstr "Längd på Tx-ledning (m)"
 
-#: resources/xnec2c.glade:14294
+#: resources/xnec2c.glade:14513
 msgid "End 1 Y Imag Part (S)"
 msgstr "Ände 1 Y imaginärdel (S)"
 
-#: resources/xnec2c.glade:14326
+#: resources/xnec2c.glade:14545
 msgid "End 2 Y Imag Part (S)"
 msgstr "Ände 2 Y imaginärdel (S)"
 
-#: resources/xnec2c.glade:14362
+#: resources/xnec2c.glade:14581
 msgid "Transmission Line"
 msgstr "Transmissionsledning"
 
-#: resources/xnec2c.glade:14589
+#: resources/xnec2c.glade:14808
 msgid "Wire Element (GW & GC cards)"
 msgstr "Trådelement (GW- & GC-kort)"
 
-#: resources/xnec2c.glade:14649
+#: resources/xnec2c.glade:14868
 msgid "Wire X1"
 msgstr "Tråd X1"
 
-#: resources/xnec2c.glade:14681
+#: resources/xnec2c.glade:14900
 msgid "Wire X2"
 msgstr "Tråd X2"
 
-#: resources/xnec2c.glade:14744
+#: resources/xnec2c.glade:14963
 msgid "Wire Y1"
 msgstr "Tråd Y1"
 
-#: resources/xnec2c.glade:14777
+#: resources/xnec2c.glade:14996
 msgid "Wire Y2"
 msgstr "Tråd Y2"
 
-#: resources/xnec2c.glade:14841
+#: resources/xnec2c.glade:15060
 msgid "Wire Z1"
 msgstr "Tråd Z1"
 
-#: resources/xnec2c.glade:14873
+#: resources/xnec2c.glade:15092
 msgid "Wire Z2"
 msgstr "Tråd Z2"
 
-#: resources/xnec2c.glade:14938
+#: resources/xnec2c.glade:15157
 msgid "Wire Length"
 msgstr "Trådlängd"
 
-#: resources/xnec2c.glade:15009
+#: resources/xnec2c.glade:15228
 msgid "Wire Data"
 msgstr "Tråddata"
 
-#: resources/xnec2c.glade:15021
+#: resources/xnec2c.glade:15240
 msgid "Tapered Wire"
 msgstr "Avsmalnande tråd"
 
-#: resources/xnec2c.glade:15063
+#: resources/xnec2c.glade:15282
 msgid "Length Taper"
 msgstr "Längdavsmalnande"
 
-#: resources/xnec2c.glade:15095
+#: resources/xnec2c.glade:15314
 msgid "Diameter Seg 1"
 msgstr "Diameter seg 1"
 
-#: resources/xnec2c.glade:15127
+#: resources/xnec2c.glade:15346
 msgid "Diameter Seg N"
 msgstr "Diameter seg N"
 
-#: resources/xnec2c.glade:15159
+#: resources/xnec2c.glade:15378
 msgid "Diam. Taper"
 msgstr "Diam. avsmalnande"
 
-#: resources/xnec2c.glade:15195
+#: resources/xnec2c.glade:15414
 msgid "Wire Taper Data"
 msgstr "Trådavsmalnande data"
 
-#: resources/xnec2c.glade:15360
+#: resources/xnec2c.glade:15579
 msgid "Impedance (Zo) Ohm"
 msgstr "Impedans (Zo) Ohm"
 
-#: resources/xnec2c.glade:15375
+#: resources/xnec2c.glade:15594
 msgid "50.00"
 msgstr "50.00"
 
-#: resources/xnec2c.glade:15398
+#: resources/xnec2c.glade:15617
 msgid "Transmission Line Impedance (Zo)"
 msgstr "Transmissionsledningsimpedans (Zo)"

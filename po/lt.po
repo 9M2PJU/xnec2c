@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-03-26 17:05-0700\n"
+"POT-Creation-Date: 2026-04-02 15:50-0700\n"
 "PO-Revision-Date: 2025-12-28 20:37-0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -45,7 +45,7 @@ msgstr "Segmento sujungimo klaida funkcijoje sbf()"
 msgid "Segment connection error in trio()"
 msgstr "Segmento sujungimo klaida funkcijoje trio()"
 
-#: src/callback_func.c:263
+#: src/callback_func.c:265
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
@@ -53,7 +53,7 @@ msgstr ""
 "Vykdomas dažnio ciklas\n"
 "Ar tikrai norite nutraukti skaičiavimą?"
 
-#: src/callback_func.c:267
+#: src/callback_func.c:269
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
@@ -61,7 +61,7 @@ msgstr ""
 "Vykdomas dažnio ciklas\n"
 "Ar tikrai norite uždaryti šį langą?"
 
-#: src/callback_func.c:520
+#: src/callback_func.c:523
 #, c-format
 msgid ""
 "Frequency plots window closed: excitation type %d is incompatible.\n"
@@ -70,7 +70,7 @@ msgstr ""
 "Dažnio grafikų langas uždarytas: žadinimo tipas %d nesuderinamas.\n"
 "Vietoj to naudokite tipą 0 (Pritaikytas E laukas) arba 5 (Srovės trūkis)."
 
-#: src/callback_func.c:526
+#: src/callback_func.c:529
 #, c-format
 msgid ""
 "Frequency plots are not available with excitation type %d.\n"
@@ -82,47 +82,47 @@ msgstr ""
 "žadinimą.\n"
 "Pakeiskite EX kortelę į tipą 0 (Pritaikytas E laukas) arba 5 (Srovės trūkis)."
 
-#: src/callback_func.c:705
+#: src/callback_func.c:736
 msgid "View Currents"
 msgstr "Rodyti sroves"
 
-#: src/callback_func.c:727 src/callback_func.c:786
+#: src/callback_func.c:758 src/callback_func.c:817
 msgid "View Geometry"
 msgstr "Rodyti geometriją"
 
-#: src/callback_func.c:764
+#: src/callback_func.c:795
 msgid "View Charges"
 msgstr "Rodyti krūvius"
 
-#: src/callback_func.c:829
+#: src/callback_func.c:861
 msgid "PNG images (*.png)"
 msgstr "PNG paveikslėliai (*.png)"
 
-#: src/callback_func.c:831
+#: src/callback_func.c:863
 msgid "GNUplot files (*.gplot)"
 msgstr "GNUplot failai (*.gplot)"
 
-#: src/callback_func.c:833
+#: src/callback_func.c:865
 msgid "NEC2 files (*.nec)"
 msgstr "NEC2 failai (*.nec)"
 
-#: src/callback_func.c:835
+#: src/callback_func.c:867
 msgid "Touchstone 1-port files (*.s1p)"
 msgstr "Touchstone 1 prievado failai (*.s1p)"
 
-#: src/callback_func.c:837
+#: src/callback_func.c:869
 msgid "Touchstone 2-port files (*.s2p)"
 msgstr "Touchstone 2 prievadų failai (*.s2p)"
 
-#: src/callback_func.c:839
+#: src/callback_func.c:871
 msgid "Comma-separated CSV files (*.csv)"
 msgstr "Kableliais atskirti CSV failai (*.csv)"
 
-#: src/callbacks.c:56 src/callbacks.c:72
+#: src/callbacks.c:135 src/callbacks.c:151
 msgid "Antenna Temperature"
 msgstr "Antenos temperatūra"
 
-#: src/callbacks.c:57
+#: src/callbacks.c:136
 msgid ""
 "Ground plane detected in model. T_ant results will overcount ground effects. "
 "Free-space models are standard for antenna temperature evaluation."
@@ -131,7 +131,7 @@ msgstr ""
 "žemės poveikį. Laisvos erdvės modeliai yra standartiniai antenos "
 "temperatūros vertinimui."
 
-#: src/callbacks.c:73
+#: src/callbacks.c:152
 #, c-format
 msgid ""
 "Max gain at θ=%.0f° (%.0f° from XY plane). Convention assumes beam in XY "
@@ -140,12 +140,12 @@ msgstr ""
 "Maks. stiprinimas ties θ=%.0f° (%.0f° nuo XY plokštumos). Konvencija numato "
 "spindulį XY plokštumoje su stebėjimo pakėlimo kampu, nustatytu sukikliu."
 
-#: src/callbacks.c:139 src/callbacks.c:440 src/callbacks.c:1984
-#: src/callbacks.c:2345
+#: src/callbacks.c:218 src/callbacks.c:517 src/callbacks.c:2556
+#: src/callbacks.c:3088
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "Ar tikrai norite išeiti iš xnec2c?"
 
-#: src/callbacks.c:182
+#: src/callbacks.c:261
 msgid ""
 "A new NEC2 input file may not be created\n"
 "while the Frequency Loop is running"
@@ -153,7 +153,7 @@ msgstr ""
 "Naujas NEC2 įvesties failas negali būti sukurtas\n"
 "kol vykdomas dažnio ciklas"
 
-#: src/callbacks.c:222
+#: src/callbacks.c:299
 msgid ""
 "A new NEC2 input file may not be opened\n"
 "while the Frequency Loop is running"
@@ -161,21 +161,21 @@ msgstr ""
 "Naujas NEC2 įvesties failas negali būti atidarytas\n"
 "kol vykdomas dažnio ciklas"
 
-#: src/callbacks.c:342
+#: src/callbacks.c:419
 msgid "xnec2c geometry optimizer"
 msgstr "xnec2c geometrijos optimizatorius"
 
-#: src/callbacks.c:343
+#: src/callbacks.c:420
 msgid ""
 "xnec2c was built without inotify support: the optimizer cannot be enabled."
 msgstr ""
 "xnec2c sukompiliuotas be inotify palaikymo: optimizatoriaus negalima įjungti."
 
-#: src/callbacks.c:367
+#: src/callbacks.c:444
 msgid "Xnec2c Optimizer"
 msgstr "Xnec2c optimizatorius"
 
-#: src/callbacks.c:367
+#: src/callbacks.c:444
 msgid ""
 "No files are selected for writing. However, xnec2c will still reload and "
 "recalculate the input file on modification when triggered by inotify.Select "
@@ -185,23 +185,23 @@ msgstr ""
 "perskaičiuos įvesties failą, kai bus modifikuotas ir inotify tai aptiks. "
 "Pasirinkite failus įrašymui \"Failas->Optimizavimo nustatymai\"."
 
-#: src/callbacks.c:378
+#: src/callbacks.c:455
 msgid "failed to create Optimizer Output thread\n"
 msgstr "nepavyko sukurti optimizatoriaus išvesties gijos\n"
 
-#: src/callbacks.c:1134 src/callbacks.c:1460 src/callbacks.c:2371
+#: src/callbacks.c:1483 src/callbacks.c:1815 src/callbacks.c:3114
 msgid "Are you sure you wish to close this window?"
 msgstr "Ar tikrai norite uždaryti šį langą?"
 
-#: src/callbacks.c:1626
+#: src/callbacks.c:1981
 msgid "noise env activate: no matching widget found\n"
 msgstr "triukšmo aplinkos aktyvavimas: atitinkamas valdiklis nerastas\n"
 
-#: src/callbacks.c:2309
+#: src/callbacks.c:3052
 msgid "No open NEC2 input file"
 msgstr "Nėra atidaryto NEC2 įvesties failo"
 
-#: src/callbacks.c:2402 src/callbacks.c:2432
+#: src/callbacks.c:3145 src/callbacks.c:3175
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -209,11 +209,11 @@ msgstr ""
 "NEC2 redaktoriaus duomenys negali būti išsaugoti\n"
 "kol vykdomas dažnio ciklas"
 
-#: src/callbacks.c:2414 src/callbacks.c:2440
+#: src/callbacks.c:3157 src/callbacks.c:3183
 msgid "untitled.nec"
 msgstr "be_pavadinimo.nec"
 
-#: src/callbacks.c:2905 src/callbacks.c:2925 src/callbacks.c:2945
+#: src/callbacks.c:3648 src/callbacks.c:3668 src/callbacks.c:3688
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
@@ -238,12 +238,12 @@ msgstr ""
 "Set_Command_Data(): Klaida rašant eilutės duomenis\n"
 "Pasirinkite eilutę iš naujo"
 
-#: src/cmnd_edit.c:488 resources/xnec2c.glade:314 resources/xnec2c.glade:1349
-#: resources/xnec2c.glade:3776 resources/xnec2c.glade:14618
+#: src/cmnd_edit.c:488 resources/xnec2c.glade:312 resources/xnec2c.glade:1347
+#: resources/xnec2c.glade:3774 resources/xnec2c.glade:14837
 msgid "Tag Number"
 msgstr "Žymės numeris"
 
-#: src/cmnd_edit.c:489 resources/xnec2c.glade:1362
+#: src/cmnd_edit.c:489 resources/xnec2c.glade:1360
 msgid "Segment Number"
 msgstr "Segmento numeris"
 
@@ -337,15 +337,15 @@ msgstr "Z žingsnis"
 msgid "Field Point R (m)"
 msgstr "Lauko taškas R (m)"
 
-#: src/cmnd_edit.c:1762 resources/xnec2c.glade:9000
+#: src/cmnd_edit.c:1762 resources/xnec2c.glade:8998
 msgid "Points in Phi"
 msgstr "Taškai Phi"
 
-#: src/cmnd_edit.c:1763 resources/xnec2c.glade:8918
+#: src/cmnd_edit.c:1763 resources/xnec2c.glade:8916
 msgid "Initial Theta (deg)"
 msgstr "Pradinis Theta (laipsn.)"
 
-#: src/cmnd_edit.c:1764 src/cmnd_edit.c:2709 resources/xnec2c.glade:8931
+#: src/cmnd_edit.c:1764 src/cmnd_edit.c:2709 resources/xnec2c.glade:8929
 msgid "Increment in Theta"
 msgstr "Theta žingsnis"
 
@@ -385,8 +385,8 @@ msgstr "Talpa pF/m"
 msgid "Reactance Ohm"
 msgstr "Reaktansas Ohm"
 
-#: src/cmnd_edit.c:2024 resources/xnec2c.glade:480 resources/xnec2c.glade:4012
-#: resources/xnec2c.glade:14970
+#: src/cmnd_edit.c:2024 resources/xnec2c.glade:478 resources/xnec2c.glade:4010
+#: resources/xnec2c.glade:15189
 msgid "Conductivity S/m"
 msgstr "Laidumas S/m"
 
@@ -454,11 +454,11 @@ msgstr "Pirmasis taškas Theta"
 msgid "Increment in R (m)"
 msgstr "R žingsnis (m)"
 
-#: src/cmnd_edit.c:2708 resources/xnec2c.glade:9026
+#: src/cmnd_edit.c:2708 resources/xnec2c.glade:9024
 msgid "Increment in Phi"
 msgstr "Phi žingsnis"
 
-#: src/draw_radiation.c:29
+#: src/draw_radiation.c:33
 msgid ""
 "Animation requires near field data.\n"
 "\n"
@@ -472,22 +472,30 @@ msgstr ""
 "H-lauko animacija: Pridėkite NH kortelę į NEC failą\n"
 "Poynting vektorius: Pridėkite abi NE ir NH korteles"
 
-#: src/draw_radiation.c:94
+#: src/draw_radiation.c:79
+#, c-format
+msgid "gain_style %d out of range [0..%d], defaulting to GS_LINP\n"
+msgstr "gain_style %d už ribų [0..%d], numatytoji reikšmė GS_LINP\n"
+
+#: src/draw_radiation.c:120
 #, c-format
 msgid "Scale_Gain: ant_temp_resolve failed for %.3f MHz env %d\n"
 msgstr "Scale_Gain: ant_temp_resolve nepavyko ties %.3f MHz env %d\n"
 
-#: src/draw_radiation.c:754 src/draw_radiation.c:764 resources/xnec2c.glade:69
+#: src/draw_radiation.c:852 src/draw_radiation.c:860 src/draw_radiation.c:870
+#: resources/xnec2c.glade:69
 msgid "Near Field Animation"
 msgstr "Artimojo lauko animacija"
 
-#: src/draw_radiation.c:754 src/draw_radiation.c:764 src/geometry.c:812
-#: src/input.c:1616 src/input.c:1617 src/utils.c:525 src/utils.c:571
+#: src/draw_radiation.c:852 src/draw_radiation.c:860 src/draw_radiation.c:870
+#: src/geometry.c:812 src/input.c:1614 src/input.c:1615 src/mathlib.c:759
+#: src/mathlib.c:1003 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:525
+#: src/utils.c:571
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: src/draw_radiation.c:985 src/draw_radiation.c:989
+#: src/draw_radiation.c:1102 src/draw_radiation.c:1108
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
@@ -495,86 +503,117 @@ msgstr ""
 "Stebėjimo pakėlimo kampas. Perkelia dangaus/žemės ribą antenos temperatūros "
 "vertinimui. 0° = horizontas."
 
-#: src/draw_radiation.c:993
+#: src/draw_radiation.c:1105 src/draw_radiation.c:1111
+msgid ""
+"Observation elevation for antenna temperature.\n"
+"Select Gain Style → Noise Temperature to enable."
+msgstr ""
+"Stebėjimo pakėlimo kampas antenos temperatūrai.\n"
+"Pasirinkite Stiprinimo stilius → Triukšmo temperatūra, kad įjungtumėte."
+
+#: src/draw_radiation.c:1114
 msgid "Select brightness temperature model for T_sky and T_earth."
 msgstr "Pasirinkite ryškumo temperatūros modelį T_sky ir T_earth."
 
-#: src/draw_radiation.c:1194
+#: src/draw_radiation.c:1116
+msgid ""
+"Brightness temperature model for T_sky and T_earth.\n"
+"Select Gain Style → Noise Temperature to enable."
+msgstr ""
+"Ryškumo temperatūros modelis T_sky ir T_earth.\n"
+"Pasirinkite Stiprinimo stilius → Triukšmo temperatūra, kad įjungtumėte."
+
+#: src/draw_radiation.c:1555
 msgid "Total Gain"
 msgstr "Bendras stiprinimas"
 
-#: src/draw_radiation.c:1195
+#: src/draw_radiation.c:1556
 msgid "Horizontal Polarization"
 msgstr "Horizontalioji poliarizacija"
 
-#: src/draw_radiation.c:1196
+#: src/draw_radiation.c:1557
 msgid "Vertical Polarization"
 msgstr "Vertikalioji poliarizacija"
 
-#: src/draw_radiation.c:1197
+#: src/draw_radiation.c:1558
 msgid "RH Circular Polarization"
 msgstr "Dešininė apskritiminė poliarizacija"
 
-#: src/draw_radiation.c:1198
+#: src/draw_radiation.c:1559
 msgid "LH Circular Polarization"
 msgstr "Kairinė apskritiminė poliarizacija"
 
-#: src/draw_radiation.c:1203
+#: src/draw_radiation.c:1564
 msgid "Linear Power"
 msgstr "Tiesinė galia"
 
-#: src/draw_radiation.c:1204
+#: src/draw_radiation.c:1565
 msgid "Linear Voltage"
 msgstr "Tiesinė įtampa"
 
-#: src/draw_radiation.c:1205
+#: src/draw_radiation.c:1566
 msgid "ARRL Scale"
 msgstr "ARRL skalė"
 
-#: src/draw_radiation.c:1206
+#: src/draw_radiation.c:1567
 msgid "Logarithmic Scale"
 msgstr "Logaritminė skalė"
 
-#: src/draw_radiation.c:1207
+#: src/draw_radiation.c:1568
 msgid "Noise Temperature"
 msgstr "Triukšmo temperatūra"
 
-#: src/draw_radiation.c:1208
+#: src/draw_radiation.c:1569
 msgid "Noise Temp (log scale)"
 msgstr "Triukšmo temp. (log skalė)"
 
-#: src/draw_radiation.c:1217 resources/xnec2c.glade:13102
+#: src/draw_radiation.c:1578 resources/xnec2c.glade:13321
 msgid "Radiation Patterns"
 msgstr "Spinduliuotės diagramos"
 
-#: src/draw_radiation.c:1220
+#: src/draw_radiation.c:1581
 msgid "Radiation Pattern: - "
 msgstr "Spinduliuotės diagrama: - "
 
-#: src/draw_radiation.c:1227
+#: src/draw_radiation.c:1588
 msgid "Near Fields:"
 msgstr "Artimieji laukai:"
 
-#: src/draw_radiation.c:1229
+#: src/draw_radiation.c:1590
 msgid " - E Field"
 msgstr " - E laukas"
 
-#: src/draw_radiation.c:1231
+#: src/draw_radiation.c:1592
 msgid " - H Field"
 msgstr " - H laukas"
 
-#: src/draw_radiation.c:1233
+#: src/draw_radiation.c:1594
 msgid " - Poynting Vector"
 msgstr " - Poynting vektorius"
 
-#: src/draw_radiation.c:1243
+#: src/draw_radiation.c:1604
 msgid "Frequency Data Plots - "
 msgstr "Dažnio duomenų grafikai - "
 
-#: src/draw_radiation.c:1461
+#: src/draw_radiation.c:1830
 #, c-format
 msgid "fstep=%d is out of bounds. calc_data.steps_total=%d"
 msgstr "fstep=%d viršija ribas. calc_data.steps_total=%d"
+
+#: src/fields.c:925
+#, c-format
+msgid "step size limited at z= %10.5f"
+msgstr "žingsnio dydis apribotas ties Z= %10.5f"
+
+#: src/fork.c:161 src/fork.c:512
+#, c-format
+msgid "child %d  length %d  return %d\n"
+msgstr "vaikinis procesas %d  ilgis %d  grąžinimas %d\n"
+
+#: src/fork.c:518
+#, c-format
+msgid "early EOF?, child %d  length %d  return %d\n"
+msgstr "ankstyvas EOF?, vaikinis procesas %d  ilgis %d  grąžinimas %d\n"
 
 #: src/geom_edit.c:108 src/geom_edit.c:2000 src/geom_edit.c:2272
 #: src/geom_edit.c:2703
@@ -653,27 +692,27 @@ msgstr ""
 msgid "No SC card after an SM card"
 msgstr "Nėra SC kortelės po SM kortelės"
 
-#: src/geom_edit.c:1157 resources/xnec2c.glade:7713
+#: src/geom_edit.c:1157 resources/xnec2c.glade:7711
 msgid "Center - X"
 msgstr "Centras - X"
 
-#: src/geom_edit.c:1159 resources/xnec2c.glade:7777
+#: src/geom_edit.c:1159 resources/xnec2c.glade:7775
 msgid "Center - Y"
 msgstr "Centras - Y"
 
-#: src/geom_edit.c:1161 resources/xnec2c.glade:7841
+#: src/geom_edit.c:1161 resources/xnec2c.glade:7839
 msgid "Center - Z"
 msgstr "Centras - Z"
 
-#: src/geom_edit.c:1163 resources/xnec2c.glade:7745
+#: src/geom_edit.c:1163 resources/xnec2c.glade:7743
 msgid "Normal - Elev."
 msgstr "Normalė - Elev."
 
-#: src/geom_edit.c:1165 resources/xnec2c.glade:7809
+#: src/geom_edit.c:1165 resources/xnec2c.glade:7807
 msgid "Normal - Azim."
 msgstr "Normalė - Azim."
 
-#: src/geom_edit.c:1167 resources/xnec2c.glade:7873
+#: src/geom_edit.c:1167 resources/xnec2c.glade:7871
 msgid "Patch Area"
 msgstr "Lopinėlio plotas"
 
@@ -705,11 +744,11 @@ msgstr "Kampas 2 - Z"
 msgid "SY Card Editor"
 msgstr "SY kortelės redaktorius"
 
-#: src/geom_edit.c:2865
+#: src/geom_edit.c:2865 resources/sy_overrides.glade:729
 msgid "_Cancel"
 msgstr "_Atšaukti"
 
-#: src/geom_edit.c:2866
+#: src/geom_edit.c:2866 resources/sy_overrides.glade:714
 msgid "_Apply"
 msgstr "_Taikyti"
 
@@ -1088,37 +1127,37 @@ msgstr "! Etaloninė varža Z0 = %.2f Ohm\n"
 msgid "This should never happen. touchstone type=%d\n"
 msgstr "Tai neturėtų įvykti. touchstone type=%d\n"
 
-#: src/gnuplot.c:227
+#: src/gnuplot.c:230
 #, c-format
 msgid "# Near E field\n"
 msgstr "# Artimasis E laukas\n"
 
-#: src/gnuplot.c:250
+#: src/gnuplot.c:253
 #, c-format
 msgid "# Near H field\n"
 msgstr "# Artimasis H laukas\n"
 
-#: src/gnuplot.c:297
+#: src/gnuplot.c:300
 #, c-format
 msgid "# Poynting Vector\n"
 msgstr "# Poynting vektorius\n"
 
-#: src/gnuplot.c:369
+#: src/gnuplot.c:372
 #, c-format
 msgid "# Radiation Pattern\n"
 msgstr "# Spinduliuotės diagrama\n"
 
-#: src/gnuplot.c:505
+#: src/gnuplot.c:508
 #, c-format
 msgid "# structure patch segments\n"
 msgstr "# struktūros lopinėlių segmentai\n"
 
-#: src/gnuplot.c:528
+#: src/gnuplot.c:531
 #, c-format
 msgid "# structure wire segments\n"
 msgstr "# struktūros laidų segmentai\n"
 
-#: src/gnuplot.c:554
+#: src/gnuplot.c:557
 #, c-format
 msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
@@ -1127,11 +1166,11 @@ msgstr ""
 "Peržiūrėkite su: gnuplot -e \"set terminal qt; splot '%s' with lines; pause "
 "mouse close\"\n"
 
-#: src/gnuplot.c:565
+#: src/gnuplot.c:569
 msgid "Save Currents and Charges to CSV"
 msgstr "Išsaugoti sroves ir krūvius į CSV"
 
-#: src/gnuplot.c:566
+#: src/gnuplot.c:570
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
@@ -1139,11 +1178,11 @@ msgstr ""
 "Turite įjungti srovių duomenis paspausdami \"Srovės\" arba \"Krūviai\" "
 "pagrindiniame xnec2c lange."
 
-#: src/gnuplot.c:626 src/gnuplot.c:634
+#: src/gnuplot.c:633 src/gnuplot.c:643
 msgid "Save Patch Currents to CSV"
 msgstr "Išsaugoti lopinėlių sroves į CSV"
 
-#: src/gnuplot.c:627
+#: src/gnuplot.c:634
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
@@ -1151,7 +1190,7 @@ msgstr ""
 "Turite įjungti srovių duomenis paspausdami \"Srovės\" arba \"Krūviai\" "
 "pagrindiniame xnec2c lange."
 
-#: src/gnuplot.c:635
+#: src/gnuplot.c:644
 msgid "No surface patches in this model."
 msgstr "Šiame modelyje nėra paviršinių lopinėlių."
 
@@ -1351,15 +1390,15 @@ msgstr "Nepavyko inicializuoti simbolių lentelės\n"
 msgid "Failed to initialize symbol table"
 msgstr "Nepavyko inicializuoti simbolių lentelės"
 
-#: src/input.c:1034
+#: src/input.c:1032
 msgid "ignoring CM card in commands\n"
 msgstr "ignoruojama CM kortelė komandose\n"
 
-#: src/input.c:1035
+#: src/input.c:1033
 msgid "Ignoring CM card in commands"
 msgstr "Ignoruojama CM kortelė komandose"
 
-#: src/input.c:1039
+#: src/input.c:1037
 msgid ""
 "CP card is ignored\n"
 "Coupling calculation not implemented"
@@ -1367,11 +1406,11 @@ msgstr ""
 "CP kortelė ignoruojama\n"
 "Sąsajos skaičiavimas neįgyvendintas"
 
-#: src/input.c:1217
+#: src/input.c:1215
 msgid "Max frequency <= Min frequency in FR card\n"
 msgstr "Maks. dažnis <= Min. dažnis FR kortelėje\n"
 
-#: src/input.c:1218
+#: src/input.c:1216
 msgid ""
 "Max frequency <= Min frequency in FR card\n"
 "Please check FR card data and correct"
@@ -1379,7 +1418,7 @@ msgstr ""
 "Maks. dažnis <= Min. dažnis FR kortelėje\n"
 "Patikrinkite FR kortelės duomenis ir pataisykite"
 
-#: src/input.c:1241
+#: src/input.c:1239
 msgid ""
 "Fix the GE/GN cards:\n"
 "The GE card specifies that a ground is present, but the GN indicates "
@@ -1388,11 +1427,11 @@ msgstr ""
 "Pataisykite GE/GN korteles:\n"
 "GE kortelė nurodo, kad yra įžeminimas, bet GN nurodo priešingai."
 
-#: src/input.c:1255
+#: src/input.c:1253
 msgid "theta > 90 deg. with ground specified\n"
 msgstr "theta > 90 laipsnių su nurodytu įžeminimu\n"
 
-#: src/input.c:1256 src/radiation.c:671
+#: src/input.c:1254 src/radiation.c:671
 msgid ""
 "Theta > 90 deg with ground specified\n"
 "Please check RP card data and correct"
@@ -1400,7 +1439,7 @@ msgstr ""
 "Theta > 90 laipsnių su nurodytu įžeminimu\n"
 "Patikrinkite RP kortelės duomenis ir pataisykite"
 
-#: src/input.c:1265
+#: src/input.c:1263
 msgid ""
 "radial wire g.s. approximation: may not be used with Sommerfeld ground "
 "option\n"
@@ -1408,7 +1447,7 @@ msgstr ""
 "radialinių laidų g.s. aproksimacija: negalima naudoti su Sommerfeld "
 "įžeminimo parinktimi\n"
 
-#: src/input.c:1266
+#: src/input.c:1264
 msgid ""
 "radial wire g.s. approximation\n"
 "may not be used with Sommerfeld ground option"
@@ -1416,7 +1455,7 @@ msgstr ""
 "radialinių laidų g.s. aproksimacija\n"
 "negalima naudoti su Sommerfeld įžeminimo parinktimi"
 
-#: src/input.c:1317
+#: src/input.c:1315
 #, c-format
 msgid ""
 "data fault on loading card no %d: itag step1 %d is greater than itag step2 "
@@ -1425,7 +1464,7 @@ msgstr ""
 "duomenų klaida apkrovos kortelėje nr. %d: itag step1 %d didesnis nei itag "
 "step2 %d\n"
 
-#: src/input.c:1319
+#: src/input.c:1317
 msgid ""
 "Data fault on loading card\n"
 "itag step1 is greater than itag step2"
@@ -1433,13 +1472,13 @@ msgstr ""
 "Duomenų klaida apkrovos kortelėje\n"
 "itag step1 didesnis nei itag step2"
 
-#: src/input.c:1452
+#: src/input.c:1450
 msgid ""
 "Transmission Line impedance = 0: is not valid. Please correct NT or TL card\n"
 msgstr ""
 "Perdavimo linijos varža = 0: neteisinga. Pataisykite NT arba TL kortelę\n"
 
-#: src/input.c:1453
+#: src/input.c:1451
 msgid ""
 "Transmission Line impedance = 0\n"
 "is not valid. Please correct NT or TL card"
@@ -1447,11 +1486,11 @@ msgstr ""
 "Perdavimo linijos varža = 0\n"
 "neteisinga. Pataisykite NT arba TL kortelę"
 
-#: src/input.c:1462
+#: src/input.c:1460
 msgid "Segment number error in TL or NT card\n"
 msgstr "Segmento numerio klaida TL arba NT kortelėje\n"
 
-#: src/input.c:1463
+#: src/input.c:1461
 msgid ""
 "Segment number\n"
 "error in NT or TL card"
@@ -1459,11 +1498,11 @@ msgstr ""
 "Segmento numerio\n"
 "klaida NT arba TL kortelėje"
 
-#: src/input.c:1484
+#: src/input.c:1482
 msgid "PQ and PT cards are ignored: Printing to file not implemented\n"
 msgstr "PQ ir PT kortelės ignoruojamos: spausdinimas į failą neįgyvendintas\n"
 
-#: src/input.c:1485
+#: src/input.c:1483
 msgid ""
 "PQ and PT cards are ignored\n"
 "Printing to file not implemented"
@@ -1471,11 +1510,11 @@ msgstr ""
 "PQ ir PT kortelės ignoruojamos\n"
 "Spausdinimas į failą neįgyvendintas"
 
-#: src/input.c:1492
+#: src/input.c:1490
 msgid "Surface wave option (I1=1): of RP command not implemented\n"
 msgstr "Paviršinės bangos parinktis (I1=1): RP komandoje neįgyvendinta\n"
 
-#: src/input.c:1493
+#: src/input.c:1491
 msgid ""
 "Surface wave option (I1=1)\n"
 "of RP command not implemented"
@@ -1483,24 +1522,24 @@ msgstr ""
 "Paviršinės bangos parinktis (I1=1)\n"
 "RP komandoje neįgyvendinta"
 
-#: src/input.c:1518
+#: src/input.c:1516
 msgid "Average gain diagnostic enabled (use --skip-verify to disable)\n"
 msgstr ""
 "Vidutinio stiprinimo diagnostika įjungta (naudokite --skip-verify "
 "išjungimui)\n"
 
-#: src/input.c:1527
+#: src/input.c:1525
 #, c-format
 msgid "Average power gain disabled: nth=%d nph=%d (both must be >= 2)\n"
 msgstr ""
 "Vidutinis galios stiprinimas išjungtas: nth=%d nph=%d (abu turi būti >= 2)\n"
 
-#: src/input.c:1532
+#: src/input.c:1530
 #, c-format
 msgid "Average power gain calculation enabled (XNDA A=%d)\n"
 msgstr "Vidutinio galios stiprinimo skaičiavimas įjungtas (XNDA A=%d)\n"
 
-#: src/input.c:1548
+#: src/input.c:1546
 msgid ""
 "Theta > 90 deg. with ground specified: Please check RP card data and "
 "correct\n"
@@ -1508,7 +1547,7 @@ msgstr ""
 "Theta > 90 laipsnių su nurodytu įžeminimu: Patikrinkite RP kortelės duomenis "
 "ir pataisykite\n"
 
-#: src/input.c:1549
+#: src/input.c:1547
 msgid ""
 "Theta > 90 deg. with ground specified\n"
 "Please check RP card data and correct"
@@ -1516,11 +1555,11 @@ msgstr ""
 "Theta > 90 laipsnių su nurodytu įžeminimu\n"
 "Patikrinkite RP kortelės duomenis ir pataisykite"
 
-#: src/input.c:1614
+#: src/input.c:1612
 msgid "Faulty data card"
 msgstr "Klaidinga duomenų kortelė"
 
-#: src/input.c:1624
+#: src/input.c:1622
 msgid ""
 "Missing or surface-wave RP card: Radiation pattern and gain calculations "
 "disabled\n"
@@ -1528,11 +1567,11 @@ msgstr ""
 "Trūksta arba paviršinės bangos RP kortelė: Spinduliuotės diagramos ir "
 "stiprinimo skaičiavimai išjungti\n"
 
-#: src/input.c:1638
+#: src/input.c:1641
 msgid "Unexpected exit from while loop"
 msgstr "Netikėtas išėjimas iš while ciklo"
 
-#: src/input.c:1729
+#: src/input.c:1732
 msgid ""
 "command data card error: Unexpected EOF while reading input file - appending "
 "EN card\n"
@@ -1540,7 +1579,7 @@ msgstr ""
 "komandos duomenų kortelės klaida: netikėta failo pabaiga skaitant įvesties "
 "failą - pridedama EN kortelė\n"
 
-#: src/input.c:1730
+#: src/input.c:1733
 msgid ""
 "Command data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -1550,13 +1589,13 @@ msgstr ""
 "Netikėta failo pabaiga skaitant įvesties failą\n"
 "Pridedama numatytoji EN kortelė"
 
-#: src/input.c:1744
+#: src/input.c:1747
 msgid "command data card error: card's mnemonic code too short or missing\n"
 msgstr ""
 "komandos duomenų kortelės klaida: kortelės mnemoninis kodas per trumpas arba "
 "jo nėra\n"
 
-#: src/input.c:1745
+#: src/input.c:1748
 msgid ""
 "Command data card error\n"
 "Mnemonic code too short or missing"
@@ -1564,7 +1603,7 @@ msgstr ""
 "Komandos duomenų kortelės klaida\n"
 "Mnemoninis kodas per trumpas arba jo nėra"
 
-#: src/input.c:1938
+#: src/input.c:1941
 msgid ""
 "geometry data card error: Unexpected EOF while reading input file - "
 "appending GE card\n"
@@ -1572,7 +1611,7 @@ msgstr ""
 "geometrijos duomenų kortelės klaida: netikėta failo pabaiga skaitant "
 "įvesties failą - pridedama GE kortelė\n"
 
-#: src/input.c:1939
+#: src/input.c:1942
 msgid ""
 "Geometry data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -1582,13 +1621,13 @@ msgstr ""
 "Netikėta failo pabaiga skaitant įvesties failą\n"
 "Pridedama numatytoji GE kortelė"
 
-#: src/input.c:1953
+#: src/input.c:1956
 msgid "geometry data card error: card's mnemonic code too short or missing\n"
 msgstr ""
 "geometrijos duomenų kortelės klaida: kortelės mnemoninis kodas per trumpas "
 "arba jo nėra\n"
 
-#: src/input.c:1954
+#: src/input.c:1957
 msgid ""
 "Geometry data card error\n"
 "Card's mnemonic code too short or missing"
@@ -1596,125 +1635,502 @@ msgstr ""
 "Geometrijos duomenų kortelės klaida\n"
 "Kortelės mnemoninis kodas per trumpas arba jo nėra"
 
-#: src/main.c:129
+#: src/interface.c:116
+#, c-format
+msgid "xnec2c Main: %s"
+msgstr "xnec2c pagrindinis: %s"
+
+#: src/interface.c:122
+#, c-format
+msgid "xnec2c Editor: %s"
+msgstr "xnec2c redaktorius: %s"
+
+#: src/interface.c:128
+#, c-format
+msgid "xnec2c Frequency Plots: %s"
+msgstr "xnec2c dažnio grafikai: %s"
+
+#: src/interface.c:134
+#, c-format
+msgid "xnec2c Radiation Pattern: %s"
+msgstr "xnec2c spinduliuotės diagrama: %s"
+
+#: src/interface.c:149
+#, c-format
+msgid "Fatal Error: builder could not find object '%s'"
+msgstr "Kritinė klaida: kūrėjas nerado objekto '%s'"
+
+#: src/interface.c:174
+#, c-format
+msgid "failed to add objects to builder: %s\n"
+msgstr "nepavyko pridėti objektų į kūrėją: %s\n"
+
+#: src/interface.c:176
+msgid "Listing Object Ids:\n"
+msgstr "Objektų identifikatorių sąrašas:\n"
+
+#: src/interface.c:180 src/utils.c:159 src/utils.c:163 src/utils.c:173
+#: src/utils.c:175
+#, c-format
+msgid "%s\n"
+msgstr "%s\n"
+
+#: src/interface.c:191 src/interface.c:194
+msgid ""
+"libgmodule not supported: xnec2c may not function properly on this "
+"platform.\n"
+msgstr ""
+"libgmodule nepalaikomas: xnec2c gali veikti netinkamai šioje platformoje.\n"
+
+#: src/main.c:133
 #, c-format
 msgid "%s requires a positive integer argument\n"
 msgstr "%s reikalauja teigiamo sveikojo skaičiaus argumento\n"
 
-#: src/main.c:187
+#: src/main.c:191
 #, c-format
 msgid "Detected %d CPUs\n"
 msgstr "Aptikta %d CPU\n"
 
-#: src/main.c:198
+#: src/main.c:202
 msgid "config file path too long\n"
 msgstr "konfigūracijos failo kelias per ilgas\n"
 
-#: src/main.c:217
+#: src/main.c:221
 #, c-format
 msgid "config file does not exist or is not readable: %s\n"
 msgstr "konfigūracijos failas neegzistuoja arba neperskaitomas: %s\n"
 
-#: src/main.c:226
+#: src/main.c:230
 #, c-format
 msgid "config file path too long ( > %d char )\n"
 msgstr "konfigūracijos failo kelias per ilgas ( > %d simb. )\n"
 
-#: src/main.c:238
+#: src/main.c:242
 #, c-format
 msgid "input file name too long ( > %d char )\n"
 msgstr "įvesties failo pavadinimas per ilgas ( > %d simb. )\n"
 
-#: src/main.c:265
+#: src/main.c:269
 msgid "Forking disabled!\n"
 msgstr "Šakojimas išjungtas!\n"
 
-#: src/main.c:273
+#: src/main.c:277
 msgid "pthread freqloop disabled!\n"
 msgstr "pthread dažnio ciklas išjungtas!\n"
 
-#: src/main.c:277
+#: src/main.c:281
 msgid "batch mode enabled, will exit after first loop\n"
 msgstr "paketinis režimas įjungtas, programa baigsis po pirmo ciklo\n"
 
-#: src/main.c:343
+#: src/main.c:347
 msgid "verify segments check disabled\n"
 msgstr "segmentų tikrinimas išjungtas\n"
 
-#: src/main.c:348
+#: src/main.c:352
 msgid "forcing overlap check on large models\n"
 msgstr "priverstinis persidengimo tikrinimas dideliems modeliams\n"
 
-#: src/main.c:362
+#: src/main.c:366
 msgid "--batch and --optimize are mutual exclusive.\n"
 msgstr "--batch ir --optimize yra tarpusavyje nesuderinami.\n"
 
-#: src/main.c:378
+#: src/main.c:382
 #, c-format
 msgid "input file path name too long ( > %d char )\n"
 msgstr "įvesties failo kelio pavadinimas per ilgas ( > %d simb. )\n"
 
-#: src/main.c:385
+#: src/main.c:389
 #, c-format
 msgid "unexpected argument '%s' does not appear to be a .nec file\n"
 msgstr "netikėtas argumentas '%s' neatrodo kaip .nec failas\n"
 
-#: src/main.c:392
+#: src/main.c:396
 #, c-format
 msgid "unexpected argument: %s\n"
 msgstr "netikėtas argumentas: %s\n"
 
-#: src/main.c:398
+#: src/main.c:402
 msgid "batch mode requires an input file\n"
 msgstr "paketiniam režimui reikalingas įvesties failas\n"
 
-#: src/main.c:419
+#: src/main.c:423
 #, c-format
 msgid "Forking %d jobs.\n"
 msgstr "Šakojama %d užduočių.\n"
 
-#: src/main.c:428 src/main.c:436
+#: src/main.c:435 src/main.c:443
 msgid "exiting after fatal error: pipe() failed"
 msgstr "išeinama po kritinės klaidos: pipe() nepavyko"
 
-#: src/main.c:445
+#: src/main.c:452
 msgid "exiting after fatal error: fork() failed"
 msgstr "išeinama po kritinės klaidos: fork() nepavyko"
 
-#: src/main.c:798
+#: src/main.c:874
 msgid "exiting via user interrupt\n"
 msgstr "išeinama pagal vartotojo pertraukimą\n"
 
-#: src/main.c:802
+#: src/main.c:878
 msgid "segmentation fault, exiting\n"
 msgstr "segmentavimo klaida, išeinama\n"
 
-#: src/main.c:806
+#: src/main.c:882
 msgid "floating point exception, exiting\n"
 msgstr "slankiojo kablelio išimtis, išeinama\n"
 
-#: src/main.c:810
+#: src/main.c:886
 msgid "abort signal received, exiting\n"
 msgstr "gautas nutraukimo signalas, išeinama\n"
 
-#: src/main.c:814
+#: src/main.c:890
 msgid "termination request received, exiting\n"
 msgstr "gauta užbaigimo užklausa, išeinama\n"
 
-#: src/main.c:824
+#: src/main.c:900
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
 msgstr "nepadalinta, ignoruojamas SIGCHLD iš pid %d\n"
 
-#: src/main.c:832
+#: src/main.c:908
 #, c-format
 msgid "child process pid %d exited\n"
 msgstr "vaikinis procesas pid %d baigėsi\n"
 
-#: src/main.c:841
+#: src/main.c:917
 #, c-format
 msgid "default exit with signal: %d\n"
 msgstr "numatytasis išėjimas su signalu: %d\n"
+
+#: src/mathlib.c:28
+msgid ""
+"Linear algebra library selection.\n"
+"Restart to change MKL threading library."
+msgstr ""
+"Tiesinės algebros bibliotekos pasirinkimas.\n"
+"Paleiskite iš naujo, kad pakeistumėte MKL gijų biblioteką."
+
+#: src/mathlib.c:296
+msgid "open_mathlib: lib is NULL\n"
+msgstr "open_mathlib: lib yra NULL\n"
+
+#: src/mathlib.c:306
+#, c-format
+msgid "setenv(%s, %s): %s\n"
+msgstr "setenv(%s, %s): %s\n"
+
+#: src/mathlib.c:320 src/utils.c:575
+#, c-format
+msgid "%s: %s\n"
+msgstr "%s: %s\n"
+
+#: src/mathlib.c:325
+#, c-format
+msgid "%s: opened %s\n"
+msgstr "%s: atidaryta %s\n"
+
+#: src/mathlib.c:333
+#, c-format
+msgid "%s: library not found or nonfunctional, skipping: %s\n"
+msgstr "%s: biblioteka nerasta arba neveikianti, praleista: %s\n"
+
+#: src/mathlib.c:358
+#, c-format
+msgid "  %s: unable to bind %s: %s\n"
+msgstr "  %s: nepavyko susieti %s: %s\n"
+
+#: src/mathlib.c:394
+#, c-format
+msgid "%s: loaded\n"
+msgstr "%s: įkelta\n"
+
+#: src/mathlib.c:464
+#, c-format
+msgid "Migrated legacy mathlib index %d to ID '%s'\n"
+msgstr "Senas mathlib indeksas %d perkeltas į ID '%s'\n"
+
+#: src/mathlib.c:469
+#, c-format
+msgid ""
+"Legacy mathlib index %d out of range [0-%d], triggering first-run scan\n"
+msgstr ""
+"Senas mathlib indeksas %d už ribų [0-%d], paleidžiamas pirmojo paleidimo "
+"nuskaitymas\n"
+
+#: src/mathlib.c:498
+#, c-format
+msgid "Mathlib ID '%s' not found in available libraries.\n"
+msgstr "Mathlib ID '%s' nerastas turimose bibliotekose.\n"
+
+#: src/mathlib.c:500
+#, c-format
+msgid "Mathlib '%s' is not available.\n"
+msgstr "Mathlib '%s' nepasiekiama.\n"
+
+#: src/mathlib.c:505
+#, c-format
+msgid "Selected first available mathlib: %s\n"
+msgstr "Pasirinkta pirmoji pasiekiama mathlib: %s\n"
+
+#: src/mathlib.c:596
+msgid "set_mathlib_interactive: lib == NULL\n"
+msgstr "set_mathlib_interactive: lib == NULL\n"
+
+#: src/mathlib.c:605
+#, c-format
+msgid "set_mathlib_interactive[%d]: mathlib.available=0, skipping: %s\n"
+msgstr "set_mathlib_interactive[%d]: mathlib.available=0, praleista: %s\n"
+
+#: src/mathlib.c:630
+msgid ""
+"mathlib: You cannot change the math library while the freq loop is running."
+msgstr ""
+"mathlib: negalima keisti matematikos bibliotekos, kol vykdomas dažnio ciklas."
+
+#: src/mathlib.c:643
+msgid "set_mathlib_batch: lib == NULL\n"
+msgstr "set_mathlib_batch: lib == NULL\n"
+
+#: src/mathlib.c:648
+msgid "Batch Math Library"
+msgstr "Paketinė matematikos biblioteka"
+
+#: src/mathlib.c:649
+msgid ""
+"Selecting a batched math library has no effect unless -j is specified on the "
+"command line. (However, this selection will be saved for next time xnec2c is "
+"opened.)\n"
+msgstr ""
+"Paketinės matematikos bibliotekos pasirinkimas neturi jokio poveikio, nebent "
+"komandinėje eilutėje nurodytas parametras -j. (Tačiau šis pasirinkimas bus "
+"išsaugotas kitam xnec2c paleidimui.)\n"
+
+#: src/mathlib.c:688
+#, c-format
+msgid "%s: benchmark=%d\n"
+msgstr "%s: benchmark=%d\n"
+
+#: src/mathlib.c:759
+msgid "Mathlib Help"
+msgstr "Mathlib pagalba"
+
+#: src/mathlib.c:795
+msgid "Mathlib Benchmark Help"
+msgstr "Mathlib lyginamųjų testų pagalba"
+
+#: src/mathlib.c:797
+msgid ""
+"Jobs are forked and run in parallel by xnec2c, whereas threads are used by "
+"the mathlib implementation to parallelize the linear algebra calculation of "
+"one job.  For parallel algorithms you can reduce the number of threads in "
+"use by the algorithm with the following environment variables:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS thread limit\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP thread limit\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL thread limit\n"
+"\n"
+"Each benchmark specifies a complexity to indicate approximately how long it "
+"will take to run.  For example, O(N) means the time will scale with N and "
+"O(N*J) means it will scale with N*J:\n"
+"  * N is the number of mathlibs selected here:\n"
+"      File->Mathlib Benchmarks->Selected Mathlibs\n"
+"  * J is the number of jobs specified on the command line with -j (eg, -j "
+"8)\n"
+"\n"
+"Higher complexity options run more benchmarks to provide additional "
+"information about how you might optimize your xnec2c runtime.  The benchmark "
+"menu options are as follows:  \n"
+"\n"
+"* Parallel (-j N): O(N/J) time: Benchmark each mathlib in parallel with the "
+"number of jobs specified on the command line with -j.\n"
+"\n"
+"* Single Job (-j 1): O(N) time: Benchmark each mathlib with a single job "
+"even if -j was specified on the command line. This is useful to find the "
+"fastest interactive mathlib that is used when the frequency is changed in "
+"the UI by changing a Frequency MHz +/- widget or (right-)clicking on the "
+"frequency plot\n"
+"\n"
+"* Iterate -j N/=2: O(N*log2(J)) time: Benchmark each mathlib in parallel "
+"initially with the number of jobs specified on the command line with -j, and "
+"then reduce the number jobs by half for each subsequent iteration until only "
+"one job remains.  This is useful to find a balance between the number of "
+"parallel jobs specified by -j and the number of threads used by the linear "
+"algebra library as modified by the environment variables listed above.\n"
+"\n"
+"* Iterate -j N-=2: O(N*J) time: Same as -j N/=2 above, but instead decrement "
+"the number of jobs by 1.  This takes the longest to run.\n"
+msgstr ""
+"xnec2c šakoja darbus ir vykdo juos lygiagrečiai, o gijos naudojamos mathlib "
+"dieginyje, kad lygiagrečiai atliktų vieno darbo tiesinės algebros "
+"skaičiavimą. Lygiagretūs algoritmai — sumažinkite algoritmui naudojamų gijų "
+"skaičių šiais aplinkos kintamaisiais:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS gijų riba\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP gijų riba\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL gijų riba\n"
+"\n"
+"Kiekvienas lyginamasis testas nurodo sudėtingumą, apytiksliai rodantį, kiek "
+"laiko užtruks vykdymas. Pvz., O(N) reiškia, kad laikas skaičiuojamas N, o "
+"O(N*J) — N*J:\n"
+"  * N yra čia pasirinktų mathlib bibliotekų skaičius:\n"
+"      Failas->Mathlib lyginamieji testai->Pasirinktos mathlib\n"
+"  * J yra komandinėje eilutėje nurodytas darbų skaičius su -j (pvz., -j 8)\n"
+"\n"
+"Didesnio sudėtingumo parinktys vykdo daugiau lyginamųjų testų, teikdamos "
+"papildomos informacijos apie galimą xnec2c vykdymo optimizavimą. Lyginamųjų "
+"testų meniu parinktys yra šios:\n"
+"\n"
+"* Lygiagrečiai (-j N): laikas O(N/J): Lygiagretūs kiekvienos mathlib "
+"lyginamieji testai su komandinėje eilutėje nurodytu darbų skaičiumi -j.\n"
+"\n"
+"* Vienas darbas (-j 1): laikas O(N): Kiekvienos mathlib lyginamasis testas "
+"su vienu darbu, net jei nurodytas -j. Naudinga surasti greičiausią "
+"interaktyvią mathlib, naudojamą keičiant dažnį vartotojo sąsajoje su Dažnis "
+"MHz +/- valdikliu arba (dešiniuoju) paspaudimu ant dažnio grafiko.\n"
+"\n"
+"* Kartoti -j N/=2: laikas O(N*log2(J)): Lygiagretūs kiekvienos mathlib "
+"lyginamieji testai pradžioje su komandinėje eilutėje nurodytu darbų "
+"skaičiumi -j, tada kiekvienos sekančios iteracijos metu darbų skaičius "
+"mažinamas per pusę, kol lieka tik vienas darbas. Naudinga surasti balansą "
+"tarp -j nurodyto lygiagrečių darbų skaičiaus ir tiesinės algebros "
+"bibliotekos gijų skaičiaus.\n"
+"\n"
+"* Kartoti -j N-=2: laikas O(N*J): Tas pats kaip -j N/=2 aukščiau, bet vietoj "
+"to darbų skaičius mažinamas 1. Tai trunka ilgiausiai.\n"
+
+#: src/mathlib.c:846 src/mathlib.c:853 src/mathlib.c:859 src/mathlib.c:876
+#: src/mathlib.c:881 src/mathlib.c:1003
+msgid "Mathlib Benchmark"
+msgstr "Mathlib lyginamasis testas"
+
+#: src/mathlib.c:847
+msgid "Benchmarks are disabled while optimization is activated."
+msgstr "Lyginamieji testai išjungti, kol aktyvuotas optimizavimas."
+
+#: src/mathlib.c:854
+msgid "You must load a NEC2 input file before running benchmarks."
+msgstr "Prieš vykdant lyginamuosius testus, būtina įkelti NEC2 įvesties failą."
+
+#: src/mathlib.c:860
+msgid ""
+"Choosing a benchmark other than \"Single Job\" has no effect unless -j is "
+"specified on the command line."
+msgstr ""
+"Kito lyginamojo testo nei „Vienas darbas\" pasirinkimas neturi poveikio, "
+"nebent komandinėje eilutėje nurodytas parametras -j."
+
+#: src/mathlib.c:877
+msgid "You must select at least one math library to benchmark"
+msgstr "Reikia pasirinkti bent vieną matematikos biblioteką lyginamajam testui"
+
+#: src/mathlib.c:882
+#, c-format
+msgid ""
+"This will run a frequency loop benchmark for each detected linear algebra "
+"library and then provide a summary.  It may take some time to complete "
+"depending on how big and how many frequencies your NEC2 will use. Detailed "
+"timing will be provided in the terminal.\n"
+"\n"
+"Notes:\n"
+"* Only one Intel MKL library can be tested without restarting xnec2c, so "
+"select which one you wishto benchmark before proceeding or it will choose "
+"the first in the list and skip the rest.\n"
+"\n"
+"* Thread congestion will occur for multi-threaded libraries when using the -"
+"j N option if there are not enough CPUs available to accommodate the forked "
+"processes in combination with library threads.  Consider reducing the value "
+"of -j N for benchmarking to find what library works best with a mix of "
+"forking and threading; you can use `top` to monitor your CPU usageand if it "
+"reaches 0% idle then you might consider reducing -j N.\n"
+"\n"
+"You may wish to experiment setting these environment variables:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS thread limit\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP thread limit\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL thread limit\n"
+"\n"
+"Click OK to proceed, this dialog will close when complete."
+msgstr ""
+"Bus vykdomas kiekvienos aptiktos tiesinės algebros bibliotekos dažnio ciklo "
+"lyginamasis testas ir pateikiama suvestinė. Tai gali užtrukti, priklausomai "
+"nuo NEC2 dydžio ir naudojamų dažnių skaičiaus. Išsami laiko informacija bus "
+"pateikta terminale.\n"
+"\n"
+"Pastabos:\n"
+"* Tik viena Intel MKL biblioteka gali būti išbandyta nepaleidžiant xnec2c iš "
+"naujo, todėl prieš tęsiant pasirinkite, kurią norite išbandyti, arba bus "
+"pasirinkta pirmoji sąraše, o kitos praleistos.\n"
+"\n"
+"* Gijų spūstis įvyks daugiagijėms bibliotekoms naudojant -j N parinktį, jei "
+"nepakanka procesorių šakotiems procesams su bibliotekos gijomis. Lyginamajam "
+"testui apsvarstykite -j N mažinimą; naudokite `top` procesoriaus apkrovai "
+"stebėti — jei pasiekia 0 % laisvo laiko, apsvarstykite -j N mažinimą.\n"
+"\n"
+"Rekomenduojama eksperimentuoti su šiais aplinkos kintamaisiais:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS gijų riba\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP gijų riba\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL gijų riba\n"
+"\n"
+"Spustelėkite Gerai, kad tęstumėte; šis dialogas užsidarys baigus."
+
+#: src/mathlib.c:939
+#, c-format
+msgid "Starting %s benchmark (-j %d)\n"
+msgstr "Pradedamas %s lyginamasis testas (-j %d)\n"
+
+#: src/mathlib.c:1036
+#, c-format
+msgid "mathlib_lock_intel: Cannot find library for mathlib ID='%s'\n"
+msgstr "mathlib_lock_intel: Nerasta biblioteka mathlib ID='%s'\n"
+
+#: src/mathlib.c:1047
+#, c-format
+msgid ""
+"\n"
+"* Notice: \"%s\" was selected, but you can only change to a\n"
+"* different Intel MKL threading library by restarting xnec2c.\n"
+"* \n"
+"* However, you may continue to select any other Linear Algebra library\n"
+"* without restart, including this same Intel MKL library.  All other\n"
+"* Intel MKL threading libraries are disabled until restart because of an \n"
+"* MKL limitation where the MKL threading library can only be dynamically\n"
+"* linked only once per runtime.\n"
+"* \n"
+"* See Intel's documentation on mkl_set_threading_layer() for more detail.\n"
+msgstr ""
+"\n"
+"* Pranešimas: \"%s\" pasirinktas, tačiau į kitą\n"
+"* Intel MKL gijų biblioteką galima pereiti tik paleidus xnec2c iš naujo.\n"
+"* \n"
+"* Tačiau galima ir toliau pasirinkti bet kurią kitą tiesinės algebros "
+"biblioteką\n"
+"* be perkrovimo, įskaitant tą pačią Intel MKL biblioteką. Visos kitos\n"
+"* Intel MKL gijų bibliotekos išjungiamos iki perkrovimo dėl\n"
+"* MKL apribojimo, pagal kurį MKL gijų biblioteka gali būti dinamiškai\n"
+"* susaistyta tik vieną kartą per vykdymo laiką.\n"
+"* \n"
+"* Žr. Intel dokumentaciją apie mkl_set_threading_layer() – daugiau "
+"informacijos.\n"
+
+#: src/mathlib.c:1122
+msgid "zgetrf: current_mathlib is NULL, this should never happen.\n"
+msgstr "zgetrf: current_mathlib yra NULL – tai neturėtų nutikti.\n"
+
+#: src/mathlib.c:1146 src/mathlib.c:1191
+#, c-format
+msgid "%s: unsupported mathlib type %d\n"
+msgstr "%s: nepalaikomas mathlib tipas %d\n"
+
+#: src/mathlib.c:1159
+msgid "zgetrs: current_mathlib is NULL, this should never happen.\n"
+msgstr "zgetrs: current_mathlib yra NULL – tai neturėtų nutikti.\n"
+
+#: src/mathlib.c:1184
+#, c-format
+msgid "zgetrs warning: lda(%d) != ldb(%d)\n"
+msgstr "zgetrs įspėjimas: lda(%d) != ldb(%d)\n"
+
+#: src/mathlib.c:1219
+#, c-format
+msgid "dlsym(mkl_set_threading_layer): %s\n"
+msgstr "dlsym(mkl_set_threading_layer): %s\n"
 
 #: src/matrix.c:1216
 #, c-format
@@ -1740,11 +2156,30 @@ msgstr "Simetrijos klaida"
 msgid "Solving Failed: %d\n"
 msgstr "Sprendimas nepavyko: %d\n"
 
+#: src/measurements.c:326
+#, c-format
+msgid "BUG: invalid mgidx=%d: idx=%d pol=%d num_fsteps=%d freq_step=%d\n"
+msgstr "BUG: neteisingas mgidx=%d: idx=%d pol=%d num_fsteps=%d freq_step=%d\n"
+
+#: src/measurements.c:329
+#, c-format
+msgid "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d\n"
+msgstr "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d\n"
+
+#: src/measurements.c:492
+#, c-format
+msgid "meas_name_idx: Invalid name with length=%d: %s\n"
+msgstr "meas_name_idx: Netinkamas pavadinimas ilgiu=%d: %s\n"
+
+#: src/measurements.c:519
+msgid "meas_format: output overflow\n"
+msgstr "meas_format: išvesties perpildymas\n"
+
 #: src/nec2_model.c:278 src/nec2_model.c:282 src/nec2_model.c:286
 msgid "Card"
 msgstr "Kortelė"
 
-#: src/nec2_model.c:278 resources/xnec2c.glade:6183
+#: src/nec2_model.c:278 resources/xnec2c.glade:6181
 msgid "Comments"
 msgstr "Komentarai"
 
@@ -1790,27 +2225,172 @@ msgstr ""
 "Naudokite mygtuką Išsaugoti\n"
 "nurodydami failo kelią"
 
-#: src/network.c:648
+#: src/network.c:646
 #, c-format
 msgid "improper load type chosen, requested type is %d\n"
 msgstr "pasirinktas netinkamas apkrovos tipas, prašomas tipas yra %d\n"
 
-#: src/network.c:649
+#: src/network.c:647
 msgid "Improper load type chose"
 msgstr "Pasirinktas netinkamas apkrovos tipas"
 
-#: src/network.c:737
+#: src/network.c:735
 #, c-format
 msgid "loading data card error, no segment has an itag = %d\n"
 msgstr "duomenų kortelės įkėlimo klaida, joks segmentas neturi itag = %d\n"
 
-#: src/network.c:738
+#: src/network.c:736
 msgid ""
 "Loading data card\n"
 "Tag number mismatch error"
 msgstr ""
 "Duomenų kortelės įkėlimas\n"
 "Žymės numerio neatitikimo klaida"
+
+#: src/opt_file.c:342
+#, c-format
+msgid "opt_file_save: %s\n"
+msgstr "opt_file_save: %s\n"
+
+#: src/opt_file.c:533
+#, c-format
+msgid "opt_file_load: unknown metric in [%s]\n"
+msgstr "opt_file_load: nežinoma metrika [%s]\n"
+
+#: src/opt_file.c:615
+#, c-format
+msgid "Loaded %d optimizer goals\n"
+msgstr "Įkelti %d optimizatoriaus tikslai\n"
+
+#: src/opt_file.c:651
+#, c-format
+msgid "opt_file_load: %s\n"
+msgstr "opt_file_load: %s\n"
+
+#: src/opt_ui_session.c:70
+#, c-format
+msgid "opt_ui: optimization finished, best fitness: %.6g\n"
+msgstr "opt_ui: optimizavimas baigtas, geriausias tinkamumas: %.6g\n"
+
+#: src/opt_ui_session.c:106 src/opt_ui_session.c:139 src/opt_ui_session.c:169
+#: src/opt_ui_session.c:268
+msgid "Optimization"
+msgstr "Optimizavimas"
+
+#: src/optimize.c:83
+#, c-format
+msgid "saving %s: %s\n"
+msgstr "išsaugoma %s: %s\n"
+
+#: src/optimize.c:100
+msgid "xnec2c was built without inotify.\n"
+msgstr "xnec2c sukompiliuotas be inotify.\n"
+
+#: src/optimize.c:157
+#, c-format
+msgid "inotify: matched companion file: %s\n"
+msgstr "inotify: rastas lydimasis failas: %s\n"
+
+#: src/optimize.c:198
+#, c-format
+msgid "Unable to configure file modification detection to %s: %s\n"
+msgstr "Nepavyko sukonfigūruoti failų modifikacijos aptikimo %s: %s\n"
+
+#: src/optimize.c:203
+#, c-format
+msgid "Monitoring directory for %s: %s\n"
+msgstr "Stebimas katalogas %s: %s\n"
+
+#: src/optimize.c:301
+msgid "Exited optimizer thread.\n"
+msgstr "Optimizatoriaus gija baigė darbą.\n"
+
+#: src/optimize.c:307
+msgid "optimize.c: exit because this is a child process.\n"
+msgstr "optimize.c: išeinama, nes tai yra antrinis procesas.\n"
+
+#: src/optimize.c:333
+#, c-format
+msgid "inotify: read %zd bytes from inotify fd\n"
+msgstr "inotify: nuskaityti %zd baitai iš inotify fd\n"
+
+#: src/optimize.c:337
+#, c-format
+msgid ""
+"inotify: SKIP all events (flags) - FREQ_LOOP_RUNNING=%d FREQ_LOOP_INIT=%d "
+"INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n"
+msgstr ""
+"inotify: SKIP visi įvykiai (vėliavėlės) – FREQ_LOOP_RUNNING=%d "
+"FREQ_LOOP_INIT=%d INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n"
+
+#: src/optimize.c:356
+#, c-format
+msgid "inotify: EVENT @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
+msgstr "inotify: EVENT @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
+
+#: src/optimize.c:360
+#, c-format
+msgid ""
+"inotify: EVENT flags: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
+"IN_CREATE=%d IN_DELETE=%d IN_MODIFY=%d\n"
+msgstr ""
+"inotify: EVENT vėliavėlės: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
+"IN_CREATE=%d IN_DELETE=%d IN_MODIFY=%d\n"
+
+#: src/optimize.c:368
+#, c-format
+msgid "inotify: FILTER: target='%s' event_name='%s' match=%d\n"
+msgstr "inotify: FILTER: tikslas='%s' event_name='%s' atitikimas=%d\n"
+
+#: src/optimize.c:375
+msgid "inotify: SKIP event (filename mismatch)\n"
+msgstr "inotify: SKIP įvykis (failo pavadinimas nesutampa)\n"
+
+#: src/optimize.c:382
+msgid "inotify: IN_MODIFY on target, setting modify_seen=TRUE\n"
+msgstr "inotify: IN_MODIFY tiksle, nustatoma modify_seen=TRUE\n"
+
+#: src/optimize.c:390
+msgid ""
+"inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n"
+msgstr ""
+"inotify: IN_MOVED_TO tiksle (atominis rašymas baigtas), inicijuojamas "
+"perkrovimas\n"
+
+#: src/optimize.c:401 src/optimize.c:436
+#, c-format
+msgid ""
+"inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), "
+"retrying\n"
+msgstr ""
+"inotify: failo stat nepavyko arba nulis baitų (ret=%d size=%ld errno=%s), "
+"kartojama\n"
+
+#: src/optimize.c:407 src/optimize.c:442
+#, c-format
+msgid "inotify: file stat OK - size=%ld bytes\n"
+msgstr "inotify: failo stat gerai – dydis=%ld baitai\n"
+
+#: src/optimize.c:425
+msgid ""
+"inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
+"triggering reload\n"
+msgstr ""
+"inotify: IN_CLOSE_WRITE po modify_seen=TRUE (tiesioginis rašymas baigtas), "
+"inicijuojamas perkrovimas\n"
+
+#: src/optimize.c:455
+msgid ""
+"inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
+"skipping\n"
+msgstr ""
+"inotify: IN_CLOSE_WRITE be modify_seen (netikėtas uždarymas, senas inode), "
+"praleidiama\n"
+
+#: src/optimize.c:462
+#, c-format
+msgid "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
+msgstr "inotify: SKIP įvykis (ne MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 
 #: src/plot_freqdata.c:132
 #, c-format
@@ -1842,112 +2422,112 @@ msgstr "Draw_Graph():Atminties paskirstymas taškams nepavyko"
 msgid "Smith Chart"
 msgstr "Smith diagrama"
 
-#: src/plot_freqdata.c:1475 src/plot_freqdata.c:1494 src/plot_freqdata.c:1519
+#: src/plot_freqdata.c:1490 src/plot_freqdata.c:1509 src/plot_freqdata.c:1534
 msgid "Raw Gain dBi"
 msgstr "Neapdorotas stiprinimas dBi"
 
-#: src/plot_freqdata.c:1478
+#: src/plot_freqdata.c:1493
 msgid "Max Gain & Net Gain vs Frequency"
 msgstr "Maks. stiprinimas ir grynasis stiprinimas pagal dažnį"
 
-#: src/plot_freqdata.c:1479
+#: src/plot_freqdata.c:1494
 msgid "Net Gain dBi"
 msgstr "Grynasis stiprinimas dBi"
 
-#: src/plot_freqdata.c:1485 src/plot_freqdata.c:1495
+#: src/plot_freqdata.c:1500 src/plot_freqdata.c:1510
 msgid "Max Gain & F/B Ratio vs Frequency"
 msgstr "Maks. stiprinimas ir F/B santykis pagal dažnį"
 
-#: src/plot_freqdata.c:1496
+#: src/plot_freqdata.c:1511
 msgid "F/B Ratio dB"
 msgstr "F/B santykis dB"
 
-#: src/plot_freqdata.c:1505
+#: src/plot_freqdata.c:1520
 msgid "Rad Angle - deg"
 msgstr "Spinduliuotės kampas - laipsniai"
 
-#: src/plot_freqdata.c:1506
+#: src/plot_freqdata.c:1521
 msgid "Max Gain Direction vs Frequency"
 msgstr "Maks. stiprinimo kryptis pagal dažnį"
 
-#: src/plot_freqdata.c:1507
+#: src/plot_freqdata.c:1522
 msgid "Phi - deg"
 msgstr "Phi - laipsniai"
 
-#: src/plot_freqdata.c:1520
+#: src/plot_freqdata.c:1535
 msgid "Gain in Viewer Direction vs Frequency"
 msgstr "Stiprinimas stebėtojo kryptimi pagal dažnį"
 
-#: src/plot_freqdata.c:1543
+#: src/plot_freqdata.c:1558
 msgid "Net gain dBi"
 msgstr "Grynasis stiprinimas dBi"
 
-#: src/plot_freqdata.c:1561 resources/xnec2c.glade:9953
-#: resources/xnec2c.glade:10177
+#: src/plot_freqdata.c:1576 resources/xnec2c.glade:9951
+#: resources/xnec2c.glade:10175
 msgid "VSWR"
 msgstr "VSWR"
 
-#: src/plot_freqdata.c:1564
+#: src/plot_freqdata.c:1579
 msgid "VSWR & S11 vs Frequency"
 msgstr "VSWR ir S11 pagal dažnį"
 
-#: src/plot_freqdata.c:1565
+#: src/plot_freqdata.c:1580
 msgid "S11 dB"
 msgstr "S11 dB"
 
-#: src/plot_freqdata.c:1569
+#: src/plot_freqdata.c:1584
 msgid "VSWR vs Frequency"
 msgstr "VSWR pagal dažnį"
 
-#: src/plot_freqdata.c:1583
+#: src/plot_freqdata.c:1598
 msgid "memory allocation for vswr/s11 failed\n"
 msgstr "atminties paskirstymas vswr/s11 nepavyko\n"
 
-#: src/plot_freqdata.c:1584
+#: src/plot_freqdata.c:1599
 msgid "Plot_Frequency_Data():Memory allocation for vswr/s11 failed"
 msgstr "Plot_Frequency_Data():Atminties paskirstymas vswr/s11 nepavyko"
 
-#: src/plot_freqdata.c:1614 resources/xnec2c.glade:10142
+#: src/plot_freqdata.c:1646 resources/xnec2c.glade:10140
 msgid "Z-real"
 msgstr "Z-reali"
 
-#: src/plot_freqdata.c:1615 src/plot_freqdata.c:1628
+#: src/plot_freqdata.c:1647 src/plot_freqdata.c:1656
 msgid "Impedance vs Frequency"
 msgstr "Varža pagal dažnį"
 
-#: src/plot_freqdata.c:1616 resources/xnec2c.glade:10107
+#: src/plot_freqdata.c:1648 resources/xnec2c.glade:10105
 msgid "Z-imag"
 msgstr "Z-menam"
 
-#: src/plot_freqdata.c:1627
+#: src/plot_freqdata.c:1655
 msgid "Z-magn"
 msgstr "Z-modulis"
 
-#: src/plot_freqdata.c:1629
+#: src/plot_freqdata.c:1657
 msgid "Z-phase"
 msgstr "Z-fazė"
 
-#: src/plot_freqdata.c:1667
+#: src/plot_freqdata.c:1691
 msgid "G/T_ant (dB)"
 msgstr "G/T_ant (dB)"
 
-#: src/plot_freqdata.c:1670
+#: src/plot_freqdata.c:1694
 msgid "G/T_ant & T_ant"
 msgstr "G/T_ant ir T_ant"
 
-#: src/plot_freqdata.c:1671
+#: src/plot_freqdata.c:1695
 msgid "T_ant (K)"
 msgstr "T_ant (K)"
 
-#: src/plot_freqdata.c:1675
+#: src/plot_freqdata.c:1699
 msgid "G/T_ant & T_total"
 msgstr "G/T_ant ir T_total"
 
-#: src/plot_freqdata.c:1676
+#: src/plot_freqdata.c:1700
 msgid "T_total (K)"
 msgstr "T_total (K)"
 
-#: src/plot_freqdata.c:1918
+#: src/plot_freqdata.c:1942
 #, c-format
 msgid "mouse button: unknown button %d\n"
 msgstr "pelės mygtukas: nežinomas mygtukas %d\n"
@@ -1968,6 +2548,93 @@ msgstr ""
 "Vidutinis stiprinimas: %.4f (%.2f dBi), efektyvumas: %.1f%%, erdvinis "
 "kampas: %.4f * pi sr\n"
 
+#: src/rc_config.c:344
+#, c-format
+msgid "unable to getcwd(): %s\n"
+msgstr "nepavyko gauti dabartinio katalogo getcwd(): %s\n"
+
+#: src/rc_config.c:348
+#, c-format
+msgid "environment variable HOME is undefined, using %s\n"
+msgstr "aplinkos kintamasis HOME neapibrėžtas, naudojama %s\n"
+
+#: src/rc_config.c:433
+#, c-format
+msgid ""
+"%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
+msgstr ""
+"%s (locale=%s): atitiko tik %d iš %lu simbolių, bandoma kita lokalė: %s\n"
+
+#: src/rc_config.c:494
+#, c-format
+msgid ""
+"rc_config: %s: builder_check_menu_item_id is NULL but builder_window is "
+"defined.\n"
+msgstr ""
+"rc_config: %s: builder_check_menu_item_id yra NULL, bet builder_window "
+"apibrėžtas.\n"
+
+#: src/rc_config.c:497
+#, c-format
+msgid ""
+"rc_config: %s: builder_window is NULL but builder_check_menu_item_id is "
+"defined.\n"
+msgstr ""
+"rc_config: %s: builder_window yra NULL, bet builder_check_menu_item_id "
+"apibrėžtas.\n"
+
+#: src/rc_config.c:510
+#, c-format
+msgid "match: %s\n"
+msgstr "sutapimas: %s\n"
+
+#: src/rc_config.c:535
+#, c-format
+msgid "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
+msgstr "window: x=%-5d y=%-5d w=%-5d h=%-5d  antraštė: \"%s\"\n"
+
+#: src/rc_config.c:605
+#, c-format
+msgid "%s: EOF reading application version.\n"
+msgstr "%s: EOF skaitant programos versiją.\n"
+
+#: src/rc_config.c:611
+#, c-format
+msgid "existing config file version differs: %s != %s\n"
+msgstr "esamo konfigūracijos failo versija skiriasi: %s != %s\n"
+
+#: src/rc_config.c:921
+#, c-format
+msgid "stat failed for %s: %s\n"
+msgstr "stat nepavyko %s: %s\n"
+
+#: src/rc_config.c:927
+#, c-format
+msgid ""
+"Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
+"4e62893b.\n"
+msgstr "Ištaisytos %s katalogo teisės iš 0%o į 0%o dėl klaidos 4e62893b.\n"
+
+#: src/rc_config.c:958
+#, c-format
+msgid "%s:%d: Line not parsed: %s\n"
+msgstr "%s:%d: eilutė neišanalizuota: %s\n"
+
+#: src/rc_config.c:964
+#, c-format
+msgid "%s:%d: Early end of file for %s: %s \n"
+msgstr "%s:%d: ankstyvoji failo pabaiga dėl %s: %s \n"
+
+#: src/rc_config.c:989
+#, c-format
+msgid "%s:%d: parse error (%s): %s \n"
+msgstr "%s:%d: analizės klaida (%s): %s \n"
+
+#: src/rc_config.c:1254
+#, c-format
+msgid "cannot open xnec2c's config file %s: %s\n"
+msgstr "negalima atidaryti xnec2c konfigūracijos failo %s: %s\n"
+
 #: src/somnec.c:238
 msgid "Hankel not valid for z = 0"
 msgstr "Hankel negalioja kai Z = 0"
@@ -1975,6 +2642,101 @@ msgstr "Hankel negalioja kai Z = 0"
 #: src/somnec.c:749
 msgid "No convergence"
 msgstr "Nėra konvergencijos"
+
+#: src/sy_expr.c:137
+msgid "(further errors suppressed)\n"
+msgstr "(tolesni klaidos pranešimai slopinami)\n"
+
+#: src/sy_expr.c:583
+msgid "Expression syntax error: unexpected character"
+msgstr "Išraiškos sintaksės klaida: netikėtas simbolis"
+
+#: src/sy_expr.c:720
+msgid "Expression parsing error: unexpected token"
+msgstr "Išraiškos analizės klaida: netikėtas žetonas"
+
+#: src/sy_expr.c:732
+msgid "Expression error: mismatched parentheses"
+msgstr "Išraiškos klaida: nesutampantys skliausteliai"
+
+#: src/sy_expr.c:814
+#, c-format
+msgid "Undefined symbol: %s"
+msgstr "Neapibrėžtas simbolis: %s"
+
+#: src/sy_expr.c:839 src/sy_expr.c:849
+msgid "Expression error: missing operand"
+msgstr "Išraiškos klaida: trūksta operando"
+
+#: src/sy_expr.c:861
+msgid "Unknown operator"
+msgstr "Nežinomas operatorius"
+
+#: src/sy_expr.c:873
+msgid "Division by zero"
+msgstr "Dalyba iš nulio"
+
+#: src/sy_expr.c:896
+#, c-format
+msgid "Unknown function: %s"
+msgstr "Nežinoma funkcija: %s"
+
+#: src/sy_expr.c:908 src/sy_expr.c:926 src/sy_expr.c:936
+msgid "Function error: missing argument"
+msgstr "Funkcijos klaida: trūksta argumento"
+
+#: src/sy_expr.c:953
+msgid "Function error: invalid arity"
+msgstr "Funkcijos klaida: netinkamas argumentų skaičius"
+
+#: src/sy_expr.c:967
+msgid "Expression error: unexpected token type in RPN"
+msgstr "Išraiškos klaida: netikėtas žetono tipas RPN"
+
+#: src/sy_expr.c:975
+msgid "Expression error: invalid result"
+msgstr "Išraiškos klaida: netinkamas rezultatas"
+
+#: src/sy_expr.c:1123
+msgid "Invalid arguments to sy_evaluate"
+msgstr "Netinkami argumentai sy_evaluate"
+
+#: src/sy_expr.c:1246
+#, c-format
+msgid "sy_load_overrides: malformed line (no colon): %s"
+msgstr "sy_load_overrides: klaidinga eilutė (nėra dvitaškio): %s"
+
+#: src/sy_expr.c:1336
+#, c-format
+msgid "Loaded %d symbol overrides from %s\n"
+msgstr "Įkelti %d simbolių pakeitimai iš %s\n"
+
+#: src/sy_expr.c:1453
+#, c-format
+msgid "sy_save_overrides: cannot open %s for writing: %s\n"
+msgstr "sy_save_overrides: nepavyko atidaryti %s rašymui: %s\n"
+
+#: src/sy_expr.c:1475
+#, c-format
+msgid "Saved %d symbol overrides to %s\n"
+msgstr "Išsaugoti %d simbolių pakeitimai į %s\n"
+
+#: src/sy_overrides.c:1093
+#, c-format
+msgid "sy_overrides_init: failed to load glade: %s\n"
+msgstr "sy_overrides_init: nepavyko įkelti glade: %s\n"
+
+#: src/sy_overrides.c:1107
+msgid "sy_overrides_init: failed to get widgets from glade\n"
+msgstr "sy_overrides_init: nepavyko gauti valdiklių iš glade\n"
+
+#: src/sy_overrides.c:1486
+msgid ""
+"Controls whether this parameter overrides the NEC model value.\n"
+"Uncheck Opt to control independently."
+msgstr ""
+"Valdo, ar šis parametras keičia NEC modelio reikšmę.\n"
+"Atžymėkite Opt, kad valdytumėte nepriklausomai."
 
 #: src/utils.c:45
 #, c-format
@@ -2077,11 +2839,6 @@ msgstr ""
 msgid "Stop: %s\n"
 msgstr "Stabdyti: %s\n"
 
-#: src/utils.c:159 src/utils.c:163 src/utils.c:173 src/utils.c:175
-#, c-format
-msgid "%s\n"
-msgstr "%s\n"
-
 #: src/utils.c:188 src/utils.c:190
 #, c-format
 msgid "Stop during freq loop, deadlock prevented: %s\n"
@@ -2134,11 +2891,6 @@ msgstr "%s: Prašoma atmintis %lu\n"
 msgid "xnec2c[%d]: %s: Failed to open file: %s\n"
 msgstr "xnec2c[%d]: %s: Nepavyko atidaryti failo: %s\n"
 
-#: src/utils.c:575
-#, c-format
-msgid "%s: %s\n"
-msgstr "%s: %s\n"
-
 #: src/utils.c:943
 msgid "Optimizer loop incomplete, skipping radiation pattern redraw.\n"
 msgstr ""
@@ -2177,39 +2929,275 @@ msgstr ""
 msgid "Ground_Parameters():Error in ground parameters"
 msgstr "Ground_Parameters():Klaida įžeminimo parametruose"
 
-#: src/xnec2c.c:509
+#: src/xnec2c.c:516
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
 msgstr "%.6f MHz: %f sekundės. (%s)\n"
 
-#: src/xnec2c.c:840
+#: src/xnec2c.c:802 src/xnec2c.c:854
+#, c-format
+msgid ""
+"step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
+msgstr ""
+"žingsnis %d aplenktas: išsiųstas %.6f MHz, esamas %.6f MHz; bus "
+"perskaičiuota\n"
+
+#: src/xnec2c.c:842
 msgid "Failed to read data from forked child\n"
 msgstr "Nepavyko nuskaityti duomenų iš atšakoto vaikinio proceso\n"
 
-#: src/xnec2c.c:876
-#, c-format
-msgid ""
-"Frequency_Loop is done with all steps but num_busy_procs=%d (calc_data."
-"freq_step=%d calc_data.steps_total=%d)?\n"
-msgstr ""
-"Frequency_Loop baigė visus žingsnius, bet num_busy_procs=%d (calc_data."
-"freq_step=%d calc_data.steps_total=%d)?\n"
-
-#: src/xnec2c.c:883
-#, c-format
-msgid "  busy job[%d]: fstep=%d freq=%f\n"
-msgstr "  užimtas darbas[%d]: fstep=%d freq=%f\n"
-
-#: src/xnec2c.c:945
+#: src/xnec2c.c:941
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
 msgstr "Dažnio ciklo praėjęs laikas: %f sekundės. (%s)\n"
 
-#: src/xnec2c.c:1090
+#: src/xnec2c.c:1211
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "nepavyko paleisti Frequency_Loop_Thread\n"
 
-#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:1964
+#: src/opengl/opengl_rdpattern.c:380
+#, c-format
+msgid "rdpattern: invalid draw style %d, using surface\n"
+msgstr "rdpattern: netinkamas braižymo stilius %d, naudojamas paviršius\n"
+
+#: src/opengl/opengl_settings.c:428
+#, c-format
+msgid "opengl_settings_init: failed to load glade: %s\n"
+msgstr "opengl_settings_init: nepavyko įkelti glade: %s\n"
+
+#: src/opengl/opengl_settings.c:441
+msgid "opengl_settings_init: failed to get opengl_settings_window from glade\n"
+msgstr "opengl_settings_init: nepavyko gauti opengl_settings_window iš glade\n"
+
+#: src/opengl-engine/opengl_axes.c:132
+#, c-format
+msgid "Generated label texture atlas (ID=%u)\n"
+msgstr "Sugeneruotas žymėjimų tekstūrų atlasas (ID=%u)\n"
+
+#: src/opengl-engine/opengl_axes.c:156
+msgid "Failed to load axes line shader\n"
+msgstr "Nepavyko įkelti ašių linijos šeiderio\n"
+
+#: src/opengl-engine/opengl_axes.c:189
+msgid "Axes renderer initialized\n"
+msgstr "Ašių atvaizdavimo modulis inicializuotas\n"
+
+#: src/opengl-engine/opengl_axes.c:193
+msgid "Failed to load text shaders\n"
+msgstr "Nepavyko įkelti teksto šeiderių\n"
+
+#: src/opengl-engine/opengl_cairo_overlay.c:60
+msgid "Failed to load cairo overlay shaders\n"
+msgstr "Nepavyko įkelti cairo perdengimo šeiderių\n"
+
+#: src/opengl-engine/opengl_gradient_overlay.c:80
+msgid "Failed to create cairo overlay base\n"
+msgstr "Nepavyko sukurti cairo perdengimo pagrindo\n"
+
+#: src/opengl-engine/opengl_ground_plane.c:103
+msgid "Failed to load ground plane shaders\n"
+msgstr "Nepavyko įkelti žemės plokštumos šeiderių\n"
+
+#: src/opengl-engine/opengl_renderer.c:55
+#, c-format
+msgid "Failed to load shader: %s (%s)\n"
+msgstr "Nepavyko įkelti šeiderio: %s (%s)\n"
+
+#: src/opengl-engine/opengl_renderer.c:84
+#, c-format
+msgid "Shader compile error: %s\n"
+msgstr "Šeiderio kompiliavimo klaida: %s\n"
+
+#: src/opengl-engine/opengl_renderer.c:126
+msgid "Shader link failed\n"
+msgstr "Šeiderio susiuvimas nepavyko\n"
+
+#: src/opengl-engine/opengl_view.c:123
+msgid "GL context error\n"
+msgstr "GL konteksto klaida\n"
+
+#: src/opengl-engine/opengl_view.c:149
+msgid "Failed to create axes renderer\n"
+msgstr "Nepavyko sukurti ašių atvaizdavimo modulio\n"
+
+#: src/opengl-engine/opengl_view.c:181
+msgid "Failed to create ground plane renderer\n"
+msgstr "Nepavyko sukurti žemės plokštumos atvaizdavimo modulio\n"
+
+#: src/opengl-engine/opengl_view.c:202
+#, c-format
+msgid "Renderable count %u exceeds MAX_RENDERABLES (%d)\n"
+msgstr "Atvaizdavimo objektų skaičius %u viršija MAX_RENDERABLES (%d)\n"
+
+#: src/opengl-engine/opengl_view.c:246
+msgid "Failed to create gradient overlay\n"
+msgstr "Nepavyko sukurti gradiento perdengimo\n"
+
+#: src/opengl-engine/opengl_view.c:294
+msgid "Failed to load peel composite shaders\n"
+msgstr "Nepavyko įkelti daugiasluoksnio perdengimo šeiderių\n"
+
+#: src/opengl-engine/opengl_view_msaa.c:137
+msgid "MSAA framebuffer incomplete\n"
+msgstr "MSAA kadrų buferis nebaigtas\n"
+
+#: src/opengl-engine/opengl_view_overlay.c:348
+msgid "Failed to load overlay shaders\n"
+msgstr "Nepavyko įkelti perdengimo šeiderių\n"
+
+#: src/opengl-engine/opengl_view_peel.c:238
+#, c-format
+msgid "Peel FBO %d incomplete\n"
+msgstr "Peel FBO %d nebaigtas\n"
+
+#: src/opengl-engine/opengl_view_peel.c:249
+#, c-format
+msgid "Peel MSAA FBO %d incomplete\n"
+msgstr "Peel MSAA FBO %d nebaigtas\n"
+
+#: src/opengl-engine/opengl_view_peel.c:260
+msgid "Peel accumulation FBO incomplete\n"
+msgstr "Peel kaupimo FBO nebaigtas\n"
+
+#: src/opengl-engine/opengl_view_render.c:297
+msgid "Transparent renderables skipped: peel FBOs unavailable\n"
+msgstr "Permatomi objektai praleisti: peel FBO nepasiekiami\n"
+
+#: src/opengl-engine/opengl_view_scene.c:283
+msgid "Failed to load shaders\n"
+msgstr "Nepavyko įkelti šeiderių\n"
+
+#: src/optimizers/opt_fitness.c:347
+#, c-format
+msgid "fitness_config_add: invalid meas_index %d\n"
+msgstr "fitness_config_add: neteisingas meas_index %d\n"
+
+#: src/optimizers/opt_fitness.c:485
+#, c-format
+msgid "fitness_transform: unknown direction %d\n"
+msgstr "fitness_transform: nežinoma kryptis %d\n"
+
+#: src/optimizers/opt_fitness.c:558
+#, c-format
+msgid "reduce_values: unknown reduction method %d\n"
+msgstr "reduce_values: nežinomas sumažinimo metodas %d\n"
+
+#: src/optimizers/opt_nec2_eval.c:189
+msgid "nec2_eval_run: not initialized\n"
+msgstr "nec2_eval_run: neinicializuota\n"
+
+#: src/optimizers/opt_session.c:96
+#, c-format
+msgid ""
+"opt: pass %d/%d iter %d fitness %.6g best %.6g ssize %.4g stagnant %d cache "
+"%d/%d\n"
+msgstr ""
+"opt: pass %d/%d iter %d tinkamumas %.6g geriausias %.6g ssize %.4g sąstingis "
+"%d talpykla %d/%d\n"
+
+#: src/optimizers/opt_session.c:120
+#, c-format
+msgid "opt: optimization complete, best fitness: %.6g\n"
+msgstr "opt: optimizavimas baigtas, geriausias tinkamumas: %.6g\n"
+
+#: src/optimizers/opt_session.c:158
+msgid "opt_start: optimizer already running\n"
+msgstr "opt_start: optimizatorius jau veikia\n"
+
+#: src/optimizers/opt_session.c:225
+msgid "opt_start: simple_new failed\n"
+msgstr "opt_start: simple_new nepavyko\n"
+
+#: src/optimizers/opt_session.c:234
+#, c-format
+msgid "opt_start: pthread_create failed: %d\n"
+msgstr "opt_start: pthread_create nepavyko: %d\n"
+
+#: src/optimizers/opt_simple.c:297
+#, c-format
+msgid "simple_config_init: unknown algorithm %d\n"
+msgstr "simple_config_init: nežinomas algoritmas %d\n"
+
+#: src/optimizers/opt_simple_var.c:42
+#, c-format
+msgid "var[%d] name is NULL or empty\n"
+msgstr "var[%d] pavadinimas yra NULL arba tuščias\n"
+
+#: src/optimizers/opt_simple_var.c:48
+#, c-format
+msgid "var '%s' values is NULL or empty\n"
+msgstr "var '%s' reikšmės yra NULL arba tuščios\n"
+
+#: src/optimizers/opt_simple_var.c:59
+#, c-format
+msgid "var '%s' enabled->size (%zu) != values->size (%zu)\n"
+msgstr "var '%s' enabled->size (%zu) != values->size (%zu)\n"
+
+#: src/optimizers/opt_simple_var.c:69
+#, c-format
+msgid "var '%s' enabled[%zu] = %g (must be 0.0 or 1.0)\n"
+msgstr "var '%s' enabled[%zu] = %g (turi būti 0.0 arba 1.0)\n"
+
+#: src/optimizers/opt_simple_var.c:79
+#, c-format
+msgid "var '%s' min and max must both be set or both NULL\n"
+msgstr "var '%s' min ir max abu turi būti nustatyti arba abu NULL\n"
+
+#: src/optimizers/opt_simple_var.c:88
+#, c-format
+msgid "var '%s' min/max size mismatch with values\n"
+msgstr "var '%s' min/max dydžio neatitikimas su reikšmėmis\n"
+
+#: src/optimizers/opt_simple_var.c:99
+#, c-format
+msgid "var '%s' min[%zu]=%g >= max[%zu]=%g (zero or negative range)\n"
+msgstr ""
+"var '%s' min[%zu]=%g >= max[%zu]=%g (nulinis arba neigiamas intervalas)\n"
+
+#: src/optimizers/opt_simple_var.c:112
+#, c-format
+msgid "var '%s'[%zu] initial value %g outside [%g, %g]\n"
+msgstr "var '%s'[%zu] pradinė reikšmė %g už ribų [%g, %g]\n"
+
+#: src/optimizers/opt_simple_var.c:125
+#, c-format
+msgid "var '%s' perturb_scale size mismatch\n"
+msgstr "var '%s' perturb_scale dydžio neatitikimas\n"
+
+#: src/optimizers/opt_simple_var.c:133
+#, c-format
+msgid "var '%s' perturb_scale[%zu] is zero\n"
+msgstr "var '%s' perturb_scale[%zu] yra nulis\n"
+
+#: src/optimizers/opt_simple_var.c:145
+#, c-format
+msgid "var '%s' round_each size mismatch\n"
+msgstr "var '%s' round_each dydžio neatitikimas\n"
+
+#: src/optimizers/opt_simple_var.c:151
+#, c-format
+msgid "var '%s' round_each has element <= 0\n"
+msgstr "var '%s' round_each turi elementą <= 0\n"
+
+#: src/optimizers/opt_simple_var.c:162
+#, c-format
+msgid "var '%s' round_result size mismatch\n"
+msgstr "var '%s' round_result dydžio neatitikimas\n"
+
+#: src/optimizers/opt_simple_var.c:168
+#, c-format
+msgid "var '%s' round_result has element <= 0\n"
+msgstr "var '%s' round_result turi elementą <= 0\n"
+
+#: src/expr_edit.h:34
+msgid ""
+"Value is controlled by an SY expression.\n"
+"Edit the SY card to change this value."
+msgstr ""
+"Reikšmę valdo SY išraiška.\n"
+"Redaguokite SY kortelę, kad pakeistumėte šią reikšmę."
+
+#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:1962
 msgid "xnec2c"
 msgstr "xnec2c"
 
@@ -2224,6 +3212,47 @@ msgstr "Skaitmeninės elektromagnetikos kodo programinė įranga"
 #: files/xnec2c.desktop.in:11
 msgid "nec2;em;simulator;"
 msgstr "nec2;em;simuliatorius;"
+
+#: resources/opengl_settings.glade:90
+msgid "OpenGL Settings"
+msgstr "OpenGL nustatymai"
+
+#: resources/opengl_settings.glade:136
+msgid "OpenGL Renderer"
+msgstr "OpenGL atvaizdavimo modulis"
+
+#: resources/opengl_settings.glade:151
+msgid "Constrained Rotation"
+msgstr "Riboti sukimą"
+
+#: resources/opengl_settings.glade:166
+msgid "Orthographic Projection"
+msgstr "Ortografinė projekcija"
+
+#: resources/opengl_settings.glade:638
+msgid "Visual only — does not affect NEC2 model calculations."
+msgstr "Tik vizualinis — neturi įtakos NEC2 modelio skaičiavimams."
+
+#: resources/opengl_settings.glade:658
+msgid "Reset to _Defaults"
+msgstr "_Atstatyti numatytuosius"
+
+#: resources/opengl_settings.glade:675 resources/sy_overrides.glade:744
+msgid "_Close"
+msgstr "_Uždaryti"
+
+#: resources/sy_overrides.glade:34
+msgid "Symbol Overrides"
+msgstr "Simbolių pakeitimai"
+
+#: resources/sy_overrides.glade:688
+msgid "_Auto Apply"
+msgstr "_Autom. taikyti"
+
+#: resources/sy_overrides.glade:693
+msgid "Automatically apply changes and reload model after 300ms delay"
+msgstr ""
+"Automatiškai taikyti pakeitimus ir įkelti modelį iš naujo po 300 ms delsimo"
 
 #: resources/xnec2c.glade:14
 msgid "(C) 2007-2022 Neoklis Kyriazis"
@@ -2266,683 +3295,683 @@ msgstr ""
 msgid "translator-credits"
 msgstr "translator-credits"
 
-#: resources/xnec2c.glade:159
-msgid "Steps/Cycle"
-msgstr "Žingsniai/Ciklas"
+#: resources/xnec2c.glade:153
+msgid "Frames/Sec"
+msgstr "Kadr./sek."
 
-#: resources/xnec2c.glade:172
+#: resources/xnec2c.glade:166
 msgid "Animate Freq (Hz)"
 msgstr "Animacijos dažnis (Hz)"
 
-#: resources/xnec2c.glade:286
+#: resources/xnec2c.glade:284
 msgid "Arc Element (GA card)"
 msgstr "Lanko elementas (GA kortelė)"
 
-#: resources/xnec2c.glade:327 resources/xnec2c.glade:14713
+#: resources/xnec2c.glade:325 resources/xnec2c.glade:14932
 msgid "No. Segments"
 msgstr "Segmentų sk."
 
-#: resources/xnec2c.glade:340 resources/xnec2c.glade:3802
-#: resources/xnec2c.glade:14809
+#: resources/xnec2c.glade:338 resources/xnec2c.glade:3800
+#: resources/xnec2c.glade:15028
 msgid "Segs % lambda"
 msgstr "Segm. % lambda"
 
-#: resources/xnec2c.glade:353 resources/xnec2c.glade:3815
-#: resources/xnec2c.glade:14905
+#: resources/xnec2c.glade:351 resources/xnec2c.glade:3813
+#: resources/xnec2c.glade:15124
 msgid "Wire Diameter"
 msgstr "Laido skersmuo"
 
-#: resources/xnec2c.glade:441
+#: resources/xnec2c.glade:439
 msgid "Radius from Y"
 msgstr "Spindulys nuo Y"
 
-#: resources/xnec2c.glade:454
+#: resources/xnec2c.glade:452
 msgid "End 1 Angle"
 msgstr "1 galo kampas"
 
-#: resources/xnec2c.glade:467
+#: resources/xnec2c.glade:465
 msgid "End 2 Angle"
 msgstr "2 galo kampas"
 
-#: resources/xnec2c.glade:578
+#: resources/xnec2c.glade:576
 msgid "Wire Arc Data"
 msgstr "Laido lanko duomenys"
 
-#: resources/xnec2c.glade:640 resources/xnec2c.glade:876
-#: resources/xnec2c.glade:1676 resources/xnec2c.glade:1899
-#: resources/xnec2c.glade:2357 resources/xnec2c.glade:2549
-#: resources/xnec2c.glade:2860 resources/xnec2c.glade:3546
-#: resources/xnec2c.glade:4346 resources/xnec2c.glade:4545
-#: resources/xnec2c.glade:4706 resources/xnec2c.glade:5238
-#: resources/xnec2c.glade:5874 resources/xnec2c.glade:7318
-#: resources/xnec2c.glade:8225 resources/xnec2c.glade:9231
-#: resources/xnec2c.glade:9511 resources/xnec2c.glade:13311
-#: resources/xnec2c.glade:13824 resources/xnec2c.glade:14423
-#: resources/xnec2c.glade:15259 resources/xnec2c.glade:15459
+#: resources/xnec2c.glade:638 resources/xnec2c.glade:874
+#: resources/xnec2c.glade:1674 resources/xnec2c.glade:1897
+#: resources/xnec2c.glade:2355 resources/xnec2c.glade:2547
+#: resources/xnec2c.glade:2858 resources/xnec2c.glade:3544
+#: resources/xnec2c.glade:4344 resources/xnec2c.glade:4543
+#: resources/xnec2c.glade:4704 resources/xnec2c.glade:5236
+#: resources/xnec2c.glade:5872 resources/xnec2c.glade:7316
+#: resources/xnec2c.glade:8223 resources/xnec2c.glade:9229
+#: resources/xnec2c.glade:9509 resources/xnec2c.glade:13530
+#: resources/xnec2c.glade:14043 resources/xnec2c.glade:14642
+#: resources/xnec2c.glade:15478 resources/xnec2c.glade:15678
 msgid "Delete Card"
 msgstr "Ištrinti kortelę"
 
-#: resources/xnec2c.glade:718
+#: resources/xnec2c.glade:716
 msgid "Cylindrical Structure (GR card)"
 msgstr "Cilindrinė struktūra (GR kortelė)"
 
-#: resources/xnec2c.glade:748 resources/xnec2c.glade:9411
+#: resources/xnec2c.glade:746 resources/xnec2c.glade:9409
 msgid "Tag Number Increment"
 msgstr "Žymės numerio pokytis"
 
-#: resources/xnec2c.glade:761
+#: resources/xnec2c.glade:759
 msgid "Number of Structures"
 msgstr "Struktūrų skaičius"
 
-#: resources/xnec2c.glade:815
+#: resources/xnec2c.glade:813
 msgid "Cylindrical Structure"
 msgstr "Cilindrinė struktūra"
 
-#: resources/xnec2c.glade:941
+#: resources/xnec2c.glade:939
 msgid "Xnec2c Error"
 msgstr "Xnec2c klaida"
 
-#: resources/xnec2c.glade:1049
+#: resources/xnec2c.glade:1047
 msgid "Error"
 msgstr "Klaida"
 
-#: resources/xnec2c.glade:1128
+#: resources/xnec2c.glade:1126
 msgid "Excitation Command (EX Card)"
 msgstr "Sužadinimo komanda (EX kortelė)"
 
-#: resources/xnec2c.glade:1154
+#: resources/xnec2c.glade:1152
 msgid "Incident LH Wave"
 msgstr "Krintanti LH banga"
 
-#: resources/xnec2c.glade:1170
+#: resources/xnec2c.glade:1168
 msgid "Incident Linear Wave "
 msgstr "Krintanti tiesinė banga "
 
-#: resources/xnec2c.glade:1186
+#: resources/xnec2c.glade:1184
 msgid "Current Source"
 msgstr "Srovės šaltinis"
 
-#: resources/xnec2c.glade:1202
+#: resources/xnec2c.glade:1200
 msgid "Incident RH Wave"
 msgstr "Krintanti RH banga"
 
-#: resources/xnec2c.glade:1218
+#: resources/xnec2c.glade:1216
 msgid "Current Slope Discontinuity"
 msgstr "Srovės nuolydžio trūkis"
 
-#: resources/xnec2c.glade:1234
+#: resources/xnec2c.glade:1232
 msgid "Voltage Source"
 msgstr "Įtampos šaltinis"
 
-#: resources/xnec2c.glade:1256
+#: resources/xnec2c.glade:1254
 msgid "Excitation Type"
 msgstr "Sužadinimo tipas"
 
-#: resources/xnec2c.glade:1281
+#: resources/xnec2c.glade:1279
 msgid "Maximum Admittance Matrix Asymmetry"
 msgstr "Maksimali laidumo matricos asimetrija"
 
-#: resources/xnec2c.glade:1297
+#: resources/xnec2c.glade:1295
 msgid "Impedance of Source Segment"
 msgstr "Šaltinio segmento impedansas"
 
-#: resources/xnec2c.glade:1319
+#: resources/xnec2c.glade:1317
 msgid "Print Control"
 msgstr "Spausdinimo valdymas"
 
-#: resources/xnec2c.glade:1411
+#: resources/xnec2c.glade:1409
 msgid "Voltage - Real Part"
 msgstr "Įtampa - realioji dalis"
 
-#: resources/xnec2c.glade:1424
+#: resources/xnec2c.glade:1422
 msgid "Voltage - Imaginary Part"
 msgstr "Įtampa - menamoji dalis"
 
-#: resources/xnec2c.glade:1437
+#: resources/xnec2c.glade:1435
 msgid "Eta"
 msgstr "Eta"
 
-#: resources/xnec2c.glade:1507
+#: resources/xnec2c.glade:1505
 msgid "Theta"
 msgstr "Theta"
 
-#: resources/xnec2c.glade:1520
+#: resources/xnec2c.glade:1518
 msgid "Phi"
 msgstr "Phi"
 
-#: resources/xnec2c.glade:1533
+#: resources/xnec2c.glade:1531
 msgid "Ratio"
 msgstr "Santykis"
 
-#: resources/xnec2c.glade:1614
+#: resources/xnec2c.glade:1612
 msgid "Excitation Parameters"
 msgstr "Sužadinimo parametrai"
 
-#: resources/xnec2c.glade:1741
+#: resources/xnec2c.glade:1739
 msgid "Execute Command (XQ Card)"
 msgstr "Vykdymo komanda (XQ kortelė)"
 
-#: resources/xnec2c.glade:1768
+#: resources/xnec2c.glade:1766
 msgid "No Pattern Cuts"
 msgstr "Be diagramos pjūvių"
 
-#: resources/xnec2c.glade:1784
+#: resources/xnec2c.glade:1782
 msgid "Pattern in XZ Plane"
 msgstr "Diagrama XZ plokštumoje"
 
-#: resources/xnec2c.glade:1800
+#: resources/xnec2c.glade:1798
 msgid "Pattern in YZ Plane"
 msgstr "Diagrama YZ plokštumoje"
 
-#: resources/xnec2c.glade:1816
+#: resources/xnec2c.glade:1814
 msgid "Both XZ/YZ Patterns"
 msgstr "Abi XZ/YZ diagramos"
 
-#: resources/xnec2c.glade:1838
+#: resources/xnec2c.glade:1836
 msgid "Execute Command"
 msgstr "Vykdymo komanda"
 
-#: resources/xnec2c.glade:2069
+#: resources/xnec2c.glade:2067
 msgid "Frequency Command (FR Card)"
 msgstr "Dažnio komanda (FR kortelė)"
 
-#: resources/xnec2c.glade:2094
+#: resources/xnec2c.glade:2092
 msgid "Additive Stepping"
 msgstr "Adityvusis žingsniavimas"
 
-#: resources/xnec2c.glade:2111
+#: resources/xnec2c.glade:2109
 msgid "Multiplicative Stepping"
 msgstr "Multiplikatyvusis žingsniavimas"
 
-#: resources/xnec2c.glade:2134
+#: resources/xnec2c.glade:2132
 msgid "Frequency Stepping"
 msgstr "Dažnio žingsniavimas"
 
-#: resources/xnec2c.glade:2164
+#: resources/xnec2c.glade:2162
 msgid "No. Frequency Points"
 msgstr "Dažnio taškų sk."
 
-#: resources/xnec2c.glade:2195
+#: resources/xnec2c.glade:2193
 msgid "Start Frequency (MHz)"
 msgstr "Pradinis dažnis (MHz)"
 
-#: resources/xnec2c.glade:2227
+#: resources/xnec2c.glade:2225
 msgid "Frequency Step (MHz)"
 msgstr "Dažnio žingsnis (MHz)"
 
-#: resources/xnec2c.glade:2260
+#: resources/xnec2c.glade:2258
 msgid "End Frequency (MHz)"
 msgstr "Galutinis dažnis (MHz)"
 
-#: resources/xnec2c.glade:2296
+#: resources/xnec2c.glade:2294
 msgid "Frequency Stepping Parameters"
 msgstr "Dažnio žingsniavimo parametrai"
 
-#: resources/xnec2c.glade:2422
+#: resources/xnec2c.glade:2420
 msgid "Geometry End (GE Card)"
 msgstr "Geometrijos pabaiga (GE kortelė)"
 
-#: resources/xnec2c.glade:2447
+#: resources/xnec2c.glade:2445
 msgid "No Ground, Free Space condition"
 msgstr "Be įžeminimo, laisvos erdvės sąlygos"
 
-#: resources/xnec2c.glade:2464
+#: resources/xnec2c.glade:2462
 msgid "Ground present, Structure reflection"
 msgstr "Įžeminimas yra, struktūros atspindys"
 
-#: resources/xnec2c.glade:2481
+#: resources/xnec2c.glade:2479
 msgid "Ground present, no Structure reflection"
 msgstr "Įžeminimas yra, be struktūros atspindžio"
 
-#: resources/xnec2c.glade:2504
+#: resources/xnec2c.glade:2502
 msgid "Ground Plane type"
 msgstr "Įžeminimo plokštumos tipas"
 
-#: resources/xnec2c.glade:2638
+#: resources/xnec2c.glade:2636
 msgid "Ground Parameters (GD Card)"
 msgstr "Įžeminimo parametrai (GD kortelė)"
 
-#: resources/xnec2c.glade:2667 resources/xnec2c.glade:3136
-#: resources/xnec2c.glade:3222
+#: resources/xnec2c.glade:2665 resources/xnec2c.glade:3134
+#: resources/xnec2c.glade:3220
 msgid "Relative Dielectric Const."
 msgstr "Santykinė dielektrinė konst."
 
-#: resources/xnec2c.glade:2699 resources/xnec2c.glade:3255
+#: resources/xnec2c.glade:2697 resources/xnec2c.glade:3253
 msgid "Distance to 2nd Medium"
 msgstr "Atstumas iki 2-os terpės"
 
-#: resources/xnec2c.glade:2731 resources/xnec2c.glade:3168
-#: resources/xnec2c.glade:3287
+#: resources/xnec2c.glade:2729 resources/xnec2c.glade:3166
+#: resources/xnec2c.glade:3285
 msgid "Ground Conductivity S/m"
 msgstr "Įžeminimo laidumas S/m"
 
-#: resources/xnec2c.glade:2763 resources/xnec2c.glade:3319
+#: resources/xnec2c.glade:2761 resources/xnec2c.glade:3317
 msgid "Dist. below 1st Medium"
 msgstr "Atstumas žemiau 1-os terpės"
 
-#: resources/xnec2c.glade:2799 resources/xnec2c.glade:3355
+#: resources/xnec2c.glade:2797 resources/xnec2c.glade:3353
 msgid "2nd Medium Parameters"
 msgstr "2-os terpės parametrai"
 
-#: resources/xnec2c.glade:2980
+#: resources/xnec2c.glade:2978
 msgid "Ground Parameters (GN & GD Cards)"
 msgstr "Įžeminimo parametrai (GN ir GD kortelės)"
 
-#: resources/xnec2c.glade:3007
+#: resources/xnec2c.glade:3005
 msgid "Perfect Ground"
 msgstr "Idealus įžeminimas"
 
-#: resources/xnec2c.glade:3023
+#: resources/xnec2c.glade:3021
 msgid "Sommerfeld/Norton"
 msgstr "Sommerfeld/Norton"
 
-#: resources/xnec2c.glade:3039
+#: resources/xnec2c.glade:3037
 msgid "Radial Ground Screen"
 msgstr "Radialinis įžeminimo ekranas"
 
-#: resources/xnec2c.glade:3054
+#: resources/xnec2c.glade:3052
 msgid "Reflection Coeff. Approx"
 msgstr "Atspindžio koef. aproks."
 
-#: resources/xnec2c.glade:3070
+#: resources/xnec2c.glade:3068
 msgid "Nullify Previous Params"
 msgstr "Anuliuoti ankstesnius param."
 
-#: resources/xnec2c.glade:3086
+#: resources/xnec2c.glade:3084
 msgid "Second Medium (Cliff)"
 msgstr "Antroji terpė (skardis)"
 
-#: resources/xnec2c.glade:3107
+#: resources/xnec2c.glade:3105
 msgid "Ground Type"
 msgstr "Įžeminimo tipas"
 
-#: resources/xnec2c.glade:3235
+#: resources/xnec2c.glade:3233
 msgid "0.00000"
 msgstr "0.00000"
 
-#: resources/xnec2c.glade:3386
+#: resources/xnec2c.glade:3384
 msgid "Number of Radials"
 msgstr "Radialų skaičius"
 
-#: resources/xnec2c.glade:3399
+#: resources/xnec2c.glade:3397
 msgid "Radial Screen Radius"
 msgstr "Radialinio ekrano spindulys"
 
-#: resources/xnec2c.glade:3449
+#: resources/xnec2c.glade:3447
 msgid "Radial Wire Diameter"
 msgstr "Radialinio laido skersmuo"
 
-#: resources/xnec2c.glade:3485
+#: resources/xnec2c.glade:3483
 msgid "Radial Screen Parameters"
 msgstr "Radialinio ekrano parametrai"
 
-#: resources/xnec2c.glade:3685
+#: resources/xnec2c.glade:3683
 msgid "Helical Element (GA card)"
 msgstr "Spiralinis elementas (GA kortelė)"
 
-#: resources/xnec2c.glade:3710
+#: resources/xnec2c.glade:3708
 msgid "Right Hand Helix"
 msgstr "Dešininė spiralė"
 
-#: resources/xnec2c.glade:3726
+#: resources/xnec2c.glade:3724
 msgid "Left Hand Helix"
 msgstr "Kairinė spiralė"
 
-#: resources/xnec2c.glade:3742
+#: resources/xnec2c.glade:3740
 msgid "Right Hand Spiral"
 msgstr "Dešininė plokščioji spiralė"
 
-#: resources/xnec2c.glade:3758
+#: resources/xnec2c.glade:3756
 msgid "Left Hand Spiral"
 msgstr "Kairinė plokščioji spiralė"
 
-#: resources/xnec2c.glade:3789
+#: resources/xnec2c.glade:3787
 msgid "Segments/Turn"
 msgstr "Segmentai/vijoje"
 
-#: resources/xnec2c.glade:3828
+#: resources/xnec2c.glade:3826
 msgid "0.0100"
 msgstr "0.0100"
 
-#: resources/xnec2c.glade:3849
+#: resources/xnec2c.glade:3847
 msgid "5.00"
 msgstr "5.00"
 
-#: resources/xnec2c.glade:3870
+#: resources/xnec2c.glade:3868
 msgid "8"
 msgstr "8"
 
-#: resources/xnec2c.glade:3890 resources/xnec2c.glade:11611
-#: resources/xnec2c.glade:12849
+#: resources/xnec2c.glade:3888 resources/xnec2c.glade:11746
+#: resources/xnec2c.glade:13068
 msgid "1"
 msgstr "1"
 
-#: resources/xnec2c.glade:3910
+#: resources/xnec2c.glade:3908
 msgid "Number of Turns"
 msgstr "Vijų skaičius"
 
-#: resources/xnec2c.glade:3923
+#: resources/xnec2c.glade:3921
 msgid "8.0000"
 msgstr "8.0000"
 
-#: resources/xnec2c.glade:3944
+#: resources/xnec2c.glade:3942
 msgid "Helix Length (HL)"
 msgstr "Spiralės ilgis (HL)"
 
-#: resources/xnec2c.glade:3957
+#: resources/xnec2c.glade:3955
 msgid "5.0000"
 msgstr "5.0000"
 
-#: resources/xnec2c.glade:3978
+#: resources/xnec2c.glade:3976
 msgid "Turns Spacing"
 msgstr "Vijų tarpas"
 
-#: resources/xnec2c.glade:3991 resources/xnec2c.glade:4103
-#: resources/xnec2c.glade:4156 resources/xnec2c.glade:4209
-#: resources/xnec2c.glade:4257
+#: resources/xnec2c.glade:3989 resources/xnec2c.glade:4101
+#: resources/xnec2c.glade:4154 resources/xnec2c.glade:4207
+#: resources/xnec2c.glade:4255
 msgid "1.0000"
 msgstr "1.0000"
 
-#: resources/xnec2c.glade:4025
+#: resources/xnec2c.glade:4023
 msgid "0.0000"
 msgstr "0.0000"
 
-#: resources/xnec2c.glade:4045
+#: resources/xnec2c.glade:4043
 msgid "Radius in X (A1)"
 msgstr "Spindulys X kryptimi (A1)"
 
-#: resources/xnec2c.glade:4058
+#: resources/xnec2c.glade:4056
 msgid "Radius in Y (B1)"
 msgstr "Spindulys Y kryptimi (B1)"
 
-#: resources/xnec2c.glade:4071
+#: resources/xnec2c.glade:4069
 msgid "Radius in X (A2)"
 msgstr "Spindulys X kryptimi (A2)"
 
-#: resources/xnec2c.glade:4084
+#: resources/xnec2c.glade:4082
 msgid "Radius in Y (B2)"
 msgstr "Spindulys Y kryptimi (B2)"
 
-#: resources/xnec2c.glade:4282
+#: resources/xnec2c.glade:4280
 msgid "GH Card"
 msgstr "GH kortelė"
 
-#: resources/xnec2c.glade:4419 resources/xnec2c.glade:15333
+#: resources/xnec2c.glade:4417 resources/xnec2c.glade:15552
 msgid "Interaction Approx Range (KH Card)"
 msgstr "Sąveikos aproks. diapazonas (KH kortelė)"
 
-#: resources/xnec2c.glade:4446
+#: resources/xnec2c.glade:4444
 msgid "Approximation Range (W/lengths)"
 msgstr "Aproksimacijos diapazonas (bangos ilgiais)"
 
-#: resources/xnec2c.glade:4484
+#: resources/xnec2c.glade:4482
 msgid "Interaction Approximation Range"
 msgstr "Sąveikos aproksimacijos diapazonas"
 
-#: resources/xnec2c.glade:4610
+#: resources/xnec2c.glade:4608
 msgid "Thin Wire Kernel (EK Card)"
 msgstr "Plono laido branduolys (EK kortelė)"
 
-#: resources/xnec2c.glade:4628
+#: resources/xnec2c.glade:4626
 msgid "Extended Thin Wire Kernel"
 msgstr "Išplėstinis plono laido branduolys"
 
-#: resources/xnec2c.glade:4645
+#: resources/xnec2c.glade:4643
 msgid "Thin Wire Kernel"
 msgstr "Plono laido branduolys"
 
-#: resources/xnec2c.glade:4808
+#: resources/xnec2c.glade:4806
 msgid "Loading Command (LD Card)"
 msgstr "Apkrovos komanda (LD kortelė)"
 
-#: resources/xnec2c.glade:4834
+#: resources/xnec2c.glade:4832
 msgid "Short all Loads (Nulls previous Loading Cards)"
 msgstr "Trumpinti visas apkrovas (anuliuoja ankstesnes apkrovos korteles)"
 
-#: resources/xnec2c.glade:4851
+#: resources/xnec2c.glade:4849
 msgid "Series, Lumped"
 msgstr "Nuoseklioji, sutelktoji"
 
-#: resources/xnec2c.glade:4867
+#: resources/xnec2c.glade:4865
 msgid "Parallel, Distributed"
 msgstr "Lygiagrečioji, paskirstytoji"
 
-#: resources/xnec2c.glade:4883
+#: resources/xnec2c.glade:4881
 msgid "Parallel, Lumped"
 msgstr "Lygiagrečioji, sutelktoji"
 
-#: resources/xnec2c.glade:4899
+#: resources/xnec2c.glade:4897
 msgid "Resistance & Reactance"
 msgstr "Varža ir reaktansas"
 
-#: resources/xnec2c.glade:4915
+#: resources/xnec2c.glade:4913
 msgid "Series, Distributed"
 msgstr "Nuoseklioji, paskirstytoji"
 
-#: resources/xnec2c.glade:4931
+#: resources/xnec2c.glade:4929
 msgid "Wire Conductivity"
 msgstr "Laido laidumas"
 
-#: resources/xnec2c.glade:4953
+#: resources/xnec2c.glade:4951
 msgid "Loading Type"
 msgstr "Apkrovos tipas"
 
-#: resources/xnec2c.glade:4983
+#: resources/xnec2c.glade:4981
 msgid "Load Tag Number"
 msgstr "Apkrovos žymės numeris"
 
-#: resources/xnec2c.glade:5014
+#: resources/xnec2c.glade:5012
 msgid "Resistance"
 msgstr "Varža"
 
-#: resources/xnec2c.glade:5046
+#: resources/xnec2c.glade:5044
 msgid "From Segment #"
 msgstr "Nuo segmento Nr."
 
-#: resources/xnec2c.glade:5077
+#: resources/xnec2c.glade:5075
 msgid "Inductance"
 msgstr "Induktyvumas"
 
-#: resources/xnec2c.glade:5109
+#: resources/xnec2c.glade:5107
 msgid "To Segment #"
 msgstr "Iki segmento Nr."
 
-#: resources/xnec2c.glade:5140
+#: resources/xnec2c.glade:5138
 msgid "Capacitance"
 msgstr "Talpa"
 
-#: resources/xnec2c.glade:5176
+#: resources/xnec2c.glade:5174
 msgid "Loading Parameters"
 msgstr "Apkrovos parametrai"
 
-#: resources/xnec2c.glade:5391
+#: resources/xnec2c.glade:5389
 msgid "Near Fields Command (NE/NH Cards)"
 msgstr "Artimojo lauko komanda (NE/NH kortelės)"
 
-#: resources/xnec2c.glade:5418
+#: resources/xnec2c.glade:5416
 msgid "Near Electric Field"
 msgstr "Artimasis elektrinis laukas"
 
-#: resources/xnec2c.glade:5434
+#: resources/xnec2c.glade:5432
 msgid "Rectangular Co-ordinates"
 msgstr "Stačiakampės koordinatės"
 
-#: resources/xnec2c.glade:5450
+#: resources/xnec2c.glade:5448
 msgid "Near Magnetic Field"
 msgstr "Artimasis magnetinis laukas"
 
-#: resources/xnec2c.glade:5465
+#: resources/xnec2c.glade:5463
 msgid "Spherical Co-ordinates"
 msgstr "Sferinės koordinatės"
 
-#: resources/xnec2c.glade:5493
+#: resources/xnec2c.glade:5491
 msgid "Field Type & Co-ordinates"
 msgstr "Lauko tipas ir koordinatės"
 
-#: resources/xnec2c.glade:5523
+#: resources/xnec2c.glade:5521
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:5554 resources/xnec2c.glade:11183
-#: resources/xnec2c.glade:12406
+#: resources/xnec2c.glade:5552 resources/xnec2c.glade:11295
+#: resources/xnec2c.glade:12602
 msgid "X"
 msgstr "X"
 
-#: resources/xnec2c.glade:5586
+#: resources/xnec2c.glade:5584
 msgid "DX"
 msgstr "DX"
 
-#: resources/xnec2c.glade:5618
+#: resources/xnec2c.glade:5616
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:5649 resources/xnec2c.glade:11198
-#: resources/xnec2c.glade:12421
+#: resources/xnec2c.glade:5647 resources/xnec2c.glade:11310
+#: resources/xnec2c.glade:12617
 msgid "Y"
 msgstr "Y"
 
-#: resources/xnec2c.glade:5681
+#: resources/xnec2c.glade:5679
 msgid "DY"
 msgstr "DY"
 
-#: resources/xnec2c.glade:5713
+#: resources/xnec2c.glade:5711
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:5744 resources/xnec2c.glade:11213
-#: resources/xnec2c.glade:12436
+#: resources/xnec2c.glade:5742 resources/xnec2c.glade:11325
+#: resources/xnec2c.glade:12632
 msgid "Z"
 msgstr "Z"
 
-#: resources/xnec2c.glade:5776
+#: resources/xnec2c.glade:5774
 msgid "DZ"
 msgstr "DZ"
 
-#: resources/xnec2c.glade:5812
+#: resources/xnec2c.glade:5810
 msgid "Field Pattern Parameters"
 msgstr "Lauko diagramos parametrai"
 
-#: resources/xnec2c.glade:5939
+#: resources/xnec2c.glade:5937
 msgid "Xnec2c: NEC2 Input File Editor"
 msgstr "Xnec2c: NEC2 įvesties failų redaktorius"
 
-#: resources/xnec2c.glade:6026
+#: resources/xnec2c.glade:6024
 msgid "Manage Cards"
 msgstr "Tvarkyti korteles"
 
-#: resources/xnec2c.glade:6123
+#: resources/xnec2c.glade:6121
 msgid "File Save"
 msgstr "Išsaugoti failą"
 
-#: resources/xnec2c.glade:6210
+#: resources/xnec2c.glade:6208
 msgid "Wire"
 msgstr "Viela"
 
-#: resources/xnec2c.glade:6224
+#: resources/xnec2c.glade:6222
 msgid "Arc"
 msgstr "Lankas"
 
-#: resources/xnec2c.glade:6238
+#: resources/xnec2c.glade:6236
 msgid "Helix"
 msgstr "Spiralė"
 
-#: resources/xnec2c.glade:6252
+#: resources/xnec2c.glade:6250
 msgid "Patch"
 msgstr "Lopinėlis"
 
-#: resources/xnec2c.glade:6266
+#: resources/xnec2c.glade:6264
 msgid "Cylinder"
 msgstr "Cilindras"
 
-#: resources/xnec2c.glade:6280
+#: resources/xnec2c.glade:6278
 msgid "Move"
 msgstr "Perkelti"
 
-#: resources/xnec2c.glade:6294
+#: resources/xnec2c.glade:6292
 msgid "Reflect"
 msgstr "Atspindėti"
 
-#: resources/xnec2c.glade:6308
+#: resources/xnec2c.glade:6306
 msgid "Scale"
 msgstr "Mastelis"
 
-#: resources/xnec2c.glade:6322 resources/xnec2c.glade:6606
+#: resources/xnec2c.glade:6320 resources/xnec2c.glade:6604
 msgid "Add Var (SY)"
 msgstr "Pridėti kint. (SY)"
 
-#: resources/xnec2c.glade:6342
+#: resources/xnec2c.glade:6340
 msgid "Edit Geometry Data"
 msgstr "Redaguoti geometrijos duomenis"
 
-#: resources/xnec2c.glade:6396
+#: resources/xnec2c.glade:6394
 msgid "Geometry"
 msgstr "Geometrija"
 
-#: resources/xnec2c.glade:6423
+#: resources/xnec2c.glade:6421
 msgid "Excitation"
 msgstr "Sužadinimas"
 
-#: resources/xnec2c.glade:6437
+#: resources/xnec2c.glade:6435
 msgid "Radiation"
 msgstr "Spinduliuotė"
 
-#: resources/xnec2c.glade:6451
+#: resources/xnec2c.glade:6449
 msgid "Frequency"
 msgstr "Dažnis"
 
-#: resources/xnec2c.glade:6465
+#: resources/xnec2c.glade:6463
 msgid "Near Fields"
 msgstr "Artimieji laukai"
 
-#: resources/xnec2c.glade:6479
+#: resources/xnec2c.glade:6477
 msgid "Ground (GN)"
 msgstr "Žemė (GN)"
 
-#: resources/xnec2c.glade:6493
+#: resources/xnec2c.glade:6491
 msgid "Ground (GD)"
 msgstr "Žemė (GD)"
 
-#: resources/xnec2c.glade:6507
+#: resources/xnec2c.glade:6505
 msgid "Loading"
 msgstr "Apkrova"
 
-#: resources/xnec2c.glade:6521
+#: resources/xnec2c.glade:6519
 msgid "Kernel"
 msgstr "Branduolys"
 
-#: resources/xnec2c.glade:6535
+#: resources/xnec2c.glade:6533
 msgid "Network"
 msgstr "Tinklas"
 
-#: resources/xnec2c.glade:6549
+#: resources/xnec2c.glade:6547
 msgid "Interaction"
 msgstr "Sąveika"
 
-#: resources/xnec2c.glade:6563
+#: resources/xnec2c.glade:6561
 msgid "Transm. Line"
 msgstr "Perdav. linija"
 
-#: resources/xnec2c.glade:6578
+#: resources/xnec2c.glade:6576
 msgid "Execute"
 msgstr "Vykdyti"
 
-#: resources/xnec2c.glade:6592
+#: resources/xnec2c.glade:6590
 msgid "Zo"
 msgstr "Zo"
 
-#: resources/xnec2c.glade:6626
+#: resources/xnec2c.glade:6624
 msgid "Edit Control Commands"
 msgstr "Redaguoti valdymo komandas"
 
-#: resources/xnec2c.glade:6680
+#: resources/xnec2c.glade:6678
 msgid "Commands"
 msgstr "Komandos"
 
-#: resources/xnec2c.glade:6699
+#: resources/xnec2c.glade:6697
 msgid "Unsaved Data"
 msgstr "Neišsaugoti duomenys"
 
-#: resources/xnec2c.glade:6775
+#: resources/xnec2c.glade:6773
 msgid ""
 "Unsaved data in NEC2 Editor.\n"
 "Save NEC2 Editor data first?\n"
@@ -2950,924 +3979,980 @@ msgstr ""
 "Neišsaugoti duomenys NEC2 redaktoriuje.\n"
 "Pirmiausia išsaugoti NEC2 redaktoriaus duomenis?\n"
 
-#: resources/xnec2c.glade:6874
+#: resources/xnec2c.glade:6872
 msgid "Network Command (NT Card)"
 msgstr "Tinklo komanda (NT kortelė)"
 
-#: resources/xnec2c.glade:6903
+#: resources/xnec2c.glade:6901
 msgid "Tag Number, Port 1  "
 msgstr "Žymos numeris, 1 prievadas  "
 
-#: resources/xnec2c.glade:6934
+#: resources/xnec2c.glade:6932
 msgid "Tag Number, Port 2  "
 msgstr "Žymos numeris, 2 prievadas  "
 
-#: resources/xnec2c.glade:6965
+#: resources/xnec2c.glade:6963
 msgid "Segment Num, Port 1"
 msgstr "Segmento Nr., 1 prievadas"
 
-#: resources/xnec2c.glade:6996
+#: resources/xnec2c.glade:6994
 msgid "Segment Num, Port 2"
 msgstr "Segmento Nr., 2 prievadas"
 
-#: resources/xnec2c.glade:7031 resources/xnec2c.glade:14119
+#: resources/xnec2c.glade:7029 resources/xnec2c.glade:14338
 msgid "Segment Identity"
 msgstr "Segmento tapatybė"
 
-#: resources/xnec2c.glade:7061
+#: resources/xnec2c.glade:7059
 msgid "Element 1,1 Real Part"
 msgstr "Elemento 1,1 realioji dalis"
 
-#: resources/xnec2c.glade:7093
+#: resources/xnec2c.glade:7091
 msgid "Element 1,2 Real Part"
 msgstr "Elemento 1,2 realioji dalis"
 
-#: resources/xnec2c.glade:7125
+#: resources/xnec2c.glade:7123
 msgid "Element 2,2 Real Part"
 msgstr "Elemento 2,2 realioji dalis"
 
-#: resources/xnec2c.glade:7157
+#: resources/xnec2c.glade:7155
 msgid "Element 1,1 Imag Part"
 msgstr "Elemento 1,1 menamoji dalis"
 
-#: resources/xnec2c.glade:7189
+#: resources/xnec2c.glade:7187
 msgid "Element 1,2 Imag Part"
 msgstr "Elemento 1,2 menamoji dalis"
 
-#: resources/xnec2c.glade:7221
+#: resources/xnec2c.glade:7219
 msgid "Element 2,2 Imag Part"
 msgstr "Elemento 2,2 menamoji dalis"
 
-#: resources/xnec2c.glade:7257
+#: resources/xnec2c.glade:7255
 msgid "Admittance Matrix Elements"
 msgstr "Laidumo matricos elementai"
 
-#: resources/xnec2c.glade:7472
+#: resources/xnec2c.glade:7470
 msgid "Patch Element (SP & SC Cards)"
 msgstr "Lopinėlio elementas (SP ir SC kortelės)"
 
-#: resources/xnec2c.glade:7496
+#: resources/xnec2c.glade:7494
 msgid "Arbitrary"
 msgstr "Laisvos formos"
 
-#: resources/xnec2c.glade:7513
+#: resources/xnec2c.glade:7511
 msgid "Rectangle"
 msgstr "Stačiakampis"
 
-#: resources/xnec2c.glade:7530
+#: resources/xnec2c.glade:7528
 msgid "Triangle"
 msgstr "Trikampis"
 
-#: resources/xnec2c.glade:7547
+#: resources/xnec2c.glade:7545
 msgid "Quadrilateral"
 msgstr "Keturkampis"
 
-#: resources/xnec2c.glade:7564
+#: resources/xnec2c.glade:7562
 msgid "Surface"
 msgstr "Paviršius"
 
-#: resources/xnec2c.glade:7587
+#: resources/xnec2c.glade:7585
 msgid "Patch Type"
 msgstr "Lopinėlio tipas"
 
-#: resources/xnec2c.glade:7617
+#: resources/xnec2c.glade:7615
 msgid "Corners 1-2 sub-division (NX)"
 msgstr "1-2 kampų padalijimas (NX)"
 
-#: resources/xnec2c.glade:7648
+#: resources/xnec2c.glade:7646
 msgid "Corners 2-3 sub-division (NY)"
 msgstr "2-3 kampų padalijimas (NY)"
 
-#: resources/xnec2c.glade:7683
+#: resources/xnec2c.glade:7681
 msgid "Surface Sub-division"
 msgstr "Paviršiaus padalijimas"
 
-#: resources/xnec2c.glade:7909
+#: resources/xnec2c.glade:7907
 msgid "SP/SM Cards"
 msgstr "SP/SM kortelės"
 
-#: resources/xnec2c.glade:7945
+#: resources/xnec2c.glade:7943
 msgid "Corner 3 - X"
 msgstr "3 kampas - X"
 
-#: resources/xnec2c.glade:7977
+#: resources/xnec2c.glade:7975
 msgid "Corner 3 - Y"
 msgstr "3 kampas - Y"
 
-#: resources/xnec2c.glade:8009
+#: resources/xnec2c.glade:8007
 msgid "Corner 3 - Z"
 msgstr "3 kampas - Z"
 
-#: resources/xnec2c.glade:8057
+#: resources/xnec2c.glade:8055
 msgid "Corner 4 - X"
 msgstr "4 kampas - X"
 
-#: resources/xnec2c.glade:8089
+#: resources/xnec2c.glade:8087
 msgid "Corner 4 - Y"
 msgstr "4 kampas - Y"
 
-#: resources/xnec2c.glade:8121
+#: resources/xnec2c.glade:8119
 msgid "Corner 4 - Z"
 msgstr "4 kampas - Z"
 
-#: resources/xnec2c.glade:8164
+#: resources/xnec2c.glade:8162
 msgid "SC Card"
 msgstr "SC kortelė"
 
-#: resources/xnec2c.glade:8380
+#: resources/xnec2c.glade:8378
 msgid "Quit xnec2c?"
 msgstr "Išeiti iš xnec2c?"
 
-#: resources/xnec2c.glade:8459
+#: resources/xnec2c.glade:8457
 msgid "Radiation Pattern (RP Card)"
 msgstr "Spinduliuotės diagrama (RP kortelė)"
 
-#: resources/xnec2c.glade:8486
+#: resources/xnec2c.glade:8484
 msgid "Normal (Space) Wave"
 msgstr "Įprastinė (erdvinė) banga"
 
-#: resources/xnec2c.glade:8502
+#: resources/xnec2c.glade:8500
 msgid "Space + Ground Wave"
 msgstr "Erdvinė + žemės banga"
 
-#: resources/xnec2c.glade:8518
+#: resources/xnec2c.glade:8516
 msgid "Linear Cliff"
 msgstr "Tiesinis skardis"
 
-#: resources/xnec2c.glade:8534
+#: resources/xnec2c.glade:8532
 msgid "Radial wire screen"
 msgstr "Radialinių vielų ekranas"
 
-#: resources/xnec2c.glade:8550
+#: resources/xnec2c.glade:8548
 msgid "Circular Cliff + Radials"
 msgstr "Žiedinis skardis + radialai"
 
-#: resources/xnec2c.glade:8566
+#: resources/xnec2c.glade:8564
 msgid "Circular Cliff"
 msgstr "Žiedinis skardis"
 
-#: resources/xnec2c.glade:8582
+#: resources/xnec2c.glade:8580
 msgid "Linear Cliff + Radials"
 msgstr "Tiesinis skardis + radialai"
 
-#: resources/xnec2c.glade:8600
+#: resources/xnec2c.glade:8598
 msgid "<b>See GN/GD Card Documentation</b>"
 msgstr "<b>Žr. GN/GD kortelių dokumentaciją</b>"
 
-#: resources/xnec2c.glade:8618
+#: resources/xnec2c.glade:8616
 msgid "Wave Type and Ground (I1)"
 msgstr "Bangos tipas ir žemė (I1)"
 
-#: resources/xnec2c.glade:8646
+#: resources/xnec2c.glade:8644
 msgid "Major & Minor Axis & Total Gain"
 msgstr "Pagrindinė ir šalutinė ašis ir bendras stiprinimas"
 
-#: resources/xnec2c.glade:8662
+#: resources/xnec2c.glade:8660
 msgid "Vertical, Horizontal & Total Gain"
 msgstr "Vertikalus, horizontalus ir bendras stiprinimas"
 
-#: resources/xnec2c.glade:8678
+#: resources/xnec2c.glade:8676
 msgid "Major Axis Gain Normalized"
 msgstr "Pagrindinės ašies stiprinimas normalizuotas"
 
-#: resources/xnec2c.glade:8694
+#: resources/xnec2c.glade:8692
 msgid "Vertical Axis Gain Normalized"
 msgstr "Vertikalios ašies stiprinimas normalizuotas"
 
-#: resources/xnec2c.glade:8710
+#: resources/xnec2c.glade:8708
 msgid "Total Gain Normalized"
 msgstr "Bendras stiprinimas normalizuotas"
 
-#: resources/xnec2c.glade:8726
+#: resources/xnec2c.glade:8724
 msgid "Print/Normalize Directive Gain"
 msgstr "Spausdinti/normalizuoti kryptinį stiprinimą"
 
-#: resources/xnec2c.glade:8742
+#: resources/xnec2c.glade:8740
 msgid "No Normalized Gain"
 msgstr "Nenormalizuotas stiprinimas"
 
-#: resources/xnec2c.glade:8758
+#: resources/xnec2c.glade:8756
 msgid "Minor Axis Gain Normalized"
 msgstr "Normalizuotas mažosios ašies stiprinimas"
 
-#: resources/xnec2c.glade:8774
+#: resources/xnec2c.glade:8772
 msgid "Horizontal Axis Gain Normalized"
 msgstr "Normalizuotas horizontaliosios ašies stiprinimas"
 
-#: resources/xnec2c.glade:8790
+#: resources/xnec2c.glade:8788
 msgid "Print/Normalize Power Gain"
 msgstr "Spausdinti/normalizuoti galios stiprinimą"
 
-#: resources/xnec2c.glade:8806
+#: resources/xnec2c.glade:8804
 msgid "No Gain Averaging"
 msgstr "Be stiprinimo vidurkio"
 
-#: resources/xnec2c.glade:8822
+#: resources/xnec2c.glade:8820
 msgid "Points in Average Not Printed"
 msgstr "Vidurkio taškai nespausdinami"
 
-#: resources/xnec2c.glade:8838
+#: resources/xnec2c.glade:8836
 msgid "Average Gain Computed"
 msgstr "Vidutinis stiprinimas apskaičiuotas"
 
-#: resources/xnec2c.glade:8856
+#: resources/xnec2c.glade:8854
 msgid "<b>See RP Card Documentation</b>"
 msgstr "<b>Žr. RP kortelės dokumentaciją</b>"
 
-#: resources/xnec2c.glade:8874
+#: resources/xnec2c.glade:8872
 msgid "Data Output Control (XNDA)"
 msgstr "Duomenų išvesties valdymas (XNDA)"
 
-#: resources/xnec2c.glade:8904
+#: resources/xnec2c.glade:8902
 msgid "Points in Theta"
 msgstr "Taškų skaičius Theta"
 
-#: resources/xnec2c.glade:9013
+#: resources/xnec2c.glade:9011
 msgid "Initial Phi (deg)"
 msgstr "Pradinis Phi (laipsniai)"
 
-#: resources/xnec2c.glade:9095
+#: resources/xnec2c.glade:9093
 msgid "Field Point Distance"
 msgstr "Lauko taško atstumas"
 
-#: resources/xnec2c.glade:9127
+#: resources/xnec2c.glade:9125
 msgid "Gain Normalization"
 msgstr "Stiprinimo normalizavimas"
 
-#: resources/xnec2c.glade:9169
+#: resources/xnec2c.glade:9167
 msgid "Radiation Pattern Parameters"
 msgstr "Spinduliuotės diagramos parametrai"
 
-#: resources/xnec2c.glade:9336
+#: resources/xnec2c.glade:9334
 msgid "Reflect Structure (GX card)"
 msgstr "Atspindėti struktūrą (GX kortelė)"
 
-#: resources/xnec2c.glade:9364
+#: resources/xnec2c.glade:9362
 msgid "Reflect in YZ plane"
 msgstr "Atspindėti YZ plokštumoje"
 
-#: resources/xnec2c.glade:9379
+#: resources/xnec2c.glade:9377
 msgid "Reflect in XY plane"
 msgstr "Atspindėti XY plokštumoje"
 
-#: resources/xnec2c.glade:9394
+#: resources/xnec2c.glade:9392
 msgid "Reflect in XZ plane"
 msgstr "Atspindėti XZ plokštumoje"
 
-#: resources/xnec2c.glade:9450
+#: resources/xnec2c.glade:9448
 msgid "Reflect Options"
 msgstr "Atspindėjimo parinktys"
 
-#: resources/xnec2c.glade:9581
+#: resources/xnec2c.glade:9579
 msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: dažnio duomenų grafikai"
 
-#: resources/xnec2c.glade:9606 resources/xnec2c.glade:10546
-#: resources/xnec2c.glade:11857
+#: resources/xnec2c.glade:9604 resources/xnec2c.glade:10544
+#: resources/xnec2c.glade:11999
 msgid "_File"
 msgstr "_Failas"
 
-#: resources/xnec2c.glade:9668 resources/xnec2c.glade:10608
-#: resources/xnec2c.glade:11919
+#: resources/xnec2c.glade:9666 resources/xnec2c.glade:10606
+#: resources/xnec2c.glade:12061
 msgid "Save as _gnuplot"
 msgstr "Išsaugoti kaip _gnuplot"
 
-#: resources/xnec2c.glade:9679 resources/xnec2c.glade:11929
+#: resources/xnec2c.glade:9677 resources/xnec2c.glade:12071
 msgid "Save as _CSV"
 msgstr "Išsaugoti kaip _CSV"
 
-#: resources/xnec2c.glade:9691
+#: resources/xnec2c.glade:9689
 msgid "Save as _Touchstone (.SnP)"
 msgstr "Išsaugoti kaip _Touchstone (.SnP)"
 
-#: resources/xnec2c.glade:9698
+#: resources/xnec2c.glade:9696
 msgid "Save as S_1P: Reflection Only"
 msgstr "Išsaugoti kaip S_1P: tik atspindys"
 
-#: resources/xnec2c.glade:9708
+#: resources/xnec2c.glade:9706
 msgid "Save as S2P: _Max Gain (S21)"
 msgstr "Išsaugoti kaip S2P: _maks. stiprinimas (S21)"
 
-#: resources/xnec2c.glade:9718
+#: resources/xnec2c.glade:9716
 msgid "Save as S2P: _Viewer Gain (S21)"
 msgstr "Išsaugoti kaip S2P: _peržiūros stiprinimas (S21)"
 
-#: resources/xnec2c.glade:9755 resources/xnec2c.glade:10974
-#: resources/xnec2c.glade:11963
+#: resources/xnec2c.glade:9753 resources/xnec2c.glade:10972
+#: resources/xnec2c.glade:12105
 msgid "_View"
 msgstr "_Rodymas"
 
-#: resources/xnec2c.glade:9764 resources/xnec2c.glade:11004
-#: resources/xnec2c.glade:11973
+#: resources/xnec2c.glade:9762 resources/xnec2c.glade:11002
+#: resources/xnec2c.glade:12115
 msgid "_Polarization"
 msgstr "_Poliarizacija"
 
-#: resources/xnec2c.glade:9780 resources/xnec2c.glade:11020
-#: resources/xnec2c.glade:11989
+#: resources/xnec2c.glade:9778 resources/xnec2c.glade:11018
+#: resources/xnec2c.glade:12131
 msgid "_Total"
 msgstr "_Bendra"
 
-#: resources/xnec2c.glade:9791 resources/xnec2c.glade:11031
-#: resources/xnec2c.glade:12000
+#: resources/xnec2c.glade:9789 resources/xnec2c.glade:11029
+#: resources/xnec2c.glade:12142
 msgid "_Horizontal"
 msgstr "_Horizontali"
 
-#: resources/xnec2c.glade:9802 resources/xnec2c.glade:11042
-#: resources/xnec2c.glade:12011
+#: resources/xnec2c.glade:9800 resources/xnec2c.glade:11040
+#: resources/xnec2c.glade:12153
 msgid "_Vertical"
 msgstr "_Vertikali"
 
-#: resources/xnec2c.glade:9813 resources/xnec2c.glade:11053
-#: resources/xnec2c.glade:12022
+#: resources/xnec2c.glade:9811 resources/xnec2c.glade:11051
+#: resources/xnec2c.glade:12164
 msgid "_Right Hand"
 msgstr "_Dešinė ranka"
 
-#: resources/xnec2c.glade:9824 resources/xnec2c.glade:11064
-#: resources/xnec2c.glade:12033
+#: resources/xnec2c.glade:9822 resources/xnec2c.glade:11062
+#: resources/xnec2c.glade:12175
 msgid "_Left Hand"
 msgstr "_Kairė ranka"
 
-#: resources/xnec2c.glade:9839
+#: resources/xnec2c.glade:9837
 msgid "_Net Gain"
 msgstr "_Grynasis stiprinimas"
 
-#: resources/xnec2c.glade:9848
+#: resources/xnec2c.glade:9846
 msgid "Show _Min/Max Values"
 msgstr "Rodyti _min./maks. reikšmes"
 
-#: resources/xnec2c.glade:9857
+#: resources/xnec2c.glade:9855
 msgid "Show _S11 (dB) Values"
 msgstr "Rodyti _S11 (dB) reikšmes"
 
-#: resources/xnec2c.glade:9866
+#: resources/xnec2c.glade:9864
 msgid "Clamp _VSWR Graph to 10"
 msgstr "Apriboti _VSWR grafiką iki 10"
 
-#: resources/xnec2c.glade:9875
+#: resources/xnec2c.glade:9873
 msgid "Show T_ant instead of T_total"
 msgstr "Rodyti T_ant vietoj T_total"
 
-#: resources/xnec2c.glade:9884
+#: resources/xnec2c.glade:9882
 msgid "Round _X Axis Frequency Values"
 msgstr "Apvalinti _X ašies dažnio reikšmes"
 
-#: resources/xnec2c.glade:9908 resources/xnec2c.glade:10072
+#: resources/xnec2c.glade:9906 resources/xnec2c.glade:10070
 msgid "Max Gain"
 msgstr "Maks. stiprinimas"
 
-#: resources/xnec2c.glade:9923
+#: resources/xnec2c.glade:9921
 msgid "Direction"
 msgstr "Kryptis"
 
-#: resources/xnec2c.glade:9938
+#: resources/xnec2c.glade:9936
 msgid "Viewer"
 msgstr "Peržiūra"
 
-#: resources/xnec2c.glade:9968
+#: resources/xnec2c.glade:9966
 msgid "Zr/Zi"
 msgstr "Zr/Zi"
 
-#: resources/xnec2c.glade:9983
+#: resources/xnec2c.glade:9981
 msgid "Zm/Zph"
 msgstr "Zm/Zph"
 
-#: resources/xnec2c.glade:9998
+#: resources/xnec2c.glade:9996
 msgid "Smith"
 msgstr "Smith"
 
-#: resources/xnec2c.glade:10013 resources/xnec2c.glade:10395
+#: resources/xnec2c.glade:10011 resources/xnec2c.glade:10393
 msgid "T_ant"
 msgstr "T_ant"
 
-#: resources/xnec2c.glade:10056 resources/xnec2c.glade:10091
-#: resources/xnec2c.glade:10126 resources/xnec2c.glade:10161
-#: resources/xnec2c.glade:10379 resources/xnec2c.glade:10413
-#: resources/xnec2c.glade:10447 resources/xnec2c.glade:13036
+#: resources/xnec2c.glade:10054 resources/xnec2c.glade:10089
+#: resources/xnec2c.glade:10124 resources/xnec2c.glade:10159
+#: resources/xnec2c.glade:10377 resources/xnec2c.glade:10411
+#: resources/xnec2c.glade:10445 resources/xnec2c.glade:13255
 msgid " - - -"
 msgstr " - - -"
 
-#: resources/xnec2c.glade:10197
+#: resources/xnec2c.glade:10195
 msgid " - - - - "
 msgstr " - - - - "
 
-#: resources/xnec2c.glade:10213
+#: resources/xnec2c.glade:10211
 msgid "Freq MHz"
 msgstr "Dažnis MHz"
 
-#: resources/xnec2c.glade:10252
+#: resources/xnec2c.glade:10250
 msgid "Tx Line Zo"
 msgstr "Perd. linijos Zo"
 
-#: resources/xnec2c.glade:10266 resources/xnec2c.glade:11626
-#: resources/xnec2c.glade:12880
+#: resources/xnec2c.glade:10264 resources/xnec2c.glade:11761
+#: resources/xnec2c.glade:13099
 msgid "Freq Loop"
 msgstr "Dažnio ciklas"
 
-#: resources/xnec2c.glade:10361 resources/xnec2c.glade:12985
+#: resources/xnec2c.glade:10359 resources/xnec2c.glade:13204
 msgid "T_total"
 msgstr "T_total"
 
-#: resources/xnec2c.glade:10429
+#: resources/xnec2c.glade:10427
 msgid "G/T_ant"
 msgstr "G/T_ant"
 
-#: resources/xnec2c.glade:10502
+#: resources/xnec2c.glade:10500
 msgid "Frequency Data Plots"
 msgstr "Dažnio duomenų grafikai"
 
-#: resources/xnec2c.glade:10619
+#: resources/xnec2c.glade:10617
 msgid "Save _Currents/Charges as CSV"
 msgstr "Išsaugoti _sroves/krūvius kaip CSV"
 
-#: resources/xnec2c.glade:10638
+#: resources/xnec2c.glade:10636
 msgid "Optimization Settings"
 msgstr "Optimizavimo nustatymai"
 
-#: resources/xnec2c.glade:10653
+#: resources/xnec2c.glade:10651
 msgid "Reload and write data on .NEC file changes"
 msgstr "Perkrauti ir įrašyti duomenis pasikeitus .NEC failui"
 
-#: resources/xnec2c.glade:10660
+#: resources/xnec2c.glade:10658
 msgid "_Write files selected below, now."
 msgstr "Į_rašyti žemiau pasirinktus failus dabar."
 
-#: resources/xnec2c.glade:10675
+#: resources/xnec2c.glade:10673
 msgid "After calculation, write <file>.csv"
 msgstr "Po skaičiavimo įrašyti <file>.csv"
 
-#: resources/xnec2c.glade:10684
+#: resources/xnec2c.glade:10682
 msgid "After calculation, write <file>.s_1p"
 msgstr "Po skaičiavimo įrašyti <file>.s_1p"
 
-#: resources/xnec2c.glade:10693
+#: resources/xnec2c.glade:10691
 msgid "After calculation, write <file>-_maxgain.s2p"
 msgstr "Po skaičiavimo įrašyti <file>-_maxgain.s2p"
 
-#: resources/xnec2c.glade:10702
+#: resources/xnec2c.glade:10700
 msgid "After calculation, write <file>-_viewergain.s2p"
 msgstr "Po skaičiavimo įrašyti <file>-_viewergain.s2p"
 
-#: resources/xnec2c.glade:10711
+#: resources/xnec2c.glade:10709
 msgid "After calculation, write <file>-_radpattern.csv"
 msgstr "Po skaičiavimo įrašyti <file>-_radpattern.csv"
 
-#: resources/xnec2c.glade:10720
+#: resources/xnec2c.glade:10718
 msgid "After calculation, write <file>-_currents.csv"
 msgstr "Po skaičiavimo įrašyti <file>-_currents.csv"
 
-#: resources/xnec2c.glade:10729
+#: resources/xnec2c.glade:10727
 msgid "After calculation, write <file>-_structure.gplot"
 msgstr "Po skaičiavimo įrašyti <file>-_structure.gplot"
 
-#: resources/xnec2c.glade:10738
+#: resources/xnec2c.glade:10736
 msgid "After calculation, write <file>-_patch-currents.csv"
 msgstr "Po skaičiavimo įrašyti <file>-_patch-currents.csv"
 
-#: resources/xnec2c.glade:10753
+#: resources/xnec2c.glade:10751
 msgid "_Math Libraries"
 msgstr "_Matematikos bibliotekos"
 
-#: resources/xnec2c.glade:10762
+#: resources/xnec2c.glade:10760
 msgid "_Interactive"
 msgstr "_Interaktyvus"
 
-#: resources/xnec2c.glade:10782
+#: resources/xnec2c.glade:10780
 msgid "_Batch"
 msgstr "_Paketinis"
 
-#: resources/xnec2c.glade:10808
+#: resources/xnec2c.glade:10806
 msgid "Mathlib _Help"
 msgstr "Mathlib _pagalba"
 
-#: resources/xnec2c.glade:10821
+#: resources/xnec2c.glade:10819
 msgid "Mathlib _Benchmarks"
 msgstr "Mathlib _testai"
 
-#: resources/xnec2c.glade:10832
+#: resources/xnec2c.glade:10830
 msgid "_Selected Mathlibs"
 msgstr "_Pasirinktos Mathlibs"
 
-#: resources/xnec2c.glade:10846
+#: resources/xnec2c.glade:10844
 msgid "Select All/None"
 msgstr "Pasirinkti visus/nė vieno"
 
-#: resources/xnec2c.glade:10871
+#: resources/xnec2c.glade:10869
 msgid "_Parallel (-j N):\t\tO(N/J)"
 msgstr "_Lygiagretus (-j N):\t\tO(N/J)"
 
-#: resources/xnec2c.glade:10880
+#: resources/xnec2c.glade:10878
 msgid "_Single Job (-j 1):\tO(N)"
 msgstr "_Viena užduotis (-j 1):\tO(N)"
 
-#: resources/xnec2c.glade:10889
+#: resources/xnec2c.glade:10887
 msgid "_Iterate -j N/=2:\tO(N*log2(J))"
 msgstr "_Iteruoti -j N/=2:\tO(N*log2(J))"
 
-#: resources/xnec2c.glade:10898
+#: resources/xnec2c.glade:10896
 msgid "_Iterate -j N-=1:\tO(N*J)"
 msgstr "_Iteruoti -j N-=1:\tO(N*J)"
 
-#: resources/xnec2c.glade:10913
+#: resources/xnec2c.glade:10911
 msgid "Benchmark _Help"
 msgstr "Testų _pagalba"
 
-#: resources/xnec2c.glade:10932
+#: resources/xnec2c.glade:10930
 msgid "Begin Frequency Loop at Startup"
 msgstr "Pradėti dažnio ciklą paleidžiant"
 
-#: resources/xnec2c.glade:10943
+#: resources/xnec2c.glade:10941
 msgid "Confirm Quit"
 msgstr "Patvirtinti išėjimą"
 
-#: resources/xnec2c.glade:10984
+#: resources/xnec2c.glade:10982
 msgid "_Radiation Pattern"
 msgstr "_Spinduliuotės diagrama"
 
-#: resources/xnec2c.glade:10994
+#: resources/xnec2c.glade:10992
 msgid "_Frequency Plots"
 msgstr "_Dažnio grafikai"
 
-#: resources/xnec2c.glade:11079 resources/xnec2c.glade:12332
+#: resources/xnec2c.glade:11077
+msgid "Current _Visualization"
+msgstr "Srovės _vizualizacija"
+
+#: resources/xnec2c.glade:11093
+msgid "Animated"
+msgstr "Animuota"
+
+#: resources/xnec2c.glade:11100
+msgid "_Reference Phase"
+msgstr "_Atskaitos fazė"
+
+#: resources/xnec2c.glade:11111
+msgid "_LIC Texture"
+msgstr "_LIC tekstūra"
+
+#: resources/xnec2c.glade:11122 resources/xnec2c.glade:12410
+msgid "_Wireframe"
+msgstr "Vielinis _karkasas"
+
+#: resources/xnec2c.glade:11140
+msgid "Static"
+msgstr "Statinis"
+
+#: resources/xnec2c.glade:11147
+msgid "Polarization _Axis"
+msgstr "_Poliarizacijos ašis"
+
+#: resources/xnec2c.glade:11158
+msgid "Peak _Magnitude"
+msgstr "Didžiausia _reikšmė"
+
+#: resources/xnec2c.glade:11173
+msgid "A_nimate"
+msgstr "A_nimuoti"
+
+#: resources/xnec2c.glade:11182 resources/xnec2c.glade:12527
 msgid "Common _Projection"
 msgstr "Bendra _projekcija"
 
-#: resources/xnec2c.glade:11089 resources/xnec2c.glade:12342
+#: resources/xnec2c.glade:11192 resources/xnec2c.glade:12537
 msgid "Common _Frequency"
 msgstr "Bendras _dažnis"
 
-#: resources/xnec2c.glade:11105
+#: resources/xnec2c.glade:11208
 msgid "_Symbol Overrides"
 msgstr "_Simbolių pakeitimai"
 
-#: resources/xnec2c.glade:11117
+#: resources/xnec2c.glade:11218
+msgid "OpenGL _Settings..."
+msgstr "OpenGL _nustatymai..."
+
+#: resources/xnec2c.glade:11229
 msgid "_Help"
 msgstr "_Pagalba"
 
-#: resources/xnec2c.glade:11126
+#: resources/xnec2c.glade:11238
 msgid "_About"
 msgstr "_Apie"
 
-#: resources/xnec2c.glade:11153
+#: resources/xnec2c.glade:11265
 msgid "Currents"
 msgstr "Srovės"
 
-#: resources/xnec2c.glade:11168
+#: resources/xnec2c.glade:11280
 msgid "Charges"
 msgstr "Krūviai"
 
-#: resources/xnec2c.glade:11349
+#: resources/xnec2c.glade:11463
 msgid " Zoom"
 msgstr " Mastelis"
 
-#: resources/xnec2c.glade:11471 resources/xnec2c.glade:12816
+#: resources/xnec2c.glade:11606 resources/xnec2c.glade:13035
 msgid "Gain"
 msgstr "Stiprinimas"
 
-#: resources/xnec2c.glade:11486 resources/xnec2c.glade:11502
-#: resources/xnec2c.glade:12829 resources/xnec2c.glade:13018
+#: resources/xnec2c.glade:11621 resources/xnec2c.glade:11637
+#: resources/xnec2c.glade:13048 resources/xnec2c.glade:13237
 msgid "0.0"
 msgstr "0.0"
 
-#: resources/xnec2c.glade:11536
+#: resources/xnec2c.glade:11671
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:11578 resources/xnec2c.glade:12972
+#: resources/xnec2c.glade:11713 resources/xnec2c.glade:13191
 msgid "dB"
 msgstr "dB"
 
-#: resources/xnec2c.glade:11592 resources/xnec2c.glade:12865
+#: resources/xnec2c.glade:11727 resources/xnec2c.glade:13084
 msgid "Step"
 msgstr "Žingsnis"
 
-#: resources/xnec2c.glade:11739 resources/xnec2c.glade:12913
+#: resources/xnec2c.glade:11874 resources/xnec2c.glade:13132
 msgid "Apply"
 msgstr "Taikyti"
 
-#: resources/xnec2c.glade:11759
+#: resources/xnec2c.glade:11894
 msgid "Frequency Mhz"
 msgstr "Dažnis MHz"
 
-#: resources/xnec2c.glade:11812
+#: resources/xnec2c.glade:11954
 msgid "Structure Geometry"
 msgstr "Struktūros geometrija"
 
-#: resources/xnec2c.glade:11831
+#: resources/xnec2c.glade:11973
 msgid "Xnec2c: Radiation Patterns"
 msgstr "Xnec2c: spinduliuotės diagramos"
 
-#: resources/xnec2c.glade:12048
+#: resources/xnec2c.glade:12190
 msgid "_Gain Scaling"
 msgstr "_Stiprinimo skalė"
 
-#: resources/xnec2c.glade:12063
+#: resources/xnec2c.glade:12205
 msgid "Linear _Power"
 msgstr "Tiesinė _galia"
 
-#: resources/xnec2c.glade:12074
+#: resources/xnec2c.glade:12216
 msgid "Linear _Voltage"
 msgstr "Tiesinė į_tampa"
 
-#: resources/xnec2c.glade:12085
+#: resources/xnec2c.glade:12227
 msgid "_ARRL Style"
 msgstr "_ARRL stilius"
 
-#: resources/xnec2c.glade:12096
+#: resources/xnec2c.glade:12238
 msgid "_Logarithmic"
 msgstr "_Logaritminis"
 
-#: resources/xnec2c.glade:12107
+#: resources/xnec2c.glade:12249
 msgid "_Noise Temperature"
 msgstr "Triukšmo _temperatūra"
 
-#: resources/xnec2c.glade:12118
+#: resources/xnec2c.glade:12260
 msgid "Noise Temp (_log scale)"
 msgstr "Triukšmo temp. (_log skalė)"
 
-#: resources/xnec2c.glade:12133
+#: resources/xnec2c.glade:12275
 msgid "Noise _Environment"
 msgstr "Triukšmo _aplinka"
 
-#: resources/xnec2c.glade:12148
+#: resources/xnec2c.glade:12290
 msgid "VE7BQH _Rural"
 msgstr "VE7BQH _Kaimas"
 
-#: resources/xnec2c.glade:12158
+#: resources/xnec2c.glade:12300
 msgid "VE7BQH Resi_dential"
 msgstr "VE7BQH Gy_venamoji"
 
-#: resources/xnec2c.glade:12170
+#: resources/xnec2c.glade:12312
 msgid "VE7BQH _City"
 msgstr "VE7BQH _Miestas"
 
-#: resources/xnec2c.glade:12181
+#: resources/xnec2c.glade:12323
 msgid "G4CQM _Baseline"
 msgstr "G4CQM _Bazinis"
 
-#: resources/xnec2c.glade:12192
+#: resources/xnec2c.glade:12334
 msgid "ITU-R _Business"
 msgstr "ITU-R _Verslas"
 
-#: resources/xnec2c.glade:12203
+#: resources/xnec2c.glade:12345
 msgid "ITU-R Reside_ntial"
 msgstr "ITU-R G_yvenamoji"
 
-#: resources/xnec2c.glade:12214
+#: resources/xnec2c.glade:12356
 msgid "ITU-R Ru_ral"
 msgstr "ITU-R Ka_imas"
 
-#: resources/xnec2c.glade:12225
+#: resources/xnec2c.glade:12367
 msgid "ITU-R _Quiet Rural"
 msgstr "ITU-R _Tylus kaimas"
 
-#: resources/xnec2c.glade:12240
+#: resources/xnec2c.glade:12382
+msgid "_Gradient Key"
+msgstr "_Gradiento legenda"
+
+#: resources/xnec2c.glade:12392
+msgid "Draw St_yle"
+msgstr "Braižymo s_tilius"
+
+#: resources/xnec2c.glade:12401
+msgid "S_urface"
+msgstr "_Paviršius"
+
+#: resources/xnec2c.glade:12420
+msgid "_Both"
+msgstr "_Abu"
+
+#: resources/xnec2c.glade:12435
 msgid "_Near Field"
 msgstr "_Artimasis laukas"
 
-#: resources/xnec2c.glade:12255
+#: resources/xnec2c.glade:12450
 msgid "Near _E Field"
 msgstr "Artimasis _E laukas"
 
-#: resources/xnec2c.glade:12265
+#: resources/xnec2c.glade:12460
 msgid "Near _H Field"
 msgstr "Artimasis _H laukas"
 
-#: resources/xnec2c.glade:12275
+#: resources/xnec2c.glade:12470
 msgid "_Poynting Vector"
 msgstr "_Poynting vektorius"
 
-#: resources/xnec2c.glade:12284
+#: resources/xnec2c.glade:12479
 msgid "_Animate Dialog"
 msgstr "_Animacijos dialogas"
 
-#: resources/xnec2c.glade:12293
+#: resources/xnec2c.glade:12488
 msgid "_Total Field"
 msgstr "_Bendras laukas"
 
-#: resources/xnec2c.glade:12302
+#: resources/xnec2c.glade:12497
 msgid "_Peak Value"
 msgstr "_Didžiausia reikšmė"
 
-#: resources/xnec2c.glade:12313
-msgid "_Snapshot"
-msgstr "_Momentinė nuotrauka"
+#: resources/xnec2c.glade:12508
+msgid "_Instantaneous (φ=0)"
+msgstr "_Momentinis (φ=0)"
 
-#: resources/xnec2c.glade:12352
+#: resources/xnec2c.glade:12547
 msgid "_Overlay Structure"
 msgstr "_Perdengti struktūrą"
 
-#: resources/xnec2c.glade:12376
+#: resources/xnec2c.glade:12572
 msgid "Gain Pattern"
 msgstr "Stiprinimo diagrama"
 
-#: resources/xnec2c.glade:12391
+#: resources/xnec2c.glade:12587
 msgid "E/H Fields"
 msgstr "E/H laukai"
 
-#: resources/xnec2c.glade:12574
+#: resources/xnec2c.glade:12772
 msgid "Zoom % "
 msgstr "Mastelis % "
 
-#: resources/xnec2c.glade:12613
+#: resources/xnec2c.glade:12811
 msgid "T Elev° "
 msgstr "T pakėl.° "
 
-#: resources/xnec2c.glade:12932
+#: resources/xnec2c.glade:13151
 msgid "Frequency MHz"
 msgstr "Dažnis MHz"
 
-#: resources/xnec2c.glade:12949
+#: resources/xnec2c.glade:13168
 msgid "0.010"
 msgstr "0.010"
 
-#: resources/xnec2c.glade:13002
+#: resources/xnec2c.glade:13221
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:13137
+#: resources/xnec2c.glade:13356
 msgid "Scale Structure (GS card)"
 msgstr "Struktūros mastelis (GS kortelė)"
 
-#: resources/xnec2c.glade:13168
+#: resources/xnec2c.glade:13387
 msgid "Structure Scale Factor"
 msgstr "Struktūros mastelio koeficientas"
 
-#: resources/xnec2c.glade:13181
+#: resources/xnec2c.glade:13400
 msgid "From Tag No."
 msgstr "Nuo žymos Nr."
 
-#: resources/xnec2c.glade:13231
+#: resources/xnec2c.glade:13450
 msgid "To Tag No."
 msgstr "Iki žymos Nr."
 
-#: resources/xnec2c.glade:13266
+#: resources/xnec2c.glade:13485
 msgid "Scale Structure"
 msgstr "Keisti struktūros mastelį"
 
-#: resources/xnec2c.glade:13443
+#: resources/xnec2c.glade:13662
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "Koordinačių transformacija (GM kortelė)"
 
-#: resources/xnec2c.glade:13473
+#: resources/xnec2c.glade:13692
 msgid "Tag Increment"
 msgstr "Žymos prieaugis"
 
-#: resources/xnec2c.glade:13504
+#: resources/xnec2c.glade:13723
 msgid "Rotate about X"
 msgstr "Sukti apie X"
 
-#: resources/xnec2c.glade:13536
+#: resources/xnec2c.glade:13755
 msgid "Move along X"
 msgstr "Perkelti išilgai X"
 
-#: resources/xnec2c.glade:13568
+#: resources/xnec2c.glade:13787
 msgid "New Structures"
 msgstr "Naujos struktūros"
 
-#: resources/xnec2c.glade:13599
+#: resources/xnec2c.glade:13818
 msgid "Rotate about Y"
 msgstr "Sukti apie Y"
 
-#: resources/xnec2c.glade:13631
+#: resources/xnec2c.glade:13850
 msgid "Move along Y"
 msgstr "Perkelti išilgai Y"
 
-#: resources/xnec2c.glade:13663
+#: resources/xnec2c.glade:13882
 msgid "Start From Tag"
 msgstr "Pradėti nuo žymos"
 
-#: resources/xnec2c.glade:13695
+#: resources/xnec2c.glade:13914
 msgid "Rotate about Z"
 msgstr "Sukti apie Z"
 
-#: resources/xnec2c.glade:13727
+#: resources/xnec2c.glade:13946
 msgid "Move along Z"
 msgstr "Perkelti išilgai Z"
 
-#: resources/xnec2c.glade:13763
+#: resources/xnec2c.glade:13982
 msgid "Co-ordinate Transformation Data"
 msgstr "Koordinačių transformacijos duomenys"
 
-#: resources/xnec2c.glade:13959
+#: resources/xnec2c.glade:14178
 msgid "Trans. Line Command (TL Card)"
 msgstr "Perdavimo linijos komanda (TL kortelė)"
 
-#: resources/xnec2c.glade:13989
+#: resources/xnec2c.glade:14208
 msgid "Tag Number, End 1  "
 msgstr "Žymos numeris, galas 1  "
 
-#: resources/xnec2c.glade:14021
+#: resources/xnec2c.glade:14240
 msgid "Tag Number, End 2  "
 msgstr "Žymos numeris, galas 2  "
 
-#: resources/xnec2c.glade:14052
+#: resources/xnec2c.glade:14271
 msgid "Segment Num, End 1"
 msgstr "Segmento Nr., galas 1"
 
-#: resources/xnec2c.glade:14084
+#: resources/xnec2c.glade:14303
 msgid "Segment Num, End 2"
 msgstr "Segmento Nr., galas 2"
 
-#: resources/xnec2c.glade:14148
+#: resources/xnec2c.glade:14367
 msgid "Crossed Transmission Line"
 msgstr "Sukryžiuota perdavimo linija"
 
-#: resources/xnec2c.glade:14166
+#: resources/xnec2c.glade:14385
 msgid "Characteristic Impedance"
 msgstr "Charakterinė varža"
 
-#: resources/xnec2c.glade:14198
+#: resources/xnec2c.glade:14417
 msgid "End 1 Y Real Part (S)"
 msgstr "Galas 1 Y realioji dalis (S)"
 
-#: resources/xnec2c.glade:14230
+#: resources/xnec2c.glade:14449
 msgid "End 2 Y Real Part (S)"
 msgstr "Galas 2 Y realioji dalis (S)"
 
-#: resources/xnec2c.glade:14262
+#: resources/xnec2c.glade:14481
 msgid "Length of Tx Line (m)"
 msgstr "Perdavimo linijos ilgis (m)"
 
-#: resources/xnec2c.glade:14294
+#: resources/xnec2c.glade:14513
 msgid "End 1 Y Imag Part (S)"
 msgstr "Galas 1 Y menamoji dalis (S)"
 
-#: resources/xnec2c.glade:14326
+#: resources/xnec2c.glade:14545
 msgid "End 2 Y Imag Part (S)"
 msgstr "Galas 2 Y menamoji dalis (S)"
 
-#: resources/xnec2c.glade:14362
+#: resources/xnec2c.glade:14581
 msgid "Transmission Line"
 msgstr "Perdavimo linija"
 
-#: resources/xnec2c.glade:14589
+#: resources/xnec2c.glade:14808
 msgid "Wire Element (GW & GC cards)"
 msgstr "Laido elementas (GW ir GC kortelės)"
 
-#: resources/xnec2c.glade:14649
+#: resources/xnec2c.glade:14868
 msgid "Wire X1"
 msgstr "Laido X1"
 
-#: resources/xnec2c.glade:14681
+#: resources/xnec2c.glade:14900
 msgid "Wire X2"
 msgstr "Laido X2"
 
-#: resources/xnec2c.glade:14744
+#: resources/xnec2c.glade:14963
 msgid "Wire Y1"
 msgstr "Laido Y1"
 
-#: resources/xnec2c.glade:14777
+#: resources/xnec2c.glade:14996
 msgid "Wire Y2"
 msgstr "Laido Y2"
 
-#: resources/xnec2c.glade:14841
+#: resources/xnec2c.glade:15060
 msgid "Wire Z1"
 msgstr "Laido Z1"
 
-#: resources/xnec2c.glade:14873
+#: resources/xnec2c.glade:15092
 msgid "Wire Z2"
 msgstr "Laido Z2"
 
-#: resources/xnec2c.glade:14938
+#: resources/xnec2c.glade:15157
 msgid "Wire Length"
 msgstr "Laido ilgis"
 
-#: resources/xnec2c.glade:15009
+#: resources/xnec2c.glade:15228
 msgid "Wire Data"
 msgstr "Laido duomenys"
 
-#: resources/xnec2c.glade:15021
+#: resources/xnec2c.glade:15240
 msgid "Tapered Wire"
 msgstr "Kūginis laidas"
 
-#: resources/xnec2c.glade:15063
+#: resources/xnec2c.glade:15282
 msgid "Length Taper"
 msgstr "Ilgio siaurėjimas"
 
-#: resources/xnec2c.glade:15095
+#: resources/xnec2c.glade:15314
 msgid "Diameter Seg 1"
 msgstr "Segmento 1 skersmuo"
 
-#: resources/xnec2c.glade:15127
+#: resources/xnec2c.glade:15346
 msgid "Diameter Seg N"
 msgstr "Segmento N skersmuo"
 
-#: resources/xnec2c.glade:15159
+#: resources/xnec2c.glade:15378
 msgid "Diam. Taper"
 msgstr "Skersmens siaurėjimas"
 
-#: resources/xnec2c.glade:15195
+#: resources/xnec2c.glade:15414
 msgid "Wire Taper Data"
 msgstr "Laido siaurėjimo duomenys"
 
-#: resources/xnec2c.glade:15360
+#: resources/xnec2c.glade:15579
 msgid "Impedance (Zo) Ohm"
 msgstr "Varža (Zo) Ω"
 
-#: resources/xnec2c.glade:15375
+#: resources/xnec2c.glade:15594
 msgid "50.00"
 msgstr "50.00"
 
-#: resources/xnec2c.glade:15398
+#: resources/xnec2c.glade:15617
 msgid "Transmission Line Impedance (Zo)"
 msgstr "Perdavimo linijos varža (Zo)"
