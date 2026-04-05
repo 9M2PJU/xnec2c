@@ -485,18 +485,11 @@ Main_Rdpattern_Activate( gboolean from_menu )
 
   /* Redo currents if not reaching this function
    * from the menu callback (e.g. not user action) */
-  int fstep = calc_data.freq_step;
-  if( !CRNT_FSTEP_AVAILABLE(fstep) && !from_menu ) Redo_Currents( NULL );
+  if( !from_menu ) fetch_freq_data();
 
   /* Display frequency in freq spinbutton */
   if( from_menu && calc_data.FR_cards )
-  {
-    char value[9];
-    size_t s = sizeof( value );
-    snprintf( value, s, "%.3f", calc_data.freq_mhz );
-    value[s - 1] = '\0';
-    gtk_entry_set_text( GTK_ENTRY(rdpattern_frequency), value );
-  }
+    gtk_spin_button_set_value( GTK_SPIN_BUTTON(rdpattern_frequency), calc_data.freq_mhz );
 
   /* Enable Gain or E/H field drawing */
   SetFlag( DRAW_ENABLED );
@@ -578,13 +571,7 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
 
     /* Redraw radiation pattern drawingarea */
     if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
-    {
-      int fstep = calc_data.freq_step;
-      if( !CRNT_FSTEP_AVAILABLE(fstep) ) Redo_Currents( NULL );
-      SetFlag( DRAW_NEW_RDPAT );
-
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
-    }
+      fetch_freq_data();
 
     Set_Window_Labels();
   }
@@ -648,12 +635,8 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
     /* Redraw radiation pattern drawingarea */
     if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
     {
-      int fstep = calc_data.freq_step;
-      if( !NF_FSTEP_AVAILABLE(fstep) )
-        Redo_Currents( NULL );
       SetFlag( DRAW_NEW_EHFIELD );
-
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
+      fetch_freq_data();
     }
 
     Set_Window_Labels();
@@ -735,10 +718,7 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
     gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
             main_window_builder, "struct_label")), _("View Currents") );
 
-    int fstep = calc_data.freq_step;
-    if( !CRNT_FSTEP_AVAILABLE(fstep) && isFlagClear(FREQ_LOOP_RUNNING) )
-      Redo_Currents( NULL );
-    else
+    if( fetch_freq_data() )
       xnec2_widget_queue_draw( structure_drawingarea );
 
     if( isFlagSet(OVERLAY_STRUCT) )
@@ -794,10 +774,7 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
           Builder_Get_Object(main_window_builder, "struct_label")),
         _("View Charges") );
 
-    int fstep = calc_data.freq_step;
-    if( !CRNT_FSTEP_AVAILABLE(fstep) && isFlagClear(FREQ_LOOP_RUNNING) )
-      Redo_Currents( NULL );
-    else
+    if( fetch_freq_data() )
       xnec2_widget_queue_draw( structure_drawingarea );
 
     if( isFlagSet(OVERLAY_STRUCT) )

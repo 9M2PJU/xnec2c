@@ -720,43 +720,6 @@ Save_Crnt_Data( int fstep )
 
 /*-----------------------------------------------------------------------*/
 
-/* Redo_Currents()
- *
- * Refreshes plots on new frequency in spinbutton
- */
-  gboolean
-Redo_Currents( gpointer udata )
-{
-  /* Abort if no geometry data */
-  if( ((data.n == 0) && (data.m == 0)) ||
-      isFlagClear(ENABLE_EXCITN) )
-    return FALSE;
-
-  if( !set_freq_step() )
-    New_Frequency();
-
-  /* Display freq data in entry widgets */
-  if( isFlagSet(PLOT_FREQ_LINE) )
-  {
-    xnec2_widget_queue_draw( freqplots_drawingarea );
-  }
-
-  /* Redraw structure on screen */
-  if( (structure_drawingarea != NULL) &&
-      (isFlagSet(DRAW_CURRENTS) || isFlagSet(DRAW_CHARGES)) )
-  {
-    xnec2_widget_queue_draw( structure_drawingarea );
-  }
-
-  /* Redraw OpenGL structure if active */
-  if( isFlagSet(DRAW_CURRENTS) || isFlagSet(DRAW_CHARGES) )
-  {
-    opengl_structure_queue_draw();
-  }
-
-  return FALSE;
-} /* Redo_Currents() */
-
 /*-----------------------------------------------------------------------*/
 
 /*  New_Structure_Projection_Angle()

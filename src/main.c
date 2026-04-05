@@ -467,6 +467,24 @@ main (int argc, char *argv[])
 
     FORKED = TRUE;
   } /* if( calc_data.num_jobs > 1 ) */
+  else
+  {
+    /* Allocate a virtual child for non-forked mode so the
+     * frequency loop state machine operates identically. */
+    size_t mreq = sizeof(child_proc_t *);
+    mem_alloc( (void **)&child_procs, mreq, "in main.c" );
+    child_procs[0] = NULL;
+    mreq = sizeof(child_proc_t);
+    mem_alloc( (void **)&child_procs[0], mreq, "in main.c" );
+    child_procs[0]->idx           = 0;
+    child_procs[0]->pid           = 0;
+    child_procs[0]->to_child[0]   = -1;
+    child_procs[0]->to_child[1]   = -1;
+    child_procs[0]->from_child[0] = -1;
+    child_procs[0]->from_child[1] = -1;
+    child_procs[0]->assigned_step = -1;
+    child_procs[0]->assigned_freq = 0.0;
+  }
 
   /* Create the main window */
   main_window = create_main_window( &main_window_builder );

@@ -133,6 +133,10 @@ typedef struct Segment
 #define ERR_OK      FALSE
 #define ERR_STOP    TRUE
 
+/* Frequency comparison tolerance: 1 Hz expressed in MHz */
+#define FREQ_EPSILON_MHZ  1e-6
+#define FREQ_EQ(a, b)     (fabs((a) - (b)) <= FREQ_EPSILON_MHZ)
+
 /*** Flow control flags ***/
 /* Freq Loop Control flags */
 #define FREQ_LOOP_RUNNING   0x0000000000000001ll
@@ -1094,7 +1098,8 @@ typedef struct
   pid_t pid;             /* Child PID */
   int   to_child[2];     /* Pipe parent→child: [READ]=child reads, [WRITE]=parent writes */
   int   from_child[2];   /* Pipe child→parent: [READ]=parent reads, [WRITE]=child writes */
-  int   assigned_step;   /* Frequency step in progress; -1 = idle */
+  int    assigned_step;   /* Frequency step in progress; -1 = idle */
+  double assigned_freq;   /* Frequency dispatched; validated at collect */
 
 } child_proc_t;
 
@@ -1552,7 +1557,6 @@ void Set_Polarization(int pol);
 void Set_Gain_Style(int gs);
 void New_Radiation_Projection_Angle(void);
 void Update_Rdpattern_UI(void);
-gboolean Redo_Radiation_Pattern(gpointer udata);
 double Viewer_Gain(projection_parameters_t proj_parameters, int fstep);
 void Rdpattern_Window_Killed(void);
 void Set_Window_Labels(void);
@@ -1571,7 +1575,6 @@ void Process_Wire_Segments(void);
 void Process_Surface_Patches(void);
 void Draw_Wire_Segments(cairo_t *cr, Segment_t *segm, gint nseg);
 void Draw_Surface_Patches(cairo_t *cr, Segment_t *segm, gint npatch);
-gboolean Redo_Currents(gpointer udata);
 void Alloc_Crnt_Fstep_Buffers(int nfrq);
 void Free_Crnt_Fstep_Buffers(void);
 void Save_Crnt_Data(int fstep);
@@ -1752,15 +1755,17 @@ void print_backtrace(char *msg);
 void Update_Window_Titles(void);
 
 /* xnec2c.c */
-void restore_fmhz_save_display(void);
+void freq_step_update_ui(int new_step);
 void Near_Field_Pattern(void);
 void New_Frequency(void);
 void New_Frequency_Reset_Prev(void);
 
 gboolean Frequency_Loop(gpointer udata);
 gboolean Start_Frequency_Loop(void);
+gboolean Start_Frequency_Loop_Greenline(void);
 void Stop_Frequency_Loop(void);
 void Incident_Field_Loop(void);
 int set_freq_step(void);
+gboolean fetch_freq_data(void);
 
 #endif

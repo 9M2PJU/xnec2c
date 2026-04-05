@@ -1316,12 +1316,12 @@ on_main_freq_spinbutton_value_changed(
   if( isFlagSet(INPUT_PENDING) )
     return;
 
-  /* Frequency spinbutton value changed by frequency loop */
+  /* Frequency spinbutton value changed by frequency loop via freq_step_update_ui;
+   * all redraws are already queued — guard against re-entrancy only. */
   if( isFlagSet(FREQ_LOOP_RUNNING) )
-  {
-    xnec2_widget_queue_draw( structure_drawingarea );
-  }
-  else if( isFlagClear(FREQ_LOOP_INIT) ) /* by user */
+    return;
+
+  if( isFlagClear(FREQ_LOOP_INIT) ) /* by user */
   {
     /* Get frequency from spin button */
     gdouble fmhz = (gdouble)gtk_spin_button_get_value(spinbutton);
@@ -1334,19 +1334,10 @@ on_main_freq_spinbutton_value_changed(
     {
       /* Recalc currents in structure */
       calc_data.freq_mhz = (double)fmhz;
-      g_idle_add( Redo_Currents, NULL );
+      fetch_freq_data();
     }
 
-    /* Sync rad pattern frequency spinbutton */
-    /* Show current frequency */
-    if( isFlagSet(DRAW_ENABLED)     &&
-        isFlagSet(COMMON_FREQUENCY) &&
-        isFlagSet(MAIN_NEW_FREQ) )
-      gtk_spin_button_set_value( rdpattern_frequency, fmhz );
-
     calc_data.fmhz_save = (double)fmhz;
-    opt_ui_update_values();
-    xnec2_widget_queue_draw( structure_drawingarea );
   } /* else */
 
   gtk_spin_button_update( spinbutton );
@@ -1374,15 +1365,7 @@ on_main_new_freq_clicked(
   if( isFlagClear(FREQ_LOOP_RUNNING) )
   {
     calc_data.freq_mhz = (double)gtk_spin_button_get_value( mainwin_frequency );
-
-    /* Sync rad pattern frequency spinbutton */
-    /* Show current frequency */
-    if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_FREQUENCY) )
-      gtk_spin_button_set_value( rdpattern_frequency, calc_data.freq_mhz );
-
-    g_idle_add( Redo_Currents, NULL );
-
-    xnec2_widget_queue_draw( structure_drawingarea );
+    fetch_freq_data();
   }
 }
 
@@ -2415,13 +2398,11 @@ on_rdpattern_freq_spinbutton_value_changed(
   if( isFlagSet(INPUT_PENDING) )
     return;
 
-  /* Frequency spinbutton value changed by frequency loop */
-  if( isFlagSet(FREQ_LOOP_RUNNING) && isFlagSet(DRAW_ENABLED) )
-  {
-    if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea );
-  }
-  else
+  /* Frequency spinbutton value changed by frequency loop via freq_step_update_ui;
+   * all redraws are already queued — guard against re-entrancy only. */
+  if( isFlagSet(FREQ_LOOP_RUNNING) )
+    return;
+
   {
     /* Get frequency from spin button */
     gdouble fmhz = (gdouble)gtk_spin_button_get_value(spinbutton);
@@ -2435,11 +2416,7 @@ on_rdpattern_freq_spinbutton_value_changed(
     {
       /* Recalc currents in structure and rad pattern */
       calc_data.freq_mhz = (double)fmhz;
-      g_idle_add( Redo_Radiation_Pattern, NULL );
-
-      /* Sync main window frequency spinbutton */
-      if( isFlagSet(COMMON_FREQUENCY) )
-        gtk_spin_button_set_value( mainwin_frequency, fmhz );
+      fetch_freq_data();
     }
     calc_data.fmhz_save = (double)fmhz;
     opt_ui_update_values();
@@ -2458,16 +2435,7 @@ on_rdpattern_new_freq_clicked(
   if( isFlagClear(FREQ_LOOP_RUNNING) )
   {
     calc_data.freq_mhz = (double)gtk_spin_button_get_value( rdpattern_frequency );
-    Redo_Radiation_Pattern( NULL );
-
-    /* Sync main frequency spinbutton */
-    /* Show current frequency */
-    if( isFlagSet(COMMON_FREQUENCY) )
-      gtk_spin_button_set_value( mainwin_frequency, calc_data.freq_mhz );
-
-    g_idle_add( Redo_Currents, NULL );
-
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
+    fetch_freq_data();
   }
 }
 

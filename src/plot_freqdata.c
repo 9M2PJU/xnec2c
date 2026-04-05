@@ -1208,13 +1208,13 @@ Plot_Graph(
 		* changed by a user click on the plots drawingarea
 		* The +/- 0.001 is to adjust for floating-point error, 
 		* for example: freq_mhz=148.000000 !<= max_fscale=147.999996 */
-		if( isFlagSet(FREQ_LOOP_DONE) && isFlagSet(PLOT_FREQ_LINE)
-			&& calc_data.freq_mhz >= min_fscale - 1e-6
-			&& calc_data.freq_mhz <= max_fscale + 1e-6)
+		if( isFlagSet(PLOT_FREQ_LINE) && calc_data.fmhz_save > 0.0
+			&& calc_data.fmhz_save >= min_fscale - 1e-6
+			&& calc_data.fmhz_save <= max_fscale + 1e-6)
 		{
 			double freq_x;
 
-			freq_x = (calc_data.freq_mhz - min_fscale) / (max_fscale - min_fscale);
+			freq_x = (calc_data.fmhz_save - min_fscale) / (max_fscale - min_fscale);
 			freq_x *= plot_rect->width;
 
 			cairo_set_source_rgb( cr, GREEN );
@@ -1344,7 +1344,7 @@ Plot_Graph_Smith(
 
   /* Draw a vertical line to show current freq if it was
    * changed by a user click on the plots drawingarea */
-  if( isFlagSet(FREQ_LOOP_DONE) && isFlagSet(PLOT_FREQ_LINE) )
+  if( isFlagSet(PLOT_FREQ_LINE) && calc_data.fmhz_save > 0.0 )
   {
     cairo_set_source_rgb( cr, GREEN );
     Calculate_Smith( creal(netcx.zped), cimag(netcx.zped), calc_data.zo, &re, &im );
@@ -1953,20 +1953,17 @@ _Set_Frequency_On_Click( GdkEvent *e)
 	  /* Save frequency for later use when the graph plots after the NEC2 run */
 	  calc_data.fmhz_save = fmhz;
 
-	  /* Update optimizer Value/Score labels for the selected frequency */
-	  opt_ui_update_values();
-
-	  /* Set frequency spinbuttons on new freq */
+	  /* When idle, dispatch the green-line step through the loop.
+	   * Forked: a child computes it asynchronously.
+	   * Non-forked: computes inline via the same loop path.
+	   * Spinbuttons and optimizer values are updated by freq_step_update_ui
+	   * after computation completes; setting them here would trigger the
+	   * value-changed handler → fetch_freq_data → duplicate in-process
+	   * computation racing the child. */
 	  if( isFlagClear(FREQ_LOOP_RUNNING) && fmhz != calc_data.freq_mhz )
 	  {
-		gtk_spin_button_set_value( mainwin_frequency, fmhz );
-		if( isFlagSet(DRAW_ENABLED) )
-		  gtk_spin_button_set_value( rdpattern_frequency, fmhz );
-
 		calc_data.freq_mhz = fmhz;
-		g_idle_add( Redo_Currents, NULL );
-		if( isFlagSet(DRAW_ENABLED) )
-		  g_idle_add( Redo_Radiation_Pattern, NULL );
+		fetch_freq_data();
 	  }
   }
 

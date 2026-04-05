@@ -1429,29 +1429,6 @@ Save_Nearfield_Data( int fstep )
 
 /*-----------------------------------------------------------------------*/
 
-/* Redo_Radiation_Pattern()
- *
- * Refreshes radiation pattern on new frequency in spinbutton
- */
-  gboolean
-Redo_Radiation_Pattern( gpointer udata )
-{
-  /* Recompute if step not yet calculated; set EH redraw flag if data available */
-  if( !set_freq_step() )
-    New_Frequency();
-
-  int fstep = calc_data.freq_step;
-  if( isFlagSet(DRAW_EHFIELD) && NF_FSTEP_AVAILABLE(fstep) )
-    SetFlag( DRAW_NEW_EHFIELD );
-
-  /* Redraw radiation pattern on screen */
-  if( isFlagSet(DRAW_ENABLED) )
-    xnec2_widget_queue_draw( rdpattern_drawingarea );
-
-  return FALSE;
-
-} /* Redo_Radiation_Pattern() */
-
 /*-----------------------------------------------------------------------*/
 
 /* Viewer_Gain()

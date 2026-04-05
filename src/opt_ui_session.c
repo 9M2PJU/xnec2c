@@ -50,9 +50,12 @@ static gboolean check_opt_complete(gpointer user_data)
 		}
 	}
 
-	/* Restore green line (fmhz_save) display state that was skipped
-	 * during optimization to avoid deadlock in Frequency_Loop. */
-	restore_fmhz_save_display();
+	/* Restore green-line display state skipped during optimization.
+	 * Use steps_total slot when valid, otherwise fall back to last sweep step. */
+	if( save.fstep && save.fstep[calc_data.steps_total] )
+		freq_step_update_ui( calc_data.steps_total );
+	else if( calc_data.freq_step >= 0 )
+		freq_step_update_ui( calc_data.freq_step );
 
 	/* Final status: preserve full running metrics, append completion */
 	opt_ui_update_status();
