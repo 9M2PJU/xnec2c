@@ -715,8 +715,14 @@ Open_Input_File( gpointer arg )
   strncpy(prev_input_file, rc_config.input_file, PATH_MAX - 1);
   prev_input_file[PATH_MAX - 1] = '\0';
 
-  /* Show current frequency */
-  gtk_spin_button_set_value( mainwin_frequency, (gdouble)calc_data.freq_mhz );
+  /* Show current frequency; prefer fmhz_save (rc_config restored green-line
+   * frequency) so the saved position survives startup initialization.
+   * Block value-changed to prevent the callback from overwriting fmhz_save. */
+  double display_freq = (calc_data.fmhz_save > 0.0)
+      ? calc_data.fmhz_save : calc_data.freq_mhz;
+  SIGNAL_BLOCK(mainwin_frequency, on_main_freq_spinbutton_value_changed);
+  gtk_spin_button_set_value( mainwin_frequency, display_freq );
+  SIGNAL_UNBLOCK(mainwin_frequency, on_main_freq_spinbutton_value_changed);
 
   /* Show main control buttons etc */
   gtk_widget_show( Builder_Get_Object(main_window_builder, "main_hbox1") );

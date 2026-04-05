@@ -32,5 +32,29 @@
 /* OpenGL common projection sync */
 void opengl_common_projection_sync(void);
 
+/* Frequency spinbutton value-changed callbacks; referenced by
+ * SIGNAL_BLOCK/SIGNAL_UNBLOCK in programmatic update sites. */
+void on_main_freq_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
+void on_rdpattern_freq_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
+
+/* Suppress -Wpedantic warnings from the g_signal_handlers_block_by_func macro,
+ * which internally casts a function pointer to gpointer (forbidden by ISO C).
+ * This cast is intentional and correct for GLib signal handling. */
+#define SIGNAL_BLOCK(widget, func) \
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS \
+  _Pragma("GCC diagnostic push") \
+  _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
+  g_signal_handlers_block_by_func((widget), (func), NULL); \
+  _Pragma("GCC diagnostic pop") \
+  G_GNUC_END_IGNORE_DEPRECATIONS
+
+#define SIGNAL_UNBLOCK(widget, func) \
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS \
+  _Pragma("GCC diagnostic push") \
+  _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
+  g_signal_handlers_unblock_by_func((widget), (func), NULL); \
+  _Pragma("GCC diagnostic pop") \
+  G_GNUC_END_IGNORE_DEPRECATIONS
+
 #endif
 

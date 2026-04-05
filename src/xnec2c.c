@@ -20,6 +20,7 @@
 #include <pthread.h>
 
 #include "xnec2c.h"
+#include "callbacks.h"
 #include "shared.h"
 #include "mathlib.h"
 #include "opt_ui.h"
@@ -127,7 +128,6 @@ fetch_freq_data( void )
     return TRUE;
   }
 
-  calc_data.fmhz_save = calc_data.freq_mhz;
   return Start_Frequency_Loop_Greenline();
 }
 
@@ -616,11 +616,18 @@ freq_step_update_ui( int new_step, gboolean force )
   SetFlag( DRAW_NEW_RDPAT );
   SetFlag( FREQ_LOOP_READY );
 
-  /* gtk_spin_button_set_value suppresses value-changed when the value is
-   * unchanged, preventing re-entrancy through fetch_freq_data. */
+  /* Block value-changed callbacks during programmatic spinbutton updates;
+   * only user interaction sets fmhz_save via those callbacks. */
+  SIGNAL_BLOCK(mainwin_frequency, on_main_freq_spinbutton_value_changed);
   gtk_spin_button_set_value( mainwin_frequency, calc_data.freq_mhz );
+  SIGNAL_UNBLOCK(mainwin_frequency, on_main_freq_spinbutton_value_changed);
+
   if( isFlagSet(DRAW_ENABLED) && rdpattern_frequency != NULL )
+  {
+    SIGNAL_BLOCK(rdpattern_frequency, on_rdpattern_freq_spinbutton_value_changed);
     gtk_spin_button_set_value( rdpattern_frequency, calc_data.freq_mhz );
+    SIGNAL_UNBLOCK(rdpattern_frequency, on_rdpattern_freq_spinbutton_value_changed);
+  }
 
   if( isFlagSet(PLOT_ENABLED) )
   {
