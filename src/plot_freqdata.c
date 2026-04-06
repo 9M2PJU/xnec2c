@@ -45,8 +45,6 @@ static GdkEvent *prev_click_event = NULL;
 /* Graph plot bounding rectangle */
 static double Fit_to_Scale( double *max, double *min, int *nval );
 
-void _Set_Frequency_On_Click( GdkEvent *e);
-
 /* helper function to get width and height by creating a layout */
 static inline void pango_text_size(GtkWidget* widget, int *width, int *height, char *s)
 {
@@ -1442,7 +1440,7 @@ _Plot_Frequency_Data( cairo_t *cr )
   // Call the underscore version because freq_data_lock is already held.
   // This makes the plot choppy during optimize, so skip that then.
   if (prev_click_event != NULL && isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS))
-	  _Set_Frequency_On_Click(prev_click_event);
+	  Set_Frequency_On_Click(prev_click_event);
 
   /* Graph position */
   posn = 0;
@@ -1776,7 +1774,7 @@ int freqplots_click_pending(void)
  * Sets the current freq after click by user on plots drawingarea
  */
   void
-_Set_Frequency_On_Click( GdkEvent *e)
+Set_Frequency_On_Click( GdkEvent *e)
 {
   double fmhz = 0.0;
   int set_fmhz = 0, draw_freqplot = 0;
@@ -1950,21 +1948,7 @@ _Set_Frequency_On_Click( GdkEvent *e)
 	  uint64_t ifmhz = ( fmhz * 1e6 + 0.5 );
 	  fmhz = ifmhz / 1e6;
 
-	  /* Save frequency for later use when the graph plots after the NEC2 run */
-	  calc_data.fmhz_save = fmhz;
-
-	  /* When idle, dispatch the green-line step through the loop.
-	   * Forked: a child computes it asynchronously.
-	   * Non-forked: computes inline via the same loop path.
-	   * Spinbuttons and optimizer values are updated by freq_step_update_ui
-	   * after computation completes; setting them here would trigger the
-	   * value-changed handler → fetch_freq_data → duplicate in-process
-	   * computation racing the child. */
-	  if( isFlagClear(FREQ_LOOP_RUNNING) && fmhz != calc_data.freq_mhz )
-	  {
-		calc_data.freq_mhz = fmhz;
-		fetch_freq_data();
-	  }
+	  user_set_frequency(fmhz);
   }
 
   // If prev_click_event is set then we are being called from Plot_Frequency_Data()
@@ -1978,13 +1962,6 @@ _Set_Frequency_On_Click( GdkEvent *e)
 	  free_ptr((void**)&prev_click_event);
 
 } /* Set_Freq_On_Click() */
-
-void Set_Frequency_On_Click( GdkEvent *e)
-{
-	g_mutex_lock(&freq_data_lock);
-	_Set_Frequency_On_Click(e);
-	g_mutex_unlock(&freq_data_lock);
-}
 
 /*-----------------------------------------------------------------------*/
 
