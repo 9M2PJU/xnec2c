@@ -145,7 +145,6 @@ m4_pattern_forbid([PKG_CHECK_MODULES])dnl
 PKG_CHECK_MODULES([GMODULE], [gmodule-2.0])
 PKG_CHECK_MODULES([GTK],     [gtk+-3.0 >= 3.18.0])
 PKG_CHECK_MODULES([GSL],     [gsl])
-PKG_CHECK_MODULES([EPOXY],   [epoxy])
 
 # OpenGL support (optional)
 AC_ARG_ENABLE([opengl],
@@ -155,6 +154,7 @@ AC_ARG_ENABLE([opengl],
 
 have_opengl=no
 AS_IF([test "x$enable_opengl" != "xno"], [
+  PKG_CHECK_MODULES([EPOXY], [epoxy])
   AC_CHECK_HEADER([GL/gl.h], [have_gl_h=yes], [have_gl_h=no])
   AC_CHECK_LIB([GL], [glEnable], [have_libgl=yes], [have_libgl=no])
 

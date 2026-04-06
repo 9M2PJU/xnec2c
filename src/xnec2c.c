@@ -672,7 +672,9 @@ freq_step_update_ui( int new_step, gboolean force )
 
   /* Vertex colors are baked per freq_step; invalidate so the next render
    * rebuilds them from crnt_fstep[new_step] rather than cached stale data. */
+#ifdef HAVE_OPENGL
   opengl_structure_invalidate();
+#endif
 
   xnec2_widget_queue_draw( structure_drawingarea, force );
 

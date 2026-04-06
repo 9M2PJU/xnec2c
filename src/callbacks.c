@@ -2650,7 +2650,11 @@ update_animation_parameters(void)
     anim_tag = g_timeout_add( intval, Animate_Near_Field, NULL );
 
   if( isFlagSet(FLOW_ANIMATE) )
+#ifdef HAVE_OPENGL
     flow_anim_tag = g_timeout_add( intval, Animate_Flow_Phase, NULL );
+#else
+    flow_anim_tag = 0;
+#endif
 }
 
   static gboolean
@@ -2721,7 +2725,9 @@ on_animation_cancelbutton_clicked(
 {
   ClearFlag( FLOW_ANIMATE );
   ClearFlag( NEAREH_ANIMATE );
+#ifdef HAVE_OPENGL
   opengl_structure_reset_flow_phase();
+#endif
 
   if( anim_tag )
     g_source_remove( anim_tag );
@@ -2781,9 +2787,11 @@ on_flow_direction_activate(
     if( GTK_WIDGET(menuitem) == w )
     {
       rc_config.current_flow_visualization_mode = items[i].mode;
+#ifdef HAVE_OPENGL
       opengl_structure_invalidate();
       opengl_structure_queue_draw();
       opengl_rdpattern_queue_draw();
+#endif
 
       /* Animation produces no visible change for phase-invariant modes.
        * Grey out Animate menu item for Polarization Tilt and Peak Magnitude. */
@@ -2842,7 +2850,9 @@ on_rdpattern_draw_style_activate(
       rc_config.rdpattern_draw_style = items[i].style;
 
       /* Force geometry regeneration by resetting staleness tracker */
+#ifdef HAVE_OPENGL
       opengl_rdpattern_queue_draw();
+#endif
       return;
     }
   }
@@ -2858,7 +2868,9 @@ on_animate_dialog_destroy(
   /* Stop all animations when dialog closes */
   ClearFlag( FLOW_ANIMATE );
   ClearFlag( NEAREH_ANIMATE );
+#ifdef HAVE_OPENGL
   opengl_structure_reset_flow_phase();
+#endif
 
   if( anim_tag )
     g_source_remove( anim_tag );

@@ -597,6 +597,155 @@ on_opengl_settings_window_destroy(GtkWidget *widget, gpointer user_data)
 }
 
 #else /* !HAVE_OPENGL */
-/* Avoid empty translation unit warning */
-typedef int opengl_settings_dummy;
+
+/* Window widget; opengl_settings_builder is the global from shared.h */
+static GtkWidget *opengl_settings_window = NULL;
+
+/*------------------------------------------------------------------------*/
+
+/** opengl_settings_init - Load dialog and disable renderer checkbox (no-OpenGL build)
+ *
+ * Opens opengl_settings.glade, disables the renderer toggle with a tooltip
+ * explaining that OpenGL support was not compiled in.  Idempotent.
+ */
+static gboolean
+opengl_settings_init(void)
+{
+  GError *gerror = NULL;
+  GtkWidget *w;
+
+  if( opengl_settings_window != NULL )
+    return TRUE;
+
+  opengl_settings_builder = gtk_builder_new();
+  if( !gtk_builder_add_from_resource(opengl_settings_builder,
+        "/opengl_settings.glade", &gerror) )
+  {
+    pr_err("opengl_settings_init: failed to load glade: %s\n",
+        gerror->message);
+    g_error_free(gerror);
+    return FALSE;
+  }
+
+  gtk_builder_connect_signals(opengl_settings_builder, NULL);
+
+  opengl_settings_window = GTK_WIDGET(
+      gtk_builder_get_object(opengl_settings_builder,
+        "opengl_settings_window"));
+  if( opengl_settings_window == NULL )
+  {
+    pr_err("opengl_settings_init: "
+        "failed to get opengl_settings_window from glade\n");
+    return FALSE;
+  }
+
+  /* Disable renderer toggle; OpenGL was not compiled in */
+  w = GTK_WIDGET(gtk_builder_get_object(opengl_settings_builder,
+        "chk_opengl_renderer"));
+  if( w != NULL )
+  {
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), FALSE);
+    gtk_widget_set_sensitive(w, FALSE);
+    gtk_widget_set_tooltip_text(w,
+        "Not compiled with OpenGL support.\n"
+        "Configure with --enable-opengl to enable.");
+  }
+
+  return TRUE;
+}
+
+/*------------------------------------------------------------------------*/
+
+static void
+opengl_settings_show(void)
+{
+  if( !opengl_settings_init() )
+    return;
+
+  gtk_widget_show_all(opengl_settings_window);
+  gtk_window_present(GTK_WINDOW(opengl_settings_window));
+}
+
+/*------------------------------------------------------------------------*/
+
+static void
+opengl_settings_hide(void)
+{
+  if( opengl_settings_window != NULL )
+    gtk_widget_hide(opengl_settings_window);
+}
+
+/*------------------------------------------------------------------------*/
+
+void
+on_opengl_settings_show_activate(GtkMenuItem *menuitem, gpointer user_data)
+{
+  (void)menuitem;
+  (void)user_data;
+
+  opengl_settings_show();
+}
+
+/*------------------------------------------------------------------------*/
+
+/* Renderer toggle is insensitive; handler must link but will not fire */
+void
+on_opengl_settings_changed(GtkWidget *widget, gpointer user_data)
+{
+  (void)widget;
+  (void)user_data;
+}
+
+/*------------------------------------------------------------------------*/
+
+void
+on_opengl_settings_close_clicked(GtkButton *button, gpointer user_data)
+{
+  (void)button;
+  (void)user_data;
+
+  opengl_settings_hide();
+}
+
+/*------------------------------------------------------------------------*/
+
+/* Reset has no effect without OpenGL */
+void
+on_opengl_settings_reset_clicked(GtkButton *button, gpointer user_data)
+{
+  (void)button;
+  (void)user_data;
+}
+
+/*------------------------------------------------------------------------*/
+
+gboolean
+on_opengl_settings_window_delete_event(
+    GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+  (void)widget;
+  (void)event;
+  (void)user_data;
+
+  opengl_settings_hide();
+  return TRUE;
+}
+
+/*------------------------------------------------------------------------*/
+
+void
+on_opengl_settings_window_destroy(GtkWidget *widget, gpointer user_data)
+{
+  (void)widget;
+  (void)user_data;
+
+  if( opengl_settings_builder != NULL )
+  {
+    g_object_unref(opengl_settings_builder);
+    opengl_settings_builder = NULL;
+  }
+
+  opengl_settings_window = NULL;
+}
+
 #endif /* HAVE_OPENGL */

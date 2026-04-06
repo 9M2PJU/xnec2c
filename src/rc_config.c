@@ -777,7 +777,9 @@ Restore_Windows( gpointer dat )
   }
 
   /* Open structure view unconditionally */
+#ifdef HAVE_OPENGL
   opengl_structure_create_widget();
+#endif
 
   return( FALSE );
 }

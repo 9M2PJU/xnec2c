@@ -857,11 +857,15 @@ Open_Input_File( gpointer arg )
     Main_Charges_Togglebutton_Toggled( TRUE );
 
   /* Invalidate cached OpenGL geometry so next render uses fresh data */
+#ifdef HAVE_OPENGL
   opengl_structure_invalidate();
+#endif
 
   /* Redraw structure with updated geometry regardless of overlay state */
   xnec2_widget_queue_draw( structure_drawingarea, TRUE );
+#ifdef HAVE_OPENGL
   opengl_structure_queue_draw();
+#endif
 
   /* Close symbol overrides window if no symbols defined */
   sy_overrides_close_if_empty();
