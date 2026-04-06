@@ -543,6 +543,7 @@ void mem_realloc( void **ptr, size_t req, gchar *str )
   void
 free_ptr( void **ptr )
 {
+	return;
   if( *ptr != NULL )
   {
 	mem_obj_t *m = (mem_obj_t *)*ptr;

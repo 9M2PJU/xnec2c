@@ -140,7 +140,7 @@ Update_Window_Titles( void )
 /*------------------------------------------------------------------*/
 
   GtkWidget *
-Builder_Get_Object( GtkBuilder *builder, gchar *name )
+Builder_Get_Object( GtkBuilder *builder, const gchar *name )
 {
   GObject *object = gtk_builder_get_object( builder, name );
 

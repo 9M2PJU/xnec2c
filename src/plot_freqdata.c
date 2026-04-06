@@ -30,6 +30,7 @@
 
 #include "plot_freqdata.h"
 #include "shared.h"
+#include "opt_ui.h"
 
 fr_plot_t *fr_plots = NULL;
 

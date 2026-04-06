@@ -198,11 +198,11 @@ main (int argc, char *argv[])
   /* Initialize default config file path */
   char home[PATH_MAX];
   get_conf_dir(home, sizeof(home));
-  if (strlen(home) + strlen(DEFAULT_CONFIG_FILE) + 2 > sizeof(rc_config.config_file)) {
+  if (snprintf(rc_config.config_file, sizeof(rc_config.config_file),
+        "%s/%s", home, DEFAULT_CONFIG_FILE) >= (int)sizeof(rc_config.config_file)) {
     pr_err("config file path too long\n");
     exit(EXIT_FAILURE);
   }
-  snprintf(rc_config.config_file, sizeof(rc_config.config_file), "%s/%s", home, DEFAULT_CONFIG_FILE);
 
   // default to show warnings or more important errors.
   rc_config.verbose = 4;

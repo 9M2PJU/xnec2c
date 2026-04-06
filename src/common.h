@@ -1629,7 +1629,7 @@ gboolean Read_Commands(void);
 gboolean readmn(char *mn, int *i1, int *i2, int *i3, int *i4, double *f1, double *f2, double *f3, double *f4, double *f5, double *f6);
 gboolean readgm(char *gm, int *i1, int *i2, double *x1, double *y1, double *z1, double *x2, double *y2, double *z2, double *rad);
 /* interface.c */
-GtkWidget *Builder_Get_Object(GtkBuilder *builder, gchar *name);
+GtkWidget *Builder_Get_Object(GtkBuilder *builder, const gchar *name);
 GtkWidget *create_main_window(GtkBuilder **builder);
 GtkWidget *create_filechooserdialog(GtkBuilder **builder);
 GtkWidget *create_freqplots_window(GtkBuilder **builder);
