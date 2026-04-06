@@ -682,8 +682,7 @@ Open_Input_File( gpointer arg )
   } /* if( FORKED ) */
 
   /* Initialize xnec2c */
-  SetFlag( COMMON_FREQUENCY );
-  SetFlag( MAIN_NEW_FREQ );
+  SetFlag( FREQ_APPLY );
   if( isFlagSet(PLOT_ENABLED) ) SetFlag( FREQ_LOOP_INIT );
   floop_tag = 0;
 
@@ -720,9 +719,9 @@ Open_Input_File( gpointer arg )
    * Block value-changed to prevent the callback from overwriting fmhz_save. */
   double display_freq = (calc_data.fmhz_save > 0.0)
       ? calc_data.fmhz_save : calc_data.freq_mhz;
-  SIGNAL_BLOCK(mainwin_frequency, on_main_freq_spinbutton_value_changed);
+  SIGNAL_BLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
   gtk_spin_button_set_value( mainwin_frequency, display_freq );
-  SIGNAL_UNBLOCK(mainwin_frequency, on_main_freq_spinbutton_value_changed);
+  SIGNAL_UNBLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
 
   /* Show main control buttons etc */
   gtk_widget_show( Builder_Get_Object(main_window_builder, "main_hbox1") );

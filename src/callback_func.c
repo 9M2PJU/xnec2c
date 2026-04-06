@@ -279,7 +279,7 @@ Delete_Event( gchar *mesg )
  * Sets the polarization type menuitem to current setting
  */
   void
-Set_Pol_Menuitem( int window )
+Set_Pol_Menuitem( window_t window )
 {
   gchar *main_pol_menu[NUM_POL] =
   {

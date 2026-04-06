@@ -11185,16 +11185,7 @@ Save NEC2 Editor data first?
                             <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
                           </object>
                         </child>
-                        <child>
-                          <object class="GtkCheckMenuItem" id="main_common_frequency">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Common _Frequency</property>
-                            <property name="use-underline">True</property>
-                            <property name="active">True</property>
-                            <signal name="activate" handler="on_common_freq_activate" swapped="no"/>
-                          </object>
-                        </child>
+
                         <child>
                           <object class="GtkSeparatorMenuItem">
                             <property name="visible">True</property>
@@ -11296,7 +11287,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="clicked" handler="on_main_x_axis_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_view_preset_clicked" swapped="no"/>
                     <accelerator key="x" signal="clicked"/>
                   </object>
                   <packing>
@@ -11311,7 +11302,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="clicked" handler="on_main_y_axis_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_view_preset_clicked" swapped="no"/>
                     <accelerator key="y" signal="clicked"/>
                   </object>
                   <packing>
@@ -11326,7 +11317,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="clicked" handler="on_main_z_axis_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_view_preset_clicked" swapped="no"/>
                     <accelerator key="z" signal="clicked"/>
                   </object>
                   <packing>
@@ -11340,7 +11331,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="clicked" handler="on_main_default_view_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_view_preset_clicked" swapped="no"/>
                     <child>
                       <object class="GtkImage">
                         <property name="visible">True</property>
@@ -11497,7 +11488,7 @@ Save NEC2 Editor data first?
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <signal name="clicked" handler="on_structure_plus_button_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_zoom_plus_clicked" swapped="no"/>
                 <child>
                   <object class="GtkImage">
                     <property name="visible">True</property>
@@ -11520,7 +11511,7 @@ Save NEC2 Editor data first?
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <signal name="clicked" handler="on_structure_minus_button_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_zoom_minus_clicked" swapped="no"/>
                 <child>
                   <object class="GtkImage">
                     <property name="visible">True</property>
@@ -11543,7 +11534,7 @@ Save NEC2 Editor data first?
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
-                <signal name="clicked" handler="on_structure_one_button_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_zoom_reset_clicked" swapped="no"/>
                 <child>
                   <object class="GtkImage">
                     <property name="visible">True</property>
@@ -11696,7 +11687,7 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <property name="value">0.01</property>
-                <signal name="value-changed" handler="on_main_freq_spinbutton_value_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_freq_spinbutton_value_changed" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">3</property>
@@ -11854,7 +11845,7 @@ Save NEC2 Editor data first?
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
                 <property name="hexpand">True</property>
-                <signal name="clicked" handler="on_main_new_freq_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_new_freq_clicked" swapped="no"/>
                 <child>
                   <object class="GtkImage">
                     <property name="visible">True</property>
@@ -11871,7 +11862,7 @@ Save NEC2 Editor data first?
             </child>
             <child>
               <object class="GtkCheckButton" id="main_freq_checkbutton">
-                <property name="label" translatable="yes">Apply</property>
+                <property name="label" translatable="yes">Apply Freq</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="focus-on-click">False</property>
@@ -11879,7 +11870,7 @@ Save NEC2 Editor data first?
                 <property name="hexpand">True</property>
                 <property name="active">True</property>
                 <property name="draw-indicator">True</property>
-                <signal name="toggled" handler="on_main_freq_checkbutton_toggled" swapped="no"/>
+                <signal name="toggled" handler="on_freq_apply_checkbutton_toggled" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">5</property>
@@ -12530,16 +12521,7 @@ Save NEC2 Editor data first?
                             <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
                           </object>
                         </child>
-                        <child>
-                          <object class="GtkCheckMenuItem" id="rdpattern_common_frequency">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Common _Frequency</property>
-                            <property name="use-underline">True</property>
-                            <property name="active">True</property>
-                            <signal name="activate" handler="on_common_freq_activate" swapped="no"/>
-                          </object>
-                        </child>
+
                         <child>
                           <object class="GtkCheckMenuItem" id="rdpattern_overlay_structure">
                             <property name="visible">True</property>
@@ -12603,7 +12585,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="clicked" handler="on_rdpattern_x_axis_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_view_preset_clicked" swapped="no"/>
                     <accelerator key="X" signal="clicked"/>
                   </object>
                   <packing>
@@ -12618,7 +12600,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="clicked" handler="on_rdpattern_y_axis_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_view_preset_clicked" swapped="no"/>
                     <accelerator key="Y" signal="clicked"/>
                   </object>
                   <packing>
@@ -12633,7 +12615,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="clicked" handler="on_rdpattern_z_axis_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_view_preset_clicked" swapped="no"/>
                     <accelerator key="Z" signal="clicked"/>
                   </object>
                   <packing>
@@ -12647,7 +12629,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="clicked" handler="on_rdpattern_default_view_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_view_preset_clicked" swapped="no"/>
                     <child>
                       <object class="GtkImage">
                         <property name="visible">True</property>
@@ -12845,7 +12827,7 @@ Save NEC2 Editor data first?
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
                 <property name="hexpand">True</property>
-                <signal name="clicked" handler="on_rdpattern_plus_button_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_zoom_plus_clicked" swapped="no"/>
                 <child>
                   <object class="GtkImage">
                     <property name="visible">True</property>
@@ -12869,7 +12851,7 @@ Save NEC2 Editor data first?
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
                 <property name="hexpand">True</property>
-                <signal name="clicked" handler="on_rdpattern_minus_button_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_zoom_minus_clicked" swapped="no"/>
                 <child>
                   <object class="GtkImage">
                     <property name="visible">True</property>
@@ -12893,7 +12875,7 @@ Save NEC2 Editor data first?
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
                 <property name="hexpand">True</property>
-                <signal name="clicked" handler="on_rdpattern_one_button_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_zoom_reset_clicked" swapped="no"/>
                 <child>
                   <object class="GtkImage">
                     <property name="visible">True</property>
@@ -13111,7 +13093,7 @@ Save NEC2 Editor data first?
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
                 <property name="hexpand">True</property>
-                <signal name="clicked" handler="on_rdpattern_new_freq_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_new_freq_clicked" swapped="no"/>
                 <child>
                   <object class="GtkImage">
                     <property name="visible">True</property>
@@ -13129,13 +13111,14 @@ Save NEC2 Editor data first?
             </child>
             <child>
               <object class="GtkCheckButton" id="rdpattern_freq_checkbutton">
-                <property name="label" translatable="yes">Apply</property>
+                <property name="label" translatable="yes">Apply Freq</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
                 <property name="hexpand">True</property>
                 <property name="active">True</property>
                 <property name="draw-indicator">True</property>
+                <signal name="toggled" handler="on_freq_apply_checkbutton_toggled" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">5</property>
@@ -13175,7 +13158,7 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <property name="value">0.01</property>
-                <signal name="value-changed" handler="on_rdpattern_freq_spinbutton_value_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_freq_spinbutton_value_changed" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">4</property>

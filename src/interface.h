@@ -575,7 +575,6 @@ NULL
 "near_peak_value", \
 "near_snapshot", \
 "rdpattern_common_projection", \
-"rdpattern_common_frequency", \
 "rdpattern_overlay_structure", \
 "rdpattern_gain_togglebutton", \
 "rdpattern_eh_togglebutton", \
@@ -662,7 +661,6 @@ NULL
 "main_right_hand", \
 "main_left_hand", \
 "main_common_projection", \
-"main_common_frequency", \
 "menuitem4_menu", \
 "about", \
 "main_hbox", \

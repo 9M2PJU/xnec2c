@@ -32,10 +32,9 @@
 /* OpenGL common projection sync */
 void opengl_common_projection_sync(void);
 
-/* Frequency spinbutton value-changed callbacks; referenced by
+/* Frequency spinbutton value-changed callback; referenced by
  * SIGNAL_BLOCK/SIGNAL_UNBLOCK in programmatic update sites. */
-void on_main_freq_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
-void on_rdpattern_freq_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
+void on_freq_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 
 /* Suppress -Wpedantic warnings from the g_signal_handlers_block_by_func macro,
  * which internally casts a function pointer to gpointer (forbidden by ISO C).

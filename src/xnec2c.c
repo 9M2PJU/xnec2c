@@ -131,6 +131,38 @@ fetch_freq_data( void )
   return Start_Frequency_Loop_Greenline();
 }
 
+/**
+ * freq_display_update - record user-selected frequency and refresh display
+ * @fmhz: frequency in MHz selected by the user
+ *
+ * Sets fmhz_save and calls opt_ui_update_values.  Does not trigger NEC2
+ * computation.  Called by user_set_frequency before dispatching computation,
+ * and directly by the spinbutton handler when Apply is unchecked.
+ */
+void
+freq_display_update( double fmhz )
+{
+  calc_data.fmhz_save = fmhz;
+  opt_ui_update_values();
+}
+
+/**
+ * user_set_frequency - apply a user-selected frequency and trigger computation
+ * @fmhz:  frequency in MHz chosen by the user
+ *
+ * Updates display state via freq_display_update then dispatches NEC2
+ * computation.  On a cache hit, freq_step_update_ui refreshes the UI with
+ * computed data.  Apply checkbox logic is handled by the caller — this
+ * function always computes.
+ */
+void
+user_set_frequency( double fmhz )
+{
+  freq_display_update( fmhz );
+  calc_data.freq_mhz = fmhz;
+  fetch_freq_data();
+}
+
 /* Frequency_Scale_Geometry()
  *
  * Scales geometric parameters to frequency
@@ -618,15 +650,15 @@ freq_step_update_ui( int new_step, gboolean force )
 
   /* Block value-changed callbacks during programmatic spinbutton updates;
    * only user interaction sets fmhz_save via those callbacks. */
-  SIGNAL_BLOCK(mainwin_frequency, on_main_freq_spinbutton_value_changed);
+  SIGNAL_BLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
   gtk_spin_button_set_value( mainwin_frequency, calc_data.freq_mhz );
-  SIGNAL_UNBLOCK(mainwin_frequency, on_main_freq_spinbutton_value_changed);
+  SIGNAL_UNBLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
 
   if( isFlagSet(DRAW_ENABLED) && rdpattern_frequency != NULL )
   {
-    SIGNAL_BLOCK(rdpattern_frequency, on_rdpattern_freq_spinbutton_value_changed);
+    SIGNAL_BLOCK(rdpattern_frequency, on_freq_spinbutton_value_changed);
     gtk_spin_button_set_value( rdpattern_frequency, calc_data.freq_mhz );
-    SIGNAL_UNBLOCK(rdpattern_frequency, on_rdpattern_freq_spinbutton_value_changed);
+    SIGNAL_UNBLOCK(rdpattern_frequency, on_freq_spinbutton_value_changed);
   }
 
   if( isFlagSet(PLOT_ENABLED) )
