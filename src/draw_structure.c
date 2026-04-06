@@ -733,10 +733,8 @@ New_Structure_Projection_Angle(void)
   structure_proj_params.cos_wi = cos(structure_proj_params.Wi/(double)TODEG);
 
   /* Trigger a redraw of structure drawingarea */
-  if( structure_drawingarea && isFlagClear(INPUT_PENDING) )
-  {
+  if( structure_drawingarea )
     xnec2_widget_queue_draw( structure_drawingarea, TRUE );
-  }
 
   /* Trigger a redraw of plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) &&

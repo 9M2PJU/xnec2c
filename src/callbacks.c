@@ -1179,9 +1179,6 @@ on_main_rotate_spinbutton_value_changed(
 {
   double value, wrapped;
 
-  if( isFlagSet(INPUT_PENDING) )
-    return;
-
   value = gtk_spin_button_get_value(spinbutton);
   wrapped = wrap_angle(value, ROTATE_LOWER, ROTATE_UPPER);
 
@@ -1218,9 +1215,6 @@ on_main_incline_spinbutton_value_changed(
     gpointer         user_data)
 {
   double value, wrapped;
-
-  if( isFlagSet(INPUT_PENDING) )
-    return;
 
   value = gtk_spin_button_get_value(spinbutton);
   wrapped = wrap_angle(value, INCLINE_LOWER, INCLINE_UPPER);
@@ -1312,10 +1306,6 @@ on_main_freq_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  /* No redraws if new input pending */
-  if( isFlagSet(INPUT_PENDING) )
-    return;
-
   /* Frequency spinbutton value changed by frequency loop via freq_step_update_ui;
    * all redraws are already queued — guard against re-entrancy only. */
   if( isFlagSet(FREQ_LOOP_RUNNING) )
@@ -1338,6 +1328,7 @@ on_main_freq_spinbutton_value_changed(
     }
 
     calc_data.fmhz_save = (double)fmhz;
+    opt_ui_update_values();
   } /* else */
 
   gtk_spin_button_update( spinbutton );
@@ -1396,10 +1387,8 @@ on_structure_drawingarea_motion_notify_event(
 {
   static int cnt = 0;
 
-  /* No redraws if new input pending or event blocked */
   /* Use only 1 in MOTION_EVENTS_COUNT event */
   if( (cnt++ < MOTION_EVENTS_COUNT) ||
-      isFlagSet(INPUT_PENDING) ||
       isFlagSet(BLOCK_MOTION_EV) )
     return( FALSE );
 
@@ -1733,10 +1722,6 @@ on_freqplots_drawingarea_button_press_event(
     GdkEventButton  *event,
     gpointer         user_data)
 {
-  /* No redraws if new input pending */
-  if( isFlagSet(INPUT_PENDING) )
-    return( FALSE );
-
   Set_Frequency_On_Click( (GdkEvent*)event );
   return( TRUE );
 }
@@ -2255,9 +2240,6 @@ on_rdpattern_rotate_spinbutton_value_changed(
 {
   double value, wrapped;
 
-  if( isFlagSet(INPUT_PENDING) )
-    return;
-
   value = gtk_spin_button_get_value(spinbutton);
   wrapped = wrap_angle(value, ROTATE_LOWER, ROTATE_UPPER);
 
@@ -2298,9 +2280,6 @@ on_rdpattern_incline_spinbutton_value_changed(
     gpointer         user_data)
 {
   double value, wrapped;
-
-  if( isFlagSet(INPUT_PENDING) )
-    return;
 
   value = gtk_spin_button_get_value(spinbutton);
   wrapped = wrap_angle(value, INCLINE_LOWER, INCLINE_UPPER);
@@ -2394,10 +2373,6 @@ on_rdpattern_freq_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  /* No redraws if new input pending */
-  if( isFlagSet(INPUT_PENDING) )
-    return;
-
   /* Frequency spinbutton value changed by frequency loop via freq_step_update_ui;
    * all redraws are already queued — guard against re-entrancy only. */
   if( isFlagSet(FREQ_LOOP_RUNNING) )
@@ -2482,10 +2457,8 @@ on_rdpattern_drawingarea_motion_notify_event(
 {
   static int cnt = 0;
 
-  /* No redraws if new input pending or event blocked */
   /* Use only 1 in MOTION_EVENTS_COUNT event */
   if( (cnt++ < MOTION_EVENTS_COUNT) ||
-      isFlagSet(INPUT_PENDING) ||
       isFlagSet(BLOCK_MOTION_EV) )
     return( FALSE );
 

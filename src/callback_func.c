@@ -1126,9 +1126,6 @@ Draw_Colorcode( cairo_t *cr )
   double red = 0.0, grn = 0.0, blu = 0.0;
   int idx;
 
-  /* No redraws if new input pending */
-  if( isFlagSet(INPUT_PENDING) ) return;
-
   /* Draw color-code bar in main window */
   for( idx = 0; idx < COLORCODE_WIDTH; idx++ )
   {
