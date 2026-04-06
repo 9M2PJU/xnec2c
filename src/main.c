@@ -692,7 +692,7 @@ Open_Input_File( gpointer arg )
    * During forked frequency loop, children scale geometry independently,
    * but parent's data.bi[] must be wavelength-normalized for any
    * intermediate renders from children. */
-  New_Frequency();
+  Frequency_Scale_Geometry();
 
   /* Allow re-draws on expose events etc */
   ClearFlag( INPUT_PENDING );

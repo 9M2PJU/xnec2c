@@ -167,7 +167,7 @@ user_set_frequency( double fmhz )
  *
  * Scales geometric parameters to frequency
  */
-  static void
+  void
 Frequency_Scale_Geometry(void)
 {
   double fr;

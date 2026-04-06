@@ -1745,6 +1745,7 @@ void Update_Window_Titles(void);
 /* xnec2c.c */
 void freq_step_update_ui(int new_step, gboolean force);
 void Near_Field_Pattern(void);
+void Frequency_Scale_Geometry(void);
 void New_Frequency(void);
 void New_Frequency_Reset_Prev(void);
 

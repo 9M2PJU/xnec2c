@@ -1629,6 +1629,7 @@ Read_Commands( void )
       Alloc_Crnt_Fstep_Buffers( calc_data.steps_total + 1 );
       if( isFlagSet(ENABLE_NEAREH) )
       {
+        Alloc_Nearfield_Buffers( fpat.nrx, fpat.nry, fpat.nrz );
         Alloc_Nearfield_Fstep_Buffers( calc_data.steps_total + 1 );
       }
       SetFlag( ENABLE_RDPAT );
