@@ -43,7 +43,7 @@ SED_CMDS += -e 's|[@]PACKAGE_VERSION@|$(PACKAGE_VERSION)|g'
 applicationsdir        = $(datarootdir)/applications
 
 if HAVE_PROG_MSGFMT
-files/xnec2c.desktop: $(srcdir)/files/xnec2c.desktop.in $(wildcard $(top_srcdir)/po/*.po)
+files/xnec2c.desktop: $(srcdir)/files/xnec2c.desktop.in
 	$(MSGFMT) --desktop --template=$(srcdir)/files/xnec2c.desktop.in \
 	  -d $(top_srcdir)/po \
 	  -o $@
