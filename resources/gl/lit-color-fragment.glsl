@@ -1,4 +1,4 @@
-#version 130
+#version 150
 #extension GL_ARB_conservative_depth : enable
 
 /* vDepthBias >= 0 always (wires: 0, patches: positive per-index bias),

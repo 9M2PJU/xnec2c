@@ -1,4 +1,4 @@
-#version 130
+#version 150
 uniform float u_alpha;
 uniform float u_color_dim;
 uniform sampler2D u_peel_depth;

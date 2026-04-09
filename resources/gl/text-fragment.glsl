@@ -1,4 +1,4 @@
-#version 130
+#version 150
 uniform sampler2D tex;
 centroid in vec2 v_texcoord;
 out vec4 fragColor;

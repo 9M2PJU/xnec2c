@@ -103,6 +103,23 @@ gl_view_state_free(gl_view_state_t *state)
 
 /*-----------------------------------------------------------------------*/
 
+/** gl_view_signal_init_failed() - Signal that OpenGL initialization failed
+ * @state: view state carrying the failure callback
+ *
+ * Schedules the on_gl_init_failed callback on the main-loop idle queue
+ * so the renderer falls back to Cairo.  Safe to call when no callback
+ * is configured (no-op).
+ */
+  static void
+gl_view_signal_init_failed(gl_view_state_t *state)
+{
+  if( state->config->on_gl_init_failed )
+    g_idle_add_once(state->config->on_gl_init_failed, NULL);
+
+} /* gl_view_signal_init_failed() */
+
+/*-----------------------------------------------------------------------*/
+
 /** on_realize() - GtkGLArea realize signal handler
  * @area: GL area widget
  * @user_data: view state
@@ -121,8 +138,7 @@ on_realize(GtkGLArea *area, gpointer user_data)
   if( gtk_gl_area_get_error(area) != NULL )
   {
     pr_err("OpenGL context error — no OpenGL implementation available on this display\n");
-    if( state->config->on_gl_init_failed )
-      g_idle_add_once(state->config->on_gl_init_failed, NULL);
+    gl_view_signal_init_failed(state);
     return;
   }
 
@@ -133,13 +149,26 @@ on_realize(GtkGLArea *area, gpointer user_data)
   /* Create scene renderable — fatal on failure */
   r = gl_view_scene_renderable_new(state);
   if( !r.render )
+  {
+    pr_err("Disabling OpenGL: scene shader failed\n");
+    gl_view_signal_init_failed(state);
     return;
+  }
   g_array_append_val(state->renderables, r);
 
   /* Create overlay renderable if configured */
   r = gl_view_overlay_renderable_new(state);
   if( r.render )
+  {
     g_array_append_val(state->renderables, r);
+  }
+  else if( state->scene->overlay_config )
+  {
+    /* Overlay was configured but shader load failed */
+    pr_err("Disabling OpenGL: overlay shader failed\n");
+    gl_view_signal_init_failed(state);
+    return;
+  }
 
   /* Create axes renderer */
   {
@@ -148,7 +177,8 @@ on_realize(GtkGLArea *area, gpointer user_data)
     axes = opengl_axes_new();
     if( !axes )
     {
-      pr_err("Failed to create axes renderer\n");
+      pr_err("Disabling OpenGL: axes renderer failed\n");
+      gl_view_signal_init_failed(state);
       return;
     }
 
@@ -180,7 +210,8 @@ on_realize(GtkGLArea *area, gpointer user_data)
     ground_plane = opengl_ground_plane_new();
     if( !ground_plane )
     {
-      pr_err("Failed to create ground plane renderer\n");
+      pr_err("Disabling OpenGL: ground plane shader failed\n");
+      gl_view_signal_init_failed(state);
       return;
     }
 
@@ -293,7 +324,9 @@ on_realize(GtkGLArea *area, gpointer user_data)
     }
     else
     {
-      pr_err("Failed to load peel composite shaders\n");
+      pr_err("Disabling OpenGL: peel composite shader failed\n");
+      gl_view_signal_init_failed(state);
+      return;
     }
   }
 

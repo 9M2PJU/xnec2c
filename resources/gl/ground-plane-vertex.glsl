@@ -1,4 +1,4 @@
-#version 130
+#version 150
 in vec3 position;
 in vec3 normal;
 in vec4 color;
