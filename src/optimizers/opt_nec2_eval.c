@@ -75,7 +75,12 @@ void nec2_eval_signal(void)
 		return;
 	}
 
-	g_mutex_lock(&eval_mutex);
+	if (!g_mutex_trylock(&eval_mutex))
+	{
+		pr_warn("nec2_eval_signal: eval_mutex contention, blocking (thr=%lu)\n",
+			(unsigned long)pthread_self());
+		g_mutex_lock(&eval_mutex);
+	}
 	g_cond_signal(&eval_cond);
 	g_mutex_unlock(&eval_mutex);
 }
@@ -193,11 +198,16 @@ int nec2_eval_run(const simple_var_t *vars, int num_vars,
 	ctx.vars = vars;
 	ctx.num_vars = num_vars;
 
-	/* Lock eval mutex before triggering freq loop so we do not miss the signal */
-	g_mutex_lock(&eval_mutex);
-
-	/* Apply overrides, save .sy, reload via GTK main loop */
+	/* Apply overrides, save .sy, reload via GTK main loop.
+	 * eval_mutex must NOT be held here: the callback calls
+	 * Open_Input_File → Stop_Frequency_Loop → pthread_join, and the
+	 * freq thread needs eval_mutex in nec2_eval_signal to exit. */
 	g_idle_add_once_sync(eval_apply_and_reload, &ctx);
+
+	/* Lock after the sync callback returns.  The freq loop was just
+	 * spawned by the callback and cannot have finished yet, so the
+	 * signal from nec2_eval_signal cannot be missed. */
+	g_mutex_lock(&eval_mutex);
 
 	/* Wait for frequency loop completion signal */
 	while (isFlagClear(FREQ_LOOP_DONE))
@@ -214,7 +224,7 @@ int nec2_eval_run(const simple_var_t *vars, int num_vars,
 	g_idle_add_once_sync(gtk_drain_pending, NULL);
 
 	/* Collect measurements under freq_data_lock */
-	g_mutex_lock(&freq_data_lock);
+	g_rec_mutex_lock(&freq_data_lock);
 
 	steps = calc_data.steps_total;
 	count = (steps < max_steps) ? steps : max_steps;
@@ -224,7 +234,7 @@ int nec2_eval_run(const simple_var_t *vars, int num_vars,
 		meas_calc(&meas_out[i], i);
 	}
 
-	g_mutex_unlock(&freq_data_lock);
+	g_rec_mutex_unlock(&freq_data_lock);
 
 	return count;
 }
@@ -239,14 +249,14 @@ int nec2_eval_get_freq(double *freq_out, int max_steps)
 	int steps;
 	int count;
 
-	g_mutex_lock(&freq_data_lock);
+	g_rec_mutex_lock(&freq_data_lock);
 
 	steps = calc_data.steps_total;
 	count = (steps < max_steps) ? steps : max_steps;
 
 	memcpy(freq_out, save.freq, count * sizeof(double));
 
-	g_mutex_unlock(&freq_data_lock);
+	g_rec_mutex_unlock(&freq_data_lock);
 
 	return count;
 }

@@ -615,19 +615,12 @@ void set_mathlib_interactive(GtkWidget *widget, mathlib_t *lib)
 		return;
 	}
 
-	if (g_mutex_trylock(&global_lock))
-	{
-		close_mathlib(current_mathlib);
-		current_mathlib = lib;
+	close_mathlib(current_mathlib);
+	current_mathlib = lib;
 
-		update_mathlib_selection(rc_config.mathlib_id, lib->id);
+	update_mathlib_selection(rc_config.mathlib_id, lib->id);
 
-		open_mathlib(lib);
-
-		g_mutex_unlock(&global_lock);
-	}
-	else
-		Stop( ERR_OK, _("mathlib: You cannot change the math library while the freq loop is running.") );
+	open_mathlib(lib);
 
 }
 
@@ -889,7 +882,7 @@ void mathlib_benchmark(int slow)
 		 "* Thread congestion will occur for multi-threaded libraries when using the -j N option if there are not enough "
 		 "CPUs available to accommodate the forked processes in combination with library threads.  Consider reducing the value of -j N for "
 		 "benchmarking to find what library works best with a mix of forking and threading; you can use `top` to monitor your CPU usage"
-		 "and if it reaches 0% idle then you might consider reducing -j N.\n"
+		 "and if it reaches 0%% idle then you might consider reducing -j N.\n"
 		 "\n"
 		 "You may wish to experiment setting these environment variables:\n"
 		 "  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS thread limit\n"
@@ -970,15 +963,11 @@ void mathlib_benchmark(int slow)
 				break;
 
 			// These iterate multiple times by reducing the number of jobs each time:
-			g_mutex_lock(&global_lock);
-
 			if (slow == MATHLIB_BENCHMARK_NLOG2)
 				calc_data.num_jobs >>= 1;
 
 			else if (slow == MATHLIB_BENCHMARK_NJ)
 				calc_data.num_jobs--;
-
-			g_mutex_unlock(&global_lock);
 		}
 	}
 
@@ -990,9 +979,7 @@ void mathlib_benchmark(int slow)
 	if (orig_draw_currents)
 		SetFlag(DRAW_CURRENTS);
 
-	g_mutex_lock(&global_lock);
 	calc_data.num_jobs = orig_jobs;
-	g_mutex_unlock(&global_lock);
 
 	if (best_mathlib != NULL)
 		snprintf(m + strlen(m), sizeof(m)-strlen(m)-1, "\nBest Mathlib: %s (-j %d): %f seconds\n",

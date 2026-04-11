@@ -91,13 +91,11 @@ extern projection_parameters_t
 /* Number of forked child processes */
 extern int num_child_procs;
 
-/* Global lock to prevent nested execution of functions like
-   Frequency_Loop(), Open_Input_File(), and possibly others. */
-extern GMutex global_lock;
-
-/* Lock for frequency data to prevent use of data populated by Get_Freq_Data() and New_Frequency()
-   before it is done filling the data buffers.  */
-extern GMutex freq_data_lock;
+/* Recursive lock for frequency data to prevent use of data populated by
+   Get_Freq_Data() and New_Frequency() before it is done filling the data
+   buffers.  Recursive so the idle wrapper can hold the lock while flushing
+   GTK events that fire draw handlers which re-acquire it. */
+extern GRecMutex freq_data_lock;
 
 /* Program forked flag */
 extern gboolean FORKED;

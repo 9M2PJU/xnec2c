@@ -830,9 +830,9 @@ int Draw_Radiation( cairo_t *cr )
 	if (isFlagSet(ERROR_CONDX))
 		return FALSE;
 
-	g_mutex_lock(&freq_data_lock);
+	g_rec_mutex_lock(&freq_data_lock);
 	ret = _Draw_Radiation( cr );
-	g_mutex_unlock(&freq_data_lock);
+	g_rec_mutex_unlock(&freq_data_lock);
 
 	return ret;
 }
@@ -900,6 +900,8 @@ Animate_Near_Field( gpointer udata )
   if( !NF_FSTEP_AVAILABLE(fstep) )
     return( FALSE );
 
+  g_rec_mutex_lock(&freq_data_lock);
+
   near_field_t *nf = &near_field_fstep[fstep];
 
   /* Reset per-frame max for animation snapshot */
@@ -954,6 +956,8 @@ Animate_Near_Field( gpointer udata )
   wt += near_field.anim_step;
   if( wt >= (double)M_2PI )
     wt = 0.0;
+
+  g_rec_mutex_unlock(&freq_data_lock);
 
   xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 
@@ -1028,7 +1032,11 @@ Set_Polarization( int pol )
 
   /* Show gain in direction of viewer */
   if( isFlagSet(INPUT_OPENED) )
+  {
+    g_rec_mutex_lock(&freq_data_lock);
     Show_Viewer_Gain( main_window_builder, "main_gain_entry", structure_proj_params );
+    g_rec_mutex_unlock(&freq_data_lock);
+  }
 
   /* Enable redraw of rad pattern */
   SetFlag( DRAW_NEW_RDPAT );
@@ -1128,7 +1136,11 @@ Set_Gain_Style( int gs )
 
   /* Check for model compatibility warnings when entering noise mode */
   if (noise)
+  {
+    g_rec_mutex_lock(&freq_data_lock);
     Check_Noise_Warnings(calc_data.freq_step);
+    g_rec_mutex_unlock(&freq_data_lock);
+  }
 
   Set_Window_Labels();
 
@@ -1648,9 +1660,9 @@ _Alloc_Rdpattern_Buffers( int nfrq, int nth, int nph )
 
 void Alloc_Rdpattern_Buffers( int nfrq, int nth, int nph )
 {
-	g_mutex_lock(&freq_data_lock);
+	g_rec_mutex_lock(&freq_data_lock);
 	_Alloc_Rdpattern_Buffers(nfrq, nth, nph);
-	g_mutex_unlock(&freq_data_lock);
+	g_rec_mutex_unlock(&freq_data_lock);
 }
 
 /*-----------------------------------------------------------------------*/

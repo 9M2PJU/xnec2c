@@ -115,9 +115,12 @@ fetch_freq_data( void )
   if( save.freq == NULL )
     return FALSE;
 
+  g_rec_mutex_lock(&freq_data_lock);
+
   if( set_freq_step() )
   {
     freq_step_update_ui( calc_data.freq_step, TRUE );
+    g_rec_mutex_unlock(&freq_data_lock);
     return TRUE;
   }
 
@@ -125,9 +128,11 @@ fetch_freq_data( void )
       FREQ_EQ(save.freq[calc_data.steps_total], calc_data.freq_mhz) )
   {
     freq_step_update_ui( calc_data.steps_total, TRUE );
+    g_rec_mutex_unlock(&freq_data_lock);
     return TRUE;
   }
 
+  g_rec_mutex_unlock(&freq_data_lock);
   return Start_Frequency_Loop_Greenline();
 }
 
@@ -534,7 +539,7 @@ New_Frequency( void )
       isFlagClear(ENABLE_EXCITN) )
     return;
 
-  g_mutex_lock(&freq_data_lock);
+  g_rec_mutex_lock(&freq_data_lock);
 
   save.last_freq = calc_data.freq_mhz;
 
@@ -568,18 +573,18 @@ New_Frequency( void )
   /* Near field calculation */
   Near_Field_Pattern();
 
-  g_mutex_unlock(&freq_data_lock);
-
-  /* For the interactive path (outside the frequency loop), store per-step
-   * results here.  During the loop, freq_loop_collect() handles this under
-   * freq_data_lock.  Child processes call these in the FRQDATA handler. */
-  if( !CHILD && isFlagClear(FREQ_LOOP_RUNNING) )
+  /* Save per-step results under lock for both interactive and loop paths.
+   * During the freq loop the non-forked path enters here via dispatch;
+   * the forked path saves in freq_loop_collect under its own lock. */
+  if( !CHILD )
   {
     Save_Crnt_Data( calc_data.freq_step );
     Save_Nearfield_Data( calc_data.freq_step );
     if( save.fstep != NULL && calc_data.freq_step >= 0 )
       save.fstep[calc_data.freq_step] = 1;
   }
+
+  g_rec_mutex_unlock(&freq_data_lock);
 
   // Calculate elapsed time
   clock_gettime(CLOCK_MONOTONIC, &end);
@@ -616,7 +621,7 @@ freq_loop_display_step( void )
 {
   int idx, step = -1;
 
-  g_mutex_lock(&freq_data_lock);
+  g_rec_mutex_lock(&freq_data_lock);
 
   for( idx = 0; idx < calc_data.steps_total; idx++ )
     if( save.fstep[idx] )
@@ -626,7 +631,7 @@ freq_loop_display_step( void )
   if( calc_data.fmhz_save > 0.0 && save.fstep[calc_data.steps_total] )
     step = calc_data.steps_total;
 
-  g_mutex_unlock(&freq_data_lock);
+  g_rec_mutex_unlock(&freq_data_lock);
   return step;
 }
 
@@ -642,6 +647,8 @@ void
 freq_step_update_ui( int new_step, gboolean force )
 {
   char txt[16];
+
+  g_rec_mutex_lock(&freq_data_lock);
 
   calc_data.freq_step = new_step;
   calc_data.freq_mhz  = save.freq[new_step];
@@ -685,6 +692,8 @@ freq_step_update_ui( int new_step, gboolean force )
   }
 
   opt_ui_update_values();
+
+  g_rec_mutex_unlock(&freq_data_lock);
 }
 
 /* Idle wrapper: intermediate loop step — draws suppressed during optimizer */
@@ -695,7 +704,10 @@ freq_step_update_ui_idle( gpointer p )
   return G_SOURCE_REMOVE;
 }
 
-/* Idle wrapper: terminal step — draws forced through SUPPRESS gate */
+/* Idle wrapper: terminal step — draws forced through SUPPRESS gate.
+ * Do not flush GTK events here — _callback_g_idle_add_once flushes
+ * after we return for sync paths; flushing here would process arbitrary
+ * idle sources (e.g. eval_apply_and_reload) and deadlock on pthread_join. */
 static gboolean
 freq_step_update_ui_idle_force( gpointer p )
 {
@@ -736,9 +748,9 @@ freq_populate_steps( void )
     }
   }
 
-  /* Include the extra green-line slot in the scan range.  save.freq[steps_total]
-   * is written only by freq_loop_dispatch to preserve the "last computed
-   * frequency" semantic used by the mismatch check in the dispatch scan. */
+  /* Include the extra green-line slot in the scan range when the user
+   * has selected a green-line frequency.  Assign it here so the dispatch
+   * loop treats it identically to sweep slots. */
   if( calc_data.fmhz_save > 0.0 )
     return calc_data.steps_total;
 
@@ -842,7 +854,7 @@ freq_loop_validate_result( freq_loop_state_t *state, child_proc_t *child )
  * Non-forked: computes inline under freq_data_lock, collects, resets
  * child->assigned_step to -1, and pushes child back onto the idle stack.
  * The COMPUTE loop detects synchronous completion via child->assigned_step == -1.
- * Called under global_lock; freq_data_lock not held on entry.
+ * Non-forked path: New_Frequency acquires freq_data_lock internally.
  */
 static void
 freq_loop_dispatch( freq_loop_state_t *state, child_proc_t *child,
@@ -880,12 +892,11 @@ freq_loop_dispatch( freq_loop_state_t *state, child_proc_t *child,
     return;
   }
 
-  g_mutex_lock(&freq_data_lock);
   /* Non-forked: write freq_mhz and freq_step for the NEC engine here;
-   * freq_step_update_ui overwrites both on the GTK thread for display. */
+   * freq_step_update_ui overwrites both on the GTK thread for display.
+   * New_Frequency acquires freq_data_lock internally. */
   calc_data.freq_mhz  = freq;
   calc_data.freq_step = fstep;
-  g_mutex_unlock(&freq_data_lock);
   New_Frequency();
 
   /* Non-forked: computation is synchronous.  Child stays off the idle stack
@@ -898,8 +909,8 @@ freq_loop_dispatch( freq_loop_state_t *state, child_proc_t *child,
  * @state: loop state; idle_stack updated in place
  *
  * Blocks in select() until at least one child pipe is readable, then
- * processes all ready children.  Called under global_lock; acquires
- * freq_data_lock internally for the data writes.
+ * processes all ready children.  Forked path acquires freq_data_lock
+ * internally; non-forked path is lock-free (saves done in New_Frequency).
  *
  * Returns FALSE and sets FREQ_LOOP_STOP if a pipe read fails; TRUE otherwise.
  */
@@ -931,9 +942,10 @@ freq_loop_collect_pending( freq_loop_state_t *state )
   /* Non-forked path: no pipe fds (n==0); dispatch() computed synchronously
    * but left the child off the idle stack with assigned_step set.
    * Collect results and return child to the idle stack. */
+  /* Non-forked path: New_Frequency already saved under freq_data_lock;
+   * collect results and return children to the idle stack. */
   if( n == 0 )
   {
-    g_mutex_lock(&freq_data_lock);
     for( idx = 0; idx < calc_data.num_jobs; idx++ )
     {
       if( child_procs[idx]->assigned_step == -1 )
@@ -946,7 +958,6 @@ freq_loop_collect_pending( freq_loop_state_t *state )
       child_procs[idx]->assigned_step = -1;
       idle_stack_push( state, child_procs[idx] );
     }
-    g_mutex_unlock(&freq_data_lock);
     return TRUE;
   }
 
@@ -961,7 +972,7 @@ freq_loop_collect_pending( freq_loop_state_t *state )
     _exit(0);
   }
 
-  g_mutex_lock(&freq_data_lock);
+  g_rec_mutex_lock(&freq_data_lock);
   for( idx = 0; idx < num_child_procs; idx++ )
   {
     if( child_procs[idx]->assigned_step == -1 )
@@ -976,7 +987,7 @@ freq_loop_collect_pending( freq_loop_state_t *state )
     {
       pr_err("Failed to read data from forked child\n");
       SetFlag(FREQ_LOOP_STOP);
-      g_mutex_unlock(&freq_data_lock);
+      g_rec_mutex_unlock(&freq_data_lock);
       return FALSE;
     }
 
@@ -990,7 +1001,7 @@ freq_loop_collect_pending( freq_loop_state_t *state )
     child_procs[idx]->assigned_step = -1;
     idle_stack_push( state, child_procs[idx] );
   }
-  g_mutex_unlock(&freq_data_lock);
+  g_rec_mutex_unlock(&freq_data_lock);
 
   return TRUE;
 }
@@ -1001,8 +1012,7 @@ freq_loop_collect_pending( freq_loop_state_t *state )
  * @state: loop state (for elapsed-time calculation)
  *
  * Sets FREQ_LOOP_DONE, logs elapsed time, wakes the optimizer, and
- * queues final UI updates.  No locks held on entry; no sync GTK calls
- * made while global_lock is held (it was released before this call).
+ * queues final UI updates.  No locks held on entry.
  */
 static void
 freq_loop_finalize( freq_loop_state_t *state )
@@ -1018,8 +1028,7 @@ freq_loop_finalize( freq_loop_state_t *state )
     (FORKED ? get_mathlib_by_id(rc_config.mathlib_batch_id)->name
             : current_mathlib->name));
 
-  /* Wake optimizer thread; must be called after global_lock is released
-   * to avoid the eval_mutex / global_lock deadlock cycle. */
+  /* Wake optimizer thread waiting on eval_cond */
   nec2_eval_signal();
 
   /* Green line visible on frequency plot if its data was computed */
@@ -1028,12 +1037,14 @@ freq_loop_finalize( freq_loop_state_t *state )
 
   int display = freq_loop_display_step();
   if( display >= 0 )
-    g_idle_add_once_sync( (GSourceOnceFunc)freq_step_update_ui_idle_force,
+    g_idle_add_once( (GSourceOnceFunc)freq_step_update_ui_idle_force,
                           GINT_TO_POINTER(display) );
 
   if( (rc_config.batch_mode || isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS)) &&
       opt_have_files_to_save() )
-    g_idle_add_once_sync((GSourceOnceFunc)Write_Optimizer_Data, NULL);
+    /* Async: sync would deadlock if the optimizer queues
+     * eval_apply_and_reload before this idle source is processed. */
+    g_idle_add_once((GSourceOnceFunc)Write_Optimizer_Data, NULL);
 }
 
 /**
@@ -1054,8 +1065,6 @@ Frequency_Loop( gpointer udata )
   /* INIT: reset all iteration state for a new sweep */
   if( isFlagSet(FREQ_LOOP_INIT) )
   {
-    g_mutex_lock(&freq_data_lock);
-
     ClearFlag( FREQ_LOOP_INIT | FREQ_LOOP_DONE );
 
     state->idle_top     = -1;
@@ -1082,7 +1091,6 @@ Frequency_Loop( gpointer udata )
 
     clock_gettime(CLOCK_MONOTONIC, &state->t0);
 
-    g_mutex_unlock(&freq_data_lock);
     return TRUE;
   }
 
@@ -1095,8 +1103,6 @@ Frequency_Loop( gpointer udata )
    * Non-forked path: dispatch() is synchronous; one step per Frequency_Loop()
    * call so async redraws can reach the GTK main thread between steps.
    */
-  g_mutex_lock(&global_lock);
-
   /* Dispatch phase: scan for invalid steps and dispatch to idle children */
   gboolean found_work = FALSE;
   while( !idle_stack_empty(state) && !isFlagSet(FREQ_LOOP_STOP) )
@@ -1104,15 +1110,7 @@ Frequency_Loop( gpointer udata )
     int next = -1;
     for( idx = state->next_scan; idx <= state->max_step; idx++ )
     {
-      /* For the extra green-line slot detect frequency mismatch between
-       * the stored result and the user's current selection; for sweep
-       * slots expected == stored so FREQ_EQ is always TRUE, reducing
-       * the condition to save.fstep[idx] == 0. */
-      double expected = (idx == calc_data.steps_total)
-          ? calc_data.fmhz_save : save.freq[idx];
-      gboolean needs_work = (save.fstep[idx] == 0
-          || !FREQ_EQ(save.freq[idx], expected));
-      if( !needs_work || step_in_flight(idx) )
+      if( save.fstep[idx] != 0 || step_in_flight(idx) )
         continue;
       next = idx;
       break;
@@ -1132,31 +1130,21 @@ Frequency_Loop( gpointer udata )
     state->next_scan = next + 1;
     child_proc_t *child = idle_stack_pop( state );
     gboolean batch = (next < calc_data.steps_total);
-    double freq = (next == calc_data.steps_total)
-        ? calc_data.fmhz_save : save.freq[next];
-    freq_loop_dispatch( state, child, next, freq, batch );
+    freq_loop_dispatch( state, child, next, save.freq[next], batch );
   }
 
 
   /* Collect phase: always invoked; handles forked (select+reap) and
    * non-forked (n==0: scan dispatched children, collect, push back). */
   if( !freq_loop_collect_pending(state) )
-  {
-    g_mutex_unlock(&global_lock);
     return FALSE;
-  }
-
-  g_mutex_unlock(&global_lock);
 
   /* STOP: drain remaining children before exiting */
   if( isFlagSet(FREQ_LOOP_STOP) )
   {
     while( children_dispatched() )
     {
-      g_mutex_lock(&global_lock);
-      gboolean ok = freq_loop_collect_pending( state );
-      g_mutex_unlock(&global_lock);
-      if( !ok )
+      if( !freq_loop_collect_pending( state ) )
         break;
     }
     return FALSE;
@@ -1280,10 +1268,10 @@ Start_Frequency_Loop( void )
   if( save.fstep == NULL || calc_data.steps_total < 1 )
     return FALSE;
 
-  int max = (calc_data.fmhz_save > 0.0)
-      ? calc_data.steps_total : calc_data.steps_total - 1;
-  for( int i = 0; i <= max; i++ )
+  g_rec_mutex_lock(&freq_data_lock);
+  for( int i = 0; i <= calc_data.steps_total; i++ )
     save.fstep[i] = 0;
+  g_rec_mutex_unlock(&freq_data_lock);
 
   return freq_loop_start_internal();
 }
@@ -1291,15 +1279,18 @@ Start_Frequency_Loop( void )
 /**
  * Start_Frequency_Loop_Greenline - recompute only the green-line step
  *
- * Invalidates save.fstep[steps_total] and starts the loop.  Sweep steps
- * 0..steps_total-1 remain valid, so the loop dispatches only steps_total
- * to a child (or computes inline for -j0).
+ * Invalidates save.fstep[steps_total] so the dispatch loop recomputes
+ * that slot.  Sweep steps 0..steps_total-1 remain valid.
  */
 gboolean
 Start_Frequency_Loop_Greenline( void )
 {
   if( calc_data.fmhz_save <= 0.0 || save.fstep == NULL || calc_data.steps_total < 1 )
     return FALSE;
+
+  g_rec_mutex_lock(&freq_data_lock);
+  save.fstep[calc_data.steps_total] = 0;
+  g_rec_mutex_unlock(&freq_data_lock);
 
   return freq_loop_start_internal();
 }

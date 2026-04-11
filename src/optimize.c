@@ -88,9 +88,9 @@ _Write_Optimizer_Data(void)
 
 void Write_Optimizer_Data( void )
 {
-	g_mutex_lock(&freq_data_lock);
+	g_rec_mutex_lock(&freq_data_lock);
 	_Write_Optimizer_Data();
-	g_mutex_unlock(&freq_data_lock);
+	g_rec_mutex_unlock(&freq_data_lock);
 }
 
 
@@ -409,9 +409,7 @@ Optimizer_Output( void *arg )
 				} while (!done);
 
 				flag = FALSE;
-				g_mutex_lock(&global_lock);
 				g_idle_add( Open_Input_File, (gpointer) &flag );
-				g_mutex_unlock(&global_lock);
 
 				modify_seen = FALSE;
 				ptr += sizeof(struct inotify_event) + event->len;
@@ -444,9 +442,7 @@ Optimizer_Output( void *arg )
 					} while (!done);
 
 					gboolean flag = FALSE;
-					g_mutex_lock(&global_lock);
 					g_idle_add( Open_Input_File, (gpointer) &flag );
-					g_mutex_unlock(&global_lock);
 
 					modify_seen = FALSE;
 				}

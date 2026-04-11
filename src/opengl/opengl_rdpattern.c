@@ -125,6 +125,8 @@ rdpattern_scene_generate(gl_view_content_t *out)
   float offset_x, offset_y, offset_z;
   const structure_overlay_data_t *geom = NULL;
 
+  g_rec_mutex_lock(&freq_data_lock);
+
   opengl_structure_show_ctrl_notice(rdpattern_gl_widget);
 
   /* Zoom from rdpattern spinbutton, normalized to multiplier */
@@ -166,7 +168,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
 
     line_count = opengl_rdpattern_generate_nf_lines();
     if( line_count <= 0 )
-      return( FALSE );
+      goto out_unlock;
 
     r_max = (float)nf->r_max;
 
@@ -188,6 +190,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
     out->show_gradient = FALSE;
     out->generation = opengl_rdpattern_get_nf_generation();
 
+    g_rec_mutex_unlock(&freq_data_lock);
     return( TRUE );
   }
 
@@ -196,6 +199,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
   {
     rdpattern_init_empty_scene(out, zoom);
     out->status_message = "Near field requires NE or NH cards in the NEC file";
+    g_rec_mutex_unlock(&freq_data_lock);
     return( TRUE );
   }
 
@@ -215,15 +219,16 @@ rdpattern_scene_generate(gl_view_content_t *out)
     {
       rdpattern_init_empty_scene(out, zoom);
       out->status_message = "Gain pattern requires an RP card in the NEC file";
+      g_rec_mutex_unlock(&freq_data_lock);
       return( TRUE );
     }
 
     current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
     if( current_gen == 0 )
-      return( FALSE );
+      goto out_unlock;
 
     if( !Get_Radiation_Pattern_Data(&rd_data) || !rd_data.valid )
-      return( FALSE );
+      goto out_unlock;
 
     r_max = (float)rd_data.r_max;
 
@@ -288,7 +293,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
             points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
 
         if( tri_count <= 0 )
-          return( FALSE );
+          goto out_unlock;
       }
 
       if( need_lines )
@@ -297,7 +302,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
             points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
 
         if( line_count <= 0 )
-          return( FALSE );
+          goto out_unlock;
       }
 
       rdpat_last_ff_gen = current_gen;
@@ -316,7 +321,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
           opengl_rdpattern_get_triangles(&tri_count);
 
         if( tri_count == 0 )
-          return( FALSE );
+          goto out_unlock;
 
         out->batches[0].vertices = tri_buf;
         out->batches[0].vertex_count = tri_count * 3;
@@ -335,7 +340,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
           opengl_rdpattern_get_lines(&line_count);
 
         if( line_count == 0 )
-          return( FALSE );
+          goto out_unlock;
 
         out->batches[0].vertices = line_buf;
         out->batches[0].vertex_count = line_count * 2;
@@ -356,7 +361,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
           opengl_rdpattern_get_lines(&line_count);
 
         if( tri_count == 0 || line_count == 0 )
-          return( FALSE );
+          goto out_unlock;
 
         /* Surface pushed behind wireframe via depth bias */
         out->batches[0].vertices = tri_buf;
@@ -381,7 +386,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
         pr_err("rdpattern: invalid draw style %d, using surface\n",
             rc_config.rdpattern_draw_style);
         rc_config.rdpattern_draw_style = RDPAT_STYLE_SURFACE;
-        return( FALSE );
+        goto out_unlock;
     }
 
     out->vertex_stride = (int)sizeof(lit_color_point_t);
@@ -397,6 +402,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
     out->show_gradient = isFlagSet(DRAW_GAIN) && rc_config.rdpattern_gradient_key;
     out->generation = opengl_rdpattern_get_ff_generation();
 
+    g_rec_mutex_unlock(&freq_data_lock);
     return( TRUE );
   }
 
@@ -423,22 +429,26 @@ rdpattern_scene_generate(gl_view_content_t *out)
     out->status_message = "Select Gain Pattern or Near Field";
   }
 
+  g_rec_mutex_unlock(&freq_data_lock);
   return( TRUE );
+
+out_unlock:
+  g_rec_mutex_unlock(&freq_data_lock);
+  return( FALSE );
 }
 
 /*-----------------------------------------------------------------------*/
 
 /** rdpattern_scene_post_render() - Scene provider post-render callback
+ *
+ * Updates rdpattern-window UI readouts after each rendered frame.
  */
   static void
 rdpattern_scene_post_render(void)
 {
-  /* Cairo's Draw_Radiation holds freq_data_lock when calling
-   * Update_Rdpattern_UI; match that to prevent a transient NULL
-   * max_gain read causing an early return that leaves "---" displayed. */
-  g_mutex_lock(&freq_data_lock);
+  g_rec_mutex_lock(&freq_data_lock);
   Update_Rdpattern_UI();
-  g_mutex_unlock(&freq_data_lock);
+  g_rec_mutex_unlock(&freq_data_lock);
 }
 
 /*-----------------------------------------------------------------------*/

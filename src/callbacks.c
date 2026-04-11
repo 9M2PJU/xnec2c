@@ -2556,7 +2556,9 @@ on_near_peak_value_activate(
   if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
   {
     int fstep = calc_data.freq_step;
+    g_rec_mutex_lock(&freq_data_lock);
     Recompute_Near_Field_Vectors( fstep, FALSE );
+    g_rec_mutex_unlock(&freq_data_lock);
     if( isFlagSet(DRAW_EHFIELD) )
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
@@ -2572,7 +2574,9 @@ on_near_snapshot_activate(
   if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
   {
     int fstep = calc_data.freq_step;
+    g_rec_mutex_lock(&freq_data_lock);
     Recompute_Near_Field_Vectors( fstep, TRUE );
+    g_rec_mutex_unlock(&freq_data_lock);
     if( isFlagSet(DRAW_EHFIELD) )
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }

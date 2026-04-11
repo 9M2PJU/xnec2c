@@ -615,9 +615,11 @@ Open_Input_File( gpointer arg )
   ClearFlag( OPEN_INPUT_FLAGS );
   SetFlag( INPUT_PENDING );
 
-  /* Stop freq loop */
-  if( isFlagSet(FREQ_LOOP_RUNNING) )
-    Stop_Frequency_Loop();
+  /* Always call Stop_Frequency_Loop: the thread clears FREQ_LOOP_RUNNING
+   * on normal exit, so checking the flag alone would skip cleanup,
+   * leaking pth_freq_loop and floop_state.  Stop_Frequency_Loop is
+   * idempotent — it checks pth_freq_loop internally and no-ops safely. */
+  Stop_Frequency_Loop();
 
   /* Close open files if any */
   Close_File( &input_fp );
@@ -627,18 +629,23 @@ Open_Input_File( gpointer arg )
   if( strlen(rc_config.input_file) == 0 )
     return( FALSE );
 
-  g_mutex_lock(&freq_data_lock);
+  /* Hold freq_data_lock across data reset and reallocation so draw
+   * handlers (which may fire during g_idle_add_once_sync flush loops)
+   * cannot access data structures mid-transition. */
+  g_rec_mutex_lock(&freq_data_lock);
+
   calc_data.freq_step = -1;
   calc_data.FR_cards    = 0;
   calc_data.steps_total = 0;
 
   free_ptr((void**)&fr_plots);
-  g_mutex_unlock(&freq_data_lock);
 
   Open_File( &input_fp, rc_config.input_file, "r");
 
   /* Read input file, record failures */
   ok = Read_Comments() && Read_Geometry() && Read_Commands();
+
+  g_rec_mutex_unlock(&freq_data_lock);
   if( !ok )
   {
     /* Hide main control buttons etc */
@@ -660,8 +667,9 @@ Open_Input_File( gpointer arg )
     return( FALSE );
   } /* if( !ok ) */
 
-  // The optimizer can queue multiple calls to this function so protect it with a lock
-  g_mutex_lock(&global_lock);
+  /* Serialization relies on GTK single-threadedness: inotify dispatches
+   * Open_Input_File to the GTK thread via g_idle_add; Stop_Frequency_Loop
+   * at entry joins any compute thread before proceeding. */
 
   SetFlag( INPUT_OPENED );
   gtk_widget_show( Builder_Get_Object(main_window_builder, "optimizer_output") );
@@ -846,8 +854,6 @@ Open_Input_File( gpointer arg )
     gtk_menu_item_activate( menu_item );
   }
 
-  // Unlock the mutex:
-  g_mutex_unlock(&global_lock);
 
   /* If currents or charges draw button is active
    * re-initialize structure currents/charges drawing */

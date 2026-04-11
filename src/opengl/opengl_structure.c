@@ -204,6 +204,8 @@ opengl_structure_show_ctrl_notice(GtkWidget *widget)
   static gboolean
 structure_scene_generate(gl_view_content_t *out)
 {
+  g_rec_mutex_lock(&freq_data_lock);
+
   const structure_overlay_data_t *geom;
   float zoom;
 
@@ -231,6 +233,7 @@ structure_scene_generate(gl_view_content_t *out)
   out->show_gradient = FALSE;
   out->generation = geom->generation;
 
+  g_rec_mutex_unlock(&freq_data_lock);
   return( TRUE );
 }
 
@@ -255,9 +258,9 @@ structure_scene_cleanup(void)
   static void
 structure_scene_post_render(void)
 {
-  g_mutex_lock(&freq_data_lock);
+  g_rec_mutex_lock(&freq_data_lock);
   Draw_Structure_UI();
-  g_mutex_unlock(&freq_data_lock);
+  g_rec_mutex_unlock(&freq_data_lock);
 
 } /* structure_scene_post_render() */
 

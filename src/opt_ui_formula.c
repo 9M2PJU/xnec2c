@@ -415,6 +415,8 @@ void opt_ui_update_values(void)
 		return;
 	}
 
+	g_rec_mutex_lock(&freq_data_lock);
+
 	/* During optimization: try to refresh from best snapshot.
 	 * If trylock fails, leave labels untouched to avoid flashing
 	 * dashes when UI interactions trigger this function. */
@@ -440,16 +442,19 @@ void opt_ui_update_values(void)
 				}
 			}
 		}
+		g_rec_mutex_unlock(&freq_data_lock);
 		return;
 	}
 
 	if (calc_data.steps_total <= 0)
 	{
+		g_rec_mutex_unlock(&freq_data_lock);
 		return;
 	}
 
 	if (calc_data.fmhz_save <= 0.0)
 	{
+		g_rec_mutex_unlock(&freq_data_lock);
 		return;
 	}
 
@@ -474,6 +479,8 @@ void opt_ui_update_values(void)
 
 	free_ptr((void **)&meas_all);
 	free_ptr((void **)&freq_all);
+
+	g_rec_mutex_unlock(&freq_data_lock);
 }
 
 /*------------------------------------------------------------------------*/

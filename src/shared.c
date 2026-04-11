@@ -179,13 +179,11 @@ child_proc_t **child_procs = NULL;
 /* Number of forked child processes */
 int num_child_procs = 0;
 
-/* Global lock to prevent nested execution of functions like
-   Frequency_Loop(), Open_Input_File(), and possibly others. */
-GMutex global_lock;
-
-/* Lock for frequency data to prevent use of data populated by Get_Freq_Data() and New_Frequency()
-   before it is done filling the data buffers.  */
-GMutex freq_data_lock;
+/* Recursive lock for frequency data to prevent use of data populated by
+   Get_Freq_Data() and New_Frequency() before it is done filling the data
+   buffers.  Recursive so the idle wrapper can hold the lock while flushing
+   GTK events that fire draw handlers which re-acquire it. */
+GRecMutex freq_data_lock;
 
 /* Program forked flag */
 gboolean FORKED = FALSE;

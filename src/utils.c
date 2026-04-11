@@ -90,15 +90,10 @@ int Notice(GtkButtonsType buttons, const char *title, const char *msg_fmt, ...)
 	vsnprintf(message, sizeof(message), msg_fmt, args);
 	va_end(args);
 
-	if (!g_mutex_trylock(&freq_data_lock))
+	if (!g_rec_mutex_trylock(&freq_data_lock))
 		locked = 1;
 	else
-		g_mutex_unlock(&freq_data_lock);
-
-	if (!g_mutex_trylock(&global_lock))
-		locked = 1;
-	else
-		g_mutex_unlock(&global_lock);
+		g_rec_mutex_unlock(&freq_data_lock);
 
 	if (locked || rc_config.batch_mode)
 	{
@@ -139,15 +134,10 @@ Stop( int err, const char *format, ... )
   vsnprintf(mesg, sizeof(mesg), format, args);
   va_end(args);
 
-  if (!g_mutex_trylock(&freq_data_lock))
+  if (!g_rec_mutex_trylock(&freq_data_lock))
     locked = 1;
   else
-    g_mutex_unlock(&freq_data_lock);
-
-  if (!g_mutex_trylock(&global_lock))
-    locked = 1;
-  else
-    g_mutex_unlock(&global_lock);
+    g_rec_mutex_unlock(&freq_data_lock);
 
   pr_err("Stop: %s\n", mesg);
 

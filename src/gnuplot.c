@@ -63,8 +63,10 @@ void Save_FreqPlots_Gnuplot_Data(char *filename)
 	fprintf(fp, _("#    plot for [i=2:3]  'filename.gplot' using 1:i with lines smooth bezier title columnhead(i);\n"));
 	fprintf(fp, "#\n");
 
+	g_rec_mutex_lock(&freq_data_lock);
 	meas_write_header_enc(fp, "\t", "\"", "\"");
 	meas_write_data(fp, "\t");
+	g_rec_mutex_unlock(&freq_data_lock);
 
 	fclose(fp);
 
@@ -132,11 +134,13 @@ void Save_FreqPlots_Touchstone(char *filename, int type)
 
 	fprintf(fp, "# MHz S DB R %g\n", calc_data.zo);
 
+	g_rec_mutex_lock(&freq_data_lock);
 	for (idx = 0; idx < calc_data.steps_total; idx++)
 	{
 		meas_calc(&meas, idx);
 		meas_write_format(&meas, format, fp);
 	}
+	g_rec_mutex_unlock(&freq_data_lock);
 
 	fclose(fp);
 
@@ -173,8 +177,10 @@ void Save_FreqPlots_CSV(char *filename)
 	if (!Open_File(&fp, filename, "w"))
 		return;
 
+	g_rec_mutex_lock(&freq_data_lock);
 	meas_write_header(fp, ",");
 	meas_write_data(fp, ",");
+	g_rec_mutex_unlock(&freq_data_lock);
 
 	fclose(fp);
 }

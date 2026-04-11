@@ -263,7 +263,7 @@ const char *meas_descriptions[] = {
 // idx: the index into the calculated data structures.
 //
 // Warning: idx is not checked to make sure it is valid.
-void meas_calc(measurement_t *m, int idx)
+static void _meas_calc(measurement_t *m, int idx)
 {
 	int pol = calc_data.pol_type;
 	int mgidx;
@@ -494,6 +494,18 @@ int meas_name_idx(char *name, int len)
 	}
 
 	return MEAS_COUNT;
+}
+
+/**
+ * meas_calc - calculate measurement data with freq_data_lock held
+ * @m:   measurement_t structure to fill
+ * @idx: index into calculated data structures (not bounds-checked)
+ */
+void meas_calc(measurement_t *m, int idx)
+{
+	g_rec_mutex_lock(&freq_data_lock);
+	_meas_calc(m, idx);
+	g_rec_mutex_unlock(&freq_data_lock);
 }
 
 // Format a string with values from the measurement.
