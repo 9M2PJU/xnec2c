@@ -24,7 +24,7 @@ print_backtrace(char *msg)
 
 /* Stub for GUI builder object accessor */
 GtkWidget *
-Builder_Get_Object(GtkBuilder *builder, gchar *name)
+Builder_Get_Object(GtkBuilder *builder, const gchar *name)
 {
   return NULL;
 }
