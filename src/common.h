@@ -227,6 +227,9 @@ typedef struct Segment
 /* Patch current flow direction phase animation active */
 #define FLOW_ANIMATE        0x0100000000000000ll
 
+/* SY optimizer evaluation in progress — suppresses inotify reload */
+#define SY_OPTIMIZER_ACTIVE 0x0200000000000000ll
+
 #define ALL_FLAGS           0xFFFFFFFFFFFFFFFFll
 
 /* Type of near field data requested */

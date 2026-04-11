@@ -615,6 +615,16 @@ Open_Input_File( gpointer arg )
   ClearFlag( OPEN_INPUT_FLAGS );
   SetFlag( INPUT_PENDING );
 
+  /* Invalidate freq loop preconditions before Stop_Frequency_Loop so that
+   * the GTK event flush inside Stop_Frequency_Loop cannot re-entrantly
+   * start a new freq loop via Start_Frequency_Loop_Greenline.  The
+   * existing steps_total < 1 guard in freq_loop_start_internal rejects
+   * any call that arrives during the flush. */
+  g_rec_mutex_lock(&freq_data_lock);
+  calc_data.FR_cards    = 0;
+  calc_data.steps_total = 0;
+  g_rec_mutex_unlock(&freq_data_lock);
+
   /* Always call Stop_Frequency_Loop: the thread clears FREQ_LOOP_RUNNING
    * on normal exit, so checking the flag alone would skip cleanup,
    * leaking pth_freq_loop and floop_state.  Stop_Frequency_Loop is
@@ -635,8 +645,6 @@ Open_Input_File( gpointer arg )
   g_rec_mutex_lock(&freq_data_lock);
 
   calc_data.freq_step = -1;
-  calc_data.FR_cards    = 0;
-  calc_data.steps_total = 0;
 
   free_ptr((void**)&fr_plots);
 
@@ -644,6 +652,15 @@ Open_Input_File( gpointer arg )
 
   /* Read input file, record failures */
   ok = Read_Comments() && Read_Geometry() && Read_Commands();
+
+  /* Zero validity flags and clear FREQ_LOOP_DONE under lock so draw
+   * and save handlers cannot observe stale fstep=1 paired with
+   * freshly-allocated garbage rad_pattern from Alloc_Rdpattern_Buffers
+   * inside Read_Commands. */
+  ClearFlag( FREQ_LOOP_DONE );
+  if( ok && save.fstep != NULL )
+    for( int i = 0; i <= calc_data.steps_total; i++ )
+      save.fstep[i] = 0;
 
   g_rec_mutex_unlock(&freq_data_lock);
   if( !ok )

@@ -442,6 +442,7 @@ void Save_RadPattern_CSV(char *filename)
 
 	int calc_idx, idx, nph, nth, pol;
 
+	g_rec_mutex_lock(&freq_data_lock);
 	if (isFlagSet(ENABLE_RDPAT) && (calc_data.freq_step >= 0))
 	{
 		for (calc_idx = 0; calc_idx < calc_data.steps_total; calc_idx++)
@@ -483,6 +484,7 @@ void Save_RadPattern_CSV(char *filename)
 			} // for( nph = 0; nph < fpat.nph; nph++ )
 		}
 	} // if( isFlagSet(ENABLE_RDPAT) && (calc_data.freq_step >= 0) )
+	g_rec_mutex_unlock(&freq_data_lock);
 
 	setlocale(LC_NUMERIC, orig_numeric_locale);
 

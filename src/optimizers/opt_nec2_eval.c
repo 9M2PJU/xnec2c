@@ -198,6 +198,12 @@ int nec2_eval_run(const simple_var_t *vars, int num_vars,
 	ctx.vars = vars;
 	ctx.num_vars = num_vars;
 
+	/* Suppress inotify reloads while the SY optimizer owns the cycle:
+	 * sy_save_overrides writes .sy which inotify watches, and without
+	 * this flag the inotify thread can trigger a competing reload
+	 * after the freq loop completes but before the next eval cycle. */
+	SetFlag( SY_OPTIMIZER_ACTIVE );
+
 	/* Apply overrides, save .sy, reload via GTK main loop.
 	 * eval_mutex must NOT be held here: the callback calls
 	 * Open_Input_File → Stop_Frequency_Loop → pthread_join, and the
@@ -235,6 +241,8 @@ int nec2_eval_run(const simple_var_t *vars, int num_vars,
 	}
 
 	g_rec_mutex_unlock(&freq_data_lock);
+
+	ClearFlag( SY_OPTIMIZER_ACTIVE );
 
 	return count;
 }

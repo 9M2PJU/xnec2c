@@ -1440,7 +1440,7 @@ _Plot_Frequency_Data( cairo_t *cr )
 
   // Call the underscore version because freq_data_lock is already held.
   // This makes the plot choppy during optimize, so skip that then.
-  if (prev_click_event != NULL && isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS))
+  if (prev_click_event != NULL)
 	  Set_Frequency_On_Click(prev_click_event);
 
   /* Graph position */

@@ -316,18 +316,37 @@ static void _meas_calc(measurement_t *m, int idx)
 	if (rad_pattern == NULL)
 		return;
 
+	/* Validate pol before indexing into NUM_POL-sized arrays */
+	if (pol < 0 || pol >= NUM_POL)
+	{
+		BUG("BUG: pol=%d out of range [0,%d): idx=%d freq_step=%d thr=%lu\n",
+			pol, NUM_POL, idx, calc_data.freq_step,
+			(unsigned long)pthread_self());
+		return;
+	}
+
 	mgidx = rad_pattern[idx].max_gain_idx[pol];
 
 	// This should never happen, but please report it with your .NEC file if it does.
 	//
 	// It should be fixed in commit 42afbe3a3, but just in case:
-	if (mgidx < 0)
+	int nthph = fpat.nth * fpat.nph;
+	if (mgidx < 0 || mgidx >= nthph)
 	{
-		BUG("BUG: invalid mgidx=%d: idx=%d pol=%d num_fsteps=%d freq_step=%d\n",
-			mgidx, idx, pol, calc_data.freq_step + 1,
-			calc_data.freq_step);
-		BUG("BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d\n", idx,
-			save.fstep[idx], isFlagSet(FREQ_LOOP_STOP));
+		BUG("BUG: mgidx=%d out of range [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n",
+			mgidx, nthph, idx, pol, calc_data.freq_step,
+			(unsigned long)pthread_self());
+		BUG("BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n",
+			idx, save.fstep[idx],
+			isFlagSet(FREQ_LOOP_STOP), isFlagSet(FREQ_LOOP_DONE));
+		BUG("BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n",
+			idx, rad_pattern[idx].efficiency,
+			(void *)rad_pattern[idx].gtot,
+			(void *)rad_pattern[idx].max_gain_idx);
+		BUG("BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n",
+			rad_pattern[idx].max_gain_idx[0],
+			rad_pattern[idx].max_gain_idx[1],
+			rad_pattern[idx].max_gain_idx[2]);
 		mem_backtrace(rad_pattern[idx].max_gain_idx);
 		return;
 	}
@@ -449,6 +468,17 @@ static void _meas_calc(measurement_t *m, int idx)
 			nth = 0;
 		else
 			nth = (int) (fbdir / fpat.dth + 0.5);
+
+		// Validate nth after over-ground recalculation
+		if (nth < 0 || nth >= fpat.nth)
+		{
+			BUG("BUG: F/B nth=%d out of [0,%d) after over-ground recalc: "
+				"idx=%d pol=%d max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n",
+				nth, fpat.nth, idx, pol,
+				rad_pattern[idx].max_gain_tht[pol], fbdir, fpat.dth);
+			m->fb_ratio = -1;
+			return;
+		}
 	}
 
 	// Find F/B direction in phi

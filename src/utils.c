@@ -533,7 +533,6 @@ void mem_realloc( void **ptr, size_t req, gchar *str )
   void
 free_ptr( void **ptr )
 {
-	return;
   if( *ptr != NULL )
   {
 	mem_obj_t *m = (mem_obj_t *)*ptr;
@@ -828,9 +827,6 @@ int _callback_g_idle_add_once(g_idle_add_data_t *cbdata)
 	//       and no caller will be waiting.
 	if (cbdata->is_locked)
 	{
-		// Wait for GTK
-		while (g_main_context_iteration(NULL, FALSE)) {}
-		
 		if (cbdata->backtrace != NULL)
 		{
 			free(cbdata->backtrace);

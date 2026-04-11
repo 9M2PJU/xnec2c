@@ -752,7 +752,10 @@ freq_populate_steps( void )
    * has selected a green-line frequency.  Assign it here so the dispatch
    * loop treats it identically to sweep slots. */
   if( calc_data.fmhz_save > 0.0 )
+  {
+    save.freq[calc_data.steps_total] = calc_data.fmhz_save;
     return calc_data.steps_total;
+  }
 
   return calc_data.steps_total - 1;
 }
@@ -1226,6 +1229,15 @@ freq_loop_start_internal( void )
   if( isFlagSet(FREQ_LOOP_RUNNING) ||
       calc_data.FR_cards < 1       ||
       calc_data.steps_total < 1 )
+    return FALSE;
+
+  /* Join previous thread if it exited naturally but was never joined.
+   * Stop_Frequency_Loop is idempotent and no-ops when pth_freq_loop is NULL. */
+  Stop_Frequency_Loop();
+
+  /* Re-check: the GTK event flush inside Stop_Frequency_Loop may have
+   * re-entrantly started a new sweep via eval_apply_and_reload. */
+  if( isFlagSet(FREQ_LOOP_RUNNING) )
     return FALSE;
 
   mem_alloc((void**)&floop_state, sizeof(freq_loop_state_t), __LOCATION__);

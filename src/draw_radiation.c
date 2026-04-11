@@ -184,7 +184,8 @@ Generate_Rdpattern_Data(double *out_r_min, double *out_r_range)
   gen_counter = 0;
   fstep = calc_data.freq_step;
 
-  if( isFlagSet(ENABLE_RDPAT) && (fstep >= 0) )
+  if( isFlagSet(ENABLE_RDPAT) && (fstep >= 0) &&
+      rad_pattern != NULL && save.fstep[fstep] )
   {
     pol = calc_data.pol_type;
 

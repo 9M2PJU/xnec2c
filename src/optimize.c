@@ -332,7 +332,7 @@ Optimizer_Output( void *arg )
 
 		pr_debug("inotify: read %zd bytes from inotify fd\n", len);
 
-		if ( isFlagSet(FREQ_LOOP_RUNNING | FREQ_LOOP_INIT | INPUT_PENDING)|| isFlagClear(FREQ_LOOP_DONE))
+		if ( isFlagSet(FREQ_LOOP_RUNNING | FREQ_LOOP_INIT | INPUT_PENDING | SY_OPTIMIZER_ACTIVE) || isFlagClear(FREQ_LOOP_DONE))
 		{
 			pr_debug("inotify: SKIP all events (flags) - FREQ_LOOP_RUNNING=%d FREQ_LOOP_INIT=%d INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n",
 				isFlagSet(FREQ_LOOP_RUNNING) ? 1 : 0,
