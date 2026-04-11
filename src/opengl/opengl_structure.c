@@ -49,15 +49,14 @@ const gl_vertex_attrib_t opengl_structure_attribs[3] = {
 };
 
 /* Vertex attribute layout for chevron shader (structure_vertex_t) */
-const gl_vertex_attrib_t opengl_chevron_attribs[8] = {
+const gl_vertex_attrib_t opengl_chevron_attribs[7] = {
   { "position",   3, 0 },
   { "normal",     3, 4 * (int)sizeof(float) },
   { "color",      4, 8 * (int)sizeof(float) },
   { "uv",         2, 12 * (int)sizeof(float) },
   { "flow_data",  4, 14 * (int)sizeof(float) },
-  { "depth_bias", 1, 18 * (int)sizeof(float) },
-  { "tangent1",   3, 19 * (int)sizeof(float) },
-  { "tangent2",   3, 22 * (int)sizeof(float) }
+  { "tangent1",   3, 18 * (int)sizeof(float) },
+  { "tangent2",   3, 21 * (int)sizeof(float) }
 };
 
 /*-----------------------------------------------------------------------*/
@@ -271,7 +270,7 @@ static gl_view_config_t structure_view_config = {
   .vertex_shader_path = "/gl/lit-color-vertex.glsl",
   .fragment_shader_path = "/gl/lit-color-fragment.glsl",
   .attribs = opengl_chevron_attribs,
-  .attrib_count = 8,
+  .attrib_count = 7,
   .vertex_stride = (int)sizeof(structure_vertex_t),
   .has_gradient = FALSE,
   .gradient_draw = NULL,

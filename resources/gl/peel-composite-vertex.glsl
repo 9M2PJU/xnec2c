@@ -1,4 +1,4 @@
-#version 130
+#version 150
 /* Fullscreen triangle via VBO-supplied positions.
  * Three vertices at (-1,-1), (3,-1), (-1,3) cover the screen. */
 in vec2 position;

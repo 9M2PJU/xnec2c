@@ -1,10 +1,9 @@
-#version 130
+#version 150
 in vec3 position;
 in vec3 normal;
 in vec4 color;
 in vec2 uv;
 in vec4 flow_data;
-in float depth_bias;
 in vec3 tangent1;
 in vec3 tangent2;
 uniform mat4 mvp;
@@ -16,7 +15,6 @@ centroid out vec3 viewNormal;
 centroid out vec3 viewPos;
 centroid out vec2 vUV;
 centroid out vec4 vFlowData;
-flat out float vDepthBias;
 
 void main() {
   vec3 world_pos = position;
@@ -60,10 +58,6 @@ void main() {
   }
 
   gl_Position = mvp * vec4(world_pos, 1.0);
-
-  /* Pass per-vertex depth bias to fragment shader for gl_FragDepth.
-   * Wires carry 0; patches carry per-index positive bias. */
-  vDepthBias = depth_bias;
 
   viewPos = (u_mv * vec4(world_pos, 1.0)).xyz;
   viewNormal = normalize(mat3(u_mv) * normal);

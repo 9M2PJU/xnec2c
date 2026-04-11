@@ -1,4 +1,4 @@
-#version 130
+#version 150
 uniform sampler2D u_layer;
 noperspective in vec2 vUV;
 out vec4 fragColor;

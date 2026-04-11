@@ -564,8 +564,8 @@ int Get_Window_Geometry(
 opengl_config_set_defaults( void )
 {
   /* Per-type brightness defaults (0.0=black, 1.0=full) */
-  rc_config.brightness_segments      = 1.0f;
-  rc_config.brightness_patches       = 1.0f;
+  rc_config.brightness_segments      = 0.47f;
+  rc_config.brightness_patches       = 0.47f;
   rc_config.brightness_rdpat_surface = 0.47f;
   rc_config.brightness_rdpat_wire    = 1.0f;
   rc_config.brightness_nearfield     = 1.0f;

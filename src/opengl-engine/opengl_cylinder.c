@@ -22,8 +22,8 @@
 
 #ifdef HAVE_OPENGL
 
-/* Cap z-fighting against patches is resolved by per-vertex depth_bias
- * applied via gl_FragDepth in the fragment shader. */
+/* Cap z-fighting against patches is resolved by glPolygonOffset
+ * applied per-batch in the render loop. */
 
 /*-----------------------------------------------------------------------*/
 

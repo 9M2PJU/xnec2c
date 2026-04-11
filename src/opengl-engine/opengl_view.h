@@ -37,6 +37,15 @@
 /* Texture unit used for the previous-pass depth texture during depth peeling */
 #define PEEL_DEPTH_TEX_UNIT 2
 
+/* Texture unit for the current layer's discovered depth (coplanar accumulation) */
+#define LAYER_DEPTH_TEX_UNIT 3
+
+/* glPolygonOffset parameters for surface-behind-wire depth ordering.
+ * Factor=2.0 exceeds the peel epsilon dz coefficient (1.0), providing a
+ * margin of dz+r that scales with surface slope and depth range. */
+#define POLYGON_OFFSET_FACTOR 2.0f
+#define POLYGON_OFFSET_UNITS  1.0f
+
 /* Convert transparency fraction (0.0–1.0) to alpha (1.0=opaque, 0.0=invisible) */
 #define TRANSPARENCY_TO_ALPHA(t) (1.0f - (t))
 
@@ -108,6 +117,11 @@ typedef struct gl_render_params_s
   float alpha;
   int peel_pass;
 
+  /* When TRUE, fragment shader applies coplanar tolerance discard
+   * against u_layer_depth instead of writing depth.  Set during
+   * sub-pass B of coplanar accumulation. */
+  int coplanar_pass;
+
 } gl_render_params_t;
 
 /* Uniform locations for depth-peel discard logic (shared by all peel-aware shaders) */
@@ -115,6 +129,8 @@ typedef struct
 {
   GLint peel_depth;
   GLint peel_pass;
+  GLint layer_depth;
+  GLint coplanar_pass;
 
 } gl_peel_uniform_locs_t;
 
@@ -159,6 +175,11 @@ typedef struct
 
   /* Whether alpha is reduced during drag interaction */
   gboolean transparent_on_drag;
+
+  /* When TRUE, this renderable always routes through the depth-peel
+   * path for coplanar accumulation, even at full opacity.  Set for
+   * renderables whose batches contain coplanar geometry (polygon_offset). */
+  gboolean force_peel;
 
 } gl_renderable_t;
 
@@ -275,6 +296,8 @@ typedef struct gl_view_state_s
   GLuint peel_fbo[2];          /* ping-pong FBOs for depth peeling (single-sample resolve targets) */
   GLuint peel_depth_tex[2];    /* depth textures attached to peel FBOs */
   GLuint peel_color_tex;       /* shared color texture for current layer */
+  GLuint layer_depth_tex;      /* discovered layer depth for coplanar accumulation */
+  GLuint layer_depth_fbo;      /* FBO for blitting peel depth → layer_depth_tex */
   GLuint accum_fbo;            /* accumulation FBO (under-operator) */
   GLuint accum_color_tex;      /* RGBA accumulation texture */
 

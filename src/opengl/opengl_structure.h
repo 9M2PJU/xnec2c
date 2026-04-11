@@ -80,7 +80,6 @@ typedef struct
   rgba_f_t color;
   float uv[2];
   float flow_data[4];   /* Re(ct1), Im(ct1), Re(ct2), Im(ct2) */
-  float depth_bias;     /* NDC depth offset for coplanar z-fighting */
 
   /* Patch tangent frame for GPU-driven arrow rotation.
    * When non-zero, the vertex shader interprets:
@@ -97,8 +96,8 @@ typedef struct
 /* Vertex attribute layout for lit-color shader (structure rendering) */
 extern const gl_vertex_attrib_t opengl_structure_attribs[3];
 
-/* Vertex attribute layout for chevron shader (structure_vertex_t: 8 attribs) */
-extern const gl_vertex_attrib_t opengl_chevron_attribs[8];
+/* Vertex attribute layout for chevron shader (structure_vertex_t: 7 attribs) */
+extern const gl_vertex_attrib_t opengl_chevron_attribs[7];
 
 arcball_state_t* opengl_structure_get_arcball(void);
 GtkWidget* opengl_structure_get_widget(void);

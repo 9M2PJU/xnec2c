@@ -1,11 +1,15 @@
-#version 130
+#version 150
 uniform float u_alpha;
 uniform float u_color_dim;
 uniform sampler2D u_peel_depth;
 uniform int u_peel_pass;
+uniform sampler2D u_layer_depth;
+uniform int u_coplanar_pass;
 
-/* Depth-peel epsilon bias — must match lit-color-fragment.glsl */
-const float PEEL_DEPTH_EPSILON = 0.00001;
+/* Round-trip quantization step for GL_DEPTH_COMPONENT24: 1/2^24.
+ * Must match lit-color-fragment.glsl. */
+const float DEPTH_QUANT_STEP = 6e-8;
+
 centroid in vec4 vertexColor;
 centroid in vec3 viewNormal;
 centroid in vec3 viewPos;
@@ -26,17 +30,27 @@ const vec3 DARK_GREEN = vec3(0.15, 0.25, 0.12);
 const vec3 LIGHT_GREEN = vec3(0.20, 0.32, 0.15);
 
 void main() {
-  /* Depth-peel discard: for passes > 0, reject fragments at or
-   * nearer than the previous layer's depth.  Derivative-based
-   * epsilon covers both 24-bit quantization and MSAA resolve
-   * offset (see lit-color-fragment.glsl for details). */
-  if (u_peel_pass > 0) {
+  /* Screen-space depth gradient: shared by peel discard and
+   * coplanar tolerance (see lit-color-fragment.glsl). */
+  float dz = max(abs(dFdx(gl_FragCoord.z)),
+                 abs(dFdy(gl_FragCoord.z)));
+
+  /* Depth-peel discard (see lit-color-fragment.glsl for derivation) */
+  if (u_peel_pass > 0)
+  {
     float prev_z = texelFetch(u_peel_depth,
         ivec2(gl_FragCoord.xy), 0).r;
-    float dz = max(abs(dFdx(gl_FragCoord.z)),
-                   abs(dFdy(gl_FragCoord.z)));
-    float eps = max(PEEL_DEPTH_EPSILON, dz);
+    float eps = max(DEPTH_QUANT_STEP, dz);
     if (gl_FragCoord.z <= prev_z + eps) discard;
+  }
+
+  /* Coplanar accumulation (see lit-color-fragment.glsl) */
+  if (u_coplanar_pass > 0)
+  {
+    float layer_z = texelFetch(u_layer_depth,
+        ivec2(gl_FragCoord.xy), 0).r;
+    float coplanar_tol = max(DEPTH_QUANT_STEP, dz);
+    if (abs(gl_FragCoord.z - layer_z) > coplanar_tol) discard;
   }
 
   vec3 lightDir = LIGHT_DIR;

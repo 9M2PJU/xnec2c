@@ -47,6 +47,8 @@ gl_view_peel_free(gl_view_state_t *state)
   }
 
   GL_DELETE(glDeleteTextures, state->peel_color_tex);
+  GL_DELETE(glDeleteTextures, state->layer_depth_tex);
+  GL_DELETE(glDeleteFramebuffers, state->layer_depth_fbo);
   GL_DELETE(glDeleteFramebuffers, state->accum_fbo);
   GL_DELETE(glDeleteTextures, state->accum_color_tex);
 
@@ -143,6 +145,11 @@ gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
 
     state->accum_color_tex = create_peel_texture_handle();
 
+    /* Layer depth texture for coplanar accumulation sub-pass.
+     * Receives a depth blit after depth discovery so the fragment
+     * shader can sample it without feedback on the active FBO. */
+    state->layer_depth_tex = create_peel_texture_handle();
+
     /* Single-sample FBOs with texture attachments */
     glGenFramebuffers(2, state->peel_fbo);
 
@@ -154,6 +161,12 @@ gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
           GL_TEXTURE_2D, state->peel_color_tex, 0);
     }
+
+    /* Layer depth FBO: depth-only target for blit from peel depth */
+    glGenFramebuffers(1, &state->layer_depth_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, state->layer_depth_fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+        GL_TEXTURE_2D, state->layer_depth_tex, 0);
 
     /* Accumulation FBO */
     glGenFramebuffers(1, &state->accum_fbo);
@@ -174,6 +187,9 @@ gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
     resize_peel_texture(state->peel_depth_tex[i],
         GL_DEPTH_COMPONENT24, width, height, GL_DEPTH_COMPONENT, GL_FLOAT);
   }
+
+  resize_peel_texture(state->layer_depth_tex,
+      GL_DEPTH_COMPONENT24, width, height, GL_DEPTH_COMPONENT, GL_FLOAT);
 
   resize_peel_texture(state->accum_color_tex,
       GL_RGBA8, width, height, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -262,6 +278,15 @@ gl_view_peel_recreate(gl_view_state_t *state, int width, int height,
     return;
   }
 
+  glBindFramebuffer(GL_FRAMEBUFFER, state->layer_depth_fbo);
+
+  if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+  {
+    pr_err("Layer depth FBO incomplete\n");
+    gl_view_peel_free(state);
+    return;
+  }
+
   glBindTexture(GL_TEXTURE_2D, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -278,6 +303,8 @@ gl_view_peel_locs_init(gl_peel_uniform_locs_t *locs, GLuint program)
 {
   locs->peel_depth = glGetUniformLocation(program, "u_peel_depth");
   locs->peel_pass = glGetUniformLocation(program, "u_peel_pass");
+  locs->layer_depth = glGetUniformLocation(program, "u_layer_depth");
+  locs->coplanar_pass = glGetUniformLocation(program, "u_coplanar_pass");
 
 } /* gl_view_peel_locs_init() */
 
@@ -293,6 +320,8 @@ gl_view_set_peel_uniforms(const gl_peel_uniform_locs_t *locs,
 {
   glUniform1i(locs->peel_pass, params->peel_pass);
   glUniform1i(locs->peel_depth, PEEL_DEPTH_TEX_UNIT);
+  glUniform1i(locs->coplanar_pass, params->coplanar_pass);
+  glUniform1i(locs->layer_depth, LAYER_DEPTH_TEX_UNIT);
 
 } /* gl_view_set_peel_uniforms() */
 
@@ -340,12 +369,30 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
-  /* Depth-peel passes: each extracts the next-nearest layer.
-   * When MSAA is active, rendering targets multisampled peel
-   * FBOs for proper edge coverage, then blit-resolves to the
-   * single-sample peel FBOs for depth texture reads and color
-   * compositing.  Without MSAA, renders directly into the
-   * single-sample peel FBOs. */
+  /* Depth-peel passes with coplanar accumulation.
+   *
+   * Each peel iteration has two sub-passes:
+   *
+   * Sub-pass A (depth discovery): color write OFF, depth write ON,
+   * GL_LESS.  Populates the depth buffer with this layer's nearest
+   * surviving depth without writing color.
+   *
+   * After sub-pass A, the discovered depth is blit to layer_depth_tex
+   * so sub-pass B can sample it without GL feedback.
+   *
+   * Sub-pass B (coplanar accumulation): color write ON, depth write
+   * OFF, depth test disabled.  Fragment shader's peel discard
+   * rejects previous layers; coplanar tolerance test rejects
+   * fragments outside dz-based tolerance of layer_depth_tex.  Alpha-over
+   * blend composites all same-depth fragments (stacked gel model).
+   * Hardware depth test is disabled because GL_LEQUAL would reject
+   * coplanar fragments differing by even 1 ULP from the sub-pass A
+   * winner before the shader's tolerance check could run.
+   *
+   * When MSAA is active, both sub-passes target multisampled peel
+   * FBOs.  Depth resolves to single-sample between sub-passes for
+   * the layer_depth blit; full resolve after sub-pass B for the
+   * under-composite. */
   for( k = 0; k < PEEL_PASSES; k++ )
   {
     int cur = k % 2;
@@ -354,56 +401,37 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
 
     render_fbo = use_ms ? state->peel_ms_fbo[cur] : state->peel_fbo[cur];
 
-    /* Blit opaque depth into this pass's render FBO.
-     * When MSAA, both source (active_fbo) and target
-     * (peel_ms_fbo) are multisampled with matching sample
-     * count — glBlitFramebuffer copies per-sample.
-     * Without MSAA, resolves MS opaque depth to single-sample. */
+    /* Blit opaque depth into this pass's render FBO */
     glBindFramebuffer(GL_READ_FRAMEBUFFER, active_fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, render_fbo);
     glBlitFramebuffer(0, 0, pw, ph, 0, 0, pw, ph,
         GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
-    /* Clear color only — depth was just blitted from opaque */
+    /* Clear color — depth was just blitted from opaque */
     glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    /* Bind previous pass's depth texture to unit 2.
-     * Fragment shader discards fragments at z <= prev_z,
-     * peeling away already-rendered layers.  Always reads
-     * from the single-sample resolve texture regardless of
-     * MSAA — the comparison is per-fragment, not per-sample. */
+    /* Bind previous pass's depth texture for peel discard */
     glActiveTexture(GL_TEXTURE0 + PEEL_DEPTH_TEX_UNIT);
     glBindTexture(GL_TEXTURE_2D, state->peel_depth_tex[prev]);
     glActiveTexture(GL_TEXTURE0);
 
-    /* Build render params for this peel pass */
+    /* Common render params for both sub-passes */
     glm_mat4_copy(mvp, render_params.mvp);
     glm_mat4_copy(mv, render_params.mv);
     render_params.peel_pass = k;
 
-    /* Render all transparent renderables into peel layer.
-     * Depth writes ON so this layer's depth is recorded
-     * for the next pass's discard test.
-     *
-     * glBlendFuncSeparate with GL_ZERO dest factor: each
-     * fragment that passes GL_LESS replaces the previous
-     * color entirely.  Only the nearest surviving fragment's
-     * premultiplied output remains per pixel.
-     *
-     * Without GL_ZERO, a nearer fragment from a later
-     * renderable would BLEND with a farther fragment from
-     * an earlier renderable, mixing two depth layers into
-     * one pass.  The inflated alpha consumes the budget
-     * for subsequent under-composite passes, making deeper
-     * layers (e.g. radiation pattern behind structure
-     * patches) nearly invisible. */
+    /* --- Sub-pass A: depth discovery ---
+     * Color mask OFF, depth write ON, GL_LESS.
+     * Finds the nearest surviving fragment per pixel. */
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
-    glEnable(GL_BLEND);
-    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ZERO,
-        GL_ONE, GL_ZERO);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glDisable(GL_BLEND);
+
+    render_params.coplanar_pass = 0;
 
     for( j = 0; j < count; j++ )
     {
@@ -414,11 +442,60 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
       r->render(r->ctx, &render_params);
     }
 
-    /* Resolve multisampled peel layer to single-sample textures.
-     * Depth resolves for the next pass's peel discard shader read;
-     * color resolves for the under-composite fullscreen blit.
-     * Without MSAA this step is skipped — rendering already
-     * targeted the single-sample peel_fbo. */
+    /* Resolve MSAA depth for layer_depth blit */
+    if( use_ms )
+    {
+      glBindFramebuffer(GL_READ_FRAMEBUFFER, state->peel_ms_fbo[cur]);
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, state->peel_fbo[cur]);
+      glBlitFramebuffer(0, 0, pw, ph, 0, 0, pw, ph,
+          GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    }
+
+    /* Blit discovered depth to layer_depth_tex (avoids GL feedback
+     * when sub-pass B samples layer depth while rendering to the
+     * same peel FBO) */
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, state->peel_fbo[cur]);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, state->layer_depth_fbo);
+    glBlitFramebuffer(0, 0, pw, ph, 0, 0, pw, ph,
+        GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+    /* Bind layer depth texture for coplanar tolerance test */
+    glActiveTexture(GL_TEXTURE0 + LAYER_DEPTH_TEX_UNIT);
+    glBindTexture(GL_TEXTURE_2D, state->layer_depth_tex);
+    glActiveTexture(GL_TEXTURE0);
+
+    /* --- Sub-pass B: coplanar accumulation ---
+     * Color mask ON, depth write OFF, depth test disabled.
+     * The shader's peel discard rejects previous layers and
+     * the coplanar tolerance test rejects non-layer fragments,
+     * so the hardware depth test must not further restrict.
+     * GL_LEQUAL would reject coplanar fragments that are even
+     * 1 ULP farther than sub-pass A's winner. */
+    glBindFramebuffer(GL_FRAMEBUFFER, render_fbo);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,
+        GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+    render_params.coplanar_pass = 1;
+
+    for( j = 0; j < count; j++ )
+    {
+      gl_renderable_t *r = &g_array_index(
+          state->renderables, gl_renderable_t, items[j].index);
+
+      render_params.alpha = items[j].alpha;
+      r->render(r->ctx, &render_params);
+    }
+
+    /* Re-enable depth test for next iteration (sub-pass A needs GL_LESS) */
+    glEnable(GL_DEPTH_TEST);
+
+    /* Resolve multisampled color + depth to single-sample.
+     * Color for the under-composite; depth for next pass's
+     * peel discard texture read. */
     if( use_ms )
     {
       glBindFramebuffer(GL_READ_FRAMEBUFFER, state->peel_ms_fbo[cur]);
@@ -428,8 +505,7 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
     }
 
     /* Under-composite this peel layer into accumulation buffer.
-     * Under operator: dst = src * (1 - dst.a) + dst
-     * Achieved via glBlendFunc(ONE_MINUS_DST_ALPHA, ONE). */
+     * Under operator: dst = src * (1 - dst.a) + dst */
     glBindFramebuffer(GL_FRAMEBUFFER, state->accum_fbo);
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);

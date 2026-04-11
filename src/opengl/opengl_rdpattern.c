@@ -33,11 +33,6 @@
 /* Default structure overlay extent as multiple of radiation pattern r_max */
 #define OVERLAY_DEFAULT_EXTENT 1.25f
 
-/* Depth bias for surface triangles in "both" mode.
- * Pushes surface behind wireframe lines to prevent z-fighting.
- * 100x PATCH_DEPTH_BIAS (1e-7f) — well within 24-bit depth precision. */
-#define RDPAT_SURFACE_DEPTH_BIAS 1e-5f
-
 /* Surface color dim values in rc_config.brightness_rdpat_surface
  * and rc_config.brightness_rdpat_wire (applied via u_color_dim
  * shader uniform in the engine).
@@ -76,7 +71,7 @@ static const gl_overlay_config_t rdpattern_overlay_config = {
   .vertex_shader_path = "/gl/lit-color-vertex.glsl",
   .fragment_shader_path = "/gl/lit-color-fragment.glsl",
   .attribs = opengl_chevron_attribs,
-  .attrib_count = 8
+  .attrib_count = 7
 };
 
 
@@ -326,7 +321,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
         out->batches[0].vertices = tri_buf;
         out->batches[0].vertex_count = tri_count * 3;
         out->batches[0].draw_mode = GL_TRIANGLES;
-        out->batches[0].depth_bias = 0.0f;
+        out->batches[0].polygon_offset = FALSE;
         out->batches[0].color_dim = rc_config.brightness_rdpat_surface;
         out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
         out->batch_count = 1;
@@ -345,7 +340,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
         out->batches[0].vertices = line_buf;
         out->batches[0].vertex_count = line_count * 2;
         out->batches[0].draw_mode = GL_LINES;
-        out->batches[0].depth_bias = 0.0f;
+        out->batches[0].polygon_offset = FALSE;
         out->batches[0].color_dim = rc_config.brightness_rdpat_wire;
         out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
         out->batch_count = 1;
@@ -363,11 +358,11 @@ rdpattern_scene_generate(gl_view_content_t *out)
         if( tri_count == 0 || line_count == 0 )
           goto out_unlock;
 
-        /* Surface pushed behind wireframe via depth bias */
+        /* Surface pushed behind wireframe via glPolygonOffset */
         out->batches[0].vertices = tri_buf;
         out->batches[0].vertex_count = tri_count * 3;
         out->batches[0].draw_mode = GL_TRIANGLES;
-        out->batches[0].depth_bias = RDPAT_SURFACE_DEPTH_BIAS;
+        out->batches[0].polygon_offset = TRUE;
         out->batches[0].color_dim =
             rc_config.brightness_rdpat_surface * RDPAT_BOTH_SURFACE_DIM_RATIO;
         out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
@@ -375,7 +370,7 @@ rdpattern_scene_generate(gl_view_content_t *out)
         out->batches[1].vertices = line_buf;
         out->batches[1].vertex_count = line_count * 2;
         out->batches[1].draw_mode = GL_LINES;
-        out->batches[1].depth_bias = 0.0f;
+        out->batches[1].polygon_offset = FALSE;
         out->batches[1].color_dim = rc_config.brightness_rdpat_wire;
         out->batches[1].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
         out->batch_count = 2;

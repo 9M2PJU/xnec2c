@@ -502,7 +502,9 @@ typedef struct
   void *vertices;
   int vertex_count;
   unsigned int draw_mode;
-  float depth_bias;
+  /* When TRUE, glPolygonOffset pushes this batch behind non-offset
+   * batches (e.g. surface triangles behind wireframe lines). */
+  gboolean polygon_offset;
 
   /* Per-batch RGB brightness multiplier (0.0=black, 1.0=full) */
   float color_dim;

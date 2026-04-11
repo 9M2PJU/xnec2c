@@ -1,10 +1,4 @@
-#version 130
-#extension GL_ARB_conservative_depth : enable
-
-/* vDepthBias >= 0 always (wires: 0, patches: positive per-index bias),
- * so gl_FragDepth = min(gl_FragCoord.z + vDepthBias, DEPTH_CLAMP_MAX)
- * >= gl_FragCoord.z.  This re-enables early-z/Hi-Z rejection. */
-layout(depth_greater) out float gl_FragDepth;
+#version 150
 
 uniform float u_alpha;
 uniform float u_color_dim;
@@ -15,23 +9,19 @@ uniform float u_sin_phase;
 uniform sampler2D noise_tex;
 uniform sampler2D u_peel_depth;
 uniform int u_peel_pass;
+uniform sampler2D u_layer_depth;
+uniform int u_coplanar_pass;
 
-/* Bias exceeding one 24-bit depth step (~6e-6) to prevent
- * quantized depth re-rendering the same fragment in multiple
- * peel passes (see peel discard block below).
+/* Round-trip quantization step for GL_DEPTH_COMPONENT24: 1/2^24.
+ * Covers write→24-bit→read error without manual bias.
  * Shared with ground-plane-fragment.glsl. */
-const float PEEL_DEPTH_EPSILON = 0.00001;
+const float DEPTH_QUANT_STEP = 6e-8;
 
-/* Maximum gl_FragDepth value: one 24-bit depth step below 1.0.
- * Prevents per-patch bias from pushing fragments to the clear
- * depth (1.0), which would fail GL_LESS and discard them. */
-const float DEPTH_CLAMP_MAX = 1.0 - 6e-8;
 centroid in vec4 vertexColor;
 centroid in vec3 viewNormal;
 centroid in vec3 viewPos;
 centroid in vec2 vUV;
 centroid in vec4 vFlowData;
-flat in float vDepthBias;
 out vec4 fragColor;
 
 /* Lighting constants — normalize(vec3(-0.3, 0.5, 1.0)) precomputed */
@@ -67,29 +57,44 @@ const int LIC_STEPS = 20;
 const float DLIC_SPEED = 0.5;
 
 void main() {
+  /* Screen-space depth gradient: shared by peel discard (MSAA
+   * resolve offset bound) and coplanar tolerance (layer depth
+   * was resolved to single-sample; gl_FragCoord.z is per-sample). */
+  float dz = max(abs(dFdx(gl_FragCoord.z)),
+                 abs(dFdy(gl_FragCoord.z)));
+
   /* Depth-peel discard: for passes > 0, reject fragments at or
    * nearer than the previous layer's depth.  Pass 0 renders the
    * nearest transparent layer with no discard.
    *
-   * Epsilon bias: two sources of depth mismatch between the value
-   * written in pass N and the value read back in pass N+1:
-   *   1. 24-bit depth texture quantization (~6e-8 per step)
-   *   2. MSAA resolve offset — the resolved depth comes from one
-   *      sample position, but gl_FragCoord.z is evaluated at pixel
-   *      center.  The difference is proportional to the depth
-   *      gradient across the pixel and the sample-to-center offset
-   *      (up to ~0.5 pixels for typical MSAA patterns).
+   * Epsilon covers two round-trip error sources:
+   *   1. 24-bit depth texture quantization (DEPTH_QUANT_STEP)
+   *   2. MSAA resolve offset — bounded by taxicab sample-to-center
+   *      distance (<=1.0) times dz.
    *
-   * The derivative-based epsilon adapts to the actual depth
-   * gradient so steep surfaces get sufficient bias while
-   * near-parallel surfaces retain tight layer separation. */
-  if (u_peel_pass > 0) {
+   * Wire/patch depth ordering uses glPolygonOffset (hardware
+   * slope-scaled bias) instead of manual gl_FragDepth.  Polygon
+   * offset factor=2.0 exceeds this epsilon's dz coefficient (1.0),
+   * providing margin of dz+r at all zoom levels. */
+  if (u_peel_pass > 0)
+  {
     float prev_z = texelFetch(u_peel_depth,
         ivec2(gl_FragCoord.xy), 0).r;
-    float dz = max(abs(dFdx(gl_FragCoord.z)),
-                   abs(dFdy(gl_FragCoord.z)));
-    float eps = max(PEEL_DEPTH_EPSILON, dz);
-    if (gl_FragCoord.z + vDepthBias <= prev_z + eps) discard;
+    float eps = max(DEPTH_QUANT_STEP, dz);
+    if (gl_FragCoord.z <= prev_z + eps) discard;
+  }
+
+  /* Coplanar accumulation sub-pass: accept only fragments within
+   * tolerance of the discovered layer depth.  The tolerance must
+   * match the peel epsilon (dz-based) because layer_depth_tex is
+   * single-sample resolved while gl_FragCoord.z is per-sample —
+   * the MSAA resolve offset between them is bounded by dz. */
+  if (u_coplanar_pass > 0)
+  {
+    float layer_z = texelFetch(u_layer_depth,
+        ivec2(gl_FragCoord.xy), 0).r;
+    float coplanar_tol = max(DEPTH_QUANT_STEP, dz);
+    if (abs(gl_FragCoord.z - layer_z) > coplanar_tol) discard;
   }
 
   vec3 lightDir = LIGHT_DIR;
@@ -289,11 +294,6 @@ void main() {
       color = mix(color, color * 0.4, chevron * contrast);
     }
   }
-
-  /* Per-patch depth offset in window space [0,1].
-   * Pushes patches behind wires and separates coplanar patches.
-   * Operates post-clipping so geometry position is unaffected. */
-  gl_FragDepth = min(gl_FragCoord.z + vDepthBias, DEPTH_CLAMP_MAX);
 
   fragColor = vec4(clamp(color, 0.0, 1.0),
                    vertexColor.a * u_alpha);

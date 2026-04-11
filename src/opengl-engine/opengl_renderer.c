@@ -81,7 +81,7 @@ compile_shader(GLenum type, const char *path)
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
     log = g_malloc(len + 1);
     glGetShaderInfoLog(shader, len, NULL, log);
-    pr_err("Shader compile error: %s\n", log);
+    pr_err("Shader compile error: %s: %s\n", path, log);
     g_free(log);
     glDeleteShader(shader);
     return( 0 );
@@ -123,7 +123,7 @@ gl_shader_load(gl_shader_t *shader,
   glGetProgramiv(shader->program, GL_LINK_STATUS, &status);
   if( status == GL_FALSE )
   {
-    pr_err("Shader link failed\n");
+    pr_err("Shader link failed: %s + %s\n", vertex_path, fragment_path);
     glDeleteProgram(shader->program);
     glDeleteShader(shader->vertex);
     glDeleteShader(shader->fragment);
