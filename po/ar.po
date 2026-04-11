@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-04-02 15:50-0700\n"
+"POT-Creation-Date: 2026-04-08 20:07-0700\n"
 "PO-Revision-Date: 2025-12-27 16:01-0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -45,7 +45,7 @@ msgstr "خطأ اتصال segment في sbf()"
 msgid "Segment connection error in trio()"
 msgstr "خطأ اتصال segment في trio()"
 
-#: src/callback_func.c:265
+#: src/callback_func.c:263
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
@@ -53,7 +53,7 @@ msgstr ""
 "حلقة التردد قيد التشغيل\n"
 "هل أنت متأكد من رغبتك في إنهاء الحساب؟"
 
-#: src/callback_func.c:269
+#: src/callback_func.c:267
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
@@ -61,7 +61,7 @@ msgstr ""
 "حلقة التردد قيد التشغيل\n"
 "هل أنت متأكد من رغبتك في إغلاق هذه النافذة؟"
 
-#: src/callback_func.c:523
+#: src/callback_func.c:514
 #, c-format
 msgid ""
 "Frequency plots window closed: excitation type %d is incompatible.\n"
@@ -70,7 +70,7 @@ msgstr ""
 "أُغلقت نافذة مخططات التردد: نوع الإثارة %d غير متوافق.\n"
 "استخدم النوع 0 (المجال الكهربائي المطبق) أو 5 (انقطاع التيار) بدلاً من ذلك."
 
-#: src/callback_func.c:529
+#: src/callback_func.c:520
 #, c-format
 msgid ""
 "Frequency plots are not available with excitation type %d.\n"
@@ -81,47 +81,47 @@ msgstr ""
 "يستخدم هذا النموذج إثارة المجال الساقط أو مصدر التيار الأولي.\n"
 "غيّر بطاقة EX إلى النوع 0 (المجال الكهربائي المطبق) أو 5 (انقطاع التيار)."
 
-#: src/callback_func.c:736
+#: src/callback_func.c:717
 msgid "View Currents"
 msgstr "عرض التيارات"
 
-#: src/callback_func.c:758 src/callback_func.c:817
+#: src/callback_func.c:736 src/callback_func.c:792
 msgid "View Geometry"
 msgstr "عرض الهندسة"
 
-#: src/callback_func.c:795
+#: src/callback_func.c:773
 msgid "View Charges"
 msgstr "عرض الشحنات"
 
-#: src/callback_func.c:861
+#: src/callback_func.c:836
 msgid "PNG images (*.png)"
 msgstr "صور PNG (*.png)"
 
-#: src/callback_func.c:863
+#: src/callback_func.c:838
 msgid "GNUplot files (*.gplot)"
 msgstr "ملفات GNUplot (*.gplot)"
 
-#: src/callback_func.c:865
+#: src/callback_func.c:840
 msgid "NEC2 files (*.nec)"
 msgstr "ملفات NEC2 (*.nec)"
 
-#: src/callback_func.c:867
+#: src/callback_func.c:842
 msgid "Touchstone 1-port files (*.s1p)"
 msgstr "ملفات Touchstone أحادية المنفذ (*.s1p)"
 
-#: src/callback_func.c:869
+#: src/callback_func.c:844
 msgid "Touchstone 2-port files (*.s2p)"
 msgstr "ملفات Touchstone ثنائية المنفذ (*.s2p)"
 
-#: src/callback_func.c:871
+#: src/callback_func.c:846
 msgid "Comma-separated CSV files (*.csv)"
 msgstr "ملفات CSV مفصولة بفواصل (*.csv)"
 
-#: src/callbacks.c:135 src/callbacks.c:151
+#: src/callbacks.c:136 src/callbacks.c:152
 msgid "Antenna Temperature"
 msgstr "درجة حرارة الهوائي"
 
-#: src/callbacks.c:136
+#: src/callbacks.c:137
 msgid ""
 "Ground plane detected in model. T_ant results will overcount ground effects. "
 "Free-space models are standard for antenna temperature evaluation."
@@ -129,7 +129,7 @@ msgstr ""
 "تم اكتشاف مستوى أرضي في النموذج. نتائج T_ant ستبالغ في احتساب تأثيرات "
 "الأرضي. نماذج الفضاء الحر هي المعيارية لتقييم درجة حرارة الهوائي."
 
-#: src/callbacks.c:152
+#: src/callbacks.c:153
 #, c-format
 msgid ""
 "Max gain at θ=%.0f° (%.0f° from XY plane). Convention assumes beam in XY "
@@ -138,12 +138,12 @@ msgstr ""
 "الكسب الأقصى عند θ=%.0f° (%.0f° من مستوى XY). يفترض أن الحزمة في مستوى XY مع "
 "ضبط ارتفاع المراقبة بمفتاح التدوير."
 
-#: src/callbacks.c:218 src/callbacks.c:517 src/callbacks.c:2556
-#: src/callbacks.c:3088
+#: src/callbacks.c:219 src/callbacks.c:518 src/callbacks.c:2438
+#: src/callbacks.c:2968
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "هل أنت متأكد من رغبتك في الخروج من xnec2c؟"
 
-#: src/callbacks.c:261
+#: src/callbacks.c:262
 msgid ""
 "A new NEC2 input file may not be created\n"
 "while the Frequency Loop is running"
@@ -151,7 +151,7 @@ msgstr ""
 "لا يمكن إنشاء ملف إدخال NEC2 جديد\n"
 "أثناء تشغيل حلقة التردد"
 
-#: src/callbacks.c:299
+#: src/callbacks.c:300
 msgid ""
 "A new NEC2 input file may not be opened\n"
 "while the Frequency Loop is running"
@@ -159,20 +159,20 @@ msgstr ""
 "لا يمكن فتح ملف إدخال NEC2 جديد\n"
 "أثناء تشغيل حلقة التردد"
 
-#: src/callbacks.c:419
+#: src/callbacks.c:420
 msgid "xnec2c geometry optimizer"
 msgstr "محسّن هندسة xnec2c"
 
-#: src/callbacks.c:420
+#: src/callbacks.c:421
 msgid ""
 "xnec2c was built without inotify support: the optimizer cannot be enabled."
 msgstr "تم بناء xnec2c بدون دعم inotify: لا يمكن تفعيل المحسّن."
 
-#: src/callbacks.c:444
+#: src/callbacks.c:445
 msgid "Xnec2c Optimizer"
 msgstr "محسّن Xnec2c"
 
-#: src/callbacks.c:444
+#: src/callbacks.c:445
 msgid ""
 "No files are selected for writing. However, xnec2c will still reload and "
 "recalculate the input file on modification when triggered by inotify.Select "
@@ -182,23 +182,27 @@ msgstr ""
 "ملف الإدخال عند التعديل عندما يتم تشغيله بواسطة inotify. حدد ملفات للكتابة "
 "في \"ملف->إعدادات التحسين\"."
 
-#: src/callbacks.c:455
+#: src/callbacks.c:456
 msgid "failed to create Optimizer Output thread\n"
 msgstr "فشل إنشاء خيط إخراج المحسّن\n"
 
-#: src/callbacks.c:1483 src/callbacks.c:1815 src/callbacks.c:3114
+#: src/callbacks.c:1510 src/callbacks.c:1838 src/callbacks.c:2994
 msgid "Are you sure you wish to close this window?"
 msgstr "هل أنت متأكد من رغبتك في إغلاق هذه النافذة؟"
 
-#: src/callbacks.c:1981
+#: src/callbacks.c:2004
 msgid "noise env activate: no matching widget found\n"
 msgstr "تفعيل بيئة الضوضاء: لم يُعثر على عنصر واجهة مطابق\n"
 
-#: src/callbacks.c:3052
+#: src/callbacks.c:2100
+msgid "OpenGL is not available on this display; cannot enable renderer.\n"
+msgstr "OpenGL غير متاح على هذه الشاشة؛ لا يمكن تمكين المُصيِّر.\n"
+
+#: src/callbacks.c:2932
 msgid "No open NEC2 input file"
 msgstr "لا يوجد ملف إدخال NEC2 مفتوح"
 
-#: src/callbacks.c:3145 src/callbacks.c:3175
+#: src/callbacks.c:3025 src/callbacks.c:3055
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -206,11 +210,11 @@ msgstr ""
 "لا يمكن حفظ بيانات محرر NEC2\n"
 "أثناء تشغيل حلقة التردد"
 
-#: src/callbacks.c:3157 src/callbacks.c:3183
+#: src/callbacks.c:3037 src/callbacks.c:3063
 msgid "untitled.nec"
 msgstr "untitled.nec"
 
-#: src/callbacks.c:3648 src/callbacks.c:3668 src/callbacks.c:3688
+#: src/callbacks.c:3528 src/callbacks.c:3548 src/callbacks.c:3568
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
@@ -236,7 +240,7 @@ msgstr ""
 "يرجى إعادة تحديد الصف"
 
 #: src/cmnd_edit.c:488 resources/xnec2c.glade:312 resources/xnec2c.glade:1347
-#: resources/xnec2c.glade:3774 resources/xnec2c.glade:14837
+#: resources/xnec2c.glade:3774 resources/xnec2c.glade:14820
 msgid "Tag Number"
 msgstr "رقم tag"
 
@@ -383,7 +387,7 @@ msgid "Reactance Ohm"
 msgstr "المفاعلة Ohm"
 
 #: src/cmnd_edit.c:2024 resources/xnec2c.glade:478 resources/xnec2c.glade:4010
-#: resources/xnec2c.glade:15189
+#: resources/xnec2c.glade:15172
 msgid "Conductivity S/m"
 msgstr "الموصلية S/m"
 
@@ -469,30 +473,30 @@ msgstr ""
 "رسوم متحركة للحقل المغناطيسي: أضف بطاقة NH لملف NEC\n"
 "متجه Poynting: أضف بطاقتي NE و NH معاً"
 
-#: src/draw_radiation.c:79
+#: src/draw_radiation.c:77
 #, c-format
 msgid "gain_style %d out of range [0..%d], defaulting to GS_LINP\n"
 msgstr "gain_style %d خارج النطاق [0..%d]، الافتراضي GS_LINP\n"
 
-#: src/draw_radiation.c:120
+#: src/draw_radiation.c:118
 #, c-format
 msgid "Scale_Gain: ant_temp_resolve failed for %.3f MHz env %d\n"
 msgstr "Scale_Gain: فشل ant_temp_resolve لـ %.3f MHz البيئة %d\n"
 
-#: src/draw_radiation.c:852 src/draw_radiation.c:860 src/draw_radiation.c:870
+#: src/draw_radiation.c:849 src/draw_radiation.c:857 src/draw_radiation.c:867
 #: resources/xnec2c.glade:69
 msgid "Near Field Animation"
 msgstr "رسوم متحركة للمجال القريب"
 
-#: src/draw_radiation.c:852 src/draw_radiation.c:860 src/draw_radiation.c:870
-#: src/geometry.c:812 src/input.c:1614 src/input.c:1615 src/mathlib.c:759
-#: src/mathlib.c:1003 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:525
-#: src/utils.c:571
+#: src/draw_radiation.c:849 src/draw_radiation.c:857 src/draw_radiation.c:867
+#: src/geometry.c:812 src/input.c:1614 src/input.c:1615 src/mathlib.c:752
+#: src/mathlib.c:990 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:515
+#: src/utils.c:562
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: src/draw_radiation.c:1102 src/draw_radiation.c:1108
+#: src/draw_radiation.c:1107 src/draw_radiation.c:1113
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
@@ -501,7 +505,7 @@ msgstr ""
 "= الأفق.زاوية ارتفاع المراقبة. تُغيّر حدود السماء/الأرض لتقييم درجة حرارة "
 "الهوائي. 0° = الأفق."
 
-#: src/draw_radiation.c:1105 src/draw_radiation.c:1111
+#: src/draw_radiation.c:1110 src/draw_radiation.c:1116
 msgid ""
 "Observation elevation for antenna temperature.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -509,11 +513,11 @@ msgstr ""
 "ارتفاع المراقبة لدرجة حرارة الهوائي.\n"
 "اختر نمط الكسب → درجة حرارة الضوضاء للتفعيل."
 
-#: src/draw_radiation.c:1114
+#: src/draw_radiation.c:1119
 msgid "Select brightness temperature model for T_sky and T_earth."
 msgstr "اختر نموذج درجة حرارة السطوع لـ T_sky و T_earth."
 
-#: src/draw_radiation.c:1116
+#: src/draw_radiation.c:1121
 msgid ""
 "Brightness temperature model for T_sky and T_earth.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -521,79 +525,79 @@ msgstr ""
 "نموذج درجة حرارة السطوع لـ T_sky و T_earth.\n"
 "اختر نمط الكسب → درجة حرارة الضوضاء للتفعيل."
 
-#: src/draw_radiation.c:1555
+#: src/draw_radiation.c:1539
 msgid "Total Gain"
 msgstr "الكسب الكلي"
 
-#: src/draw_radiation.c:1556
+#: src/draw_radiation.c:1540
 msgid "Horizontal Polarization"
 msgstr "الاستقطاب الأفقي"
 
-#: src/draw_radiation.c:1557
+#: src/draw_radiation.c:1541
 msgid "Vertical Polarization"
 msgstr "الاستقطاب الرأسي"
 
-#: src/draw_radiation.c:1558
+#: src/draw_radiation.c:1542
 msgid "RH Circular Polarization"
 msgstr "الاستقطاب الدائري لليمين"
 
-#: src/draw_radiation.c:1559
+#: src/draw_radiation.c:1543
 msgid "LH Circular Polarization"
 msgstr "الاستقطاب الدائري لليسار"
 
-#: src/draw_radiation.c:1564
+#: src/draw_radiation.c:1548
 msgid "Linear Power"
 msgstr "القدرة الخطية"
 
-#: src/draw_radiation.c:1565
+#: src/draw_radiation.c:1549
 msgid "Linear Voltage"
 msgstr "الجهد الخطي"
 
-#: src/draw_radiation.c:1566
+#: src/draw_radiation.c:1550
 msgid "ARRL Scale"
 msgstr "مقياس ARRL"
 
-#: src/draw_radiation.c:1567
+#: src/draw_radiation.c:1551
 msgid "Logarithmic Scale"
 msgstr "المقياس اللوغاريتمي"
 
-#: src/draw_radiation.c:1568
+#: src/draw_radiation.c:1552
 msgid "Noise Temperature"
 msgstr "درجة حرارة الضوضاء"
 
-#: src/draw_radiation.c:1569
+#: src/draw_radiation.c:1553
 msgid "Noise Temp (log scale)"
 msgstr "درجة حرارة الضوضاء (مقياس لوغاريتمي)"
 
-#: src/draw_radiation.c:1578 resources/xnec2c.glade:13321
+#: src/draw_radiation.c:1562 resources/xnec2c.glade:13304
 msgid "Radiation Patterns"
 msgstr "أنماط الإشعاع"
 
-#: src/draw_radiation.c:1581
+#: src/draw_radiation.c:1565
 msgid "Radiation Pattern: - "
 msgstr "نمط الإشعاع: - "
 
-#: src/draw_radiation.c:1588
+#: src/draw_radiation.c:1572
 msgid "Near Fields:"
 msgstr "الحقول القريبة:"
 
-#: src/draw_radiation.c:1590
+#: src/draw_radiation.c:1574
 msgid " - E Field"
 msgstr " - الحقل الكهربائي E"
 
-#: src/draw_radiation.c:1592
+#: src/draw_radiation.c:1576
 msgid " - H Field"
 msgstr " - الحقل المغناطيسي H"
 
-#: src/draw_radiation.c:1594
+#: src/draw_radiation.c:1578
 msgid " - Poynting Vector"
 msgstr " - متجه بوينتنغ"
 
-#: src/draw_radiation.c:1604
+#: src/draw_radiation.c:1588
 msgid "Frequency Data Plots - "
 msgstr "رسومات بيانات التردد - "
 
-#: src/draw_radiation.c:1830
+#: src/draw_radiation.c:1814
 #, c-format
 msgid "fstep=%d is out of bounds. calc_data.steps_total=%d"
 msgstr "fstep=%d خارج النطاق. calc_data.steps_total=%d"
@@ -603,12 +607,12 @@ msgstr "fstep=%d خارج النطاق. calc_data.steps_total=%d"
 msgid "step size limited at z= %10.5f"
 msgstr "حجم الخطوة محدود عند Z= %10.5f"
 
-#: src/fork.c:161 src/fork.c:512
+#: src/fork.c:161 src/fork.c:511
 #, c-format
 msgid "child %d  length %d  return %d\n"
 msgstr "العملية الفرعية %d  الطول %d  القيمة المرجعة %d\n"
 
-#: src/fork.c:518
+#: src/fork.c:517
 #, c-format
 msgid "early EOF?, child %d  length %d  return %d\n"
 msgstr "نهاية ملف مبكرة؟، العملية الفرعية %d  الطول %d  القيمة المرجعة %d\n"
@@ -1068,7 +1072,7 @@ msgstr ""
 msgid "Gnuplot Data"
 msgstr "بيانات Gnuplot"
 
-#: src/gnuplot.c:46 src/gnuplot.c:88 src/gnuplot.c:169
+#: src/gnuplot.c:46 src/gnuplot.c:90 src/gnuplot.c:173
 msgid "Cannot save data while frequency loop is running"
 msgstr "لا يمكن حفظ البيانات أثناء تشغيل حلقة التردد"
 
@@ -1095,51 +1099,51 @@ msgstr ""
 "#    plot for [i=2:3]  'filename.gplot' using 1:i with lines smooth bezier "
 "title columnhead(i);\n"
 
-#: src/gnuplot.c:88 src/gnuplot.c:169
+#: src/gnuplot.c:90 src/gnuplot.c:173
 msgid "Touchstone Data"
 msgstr "بيانات Touchstone"
 
-#: src/gnuplot.c:102
+#: src/gnuplot.c:104
 #, c-format
 msgid "! Reference impedance Z0 = %.2f Ohm\n"
 msgstr "! ممانعة مرجعية Z0 = %.2f Ohm\n"
 
-#: src/gnuplot.c:130
+#: src/gnuplot.c:132
 #, c-format
 msgid "This should never happen. touchstone type=%d\n"
 msgstr "هذا لا يجب أن يحدث. نوع touchstone=%d\n"
 
-#: src/gnuplot.c:230
+#: src/gnuplot.c:236
 #, c-format
 msgid "# Near E field\n"
 msgstr "# الحقل الكهربائي القريب E\n"
 
-#: src/gnuplot.c:253
+#: src/gnuplot.c:259
 #, c-format
 msgid "# Near H field\n"
 msgstr "# الحقل المغناطيسي القريب H\n"
 
-#: src/gnuplot.c:300
+#: src/gnuplot.c:306
 #, c-format
 msgid "# Poynting Vector\n"
 msgstr "# متجه بوينتنغ\n"
 
-#: src/gnuplot.c:372
+#: src/gnuplot.c:378
 #, c-format
 msgid "# Radiation Pattern\n"
 msgstr "# نمط الإشعاع\n"
 
-#: src/gnuplot.c:508
+#: src/gnuplot.c:514
 #, c-format
 msgid "# structure patch segments\n"
 msgstr "# segments patch الهيكل\n"
 
-#: src/gnuplot.c:531
+#: src/gnuplot.c:537
 #, c-format
 msgid "# structure wire segments\n"
 msgstr "# segments سلك الهيكل\n"
 
-#: src/gnuplot.c:557
+#: src/gnuplot.c:563
 #, c-format
 msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
@@ -1148,11 +1152,11 @@ msgstr ""
 "العرض بواسطة: gnuplot -e \"set terminal qt; splot '%s' with lines; pause "
 "mouse close\"\n"
 
-#: src/gnuplot.c:569
+#: src/gnuplot.c:575
 msgid "Save Currents and Charges to CSV"
 msgstr "حفظ التيارات والشحنات إلى CSV"
 
-#: src/gnuplot.c:570
+#: src/gnuplot.c:576
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
@@ -1160,11 +1164,11 @@ msgstr ""
 "يجب تمكين بيانات التيار بالنقر على \"التيارات\" أو \"الشحنات\" في نافذة "
 "xnec2c الرئيسية."
 
-#: src/gnuplot.c:633 src/gnuplot.c:643
+#: src/gnuplot.c:639 src/gnuplot.c:649
 msgid "Save Patch Currents to CSV"
 msgstr "حفظ تيارات الرقع إلى CSV"
 
-#: src/gnuplot.c:634
+#: src/gnuplot.c:640
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
@@ -1172,7 +1176,7 @@ msgstr ""
 "يجب تمكين بيانات التيار بالنقر على \"التيارات\" أو \"الشحنات\" في نافذة "
 "xnec2c الرئيسية."
 
-#: src/gnuplot.c:644
+#: src/gnuplot.c:650
 msgid "No surface patches in this model."
 msgstr "لا توجد رقع سطحية في هذا النموذج."
 
@@ -1541,11 +1545,11 @@ msgid ""
 msgstr ""
 "بطاقة RP مفقودة أو للموجة السطحية: تم تعطيل حسابات نمط الإشعاع والكسب\n"
 
-#: src/input.c:1641
+#: src/input.c:1642
 msgid "Unexpected exit from while loop"
 msgstr "خروج غير متوقع من حلقة while"
 
-#: src/input.c:1732
+#: src/input.c:1733
 msgid ""
 "command data card error: Unexpected EOF while reading input file - appending "
 "EN card\n"
@@ -1553,7 +1557,7 @@ msgstr ""
 "خطأ في بطاقة بيانات الأوامر: نهاية ملف غير متوقعة أثناء قراءة ملف الإدخال - "
 "إضافة بطاقة EN\n"
 
-#: src/input.c:1733
+#: src/input.c:1734
 msgid ""
 "Command data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -1563,11 +1567,11 @@ msgstr ""
 "نهاية ملف غير متوقعة أثناء قراءة ملف الإدخال\n"
 "إضافة بطاقة EN افتراضية"
 
-#: src/input.c:1747
+#: src/input.c:1748
 msgid "command data card error: card's mnemonic code too short or missing\n"
 msgstr "خطأ في بطاقة بيانات الأوامر: رمز البطاقة التذكيري قصير جداً أو مفقود\n"
 
-#: src/input.c:1748
+#: src/input.c:1749
 msgid ""
 "Command data card error\n"
 "Mnemonic code too short or missing"
@@ -1575,7 +1579,7 @@ msgstr ""
 "خطأ في بطاقة بيانات الأوامر\n"
 "الرمز التذكيري قصير جداً أو مفقود"
 
-#: src/input.c:1941
+#: src/input.c:1942
 msgid ""
 "geometry data card error: Unexpected EOF while reading input file - "
 "appending GE card\n"
@@ -1583,7 +1587,7 @@ msgstr ""
 "خطأ في بطاقة بيانات الهندسة: نهاية ملف غير متوقعة أثناء قراءة ملف الإدخال - "
 "إضافة بطاقة GE\n"
 
-#: src/input.c:1942
+#: src/input.c:1943
 msgid ""
 "Geometry data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -1593,11 +1597,11 @@ msgstr ""
 "نهاية ملف غير متوقعة أثناء قراءة ملف الإدخال\n"
 "إضافة بطاقة GE افتراضية"
 
-#: src/input.c:1956
+#: src/input.c:1957
 msgid "geometry data card error: card's mnemonic code too short or missing\n"
 msgstr "خطأ في بطاقة بيانات الهندسة: رمز البطاقة التذكيري قصير جداً أو مفقود\n"
 
-#: src/input.c:1957
+#: src/input.c:1958
 msgid ""
 "Geometry data card error\n"
 "Card's mnemonic code too short or missing"
@@ -1639,8 +1643,8 @@ msgstr "فشل إضافة الكائنات إلى builder: %s\n"
 msgid "Listing Object Ids:\n"
 msgstr "قائمة معرّفات الكائنات:\n"
 
-#: src/interface.c:180 src/utils.c:159 src/utils.c:163 src/utils.c:173
-#: src/utils.c:175
+#: src/interface.c:180 src/utils.c:149 src/utils.c:153 src/utils.c:163
+#: src/utils.c:165
 #, c-format
 msgid "%s\n"
 msgstr "%s\n"
@@ -1661,7 +1665,7 @@ msgstr "%s يتطلب وسيطة عدد صحيح موجب\n"
 msgid "Detected %d CPUs\n"
 msgstr "تم اكتشاف %d وحدات معالجة مركزية\n"
 
-#: src/main.c:202
+#: src/main.c:203
 msgid "config file path too long\n"
 msgstr "مسار ملف التكوين طويل جداً\n"
 
@@ -1736,37 +1740,37 @@ msgstr "الخروج بعد خطأ فادح: فشل pipe()"
 msgid "exiting after fatal error: fork() failed"
 msgstr "الخروج بعد خطأ فادح: فشل fork()"
 
-#: src/main.c:874
+#: src/main.c:896
 msgid "exiting via user interrupt\n"
 msgstr "الخروج عبر مقاطعة المستخدم\n"
 
-#: src/main.c:878
+#: src/main.c:900
 msgid "segmentation fault, exiting\n"
 msgstr "خطأ تجزئة، جارٍ الخروج\n"
 
-#: src/main.c:882
+#: src/main.c:904
 msgid "floating point exception, exiting\n"
 msgstr "استثناء الفاصلة العائمة، جارٍ الخروج\n"
 
-#: src/main.c:886
+#: src/main.c:908
 msgid "abort signal received, exiting\n"
 msgstr "تم استلام إشارة الإلغاء، جارٍ الخروج\n"
 
-#: src/main.c:890
+#: src/main.c:912
 msgid "termination request received, exiting\n"
 msgstr "تم استلام طلب الإنهاء، جارٍ الخروج\n"
 
-#: src/main.c:900
+#: src/main.c:922
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
 msgstr "لم يتم التفريع، تجاهل SIGCHLD من pid %d\n"
 
-#: src/main.c:908
+#: src/main.c:930
 #, c-format
 msgid "child process pid %d exited\n"
 msgstr "خرجت العملية الفرعية pid %d\n"
 
-#: src/main.c:917
+#: src/main.c:939
 #, c-format
 msgid "default exit with signal: %d\n"
 msgstr "خروج افتراضي مع إشارة: %d\n"
@@ -1788,7 +1792,7 @@ msgstr "open_mathlib: lib تساوي NULL\n"
 msgid "setenv(%s, %s): %s\n"
 msgstr "setenv(%s, %s): %s\n"
 
-#: src/mathlib.c:320 src/utils.c:575
+#: src/mathlib.c:320 src/utils.c:566
 #, c-format
 msgid "%s: %s\n"
 msgstr "%s: %s\n"
@@ -1848,20 +1852,15 @@ msgstr "set_mathlib_interactive: lib تساوي NULL\n"
 msgid "set_mathlib_interactive[%d]: mathlib.available=0, skipping: %s\n"
 msgstr "set_mathlib_interactive[%d]: mathlib.available=0، تخطي: %s\n"
 
-#: src/mathlib.c:630
-msgid ""
-"mathlib: You cannot change the math library while the freq loop is running."
-msgstr "mathlib: لا يمكن تغيير مكتبة الرياضيات أثناء تشغيل حلقة التردد."
-
-#: src/mathlib.c:643
+#: src/mathlib.c:636
 msgid "set_mathlib_batch: lib == NULL\n"
 msgstr "set_mathlib_batch: lib تساوي NULL\n"
 
-#: src/mathlib.c:648
+#: src/mathlib.c:641
 msgid "Batch Math Library"
 msgstr "مكتبة الرياضيات الدفعية"
 
-#: src/mathlib.c:649
+#: src/mathlib.c:642
 msgid ""
 "Selecting a batched math library has no effect unless -j is specified on the "
 "command line. (However, this selection will be saved for next time xnec2c is "
@@ -1870,20 +1869,20 @@ msgstr ""
 "اختيار مكتبة رياضيات دفعية ليس له تأثير ما لم يتم تحديد -j في سطر الأوامر. "
 "(ومع ذلك، سيتم حفظ هذا الاختيار للمرة القادمة التي يُفتح فيها xnec2c.)\n"
 
-#: src/mathlib.c:688
+#: src/mathlib.c:681
 #, c-format
 msgid "%s: benchmark=%d\n"
 msgstr "%s: benchmark=%d\n"
 
-#: src/mathlib.c:759
+#: src/mathlib.c:752
 msgid "Mathlib Help"
 msgstr "مساعدة Mathlib"
 
-#: src/mathlib.c:795
+#: src/mathlib.c:788
 msgid "Mathlib Benchmark Help"
 msgstr "مساعدة اختبار أداء Mathlib"
 
-#: src/mathlib.c:797
+#: src/mathlib.c:790
 msgid ""
 "Jobs are forked and run in parallel by xnec2c, whereas threads are used by "
 "the mathlib implementation to parallelize the linear algebra calculation of "
@@ -1958,20 +1957,20 @@ msgstr ""
 "* تكرار -j N-=2: وقت O(N*J): مثل -j N/=2 أعلاه، لكن بتقليل عدد العمليات "
 "بمقدار 1 بدلاً من ذلك. هذا يستغرق أطول وقت للتشغيل.\n"
 
-#: src/mathlib.c:846 src/mathlib.c:853 src/mathlib.c:859 src/mathlib.c:876
-#: src/mathlib.c:881 src/mathlib.c:1003
+#: src/mathlib.c:839 src/mathlib.c:846 src/mathlib.c:852 src/mathlib.c:869
+#: src/mathlib.c:874 src/mathlib.c:990
 msgid "Mathlib Benchmark"
 msgstr "اختبار أداء Mathlib"
 
-#: src/mathlib.c:847
+#: src/mathlib.c:840
 msgid "Benchmarks are disabled while optimization is activated."
 msgstr "اختبارات الأداء معطّلة أثناء تفعيل التحسين."
 
-#: src/mathlib.c:854
+#: src/mathlib.c:847
 msgid "You must load a NEC2 input file before running benchmarks."
 msgstr "يجب تحميل ملف إدخال NEC2 قبل تشغيل اختبارات الأداء."
 
-#: src/mathlib.c:860
+#: src/mathlib.c:853
 msgid ""
 "Choosing a benchmark other than \"Single Job\" has no effect unless -j is "
 "specified on the command line."
@@ -1979,11 +1978,11 @@ msgstr ""
 "اختيار اختبار أداء غير \"Single Job\" ليس له تأثير ما لم يتم تحديد -j في سطر "
 "الأوامر."
 
-#: src/mathlib.c:877
+#: src/mathlib.c:870
 msgid "You must select at least one math library to benchmark"
 msgstr "يجب اختيار مكتبة رياضيات واحدة على الأقل لاختبار الأداء"
 
-#: src/mathlib.c:882
+#: src/mathlib.c:875
 #, c-format
 msgid ""
 "This will run a frequency loop benchmark for each detected linear algebra "
@@ -2001,7 +2000,7 @@ msgid ""
 "processes in combination with library threads.  Consider reducing the value "
 "of -j N for benchmarking to find what library works best with a mix of "
 "forking and threading; you can use `top` to monitor your CPU usageand if it "
-"reaches 0% idle then you might consider reducing -j N.\n"
+"reaches 0%% idle then you might consider reducing -j N.\n"
 "\n"
 "You may wish to experiment setting these environment variables:\n"
 "  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS thread limit\n"
@@ -2022,8 +2021,8 @@ msgstr ""
 "* سيحدث ازدحام الخيوط للمكتبات متعددة الخيوط عند استخدام خيار -j N إذا لم "
 "تتوفر وحدات معالجة كافية لاستيعاب العمليات الفرعية مع خيوط المكتبة. حاول "
 "تقليل قيمة -j N لاختبار الأداء لإيجاد المكتبة الأفضل مع مزيج من العمليات "
-"الفرعية والخيوط؛ يمكنك استخدام `top` لمراقبة استخدام المعالج وإذا وصل إلى 0% "
-"خاملاً فقد تحتاج لتقليل -j N.\n"
+"الفرعية والخيوط؛ يمكنك استخدام `top` لمراقبة استخدام المعالج وإذا وصل إلى "
+"0%% خاملاً فقد تحتاج لتقليل -j N.\n"
 "\n"
 "قد ترغب في تجربة ضبط متغيرات البيئة التالية:\n"
 "  * OPENBLAS_NUM_THREADS=N\t# حد خيوط OpenBLAS\n"
@@ -2032,17 +2031,17 @@ msgstr ""
 "\n"
 "انقر موافق للمتابعة، سيُغلق هذا الحوار عند الاكتمال."
 
-#: src/mathlib.c:939
+#: src/mathlib.c:932
 #, c-format
 msgid "Starting %s benchmark (-j %d)\n"
 msgstr "بدء اختبار أداء %s (-j %d)\n"
 
-#: src/mathlib.c:1036
+#: src/mathlib.c:1023
 #, c-format
 msgid "mathlib_lock_intel: Cannot find library for mathlib ID='%s'\n"
 msgstr "mathlib_lock_intel: لا يمكن العثور على المكتبة لمعرّف mathlib='%s'\n"
 
-#: src/mathlib.c:1047
+#: src/mathlib.c:1034
 #, c-format
 msgid ""
 "\n"
@@ -2069,25 +2068,25 @@ msgstr ""
 "* \n"
 "* راجع وثائق Intel حول mkl_set_threading_layer() لمزيد من التفاصيل.\n"
 
-#: src/mathlib.c:1122
+#: src/mathlib.c:1109
 msgid "zgetrf: current_mathlib is NULL, this should never happen.\n"
 msgstr "zgetrf: current_mathlib تساوي NULL، هذا لا ينبغي أن يحدث.\n"
 
-#: src/mathlib.c:1146 src/mathlib.c:1191
+#: src/mathlib.c:1133 src/mathlib.c:1178
 #, c-format
 msgid "%s: unsupported mathlib type %d\n"
 msgstr "%s: نوع mathlib غير مدعوم %d\n"
 
-#: src/mathlib.c:1159
+#: src/mathlib.c:1146
 msgid "zgetrs: current_mathlib is NULL, this should never happen.\n"
 msgstr "zgetrs: current_mathlib تساوي NULL، هذا لا ينبغي أن يحدث.\n"
 
-#: src/mathlib.c:1184
+#: src/mathlib.c:1171
 #, c-format
 msgid "zgetrs warning: lda(%d) != ldb(%d)\n"
 msgstr "تحذير zgetrs: lda(%d) != ldb(%d)\n"
 
-#: src/mathlib.c:1219
+#: src/mathlib.c:1206
 #, c-format
 msgid "dlsym(mkl_set_threading_layer): %s\n"
 msgstr "dlsym(mkl_set_threading_layer): %s\n"
@@ -2227,13 +2226,13 @@ msgstr "تم تحميل %d من أهداف المحسّن\n"
 msgid "opt_file_load: %s\n"
 msgstr "opt_file_load: %s\n"
 
-#: src/opt_ui_session.c:70
+#: src/opt_ui_session.c:73
 #, c-format
 msgid "opt_ui: optimization finished, best fitness: %.6g\n"
 msgstr "opt_ui: اكتمل التحسين، أفضل ملاءمة: %.6g\n"
 
-#: src/opt_ui_session.c:106 src/opt_ui_session.c:139 src/opt_ui_session.c:169
-#: src/opt_ui_session.c:268
+#: src/opt_ui_session.c:109 src/opt_ui_session.c:142 src/opt_ui_session.c:172
+#: src/opt_ui_session.c:271
 msgid "Optimization"
 msgstr "التحسين"
 
@@ -2316,7 +2315,7 @@ msgid ""
 msgstr ""
 "inotify: IN_MOVED_TO على الهدف (اكتملت الكتابة الذرية)، بدء إعادة التحميل\n"
 
-#: src/optimize.c:401 src/optimize.c:436
+#: src/optimize.c:401 src/optimize.c:434
 #, c-format
 msgid ""
 "inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), "
@@ -2325,12 +2324,12 @@ msgstr ""
 "inotify: فشل stat الملف أو صفر بايت (ret=%d size=%ld errno=%s)، إعادة "
 "المحاولة\n"
 
-#: src/optimize.c:407 src/optimize.c:442
+#: src/optimize.c:407 src/optimize.c:440
 #, c-format
 msgid "inotify: file stat OK - size=%ld bytes\n"
 msgstr "inotify: stat الملف ناجح - الحجم=%ld بايت\n"
 
-#: src/optimize.c:425
+#: src/optimize.c:423
 msgid ""
 "inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
 "triggering reload\n"
@@ -2338,19 +2337,19 @@ msgstr ""
 "inotify: IN_CLOSE_WRITE بعد modify_seen=TRUE (اكتملت الكتابة المباشرة)، بدء "
 "إعادة التحميل\n"
 
-#: src/optimize.c:455
+#: src/optimize.c:451
 msgid ""
 "inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
 "skipping\n"
 msgstr ""
 "inotify: IN_CLOSE_WRITE بدون modify_seen (إغلاق زائف، inode قديم)، تخطي\n"
 
-#: src/optimize.c:462
+#: src/optimize.c:458
 #, c-format
 msgid "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 msgstr "inotify: تخطي الحدث (ليس MODIFY/CLOSE_WRITE/MOVED_TO، mask=0x%08x)\n"
 
-#: src/plot_freqdata.c:132
+#: src/plot_freqdata.c:131
 #, c-format
 msgid ""
 "fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d calc_data.ngraph="
@@ -2359,7 +2358,7 @@ msgstr ""
 "fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d calc_data.ngraph="
 "%d fr=%d posn=%d valid=%d\n"
 
-#: src/plot_freqdata.c:148
+#: src/plot_freqdata.c:147
 #, c-format
 msgid ""
 "fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
@@ -2368,124 +2367,124 @@ msgstr ""
 "fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
 "%d]\n"
 
-#: src/plot_freqdata.c:853 src/plot_freqdata.c:1320
+#: src/plot_freqdata.c:852 src/plot_freqdata.c:1319
 msgid "memory allocation for points failed\n"
 msgstr "فشل تخصيص الذاكرة للنقاط\n"
 
-#: src/plot_freqdata.c:854 src/plot_freqdata.c:1321
+#: src/plot_freqdata.c:853 src/plot_freqdata.c:1320
 msgid "Draw_Graph():Memory allocation for points failed"
 msgstr "Draw_Graph(): فشل تخصيص الذاكرة للنقاط"
 
-#: src/plot_freqdata.c:1282
+#: src/plot_freqdata.c:1281
 msgid "Smith Chart"
 msgstr "مخطط سميث"
 
-#: src/plot_freqdata.c:1490 src/plot_freqdata.c:1509 src/plot_freqdata.c:1534
+#: src/plot_freqdata.c:1489 src/plot_freqdata.c:1508 src/plot_freqdata.c:1533
 msgid "Raw Gain dBi"
 msgstr "الكسب الخام dBi"
 
-#: src/plot_freqdata.c:1493
+#: src/plot_freqdata.c:1492
 msgid "Max Gain & Net Gain vs Frequency"
 msgstr "الكسب الأقصى والكسب الصافي مقابل التردد"
 
-#: src/plot_freqdata.c:1494
+#: src/plot_freqdata.c:1493
 msgid "Net Gain dBi"
 msgstr "الكسب الصافي dBi"
 
-#: src/plot_freqdata.c:1500 src/plot_freqdata.c:1510
+#: src/plot_freqdata.c:1499 src/plot_freqdata.c:1509
 msgid "Max Gain & F/B Ratio vs Frequency"
 msgstr "الكسب الأقصى ونسبة أمامي/خلفي مقابل التردد"
 
-#: src/plot_freqdata.c:1511
+#: src/plot_freqdata.c:1510
 msgid "F/B Ratio dB"
 msgstr "نسبة أمامي/خلفي dB"
 
-#: src/plot_freqdata.c:1520
+#: src/plot_freqdata.c:1519
 msgid "Rad Angle - deg"
 msgstr "زاوية الإشعاع - deg"
 
-#: src/plot_freqdata.c:1521
+#: src/plot_freqdata.c:1520
 msgid "Max Gain Direction vs Frequency"
 msgstr "اتجاه الكسب الأقصى مقابل التردد"
 
-#: src/plot_freqdata.c:1522
+#: src/plot_freqdata.c:1521
 msgid "Phi - deg"
 msgstr "Phi - deg"
 
-#: src/plot_freqdata.c:1535
+#: src/plot_freqdata.c:1534
 msgid "Gain in Viewer Direction vs Frequency"
 msgstr "الكسب في اتجاه المشاهد مقابل التردد"
 
-#: src/plot_freqdata.c:1558
+#: src/plot_freqdata.c:1557
 msgid "Net gain dBi"
 msgstr "الكسب الصافي dBi"
 
-#: src/plot_freqdata.c:1576 resources/xnec2c.glade:9951
+#: src/plot_freqdata.c:1575 resources/xnec2c.glade:9951
 #: resources/xnec2c.glade:10175
 msgid "VSWR"
 msgstr "VSWR"
 
-#: src/plot_freqdata.c:1579
+#: src/plot_freqdata.c:1578
 msgid "VSWR & S11 vs Frequency"
 msgstr "VSWR و S11 مقابل التردد"
 
-#: src/plot_freqdata.c:1580
+#: src/plot_freqdata.c:1579
 msgid "S11 dB"
 msgstr "S11 dB"
 
-#: src/plot_freqdata.c:1584
+#: src/plot_freqdata.c:1583
 msgid "VSWR vs Frequency"
 msgstr "VSWR مقابل التردد"
 
-#: src/plot_freqdata.c:1598
+#: src/plot_freqdata.c:1597
 msgid "memory allocation for vswr/s11 failed\n"
 msgstr "فشل تخصيص الذاكرة لـ vswr/s11\n"
 
-#: src/plot_freqdata.c:1599
+#: src/plot_freqdata.c:1598
 msgid "Plot_Frequency_Data():Memory allocation for vswr/s11 failed"
 msgstr "Plot_Frequency_Data(): فشل تخصيص الذاكرة لـ vswr/s11"
 
-#: src/plot_freqdata.c:1646 resources/xnec2c.glade:10140
+#: src/plot_freqdata.c:1645 resources/xnec2c.glade:10140
 msgid "Z-real"
 msgstr "Z-real"
 
-#: src/plot_freqdata.c:1647 src/plot_freqdata.c:1656
+#: src/plot_freqdata.c:1646 src/plot_freqdata.c:1655
 msgid "Impedance vs Frequency"
 msgstr "الممانعة مقابل التردد"
 
-#: src/plot_freqdata.c:1648 resources/xnec2c.glade:10105
+#: src/plot_freqdata.c:1647 resources/xnec2c.glade:10105
 msgid "Z-imag"
 msgstr "Z-imag"
 
-#: src/plot_freqdata.c:1655
+#: src/plot_freqdata.c:1654
 msgid "Z-magn"
 msgstr "Z-magn"
 
-#: src/plot_freqdata.c:1657
+#: src/plot_freqdata.c:1656
 msgid "Z-phase"
 msgstr "Z-phase"
 
-#: src/plot_freqdata.c:1691
+#: src/plot_freqdata.c:1690
 msgid "G/T_ant (dB)"
 msgstr "G/T_ant (dB)"
 
-#: src/plot_freqdata.c:1694
+#: src/plot_freqdata.c:1693
 msgid "G/T_ant & T_ant"
 msgstr "G/T_ant و T_ant"
 
-#: src/plot_freqdata.c:1695
+#: src/plot_freqdata.c:1694
 msgid "T_ant (K)"
 msgstr "T_ant (K)"
 
-#: src/plot_freqdata.c:1699
+#: src/plot_freqdata.c:1698
 msgid "G/T_ant & T_total"
 msgstr "G/T_ant و T_total"
 
-#: src/plot_freqdata.c:1700
+#: src/plot_freqdata.c:1699
 msgid "T_total (K)"
 msgstr "T_total (K)"
 
-#: src/plot_freqdata.c:1942
+#: src/plot_freqdata.c:1941
 #, c-format
 msgid "mouse button: unknown button %d\n"
 msgstr "زر الفأرة: زر غير معروف %d\n"
@@ -2559,34 +2558,34 @@ msgstr "%s: نهاية ملف أثناء قراءة إصدار التطبيق.\n
 msgid "existing config file version differs: %s != %s\n"
 msgstr "إصدار ملف الإعدادات الحالي يختلف: %s != %s\n"
 
-#: src/rc_config.c:921
+#: src/rc_config.c:923
 #, c-format
 msgid "stat failed for %s: %s\n"
 msgstr "فشل stat لـ %s: %s\n"
 
-#: src/rc_config.c:927
+#: src/rc_config.c:929
 #, c-format
 msgid ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
 "4e62893b.\n"
 msgstr "تم إصلاح أذونات مجلد %s من 0%o إلى 0%o من خلل أُدخل في 4e62893b.\n"
 
-#: src/rc_config.c:958
+#: src/rc_config.c:960
 #, c-format
 msgid "%s:%d: Line not parsed: %s\n"
 msgstr "%s:%d: لم يتم تحليل السطر: %s\n"
 
-#: src/rc_config.c:964
+#: src/rc_config.c:966
 #, c-format
 msgid "%s:%d: Early end of file for %s: %s \n"
 msgstr "%s:%d: نهاية ملف مبكرة لـ %s: %s \n"
 
-#: src/rc_config.c:989
+#: src/rc_config.c:991
 #, c-format
 msgid "%s:%d: parse error (%s): %s \n"
 msgstr "%s:%d: خطأ تحليل (%s): %s \n"
 
-#: src/rc_config.c:1254
+#: src/rc_config.c:1256
 #, c-format
 msgid "cannot open xnec2c's config file %s: %s\n"
 msgstr "لا يمكن فتح ملف إعدادات xnec2c %s: %s\n"
@@ -2767,7 +2766,7 @@ msgstr ""
 "  --write-gnuplot-structure <اسم الملف> - كتابة ملف gnuplot للبنية\n"
 "  --write-patch-currents  <اسم الملف>  - كتابة CSV لتيارات الرقع السطحية\n"
 
-#: src/utils.c:105 src/utils.c:110
+#: src/utils.c:100 src/utils.c:105
 #, c-format
 msgid ""
 "\n"
@@ -2780,27 +2779,27 @@ msgstr ""
 "%s\n"
 "\n"
 
-#: src/utils.c:152
+#: src/utils.c:142
 #, c-format
 msgid "Stop: %s\n"
 msgstr "إيقاف: %s\n"
 
-#: src/utils.c:188 src/utils.c:190
+#: src/utils.c:178 src/utils.c:180
 #, c-format
 msgid "Stop during freq loop, deadlock prevented: %s\n"
 msgstr "إيقاف أثناء حلقة التردد، تم منع الجمود: %s\n"
 
-#: src/utils.c:370
+#: src/utils.c:360
 #, c-format
 msgid "using %d OpenMP threads per job (%d/%d CPUs)\n"
 msgstr "استخدام %d خيوط OpenMP لكل مهمة (%d/%d وحدات معالجة)\n"
 
-#: src/utils.c:386
+#: src/utils.c:376
 #, c-format
 msgid "%s[%d]: %f seconds\n"
 msgstr "%s[%d]: %f ثانية\n"
 
-#: src/utils.c:438
+#: src/utils.c:428
 #, c-format
 msgid ""
 "mem_obj_t at %p:\n"
@@ -2813,37 +2812,33 @@ msgstr ""
 "  used: %lu\n"
 "  addr: %p\n"
 
-#: src/utils.c:457
+#: src/utils.c:447
 #, c-format
 msgid "mem_backtrace(%p):\n"
 msgstr "mem_backtrace(%p):\n"
 
-#: src/utils.c:459
+#: src/utils.c:449
 msgid "  m->backtrace is null, no backtrace data\n"
 msgstr "  m->backtrace فارغ، لا توجد بيانات تتبع\n"
 
-#: src/utils.c:523
+#: src/utils.c:513
 #, c-format
 msgid "Memory re-allocation denied %s\n"
 msgstr "تم رفض إعادة تخصيص الذاكرة %s\n"
 
-#: src/utils.c:524
+#: src/utils.c:514
 #, c-format
 msgid "%s: Memory requested %lu\n"
 msgstr "%s: الذاكرة المطلوبة %lu\n"
 
-#: src/utils.c:570
+#: src/utils.c:561
 #, c-format
 msgid "xnec2c[%d]: %s: Failed to open file: %s\n"
 msgstr "xnec2c[%d]: %s: فشل فتح الملف: %s\n"
 
-#: src/utils.c:943
-msgid "Optimizer loop incomplete, skipping radiation pattern redraw.\n"
-msgstr "حلقة المحسّن غير مكتملة، تخطي إعادة رسم نمط الإشعاع.\n"
-
 #: src/utils.c:950
-msgid "Optimizer loop incomplete, skipping structure redraw.\n"
-msgstr "حلقة المحسّن غير مكتملة، تخطي إعادة رسم الهيكل.\n"
+msgid "Optimizer loop incomplete, suppressing intermediate redraw.\n"
+msgstr "حلقة المحسّن غير مكتملة، تعطيل إعادة الرسم الوسيطة.\n"
 
 #: src/utils.c:965
 msgid "  Backtrace:\n"
@@ -2859,7 +2854,7 @@ msgstr "    %d. %s\n"
 msgid "%s:\n"
 msgstr "%s:\n"
 
-#: src/xnec2c.c:196
+#: src/xnec2c.c:275
 #, c-format
 msgid ""
 "complex dielectric constant from file: %12.5E%+12.5Ej, requested: %12.5E"
@@ -2868,45 +2863,58 @@ msgstr ""
 "ثابت العزل الكهربائي المركب من الملف: %12.5E%+12.5Ej، المطلوب: %12.5E"
 "%+12.5Ej\n"
 
-#: src/xnec2c.c:199
+#: src/xnec2c.c:278
 msgid "Ground_Parameters():Error in ground parameters"
 msgstr "Ground_Parameters(): خطأ في معاملات الأرضي"
 
-#: src/xnec2c.c:516
+#: src/xnec2c.c:595
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
 msgstr "%.6f MHz: %f ثانية. (%s)\n"
 
-#: src/xnec2c.c:802 src/xnec2c.c:854
+#: src/xnec2c.c:839
 #, c-format
 msgid ""
 "step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
 msgstr "الخطوة %d تسابقت: أُرسلت %.6f MHz، الحالي %.6f MHz؛ ستتم إعادة الحساب\n"
 
-#: src/xnec2c.c:842
+#: src/xnec2c.c:935
+#, c-format
+msgid "child %d has invalid pipe fd during forked collect\n"
+msgstr "العملية الفرعية %d لها واصف أنبوب غير صالح أثناء التجميع المتفرع\n"
+
+#: src/xnec2c.c:990
 msgid "Failed to read data from forked child\n"
 msgstr "فشل قراءة البيانات من العملية الفرعية\n"
 
-#: src/xnec2c.c:941
+#: src/xnec2c.c:1027
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
 msgstr "الوقت المنقضي لحلقة التردد: %f ثانية. (%s)\n"
 
-#: src/xnec2c.c:1211
+#: src/xnec2c.c:1261
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "فشل بدء Frequency_Loop_Thread\n"
 
-#: src/opengl/opengl_rdpattern.c:380
+#: src/opengl/opengl_rdpattern.c:386
 #, c-format
 msgid "rdpattern: invalid draw style %d, using surface\n"
 msgstr "rdpattern: نمط رسم غير صالح %d، استخدام سطح\n"
 
-#: src/opengl/opengl_settings.c:428
+#: src/opengl/opengl_settings.c:380
+msgid ""
+"OpenGL is not available on this display; switching to Cairo renderer. See "
+"'OpenGL Renderer' in View > OpenGL Settings.\n"
+msgstr ""
+"OpenGL غير متاح على هذه الشاشة؛ التبديل إلى مُصيِّر Cairo. راجع 'OpenGL "
+"Renderer' في عرض > إعدادات OpenGL.\n"
+
+#: src/opengl/opengl_settings.c:483 src/opengl/opengl_settings.c:624
 #, c-format
 msgid "opengl_settings_init: failed to load glade: %s\n"
 msgstr "opengl_settings_init: فشل تحميل glade: %s\n"
 
-#: src/opengl/opengl_settings.c:441
+#: src/opengl/opengl_settings.c:496 src/opengl/opengl_settings.c:637
 msgid "opengl_settings_init: failed to get opengl_settings_window from glade\n"
 msgstr "opengl_settings_init: فشل الحصول على opengl_settings_window من glade\n"
 
@@ -2954,27 +2962,28 @@ msgid "Shader link failed\n"
 msgstr "فشل ربط shader\n"
 
 #: src/opengl-engine/opengl_view.c:123
-msgid "GL context error\n"
-msgstr "خطأ سياق GL\n"
+msgid ""
+"OpenGL context error — no OpenGL implementation available on this display\n"
+msgstr "خطأ في سياق OpenGL — لا يوجد تطبيق OpenGL متاح على هذه الشاشة\n"
 
-#: src/opengl-engine/opengl_view.c:149
+#: src/opengl-engine/opengl_view.c:151
 msgid "Failed to create axes renderer\n"
 msgstr "فشل إنشاء محرك عرض المحاور\n"
 
-#: src/opengl-engine/opengl_view.c:181
+#: src/opengl-engine/opengl_view.c:183
 msgid "Failed to create ground plane renderer\n"
 msgstr "فشل إنشاء محرك عرض مستوى الأرضي\n"
 
-#: src/opengl-engine/opengl_view.c:202
+#: src/opengl-engine/opengl_view.c:204
 #, c-format
 msgid "Renderable count %u exceeds MAX_RENDERABLES (%d)\n"
 msgstr "عدد العناصر القابلة للعرض %u يتجاوز MAX_RENDERABLES (%d)\n"
 
-#: src/opengl-engine/opengl_view.c:246
+#: src/opengl-engine/opengl_view.c:248
 msgid "Failed to create gradient overlay\n"
 msgstr "فشل إنشاء تراكب التدرج\n"
 
-#: src/opengl-engine/opengl_view.c:294
+#: src/opengl-engine/opengl_view.c:296
 msgid "Failed to load peel composite shaders\n"
 msgstr "فشل تحميل shaders تركيب التقشير\n"
 
@@ -3244,17 +3253,17 @@ msgstr "تردد الحركة (Hz)"
 msgid "Arc Element (GA card)"
 msgstr "عنصر القوس (بطاقة GA)"
 
-#: resources/xnec2c.glade:325 resources/xnec2c.glade:14932
+#: resources/xnec2c.glade:325 resources/xnec2c.glade:14915
 msgid "No. Segments"
 msgstr "عدد segments"
 
 #: resources/xnec2c.glade:338 resources/xnec2c.glade:3800
-#: resources/xnec2c.glade:15028
+#: resources/xnec2c.glade:15011
 msgid "Segs % lambda"
 msgstr "segments % lambda"
 
 #: resources/xnec2c.glade:351 resources/xnec2c.glade:3813
-#: resources/xnec2c.glade:15124
+#: resources/xnec2c.glade:15107
 msgid "Wire Diameter"
 msgstr "قطر السلك"
 
@@ -3282,9 +3291,9 @@ msgstr "بيانات قوس السلك"
 #: resources/xnec2c.glade:4704 resources/xnec2c.glade:5236
 #: resources/xnec2c.glade:5872 resources/xnec2c.glade:7316
 #: resources/xnec2c.glade:8223 resources/xnec2c.glade:9229
-#: resources/xnec2c.glade:9509 resources/xnec2c.glade:13530
-#: resources/xnec2c.glade:14043 resources/xnec2c.glade:14642
-#: resources/xnec2c.glade:15478 resources/xnec2c.glade:15678
+#: resources/xnec2c.glade:9509 resources/xnec2c.glade:13513
+#: resources/xnec2c.glade:14026 resources/xnec2c.glade:14625
+#: resources/xnec2c.glade:15461 resources/xnec2c.glade:15661
 msgid "Delete Card"
 msgstr "حذف البطاقة"
 
@@ -3578,8 +3587,8 @@ msgstr "5.00"
 msgid "8"
 msgstr "8"
 
-#: resources/xnec2c.glade:3888 resources/xnec2c.glade:11746
-#: resources/xnec2c.glade:13068
+#: resources/xnec2c.glade:3888 resources/xnec2c.glade:11737
+#: resources/xnec2c.glade:13050
 msgid "1"
 msgstr "1"
 
@@ -3633,7 +3642,7 @@ msgstr "نصف القطر في Y (B2)"
 msgid "GH Card"
 msgstr "بطاقة GH"
 
-#: resources/xnec2c.glade:4417 resources/xnec2c.glade:15552
+#: resources/xnec2c.glade:4417 resources/xnec2c.glade:15535
 msgid "Interaction Approx Range (KH Card)"
 msgstr "نطاق تقريب التفاعل (بطاقة KH)"
 
@@ -3749,8 +3758,8 @@ msgstr "نوع المجال والإحداثيات"
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:5552 resources/xnec2c.glade:11295
-#: resources/xnec2c.glade:12602
+#: resources/xnec2c.glade:5552 resources/xnec2c.glade:11286
+#: resources/xnec2c.glade:12584
 msgid "X"
 msgstr "X"
 
@@ -3762,8 +3771,8 @@ msgstr "DX"
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:5647 resources/xnec2c.glade:11310
-#: resources/xnec2c.glade:12617
+#: resources/xnec2c.glade:5647 resources/xnec2c.glade:11301
+#: resources/xnec2c.glade:12599
 msgid "Y"
 msgstr "Y"
 
@@ -3775,8 +3784,8 @@ msgstr "DY"
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:5742 resources/xnec2c.glade:11325
-#: resources/xnec2c.glade:12632
+#: resources/xnec2c.glade:5742 resources/xnec2c.glade:11316
+#: resources/xnec2c.glade:12614
 msgid "Z"
 msgstr "Z"
 
@@ -3936,7 +3945,7 @@ msgstr "رقم segment، المنفذ 1"
 msgid "Segment Num, Port 2"
 msgstr "رقم segment، المنفذ 2"
 
-#: resources/xnec2c.glade:7029 resources/xnec2c.glade:14338
+#: resources/xnec2c.glade:7029 resources/xnec2c.glade:14321
 msgid "Segment Identity"
 msgstr "هوية segment"
 
@@ -4189,16 +4198,16 @@ msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: مخططات بيانات التردد"
 
 #: resources/xnec2c.glade:9604 resources/xnec2c.glade:10544
-#: resources/xnec2c.glade:11999
+#: resources/xnec2c.glade:11990
 msgid "_File"
 msgstr "_ملف"
 
 #: resources/xnec2c.glade:9666 resources/xnec2c.glade:10606
-#: resources/xnec2c.glade:12061
+#: resources/xnec2c.glade:12052
 msgid "Save as _gnuplot"
 msgstr "حفظ كـ _gnuplot"
 
-#: resources/xnec2c.glade:9677 resources/xnec2c.glade:12071
+#: resources/xnec2c.glade:9677 resources/xnec2c.glade:12062
 msgid "Save as _CSV"
 msgstr "حفظ كـ _CSV"
 
@@ -4219,37 +4228,37 @@ msgid "Save as S2P: _Viewer Gain (S21)"
 msgstr "حفظ كـ S2P: كسب ال_مشاهد (S21)"
 
 #: resources/xnec2c.glade:9753 resources/xnec2c.glade:10972
-#: resources/xnec2c.glade:12105
+#: resources/xnec2c.glade:12096
 msgid "_View"
 msgstr "_عرض"
 
 #: resources/xnec2c.glade:9762 resources/xnec2c.glade:11002
-#: resources/xnec2c.glade:12115
+#: resources/xnec2c.glade:12106
 msgid "_Polarization"
 msgstr "الا_ستقطاب"
 
 #: resources/xnec2c.glade:9778 resources/xnec2c.glade:11018
-#: resources/xnec2c.glade:12131
+#: resources/xnec2c.glade:12122
 msgid "_Total"
 msgstr "ال_كلي"
 
 #: resources/xnec2c.glade:9789 resources/xnec2c.glade:11029
-#: resources/xnec2c.glade:12142
+#: resources/xnec2c.glade:12133
 msgid "_Horizontal"
 msgstr "الأ_فقي"
 
 #: resources/xnec2c.glade:9800 resources/xnec2c.glade:11040
-#: resources/xnec2c.glade:12153
+#: resources/xnec2c.glade:12144
 msgid "_Vertical"
 msgstr "ال_رأسي"
 
 #: resources/xnec2c.glade:9811 resources/xnec2c.glade:11051
-#: resources/xnec2c.glade:12164
+#: resources/xnec2c.glade:12155
 msgid "_Right Hand"
 msgstr "اليد الي_منى"
 
 #: resources/xnec2c.glade:9822 resources/xnec2c.glade:11062
-#: resources/xnec2c.glade:12175
+#: resources/xnec2c.glade:12166
 msgid "_Left Hand"
 msgstr "اليد الي_سرى"
 
@@ -4308,7 +4317,7 @@ msgstr "T_ant"
 #: resources/xnec2c.glade:10054 resources/xnec2c.glade:10089
 #: resources/xnec2c.glade:10124 resources/xnec2c.glade:10159
 #: resources/xnec2c.glade:10377 resources/xnec2c.glade:10411
-#: resources/xnec2c.glade:10445 resources/xnec2c.glade:13255
+#: resources/xnec2c.glade:10445 resources/xnec2c.glade:13238
 msgid " - - -"
 msgstr " - - -"
 
@@ -4324,12 +4333,12 @@ msgstr "التردد MHz"
 msgid "Tx Line Zo"
 msgstr "Zo خط النقل"
 
-#: resources/xnec2c.glade:10264 resources/xnec2c.glade:11761
-#: resources/xnec2c.glade:13099
+#: resources/xnec2c.glade:10264 resources/xnec2c.glade:11752
+#: resources/xnec2c.glade:13081
 msgid "Freq Loop"
 msgstr "حلقة التردد"
 
-#: resources/xnec2c.glade:10359 resources/xnec2c.glade:13204
+#: resources/xnec2c.glade:10359 resources/xnec2c.glade:13187
 msgid "T_total"
 msgstr "T_total"
 
@@ -4469,7 +4478,7 @@ msgstr "ال_طور المرجعي"
 msgid "_LIC Texture"
 msgstr "نسيج _LIC"
 
-#: resources/xnec2c.glade:11122 resources/xnec2c.glade:12410
+#: resources/xnec2c.glade:11122 resources/xnec2c.glade:12401
 msgid "_Wireframe"
 msgstr "إطار سل_كي"
 
@@ -4489,407 +4498,403 @@ msgstr "ال_قيمة القصوى"
 msgid "A_nimate"
 msgstr "ت_حريك"
 
-#: resources/xnec2c.glade:11182 resources/xnec2c.glade:12527
+#: resources/xnec2c.glade:11182 resources/xnec2c.glade:12518
 msgid "Common _Projection"
 msgstr "الإسقاط الم_شترك"
 
-#: resources/xnec2c.glade:11192 resources/xnec2c.glade:12537
-msgid "Common _Frequency"
-msgstr "التردد الم_شترك"
-
-#: resources/xnec2c.glade:11208
+#: resources/xnec2c.glade:11199
 msgid "_Symbol Overrides"
 msgstr "تجاوز ال_رموز"
 
-#: resources/xnec2c.glade:11218
+#: resources/xnec2c.glade:11209
 msgid "OpenGL _Settings..."
 msgstr "إ_عدادات OpenGL..."
 
-#: resources/xnec2c.glade:11229
+#: resources/xnec2c.glade:11220
 msgid "_Help"
 msgstr "م_ساعدة"
 
-#: resources/xnec2c.glade:11238
+#: resources/xnec2c.glade:11229
 msgid "_About"
 msgstr "_حول"
 
-#: resources/xnec2c.glade:11265
+#: resources/xnec2c.glade:11256
 msgid "Currents"
 msgstr "التيارات"
 
-#: resources/xnec2c.glade:11280
+#: resources/xnec2c.glade:11271
 msgid "Charges"
 msgstr "الشحنات"
 
-#: resources/xnec2c.glade:11463
+#: resources/xnec2c.glade:11454
 msgid " Zoom"
 msgstr " تكبير"
 
-#: resources/xnec2c.glade:11606 resources/xnec2c.glade:13035
+#: resources/xnec2c.glade:11597 resources/xnec2c.glade:13017
 msgid "Gain"
 msgstr "الكسب"
 
-#: resources/xnec2c.glade:11621 resources/xnec2c.glade:11637
-#: resources/xnec2c.glade:13048 resources/xnec2c.glade:13237
+#: resources/xnec2c.glade:11612 resources/xnec2c.glade:11628
+#: resources/xnec2c.glade:13030 resources/xnec2c.glade:13220
 msgid "0.0"
 msgstr "0.0"
 
-#: resources/xnec2c.glade:11671
+#: resources/xnec2c.glade:11662
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:11713 resources/xnec2c.glade:13191
+#: resources/xnec2c.glade:11704 resources/xnec2c.glade:13174
 msgid "dB"
 msgstr "dB"
 
-#: resources/xnec2c.glade:11727 resources/xnec2c.glade:13084
+#: resources/xnec2c.glade:11718 resources/xnec2c.glade:13066
 msgid "Step"
 msgstr "الخطوة"
 
-#: resources/xnec2c.glade:11874 resources/xnec2c.glade:13132
-msgid "Apply"
-msgstr "تطبيق"
+#: resources/xnec2c.glade:11865 resources/xnec2c.glade:13114
+msgid "Apply Freq"
+msgstr "تطبيق التردد"
 
-#: resources/xnec2c.glade:11894
+#: resources/xnec2c.glade:11885
 msgid "Frequency Mhz"
 msgstr "التردد MHz"
 
-#: resources/xnec2c.glade:11954
+#: resources/xnec2c.glade:11945
 msgid "Structure Geometry"
 msgstr "هندسة الهيكل"
 
-#: resources/xnec2c.glade:11973
+#: resources/xnec2c.glade:11964
 msgid "Xnec2c: Radiation Patterns"
 msgstr "Xnec2c: أنماط الإشعاع"
 
-#: resources/xnec2c.glade:12190
+#: resources/xnec2c.glade:12181
 msgid "_Gain Scaling"
 msgstr "تحجيم الك_سب"
 
-#: resources/xnec2c.glade:12205
+#: resources/xnec2c.glade:12196
 msgid "Linear _Power"
 msgstr "ال_قدرة الخطية"
 
-#: resources/xnec2c.glade:12216
+#: resources/xnec2c.glade:12207
 msgid "Linear _Voltage"
 msgstr "الج_هد الخطي"
 
-#: resources/xnec2c.glade:12227
+#: resources/xnec2c.glade:12218
 msgid "_ARRL Style"
 msgstr "نمط _ARRL"
 
-#: resources/xnec2c.glade:12238
+#: resources/xnec2c.glade:12229
 msgid "_Logarithmic"
 msgstr "ال_لوغاريتمي"
 
-#: resources/xnec2c.glade:12249
+#: resources/xnec2c.glade:12240
 msgid "_Noise Temperature"
 msgstr "درجة _حرارة الضوضاء"
 
-#: resources/xnec2c.glade:12260
+#: resources/xnec2c.glade:12251
 msgid "Noise Temp (_log scale)"
 msgstr "درجة حرارة الضوضاء (_مقياس لوغاريتمي)"
 
-#: resources/xnec2c.glade:12275
+#: resources/xnec2c.glade:12266
 msgid "Noise _Environment"
 msgstr "بيئة ال_ضوضاء"
 
-#: resources/xnec2c.glade:12290
+#: resources/xnec2c.glade:12281
 msgid "VE7BQH _Rural"
 msgstr "VE7BQH _ريفي"
 
-#: resources/xnec2c.glade:12300
+#: resources/xnec2c.glade:12291
 msgid "VE7BQH Resi_dential"
 msgstr "VE7BQH س_كني"
 
-#: resources/xnec2c.glade:12312
+#: resources/xnec2c.glade:12303
 msgid "VE7BQH _City"
 msgstr "VE7BQH _مدينة"
 
-#: resources/xnec2c.glade:12323
+#: resources/xnec2c.glade:12314
 msgid "G4CQM _Baseline"
 msgstr "G4CQM خط ال_أساس"
 
-#: resources/xnec2c.glade:12334
+#: resources/xnec2c.glade:12325
 msgid "ITU-R _Business"
 msgstr "ITU-R _تجاري"
 
-#: resources/xnec2c.glade:12345
+#: resources/xnec2c.glade:12336
 msgid "ITU-R Reside_ntial"
 msgstr "ITU-R سك_ني"
 
-#: resources/xnec2c.glade:12356
+#: resources/xnec2c.glade:12347
 msgid "ITU-R Ru_ral"
 msgstr "ITU-R ري_في"
 
-#: resources/xnec2c.glade:12367
+#: resources/xnec2c.glade:12358
 msgid "ITU-R _Quiet Rural"
 msgstr "ITU-R ريفي _هادئ"
 
-#: resources/xnec2c.glade:12382
+#: resources/xnec2c.glade:12373
 msgid "_Gradient Key"
 msgstr "م_فتاح التدرج"
 
-#: resources/xnec2c.glade:12392
+#: resources/xnec2c.glade:12383
 msgid "Draw St_yle"
 msgstr "ن_مط الرسم"
 
-#: resources/xnec2c.glade:12401
+#: resources/xnec2c.glade:12392
 msgid "S_urface"
 msgstr "_سطح"
 
-#: resources/xnec2c.glade:12420
+#: resources/xnec2c.glade:12411
 msgid "_Both"
 msgstr "الا_ثنان"
 
-#: resources/xnec2c.glade:12435
+#: resources/xnec2c.glade:12426
 msgid "_Near Field"
 msgstr "المجال ال_قريب"
 
-#: resources/xnec2c.glade:12450
+#: resources/xnec2c.glade:12441
 msgid "Near _E Field"
 msgstr "حقل _E القريب"
 
-#: resources/xnec2c.glade:12460
+#: resources/xnec2c.glade:12451
 msgid "Near _H Field"
 msgstr "حقل _H القريب"
 
-#: resources/xnec2c.glade:12470
+#: resources/xnec2c.glade:12461
 msgid "_Poynting Vector"
 msgstr "متجه _Poynting"
 
-#: resources/xnec2c.glade:12479
+#: resources/xnec2c.glade:12470
 msgid "_Animate Dialog"
 msgstr "حوار ال_تحريك"
 
-#: resources/xnec2c.glade:12488
+#: resources/xnec2c.glade:12479
 msgid "_Total Field"
 msgstr "الحقل ال_كلي"
 
-#: resources/xnec2c.glade:12497
+#: resources/xnec2c.glade:12488
 msgid "_Peak Value"
 msgstr "القيمة ال_قصوى"
 
-#: resources/xnec2c.glade:12508
+#: resources/xnec2c.glade:12499
 msgid "_Instantaneous (φ=0)"
 msgstr "ال_لحظي (φ=0)"
 
-#: resources/xnec2c.glade:12547
+#: resources/xnec2c.glade:12529
 msgid "_Overlay Structure"
 msgstr "_تراكب البنية"
 
-#: resources/xnec2c.glade:12572
+#: resources/xnec2c.glade:12554
 msgid "Gain Pattern"
 msgstr "نمط الكسب"
 
-#: resources/xnec2c.glade:12587
+#: resources/xnec2c.glade:12569
 msgid "E/H Fields"
 msgstr "حقول E/H"
 
-#: resources/xnec2c.glade:12772
+#: resources/xnec2c.glade:12754
 msgid "Zoom % "
 msgstr "التكبير % "
 
-#: resources/xnec2c.glade:12811
+#: resources/xnec2c.glade:12793
 msgid "T Elev° "
 msgstr "ارتفاع T° "
 
-#: resources/xnec2c.glade:13151
+#: resources/xnec2c.glade:13134
 msgid "Frequency MHz"
 msgstr "التردد MHz"
 
-#: resources/xnec2c.glade:13168
+#: resources/xnec2c.glade:13151
 msgid "0.010"
 msgstr "0.010"
 
-#: resources/xnec2c.glade:13221
+#: resources/xnec2c.glade:13204
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:13356
+#: resources/xnec2c.glade:13339
 msgid "Scale Structure (GS card)"
 msgstr "تحجيم البنية (بطاقة GS)"
 
-#: resources/xnec2c.glade:13387
+#: resources/xnec2c.glade:13370
 msgid "Structure Scale Factor"
 msgstr "معامل تحجيم البنية"
 
-#: resources/xnec2c.glade:13400
+#: resources/xnec2c.glade:13383
 msgid "From Tag No."
 msgstr "من رقم tag"
 
-#: resources/xnec2c.glade:13450
+#: resources/xnec2c.glade:13433
 msgid "To Tag No."
 msgstr "إلى رقم tag"
 
-#: resources/xnec2c.glade:13485
+#: resources/xnec2c.glade:13468
 msgid "Scale Structure"
 msgstr "تحجيم البنية"
 
-#: resources/xnec2c.glade:13662
+#: resources/xnec2c.glade:13645
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "تحويل الإحداثيات (بطاقة GM)"
 
-#: resources/xnec2c.glade:13692
+#: resources/xnec2c.glade:13675
 msgid "Tag Increment"
 msgstr "زيادة tag"
 
-#: resources/xnec2c.glade:13723
+#: resources/xnec2c.glade:13706
 msgid "Rotate about X"
 msgstr "الدوران حول X"
 
-#: resources/xnec2c.glade:13755
+#: resources/xnec2c.glade:13738
 msgid "Move along X"
 msgstr "التحريك على X"
 
-#: resources/xnec2c.glade:13787
+#: resources/xnec2c.glade:13770
 msgid "New Structures"
 msgstr "بنى جديدة"
 
-#: resources/xnec2c.glade:13818
+#: resources/xnec2c.glade:13801
 msgid "Rotate about Y"
 msgstr "الدوران حول Y"
 
-#: resources/xnec2c.glade:13850
+#: resources/xnec2c.glade:13833
 msgid "Move along Y"
 msgstr "التحريك على Y"
 
-#: resources/xnec2c.glade:13882
+#: resources/xnec2c.glade:13865
 msgid "Start From Tag"
 msgstr "البدء من tag"
 
-#: resources/xnec2c.glade:13914
+#: resources/xnec2c.glade:13897
 msgid "Rotate about Z"
 msgstr "الدوران حول Z"
 
-#: resources/xnec2c.glade:13946
+#: resources/xnec2c.glade:13929
 msgid "Move along Z"
 msgstr "التحريك على Z"
 
-#: resources/xnec2c.glade:13982
+#: resources/xnec2c.glade:13965
 msgid "Co-ordinate Transformation Data"
 msgstr "بيانات تحويل الإحداثيات"
 
-#: resources/xnec2c.glade:14178
+#: resources/xnec2c.glade:14161
 msgid "Trans. Line Command (TL Card)"
 msgstr "أمر خط النقل (بطاقة TL)"
 
-#: resources/xnec2c.glade:14208
+#: resources/xnec2c.glade:14191
 msgid "Tag Number, End 1  "
 msgstr "رقم tag، الطرف 1  "
 
-#: resources/xnec2c.glade:14240
+#: resources/xnec2c.glade:14223
 msgid "Tag Number, End 2  "
 msgstr "رقم tag، الطرف 2  "
 
-#: resources/xnec2c.glade:14271
+#: resources/xnec2c.glade:14254
 msgid "Segment Num, End 1"
 msgstr "رقم segment، الطرف 1"
 
-#: resources/xnec2c.glade:14303
+#: resources/xnec2c.glade:14286
 msgid "Segment Num, End 2"
 msgstr "رقم segment، الطرف 2"
 
-#: resources/xnec2c.glade:14367
+#: resources/xnec2c.glade:14350
 msgid "Crossed Transmission Line"
 msgstr "خط نقل متقاطع"
 
-#: resources/xnec2c.glade:14385
+#: resources/xnec2c.glade:14368
 msgid "Characteristic Impedance"
 msgstr "الممانعة المميزة"
 
-#: resources/xnec2c.glade:14417
+#: resources/xnec2c.glade:14400
 msgid "End 1 Y Real Part (S)"
 msgstr "الجزء الحقيقي لـ Y للطرف 1 (S)"
 
-#: resources/xnec2c.glade:14449
+#: resources/xnec2c.glade:14432
 msgid "End 2 Y Real Part (S)"
 msgstr "الجزء الحقيقي لـ Y للطرف 2 (S)"
 
-#: resources/xnec2c.glade:14481
+#: resources/xnec2c.glade:14464
 msgid "Length of Tx Line (m)"
 msgstr "طول خط النقل (m)"
 
-#: resources/xnec2c.glade:14513
+#: resources/xnec2c.glade:14496
 msgid "End 1 Y Imag Part (S)"
 msgstr "الجزء التخيلي لـ Y للطرف 1 (S)"
 
-#: resources/xnec2c.glade:14545
+#: resources/xnec2c.glade:14528
 msgid "End 2 Y Imag Part (S)"
 msgstr "الجزء التخيلي لـ Y للطرف 2 (S)"
 
-#: resources/xnec2c.glade:14581
+#: resources/xnec2c.glade:14564
 msgid "Transmission Line"
 msgstr "خط النقل"
 
-#: resources/xnec2c.glade:14808
+#: resources/xnec2c.glade:14791
 msgid "Wire Element (GW & GC cards)"
 msgstr "عنصر السلك (بطاقتا GW و GC)"
 
-#: resources/xnec2c.glade:14868
+#: resources/xnec2c.glade:14851
 msgid "Wire X1"
 msgstr "السلك X1"
 
-#: resources/xnec2c.glade:14900
+#: resources/xnec2c.glade:14883
 msgid "Wire X2"
 msgstr "السلك X2"
 
-#: resources/xnec2c.glade:14963
+#: resources/xnec2c.glade:14946
 msgid "Wire Y1"
 msgstr "السلك Y1"
 
-#: resources/xnec2c.glade:14996
+#: resources/xnec2c.glade:14979
 msgid "Wire Y2"
 msgstr "السلك Y2"
 
-#: resources/xnec2c.glade:15060
+#: resources/xnec2c.glade:15043
 msgid "Wire Z1"
 msgstr "السلك Z1"
 
-#: resources/xnec2c.glade:15092
+#: resources/xnec2c.glade:15075
 msgid "Wire Z2"
 msgstr "السلك Z2"
 
-#: resources/xnec2c.glade:15157
+#: resources/xnec2c.glade:15140
 msgid "Wire Length"
 msgstr "طول السلك"
 
-#: resources/xnec2c.glade:15228
+#: resources/xnec2c.glade:15211
 msgid "Wire Data"
 msgstr "بيانات السلك"
 
-#: resources/xnec2c.glade:15240
+#: resources/xnec2c.glade:15223
 msgid "Tapered Wire"
 msgstr "سلك مدبب"
 
-#: resources/xnec2c.glade:15282
+#: resources/xnec2c.glade:15265
 msgid "Length Taper"
 msgstr "تدرج الطول"
 
-#: resources/xnec2c.glade:15314
+#: resources/xnec2c.glade:15297
 msgid "Diameter Seg 1"
 msgstr "قطر segment 1"
 
-#: resources/xnec2c.glade:15346
+#: resources/xnec2c.glade:15329
 msgid "Diameter Seg N"
 msgstr "قطر segment N"
 
-#: resources/xnec2c.glade:15378
+#: resources/xnec2c.glade:15361
 msgid "Diam. Taper"
 msgstr "تدرج القطر"
 
-#: resources/xnec2c.glade:15414
+#: resources/xnec2c.glade:15397
 msgid "Wire Taper Data"
 msgstr "بيانات تدرج السلك"
 
-#: resources/xnec2c.glade:15579
+#: resources/xnec2c.glade:15562
 msgid "Impedance (Zo) Ohm"
 msgstr "الممانعة (Zo) Ohm"
 
-#: resources/xnec2c.glade:15594
+#: resources/xnec2c.glade:15577
 msgid "50.00"
 msgstr "50.00"
 
-#: resources/xnec2c.glade:15617
+#: resources/xnec2c.glade:15600
 msgid "Transmission Line Impedance (Zo)"
 msgstr "ممانعة خط النقل (Zo)"

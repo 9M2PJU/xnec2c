@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-04-02 15:50-0700\n"
+"POT-Creation-Date: 2026-04-08 20:07-0700\n"
 "PO-Revision-Date: 2025-12-28 20:37-0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -45,7 +45,7 @@ msgstr "Eroare de conexiune a segmentului în sbf()"
 msgid "Segment connection error in trio()"
 msgstr "Eroare de conexiune a segmentului în trio()"
 
-#: src/callback_func.c:265
+#: src/callback_func.c:263
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
@@ -53,7 +53,7 @@ msgstr ""
 "Bucla de frecvență rulează\n"
 "Sunteți sigur că doriți să încheiați calculul?"
 
-#: src/callback_func.c:269
+#: src/callback_func.c:267
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
@@ -61,7 +61,7 @@ msgstr ""
 "Bucla de frecvență rulează\n"
 "Sunteți sigur că doriți să închideți această fereastră?"
 
-#: src/callback_func.c:523
+#: src/callback_func.c:514
 #, c-format
 msgid ""
 "Frequency plots window closed: excitation type %d is incompatible.\n"
@@ -72,7 +72,7 @@ msgstr ""
 "Folosiți în schimb tipul 0 (Câmp E Aplicat) sau 5 (Discontinuitate de "
 "Curent)."
 
-#: src/callback_func.c:529
+#: src/callback_func.c:520
 #, c-format
 msgid ""
 "Frequency plots are not available with excitation type %d.\n"
@@ -85,47 +85,47 @@ msgstr ""
 "Modificați cardul EX la tipul 0 (Câmp E Aplicat) sau 5 (Discontinuitate de "
 "Curent)."
 
-#: src/callback_func.c:736
+#: src/callback_func.c:717
 msgid "View Currents"
 msgstr "Vizualizare Curenți"
 
-#: src/callback_func.c:758 src/callback_func.c:817
+#: src/callback_func.c:736 src/callback_func.c:792
 msgid "View Geometry"
 msgstr "Vizualizare Geometrie"
 
-#: src/callback_func.c:795
+#: src/callback_func.c:773
 msgid "View Charges"
 msgstr "Vizualizare Sarcini"
 
-#: src/callback_func.c:861
+#: src/callback_func.c:836
 msgid "PNG images (*.png)"
 msgstr "Imagini PNG (*.png)"
 
-#: src/callback_func.c:863
+#: src/callback_func.c:838
 msgid "GNUplot files (*.gplot)"
 msgstr "Fișiere GNUplot (*.gplot)"
 
-#: src/callback_func.c:865
+#: src/callback_func.c:840
 msgid "NEC2 files (*.nec)"
 msgstr "Fișiere NEC2 (*.nec)"
 
-#: src/callback_func.c:867
+#: src/callback_func.c:842
 msgid "Touchstone 1-port files (*.s1p)"
 msgstr "Fișiere Touchstone 1-port (*.s1p)"
 
-#: src/callback_func.c:869
+#: src/callback_func.c:844
 msgid "Touchstone 2-port files (*.s2p)"
 msgstr "Fișiere Touchstone 2-port (*.s2p)"
 
-#: src/callback_func.c:871
+#: src/callback_func.c:846
 msgid "Comma-separated CSV files (*.csv)"
 msgstr "Fișiere CSV separate prin virgulă (*.csv)"
 
-#: src/callbacks.c:135 src/callbacks.c:151
+#: src/callbacks.c:136 src/callbacks.c:152
 msgid "Antenna Temperature"
 msgstr "Temperatură de Antenă"
 
-#: src/callbacks.c:136
+#: src/callbacks.c:137
 msgid ""
 "Ground plane detected in model. T_ant results will overcount ground effects. "
 "Free-space models are standard for antenna temperature evaluation."
@@ -134,7 +134,7 @@ msgstr ""
 "de masă. Modelele în spațiu liber sunt standard pentru evaluarea "
 "temperaturii antenei."
 
-#: src/callbacks.c:152
+#: src/callbacks.c:153
 #, c-format
 msgid ""
 "Max gain at θ=%.0f° (%.0f° from XY plane). Convention assumes beam in XY "
@@ -143,12 +143,12 @@ msgstr ""
 "Câștig maxim la θ=%.0f° (%.0f° de la planul XY). Convenția presupune "
 "fasciculul în planul XY cu elevația de observare setată prin butonul rotativ."
 
-#: src/callbacks.c:218 src/callbacks.c:517 src/callbacks.c:2556
-#: src/callbacks.c:3088
+#: src/callbacks.c:219 src/callbacks.c:518 src/callbacks.c:2438
+#: src/callbacks.c:2968
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "Sunteți sigur că doriți să ieșiți din xnec2c?"
 
-#: src/callbacks.c:261
+#: src/callbacks.c:262
 msgid ""
 "A new NEC2 input file may not be created\n"
 "while the Frequency Loop is running"
@@ -156,7 +156,7 @@ msgstr ""
 "Nu se poate crea un fișier NEC2 de intrare nou\n"
 "cât timp Bucla de Frecvență rulează"
 
-#: src/callbacks.c:299
+#: src/callbacks.c:300
 msgid ""
 "A new NEC2 input file may not be opened\n"
 "while the Frequency Loop is running"
@@ -164,22 +164,22 @@ msgstr ""
 "Nu se poate deschide un fișier NEC2 de intrare nou\n"
 "cât timp Bucla de Frecvență rulează"
 
-#: src/callbacks.c:419
+#: src/callbacks.c:420
 msgid "xnec2c geometry optimizer"
 msgstr "optimizator de geometrie xnec2c"
 
-#: src/callbacks.c:420
+#: src/callbacks.c:421
 msgid ""
 "xnec2c was built without inotify support: the optimizer cannot be enabled."
 msgstr ""
 "xnec2c a fost compilat fără suport inotify: optimizatorul nu poate fi "
 "activat."
 
-#: src/callbacks.c:444
+#: src/callbacks.c:445
 msgid "Xnec2c Optimizer"
 msgstr "Optimizator Xnec2c"
 
-#: src/callbacks.c:444
+#: src/callbacks.c:445
 msgid ""
 "No files are selected for writing. However, xnec2c will still reload and "
 "recalculate the input file on modification when triggered by inotify.Select "
@@ -189,23 +189,28 @@ msgstr ""
 "recalcula fișierul de intrare la modificare când este declanșat de inotify. "
 "Selectați fișierele pentru scriere în \"Fișier->Setări Optimizare\"."
 
-#: src/callbacks.c:455
+#: src/callbacks.c:456
 msgid "failed to create Optimizer Output thread\n"
 msgstr "nu s-a putut crea firul de execuție pentru Ieșire Optimizator\n"
 
-#: src/callbacks.c:1483 src/callbacks.c:1815 src/callbacks.c:3114
+#: src/callbacks.c:1510 src/callbacks.c:1838 src/callbacks.c:2994
 msgid "Are you sure you wish to close this window?"
 msgstr "Sunteți sigur că doriți să închideți această fereastră?"
 
-#: src/callbacks.c:1981
+#: src/callbacks.c:2004
 msgid "noise env activate: no matching widget found\n"
 msgstr "activare mediu zgomot: niciun widget corespunzător găsit\n"
 
-#: src/callbacks.c:3052
+#: src/callbacks.c:2100
+msgid "OpenGL is not available on this display; cannot enable renderer.\n"
+msgstr ""
+"OpenGL nu este disponibil pe acest display; nu se poate activa renderul.\n"
+
+#: src/callbacks.c:2932
 msgid "No open NEC2 input file"
 msgstr "Niciun fișier NEC2 de intrare deschis"
 
-#: src/callbacks.c:3145 src/callbacks.c:3175
+#: src/callbacks.c:3025 src/callbacks.c:3055
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -213,11 +218,11 @@ msgstr ""
 "Datele Editorului NEC2 nu pot fi salvate\n"
 "cât timp Bucla de Frecvență rulează"
 
-#: src/callbacks.c:3157 src/callbacks.c:3183
+#: src/callbacks.c:3037 src/callbacks.c:3063
 msgid "untitled.nec"
 msgstr "untitled.nec"
 
-#: src/callbacks.c:3648 src/callbacks.c:3668 src/callbacks.c:3688
+#: src/callbacks.c:3528 src/callbacks.c:3548 src/callbacks.c:3568
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
@@ -243,7 +248,7 @@ msgstr ""
 "Vă rugăm să reselectați rândul"
 
 #: src/cmnd_edit.c:488 resources/xnec2c.glade:312 resources/xnec2c.glade:1347
-#: resources/xnec2c.glade:3774 resources/xnec2c.glade:14837
+#: resources/xnec2c.glade:3774 resources/xnec2c.glade:14820
 msgid "Tag Number"
 msgstr "Număr Etichetă"
 
@@ -390,7 +395,7 @@ msgid "Reactance Ohm"
 msgstr "Reactanță Ohm"
 
 #: src/cmnd_edit.c:2024 resources/xnec2c.glade:478 resources/xnec2c.glade:4010
-#: resources/xnec2c.glade:15189
+#: resources/xnec2c.glade:15172
 msgid "Conductivity S/m"
 msgstr "Conductivitate S/m"
 
@@ -476,30 +481,30 @@ msgstr ""
 "Animație câmp H: Adăugați cardul NH în fișierul NEC\n"
 "Vector Poynting: Adăugați ambele carduri NE și NH"
 
-#: src/draw_radiation.c:79
+#: src/draw_radiation.c:77
 #, c-format
 msgid "gain_style %d out of range [0..%d], defaulting to GS_LINP\n"
 msgstr "gain_style %d în afara intervalului [0..%d], implicit GS_LINP\n"
 
-#: src/draw_radiation.c:120
+#: src/draw_radiation.c:118
 #, c-format
 msgid "Scale_Gain: ant_temp_resolve failed for %.3f MHz env %d\n"
 msgstr "Scale_Gain: ant_temp_resolve a eșuat pentru %.3f MHz env %d\n"
 
-#: src/draw_radiation.c:852 src/draw_radiation.c:860 src/draw_radiation.c:870
+#: src/draw_radiation.c:849 src/draw_radiation.c:857 src/draw_radiation.c:867
 #: resources/xnec2c.glade:69
 msgid "Near Field Animation"
 msgstr "Animație Câmp Apropiat"
 
-#: src/draw_radiation.c:852 src/draw_radiation.c:860 src/draw_radiation.c:870
-#: src/geometry.c:812 src/input.c:1614 src/input.c:1615 src/mathlib.c:759
-#: src/mathlib.c:1003 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:525
-#: src/utils.c:571
+#: src/draw_radiation.c:849 src/draw_radiation.c:857 src/draw_radiation.c:867
+#: src/geometry.c:812 src/input.c:1614 src/input.c:1615 src/mathlib.c:752
+#: src/mathlib.c:990 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:515
+#: src/utils.c:562
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: src/draw_radiation.c:1102 src/draw_radiation.c:1108
+#: src/draw_radiation.c:1107 src/draw_radiation.c:1113
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
@@ -507,7 +512,7 @@ msgstr ""
 "Unghiul de elevare a observației. Deplasează limita cer/pământ pentru "
 "evaluarea temperaturii antenei. 0° = orizont."
 
-#: src/draw_radiation.c:1105 src/draw_radiation.c:1111
+#: src/draw_radiation.c:1110 src/draw_radiation.c:1116
 msgid ""
 "Observation elevation for antenna temperature.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -515,12 +520,12 @@ msgstr ""
 "Elevație de observație pentru temperatura antenei.\n"
 "Selectați Stil Câștig → Temperatură de Zgomot pentru a activa."
 
-#: src/draw_radiation.c:1114
+#: src/draw_radiation.c:1119
 msgid "Select brightness temperature model for T_sky and T_earth."
 msgstr ""
 "Selectați modelul de temperatură de strălucire pentru T_sky și T_earth."
 
-#: src/draw_radiation.c:1116
+#: src/draw_radiation.c:1121
 msgid ""
 "Brightness temperature model for T_sky and T_earth.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -528,79 +533,79 @@ msgstr ""
 "Model de temperatură de strălucire pentru T_sky și T_earth.\n"
 "Selectați Stil Câștig → Temperatură de Zgomot pentru a activa."
 
-#: src/draw_radiation.c:1555
+#: src/draw_radiation.c:1539
 msgid "Total Gain"
 msgstr "Câștig Total"
 
-#: src/draw_radiation.c:1556
+#: src/draw_radiation.c:1540
 msgid "Horizontal Polarization"
 msgstr "Polarizare Orizontală"
 
-#: src/draw_radiation.c:1557
+#: src/draw_radiation.c:1541
 msgid "Vertical Polarization"
 msgstr "Polarizare Verticală"
 
-#: src/draw_radiation.c:1558
+#: src/draw_radiation.c:1542
 msgid "RH Circular Polarization"
 msgstr "Polarizare Circulară Dreapta"
 
-#: src/draw_radiation.c:1559
+#: src/draw_radiation.c:1543
 msgid "LH Circular Polarization"
 msgstr "Polarizare Circulară Stânga"
 
-#: src/draw_radiation.c:1564
+#: src/draw_radiation.c:1548
 msgid "Linear Power"
 msgstr "Putere Liniară"
 
-#: src/draw_radiation.c:1565
+#: src/draw_radiation.c:1549
 msgid "Linear Voltage"
 msgstr "Tensiune Liniară"
 
-#: src/draw_radiation.c:1566
+#: src/draw_radiation.c:1550
 msgid "ARRL Scale"
 msgstr "Scară ARRL"
 
-#: src/draw_radiation.c:1567
+#: src/draw_radiation.c:1551
 msgid "Logarithmic Scale"
 msgstr "Scară Logaritmică"
 
-#: src/draw_radiation.c:1568
+#: src/draw_radiation.c:1552
 msgid "Noise Temperature"
 msgstr "Temperatură de Zgomot"
 
-#: src/draw_radiation.c:1569
+#: src/draw_radiation.c:1553
 msgid "Noise Temp (log scale)"
 msgstr "Temp. Zgomot (scară log)"
 
-#: src/draw_radiation.c:1578 resources/xnec2c.glade:13321
+#: src/draw_radiation.c:1562 resources/xnec2c.glade:13304
 msgid "Radiation Patterns"
 msgstr "Diagrame de Radiație"
 
-#: src/draw_radiation.c:1581
+#: src/draw_radiation.c:1565
 msgid "Radiation Pattern: - "
 msgstr "Diagramă de Radiație: - "
 
-#: src/draw_radiation.c:1588
+#: src/draw_radiation.c:1572
 msgid "Near Fields:"
 msgstr "Câmpuri apropiate:"
 
-#: src/draw_radiation.c:1590
+#: src/draw_radiation.c:1574
 msgid " - E Field"
 msgstr " - Câmp E"
 
-#: src/draw_radiation.c:1592
+#: src/draw_radiation.c:1576
 msgid " - H Field"
 msgstr " - Câmp H"
 
-#: src/draw_radiation.c:1594
+#: src/draw_radiation.c:1578
 msgid " - Poynting Vector"
 msgstr " - Vector Poynting"
 
-#: src/draw_radiation.c:1604
+#: src/draw_radiation.c:1588
 msgid "Frequency Data Plots - "
 msgstr "Grafice date frecvență - "
 
-#: src/draw_radiation.c:1830
+#: src/draw_radiation.c:1814
 #, c-format
 msgid "fstep=%d is out of bounds. calc_data.steps_total=%d"
 msgstr "fstep=%d este în afara limitelor. calc_data.steps_total=%d"
@@ -610,12 +615,12 @@ msgstr "fstep=%d este în afara limitelor. calc_data.steps_total=%d"
 msgid "step size limited at z= %10.5f"
 msgstr "dimensiunea pasului limitată la z= %10.5f"
 
-#: src/fork.c:161 src/fork.c:512
+#: src/fork.c:161 src/fork.c:511
 #, c-format
 msgid "child %d  length %d  return %d\n"
 msgstr "copil %d  lungime %d  retur %d\n"
 
-#: src/fork.c:518
+#: src/fork.c:517
 #, c-format
 msgid "early EOF?, child %d  length %d  return %d\n"
 msgstr "EOF timpuriu?, copil %d  lungime %d  retur %d\n"
@@ -1098,7 +1103,7 @@ msgstr ""
 msgid "Gnuplot Data"
 msgstr "Date Gnuplot"
 
-#: src/gnuplot.c:46 src/gnuplot.c:88 src/gnuplot.c:169
+#: src/gnuplot.c:46 src/gnuplot.c:90 src/gnuplot.c:173
 msgid "Cannot save data while frequency loop is running"
 msgstr "Nu se pot salva datele cât timp bucla de frecvență rulează"
 
@@ -1125,51 +1130,51 @@ msgstr ""
 "#    plot for [i=2:3]  'filename.gplot' using 1:i with lines smooth bezier "
 "title columnhead(i);\n"
 
-#: src/gnuplot.c:88 src/gnuplot.c:169
+#: src/gnuplot.c:90 src/gnuplot.c:173
 msgid "Touchstone Data"
 msgstr "Date Touchstone"
 
-#: src/gnuplot.c:102
+#: src/gnuplot.c:104
 #, c-format
 msgid "! Reference impedance Z0 = %.2f Ohm\n"
 msgstr "! Impedanță de referință Z0 = %.2f Ohm\n"
 
-#: src/gnuplot.c:130
+#: src/gnuplot.c:132
 #, c-format
 msgid "This should never happen. touchstone type=%d\n"
 msgstr "Aceasta nu ar trebui să se întâmple niciodată. touchstone type=%d\n"
 
-#: src/gnuplot.c:230
+#: src/gnuplot.c:236
 #, c-format
 msgid "# Near E field\n"
 msgstr "# Câmp E apropiat\n"
 
-#: src/gnuplot.c:253
+#: src/gnuplot.c:259
 #, c-format
 msgid "# Near H field\n"
 msgstr "# Câmp H apropiat\n"
 
-#: src/gnuplot.c:300
+#: src/gnuplot.c:306
 #, c-format
 msgid "# Poynting Vector\n"
 msgstr "# Vector Poynting\n"
 
-#: src/gnuplot.c:372
+#: src/gnuplot.c:378
 #, c-format
 msgid "# Radiation Pattern\n"
 msgstr "# Diagramă de radiație\n"
 
-#: src/gnuplot.c:508
+#: src/gnuplot.c:514
 #, c-format
 msgid "# structure patch segments\n"
 msgstr "# segmente patch structură\n"
 
-#: src/gnuplot.c:531
+#: src/gnuplot.c:537
 #, c-format
 msgid "# structure wire segments\n"
 msgstr "# segmente fir structură\n"
 
-#: src/gnuplot.c:557
+#: src/gnuplot.c:563
 #, c-format
 msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
@@ -1178,11 +1183,11 @@ msgstr ""
 "Vizualizați cu: gnuplot -e \"set terminal qt; splot '%s' with lines; pause "
 "mouse close\"\n"
 
-#: src/gnuplot.c:569
+#: src/gnuplot.c:575
 msgid "Save Currents and Charges to CSV"
 msgstr "Salvează Curenții și Sarcinile în CSV"
 
-#: src/gnuplot.c:570
+#: src/gnuplot.c:576
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
@@ -1190,11 +1195,11 @@ msgstr ""
 "Trebuie să activați datele de curent făcând clic pe \"Curenți\" sau \"Sarcini"
 "\" în fereastra principală xnec2c."
 
-#: src/gnuplot.c:633 src/gnuplot.c:643
+#: src/gnuplot.c:639 src/gnuplot.c:649
 msgid "Save Patch Currents to CSV"
 msgstr "Salvează Curenții Patch în CSV"
 
-#: src/gnuplot.c:634
+#: src/gnuplot.c:640
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
@@ -1202,7 +1207,7 @@ msgstr ""
 "Trebuie să activați datele de curent făcând clic pe \"Curenți\" sau \"Sarcini"
 "\" în fereastra principală xnec2c."
 
-#: src/gnuplot.c:644
+#: src/gnuplot.c:650
 msgid "No surface patches in this model."
 msgstr "Nu există suprafețe patch în acest model."
 
@@ -1583,11 +1588,11 @@ msgstr ""
 "Card RP lipsă sau pentru undă de suprafață: Calculele diagramei de radiație "
 "și câștigului sunt dezactivate\n"
 
-#: src/input.c:1641
+#: src/input.c:1642
 msgid "Unexpected exit from while loop"
 msgstr "Ieșire neașteptată din bucla while"
 
-#: src/input.c:1732
+#: src/input.c:1733
 msgid ""
 "command data card error: Unexpected EOF while reading input file - appending "
 "EN card\n"
@@ -1595,7 +1600,7 @@ msgstr ""
 "eroare card date comandă: EOF neașteptat la citirea fișierului de intrare - "
 "se adaugă cardul EN\n"
 
-#: src/input.c:1733
+#: src/input.c:1734
 msgid ""
 "Command data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -1605,13 +1610,13 @@ msgstr ""
 "EOF neașteptat la citirea fișierului de intrare\n"
 "Se adaugă un card EN implicit"
 
-#: src/input.c:1747
+#: src/input.c:1748
 msgid "command data card error: card's mnemonic code too short or missing\n"
 msgstr ""
 "eroare card date comandă: codul mnemonic al cardului este prea scurt sau "
 "lipsește\n"
 
-#: src/input.c:1748
+#: src/input.c:1749
 msgid ""
 "Command data card error\n"
 "Mnemonic code too short or missing"
@@ -1619,7 +1624,7 @@ msgstr ""
 "Eroare card date comandă\n"
 "Codul mnemonic este prea scurt sau lipsește"
 
-#: src/input.c:1941
+#: src/input.c:1942
 msgid ""
 "geometry data card error: Unexpected EOF while reading input file - "
 "appending GE card\n"
@@ -1627,7 +1632,7 @@ msgstr ""
 "eroare card date geometrie: EOF neașteptat la citirea fișierului de intrare "
 "- se adaugă cardul GE\n"
 
-#: src/input.c:1942
+#: src/input.c:1943
 msgid ""
 "Geometry data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -1637,13 +1642,13 @@ msgstr ""
 "EOF neașteptat la citirea fișierului de intrare\n"
 "Se adaugă un card GE implicit"
 
-#: src/input.c:1956
+#: src/input.c:1957
 msgid "geometry data card error: card's mnemonic code too short or missing\n"
 msgstr ""
 "eroare card date geometrie: codul mnemonic al cardului este prea scurt sau "
 "lipsește\n"
 
-#: src/input.c:1957
+#: src/input.c:1958
 msgid ""
 "Geometry data card error\n"
 "Card's mnemonic code too short or missing"
@@ -1685,8 +1690,8 @@ msgstr "eșec la adăugarea obiectelor în constructor: %s\n"
 msgid "Listing Object Ids:\n"
 msgstr "Listare ID-uri obiecte:\n"
 
-#: src/interface.c:180 src/utils.c:159 src/utils.c:163 src/utils.c:173
-#: src/utils.c:175
+#: src/interface.c:180 src/utils.c:149 src/utils.c:153 src/utils.c:163
+#: src/utils.c:165
 #, c-format
 msgid "%s\n"
 msgstr "%s\n"
@@ -1709,7 +1714,7 @@ msgstr "%s necesită un argument întreg pozitiv\n"
 msgid "Detected %d CPUs\n"
 msgstr "S-au detectat %d procesoare\n"
 
-#: src/main.c:202
+#: src/main.c:203
 msgid "config file path too long\n"
 msgstr "calea fișierului de configurare este prea lungă\n"
 
@@ -1784,37 +1789,37 @@ msgstr "se iese după eroare fatală: pipe() a eșuat"
 msgid "exiting after fatal error: fork() failed"
 msgstr "se iese după eroare fatală: fork() a eșuat"
 
-#: src/main.c:874
+#: src/main.c:896
 msgid "exiting via user interrupt\n"
 msgstr "se iese prin întrerupere utilizator\n"
 
-#: src/main.c:878
+#: src/main.c:900
 msgid "segmentation fault, exiting\n"
 msgstr "eroare de segmentare, se iese\n"
 
-#: src/main.c:882
+#: src/main.c:904
 msgid "floating point exception, exiting\n"
 msgstr "excepție în virgulă mobilă, se iese\n"
 
-#: src/main.c:886
+#: src/main.c:908
 msgid "abort signal received, exiting\n"
 msgstr "semnal de întrerupere primit, se iese\n"
 
-#: src/main.c:890
+#: src/main.c:912
 msgid "termination request received, exiting\n"
 msgstr "cerere de terminare primită, se iese\n"
 
-#: src/main.c:900
+#: src/main.c:922
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
 msgstr "neramificat, se ignoră SIGCHLD de la pid %d\n"
 
-#: src/main.c:908
+#: src/main.c:930
 #, c-format
 msgid "child process pid %d exited\n"
 msgstr "procesul copil pid %d s-a terminat\n"
 
-#: src/main.c:917
+#: src/main.c:939
 #, c-format
 msgid "default exit with signal: %d\n"
 msgstr "ieșire implicită cu semnalul: %d\n"
@@ -1836,7 +1841,7 @@ msgstr "open_mathlib: lib este NULL\n"
 msgid "setenv(%s, %s): %s\n"
 msgstr "setenv(%s, %s): %s\n"
 
-#: src/mathlib.c:320 src/utils.c:575
+#: src/mathlib.c:320 src/utils.c:566
 #, c-format
 msgid "%s: %s\n"
 msgstr "%s: %s\n"
@@ -1898,22 +1903,15 @@ msgstr "set_mathlib_interactive: lib == NULL\n"
 msgid "set_mathlib_interactive[%d]: mathlib.available=0, skipping: %s\n"
 msgstr "set_mathlib_interactive[%d]: mathlib.available=0, se omite: %s\n"
 
-#: src/mathlib.c:630
-msgid ""
-"mathlib: You cannot change the math library while the freq loop is running."
-msgstr ""
-"mathlib: Nu puteți schimba biblioteca matematică cât timp bucla de frecvență "
-"rulează."
-
-#: src/mathlib.c:643
+#: src/mathlib.c:636
 msgid "set_mathlib_batch: lib == NULL\n"
 msgstr "set_mathlib_batch: lib == NULL\n"
 
-#: src/mathlib.c:648
+#: src/mathlib.c:641
 msgid "Batch Math Library"
 msgstr "Bibliotecă Matematică Lot"
 
-#: src/mathlib.c:649
+#: src/mathlib.c:642
 msgid ""
 "Selecting a batched math library has no effect unless -j is specified on the "
 "command line. (However, this selection will be saved for next time xnec2c is "
@@ -1923,20 +1921,20 @@ msgstr ""
 "specificat -j pe linia de comandă. (Totuși, această selecție va fi salvată "
 "pentru data viitoare când xnec2c este deschis.)\n"
 
-#: src/mathlib.c:688
+#: src/mathlib.c:681
 #, c-format
 msgid "%s: benchmark=%d\n"
 msgstr "%s: benchmark=%d\n"
 
-#: src/mathlib.c:759
+#: src/mathlib.c:752
 msgid "Mathlib Help"
 msgstr "Ajutor Mathlib"
 
-#: src/mathlib.c:795
+#: src/mathlib.c:788
 msgid "Mathlib Benchmark Help"
 msgstr "Ajutor Benchmark Mathlib"
 
-#: src/mathlib.c:797
+#: src/mathlib.c:790
 msgid ""
 "Jobs are forked and run in parallel by xnec2c, whereas threads are used by "
 "the mathlib implementation to parallelize the linear algebra calculation of "
@@ -2009,22 +2007,22 @@ msgstr ""
 "* Iterate -j N-=2: timp O(N*J): Similar cu -j N/=2, dar decrementează "
 "sarcinile cu 1. Durează cel mai mult.\n"
 
-#: src/mathlib.c:846 src/mathlib.c:853 src/mathlib.c:859 src/mathlib.c:876
-#: src/mathlib.c:881 src/mathlib.c:1003
+#: src/mathlib.c:839 src/mathlib.c:846 src/mathlib.c:852 src/mathlib.c:869
+#: src/mathlib.c:874 src/mathlib.c:990
 msgid "Mathlib Benchmark"
 msgstr "Benchmark Mathlib"
 
-#: src/mathlib.c:847
+#: src/mathlib.c:840
 msgid "Benchmarks are disabled while optimization is activated."
 msgstr "Benchmark-urile sunt dezactivate cât timp optimizarea este activată."
 
-#: src/mathlib.c:854
+#: src/mathlib.c:847
 msgid "You must load a NEC2 input file before running benchmarks."
 msgstr ""
 "Trebuie să încărcați un fișier de intrare NEC2 înainte de a rula benchmark-"
 "uri."
 
-#: src/mathlib.c:860
+#: src/mathlib.c:853
 msgid ""
 "Choosing a benchmark other than \"Single Job\" has no effect unless -j is "
 "specified on the command line."
@@ -2032,12 +2030,12 @@ msgstr ""
 "Alegerea unui benchmark altul decât \"Single Job\" nu are efect dacă -j nu "
 "este specificat pe linia de comandă."
 
-#: src/mathlib.c:877
+#: src/mathlib.c:870
 msgid "You must select at least one math library to benchmark"
 msgstr ""
 "Trebuie să selectați cel puțin o bibliotecă matematică pentru benchmark"
 
-#: src/mathlib.c:882
+#: src/mathlib.c:875
 #, c-format
 msgid ""
 "This will run a frequency loop benchmark for each detected linear algebra "
@@ -2055,7 +2053,7 @@ msgid ""
 "processes in combination with library threads.  Consider reducing the value "
 "of -j N for benchmarking to find what library works best with a mix of "
 "forking and threading; you can use `top` to monitor your CPU usageand if it "
-"reaches 0% idle then you might consider reducing -j N.\n"
+"reaches 0%% idle then you might consider reducing -j N.\n"
 "\n"
 "You may wish to experiment setting these environment variables:\n"
 "  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS thread limit\n"
@@ -2066,18 +2064,21 @@ msgid ""
 msgstr ""
 "Se va rula un benchmark al buclei de frecvență pentru fiecare bibliotecă de "
 "algebră liniară detectată și se va furniza un rezumat. Poate dura ceva timp "
-"în funcție de dimensiunea și numărul de frecvențe din modelul NEC2. Detalii "
-"de timp vor fi furnizate în terminal.\n"
+"în funcție de dimensiunea și numărul de frecvențe utilizate de NEC2. Detalii "
+"de timing vor fi furnizate în terminal.\n"
 "\n"
 "Note:\n"
 "* Doar o bibliotecă Intel MKL poate fi testată fără repornirea xnec2c, deci "
-"selectați pe care doriți să o testați înainte de a continua, altfel va fi "
-"ales primul din listă.\n"
+"selectați pe care doriți să o testați înainte de a continua sau va fi ales "
+"primul din listă și restul vor fi omise.\n"
 "\n"
 "* Congestia firelor va apărea pentru bibliotecile cu mai multe fire la "
-"utilizarea opțiunii -j N dacă nu există suficiente procesoare disponibile. "
-"Luați în considerare reducerea valorii -j N; puteți folosi `top` pentru a "
-"monitoriza utilizarea procesorului.\n"
+"utilizarea opțiunii -j N dacă nu există suficiente procesoare disponibile "
+"pentru procesele ramificate în combinație cu firele de bibliotecă. Luați în "
+"considerare reducerea valorii -j N pentru benchmark pentru a găsi ce "
+"bibliotecă funcționează cel mai bine cu un mix de ramificare și fire; puteți "
+"folosi `top` pentru a monitoriza utilizarea procesorului și dacă ajunge la "
+"0%% idle luați în considerare reducerea -j N.\n"
 "\n"
 "Puteți experimenta setând aceste variabile de mediu:\n"
 "  * OPENBLAS_NUM_THREADS=N\t# Limită fire OpenBLAS\n"
@@ -2086,17 +2087,17 @@ msgstr ""
 "\n"
 "Faceți clic pe OK pentru a continua, dialogul se va închide la finalizare."
 
-#: src/mathlib.c:939
+#: src/mathlib.c:932
 #, c-format
 msgid "Starting %s benchmark (-j %d)\n"
 msgstr "Pornire benchmark %s (-j %d)\n"
 
-#: src/mathlib.c:1036
+#: src/mathlib.c:1023
 #, c-format
 msgid "mathlib_lock_intel: Cannot find library for mathlib ID='%s'\n"
 msgstr "mathlib_lock_intel: Nu s-a găsit biblioteca pentru mathlib ID='%s'\n"
 
-#: src/mathlib.c:1047
+#: src/mathlib.c:1034
 #, c-format
 msgid ""
 "\n"
@@ -2126,29 +2127,29 @@ msgstr ""
 "* Consultați documentația Intel pentru mkl_set_threading_layer() pentru "
 "detalii.\n"
 
-#: src/mathlib.c:1122
+#: src/mathlib.c:1109
 msgid "zgetrf: current_mathlib is NULL, this should never happen.\n"
 msgstr ""
 "zgetrf: current_mathlib este NULL, aceasta nu ar trebui să se întâmple "
 "niciodată.\n"
 
-#: src/mathlib.c:1146 src/mathlib.c:1191
+#: src/mathlib.c:1133 src/mathlib.c:1178
 #, c-format
 msgid "%s: unsupported mathlib type %d\n"
 msgstr "%s: tip mathlib nesuportat %d\n"
 
-#: src/mathlib.c:1159
+#: src/mathlib.c:1146
 msgid "zgetrs: current_mathlib is NULL, this should never happen.\n"
 msgstr ""
 "zgetrs: current_mathlib este NULL, aceasta nu ar trebui să se întâmple "
 "niciodată.\n"
 
-#: src/mathlib.c:1184
+#: src/mathlib.c:1171
 #, c-format
 msgid "zgetrs warning: lda(%d) != ldb(%d)\n"
 msgstr "zgetrs avertisment: lda(%d) != ldb(%d)\n"
 
-#: src/mathlib.c:1219
+#: src/mathlib.c:1206
 #, c-format
 msgid "dlsym(mkl_set_threading_layer): %s\n"
 msgstr "dlsym(mkl_set_threading_layer): %s\n"
@@ -2289,13 +2290,13 @@ msgstr "S-au încărcat %d obiective de optimizare\n"
 msgid "opt_file_load: %s\n"
 msgstr "opt_file_load: %s\n"
 
-#: src/opt_ui_session.c:70
+#: src/opt_ui_session.c:73
 #, c-format
 msgid "opt_ui: optimization finished, best fitness: %.6g\n"
 msgstr "opt_ui: optimizare finalizată, aptitudine maximă: %.6g\n"
 
-#: src/opt_ui_session.c:106 src/opt_ui_session.c:139 src/opt_ui_session.c:169
-#: src/opt_ui_session.c:268
+#: src/opt_ui_session.c:109 src/opt_ui_session.c:142 src/opt_ui_session.c:172
+#: src/opt_ui_session.c:271
 msgid "Optimization"
 msgstr "Optimizare"
 
@@ -2381,7 +2382,7 @@ msgstr ""
 "inotify: IN_MOVED_TO pe țintă (scriere atomică completă), declanșare "
 "reîncărcare\n"
 
-#: src/optimize.c:401 src/optimize.c:436
+#: src/optimize.c:401 src/optimize.c:434
 #, c-format
 msgid ""
 "inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), "
@@ -2390,12 +2391,12 @@ msgstr ""
 "inotify: stat fișier eșuat sau zero octeți (ret=%d size=%ld errno=%s), "
 "reîncercare\n"
 
-#: src/optimize.c:407 src/optimize.c:442
+#: src/optimize.c:407 src/optimize.c:440
 #, c-format
 msgid "inotify: file stat OK - size=%ld bytes\n"
 msgstr "inotify: stat fișier OK - size=%ld octeți\n"
 
-#: src/optimize.c:425
+#: src/optimize.c:423
 msgid ""
 "inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
 "triggering reload\n"
@@ -2403,7 +2404,7 @@ msgstr ""
 "inotify: IN_CLOSE_WRITE după modify_seen=TRUE (scriere directă completă), "
 "declanșare reîncărcare\n"
 
-#: src/optimize.c:455
+#: src/optimize.c:451
 msgid ""
 "inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
 "skipping\n"
@@ -2411,13 +2412,13 @@ msgstr ""
 "inotify: IN_CLOSE_WRITE fără modify_seen (închidere parazită, inode vechi), "
 "omitere\n"
 
-#: src/optimize.c:462
+#: src/optimize.c:458
 #, c-format
 msgid "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 msgstr ""
 "inotify: OMITERE eveniment (nu MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 
-#: src/plot_freqdata.c:132
+#: src/plot_freqdata.c:131
 #, c-format
 msgid ""
 "fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d calc_data.ngraph="
@@ -2426,7 +2427,7 @@ msgstr ""
 "fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d calc_data.ngraph="
 "%d fr=%d posn=%d valid=%d\n"
 
-#: src/plot_freqdata.c:148
+#: src/plot_freqdata.c:147
 #, c-format
 msgid ""
 "fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
@@ -2435,124 +2436,124 @@ msgstr ""
 "fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
 "%d]\n"
 
-#: src/plot_freqdata.c:853 src/plot_freqdata.c:1320
+#: src/plot_freqdata.c:852 src/plot_freqdata.c:1319
 msgid "memory allocation for points failed\n"
 msgstr "alocarea memoriei pentru puncte a eșuat\n"
 
-#: src/plot_freqdata.c:854 src/plot_freqdata.c:1321
+#: src/plot_freqdata.c:853 src/plot_freqdata.c:1320
 msgid "Draw_Graph():Memory allocation for points failed"
 msgstr "Draw_Graph():Alocarea memoriei pentru puncte a eșuat"
 
-#: src/plot_freqdata.c:1282
+#: src/plot_freqdata.c:1281
 msgid "Smith Chart"
 msgstr "Diagramă Smith"
 
-#: src/plot_freqdata.c:1490 src/plot_freqdata.c:1509 src/plot_freqdata.c:1534
+#: src/plot_freqdata.c:1489 src/plot_freqdata.c:1508 src/plot_freqdata.c:1533
 msgid "Raw Gain dBi"
 msgstr "Câștig brut dBi"
 
-#: src/plot_freqdata.c:1493
+#: src/plot_freqdata.c:1492
 msgid "Max Gain & Net Gain vs Frequency"
 msgstr "Câștig maxim și câștig net vs frecvență"
 
-#: src/plot_freqdata.c:1494
+#: src/plot_freqdata.c:1493
 msgid "Net Gain dBi"
 msgstr "Câștig net dBi"
 
-#: src/plot_freqdata.c:1500 src/plot_freqdata.c:1510
+#: src/plot_freqdata.c:1499 src/plot_freqdata.c:1509
 msgid "Max Gain & F/B Ratio vs Frequency"
 msgstr "Câștig maxim și raport F/B vs frecvență"
 
-#: src/plot_freqdata.c:1511
+#: src/plot_freqdata.c:1510
 msgid "F/B Ratio dB"
 msgstr "Raport F/B dB"
 
-#: src/plot_freqdata.c:1520
+#: src/plot_freqdata.c:1519
 msgid "Rad Angle - deg"
 msgstr "Unghi radiație - grade"
 
-#: src/plot_freqdata.c:1521
+#: src/plot_freqdata.c:1520
 msgid "Max Gain Direction vs Frequency"
 msgstr "Direcția câștigului maxim vs frecvență"
 
-#: src/plot_freqdata.c:1522
+#: src/plot_freqdata.c:1521
 msgid "Phi - deg"
 msgstr "Phi - grade"
 
-#: src/plot_freqdata.c:1535
+#: src/plot_freqdata.c:1534
 msgid "Gain in Viewer Direction vs Frequency"
 msgstr "Câștig în direcția observatorului vs frecvență"
 
-#: src/plot_freqdata.c:1558
+#: src/plot_freqdata.c:1557
 msgid "Net gain dBi"
 msgstr "Câștig net dBi"
 
-#: src/plot_freqdata.c:1576 resources/xnec2c.glade:9951
+#: src/plot_freqdata.c:1575 resources/xnec2c.glade:9951
 #: resources/xnec2c.glade:10175
 msgid "VSWR"
 msgstr "VSWR"
 
-#: src/plot_freqdata.c:1579
+#: src/plot_freqdata.c:1578
 msgid "VSWR & S11 vs Frequency"
 msgstr "VSWR și S11 vs frecvență"
 
-#: src/plot_freqdata.c:1580
+#: src/plot_freqdata.c:1579
 msgid "S11 dB"
 msgstr "S11 dB"
 
-#: src/plot_freqdata.c:1584
+#: src/plot_freqdata.c:1583
 msgid "VSWR vs Frequency"
 msgstr "VSWR vs frecvență"
 
-#: src/plot_freqdata.c:1598
+#: src/plot_freqdata.c:1597
 msgid "memory allocation for vswr/s11 failed\n"
 msgstr "alocarea memoriei pentru vswr/s11 a eșuat\n"
 
-#: src/plot_freqdata.c:1599
+#: src/plot_freqdata.c:1598
 msgid "Plot_Frequency_Data():Memory allocation for vswr/s11 failed"
 msgstr "Plot_Frequency_Data():Alocarea memoriei pentru vswr/s11 a eșuat"
 
-#: src/plot_freqdata.c:1646 resources/xnec2c.glade:10140
+#: src/plot_freqdata.c:1645 resources/xnec2c.glade:10140
 msgid "Z-real"
 msgstr "Z-real"
 
-#: src/plot_freqdata.c:1647 src/plot_freqdata.c:1656
+#: src/plot_freqdata.c:1646 src/plot_freqdata.c:1655
 msgid "Impedance vs Frequency"
 msgstr "Impedanță vs frecvență"
 
-#: src/plot_freqdata.c:1648 resources/xnec2c.glade:10105
+#: src/plot_freqdata.c:1647 resources/xnec2c.glade:10105
 msgid "Z-imag"
 msgstr "Z-imag"
 
-#: src/plot_freqdata.c:1655
+#: src/plot_freqdata.c:1654
 msgid "Z-magn"
 msgstr "Z-magn"
 
-#: src/plot_freqdata.c:1657
+#: src/plot_freqdata.c:1656
 msgid "Z-phase"
 msgstr "Z-fază"
 
-#: src/plot_freqdata.c:1691
+#: src/plot_freqdata.c:1690
 msgid "G/T_ant (dB)"
 msgstr "G/T_ant (dB)"
 
-#: src/plot_freqdata.c:1694
+#: src/plot_freqdata.c:1693
 msgid "G/T_ant & T_ant"
 msgstr "G/T_ant și T_ant"
 
-#: src/plot_freqdata.c:1695
+#: src/plot_freqdata.c:1694
 msgid "T_ant (K)"
 msgstr "T_ant (K)"
 
-#: src/plot_freqdata.c:1699
+#: src/plot_freqdata.c:1698
 msgid "G/T_ant & T_total"
 msgstr "G/T_ant și T_total"
 
-#: src/plot_freqdata.c:1700
+#: src/plot_freqdata.c:1699
 msgid "T_total (K)"
 msgstr "T_total (K)"
 
-#: src/plot_freqdata.c:1942
+#: src/plot_freqdata.c:1941
 #, c-format
 msgid "mouse button: unknown button %d\n"
 msgstr "buton mouse: buton necunoscut %d\n"
@@ -2628,12 +2629,12 @@ msgstr "%s: EOF la citirea versiunii aplicației.\n"
 msgid "existing config file version differs: %s != %s\n"
 msgstr "versiunea fișierului de configurare existent diferă: %s != %s\n"
 
-#: src/rc_config.c:921
+#: src/rc_config.c:923
 #, c-format
 msgid "stat failed for %s: %s\n"
 msgstr "stat eșuat pentru %s: %s\n"
 
-#: src/rc_config.c:927
+#: src/rc_config.c:929
 #, c-format
 msgid ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
@@ -2642,22 +2643,22 @@ msgstr ""
 "Corectat permisiuni director %s de la 0%o la 0%o din cauza unui bug introdus "
 "în 4e62893b.\n"
 
-#: src/rc_config.c:958
+#: src/rc_config.c:960
 #, c-format
 msgid "%s:%d: Line not parsed: %s\n"
 msgstr "%s:%d: Linie neparsată: %s\n"
 
-#: src/rc_config.c:964
+#: src/rc_config.c:966
 #, c-format
 msgid "%s:%d: Early end of file for %s: %s \n"
 msgstr "%s:%d: Sfârșit de fișier prematur pentru %s: %s \n"
 
-#: src/rc_config.c:989
+#: src/rc_config.c:991
 #, c-format
 msgid "%s:%d: parse error (%s): %s \n"
 msgstr "%s:%d: eroare de parsare (%s): %s \n"
 
-#: src/rc_config.c:1254
+#: src/rc_config.c:1256
 #, c-format
 msgid "cannot open xnec2c's config file %s: %s\n"
 msgstr "nu se poate deschide fișierul de configurare xnec2c %s: %s\n"
@@ -2850,7 +2851,7 @@ msgstr ""
 "  --write-patch-currents  <nume_fișier>  - scrie CSV cu curenți de suprafață "
 "patch\n"
 
-#: src/utils.c:105 src/utils.c:110
+#: src/utils.c:100 src/utils.c:105
 #, c-format
 msgid ""
 "\n"
@@ -2863,27 +2864,27 @@ msgstr ""
 "%s\n"
 "\n"
 
-#: src/utils.c:152
+#: src/utils.c:142
 #, c-format
 msgid "Stop: %s\n"
 msgstr "Stop: %s\n"
 
-#: src/utils.c:188 src/utils.c:190
+#: src/utils.c:178 src/utils.c:180
 #, c-format
 msgid "Stop during freq loop, deadlock prevented: %s\n"
 msgstr "Stop în timpul buclei de frecvență, blocaj prevenit: %s\n"
 
-#: src/utils.c:370
+#: src/utils.c:360
 #, c-format
 msgid "using %d OpenMP threads per job (%d/%d CPUs)\n"
 msgstr "se utilizează %d fire OpenMP per sarcină (%d/%d procesoare)\n"
 
-#: src/utils.c:386
+#: src/utils.c:376
 #, c-format
 msgid "%s[%d]: %f seconds\n"
 msgstr "%s[%d]: %f secunde\n"
 
-#: src/utils.c:438
+#: src/utils.c:428
 #, c-format
 msgid ""
 "mem_obj_t at %p:\n"
@@ -2896,38 +2897,33 @@ msgstr ""
 "  utilizat: %lu\n"
 "  adresă: %p\n"
 
-#: src/utils.c:457
+#: src/utils.c:447
 #, c-format
 msgid "mem_backtrace(%p):\n"
 msgstr "mem_backtrace(%p):\n"
 
-#: src/utils.c:459
+#: src/utils.c:449
 msgid "  m->backtrace is null, no backtrace data\n"
 msgstr "  m->backtrace este nul, fără date de backtrace\n"
 
-#: src/utils.c:523
+#: src/utils.c:513
 #, c-format
 msgid "Memory re-allocation denied %s\n"
 msgstr "Realocarea memoriei refuzată %s\n"
 
-#: src/utils.c:524
+#: src/utils.c:514
 #, c-format
 msgid "%s: Memory requested %lu\n"
 msgstr "%s: Memorie solicitată %lu\n"
 
-#: src/utils.c:570
+#: src/utils.c:561
 #, c-format
 msgid "xnec2c[%d]: %s: Failed to open file: %s\n"
 msgstr "xnec2c[%d]: %s: Deschiderea fișierului a eșuat: %s\n"
 
-#: src/utils.c:943
-msgid "Optimizer loop incomplete, skipping radiation pattern redraw.\n"
-msgstr ""
-"Buclă optimizer incompletă, se omite redesenarea diagramei de radiație.\n"
-
 #: src/utils.c:950
-msgid "Optimizer loop incomplete, skipping structure redraw.\n"
-msgstr "Buclă optimizer incompletă, se omite redesenarea structurii.\n"
+msgid "Optimizer loop incomplete, suppressing intermediate redraw.\n"
+msgstr "Buclă optimizer incompletă, se suprimă redesenarea intermediară.\n"
 
 #: src/utils.c:965
 msgid "  Backtrace:\n"
@@ -2943,7 +2939,7 @@ msgstr "    %d. %s\n"
 msgid "%s:\n"
 msgstr "%s:\n"
 
-#: src/xnec2c.c:196
+#: src/xnec2c.c:275
 #, c-format
 msgid ""
 "complex dielectric constant from file: %12.5E%+12.5Ej, requested: %12.5E"
@@ -2952,46 +2948,60 @@ msgstr ""
 "constantă dielectrică complexă din fișier: %12.5E%+12.5Ej, solicitată: %12.5E"
 "%+12.5Ej\n"
 
-#: src/xnec2c.c:199
+#: src/xnec2c.c:278
 msgid "Ground_Parameters():Error in ground parameters"
 msgstr "Ground_Parameters():Eroare în parametrii de sol"
 
-#: src/xnec2c.c:516
+#: src/xnec2c.c:595
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
 msgstr "%.6f MHz: %f secunde. (%s)\n"
 
-#: src/xnec2c.c:802 src/xnec2c.c:854
+#: src/xnec2c.c:839
 #, c-format
 msgid ""
 "step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
 msgstr ""
 "pasul %d în competiție: expediat %.6f MHz, curent %.6f MHz; se va recalcula\n"
 
-#: src/xnec2c.c:842
+#: src/xnec2c.c:935
+#, c-format
+msgid "child %d has invalid pipe fd during forked collect\n"
+msgstr ""
+"procesul copil %d are un fd de pipe invalid în timpul colectării ramificate\n"
+
+#: src/xnec2c.c:990
 msgid "Failed to read data from forked child\n"
 msgstr "Citirea datelor de la procesul copil ramificat a eșuat\n"
 
-#: src/xnec2c.c:941
+#: src/xnec2c.c:1027
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
 msgstr "Timp scurs buclă de frecvență: %f secunde. (%s)\n"
 
-#: src/xnec2c.c:1211
+#: src/xnec2c.c:1261
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "pornirea Frequency_Loop_Thread a eșuat\n"
 
-#: src/opengl/opengl_rdpattern.c:380
+#: src/opengl/opengl_rdpattern.c:386
 #, c-format
 msgid "rdpattern: invalid draw style %d, using surface\n"
 msgstr "rdpattern: stil de desenare invalid %d, se folosește suprafață\n"
 
-#: src/opengl/opengl_settings.c:428
+#: src/opengl/opengl_settings.c:380
+msgid ""
+"OpenGL is not available on this display; switching to Cairo renderer. See "
+"'OpenGL Renderer' in View > OpenGL Settings.\n"
+msgstr ""
+"OpenGL nu este disponibil pe acest display; se comută la renderul Cairo. "
+"Consultați 'OpenGL Renderer' în View > OpenGL Settings.\n"
+
+#: src/opengl/opengl_settings.c:483 src/opengl/opengl_settings.c:624
 #, c-format
 msgid "opengl_settings_init: failed to load glade: %s\n"
 msgstr "opengl_settings_init: eșec la încărcarea glade: %s\n"
 
-#: src/opengl/opengl_settings.c:441
+#: src/opengl/opengl_settings.c:496 src/opengl/opengl_settings.c:637
 msgid "opengl_settings_init: failed to get opengl_settings_window from glade\n"
 msgstr ""
 "opengl_settings_init: eșec la obținerea opengl_settings_window din glade\n"
@@ -3040,27 +3050,30 @@ msgid "Shader link failed\n"
 msgstr "Legare shader eșuată\n"
 
 #: src/opengl-engine/opengl_view.c:123
-msgid "GL context error\n"
-msgstr "Eroare context GL\n"
+msgid ""
+"OpenGL context error — no OpenGL implementation available on this display\n"
+msgstr ""
+"Eroare context OpenGL — nicio implementare OpenGL disponibilă pe acest "
+"display\n"
 
-#: src/opengl-engine/opengl_view.c:149
+#: src/opengl-engine/opengl_view.c:151
 msgid "Failed to create axes renderer\n"
 msgstr "Eșec la crearea renderer-ului de axe\n"
 
-#: src/opengl-engine/opengl_view.c:181
+#: src/opengl-engine/opengl_view.c:183
 msgid "Failed to create ground plane renderer\n"
 msgstr "Eșec la crearea renderer-ului planului de masă\n"
 
-#: src/opengl-engine/opengl_view.c:202
+#: src/opengl-engine/opengl_view.c:204
 #, c-format
 msgid "Renderable count %u exceeds MAX_RENDERABLES (%d)\n"
 msgstr "Numărul de obiecte randabile %u depășește MAX_RENDERABLES (%d)\n"
 
-#: src/opengl-engine/opengl_view.c:246
+#: src/opengl-engine/opengl_view.c:248
 msgid "Failed to create gradient overlay\n"
 msgstr "Eșec la crearea overlay-ului gradient\n"
 
-#: src/opengl-engine/opengl_view.c:294
+#: src/opengl-engine/opengl_view.c:296
 msgid "Failed to load peel composite shaders\n"
 msgstr "Eșec la încărcarea shaderelor compozite peel\n"
 
@@ -3335,17 +3348,17 @@ msgstr "Animare frecvență (Hz)"
 msgid "Arc Element (GA card)"
 msgstr "Element de arc (card GA)"
 
-#: resources/xnec2c.glade:325 resources/xnec2c.glade:14932
+#: resources/xnec2c.glade:325 resources/xnec2c.glade:14915
 msgid "No. Segments"
 msgstr "Nr. segmente"
 
 #: resources/xnec2c.glade:338 resources/xnec2c.glade:3800
-#: resources/xnec2c.glade:15028
+#: resources/xnec2c.glade:15011
 msgid "Segs % lambda"
 msgstr "Segmente % lambda"
 
 #: resources/xnec2c.glade:351 resources/xnec2c.glade:3813
-#: resources/xnec2c.glade:15124
+#: resources/xnec2c.glade:15107
 msgid "Wire Diameter"
 msgstr "Diametru fir"
 
@@ -3373,9 +3386,9 @@ msgstr "Date arc de fir"
 #: resources/xnec2c.glade:4704 resources/xnec2c.glade:5236
 #: resources/xnec2c.glade:5872 resources/xnec2c.glade:7316
 #: resources/xnec2c.glade:8223 resources/xnec2c.glade:9229
-#: resources/xnec2c.glade:9509 resources/xnec2c.glade:13530
-#: resources/xnec2c.glade:14043 resources/xnec2c.glade:14642
-#: resources/xnec2c.glade:15478 resources/xnec2c.glade:15678
+#: resources/xnec2c.glade:9509 resources/xnec2c.glade:13513
+#: resources/xnec2c.glade:14026 resources/xnec2c.glade:14625
+#: resources/xnec2c.glade:15461 resources/xnec2c.glade:15661
 msgid "Delete Card"
 msgstr "Șterge card"
 
@@ -3669,8 +3682,8 @@ msgstr "5.00"
 msgid "8"
 msgstr "8"
 
-#: resources/xnec2c.glade:3888 resources/xnec2c.glade:11746
-#: resources/xnec2c.glade:13068
+#: resources/xnec2c.glade:3888 resources/xnec2c.glade:11737
+#: resources/xnec2c.glade:13050
 msgid "1"
 msgstr "1"
 
@@ -3724,7 +3737,7 @@ msgstr "Rază în Y (B2)"
 msgid "GH Card"
 msgstr "Card GH"
 
-#: resources/xnec2c.glade:4417 resources/xnec2c.glade:15552
+#: resources/xnec2c.glade:4417 resources/xnec2c.glade:15535
 msgid "Interaction Approx Range (KH Card)"
 msgstr "Interval aprox. interacțiune (Card KH)"
 
@@ -3841,8 +3854,8 @@ msgstr "Tip Câmp și Coordonate"
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:5552 resources/xnec2c.glade:11295
-#: resources/xnec2c.glade:12602
+#: resources/xnec2c.glade:5552 resources/xnec2c.glade:11286
+#: resources/xnec2c.glade:12584
 msgid "X"
 msgstr "X"
 
@@ -3854,8 +3867,8 @@ msgstr "DX"
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:5647 resources/xnec2c.glade:11310
-#: resources/xnec2c.glade:12617
+#: resources/xnec2c.glade:5647 resources/xnec2c.glade:11301
+#: resources/xnec2c.glade:12599
 msgid "Y"
 msgstr "Y"
 
@@ -3867,8 +3880,8 @@ msgstr "DY"
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:5742 resources/xnec2c.glade:11325
-#: resources/xnec2c.glade:12632
+#: resources/xnec2c.glade:5742 resources/xnec2c.glade:11316
+#: resources/xnec2c.glade:12614
 msgid "Z"
 msgstr "Z"
 
@@ -4028,7 +4041,7 @@ msgstr "Num. Segment, Port 1"
 msgid "Segment Num, Port 2"
 msgstr "Num. Segment, Port 2"
 
-#: resources/xnec2c.glade:7029 resources/xnec2c.glade:14338
+#: resources/xnec2c.glade:7029 resources/xnec2c.glade:14321
 msgid "Segment Identity"
 msgstr "Identitate Segment"
 
@@ -4281,16 +4294,16 @@ msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: Grafice Date Frecvență"
 
 #: resources/xnec2c.glade:9604 resources/xnec2c.glade:10544
-#: resources/xnec2c.glade:11999
+#: resources/xnec2c.glade:11990
 msgid "_File"
 msgstr "_Fișier"
 
 #: resources/xnec2c.glade:9666 resources/xnec2c.glade:10606
-#: resources/xnec2c.glade:12061
+#: resources/xnec2c.glade:12052
 msgid "Save as _gnuplot"
 msgstr "Salvare ca _gnuplot"
 
-#: resources/xnec2c.glade:9677 resources/xnec2c.glade:12071
+#: resources/xnec2c.glade:9677 resources/xnec2c.glade:12062
 msgid "Save as _CSV"
 msgstr "Salvare ca _CSV"
 
@@ -4311,37 +4324,37 @@ msgid "Save as S2P: _Viewer Gain (S21)"
 msgstr "Salvare ca S2P: Câștig _Vizualizator (S21)"
 
 #: resources/xnec2c.glade:9753 resources/xnec2c.glade:10972
-#: resources/xnec2c.glade:12105
+#: resources/xnec2c.glade:12096
 msgid "_View"
 msgstr "_Vizualizare"
 
 #: resources/xnec2c.glade:9762 resources/xnec2c.glade:11002
-#: resources/xnec2c.glade:12115
+#: resources/xnec2c.glade:12106
 msgid "_Polarization"
 msgstr "_Polarizare"
 
 #: resources/xnec2c.glade:9778 resources/xnec2c.glade:11018
-#: resources/xnec2c.glade:12131
+#: resources/xnec2c.glade:12122
 msgid "_Total"
 msgstr "_Total"
 
 #: resources/xnec2c.glade:9789 resources/xnec2c.glade:11029
-#: resources/xnec2c.glade:12142
+#: resources/xnec2c.glade:12133
 msgid "_Horizontal"
 msgstr "_Orizontală"
 
 #: resources/xnec2c.glade:9800 resources/xnec2c.glade:11040
-#: resources/xnec2c.glade:12153
+#: resources/xnec2c.glade:12144
 msgid "_Vertical"
 msgstr "_Verticală"
 
 #: resources/xnec2c.glade:9811 resources/xnec2c.glade:11051
-#: resources/xnec2c.glade:12164
+#: resources/xnec2c.glade:12155
 msgid "_Right Hand"
 msgstr "Mână _Dreaptă"
 
 #: resources/xnec2c.glade:9822 resources/xnec2c.glade:11062
-#: resources/xnec2c.glade:12175
+#: resources/xnec2c.glade:12166
 msgid "_Left Hand"
 msgstr "Mână _Stângă"
 
@@ -4400,7 +4413,7 @@ msgstr "T_ant"
 #: resources/xnec2c.glade:10054 resources/xnec2c.glade:10089
 #: resources/xnec2c.glade:10124 resources/xnec2c.glade:10159
 #: resources/xnec2c.glade:10377 resources/xnec2c.glade:10411
-#: resources/xnec2c.glade:10445 resources/xnec2c.glade:13255
+#: resources/xnec2c.glade:10445 resources/xnec2c.glade:13238
 msgid " - - -"
 msgstr " - - -"
 
@@ -4416,12 +4429,12 @@ msgstr "Frecv MHz"
 msgid "Tx Line Zo"
 msgstr "Zo Linie Tx"
 
-#: resources/xnec2c.glade:10264 resources/xnec2c.glade:11761
-#: resources/xnec2c.glade:13099
+#: resources/xnec2c.glade:10264 resources/xnec2c.glade:11752
+#: resources/xnec2c.glade:13081
 msgid "Freq Loop"
 msgstr "Buclă Frecvență"
 
-#: resources/xnec2c.glade:10359 resources/xnec2c.glade:13204
+#: resources/xnec2c.glade:10359 resources/xnec2c.glade:13187
 msgid "T_total"
 msgstr "T_total"
 
@@ -4561,7 +4574,7 @@ msgstr "Faza de _Referință"
 msgid "_LIC Texture"
 msgstr "Textură _LIC"
 
-#: resources/xnec2c.glade:11122 resources/xnec2c.glade:12410
+#: resources/xnec2c.glade:11122 resources/xnec2c.glade:12401
 msgid "_Wireframe"
 msgstr "_Cadru de sârmă"
 
@@ -4581,407 +4594,403 @@ msgstr "_Magnitudine de vârf"
 msgid "A_nimate"
 msgstr "A_nimează"
 
-#: resources/xnec2c.glade:11182 resources/xnec2c.glade:12527
+#: resources/xnec2c.glade:11182 resources/xnec2c.glade:12518
 msgid "Common _Projection"
 msgstr "_Proiecție Comună"
 
-#: resources/xnec2c.glade:11192 resources/xnec2c.glade:12537
-msgid "Common _Frequency"
-msgstr "_Frecvență Comună"
-
-#: resources/xnec2c.glade:11208
+#: resources/xnec2c.glade:11199
 msgid "_Symbol Overrides"
 msgstr "_Suprascrieri Simboluri"
 
-#: resources/xnec2c.glade:11218
+#: resources/xnec2c.glade:11209
 msgid "OpenGL _Settings..."
 msgstr "_Setări OpenGL..."
 
-#: resources/xnec2c.glade:11229
+#: resources/xnec2c.glade:11220
 msgid "_Help"
 msgstr "_Ajutor"
 
-#: resources/xnec2c.glade:11238
+#: resources/xnec2c.glade:11229
 msgid "_About"
 msgstr "_Despre"
 
-#: resources/xnec2c.glade:11265
+#: resources/xnec2c.glade:11256
 msgid "Currents"
 msgstr "Curenți"
 
-#: resources/xnec2c.glade:11280
+#: resources/xnec2c.glade:11271
 msgid "Charges"
 msgstr "Sarcini"
 
-#: resources/xnec2c.glade:11463
+#: resources/xnec2c.glade:11454
 msgid " Zoom"
 msgstr " Zoom"
 
-#: resources/xnec2c.glade:11606 resources/xnec2c.glade:13035
+#: resources/xnec2c.glade:11597 resources/xnec2c.glade:13017
 msgid "Gain"
 msgstr "Câștig"
 
-#: resources/xnec2c.glade:11621 resources/xnec2c.glade:11637
-#: resources/xnec2c.glade:13048 resources/xnec2c.glade:13237
+#: resources/xnec2c.glade:11612 resources/xnec2c.glade:11628
+#: resources/xnec2c.glade:13030 resources/xnec2c.glade:13220
 msgid "0.0"
 msgstr "0.0"
 
-#: resources/xnec2c.glade:11671
+#: resources/xnec2c.glade:11662
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:11713 resources/xnec2c.glade:13191
+#: resources/xnec2c.glade:11704 resources/xnec2c.glade:13174
 msgid "dB"
 msgstr "dB"
 
-#: resources/xnec2c.glade:11727 resources/xnec2c.glade:13084
+#: resources/xnec2c.glade:11718 resources/xnec2c.glade:13066
 msgid "Step"
 msgstr "Pas"
 
-#: resources/xnec2c.glade:11874 resources/xnec2c.glade:13132
-msgid "Apply"
-msgstr "Aplică"
+#: resources/xnec2c.glade:11865 resources/xnec2c.glade:13114
+msgid "Apply Freq"
+msgstr "Aplică Frecv."
 
-#: resources/xnec2c.glade:11894
+#: resources/xnec2c.glade:11885
 msgid "Frequency Mhz"
 msgstr "Frecvență MHz"
 
-#: resources/xnec2c.glade:11954
+#: resources/xnec2c.glade:11945
 msgid "Structure Geometry"
 msgstr "Geometria Structurii"
 
-#: resources/xnec2c.glade:11973
+#: resources/xnec2c.glade:11964
 msgid "Xnec2c: Radiation Patterns"
 msgstr "Xnec2c: Diagrame de Radiație"
 
-#: resources/xnec2c.glade:12190
+#: resources/xnec2c.glade:12181
 msgid "_Gain Scaling"
 msgstr "Scalare _Câștig"
 
-#: resources/xnec2c.glade:12205
+#: resources/xnec2c.glade:12196
 msgid "Linear _Power"
 msgstr "_Putere Liniară"
 
-#: resources/xnec2c.glade:12216
+#: resources/xnec2c.glade:12207
 msgid "Linear _Voltage"
 msgstr "_Tensiune Liniară"
 
-#: resources/xnec2c.glade:12227
+#: resources/xnec2c.glade:12218
 msgid "_ARRL Style"
 msgstr "Stil _ARRL"
 
-#: resources/xnec2c.glade:12238
+#: resources/xnec2c.glade:12229
 msgid "_Logarithmic"
 msgstr "_Logaritmic"
 
-#: resources/xnec2c.glade:12249
+#: resources/xnec2c.glade:12240
 msgid "_Noise Temperature"
 msgstr "Temperatură de _Zgomot"
 
-#: resources/xnec2c.glade:12260
+#: resources/xnec2c.glade:12251
 msgid "Noise Temp (_log scale)"
 msgstr "Temp. Zgomot (scară _log)"
 
-#: resources/xnec2c.glade:12275
+#: resources/xnec2c.glade:12266
 msgid "Noise _Environment"
 msgstr "_Mediu de Zgomot"
 
-#: resources/xnec2c.glade:12290
+#: resources/xnec2c.glade:12281
 msgid "VE7BQH _Rural"
 msgstr "VE7BQH _Rural"
 
-#: resources/xnec2c.glade:12300
+#: resources/xnec2c.glade:12291
 msgid "VE7BQH Resi_dential"
 msgstr "VE7BQH Rezi_dențial"
 
-#: resources/xnec2c.glade:12312
+#: resources/xnec2c.glade:12303
 msgid "VE7BQH _City"
 msgstr "VE7BQH _Oraș"
 
-#: resources/xnec2c.glade:12323
+#: resources/xnec2c.glade:12314
 msgid "G4CQM _Baseline"
 msgstr "G4CQM _Bază"
 
-#: resources/xnec2c.glade:12334
+#: resources/xnec2c.glade:12325
 msgid "ITU-R _Business"
 msgstr "ITU-R _Comercial"
 
-#: resources/xnec2c.glade:12345
+#: resources/xnec2c.glade:12336
 msgid "ITU-R Reside_ntial"
 msgstr "ITU-R Rezide_nțial"
 
-#: resources/xnec2c.glade:12356
+#: resources/xnec2c.glade:12347
 msgid "ITU-R Ru_ral"
 msgstr "ITU-R Ru_ral"
 
-#: resources/xnec2c.glade:12367
+#: resources/xnec2c.glade:12358
 msgid "ITU-R _Quiet Rural"
 msgstr "ITU-R Rural _Liniștit"
 
-#: resources/xnec2c.glade:12382
+#: resources/xnec2c.glade:12373
 msgid "_Gradient Key"
 msgstr "_Legendă gradient"
 
-#: resources/xnec2c.glade:12392
+#: resources/xnec2c.glade:12383
 msgid "Draw St_yle"
 msgstr "Stil de _Desenare"
 
-#: resources/xnec2c.glade:12401
+#: resources/xnec2c.glade:12392
 msgid "S_urface"
 msgstr "S_uprafață"
 
-#: resources/xnec2c.glade:12420
+#: resources/xnec2c.glade:12411
 msgid "_Both"
 msgstr "Am_bele"
 
-#: resources/xnec2c.glade:12435
+#: resources/xnec2c.glade:12426
 msgid "_Near Field"
 msgstr "Câmp _Apropiat"
 
-#: resources/xnec2c.glade:12450
+#: resources/xnec2c.glade:12441
 msgid "Near _E Field"
 msgstr "Câmp _E Apropiat"
 
-#: resources/xnec2c.glade:12460
+#: resources/xnec2c.glade:12451
 msgid "Near _H Field"
 msgstr "Câmp _H Apropiat"
 
-#: resources/xnec2c.glade:12470
+#: resources/xnec2c.glade:12461
 msgid "_Poynting Vector"
 msgstr "_Vector Poynting"
 
-#: resources/xnec2c.glade:12479
+#: resources/xnec2c.glade:12470
 msgid "_Animate Dialog"
 msgstr "_Dialog animație"
 
-#: resources/xnec2c.glade:12488
+#: resources/xnec2c.glade:12479
 msgid "_Total Field"
 msgstr "_Câmp total"
 
-#: resources/xnec2c.glade:12497
+#: resources/xnec2c.glade:12488
 msgid "_Peak Value"
 msgstr "_Valoare de vârf"
 
-#: resources/xnec2c.glade:12508
+#: resources/xnec2c.glade:12499
 msgid "_Instantaneous (φ=0)"
 msgstr "_Instantaneu (φ=0)"
 
-#: resources/xnec2c.glade:12547
+#: resources/xnec2c.glade:12529
 msgid "_Overlay Structure"
 msgstr "_Suprapunere structură"
 
-#: resources/xnec2c.glade:12572
+#: resources/xnec2c.glade:12554
 msgid "Gain Pattern"
 msgstr "Diagramă de câștig"
 
-#: resources/xnec2c.glade:12587
+#: resources/xnec2c.glade:12569
 msgid "E/H Fields"
 msgstr "Câmpuri E/H"
 
-#: resources/xnec2c.glade:12772
+#: resources/xnec2c.glade:12754
 msgid "Zoom % "
 msgstr "Zoom % "
 
-#: resources/xnec2c.glade:12811
+#: resources/xnec2c.glade:12793
 msgid "T Elev° "
 msgstr "T Elev° "
 
-#: resources/xnec2c.glade:13151
+#: resources/xnec2c.glade:13134
 msgid "Frequency MHz"
 msgstr "Frecvență MHz"
 
-#: resources/xnec2c.glade:13168
+#: resources/xnec2c.glade:13151
 msgid "0.010"
 msgstr "0.010"
 
-#: resources/xnec2c.glade:13221
+#: resources/xnec2c.glade:13204
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:13356
+#: resources/xnec2c.glade:13339
 msgid "Scale Structure (GS card)"
 msgstr "Scalare structură (card GS)"
 
-#: resources/xnec2c.glade:13387
+#: resources/xnec2c.glade:13370
 msgid "Structure Scale Factor"
 msgstr "Factor de scalare structură"
 
-#: resources/xnec2c.glade:13400
+#: resources/xnec2c.glade:13383
 msgid "From Tag No."
 msgstr "De la Tag nr."
 
-#: resources/xnec2c.glade:13450
+#: resources/xnec2c.glade:13433
 msgid "To Tag No."
 msgstr "Până la Tag nr."
 
-#: resources/xnec2c.glade:13485
+#: resources/xnec2c.glade:13468
 msgid "Scale Structure"
 msgstr "Scalare structură"
 
-#: resources/xnec2c.glade:13662
+#: resources/xnec2c.glade:13645
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "Transformare coordonate (card GM)"
 
-#: resources/xnec2c.glade:13692
+#: resources/xnec2c.glade:13675
 msgid "Tag Increment"
 msgstr "Increment Tag"
 
-#: resources/xnec2c.glade:13723
+#: resources/xnec2c.glade:13706
 msgid "Rotate about X"
 msgstr "Rotire în jurul X"
 
-#: resources/xnec2c.glade:13755
+#: resources/xnec2c.glade:13738
 msgid "Move along X"
 msgstr "Deplasare pe X"
 
-#: resources/xnec2c.glade:13787
+#: resources/xnec2c.glade:13770
 msgid "New Structures"
 msgstr "Structuri noi"
 
-#: resources/xnec2c.glade:13818
+#: resources/xnec2c.glade:13801
 msgid "Rotate about Y"
 msgstr "Rotire în jurul Y"
 
-#: resources/xnec2c.glade:13850
+#: resources/xnec2c.glade:13833
 msgid "Move along Y"
 msgstr "Deplasare pe Y"
 
-#: resources/xnec2c.glade:13882
+#: resources/xnec2c.glade:13865
 msgid "Start From Tag"
 msgstr "Pornire de la Tag"
 
-#: resources/xnec2c.glade:13914
+#: resources/xnec2c.glade:13897
 msgid "Rotate about Z"
 msgstr "Rotire în jurul Z"
 
-#: resources/xnec2c.glade:13946
+#: resources/xnec2c.glade:13929
 msgid "Move along Z"
 msgstr "Deplasare pe Z"
 
-#: resources/xnec2c.glade:13982
+#: resources/xnec2c.glade:13965
 msgid "Co-ordinate Transformation Data"
 msgstr "Date transformare coordonate"
 
-#: resources/xnec2c.glade:14178
+#: resources/xnec2c.glade:14161
 msgid "Trans. Line Command (TL Card)"
 msgstr "Comandă linie de transmisie (Card TL)"
 
-#: resources/xnec2c.glade:14208
+#: resources/xnec2c.glade:14191
 msgid "Tag Number, End 1  "
 msgstr "Număr Tag, Capăt 1  "
 
-#: resources/xnec2c.glade:14240
+#: resources/xnec2c.glade:14223
 msgid "Tag Number, End 2  "
 msgstr "Număr Tag, Capăt 2  "
 
-#: resources/xnec2c.glade:14271
+#: resources/xnec2c.glade:14254
 msgid "Segment Num, End 1"
 msgstr "Nr. segment, Capăt 1"
 
-#: resources/xnec2c.glade:14303
+#: resources/xnec2c.glade:14286
 msgid "Segment Num, End 2"
 msgstr "Nr. segment, Capăt 2"
 
-#: resources/xnec2c.glade:14367
+#: resources/xnec2c.glade:14350
 msgid "Crossed Transmission Line"
 msgstr "Linie de transmisie încrucișată"
 
-#: resources/xnec2c.glade:14385
+#: resources/xnec2c.glade:14368
 msgid "Characteristic Impedance"
 msgstr "Impedanță caracteristică"
 
-#: resources/xnec2c.glade:14417
+#: resources/xnec2c.glade:14400
 msgid "End 1 Y Real Part (S)"
 msgstr "Capăt 1 Y Parte reală (S)"
 
-#: resources/xnec2c.glade:14449
+#: resources/xnec2c.glade:14432
 msgid "End 2 Y Real Part (S)"
 msgstr "Capăt 2 Y Parte reală (S)"
 
-#: resources/xnec2c.glade:14481
+#: resources/xnec2c.glade:14464
 msgid "Length of Tx Line (m)"
 msgstr "Lungime linie Tx (m)"
 
-#: resources/xnec2c.glade:14513
+#: resources/xnec2c.glade:14496
 msgid "End 1 Y Imag Part (S)"
 msgstr "Capăt 1 Y Parte imaginară (S)"
 
-#: resources/xnec2c.glade:14545
+#: resources/xnec2c.glade:14528
 msgid "End 2 Y Imag Part (S)"
 msgstr "Capăt 2 Y Parte imaginară (S)"
 
-#: resources/xnec2c.glade:14581
+#: resources/xnec2c.glade:14564
 msgid "Transmission Line"
 msgstr "Linie de transmisie"
 
-#: resources/xnec2c.glade:14808
+#: resources/xnec2c.glade:14791
 msgid "Wire Element (GW & GC cards)"
 msgstr "Element fir (carduri GW & GC)"
 
-#: resources/xnec2c.glade:14868
+#: resources/xnec2c.glade:14851
 msgid "Wire X1"
 msgstr "Fir X1"
 
-#: resources/xnec2c.glade:14900
+#: resources/xnec2c.glade:14883
 msgid "Wire X2"
 msgstr "Fir X2"
 
-#: resources/xnec2c.glade:14963
+#: resources/xnec2c.glade:14946
 msgid "Wire Y1"
 msgstr "Fir Y1"
 
-#: resources/xnec2c.glade:14996
+#: resources/xnec2c.glade:14979
 msgid "Wire Y2"
 msgstr "Fir Y2"
 
-#: resources/xnec2c.glade:15060
+#: resources/xnec2c.glade:15043
 msgid "Wire Z1"
 msgstr "Fir Z1"
 
-#: resources/xnec2c.glade:15092
+#: resources/xnec2c.glade:15075
 msgid "Wire Z2"
 msgstr "Fir Z2"
 
-#: resources/xnec2c.glade:15157
+#: resources/xnec2c.glade:15140
 msgid "Wire Length"
 msgstr "Lungime fir"
 
-#: resources/xnec2c.glade:15228
+#: resources/xnec2c.glade:15211
 msgid "Wire Data"
 msgstr "Date fir"
 
-#: resources/xnec2c.glade:15240
+#: resources/xnec2c.glade:15223
 msgid "Tapered Wire"
 msgstr "Fir conic"
 
-#: resources/xnec2c.glade:15282
+#: resources/xnec2c.glade:15265
 msgid "Length Taper"
 msgstr "Conicitate lungime"
 
-#: resources/xnec2c.glade:15314
+#: resources/xnec2c.glade:15297
 msgid "Diameter Seg 1"
 msgstr "Diametru Seg 1"
 
-#: resources/xnec2c.glade:15346
+#: resources/xnec2c.glade:15329
 msgid "Diameter Seg N"
 msgstr "Diametru Seg N"
 
-#: resources/xnec2c.glade:15378
+#: resources/xnec2c.glade:15361
 msgid "Diam. Taper"
 msgstr "Conicitate diam."
 
-#: resources/xnec2c.glade:15414
+#: resources/xnec2c.glade:15397
 msgid "Wire Taper Data"
 msgstr "Date conicitate fir"
 
-#: resources/xnec2c.glade:15579
+#: resources/xnec2c.glade:15562
 msgid "Impedance (Zo) Ohm"
 msgstr "Impedanță (Zo) Ohm"
 
-#: resources/xnec2c.glade:15594
+#: resources/xnec2c.glade:15577
 msgid "50.00"
 msgstr "50.00"
 
-#: resources/xnec2c.glade:15617
+#: resources/xnec2c.glade:15600
 msgid "Transmission Line Impedance (Zo)"
 msgstr "Impedanță linie de transmisie (Zo)"
