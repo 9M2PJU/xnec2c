@@ -118,7 +118,8 @@ typedef struct Segment
 #define WHITE   1.0, 1.0, 1.0
 #define RED     1.0, 0.0, 0.0
 #define YELLOW  1.0, 1.0, 0.0
-#define GREEN   0.0, 1.0, 0.0
+#define GREEN      0.0, 1.0, 0.0
+#define DARK_GREEN 0.0, 0.5, 0.0
 #define CYAN    0.0, 1.0, 1.0
 #define BLUE    0.0, 0.0, 1.0
 #define MAGENTA 1.0, 0.0, 1.0

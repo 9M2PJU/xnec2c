@@ -37,6 +37,9 @@ static gboolean check_opt_complete(gpointer user_data)
 	gtk_widget_set_sensitive(start_button, TRUE);
 	gtk_widget_set_sensitive(cancel_button, FALSE);
 	sy_overrides_set_apply_enabled(TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(mainwin_frequency), TRUE);
+	if( isFlagSet(DRAW_ENABLED) && rdpattern_frequency != NULL )
+		gtk_widget_set_sensitive(GTK_WIDGET(rdpattern_frequency), TRUE);
 
 	/* Apply results back to override entries */
 	{
@@ -257,6 +260,9 @@ void on_opt_start_clicked(GtkButton *button, gpointer user_data)
 		gtk_widget_set_sensitive(start_button, FALSE);
 		gtk_widget_set_sensitive(cancel_button, TRUE);
 		sy_overrides_set_apply_enabled(FALSE);
+		gtk_widget_set_sensitive(GTK_WIDGET(mainwin_frequency), FALSE);
+		if( isFlagSet(DRAW_ENABLED) && rdpattern_frequency != NULL )
+			gtk_widget_set_sensitive(GTK_WIDGET(rdpattern_frequency), FALSE);
 
 		if (status_label != NULL)
 		{

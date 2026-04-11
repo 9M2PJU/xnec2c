@@ -1216,7 +1216,10 @@ Plot_Graph(
 			freq_x = (calc_data.fmhz_save - min_fscale) / (max_fscale - min_fscale);
 			freq_x *= plot_rect->width;
 
-			cairo_set_source_rgb( cr, GREEN );
+			if( isFlagSet(SY_OPTIMIZER_ACTIVE) )
+				cairo_set_source_rgb( cr, DARK_GREEN );
+			else
+				cairo_set_source_rgb( cr, GREEN );
 			Cairo_Draw_Line(cr,
 				plot_rect->x+freq_x, plot_rect->y,
 				plot_rect->x+freq_x, plot_rect->y+plot_rect->height);
@@ -1345,7 +1348,10 @@ Plot_Graph_Smith(
    * changed by a user click on the plots drawingarea */
   if( isFlagSet(PLOT_FREQ_LINE) && calc_data.fmhz_save > 0.0 )
   {
-    cairo_set_source_rgb( cr, GREEN );
+    if( isFlagSet(SY_OPTIMIZER_ACTIVE) )
+      cairo_set_source_rgb( cr, DARK_GREEN );
+    else
+      cairo_set_source_rgb( cr, GREEN );
     Calculate_Smith( creal(netcx.zped), cimag(netcx.zped), calc_data.zo, &re, &im );
 
     // flip plot vertically because negative imaginary is the bottom half    
@@ -1791,6 +1797,9 @@ Set_Frequency_On_Click( GdkEvent *e)
 
   // fr_adj: the plot to adjust when using the mouse wheel:
   fr_plot_t *fr_adj = NULL;
+
+  if (isFlagSet(SY_OPTIMIZER_ACTIVE))
+	  return;
 
   if (fr_plots == NULL)
   {
