@@ -76,7 +76,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 {
   gl_view_state_t *state;
   gl_view_content_t content = {0};
-  gl_render_params_t render_params;
+  gl_render_params_t render_params = {0};
   mat4 mvp, mv;
   float camera_distance;
   GLint default_fbo = 0;
@@ -206,7 +206,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
     float eff_alpha = eff_alphas[i];
 
-    if( eff_alpha < 1.0f )
+    if( eff_alpha < 1.0f || r->force_peel )
       continue;
 
     r->prepare(r->ctx, content.r_max);
@@ -241,7 +241,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
       float eff_alpha = eff_alphas[i];
 
-      if( eff_alpha >= 1.0f )
+      if( eff_alpha >= 1.0f && !r->force_peel )
         continue;
 
       items[trans_count].alpha = eff_alpha;

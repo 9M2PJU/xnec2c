@@ -42,7 +42,6 @@ typedef struct
   GLint noise_tex_location;
   gl_peel_uniform_locs_t peel_locs;
   GLint *attrib_locations;
-  GLint depth_bias_attrib_loc;
 
 } gl_scene_ctx_t;
 
@@ -149,9 +148,6 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
 
   gl_view_set_peel_uniforms(&sc->peel_locs, params);
 
-  /* Depth priority handled uniformly by gl_FragDepth in the fragment
-   * shader via per-vertex depth_bias: wires carry 0 (natural depth),
-   * patches carry per-index positive bias (pushed behind wires). */
   glUniformMatrix4fv(sc->mvp_location, 1, GL_FALSE,
       (const float *)params->mvp);
 
@@ -171,12 +167,19 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
 
         glBindVertexArray(sc->vao[i]);
 
-        /* Set per-batch depth bias as generic vertex attribute.
-         * When the VAO has no depth_bias bound (e.g. rdpattern
-         * 3-attrib layout), this sets the shader input directly. */
-        if( sc->depth_bias_attrib_loc >= 0 )
-          glVertexAttrib1f(sc->depth_bias_attrib_loc,
-              view->content.batches[i].depth_bias);
+        /* Per-batch polygon offset: pushes filled surfaces behind
+         * lines/wires at hardware level (slope-scaled + depth-step).
+         * Factor=2.0 exceeds peel epsilon dz coefficient (1.0),
+         * providing margin of dz+r at all zoom levels. */
+        if( view->content.batches[i].polygon_offset )
+        {
+          glEnable(GL_POLYGON_OFFSET_FILL);
+          glPolygonOffset(POLYGON_OFFSET_FACTOR, POLYGON_OFFSET_UNITS);
+        }
+        else
+        {
+          glDisable(GL_POLYGON_OFFSET_FILL);
+        }
 
         glUniform1f(sc->u_alpha_location, batch_alpha);
         glUniform1f(sc->u_color_dim_location,
@@ -187,6 +190,7 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
       }
     }
 
+    glDisable(GL_POLYGON_OFFSET_FILL);
     glBindVertexArray(0);
   }
 
@@ -321,10 +325,6 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
       glVertexAttrib4f(flow_loc, 0.0f, 0.0f, 0.0f, 0.0f);
   }
 
-  /* Cache depth_bias attribute location for per-batch generic attrib */
-  sc->depth_bias_attrib_loc =
-    glGetAttribLocation(sc->shader.program, "depth_bias");
-
   r = (gl_renderable_t){
     .render               = gl_scene_render,
     .prepare              = gl_scene_prepare,
@@ -335,7 +335,8 @@ gl_view_scene_renderable_new(gl_view_state_t *state)
     .get_alpha            = gl_scene_get_alpha,
     .origin               = {0.0f, 0.0f, 0.0f},
     .transparent_sort_order = 1,
-    .transparent_on_drag  = TRUE
+    .transparent_on_drag  = TRUE,
+    .force_peel           = TRUE
   };
 
   return( r );

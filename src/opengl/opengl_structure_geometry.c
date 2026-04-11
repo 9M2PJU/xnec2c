@@ -80,11 +80,6 @@ static const float arrow_template_uvs[ARROW_VERTEX_COUNT][2] = {
   { ARROW_ARU, ARROW_ARV }, { ARROW_TPU, ARROW_TPV },   /* bottom arm */
 };
 
-/* Per-patch window-space depth offset for coplanar z-fighting resolution.
- * Applied in fragment shader via gl_FragDepth; scales by patch index.
- * 1e-7 provides ~1.7 depth buffer steps per patch at 24-bit precision,
- * supporting ~1000 patches within the far plane headroom margin. */
-#define PATCH_DEPTH_BIAS 1e-7f
 
 
 /* Per-type draw batches: each batch owns its own vertex allocation and GL mode */
@@ -512,7 +507,6 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
     float p_r, p_g, p_b;
     float c0x, c0y, c0z, c1x, c1y, c1z;
     float c2x, c2y, c2z, c3x, c3y, c3z;
-    float dbias = (float)(idx + 1) * PATCH_DEPTH_BIAS;
 
     get_patch_normal(idx, &nx, &ny, &nz);
     get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
@@ -534,38 +528,38 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
     /* Box outline: 4 edges as GL_LINES pairs (8 vertices) */
     verts[vidx++] = (structure_vertex_t){
         .point = {c0x, c0y, c0z}, .normal = {nx, ny, nz},
-        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+        .color = {p_r, p_g, p_b, 1.0f},
     };
     verts[vidx++] = (structure_vertex_t){
         .point = {c1x, c1y, c1z}, .normal = {nx, ny, nz},
-        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+        .color = {p_r, p_g, p_b, 1.0f},
     };
 
     verts[vidx++] = (structure_vertex_t){
         .point = {c1x, c1y, c1z}, .normal = {nx, ny, nz},
-        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+        .color = {p_r, p_g, p_b, 1.0f},
     };
     verts[vidx++] = (structure_vertex_t){
         .point = {c2x, c2y, c2z}, .normal = {nx, ny, nz},
-        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+        .color = {p_r, p_g, p_b, 1.0f},
     };
 
     verts[vidx++] = (structure_vertex_t){
         .point = {c2x, c2y, c2z}, .normal = {nx, ny, nz},
-        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+        .color = {p_r, p_g, p_b, 1.0f},
     };
     verts[vidx++] = (structure_vertex_t){
         .point = {c3x, c3y, c3z}, .normal = {nx, ny, nz},
-        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+        .color = {p_r, p_g, p_b, 1.0f},
     };
 
     verts[vidx++] = (structure_vertex_t){
         .point = {c3x, c3y, c3z}, .normal = {nx, ny, nz},
-        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+        .color = {p_r, p_g, p_b, 1.0f},
     };
     verts[vidx++] = (structure_vertex_t){
         .point = {c0x, c0y, c0z}, .normal = {nx, ny, nz},
-        .color = {p_r, p_g, p_b, 1.0f}, .depth_bias = dbias,
+        .color = {p_r, p_g, p_b, 1.0f},
     };
 
     /* GPU-driven arrow: store template UV + tangent frame + flow data.
@@ -610,7 +604,6 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
               .color = {p_r, p_g, p_b, 1.0f},
               .uv = {arrow_template_uvs[k][0], arrow_template_uvs[k][1]},
               .flow_data = {fd[0], fd[1], fd[2], fd[3]},
-              .depth_bias = dbias,
               .tangent1 = {st1x, st1y, st1z},
               .tangent2 = {st2x, st2y, st2z},
           };
@@ -715,7 +708,6 @@ generate_patches_triangles(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
     float p_r, p_g, p_b;
     float fd[4];
     float c0x, c0y, c0z, c1x, c1y, c1z, c2x, c2y, c2z, c3x, c3y, c3z;
-    float dbias = (float)(idx + 1) * PATCH_DEPTH_BIAS;
 
     get_patch_normal(idx, &nx, &ny, &nz);
 
@@ -741,19 +733,19 @@ generate_patches_triangles(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
         .point = {c0x, c0y, c0z}, .normal = {nx, ny, nz},
         .color = {p_r, p_g, p_b, 1.0f},
         .uv = {1.0f, 1.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
-        .depth_bias = dbias,
+
     };
     verts[vidx++] = (structure_vertex_t){
         .point = {c1x, c1y, c1z}, .normal = {nx, ny, nz},
         .color = {p_r, p_g, p_b, 1.0f},
         .uv = {0.0f, 1.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
-        .depth_bias = dbias,
+
     };
     verts[vidx++] = (structure_vertex_t){
         .point = {c2x, c2y, c2z}, .normal = {nx, ny, nz},
         .color = {p_r, p_g, p_b, 1.0f},
         .uv = {0.0f, 0.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
-        .depth_bias = dbias,
+
     };
 
     /* Triangle 2: c0(1,1), c2(0,0), c3(1,0) */
@@ -761,19 +753,19 @@ generate_patches_triangles(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
         .point = {c0x, c0y, c0z}, .normal = {nx, ny, nz},
         .color = {p_r, p_g, p_b, 1.0f},
         .uv = {1.0f, 1.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
-        .depth_bias = dbias,
+
     };
     verts[vidx++] = (structure_vertex_t){
         .point = {c2x, c2y, c2z}, .normal = {nx, ny, nz},
         .color = {p_r, p_g, p_b, 1.0f},
         .uv = {0.0f, 0.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
-        .depth_bias = dbias,
+
     };
     verts[vidx++] = (structure_vertex_t){
         .point = {c3x, c3y, c3z}, .normal = {nx, ny, nz},
         .color = {p_r, p_g, p_b, 1.0f},
         .uv = {1.0f, 0.0f}, .flow_data = {fd[0], fd[1], fd[2], fd[3]},
-        .depth_bias = dbias,
+
     };
   }
 
@@ -922,6 +914,7 @@ opengl_structure_generate_geometry(
       generate_patches_triangles(&batches[1], mode, cmax);
 
     batches[1].draw_mode = patch_wireframe ? GL_LINES : GL_TRIANGLES;
+    batches[1].polygon_offset = TRUE;
   }
 
   batch_count = (data.m > 0) ? GL_VIEW_MAX_BATCHES : 1;

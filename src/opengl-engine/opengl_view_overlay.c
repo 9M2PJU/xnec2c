@@ -184,9 +184,6 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
 
   gl_view_set_peel_uniforms(&ovl->peel_locs, params);
 
-  /* Depth priority handled uniformly by gl_FragDepth in the fragment
-   * shader via per-vertex depth_bias: wires carry 0 (natural depth),
-   * patches carry per-index positive bias (pushed behind wires). */
   glUniformMatrix4fv(ovl->mvp_location, 1, GL_FALSE,
       (const float *)ovl->cached_mvp);
 
@@ -204,6 +201,17 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
 
         glBindVertexArray(ovl->vao[i]);
 
+        /* Per-batch polygon offset for overlay structure patches */
+        if( ovl->ovl_content.batches[i].polygon_offset )
+        {
+          glEnable(GL_POLYGON_OFFSET_FILL);
+          glPolygonOffset(POLYGON_OFFSET_FACTOR, POLYGON_OFFSET_UNITS);
+        }
+        else
+        {
+          glDisable(GL_POLYGON_OFFSET_FILL);
+        }
+
         glUniform1f(ovl->u_alpha_location, batch_alpha);
         glUniform1f(ovl->u_color_dim_location,
             ovl->ovl_content.batches[i].color_dim);
@@ -213,6 +221,7 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
       }
     }
 
+    glDisable(GL_POLYGON_OFFSET_FILL);
     glBindVertexArray(0);
   }
 
@@ -405,7 +414,8 @@ gl_view_overlay_renderable_new(gl_view_state_t *state)
     .get_alpha            = gl_overlay_get_alpha,
     .origin               = {0.0f, 0.0f, 0.0f},
     .transparent_sort_order = 1,
-    .transparent_on_drag  = TRUE
+    .transparent_on_drag  = TRUE,
+    .force_peel           = TRUE
   };
 
   return( r );
