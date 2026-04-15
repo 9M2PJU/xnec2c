@@ -406,4 +406,9 @@ locale-tree:
 
 CLEANFILES += -r locale
 
+# Force po revalidation after clean by removing stamp-po and .gmo files
+# that the stock gettext Makefile.in.in only removes in maintainer-clean
+clean-local:
+	rm -f po/stamp-po po/*.gmo
+
 .PHONY: locale-tree
