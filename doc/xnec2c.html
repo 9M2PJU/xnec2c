@@ -1106,6 +1106,7 @@ Window</a></li>
 </li>
 <li><a href="#InputFile">Input File Considerations and NEC2 Card Reference</a></li>
 <li><a href="#OutputFile">Output File Considerations</a></li>
+<li><a href="#KeyboardShortcuts">Keyboard Shortcuts</a></li>
 <li><a href="#Version">Version History</a></li>
 <li><a href="#Limitations">Limitations</a></li>
 <li><a href="#Bugs">Bugs and Inadequacies</a></li>
@@ -1236,6 +1237,9 @@ the <a href="#RadiationWindow">Radiation Pattern window</a> have
 buttons to select fixed viewing angles of the structure or the
 radiation pattern, as well as spin buttons to input specific
 viewing angles.
+When built with OpenGL support, both windows use a hardware-accelerated
+3D renderer with configurable anti-aliasing, transparency, and
+draw-style options; see <a href="#OpenGL">OpenGL Rendering</a>.
 
 <h3 id="NoiseTemp">Noise Temperature Visualization</h3>
 <p>
@@ -1250,6 +1254,17 @@ dense urban conditions. An
 the antenna pattern to the desired observation elevation. The <a href="#FrequencyWindow">Frequency Plots
 window</a> displays T<sub>ant</sub>, T<sub>total</sub>, and
 G/T<sub>ant</sub> across the operating band.</p>
+
+<h3 id="AveragePowerGain">Average Power Gain</h3>
+<p>
+When the RP card specifies at least two theta and two phi steps,
+xnec2c computes the average power gain over the radiation sphere
+after each frequency step. The result is printed to the console as a
+linear ratio, in dBi, and as a radiation efficiency percentage. An
+ideal lossless antenna with complete sphere coverage produces an
+average gain of 1.0 (0.0 dBi, 100% efficiency); lower values
+indicate resistive or ground losses. This diagnostic is enabled
+automatically unless <code>--skip-verify</code> is active.</p>
 
 <h3 id="Color">Color Coding</h3>
 <p>
@@ -1390,6 +1405,17 @@ loop, or greater than the number of logical CPUs on your system.
 <p>Starting in <span class="version-tag">v4.3</span>, xnec2c always forks at least one job
 for better UI responsiveness.  If you wish to disable forking for
 debug or testing then specify <code>-j0</code>.</p>
+
+<h4 id="Internationalization">Internationalization</h4>
+<p>
+Xnec2c supports 42 languages via GNU gettext. The language is
+selected automatically from the system locale. To override, set the
+<code>LANGUAGE</code> environment variable before launching — for
+example, <code>LANGUAGE=de xnec2c</code> for German. If the compiled-in
+locale directory is not correct for your installation, set
+<code>XNEC2C_LOCALEDIR</code> to point to the directory containing the
+<span class="filepath">LC_MESSAGES</span> trees.</p>
+
 <h3 id="MainWindow">The Main Window</h3>
 <figure>
 <img src="images/currents.png" class="float-left" alt="Main window showing current distribution on antenna structure" loading="lazy">
@@ -1477,7 +1503,33 @@ The <span class="menu-path">Common Projection</span> item couples the projection
 angle) parameters of the Structure display in the Main window and
 the Gain or E/H field display in the <a href=
 "#RadiationWindow">Radiation pattern</a> window so that both move
-in step.</p>
+in step.
+The <span class="menu-path">Current Visualization</span> submenu selects how current
+flow is depicted on the structure; see
+<a href="#CurrentVisualization">Current Flow Visualization</a>.
+The <span class="menu-path">Animate</span> item opens the
+<a href="#RadiationWindow">near-field animation dialog</a>.
+The <span class="menu-path">Symbol Overrides</span> item opens the
+<a href="#SymbolicVariables">SY parameter tuning window</a>.
+The <span class="menu-path">OpenGL Settings…</span> item opens the
+<a href="#OpenGLSettings">renderer configuration dialog</a>.</p>
+<p>The toolbar includes an
+<span class="ui-button">Orthographic</span> toggle button that
+switches between perspective and orthographic projection; see
+<a href="#Projection">Orthographic Projection</a>.
+The <span class="ui-button">Rotate</span> and <span class="ui-button">Incline</span>
+spin buttons accept mouse-wheel scrolling in 5&deg; increments and
+have extended ranges (Rotate 0–720°, Incline ±360°) to
+allow continuous dragging past the original limits; values wrap
+automatically at 360&deg; and &plusmn;180&deg; respectively.
+With the OpenGL renderer active,
+<kbd class="shortcut">Ctrl+Scroll</kbd> adjusts the visual thickness
+of wire segment cylinders (equivalent to the
+<a href="#OpenGLSettings">Cylinder Scale</a> slider).
+Scrolling down past the minimum snaps to line rendering mode, where
+segments draw as thin lines instead of 3D cylinders; scrolling back
+up returns to cylinder mode. This does not affect NEC2 model
+calculations.</p>
 <h3 id="RadiationWindow">The Radiation Pattern window</h3>
 <figure>
 <img src="images/radiation.png" class="float-left" alt="Radiation pattern window showing 3D gain visualization" loading="lazy">
@@ -1485,8 +1537,17 @@ in step.</p>
 </figure>
 On
 the top row of widgets, this window has the same Viewer angle
-selection buttons and spin button displays as the <a href=
-"#MainWindow">Main window</a>. The two buttons at the middle right
+selection buttons, spin button displays, and
+<a href="#Projection">orthographic toggle</a> as the <a href=
+"#MainWindow">Main window</a>.
+A <span class="ui-button">T Elev&deg;</span> spin button (&minus;90&deg;
+to +90&deg;) sets the
+<a href="#ElevationOffset">observation elevation</a> for noise
+temperature calculations; this control only has effect when a
+<a href="#NoiseTempDisplay">Noise Temperature</a> gain scaling mode
+is selected. A <span class="ui-button">T_total</span>
+readout displays the current antenna temperature in Kelvin.
+The two buttons at the middle right
 (<span class="ui-button">Gain</span> (<kbd class="shortcut">g</kbd>) and <span class="ui-button">E/H Field</span> (<kbd class="shortcut">f</kbd>)) select either the Gain
 or the Near Electric/Magnetic Field pattern display. Provided there
 are at least two steps in the <var>θ</var> and one in the <var>φ</var> angle as
@@ -1497,8 +1558,13 @@ commands. The Frequency Loop control buttons at the far right can
 be used to Start, Pause and Reset the loop.</p>
 <p>The <span class="ui-button">View</span> menu, in addition to the <span class="menu-path">Common
 Projection</span> check button, provides
-submenus for selecting <span class="ui-button">Polarization</span> type, <span class="ui-button">Gain
-Scaling</span> and the <span class="ui-button">Near Field</span> data to be drawn. The
+submenus for selecting <span class="ui-button">Polarization</span> type,
+<span class="ui-button">Gain Scaling</span>
+(which includes <a href="#NoiseTempDisplay">Noise Temperature</a> modes),
+<a href="#NoiseEnvModels">Noise Environment</a>,
+<a href="#DrawStyle">Draw Style</a> (Surface, Wireframe, or Both),
+a <span class="ui-button">Gradient Key</span> toggle for the color legend,
+and the <span class="ui-button">Near Field</span> data to be drawn. The
 selection of polarization type affects the Gain pattern, the
 displayed Viewer gain and the value of max and min gain as shown to
 the left and right of the color code bar. The selection of gain
@@ -1527,20 +1593,21 @@ by the color of the lines as using the line length for this purpose
 makes most lines too small to be useful. The drawing of the Near E
 or H Fields can be enabled or disabled by the <span class="menu-path">Near Field → Near E Field</span> and <span class="menu-path">Near Field → Near H Field</span>
 menu items.</p>
-<p>The <span class="menu-path">Near Field → Animate Dialog</span> menu item opens a
-dialog box for setting the parameters and starting an Animation of
-the near field pattern. The <span class="ui-button">Steps/Cycle</span> spin button allows
-the setting of the number of angular steps around a cycle of the
-excitation input. The default is 36 and it results in angular steps
-of 10°. The <span class="ui-button">Animate Frequency</span> spin button specifies a
+<p>The <span class="menu-path">Near Field → Animate Dialog</span> menu item (also
+available from <span class="menu-path">View → Animate</span> in the
+<a href="#MainWindow">Main window</a>) opens a dialog for setting
+animation parameters. The <span class="ui-button">Frames/Sec</span>
+spin button sets the target frame rate (1–120, default 30). The
+<span class="ui-button">Animate Frequency</span> spin button specifies a
 fictitious (slowed down) excitation frequency for which the
-animation is performed. The default is 1.0&nbsp;Hz. Clicking the
-<span class="ui-button">Apply</span> button starts an animation of the near fields using
-the specified parameters. The <span class="ui-button">OK</span> button does like wise but
-it closes the animation dialog, while <span class="ui-button">Cancel</span> stops the
-animation.</p>
+animation is performed; the default is 1.0&nbsp;Hz. Clicking
+<span class="ui-button">Start</span> begins the animation;
+<span class="ui-button">Stop</span> halts it; <span class="ui-button">Close</span>
+dismisses the dialog. Changing either spin button value auto-applies
+after a 500&nbsp;ms pause, restarting the animation without pressing
+<span class="ui-button">Start</span>.</p>
 <p>The <span class="ui-button">Total Field</span> sub-menu allows the selection of drawing
-either the <span class="ui-button">Peak</span> value or a "time-frozen" <span class="ui-button">Snapshot</span> of
+either the <span class="ui-button">Peak</span> value or a "time-frozen" <span class="ui-button">Instantaneous (φ=0)</span> snapshot of
 the instantaneous value of the total Near Field E/H vectors. The
 Snapshot values are calculated as the vector sum of the X, Y, Z
 components of the E/H field and the Peak values are calculated
@@ -1552,7 +1619,13 @@ understand the scale and extend of the Near Field patterns around
 the structure. The color scheme for the structure becomes white
 when Overlay is enabled, unless it is overridden by either the
 Current or Charge distribution being enabled by the relevant
-buttons in the <a href="#MainWindow">Main window.</a></p>
+buttons in the <a href="#MainWindow">Main window.</a>
+With the OpenGL renderer,
+<kbd class="shortcut">Shift+Scroll</kbd> scales the overlay structure
+relative to the radiation pattern (gain view only; inactive in
+near-field mode), and
+<kbd class="shortcut">Ctrl+Scroll</kbd> adjusts wire cylinder thickness
+as in the <a href="#MainWindow">Main window</a>.</p>
 <p>In the second row of widgets, the <span class="ui-button">Color Code</span> bar shows
 either the max and min values of Gain in the radiation pattern or
 the maximum value of the field strength in the near E/H field
@@ -1568,9 +1641,13 @@ also be used to enter a new frequency in the same manner as in the
 enables re-calculation and display of data when the frequency value
 changes, while the button to its right causes same when clicked by
 the user, but only if a new frequency has been entered.</p>
-<p>Currently the Gain pattern is drawn as a transparent wire frame,
-with each line segment colored according to the average value of
-gain associated with the two points it joins. The pattern can be
+<p>The Gain pattern draw style is selectable from
+<span class="menu-path">View → Draw Style</span>:
+<span class="ui-button">Surface</span> renders a filled triangulated mesh,
+<span class="ui-button">Wireframe</span> draws colored line segments, and
+<span class="ui-button">Both</span> overlays wireframe on a dimmed surface.
+In all modes each element is colored according to the average value of
+gain associated with its vertices. The pattern can be
 "dragged" with the mouse pointer to rotate or tilt it and it can
 also be positioned using either the <span class="ui-button">X</span> (<kbd class="shortcut">x</kbd>), <span class="ui-button">Y</span> (<kbd class="shortcut">y</kbd>), <span class="ui-button">Z</span> (<kbd class="shortcut">z</kbd>), or
 <span class="ui-button">Default</span> (<kbd class="shortcut">d</kbd>) buttons. The <span class="ui-button">Rotate</span> and
@@ -1640,11 +1717,11 @@ gain no longer represents the intended receive direction.</p>
 <figure>
 <img src="images/yagi-antenna-noise-pattern.png" alt="Radiation pattern of a 5-element Yagi at 151 MHz in Noise Temp (log scale) mode at 30° elevation" loading="lazy">
 <figcaption>A parametric 5-element Yagi for 2m viewed from the side (Y axis)
-in Noise Temp (log scale) mode at 30&deg; elevation.
-T<sub>total</sub> reads 1214&nbsp;K. The main beam (forward along X)
+in Noise Temp (log scale) mode at 40&deg; elevation.
+T<sub>total</sub> reads 719&nbsp;K. The main beam (forward along X)
 appears blue, capturing cold sky; rear and downward lobes glow
 green through red where they intercept the warm earth hemisphere.
-The color legend spans 0&ndash;2294&nbsp;K/sr. The Noise readout
+The color legend spans 0&ndash;837&nbsp;K/sr. The Noise readout
 shows &minus;999.99&nbsp;K/sr because the viewer direction is
 perpendicular to the boom, where pattern gain is near zero.</figcaption>
 </figure>
@@ -1997,7 +2074,173 @@ Once you have your <span class="fileext">.s2p</span> or <span class="fileext">.s
 or other RF behavior in your favorite RF design software.
 </p>
 
-</p>
+<h3 id="OpenGL">OpenGL Rendering</h3>
+<p>
+When built with OpenGL support, xnec2c uses a
+hardware-accelerated 3D renderer for both the
+<a href="#MainWindow">Main window</a> antenna structure display and the
+<a href="#RadiationWindow">Radiation Pattern window</a>. The renderer
+provides lit cylinder geometry for wire segments, triangulated patch
+surfaces, coordinate axes with labels, ground plane visualization,
+and smooth vertex normals on radiation pattern surfaces. If OpenGL
+initialization fails, xnec2c falls back to the Cairo software renderer
+automatically.</p>
+
+<p>
+The OpenGL renderer is enabled by default when available. It can be
+toggled at runtime from
+<span class="menu-path">View &rarr; OpenGL Settings&hellip;</span> or
+by editing the <code>Use OpenGL Renderer</code> line in the
+configuration file. All OpenGL settings are persisted across sessions.</p>
+
+<h4 id="OpenGLSettings">OpenGL Settings Dialog</h4>
+<p>
+The <span class="menu-path">View &rarr; OpenGL Settings&hellip;</span>
+menu item opens the settings dialog, organized into four sections.</p>
+
+<dl>
+<dt>Rendering</dt>
+<dd>
+<span class="ui-button">OpenGL Renderer</span> &mdash; toggle hardware
+acceleration on or off.
+<span class="ui-button">Constrained Rotation</span> &mdash; restrict
+arcball rotation to a single axis at a time.
+<span class="ui-button">Orthographic Projection</span> &mdash; see
+<a href="#Projection">below</a>.
+<span class="ui-button">MSAA Samples</span> &mdash; multi-sample
+anti-aliasing at Off, 2&times;, 4&times; (default), 8&times;, or
+16&times;. Higher values produce smoother edges at increased GPU cost.
+</dd>
+
+<dt>Structure</dt>
+<dd>
+Per-element <span class="ui-button">Brightness</span> (0=black, 1=full)
+and <span class="ui-button">Transparency</span> (0=opaque, 1=invisible)
+sliders for wire <em>Segments</em> and surface <em>Patches</em>.
+</dd>
+
+<dt>Radiation Pattern</dt>
+<dd>
+Brightness and Transparency sliders for the pattern
+<em>Surface</em>, <em>Wireframe</em>, and <em>Near-field</em> elements.
+A <a href="#DrawStyle">Draw Style</a> radio group selects Surface,
+Wireframe, or Both.
+</dd>
+
+<dt>Scene</dt>
+<dd>
+Brightness and Transparency sliders for the <em>Ground</em> plane and
+coordinate <em>Axes</em>.
+<span class="ui-button">Transparency Only on Click</span> &mdash;
+when active, per-type transparency applies only while dragging;
+otherwise transparency is always visible.
+<span class="ui-button">Cylinder Scale</span> &mdash; visual thickness
+multiplier for wire segments. Below approximately 0.1 the display
+switches to line rendering mode, drawing segments as thin lines
+instead of 3D cylinders. Also adjustable with
+<kbd class="shortcut">Ctrl+Scroll</kbd> in either window.
+Does not affect NEC2 calculations.
+</dd>
+</dl>
+
+<p>
+The <span class="ui-button">Reset to Defaults</span> button restores all
+sliders, MSAA, draw style, and transparency settings to factory
+values. The renderer toggle and constrained rotation state are
+preserved across a reset.</p>
+
+<h4 id="Projection">Orthographic Projection</h4>
+<p>
+When the OpenGL renderer is active, a toggle button in both the
+<a href="#MainWindow">Main</a> and
+<a href="#RadiationWindow">Radiation Pattern</a> window toolbars
+switches between perspective and orthographic projection. The button
+icon changes between a perspective cube and a flat cube to indicate
+the active mode. Orthographic projection is also available as a
+checkbox in the <a href="#OpenGLSettings">OpenGL Settings</a> dialog.
+This feature requires the OpenGL renderer; the toggle is
+disabled when using the Cairo software renderer.</p>
+
+<p>
+In orthographic mode, parallel lines remain parallel regardless of
+distance, and object size does not change with depth. This is useful
+for precise angular measurements, verifying element alignment, and
+flat inspection of radiation patterns where foreshortening would
+distort apparent lobe symmetry.</p>
+
+<h4 id="CurrentVisualization">Patch Current Visualization</h4>
+<p>
+The <span class="menu-path">View &rarr; Current Visualization</span>
+submenu in the <a href="#MainWindow">Main window</a> selects how
+current flow is depicted on surface patch elements
+(<code class="nec-card">SM</code>/<code class="nec-card">SP</code> cards)
+during animation. This feature requires the OpenGL renderer and is
+only visible when the model contains patch geometry. Five modes are
+available in two categories.</p>
+
+<table>
+<thead>
+<tr><th>Category</th><th>Mode</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr>
+<td rowspan="3">Animated</td>
+<td>Reference Phase</td>
+<td>Chevron arrows advance along segments following the excitation phase (default).</td>
+</tr>
+<tr>
+<td>LIC Texture</td>
+<td>Line-integral-convolution flow field showing current direction as a moving texture.</td>
+</tr>
+<tr>
+<td>Wireframe</td>
+<td>Animated wireframe pattern indicating current magnitude and direction.</td>
+</tr>
+<tr>
+<td rowspan="2">Static</td>
+<td>Polarization Axis</td>
+<td>Fixed arrows showing the polarization direction at each segment.</td>
+</tr>
+<tr>
+<td>Peak Magnitude</td>
+<td>Fixed arrows showing the peak current magnitude direction.</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Animated modes update continuously while the structure display is
+open. The selected mode is persisted in the configuration file.</p>
+
+<h4 id="DrawStyle">Radiation Pattern Draw Style</h4>
+<p>
+The draw style controls how the 3D radiation pattern is rendered.
+It is selectable from
+<span class="menu-path">View &rarr; Draw Style</span> in the
+<a href="#RadiationWindow">Radiation Pattern window</a> or from the
+<a href="#OpenGLSettings">OpenGL Settings</a> dialog.</p>
+
+<dl>
+<dt>Surface</dt>
+<dd>Filled triangulated mesh colored by gain. Provides the clearest
+view of pattern shape and gain distribution.</dd>
+
+<dt>Wireframe</dt>
+<dd>Colored line segments only. Allows seeing through the pattern to
+observe rear lobes and the structure overlay.</dd>
+
+<dt>Both</dt>
+<dd>Surface with wireframe overlay. The surface brightness is
+automatically dimmed so wireframe lines remain visible. This is
+the default.</dd>
+</dl>
+
+<p>
+The <span class="menu-path">View &rarr; Gradient Key</span> toggle
+controls visibility of the color legend bar that maps the gain color
+range. The draw style and gradient key state are persisted in the
+configuration file.</p>
+
 <h3 id="Nec2Treeview">NEC2 Input File Editor</h3>
 <figure>
 <img src="images/nec2_edit.png" class="float-left" alt="NEC2 input file editor window" loading="lazy">
@@ -2027,7 +2270,10 @@ one for editing Comments, one for editing Geometry and one for
 Control Commands. Each tree view has editable rows divided into
 cells that correspond to NEC2 input file's card columns e.g.&nbsp;Card
 Name (<code class="nec-card">CM</code>) - Comment Text or Card Name (<code class="nec-card">GW</code>) - Wire Data (<var>I1</var> <var>I2</var> <var>F1</var> <var>F2</var>
-<var>F3</var> <var>F4</var> <var>F5</var> <var>F6</var> <var>F7</var>) etc. Each row can be edited by selecting it with a
+<var>F3</var> <var>F4</var> <var>F5</var> <var>F6</var> <var>F7</var>) etc. The text of the first
+<code class="nec-card">CM</code> card is displayed in the title bar of
+the Main and Radiation Pattern windows, providing a quick
+identification of the loaded model. Each row can be edited by selecting it with a
 mouse click and then clicking on a cell. This requires detailed
 knowledge of the format of each of the NEC2 input file "cards" and
 so this method is only useful for editing comments.</p>
@@ -2040,7 +2286,21 @@ and clears it. The <span class="ui-button">Save As</span> (<kbd class="shortcut"
 selector dialog for saving the data in the Editor to a NEC2 input
 file. The <span class="ui-button">Save</span> (<kbd class="shortcut">Ctrl+s</kbd>) button writes data in the Editor to
 an already open input file. The <span class="ui-button">Apply</span> check button, when checked,
-signals xnec2c to reload the edited input file for execution.</p>
+signals xnec2c to reload the edited input file for execution.
+The Geometry and Commands tree views each have an
+<span class="ui-button">Add Var (SY)</span> button that creates a
+<a href="#SymbolicVariables">symbolic variable</a>
+<code class="nec-card">SY</code> card for the selected row's numeric
+fields, converting literal values into named parameters.
+SY expressions can also be typed directly into the numeric fields
+of any card editor — for example, entering
+<code>L0/2</code> in the Y2 field of a GW wire editor substitutes
+the half-length at evaluation time.</p>
+
+<figure>
+<img src="images/sy_nec_edit_expressions.png" alt="SY expressions entered directly in NEC2 card editor fields" loading="lazy">
+<figcaption>SY expressions entered directly in NEC2 card editor fields</figcaption>
+</figure>
 <p>Note: In xnec2c versions earlier than <span class="version-tag">v2.0-beta</span>, due to
 the complex file opening process followed by NEC2 (many data sanity
 checks and initializations etc), reloading the input file resulted
@@ -2339,6 +2599,15 @@ across the band as the optimizer tests candidates</li>
 in real time</li>
 <li>The main <strong>Structure</strong> window — see geometry adjust as variables change</li>
 </ul>
+
+<p>
+While the optimizer is running it controls the frequency sweep
+exclusively. The frequency spin buttons in both the Main and
+Radiation Pattern windows are disabled, and frequency plot traces
+turn dark green to indicate that the sweep is managed by the
+optimizer. Clicking in the plot area to select a frequency is also
+blocked during this time. All controls are restored when the
+optimizer finishes or is stopped.</p>
 
 <p>
 For the historical external-optimizer approach (where a separate program modifies the
@@ -2836,7 +3105,14 @@ Xnec2c will monitor the currently open <span class="fileext">.NEC</span> file wh
 changes".  Additionally, you need to tell xnec2c where to write its output
 file.  You can do that with one of the <code>--write-*</code> command-line options
 or by checking one of the boxes in <span class="menu-path">File → Optimization Settings</span> such as
-"After calculation, write &lt;file&gt;<span class="fileext">.csv</span>".</p>
+"After calculation, write <span class="filepath">&lt;file&gt;.csv</span>".
+The checkbox
+"After calculation, write <span class="filepath">&lt;file&gt;-structure.gplot</span>"
+exports a gnuplot-compatible 3D structure file after each evaluation.
+The checkbox
+"After calculation, write <span class="filepath">&lt;file&gt;-patch-currents.csv</span>"
+exports surface patch current data in CSV format.
+All output settings are persisted in the configuration file.</p>
 
 <p>
 Enable the frequency sweep if it is not already turned on:
@@ -2951,6 +3227,96 @@ from <span class="version-tag">v1.0</span>, since xnec2c works in a way that doe
 printing compatible with the NEC2 format. If printing to file is
 needed then it is better to use the original NEC2 program, to avoid
 bugs that may still be lurking in the C translation.</p>
+<h2 id="KeyboardShortcuts">Keyboard Shortcuts</h2>
+<p>
+The following tables summarize all keyboard accelerators. Single-key
+shortcuts are active when the corresponding window has focus.
+Modifier combinations work regardless of widget focus within the window.</p>
+
+<h3>Main Window</h3>
+<table>
+<thead><tr><th>Key</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td><kbd class="shortcut">n</kbd></td><td>File &rarr; New</td></tr>
+<tr><td><kbd class="shortcut">o</kbd></td><td>File &rarr; Open</td></tr>
+<tr><td><kbd class="shortcut">e</kbd></td><td>File &rarr; Edit NEC2 input</td></tr>
+<tr><td><kbd class="shortcut">s</kbd></td><td>File &rarr; Save</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+s</kbd></td><td>File &rarr; Save As</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+q</kbd></td><td>Quit</td></tr>
+<tr><td><kbd class="shortcut">r</kbd></td><td>Open Radiation Pattern window</td></tr>
+<tr><td><kbd class="shortcut">f</kbd></td><td>Open Frequency Data window</td></tr>
+<tr><td><kbd class="shortcut">i</kbd></td><td>Toggle Currents display</td></tr>
+<tr><td><kbd class="shortcut">v</kbd></td><td>Toggle Charges display</td></tr>
+<tr><td><kbd class="shortcut">x</kbd></td><td>X axis view preset</td></tr>
+<tr><td><kbd class="shortcut">y</kbd></td><td>Y axis view preset</td></tr>
+<tr><td><kbd class="shortcut">z</kbd></td><td>Z axis view preset</td></tr>
+<tr><td><kbd class="shortcut">d</kbd></td><td>Default view preset</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+Plus</kbd></td><td>Zoom in</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+Minus</kbd></td><td>Zoom out</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+1</kbd></td><td>Zoom 100%</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+Scroll</kbd></td><td>Adjust wire cylinder scale (OpenGL)</td></tr>
+</tbody>
+</table>
+
+<h3>Radiation Pattern Window</h3>
+<table>
+<thead><tr><th>Key</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td><kbd class="shortcut">n</kbd></td><td>File &rarr; New</td></tr>
+<tr><td><kbd class="shortcut">o</kbd></td><td>File &rarr; Open</td></tr>
+<tr><td><kbd class="shortcut">e</kbd></td><td>File &rarr; Edit NEC2 input</td></tr>
+<tr><td><kbd class="shortcut">s</kbd></td><td>File &rarr; Save</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+s</kbd></td><td>File &rarr; Save As</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+q</kbd></td><td>Quit</td></tr>
+<tr><td><kbd class="shortcut">g</kbd></td><td>Toggle Gain pattern display</td></tr>
+<tr><td><kbd class="shortcut">f</kbd></td><td>Toggle E/H Near Field display</td></tr>
+<tr><td><kbd class="shortcut">X</kbd></td><td>X axis view preset</td></tr>
+<tr><td><kbd class="shortcut">Y</kbd></td><td>Y axis view preset</td></tr>
+<tr><td><kbd class="shortcut">Z</kbd></td><td>Z axis view preset</td></tr>
+<tr><td><kbd class="shortcut">d</kbd></td><td>Default view preset</td></tr>
+<tr><td><kbd class="shortcut">a</kbd></td><td>Apply frequency / recalculate</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+Plus</kbd></td><td>Zoom in</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+Minus</kbd></td><td>Zoom out</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+1</kbd></td><td>Zoom 100%</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+Scroll</kbd></td><td>Adjust wire cylinder scale (OpenGL)</td></tr>
+<tr><td><kbd class="shortcut">Shift+Scroll</kbd></td><td>Scale structure overlay (OpenGL, gain view only)</td></tr>
+</tbody>
+</table>
+
+<h3>Frequency Data Window</h3>
+<table>
+<thead><tr><th>Key</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td><kbd class="shortcut">n</kbd></td><td>File &rarr; New</td></tr>
+<tr><td><kbd class="shortcut">o</kbd></td><td>File &rarr; Open</td></tr>
+<tr><td><kbd class="shortcut">e</kbd></td><td>File &rarr; Edit NEC2 input</td></tr>
+<tr><td><kbd class="shortcut">s</kbd></td><td>File &rarr; Save</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+s</kbd></td><td>File &rarr; Save As</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+q</kbd></td><td>Quit</td></tr>
+<tr><td><kbd class="shortcut">m</kbd></td><td>Toggle Max Gain plot</td></tr>
+<tr><td><kbd class="shortcut">d</kbd></td><td>Toggle Directivity plot</td></tr>
+<tr><td><kbd class="shortcut">w</kbd></td><td>Toggle Net Gain plot</td></tr>
+<tr><td><kbd class="shortcut">v</kbd></td><td>Toggle VSWR plot</td></tr>
+<tr><td><kbd class="shortcut">z</kbd></td><td>Toggle Impedance plot</td></tr>
+<tr><td><kbd class="shortcut">p</kbd></td><td>Toggle S11 plot</td></tr>
+<tr><td><kbd class="shortcut">l</kbd></td><td>Linear frequency scale</td></tr>
+<tr><td><kbd class="shortcut">h</kbd></td><td>Logarithmic frequency scale</td></tr>
+<tr><td><kbd class="shortcut">b</kbd></td><td>Both (linear + log) frequency scale</td></tr>
+</tbody>
+</table>
+
+<h3>NEC2 Editor</h3>
+<table>
+<thead><tr><th>Key</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td><kbd class="shortcut">Ctrl+a</kbd></td><td>Add row</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+r</kbd></td><td>Remove row / Revert</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+s</kbd></td><td>Save</td></tr>
+<tr><td><kbd class="shortcut">Ctrl+Shift+s</kbd></td><td>Save As</td></tr>
+<tr><td><kbd class="shortcut">c</kbd></td><td>Clear selected tree view</td></tr>
+</tbody>
+</table>
+
 <h2 id="Version">Version History (newest first)</h2>
 
 <h3>Version <span class="version-tag">4.4.18</span></h3>
