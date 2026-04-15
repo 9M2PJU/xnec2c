@@ -1010,6 +1010,79 @@ freq_loop_collect_pending( freq_loop_state_t *state )
 }
 
 
+/**
+ * fmhz_save_apply_idle - GTK idle callback to apply reset fmhz_save via
+ *     user_set_frequency (the single point of truth for frequency selection).
+ */
+static void
+fmhz_save_apply_idle(gpointer data)
+{
+  (void)data;
+  user_set_frequency(calc_data.fmhz_save);
+}
+
+/**
+ * fmhz_save_reset_if_stale - reset stale green-line frequency to best-VSWR step
+ *
+ * When fmhz_save falls outside every FR card range (e.g. after loading a
+ * different NEC2 file while the config retains the old frequency), replaces
+ * it with the sweep frequency that has the lowest VSWR.
+ *
+ * Called from freq_loop_finalize after all sweep data is valid.
+ *
+ * Returns TRUE when fmhz_save was reset, signalling the caller to skip
+ * its normal display-step logic (user_set_frequency handles the UI update).
+ */
+static gboolean
+fmhz_save_reset_if_stale(void)
+{
+  if (calc_data.fmhz_save <= 0.0 || isnan(calc_data.fmhz_save) || calc_data.FR_cards < 1)
+    return FALSE;
+
+  /* Check whether fmhz_save falls within any FR card range */
+  for (int fr = 0; fr < calc_data.FR_cards; fr++)
+  {
+    freq_loop_data_t *fld = &calc_data.freq_loop_data[fr];
+    if (calc_data.fmhz_save >= fld->min_freq - 1e-6
+        && calc_data.fmhz_save <= fld->max_freq + 1e-6)
+      return FALSE;
+  }
+
+  /* fmhz_save is outside all FR card ranges; find lowest-VSWR step */
+  double best_vswr = 1e30;
+  int best_step = 0;
+  measurement_t meas;
+
+  for (int idx = 0; idx < calc_data.steps_total; idx++)
+  {
+    if (!save.fstep[idx])
+      continue;
+
+    meas_calc(&meas, idx);
+
+    if (!isnan(meas.vswr) && meas.vswr >= 0.0 && meas.vswr < best_vswr)
+    {
+      best_vswr = meas.vswr;
+      best_step = idx;
+    }
+  }
+
+  /* No valid steps computed; leave fmhz_save unchanged */
+  if (best_vswr >= 1e30)
+    return FALSE;
+
+  pr_notice("fmhz_save %.4f MHz outside FR card ranges; reset to %.4f MHz (VSWR %.2f)\n",
+    calc_data.fmhz_save, save.freq[best_step], best_vswr);
+
+  calc_data.fmhz_save = save.freq[best_step];
+  SetFlag(PLOT_FREQ_LINE);
+
+  /* Queue the full UI update on the GTK main thread via the single
+   * point of truth for user-selected frequency changes. */
+  g_idle_add_once((GSourceOnceFunc)fmhz_save_apply_idle, NULL);
+  return TRUE;
+}
+
 /*
  * freq_loop_finalize - complete a finished sweep
  * @state: loop state (for elapsed-time calculation)
@@ -1034,14 +1107,20 @@ freq_loop_finalize( freq_loop_state_t *state )
   /* Wake optimizer thread waiting on eval_cond */
   nec2_eval_signal();
 
-  /* Green line visible on frequency plot if its data was computed */
-  if( calc_data.fmhz_save > 0.0 && save.fstep[calc_data.steps_total] )
-    SetFlag( PLOT_FREQ_LINE );
+  /* Reset stale green-line frequency to best-VSWR sweep step;
+   * when reset occurs, fmhz_save_reset_if_stale queues user_set_frequency
+   * on the GTK main thread which handles all UI updates. */
+  if( !fmhz_save_reset_if_stale() )
+  {
+    /* Green line visible on frequency plot if its data was computed */
+    if( calc_data.fmhz_save > 0.0 && save.fstep[calc_data.steps_total] )
+      SetFlag( PLOT_FREQ_LINE );
 
-  int display = freq_loop_display_step();
-  if( display >= 0 )
-    g_idle_add_once( (GSourceOnceFunc)freq_step_update_ui_idle_force,
-                          GINT_TO_POINTER(display) );
+    int display = freq_loop_display_step();
+    if( display >= 0 )
+      g_idle_add_once( (GSourceOnceFunc)freq_step_update_ui_idle_force,
+                            GINT_TO_POINTER(display) );
+  }
 
   if( (rc_config.batch_mode || isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS)) &&
       opt_have_files_to_save() )
