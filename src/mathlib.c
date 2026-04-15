@@ -877,7 +877,7 @@ void mathlib_benchmark(int slow)
 		 "Detailed timing will be provided in the terminal.\n"
 		 "\n"
 		 "Notes:\n"
-		 "* Only one Intel MKL library can be tested without restarting xnec2c, so select which one you wish"
+		 "* Only one Intel MKL library can be tested without restarting xnec2c, so select which one you wish "
 		 "to benchmark before proceeding or it will choose the first in the list and skip the rest.\n\n"
 		 "* Thread congestion will occur for multi-threaded libraries when using the -j N option if there are not enough "
 		 "CPUs available to accommodate the forked processes in combination with library threads.  Consider reducing the value of -j N for "
@@ -889,8 +889,7 @@ void mathlib_benchmark(int slow)
 		 "  * OMP_NUM_THREADS=N\t\t# OpenMP thread limit\n"
 		 "  * MKL_NUM_THREADS=N\t\t# Intel MKL thread limit\n"
 		 "\n"
-		 "Click OK to proceed, this dialog will close when complete."),
-		 GTK_BUTTONS_OK_CANCEL);
+		 "Click OK to proceed, this dialog will close when complete."));
 
 	if (response != GTK_RESPONSE_OK)
 		return;
