@@ -7,7 +7,7 @@ xnec2c \- a GTK+ graphical interactive version of nec2c,
 a translation to C of the FORTRAN application NEC2
 .SH SYNOPSIS
 .IP
-.B xnec2c [\-ijhvPVb]
+.B xnec2c [\-bcCdijhqvPV]
 \fI\,<input-file-name>\/\fR
 .SH DESCRIPTION
 .PD 0
@@ -36,7 +36,7 @@ a translation to C of the FORTRAN application NEC2
 .IP
 \-d|\-\-debug:        enable debug output (-dd includes backtraces)
 .IP
-\-d|\-\-quiet:        suppress debug/verbose output
+\-q|\-\-quiet:        suppress debug/verbose output
 .IP
 \-\-optimize:         Activate the optimizer immediately.
 .IP
@@ -69,6 +69,19 @@ specify on the command line will not be written.
 .IP
 \-\-write\-patch\-currents   <filename>  \- write CSV of patch surface currents
 .IP
+.SH "ENVIRONMENT"
+.TP
+.B LANGUAGE
+Override the system locale for message translation.
+For example,
+.B LANGUAGE=de xnec2c
+selects German.
+.TP
+.B XNEC2C_LOCALEDIR
+Override the compiled-in locale directory.
+Set this to the directory containing the
+.I LC_MESSAGES
+trees when the default path does not match your installation.
 .SH "SEE ALSO"
 Full documentation is available at the official website for xnec2c
 .URL "https://www.xnec2c.org/" "Official xnec2c Website" .
