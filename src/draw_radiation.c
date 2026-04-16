@@ -51,6 +51,8 @@ static double cached_r_range = 1.0;
  * Allows renderers to track independently whether data has changed */
 static unsigned int rdpat_gen_counter = 0;
 
+static double Viewer_Noise_Value(projection_parameters_t proj_parameters, int fstep);
+
 /*-----------------------------------------------------------------------*/
 
 /* Scale_Gain()
@@ -346,11 +348,21 @@ Update_Rdpattern_UI(void)
           rdpattern_window_builder, "rdpattern_colorcode_minlabel")),
       txt );
 
-  /* Show gain in direction of viewer */
-  Show_Viewer_Gain(
-      rdpattern_window_builder,
-      "rdpattern_viewer_gain",
-      rdpattern_proj_params );
+  /* Show gain (dBi) or noise density (K/sr) in direction of viewer */
+  if (IS_NOISE_MODE(rc_config.gain_style))
+  {
+    double ksr = Viewer_Noise_Value(rdpattern_proj_params, fstep);
+    snprintf(txt, sizeof(txt) - 1, "%.2f", ksr);
+    gtk_entry_set_text(GTK_ENTRY(Builder_Get_Object(
+            rdpattern_window_builder, "rdpattern_viewer_gain")), txt);
+  }
+  else
+  {
+    Show_Viewer_Gain(
+        rdpattern_window_builder,
+        "rdpattern_viewer_gain",
+        rdpattern_proj_params);
+  }
 
   /* Display frequency step */
   if( calc_data.freq_step >= 0 )
@@ -1770,6 +1782,115 @@ Inverse_Scale_Gain(double scaled_val)
 
   return db_val;
 }
+
+/**
+ * Viewer_Noise_Value() - noise temperature density at the viewer direction
+ * @proj_parameters: projection parameters defining viewer angle
+ * @fstep:           frequency step index
+ *
+ * Returns the K/sr noise density for the pattern cell visually at the
+ * viewer direction.  When ant_temp_elevation is non-zero, the 3D pattern
+ * is rendered with a Rodrigues rotation; this function applies the inverse
+ * rotation to find the correct unrotated pattern cell.
+ *
+ * Returns 0.0 when the direction is occluded by a ground plane or when
+ * noise environment resolution fails.
+ */
+static double
+Viewer_Noise_Value(projection_parameters_t proj_parameters, int fstep)
+{
+	double phi_deg, theta_deg;
+	int nth, nph, idx, pol;
+
+	if (!rad_pattern)
+		return 0.0;
+
+	pol = calc_data.pol_type;
+	if (pol < 0 || pol >= NUM_POL)
+		return 0.0;
+
+	/* Convert viewer angles to NEC (theta, phi) in degrees,
+	 * same coordinate mapping as Viewer_Gain(). */
+	phi_deg = proj_parameters.Wr;
+	if (fpat.dth == 0.0)
+	{
+		theta_deg = fpat.thets;
+	}
+	else
+	{
+		theta_deg = fabs(90.0 - proj_parameters.Wi);
+		if (theta_deg > 180.0)
+		{
+			theta_deg = 360.0 - theta_deg;
+			phi_deg -= 180.0;
+		}
+	}
+
+	/* When elevation is non-zero, the 3D pattern is visually rotated
+	 * via ant_temp_rotate_point().  Apply the inverse rotation (negated
+	 * angle) to map the viewer direction back to unrotated pattern
+	 * coordinates so the readout matches the cell on screen. */
+	double elev_deg = rc_config.ant_temp_elevation;
+	if (elev_deg != 0.0)
+	{
+		double tht_mg = rad_pattern[fstep].max_gain_tht[pol] * M_PI / 180.0;
+		double phi_mg = rad_pattern[fstep].max_gain_phi[pol] * M_PI / 180.0;
+		double elev_rad = elev_deg * M_PI / 180.0;
+
+		double tht_rad = theta_deg * M_PI / 180.0;
+		double phi_rad = phi_deg * M_PI / 180.0;
+
+		double xr, yr, zr;
+		ant_temp_rotate_point(tht_rad, phi_rad,
+			tht_mg, phi_mg, -elev_rad,
+			&xr, &yr, &zr);
+
+		if (zr > 1.0)
+			zr = 1.0;
+		else if (zr < -1.0)
+			zr = -1.0;
+
+		theta_deg = acos(zr) * 180.0 / M_PI;
+		phi_deg = atan2(yr, xr) * 180.0 / M_PI;
+		if (phi_deg < 0.0)
+			phi_deg += 360.0;
+	}
+
+	/* Ground-plane occlusion on the resolved direction */
+	if ((gnd.ksymp == 2) &&
+		(theta_deg > 90.01) &&
+		(gnd.ifar != 1))
+		return 0.0;
+
+	/* Snap to pattern grid */
+	if (fpat.dth == 0.0)
+		nth = 0;
+	else
+	{
+		nth = (int)((theta_deg - fpat.thets) / fpat.dth + 0.5);
+		if (nth >= fpat.nth || nth < 0)
+			nth = fpat.nth - 1;
+	}
+
+	if (fpat.dph == 0.0)
+		nph = 0;
+	else
+	{
+		while (phi_deg < 0.0)
+			phi_deg += 360.0;
+		nph = (int)((phi_deg - fpat.phis) / fpat.dph + 0.5);
+		if (nph >= fpat.nph || nph < 0)
+			nph = fpat.nph - 1;
+	}
+
+	idx = nth + nph * fpat.nth;
+	double gain = rad_pattern[fstep].gtot[idx]
+		+ Polarization_Factor(pol, fstep, idx);
+
+	return Inverse_Scale_Gain(Scale_Gain(gain, fstep, idx));
+}
+
+/*-----------------------------------------------------------------------*/
 
 /* Draw_Color_Legend_Overlay()
  *
