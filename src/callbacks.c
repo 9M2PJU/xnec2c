@@ -32,6 +32,10 @@
 #include "opengl/opengl_settings.h"
 
 static void common_projection_share_arcball(void);
+static void noise_model_menus_populate(void);
+static void noise_interp_menu_set_active(int method);
+static void noise_interp_update_sensitivity(void);
+static void noise_interp_auto_switch(int fallback);
 #endif
 
 /* Action flag for NEC2 "card" editors */
@@ -704,17 +708,8 @@ on_main_rdpattern_activate(
     /* Restore gain style */
     Set_Gain_Style(rc_config.gain_style);
 
-    /* Restore noise environment radio item */
-    {
-      int env = rc_config.ant_temp_env;
-      if (env >= 0 && env < ANT_TEMP_ENV_COUNT)
-      {
-        widget = Builder_Get_Object(
-            rdpattern_window_builder, (gchar *)noise_env_widget_ids[env]);
-        gtk_check_menu_item_set_active(
-            GTK_CHECK_MENU_ITEM(widget), TRUE);
-      }
-    }
+    /* Populate and restore noise model sub-menus */
+    noise_model_menus_populate();
 
     /* Restore elevation spinbutton */
     widget = Builder_Get_Object(
@@ -1979,29 +1974,227 @@ on_rdpattern_noise_temp_log_activate(
     Set_Gain_Style( GS_NOISE_LOG );
 }
 
-/* Noise environment radio menu item callback — single handler for all models */
-
-  void
-on_rdpattern_noise_env_activate(
-    GtkMenuItem *menuitem, gpointer user_data)
+/**
+ * noise_interp_menu_set_active() - sync interp radio to given method
+ * @method: ant_temp_method_t value to activate
+ *
+ * Searches the flat noise model menu for interp radio items tagged
+ * with "interp-idx" and activates the matching one.
+ */
+static void
+noise_interp_menu_set_active(int method)
 {
-  if( !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+  GtkWidget *menu = Builder_Get_Object(
+      rdpattern_window_builder, "rdpattern_noise_env_menu_menu");
+  if (!menu)
     return;
 
-  /* Match activated widget against known radio items */
-  for (int i = 0; i < ANT_TEMP_ENV_COUNT; i++)
+  GList *children = gtk_container_get_children(GTK_CONTAINER(menu));
+  for (GList *l = children; l; l = l->next)
   {
-    GtkWidget *w = Builder_Get_Object(
-        rdpattern_window_builder, (gchar *)noise_env_widget_ids[i]);
-    if (GTK_WIDGET(menuitem) == w)
+    gpointer data = g_object_get_data(G_OBJECT(l->data), "interp-idx");
+    if (!data)
+      continue;
+
+    /* Stored as index+1 so that index 0 is distinguishable from NULL */
+    int idx = GPOINTER_TO_INT(data) - 1;
+    if (idx == method)
     {
-      rc_config.ant_temp_env = i;
-      New_Radiation_Projection_Angle();
-      return;
+      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(l->data), TRUE);
+      break;
     }
   }
+  g_list_free(children);
+}
 
-  pr_warn("noise env activate: no matching widget found\n");
+/**
+ * noise_interp_update_sensitivity() - enable/disable interp menu items
+ *
+ * Computes the union of valid_interp bitmasks from the currently
+ * selected sky and earth models.  Sets each interpolation menu item
+ * sensitive if its method bit is present in the union.
+ */
+static void
+noise_interp_update_sensitivity(void)
+{
+  GtkWidget *menu = Builder_Get_Object(
+      rdpattern_window_builder, "rdpattern_noise_env_menu_menu");
+  if (!menu)
+    return;
+
+  uint8_t allowed = sky_models[rc_config.ant_temp_sky].valid_interp
+      | earth_models[rc_config.ant_temp_earth].valid_interp;
+
+  GList *children = gtk_container_get_children(GTK_CONTAINER(menu));
+  for (GList *l = children; l; l = l->next)
+  {
+    gpointer data = g_object_get_data(G_OBJECT(l->data), "interp-idx");
+    if (!data)
+      continue;
+
+    int idx = GPOINTER_TO_INT(data) - 1;
+    gtk_widget_set_sensitive(GTK_WIDGET(l->data),
+        (allowed & ANT_TEMP_METHOD_BIT(idx)) != 0);
+  }
+  g_list_free(children);
+}
+
+/**
+ * noise_interp_auto_switch() - validate interp against current models
+ * @fallback: method to switch to if current interp is invalid
+ *
+ * Computes the union of valid interp methods from the selected sky
+ * and earth models.  If the current interp is outside that set,
+ * switches to the fallback.  Updates menu sensitivity and active item.
+ */
+static void
+noise_interp_auto_switch(int fallback)
+{
+  /* Clamp fallback to menu-visible methods; formula/galactic models
+   * pass their intrinsic method which has no menu radio item */
+  if (fallback != ANT_TEMP_SNAP && fallback != ANT_TEMP_INTERP)
+    fallback = ANT_TEMP_INTERP;
+
+  uint8_t allowed = sky_models[rc_config.ant_temp_sky].valid_interp
+      | earth_models[rc_config.ant_temp_earth].valid_interp;
+  if (!(allowed & ANT_TEMP_METHOD_BIT(rc_config.ant_temp_interp)))
+    rc_config.ant_temp_interp = fallback;
+  noise_interp_update_sensitivity();
+  noise_interp_menu_set_active(rc_config.ant_temp_interp);
+}
+
+/* Noise model radio menu item callbacks — one per selector */
+
+static void
+on_noise_sky_activate(GtkCheckMenuItem *item, gpointer user_data)
+{
+  if (!gtk_check_menu_item_get_active(item))
+    return;
+
+  int idx = GPOINTER_TO_INT(user_data);
+  rc_config.ant_temp_sky = idx;
+  noise_interp_auto_switch(sky_models[idx].method);
+  New_Radiation_Projection_Angle();
+}
+
+static void
+on_noise_earth_activate(GtkCheckMenuItem *item, gpointer user_data)
+{
+  if (!gtk_check_menu_item_get_active(item))
+    return;
+
+  int idx = GPOINTER_TO_INT(user_data);
+  rc_config.ant_temp_earth = idx;
+  noise_interp_auto_switch(earth_models[idx].method);
+  New_Radiation_Projection_Angle();
+}
+
+static void
+on_noise_interp_activate(GtkCheckMenuItem *item, gpointer user_data)
+{
+  if (!gtk_check_menu_item_get_active(item))
+    return;
+
+  rc_config.ant_temp_interp = GPOINTER_TO_INT(user_data);
+  New_Radiation_Projection_Angle();
+}
+
+/**
+ * noise_menu_append_separator() - add a separator to the noise menu
+ * @menu: target GtkMenuShell
+ */
+static void
+noise_menu_append_separator(GtkWidget *menu)
+{
+  GtkWidget *sep = gtk_separator_menu_item_new();
+  gtk_widget_show(sep);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep);
+}
+
+/**
+ * noise_menu_append_heading() - add a disabled label as section heading
+ * @menu:  target GtkMenuShell
+ * @label: heading text
+ */
+static void
+noise_menu_append_heading(GtkWidget *menu, const char *label)
+{
+  GtkWidget *item = gtk_menu_item_new_with_label(label);
+  gtk_widget_set_sensitive(item, FALSE);
+  gtk_widget_show(item);
+  gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+}
+
+/**
+ * noise_model_menus_populate() - build radio items in noise model menu
+ *
+ * Populates the flat noise model menu from the model registries,
+ * separated by section headings and GtkSeparatorMenuItems.
+ * Sets active items from rc_config.  Called once when the
+ * rdpattern window opens.
+ */
+static void
+noise_model_menus_populate(void)
+{
+  GtkWidget *menu = Builder_Get_Object(
+      rdpattern_window_builder, "rdpattern_noise_env_menu_menu");
+
+  GSList *sky_group = NULL;
+  GSList *earth_group = NULL;
+  GSList *interp_group = NULL;
+
+  /* Sky models */
+  noise_menu_append_heading(menu, "Sky Model");
+  for (int i = 0; i < ANT_TEMP_SKY_COUNT; i++)
+  {
+    GtkWidget *item = gtk_radio_menu_item_new_with_label(sky_group, sky_models[i].name);
+    sky_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+    if (i == rc_config.ant_temp_sky)
+      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), TRUE);
+    g_signal_connect(item, "toggled",
+        G_CALLBACK(on_noise_sky_activate), GINT_TO_POINTER(i));
+    gtk_widget_show(item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+  }
+
+  /* Earth models */
+  noise_menu_append_separator(menu);
+  noise_menu_append_heading(menu, "Earth Model");
+  for (int i = 0; i < ANT_TEMP_EARTH_COUNT; i++)
+  {
+    GtkWidget *item = gtk_radio_menu_item_new_with_label(earth_group, earth_models[i].name);
+    earth_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+    if (i == rc_config.ant_temp_earth)
+      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), TRUE);
+    g_signal_connect(item, "toggled",
+        G_CALLBACK(on_noise_earth_activate), GINT_TO_POINTER(i));
+    gtk_widget_show(item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+  }
+
+  /* Interpolation method (user-selectable for table models only;
+   * formula and galactic are intrinsic to their models) */
+  noise_menu_append_separator(menu);
+  noise_menu_append_heading(menu, "Interpolation");
+  for (int i = 0; i < ANT_TEMP_METHOD_COUNT; i++)
+  {
+    if (i == ANT_TEMP_FORMULA || i == ANT_TEMP_GALACTIC)
+      continue;
+
+    GtkWidget *item = gtk_radio_menu_item_new_with_label(
+        interp_group, ant_temp_method_names[i]);
+    interp_group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+    /* Store index+1 so that index 0 is distinguishable from NULL */
+    g_object_set_data(G_OBJECT(item), "interp-idx", GINT_TO_POINTER(i + 1));
+    if (i == rc_config.ant_temp_interp)
+      gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(item), TRUE);
+    g_signal_connect(item, "toggled",
+        G_CALLBACK(on_noise_interp_activate), GINT_TO_POINTER(i));
+    gtk_widget_show(item);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+  }
+
+  noise_interp_update_sensitivity();
 }
 
 

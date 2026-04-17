@@ -3,68 +3,187 @@
 
 #define clog10(z) (clog(z) / log(10))
 
-/* Antenna temperature environment models */
-typedef enum
-{
-	ANT_TEMP_ENV_VE7BQH_RURAL       = 0,
-	ANT_TEMP_ENV_VE7BQH_RESIDENTIAL = 1,
-	ANT_TEMP_ENV_VE7BQH_CITY        = 2,
-	ANT_TEMP_ENV_G4CQM_BASELINE     = 3,
-	ANT_TEMP_ENV_ITU_BUSINESS       = 4,
-	ANT_TEMP_ENV_ITU_RESIDENTIAL    = 5,
-	ANT_TEMP_ENV_ITU_RURAL          = 6,
-	ANT_TEMP_ENV_ITU_QUIET_RURAL    = 7,
-} ant_temp_env_t;
-
-const char *ant_temp_env_names[ANT_TEMP_ENV_COUNT] = {
-	"VE7BQH Rural",
-	"VE7BQH Residential",
-	"VE7BQH City",
-	"G4CQM Baseline",
-	"ITU-R Business",
-	"ITU-R Residential",
-	"ITU-R Rural",
-	"ITU-R Quiet Rural",
+/* Interpolation method names for config and UI */
+const char *ant_temp_method_names[ANT_TEMP_METHOD_COUNT] = {
+	[ANT_TEMP_SNAP]     = "Snap",
+	[ANT_TEMP_INTERP]   = "Interpolate",
+	[ANT_TEMP_FORMULA]  = "Formula",
+	[ANT_TEMP_GALACTIC] = "Galactic",
 };
 
-/* Glade widget IDs for noise environment radio menu items,
- * indexed by ant_temp_env_t (0..ANT_TEMP_ENV_COUNT-1) */
-const char *noise_env_widget_ids[ANT_TEMP_ENV_COUNT] = {
-	"rdpattern_env_ve7bqh_rural",
-	"rdpattern_env_ve7bqh_residential",
-	"rdpattern_env_ve7bqh_city",
-	"rdpattern_env_g4cqm_baseline",
-	"rdpattern_env_itu_business",
-	"rdpattern_env_itu_residential",
-	"rdpattern_env_itu_rural",
-	"rdpattern_env_itu_quiet_rural",
-};
-
-/* VE7BQH 2024 — [env][band]: 0=Rural 1=Residential 2=City;
- * 0=50MHz 1=144MHz 2=432MHz */
+/* DG7YBN Era 3 (2025-08-29) — [env][band]: 0=Rural 1=Residential 2=City;
+ * 0=50MHz 1=144MHz 2=432MHz
+ *
+ * Sky: galactic average from DG7YBN Ant_Temp page
+ * Earth 50/144: ITU-R P.372-16 §6 pp.98-100
+ * Earth 432 Rural: URSI No.334 (Lefering/Ghent/OFCOM 2010)
+ * dg7ybn.de/GT_Tables/Download/VE7BQH_Tables_White_Paper_2025_09_07.pdf */
 static const double ve7bqh_sky[3]    = { 5640.0,  290.0,  27.0 };
 static const double ve7bqh_mhz[3]    = {   50.0,  144.0, 432.0 };
 static const double ve7bqh_earth[3][3] = {
-	/* Rural */       {  29640.0,  1600.0,  460.0 },
+	/* Rural */       {  29640.0,  1600.0,  760.0 },
 	/* Residential */ { 100600.0,  5400.0, 1800.0 },
-	/* City */        { 271000.0, 14500.0, 7900.0 },
+	/* City */        { 271000.0, 14550.0, 7900.0 },
 };
 
-/* G4CQM historical baseline — single environment */
+/* G4CQM historical baseline (pre-2016) — single environment
+ * g4cqm.co.uk (labeled "VK3UM's Calc compliance") */
 #define G4CQM_NPTS 5
 static const double g4cqm_mhz[G4CQM_NPTS]   = {   50.0, 144.0, 222.0,  432.0, 1296.0 };
 static const double g4cqm_sky[G4CQM_NPTS]    = { 2200.0, 250.0,  70.0,   20.0,   10.0 };
 static const double g4cqm_earth[G4CQM_NPTS]  = { 3000.0,1000.0, 600.0,  350.0,  290.0 };
 
-/* ITU-R P.372 formula coefficients
- * T_earth(K) = 290 * (pow(10, (c - d*log10(f_MHz))/10) - 1)
- * Valid 0.3–250 MHz */
-typedef struct { double c; double d; } itu_coeffs_t;
-static const itu_coeffs_t itu_coeffs[4] = {
-	/* Business    */ { 76.8, 27.7 },
-	/* Residential */ { 72.5, 27.7 },
-	/* Rural       */ { 67.2, 27.7 },
-	/* Quiet Rural */ { 53.6, 28.6 },
+/* VK3UM minimum quiet sky (pre-2016)
+ * Doug McArthur VK3UM (SK 2016), sm2cew.com/rpc.pdf */
+#define VK3UM_NPTS 6
+static const double vk3um_mhz[VK3UM_NPTS] = {   50.0, 144.0, 220.0,  432.0,  900.0, 1296.0 };
+static const double vk3um_sky[VK3UM_NPTS]  = { 2200.0, 250.0, 150.0,   15.0,   10.0,    5.0 };
+
+/* VE7BQH Base Reference (pre-2018, frozen)
+ * Original VE7BQH estimates before ITU-R P.372 adoption.
+ * Used as normalization baseline in F5FOD AGTC-JS. */
+#define BASE_REF_NPTS 3
+static const double base_ref_mhz[BASE_REF_NPTS]   = {   50.0, 144.0, 432.0 };
+static const double base_ref_sky[BASE_REF_NPTS]    = { 1700.0, 200.0,  20.0 };
+static const double base_ref_earth[BASE_REF_NPTS]  = { 9000.0,1000.0, 350.0 };
+
+/* Synthesized sky models — shared frequency grid (2026-04 analysis)
+ * Frequencies from NTIA/ITS measurement campaigns:
+ *   112.5, 221.5, 401 MHz: TR-11-478 (Wepman & Sanders, 2011)
+ *   137.5, 402.5, 761 MHz: TR-02-390 (Achatz & Dalke, 2001)
+ * Values derived in debug/plot_proposed_models.py */
+#define SYNTH_NPTS 17
+static const double synth_mhz[SYNTH_NPTS] = {
+	50.0, 100.0, 112.5, 137.5, 144.0, 220.0, 222.0, 250.0,
+	401.0, 402.5, 408.0, 432.0, 500.0, 761.0, 900.0, 1000.0, 1296.0
+};
+static const double synth_avg_sky[SYNTH_NPTS] = {
+	5640.0, 1139.0, 830.0, 480.0, 290.0, 138.0, 131.0, 97.0,
+	28.0, 27.0, 25.0, 27.0, 22.0, 12.0, 11.0, 11.0, 10.0
+};
+static const double synth_min_sky[SYNTH_NPTS] = {
+	2200.0, 480.0, 370.0, 280.0, 250.0, 70.0, 70.0, 56.0,
+	22.0, 21.0, 21.0, 20.0, 17.0, 13.0, 12.0, 12.0, 10.0
+};
+
+/* Sky model registry (ascending year) */
+const ant_temp_model_t sky_models[ANT_TEMP_SKY_COUNT] = {
+	[ANT_TEMP_SKY_G4CQM_MIN] = {
+		.name = "G4CQM Min Quiet (pre-2016)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = g4cqm_mhz, .temp = g4cqm_sky, .freq_count = G4CQM_NPTS,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_SKY_VK3UM_MIN] = {
+		.name = "VK3UM Min Quiet (pre-2016)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = vk3um_mhz, .temp = vk3um_sky, .freq_count = VK3UM_NPTS,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_SKY_BASE_REF] = {
+		.name = "VE7BQH Base Ref (pre-2018)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = base_ref_mhz, .temp = base_ref_sky, .freq_count = BASE_REF_NPTS,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_SKY_GALACTIC] = {
+		.name = "Galactic P.372 (2022)",
+		.method = ANT_TEMP_GALACTIC,
+		.c = 52.0, .d = 23.0,
+		.freq_break = 100.0, .power_exponent = -2.75, .power_offset = 2.7,
+
+	},
+	[ANT_TEMP_SKY_DG7YBN_AVG] = {
+		.name = "DG7YBN Galactic Avg (2025)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = ve7bqh_mhz, .temp = ve7bqh_sky, .freq_count = 3,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_SKY_SYNTH_AVG] = {
+		.name = "Synth Practical Avg (2026)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = synth_mhz, .temp = synth_avg_sky, .freq_count = SYNTH_NPTS,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_SKY_SYNTH_MIN] = {
+		.name = "Synth Min Quiet (2026)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = synth_mhz, .temp = synth_min_sky, .freq_count = SYNTH_NPTS,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+};
+
+/* Earth model registry (ascending year) */
+const ant_temp_model_t earth_models[ANT_TEMP_EARTH_COUNT] = {
+	[ANT_TEMP_EARTH_ITU_BUSINESS] = {
+		.name = "ITU-R Business (1974)",
+		.method = ANT_TEMP_FORMULA,
+		.c = 76.8, .d = 27.7,
+
+		/* Formula is intrinsic; no user-selectable interp override */
+	},
+	[ANT_TEMP_EARTH_ITU_RESIDENTIAL] = {
+		.name = "ITU-R Residential (1974)",
+		.method = ANT_TEMP_FORMULA,
+		.c = 72.5, .d = 27.7,
+
+		/* Formula is intrinsic; no user-selectable interp override */
+	},
+	[ANT_TEMP_EARTH_ITU_RURAL] = {
+		.name = "ITU-R Rural (1974)",
+		.method = ANT_TEMP_FORMULA,
+		.c = 67.2, .d = 27.7,
+
+		/* Formula is intrinsic; no user-selectable interp override */
+	},
+	[ANT_TEMP_EARTH_ITU_QUIET_RURAL] = {
+		.name = "ITU-R Quiet Rural (1974)",
+		.method = ANT_TEMP_FORMULA,
+		.c = 53.6, .d = 28.6,
+
+		/* Formula is intrinsic; no user-selectable interp override */
+	},
+	[ANT_TEMP_EARTH_G4CQM_MIXED] = {
+		.name = "G4CQM Mixed (pre-2016)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = g4cqm_mhz, .temp = g4cqm_earth, .freq_count = G4CQM_NPTS,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_EARTH_BASE_REF] = {
+		.name = "VE7BQH Base Ref (pre-2018)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = base_ref_mhz, .temp = base_ref_earth, .freq_count = BASE_REF_NPTS,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_EARTH_DG7YBN_RURAL] = {
+		.name = "DG7YBN Rural (2025)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = ve7bqh_mhz, .temp = ve7bqh_earth[0], .freq_count = 3,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL] = {
+		.name = "DG7YBN Residential (2025)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = ve7bqh_mhz, .temp = ve7bqh_earth[1], .freq_count = 3,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_EARTH_DG7YBN_CITY] = {
+		.name = "DG7YBN City (2025)",
+		.method = ANT_TEMP_INTERP,
+		.freq_mhz = ve7bqh_mhz, .temp = ve7bqh_earth[2], .freq_count = 3,
+
+		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
 };
 
 /**
@@ -103,65 +222,111 @@ static double ant_temp_log_interp(double freq_mhz,
 }
 
 /**
- * ant_temp_resolve() - resolve sky and earth brightness temperatures
- * @freq_mhz:  operating frequency in MHz
- * @env:       ANT_TEMP_ENV_* index
- * @t_sky:     output sky brightness temperature (K)
- * @t_earth:   output earth/man-made noise temperature (K)
+ * ant_temp_eval() - evaluate a single noise model at a frequency
+ * @m:       model descriptor (sky or earth)
+ * @freq:    operating frequency in MHz
+ * @interp:  user-selected interpolation override (ANT_TEMP_SNAP or ANT_TEMP_INTERP);
+ *           ignored when model method is FORMULA or GALACTIC
  *
- * Returns 0 on success, -1 if env/freq combination is invalid.
+ * Returns temperature in Kelvin, or -1.0 on error.
  */
-int ant_temp_resolve(double freq_mhz, int env,
-	double *t_sky, double *t_earth)
+static double ant_temp_eval(const ant_temp_model_t *m, double freq, int interp)
 {
-	if (env < 0 || env >= ANT_TEMP_ENV_COUNT)
-		return -1;
-
-	ant_temp_env_t e = (ant_temp_env_t)env;
-
-	/* VE7BQH: nearest band anchor */
-	if (e <= ANT_TEMP_ENV_VE7BQH_CITY)
+	/* Determine effective method: formula/galactic models override interp;
+	 * table models honor the user's snap/interp choice */
+	ant_temp_method_t method = m->method;
+	if (method == ANT_TEMP_SNAP || method == ANT_TEMP_INTERP)
 	{
-		int b = 0;
-		double best = fabs(freq_mhz - ve7bqh_mhz[0]);
-		for (int i = 1; i < 3; i++)
+		if (interp == ANT_TEMP_SNAP || interp == ANT_TEMP_INTERP)
+			method = (ant_temp_method_t)interp;
+	}
+
+	switch (method)
+	{
+	case ANT_TEMP_SNAP:
 		{
-			double d = fabs(freq_mhz - ve7bqh_mhz[i]);
-			if (d < best)
+			int b = 0;
+			double best = fabs(freq - m->freq_mhz[0]);
+			for (int i = 1; i < m->freq_count; i++)
 			{
-				best = d;
-				b = i;
+				double dist = fabs(freq - m->freq_mhz[i]);
+				if (dist < best)
+				{
+					best = dist;
+					b = i;
+				}
+			}
+			return m->temp[b];
+		}
+
+	case ANT_TEMP_INTERP:
+		return ant_temp_log_interp(freq, m->freq_mhz, m->temp, m->freq_count);
+
+	case ANT_TEMP_FORMULA:
+		{
+			/* F_am = c - d·log10(f), T = 290·(10^(F/10) - 1) */
+			double fam = m->c - m->d * log10(freq);
+			double t = 290.0 * (pow(10.0, fam / 10.0) - 1.0);
+
+			/* Thermodynamic floor: earth brightness cannot fall below
+			 * ground thermal emission (~290 K) */
+			if (t < 290.0)
+				t = 290.0;
+			return t;
+		}
+
+	case ANT_TEMP_GALACTIC:
+		{
+			if (freq <= m->freq_break)
+			{
+				/* P.372-16 eq.13: log-linear, same form as man-made */
+				double fam = m->c - m->d * log10(freq);
+				return 290.0 * pow(10.0, fam / 10.0);
+			}
+			else
+			{
+				/* P.372-16 eq.14: power-law scaling from break frequency */
+				double fam_break = m->c - m->d * log10(m->freq_break);
+				double t_break = 290.0 * pow(10.0, fam_break / 10.0);
+				return (t_break - m->power_offset)
+					* pow(freq / m->freq_break, m->power_exponent)
+					+ m->power_offset;
 			}
 		}
-		*t_sky   = ve7bqh_sky[b];
-		*t_earth = ve7bqh_earth[e][b];
-		return 0;
-	}
 
-	/* G4CQM: log-log interpolation, single environment */
-	if (e == ANT_TEMP_ENV_G4CQM_BASELINE)
-	{
-		*t_sky   = ant_temp_log_interp(freq_mhz, g4cqm_mhz, g4cqm_sky, G4CQM_NPTS);
-		*t_earth = ant_temp_log_interp(freq_mhz, g4cqm_mhz, g4cqm_earth, G4CQM_NPTS);
-		return 0;
+	default:
+		return -1.0;
 	}
+}
 
-	/* ITU-R P.372: formula-derived T_earth, G4CQM sky anchors */
-	if (freq_mhz < 0.3 || freq_mhz > 250.0)
+/**
+ * ant_temp_resolve() - resolve sky and earth brightness temperatures
+ * @freq_mhz:  operating frequency in MHz
+ * @sky:        ant_temp_sky_t index
+ * @earth:      ant_temp_earth_t index
+ * @interp:     ant_temp_method_t value (user override for table models)
+ * @t_sky:      output sky brightness temperature (K)
+ * @t_earth:    output earth/man-made noise temperature (K)
+ *
+ * Returns 0 on success, -1 if index or frequency is invalid.
+ */
+int ant_temp_resolve(double freq_mhz, int sky, int earth, int interp,
+	double *t_sky, double *t_earth)
+{
+	if (sky < 0 || sky >= ANT_TEMP_SKY_COUNT)
+		return -1;
+	if (earth < 0 || earth >= ANT_TEMP_EARTH_COUNT)
 		return -1;
 
-	int ci = e - ANT_TEMP_ENV_ITU_BUSINESS;
-	double fam = itu_coeffs[ci].c - itu_coeffs[ci].d * log10(freq_mhz);
-	*t_earth = 290.0 * (pow(10.0, fam / 10.0) - 1.0);
+	double ts = ant_temp_eval(&sky_models[sky], freq_mhz, interp);
+	double te = ant_temp_eval(&earth_models[earth], freq_mhz, interp);
 
-	/* Clamp to thermodynamic floor: earth brightness cannot fall below
-	 * ground thermal emission (~290 K).  The ITU-R Fa formula models
-	 * man-made noise and goes negative when Fa < 0 dB, which occurs
-	 * at higher VHF for quieter environments (Quiet Rural above ~85 MHz). */
-	if (*t_earth < 290.0)
-		*t_earth = 290.0;
+	if (ts < 0.0 || te < 0.0)
+		return -1;
 
-	*t_sky   = ant_temp_log_interp(freq_mhz, g4cqm_mhz, g4cqm_sky, G4CQM_NPTS);
+	*t_sky = ts;
+	*t_earth = te;
+
 	return 0;
 }
 
@@ -402,7 +567,9 @@ static void _meas_calc(measurement_t *m, int idx)
 	if (fpat.dth != 0.0 && fpat.dph != 0.0 && fpat.nth > 0 && fpat.nph > 0)
 	{
 		double t_sky, t_earth;
-		if (ant_temp_resolve(save.freq[idx], rc_config.ant_temp_env,
+		if (ant_temp_resolve(save.freq[idx],
+				rc_config.ant_temp_sky, rc_config.ant_temp_earth,
+				rc_config.ant_temp_interp,
 				&t_sky, &t_earth) == 0)
 		{
 			double t_pattern = 0.0;

@@ -322,8 +322,14 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Symbol Overrides Window Position (root x and y)", .format = "%d,%d",
 		.vars = { &rc_config.sy_overrides_x, &rc_config.sy_overrides_y } },
 
-	{ .desc = "Antenna Temp Environment (0=VE7BQH Rural .. 7=ITU Quiet Rural)", .format = "%d",
-		.vars = { &rc_config.ant_temp_env } },
+	{ .desc = "Antenna Temp Sky Model (0..6)", .format = "%d",
+		.vars = { &rc_config.ant_temp_sky } },
+
+	{ .desc = "Antenna Temp Earth Model (0..8)", .format = "%d",
+		.vars = { &rc_config.ant_temp_earth } },
+
+	{ .desc = "Antenna Temp Interp Method (0=Snap 1=Interp 2=Formula 3=Galactic)", .format = "%d",
+		.vars = { &rc_config.ant_temp_interp } },
 
 	{ .desc = "Antenna Temp Elevation (deg, +=up)", .format = "%lf",
 		.vars = { &rc_config.ant_temp_elevation } },
@@ -699,8 +705,10 @@ Create_Default_Config( void )
   rc_config.freqplots_clamp_vswr = 1;
   rc_config.freqplots_round_x_axis = 0;
 
-  /* Antenna temperature defaults */
-  rc_config.ant_temp_env = 1;   /* ANT_TEMP_ENV_VE7BQH_RESIDENTIAL */
+  /* Antenna temperature defaults (DG7YBN Avg sky + DG7YBN Residential earth) */
+  rc_config.ant_temp_sky = ANT_TEMP_SKY_DG7YBN_AVG;
+  rc_config.ant_temp_earth = ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL;
+  rc_config.ant_temp_interp = ANT_TEMP_INTERP;
   rc_config.ant_temp_elevation = 0.0;
 
   /* For NEC2 editor window */
@@ -1122,16 +1130,9 @@ Get_GUI_State( void )
     rc_config.ant_temp_elevation =
       gtk_spin_button_get_value(GTK_SPIN_BUTTON(widget) );
 
-    /* Noise environment — find active radio item */
-    for (int i = 0; i < ANT_TEMP_ENV_COUNT; i++)
-    {
-      widget = Builder_Get_Object(rdpattern_window_builder, (gchar *)noise_env_widget_ids[i]);
-      if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
-      {
-        rc_config.ant_temp_env = i;
-        break;
-      }
-    }
+    /* Noise models — values are maintained by signal handlers;
+     * no widget query needed here since rc_config fields are
+     * updated directly by on_rdpattern_noise_{sky,earth,interp}_activate */
   }
 
   /* Get geometry of frequency plots window */

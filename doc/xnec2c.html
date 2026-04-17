@@ -1246,10 +1246,10 @@ draw-style options; see <a href="#OpenGL">OpenGL Rendering</a>.
 The <a href="#RadiationWindow">Radiation Pattern window</a> can render
 each solid-angle cell of the pattern by its gain-weighted brightness
 temperature (K/sr) under a selectable RF noise environment, showing
-where noise enters the antenna. Eight
-<a href="#NoiseEnvModels">environment models</a> provide
-T<sub>sky</sub> and T<sub>earth</sub> values spanning quiet rural to
-dense urban conditions. An
+where noise enters the antenna. Three independent
+<a href="#NoiseEnvModels">selectors</a>&mdash;sky model, earth model,
+and interpolation method&mdash;determine the T<sub>sky</sub> and
+T<sub>earth</sub> values assigned to each hemisphere. An
 <a href="#ElevationOffset">elevation control</a> virtually rotates
 the antenna pattern to the desired observation elevation. The <a href="#FrequencyWindow">Frequency Plots
 window</a> displays T<sub>ant</sub>, T<sub>total</sub>, and
@@ -1561,7 +1561,7 @@ Projection</span> check button, provides
 submenus for selecting <span class="ui-button">Polarization</span> type,
 <span class="ui-button">Gain Scaling</span>
 (which includes <a href="#NoiseTempDisplay">Noise Temperature</a> modes),
-<a href="#NoiseEnvModels">Noise Environment</a>,
+<a href="#NoiseEnvModels">Noise Models</a>,
 <a href="#DrawStyle">Draw Style</a> (Surface, Wireframe, or Both),
 a <span class="ui-button">Gradient Key</span> toggle for the color legend,
 and the <span class="ui-button">Near Field</span> data to be drawn. The
@@ -1726,89 +1726,265 @@ shows &minus;999.99&nbsp;K/sr because the viewer direction is
 perpendicular to the boom, where pattern gain is near zero.</figcaption>
 </figure>
 
-<h4 id="NoiseEnvModels">Noise Environment Models</h4>
+<h4 id="NoiseEnvModels">Noise Models</h4>
 <p>
-The <span class="menu-path">View &rarr; Noise Environment</span> submenu
-selects which brightness temperatures are assigned to the sky and
-earth hemispheres. Eight models are available, drawn from three
-independent sources. Each defines T<sub>sky</sub> and
-T<sub>earth</sub> as functions of frequency.</p>
+The <span class="menu-path">View &rarr; Noise Models</span> submenu
+controls which brightness temperatures are assigned to the sky and
+earth hemispheres. Three independent selectors appear in the menu,
+separated by headings: Sky Model, Earth Model, and Interpolation.
+Any sky model can be combined with any earth model.</p>
+
+<p>
+Sky and earth temperatures describe physically distinct emission
+sources. T<sub>sky</sub> is dominated by galactic synchrotron
+radiation&mdash;diffuse radio emission from the Milky Way&mdash;which
+decreases steeply with frequency (roughly as
+f<sup>&minus;2.75</sup>). T<sub>earth</sub> is dominated by
+man-made electrical noise from power lines, motors, and electronics,
+which also decreases with frequency but at a rate that depends on
+the density of the local built environment. The two quantities are
+independent: a rural site under galactic center sees low earth noise
+but high sky noise, while a city rooftop pointed at the galactic
+pole sees the opposite. Selecting sky and earth models independently
+reflects this physical reality.</p>
+
+<h5>Sky Models</h5>
 
 <table>
 <thead>
 <tr>
 <th>Model</th>
-<th>Source</th>
-<th>Character</th>
+<th>Bands</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>VE7BQH Rural</td>
-<td>VE7BQH antenna comparison tables</td>
-<td>Low man-made noise</td>
+<td>G4CQM Min Quiet (pre-2016)</td>
+<td>50, 144, 222, 432, 1296</td>
+<td>Minimum quiet-sky temperatures from the <a target="_blank" rel="noopener noreferrer"
+href="http://g4cqm.co.uk/">G4CQM</a> reference data used
+in VK3UM&rsquo;s EME Calculator. Represents the coldest sky an
+antenna can point at, away from the galactic plane. Use for
+best-case EME system noise budgets.</td>
 </tr>
 <tr>
-<td>VE7BQH Residential</td>
-<td>VE7BQH antenna comparison tables</td>
-<td>Moderate man-made noise (default)</td>
+<td>VK3UM Min Quiet (pre-2016)</td>
+<td>50, 144, 220, 432, 900, 1296</td>
+<td>Minimum quiet-sky values from VK3UM&rsquo;s <a target="_blank" rel="noopener noreferrer"
+href="https://sm2cew.com/rpc.pdf">Radio Path
+Calculator</a>. Similar to G4CQM but includes 220 and 900&nbsp;MHz
+bands. Useful when those intermediate frequencies are needed.</td>
 </tr>
 <tr>
-<td>VE7BQH City</td>
-<td>VE7BQH antenna comparison tables</td>
-<td>High man-made noise</td>
+<td>VE7BQH Base Ref (pre-2018)</td>
+<td>50, 144, 432</td>
+<td>Frozen pre-2018 normalization values (1700, 200, 20&nbsp;K).
+Historical reference for comparing against older <a target="_blank" rel="noopener noreferrer"
+href="https://www.ve7bqh.com/">VE7BQH</a> table
+editions. Superseded by DG7YBN Galactic Avg for current work.</td>
 </tr>
 <tr>
-<td>G4CQM Baseline</td>
-<td>G4CQM reference data</td>
-<td>Interpolated baseline independent of other category schemes</td>
+<td>Galactic P.372 (2022)</td>
+<td>continuous</td>
+<td>Galactic noise computed from <a target="_blank" rel="noopener noreferrer"
+href="https://www.itu.int/rec/R-REC-P.372/en">ITU-R
+P.372-16</a> equations&nbsp;13
+and&nbsp;14. Below 100&nbsp;MHz the log-linear man-made noise formula
+applies (F<sub>am</sub>&nbsp;=&nbsp;52&nbsp;&minus;&nbsp;23&middot;log<sub>10</sub>(f));
+above 100&nbsp;MHz a power-law extrapolation
+(T&nbsp;&prop;&nbsp;f<sup>&minus;2.75</sup>) plus the 2.7&nbsp;K
+cosmic microwave background. This is the mathematical all-sky
+average, which runs higher than practical antenna measurements
+above 100&nbsp;MHz (e.g., 425&nbsp;K at 144&nbsp;MHz versus
+290&nbsp;K for DG7YBN). Select this for theoretical analysis or
+when no tabulated data covers the operating frequency.</td>
 </tr>
 <tr>
-<td>ITU-R Business</td>
-<td>ITU-R P.372</td>
-<td>High urban and industrial noise</td>
+<td>DG7YBN Galactic Avg (2025)</td>
+<td>50, 144, 432</td>
+<td>Average galactic background as used in the <a target="_blank" rel="noopener noreferrer"
+href="https://dg7ybn.de/GT_Tables/">DG7YBN/VE7BQH antenna
+comparison tables</a>. Select this to reproduce
+published VE7BQH G/T values. Values represent a practical average
+over the sky as seen by a directional antenna, lower than the
+mathematical all-sky average at VHF.</td>
 </tr>
 <tr>
-<td>ITU-R Residential</td>
-<td>ITU-R P.372</td>
-<td>Suburban residential</td>
+<td>Synth Practical Avg (2026)</td>
+<td>50, 100, 112.5, 137.5, 144, 220, 222, 250, 401, 402.5, 408, 432, 500, 761, 900, 1000, 1296</td>
+<td>Synthesized practical-average galactic sky derived from
+cross-referencing DG7YBN, G4CQM, and P.372 data.
+Follows the galactic formula closely below 144&nbsp;MHz, then
+tracks practical antenna measurements at higher frequencies. The
+broadest-coverage sky model for general antenna comparison.</td>
 </tr>
 <tr>
-<td>ITU-R Rural</td>
-<td>ITU-R P.372</td>
-<td>Low-density rural</td>
+<td>Synth Min Quiet (2026)</td>
+<td>50, 100, 112.5, 137.5, 144, 220, 222, 250, 401, 402.5, 408, 432, 500, 761, 900, 1000, 1296</td>
+<td>Synthesized minimum quiet sky. Coldest
+achievable sky across the full VHF/UHF range. Use for best-case
+system noise analysis with fine frequency resolution.</td>
+</tr>
+</tbody>
+</table>
+
+<h5>Earth Models</h5>
+
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Bands</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ITU-R Business (1974)</td>
+<td>continuous</td>
+<td>High urban and industrial noise computed from the <a target="_blank" rel="noopener noreferrer"
+href="https://www.itu.int/rec/R-REC-P.372/en">ITU-R P.372</a>
+man-made noise formula
+(F<sub>am</sub>&nbsp;=&nbsp;76.8&nbsp;&minus;&nbsp;27.7&middot;log<sub>10</sub>(f)).
+Continuous across 0.3&ndash;250&nbsp;MHz. At higher frequencies the
+formula drops below 290&nbsp;K and is clamped to the ambient
+thermal floor.</td>
 </tr>
 <tr>
-<td>ITU-R Quiet Rural</td>
-<td>ITU-R P.372</td>
-<td>Minimal man-made noise</td>
+<td>ITU-R Residential (1974)</td>
+<td>continuous</td>
+<td>Suburban residential noise computed from formula
+(F<sub>am</sub>&nbsp;=&nbsp;72.5&nbsp;&minus;&nbsp;27.7&middot;log<sub>10</sub>(f)).
+Floor activates around 323&nbsp;MHz.</td>
+</tr>
+<tr>
+<td>ITU-R Rural (1974)</td>
+<td>continuous</td>
+<td>Low-density rural noise computed from formula
+(F<sub>am</sub>&nbsp;=&nbsp;67.2&nbsp;&minus;&nbsp;27.7&middot;log<sub>10</sub>(f)).
+Floor activates around 208&nbsp;MHz.</td>
+</tr>
+<tr>
+<td>ITU-R Quiet Rural (1974)</td>
+<td>continuous</td>
+<td>Minimal man-made noise computed from formula
+(F<sub>am</sub>&nbsp;=&nbsp;53.6&nbsp;&minus;&nbsp;28.6&middot;log<sub>10</sub>(f)).
+Approaches the 290&nbsp;K thermal floor above approximately
+59&nbsp;MHz. Select this for remote sites far from electrical
+infrastructure, such as EME or radio astronomy installations.</td>
+</tr>
+<tr>
+<td>G4CQM Mixed (pre-2016)</td>
+<td>50, 144, 222, 432, 1296</td>
+<td>Mixed-use environment from the <a target="_blank" rel="noopener noreferrer"
+href="http://g4cqm.co.uk/">G4CQM</a> tabulated reference data.
+Independent of the DG7YBN and ITU classification schemes. Values
+are moderate, between rural and residential.</td>
+</tr>
+<tr>
+<td>VE7BQH Base Ref (pre-2018)</td>
+<td>50, 144, 432</td>
+<td>Frozen pre-2018 tabulated earth values (9000, 1000, 350&nbsp;K).
+Historical reference for older <a target="_blank" rel="noopener noreferrer"
+href="https://www.ve7bqh.com/">VE7BQH</a> table
+comparison. Superseded by the DG7YBN earth models for current
+work.</td>
+</tr>
+<tr>
+<td>DG7YBN Rural (2025)</td>
+<td>50, 144, 432</td>
+<td>Low man-made noise from the
+<a target="_blank" rel="noopener noreferrer"
+href="https://dg7ybn.de/GT_Tables/">DG7YBN/VE7BQH</a> tabulated
+data. Select this with DG7YBN Galactic Avg sky to reproduce
+published VE7BQH Rural G/T values.</td>
+</tr>
+<tr>
+<td>DG7YBN Residential (2025)</td>
+<td>50, 144, 432</td>
+<td>Moderate man-made noise from tabulated data. The default pairing
+with DG7YBN Galactic Avg for standard VE7BQH table comparison.
+Represents a typical suburban location.</td>
+</tr>
+<tr>
+<td>DG7YBN City (2025)</td>
+<td>50, 144, 432</td>
+<td>High man-made noise from tabulated data. Urban and industrial
+environments with dense electrical infrastructure.</td>
+</tr>
+</tbody>
+</table>
+
+<h5>Interpolation Method</h5>
+
+<p>
+The interpolation selector governs how table-based models (those with
+discrete frequency anchors) resolve temperatures at arbitrary
+frequencies. It does not apply to formula-based models (ITU-R earth,
+Galactic sky), which compute values directly from their equations.</p>
+
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Snap</td>
+<td>Use the temperature from the nearest tabulated frequency. No
+values are fabricated between bands. This is the correct method for
+DG7YBN and VE7BQH models, whose per-band values are independent
+community estimates rather than samples from a continuous curve.
+Interpolating between them would assert a smooth relationship that
+was never claimed by the source data.</td>
+</tr>
+<tr>
+<td>Interpolate</td>
+<td>Log-log interpolation between adjacent table anchors, clamped to
+the nearest anchor outside the table range. Appropriate for models
+with many anchor points (G4CQM, VK3UM, Synth) where smooth
+inter-band coverage is desired. When the operating frequency falls
+between two anchors, the temperature is computed by linear
+interpolation in log-frequency/log-temperature space.</td>
 </tr>
 </tbody>
 </table>
 
 <p>
-The VE7BQH models use tabulated T<sub>sky</sub> and T<sub>earth</sub>
-values at discrete amateur band frequencies, interpolated
-logarithmically between points. These are the standard temperatures
-used in the widely-referenced VE7BQH antenna comparison tables,
-making VE7BQH Residential the natural default when comparing results
-against published data. For worst-case urban or contest scenarios,
-VE7BQH City or ITU-R Business represents the noisiest conditions.
-For remote EME or radio astronomy sites, ITU-R Quiet Rural represents
-the lowest terrestrial noise floor.</p>
+When the sky or earth model changes, the interpolation selector
+automatically switches to the method that model was designed for.
+The user can override this afterward. For example, selecting DG7YBN
+Galactic Avg sets Interpolate as the default; the user can switch to
+Snap to see the nearest-band value instead.</p>
+
+<h5>Choosing Models</h5>
 
 <p>
-The ITU-R models derive T<sub>earth</sub> from the man-made noise
-coefficients in ITU-R Recommendation P.372. At higher VHF frequencies
-in quieter environments, this formula can yield values below the
-physical ambient temperature; xnec2c clamps T<sub>earth</sub> to a
-290&nbsp;K floor in these cases, since no terrestrial environment can
-be colder than its physical surroundings. To observe the clamping,
-select ITU-R Quiet Rural and increase frequency above 200&nbsp;MHz
-while watching the reported T<sub>earth</sub>.</p>
+To reproduce published VE7BQH antenna comparison table values, select
+DG7YBN Galactic Avg sky with the appropriate DG7YBN earth model
+(Rural, Residential, or City). For broadband antenna development
+where smooth frequency coverage matters, Synth Practical Avg sky
+with an ITU-R earth model provides continuous T<sub>sky</sub> and
+T<sub>earth</sub> across the full VHF/UHF range. For EME system
+noise budgets, pair a minimum quiet sky model (G4CQM, VK3UM, or
+Synth Min Quiet) with ITU-R Quiet Rural earth to represent the
+coldest achievable environment. The Galactic (P.372) sky model is
+useful for theoretical analysis at frequencies outside the
+tabulated ranges or for comparing practical antenna measurements
+against the mathematical all-sky prediction.</p>
 
 <p>
-The selected environment is persisted in the configuration file and
+The ITU-R formula can yield T<sub>earth</sub> values below the
+physical ambient temperature at higher VHF frequencies in quieter
+environments; xnec2c clamps T<sub>earth</sub> to a 290&nbsp;K floor
+in these cases, since no terrestrial environment can be colder than
+its physical surroundings.</p>
+
+<p>
+All three selections are persisted in the configuration file and
 restored on next startup.</p>
 
 <h4 id="ElevationOffset">Elevation Offset</h4>
@@ -2031,9 +2207,9 @@ material and construction quality.</p>
 
 <p>
 G/T<sub>ant</sub> versus frequency reveals the figure of merit across
-the band. When using VE7BQH Residential as the environment, values at
-the design frequency can be compared directly against published
-VE7BQH table entries. A rising T<sub>ant</sub> toward band edges
+the band. When using DG7YBN Residential earth with DG7YBN Galactic Avg
+sky, values at the design frequency can be compared directly against
+published VE7BQH table entries. A rising T<sub>ant</sub> toward band edges
 indicates growing sidelobe levels, since more of the pattern
 intercepts the warmer earth hemisphere. The gap between
 T<sub>total</sub> and T<sub>ant</sub> quantifies the ohmic loss
@@ -3318,6 +3494,163 @@ Modifier combinations work regardless of widget focus within the window.</p>
 </table>
 
 <h2 id="Version">Version History (newest first)</h2>
+
+<h3>Version <span class="version-tag">4.5.0</span></h3>
+<p>This release adds hardware-accelerated OpenGL rendering, an integrated
+antenna geometry optimizer with three algorithms, symbolic variable
+parametric modeling, noise temperature analysis, current flow
+visualization, and internationalization support.</p>
+
+<ul>
+	<li>Contributors:
+		<ul>
+			<li><span class="contact" data-github="frazij">frazij</span> &mdash; suggested displaying model filename in window titles (<a href="https://github.com/KJ7LNW/xnec2c/issues/77" target="_blank" rel="noopener noreferrer">#77</a>)</li>
+			<li><span class="contact" data-callsign="G1OGY" data-github="g1ogy">G1OGY</span> &mdash; reported WSL2/Debian compile failure (<a href="https://github.com/KJ7LNW/xnec2c/issues/78" target="_blank" rel="noopener noreferrer">#78</a>)</li>
+			<li><span class="contact" data-github="malcolmboyd">malcolmboyd</span> &mdash; reported optimizer single-frequency issue (<a href="https://github.com/KJ7LNW/xnec2c/issues/62" target="_blank" rel="noopener noreferrer">#62</a>)</li>
+			<li><span class="contact" data-github="AsciiWolf">AsciiWolf</span> &mdash; reported segfault crashes (<a href="https://github.com/KJ7LNW/xnec2c/issues/69" target="_blank" rel="noopener noreferrer">#69</a>)</li>
+		</ul>
+	</li>
+
+	<li>OpenGL rendering (<a href="#OpenGL">documentation</a>):
+		<ul>
+			<li>Hardware-accelerated 3D renderer with lit cylinder geometry,
+			triangulated patch surfaces, smooth vertex normals, coordinate
+			axes with labels, and ground plane visualization</li>
+			<li>OpenGL Settings dialog: per-element brightness and transparency
+			sliders, MSAA anti-aliasing (Off/2&times;/4&times;/8&times;/16&times;),
+			cylinder scale, and draw style selection</li>
+			<li>Orthographic projection toggle in both Main and Radiation Pattern
+			window toolbars (<a href="#Projection">documentation</a>)</li>
+			<li>Radiation pattern draw style: Surface, Wireframe, or Both
+			(<a href="#DrawStyle">documentation</a>)</li>
+			<li>Gradient key (color legend) visibility toggle</li>
+			<li>Structure overlay in radiation pattern view with
+			<kbd class="shortcut">Shift+Scroll</kbd> scaling</li>
+			<li>Interactive wire cylinder radius via
+			<kbd class="shortcut">Ctrl+Scroll</kbd> with line-mode snap
+			at minimum</li>
+			<li>Patch current visualization with five modes: Reference Phase,
+			LIC Texture, Wireframe, Polarization Axis, and Peak Magnitude
+			(<a href="#CurrentVisualization">documentation</a>)</li>
+			<li>Automatic Cairo software renderer fallback when OpenGL is
+			unavailable</li>
+		</ul>
+	</li>
+
+	<li>Symbolic variables and parametric modeling
+	(<a href="#SymbolicVariables">documentation</a>):
+		<ul>
+			<li><code class="nec-card">SY</code> card support for named
+			constants and expressions, compatible with 4nec2</li>
+			<li>SY expressions can be entered directly in NEC2 card editor
+			numeric fields (e.g., <code>L0/2</code> in a GW wire Y2 field)</li>
+			<li>Add Var (SY) buttons in NEC2 editor Geometry and Commands
+			toolbars for converting literal values to named parameters</li>
+			<li>Symbol Overrides window for interactive parameter tuning with
+			min/max bounds, collapsible sections, and auto-apply</li>
+			<li>External <span class="fileext">.sy</span> override files for
+			scripted parameter sweeps</li>
+		</ul>
+	</li>
+
+	<li>Antenna geometry optimization
+	(<a href="#Optimization">documentation</a>):
+		<ul>
+			<li>Built-in optimizer with Particle Swarm (PSO), Nelder-Mead
+			Simplex, and Simple named-variable algorithms</li>
+			<li>Dynamic fitness goals with selectable measurements, per-goal
+			frequency band filtering, and threshold-based scoring</li>
+			<li>Persistent <span class="fileext">.opt</span> configuration
+			files with auto-save</li>
+			<li>Frequency controls locked during optimization with visual
+			feedback (dark green plot traces)</li>
+			<li>Gnuplot structure export and patch currents CSV output
+			options</li>
+			<li>inotify file watching for external optimizer compatibility</li>
+		</ul>
+	</li>
+
+	<li>Noise temperature and measurements
+	(<a href="#NoiseTemp">documentation</a>):
+		<ul>
+			<li>Noise temperature visualization with eight environment models
+			(VE7BQH, G4CQM, ITU-R) and adjustable observation elevation</li>
+			<li>Antenna temperature (T<sub>ant</sub>), total noise temperature
+			(T<sub>total</sub>), and G/T figure of merit readouts in
+			Frequency Plots and Radiation Pattern windows</li>
+			<li>Average power gain diagnostic with efficiency percentage,
+			auto-enabled with RP card
+			(<a href="#AveragePowerGain">documentation</a>)</li>
+			<li>Radiation efficiency transmitted in frequency analysis for
+			accurate G/T computation</li>
+		</ul>
+	</li>
+
+	<li>User interface:
+		<ul>
+			<li>First <code class="nec-card">CM</code> card text displayed
+			in Main and Radiation Pattern window title bars</li>
+			<li>Animation dialog reworked: Frames/Sec (1&ndash;120) replaces
+			Steps/Cycle with auto-apply on value change</li>
+			<li>Extended rotation range (0&ndash;720&deg;) and incline range
+			(&plusmn;360&deg;) with mouse-wheel scrolling on spin buttons</li>
+			<li>Configuration file selection via
+			<code>--config</code> and <code>--new-config</code> CLI options</li>
+			<li><code>--skip-verify</code> option to improve load time on
+			large models</li>
+			<li>Batch mode (<code>--batch</code>) with
+			<code>--optimize</code> for headless optimization runs</li>
+			<li>All checkbox menu item states persisted in configuration
+			file across sessions</li>
+		</ul>
+	</li>
+
+	<li>Internationalization
+	(<a href="#Internationalization">documentation</a>):
+		<ul>
+			<li>42 languages via GNU gettext, selected automatically from
+			system locale</li>
+			<li><code>LANGUAGE</code> environment variable override</li>
+		</ul>
+	</li>
+
+	<li>Examples:
+		<ul>
+			<li>ISS communication antenna designs (2m and 70cm 5-element RHCP
+			Yagi by <span class="contact" data-callsign="KJ7NLL">Zeke</span>)</li>
+			<li>Parametric 2m Yagi with optimizer configuration</li>
+		</ul>
+	</li>
+
+	<li>Bug fixes:
+		<ul>
+			<li>Fix frequency loop re-entrancy and SY optimizer inotify
+			reload races</li>
+			<li>Fix fmhz_save clobbered by programmatic spinbutton
+			updates</li>
+			<li>Fix double unlock of global_lock mutex</li>
+			<li>Fix single frequency step not running frequency loop
+			(<a href="https://github.com/KJ7LNW/xnec2c/issues/62" target="_blank" rel="noopener noreferrer">#62</a>)</li>
+			<li>Fix gradient legend invisible in Cairo renderer</li>
+			<li>Fix compiler warnings on stricter build systems
+			(<a href="https://github.com/KJ7LNW/xnec2c/issues/78" target="_blank" rel="noopener noreferrer">#78</a>)</li>
+			<li>Replace GMutex with GRecMutex to prevent recursive lock
+			deadlocks</li>
+			<li>Fix sky/earth boundary calculation using Rodrigues
+			rotation</li>
+			<li>Fix inotify watch for atomic editor writes</li>
+			<li>Fix stale geometry after SY variable apply</li>
+		</ul>
+	</li>
+
+	<li>Build system:
+		<ul>
+			<li>OpenGL and Epoxy are optional build dependencies
+			(<code>--enable-opengl</code>)</li>
+			<li>Support running from source tree without installation</li>
+		</ul>
+	</li>
+</ul>
 
 <h3>Version <span class="version-tag">4.4.18</span></h3>
 <p>This release focuses on mathlib enhancements, platform compatibility improvements for MacOS and Fedora, and crash prevention through input validation.

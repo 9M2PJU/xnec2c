@@ -110,15 +110,17 @@ double Scale_Gain( double gain, int fstep, int idx )
     case GS_NOISE_LOG:
       {
         double t_sky, t_earth;
-        if (ant_temp_resolve(save.freq[fstep], rc_config.ant_temp_env,
+        if (ant_temp_resolve(save.freq[fstep],
+              rc_config.ant_temp_sky, rc_config.ant_temp_earth,
+              rc_config.ant_temp_interp,
               &t_sky, &t_earth) < 0)
         {
           static gboolean warned = FALSE;
           if (!warned)
           {
             warned = TRUE;
-            pr_warn("Scale_Gain: ant_temp_resolve failed for %.3f MHz env %d\n",
-                save.freq[fstep], rc_config.ant_temp_env);
+            pr_warn("Scale_Gain: ant_temp_resolve failed for %.3f MHz sky=%d earth=%d\n",
+                save.freq[fstep], rc_config.ant_temp_sky, rc_config.ant_temp_earth);
           }
           scaled_rad = 0.0;
           break;
@@ -198,6 +200,12 @@ Generate_Rdpattern_Data(double *out_r_min, double *out_r_range)
 
       idx = rad_pattern[fstep].max_gain_idx[pol];
       r_max = Scale_Gain( rad_pattern[fstep].gtot[idx], fstep, idx);
+
+      /* Prevent r_max collapse when noise mode cannot resolve temperatures;
+       * Scale_Gain returns 0.0 on failure, which collapses the projection
+       * and leaves the structure overlay invisible. */
+      if (r_max < 0.01)
+        r_max = 1.0;
 
       idx = rad_pattern[fstep].min_gain_idx[pol];
       double actual_gain = rad_pattern[fstep].gtot[idx];
@@ -1128,9 +1136,9 @@ Set_Gain_Style( int gs )
       N_("Observation elevation for antenna temperature.\n"
          "Select Gain Style → Noise Temperature to enable.") },
     { "rdpattern_noise_env_menu",
-      N_("Select brightness temperature model "
-         "for T_sky and T_earth."),
-      N_("Brightness temperature model for T_sky and T_earth.\n"
+      N_("Independent sky, earth, and interpolation "
+         "selectors for noise temperature models."),
+      N_("Sky and earth noise temperature models.\n"
          "Select Gain Style → Noise Temperature to enable.") },
   };
 

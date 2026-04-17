@@ -2,6 +2,7 @@
 #define MEASUREMENTS_H 1
 
 #include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 
 // The enum, and the struct measurement_t values must be in
@@ -125,9 +126,97 @@ static inline void ant_temp_rotate_point(
 	*zr = vz * ce + cz * se;
 }
 
-#define ANT_TEMP_ENV_COUNT 8
-extern const char *ant_temp_env_names[ANT_TEMP_ENV_COUNT];
-extern const char *noise_env_widget_ids[ANT_TEMP_ENV_COUNT];
+/* Interpolation / resolution method for noise temperature models.
+ * FORMULA: ITU-R P.372-16 Table 1 (Spaulding & Disney 1974)
+ * GALACTIC: ITU-R P.372-16 §4.1 eq.13/14 (Reich & Reich 1988) */
+typedef enum
+{
+	ANT_TEMP_SNAP,       /* nearest-band snap */
+	ANT_TEMP_INTERP,     /* log-log interpolation, clamp at edges */
+	ANT_TEMP_FORMULA,    /* F_am = c - d·log10(f), T = T0·(10^(Fa/10) - 1) */
+	ANT_TEMP_GALACTIC,   /* P.372-16 eq.13 below break, eq.14 above */
+	ANT_TEMP_METHOD_COUNT,
+} ant_temp_method_t;
+
+/* Sky noise model selector
+ *
+ * DG7YBN:   dg7ybn.de/GT_Tables/ (Kluver, Dubus 2/2019 pp.116-117)
+ * G4CQM:    g4cqm.co.uk (VK3UM Calc compliance, pre-2016)
+ * VK3UM:    sm2cew.com/rpc.pdf (McArthur, SK 2016)
+ * Galactic: ITU-R P.372-16 §4.1 eq.13/14 (2022)
+ * Base Ref: VE7BQH Era 1 / F5FOD AGTC-JS normalization (pre-2018)
+ * Synth:    debug/plot_proposed_models.py (2026-04 analysis)
+ */
+typedef enum
+{
+	ANT_TEMP_SKY_G4CQM_MIN,      /* minimum quiet, 5 bands (pre-2016) */
+	ANT_TEMP_SKY_VK3UM_MIN,      /* minimum quiet, 6 bands (pre-2016) */
+	ANT_TEMP_SKY_BASE_REF,        /* VE7BQH Era 1 frozen values (pre-2018) */
+	ANT_TEMP_SKY_GALACTIC,        /* P.372-16 eq.13/14, continuous (2022) */
+	ANT_TEMP_SKY_DG7YBN_AVG,     /* galactic average, 3 bands (2025) */
+	ANT_TEMP_SKY_SYNTH_AVG,       /* synthesized practical average, 17 bands (2026) */
+	ANT_TEMP_SKY_SYNTH_MIN,       /* synthesized minimum quiet, 17 bands (2026) */
+	ANT_TEMP_SKY_COUNT,
+} ant_temp_sky_t;
+
+/* Earth noise model selector
+ *
+ * DG7YBN:   dg7ybn.de/GT_Tables/ Era 3 (2025-08-29)
+ *           50/144 MHz: ITU-R P.372-16 §6 pp.98-100
+ *           432 MHz: URSI Radio Science Bulletin No.334, 09.2010
+ *           (Lefering et al, Ghent University INTEC / OFCOM)
+ * G4CQM:   g4cqm.co.uk (pre-2016, matches VK3UM Calc defaults)
+ * ITU:     ITU-R P.372-16 Table 1, F_am = c - d·log10(f_MHz)
+ *          Coefficients from Spaulding & Disney OT-74-38 (1974)
+ * Base Ref: VE7BQH Era 1 (pre-2018 frozen)
+ */
+typedef enum
+{
+	ANT_TEMP_EARTH_ITU_BUSINESS,
+	ANT_TEMP_EARTH_ITU_RESIDENTIAL,
+	ANT_TEMP_EARTH_ITU_RURAL,
+	ANT_TEMP_EARTH_ITU_QUIET_RURAL,
+	ANT_TEMP_EARTH_G4CQM_MIXED,
+	ANT_TEMP_EARTH_BASE_REF,
+	ANT_TEMP_EARTH_DG7YBN_RURAL,
+	ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL,
+	ANT_TEMP_EARTH_DG7YBN_CITY,
+	ANT_TEMP_EARTH_COUNT,
+} ant_temp_earth_t;
+
+/* Unified noise temperature model descriptor.
+ * One struct type serves both sky_models[] and earth_models[]. */
+typedef struct
+{
+	const char *name;
+
+	ant_temp_method_t method;        /* default resolution method */
+
+	/* Table anchors (SNAP and INTERP) */
+	const double *freq_mhz;
+	const double *temp;
+	int freq_count;
+
+	/* Formula coefficients: F_am = c - d·log10(f_MHz) */
+	double c, d;
+
+	/* Galactic power-law (ANT_TEMP_GALACTIC only) */
+	double freq_break;               /* eq.13/14 transition, MHz */
+	double power_exponent;           /* -2.75 */
+	double power_offset;             /* CMB 2.7 K */
+
+	/* Bitmask of interp methods this model supports as user overrides */
+	uint8_t valid_interp;
+} ant_temp_model_t;
+
+#define ANT_TEMP_METHOD_BIT(m) (1u << (m))
+#define ANT_TEMP_TABLE_METHODS \
+	(ANT_TEMP_METHOD_BIT(ANT_TEMP_SNAP) | ANT_TEMP_METHOD_BIT(ANT_TEMP_INTERP))
+
+extern const ant_temp_model_t sky_models[ANT_TEMP_SKY_COUNT];
+extern const ant_temp_model_t earth_models[ANT_TEMP_EARTH_COUNT];
+
+extern const char *ant_temp_method_names[ANT_TEMP_METHOD_COUNT];
 
 typedef struct
 {
@@ -157,7 +246,7 @@ typedef struct
 } measurement_t;
 
 
-int ant_temp_resolve(double freq_mhz, int env,
+int ant_temp_resolve(double freq_mhz, int sky, int earth, int interp,
 	double *t_sky, double *t_earth);
 void meas_calc(measurement_t *m, int idx);
 int meas_name_idx(char *name, int len);

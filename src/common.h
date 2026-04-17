@@ -389,7 +389,9 @@ typedef struct
   int sy_overrides_height;
 
   /* Antenna temperature calculation */
-  int ant_temp_env;       /* ANT_TEMP_ENV_* index from measurements.h */
+  int ant_temp_sky;       /* ant_temp_sky_t index */
+  int ant_temp_earth;     /* ant_temp_earth_t index */
+  int ant_temp_interp;    /* ant_temp_method_t value */
   double ant_temp_elevation; /* Antenna elevation tilt (degrees), +=up */
   /* Use OpenGL rendering for radiation patterns */
   int use_opengl_renderer;
@@ -1219,7 +1221,6 @@ void on_rdpattern_arrl_style_activate(GtkMenuItem *menuitem, gpointer user_data)
 void on_rdpattern_logarithmic_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_noise_temp_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_noise_temp_log_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_rdpattern_noise_env_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_elevation_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 void Check_Noise_Warnings(int fstep);
 void on_rdpattern_e_field_activate(GtkMenuItem *menuitem, gpointer user_data);
