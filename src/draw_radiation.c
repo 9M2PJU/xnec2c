@@ -376,7 +376,7 @@ Update_Rdpattern_UI(void)
   if( calc_data.freq_step >= 0 )
     Display_Fstep( rdpattern_fstep_entry, calc_data.freq_step );
 
-  /* Update T_total readout in toolbar */
+  /* Update TA readout in toolbar */
   {
     measurement_t meas = { .a = {0} };
     meas_calc(&meas, fstep);
@@ -576,7 +576,7 @@ Draw_Radiation_Pattern( cairo_t *cr )
   if( rc_config.rdpattern_gradient_key )
     Draw_Color_Legend_Overlay( cr );
 
-  /* Update UI elements (includes T_total readout) */
+  /* Update UI elements (includes TA readout) */
   Update_Rdpattern_UI();
 
 } /* Draw_Radiation_Pattern() */
@@ -1205,7 +1205,7 @@ New_Radiation_Projection_Angle(void)
   }
 
   /* Trigger a redraw of plots drawingarea if doing "viewer" gain
-   * or antenna temperature (noise env / elevation changes affect T_ant) */
+   * or antenna temperature (noise env / elevation changes affect Ta) */
   if( isFlagSet(PLOT_ENABLED) &&
       (isFlagSet(PLOT_GVIEWER) || isFlagSet(PLOT_ANT_TEMP)) &&
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )

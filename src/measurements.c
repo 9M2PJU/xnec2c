@@ -387,9 +387,9 @@ const char *meas_display_names[] = {
 	[MEAS_GAIN_DEV_NY]     =  "Gain Dev −Y",
 	[MEAS_GAIN_DEV_PZ]     =  "Gain Dev +Z",
 	[MEAS_GAIN_DEV_NZ]     =  "Gain Dev −Z",
-	[MEAS_ANT_TEMP]        =  "T_ant",
-	[MEAS_ANT_TEMP_TOT]   =  "T_total",
-	[MEAS_GT]              =  "G/T_ant",
+	[MEAS_ANT_TEMP]        =  "Ta",
+	[MEAS_ANT_TEMP_TOT]   =  "TA",
+	[MEAS_GT]              =  "G/Ta",
 	[MEAS_COUNT]            =  NULL
 };
 
@@ -417,8 +417,8 @@ const char *meas_descriptions[] = {
 	[MEAS_GAIN_DEV_NY]     =  "Angular deviation of peak gain from -Y axis (degrees)",
 	[MEAS_GAIN_DEV_PZ]     =  "Angular deviation of peak gain from +Z axis (degrees)",
 	[MEAS_GAIN_DEV_NZ]     =  "Angular deviation of peak gain from -Z axis (degrees)",
-	[MEAS_ANT_TEMP]        =  "Antenna noise temperature T_ant from sky/earth brightness (K)",
-	[MEAS_ANT_TEMP_TOT]   =  "Total system noise temperature T_total including ohmic loss (K)",
+	[MEAS_ANT_TEMP]        =  "Antenna noise temperature Ta from sky/earth brightness (K)",
+	[MEAS_ANT_TEMP_TOT]   =  "Total system noise temperature TA including ohmic loss (K)",
 	[MEAS_GT]              =  "Gain-to-antenna-temperature ratio (dB), excludes loss",
 	[MEAS_COUNT]            =  NULL
 };
@@ -606,7 +606,7 @@ static void _meas_calc(measurement_t *m, int idx)
 
 			m->ant_temp_tot = m->ant_temp + t_loss_nec2;
 
-			/* G/T_ant ratio — figure of merit using antenna temperature only,
+			/* G/Ta ratio — figure of merit using antenna temperature only,
 			 * excluding ohmic and external losses */
 			if (m->ant_temp > 0.0)
 			{

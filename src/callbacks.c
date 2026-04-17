@@ -139,7 +139,7 @@ Check_Noise_Warnings(int fstep)
     Notice(GTK_BUTTONS_OK,
         _("Antenna Temperature"),
         _("Ground plane detected in model. "
-          "T_ant results will overcount ground effects. "
+          "Ta results will overcount ground effects. "
           "Free-space models are standard for antenna "
           "temperature evaluation."));
   }
@@ -5697,7 +5697,7 @@ on_freqplots_show_ant_temp_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
 {
-  /* Toggle showing T_ant instead of T_total on right axis */
+  /* Toggle showing Ta instead of TA on right axis */
   rc_config.freqplots_show_ant_temp =
     gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem));
 

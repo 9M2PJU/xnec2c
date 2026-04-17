@@ -9870,7 +9870,7 @@ Save NEC2 Editor data first?
                           <object class="GtkCheckMenuItem" id="freqplots_show_ant_temp">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Show T_ant instead of T_total</property>
+                            <property name="label" translatable="yes">Show Ta instead of TA</property>
                             <property name="use-underline">True</property>
                             <signal name="activate" handler="on_freqplots_show_ant_temp_activate" swapped="no"/>
                           </object>
@@ -10008,7 +10008,7 @@ Save NEC2 Editor data first?
                 </child>
                 <child>
                   <object class="GtkToggleButton" id="freqplots_ant_temp_togglebutton">
-                    <property name="label" translatable="yes">T_ant</property>
+                    <property name="label" translatable="yes">G/Ta</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
@@ -10356,7 +10356,8 @@ Save NEC2 Editor data first?
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
-                <property name="label" translatable="yes">T_total</property>
+                <property name="label" translatable="yes">T&lt;sub&gt;A&lt;/sub&gt;(Elev.°)</property>
+                <property name="use-markup">True</property>
                 <property name="single-line-mode">True</property>
               </object>
               <packing>
@@ -10390,7 +10391,8 @@ Save NEC2 Editor data first?
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
-                <property name="label" translatable="yes">T_ant</property>
+                <property name="label" translatable="yes">T&lt;sub&gt;a&lt;/sub&gt;</property>
+                <property name="use-markup">True</property>
                 <property name="single-line-mode">True</property>
               </object>
               <packing>
@@ -10424,7 +10426,8 @@ Save NEC2 Editor data first?
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
-                <property name="label" translatable="yes">G/T_ant</property>
+                <property name="label" translatable="yes">G/T&lt;sub&gt;a&lt;/sub&gt;</property>
+                <property name="use-markup">True</property>
                 <property name="single-line-mode">True</property>
               </object>
               <packing>
@@ -12702,7 +12705,7 @@ Save NEC2 Editor data first?
                 <property name="can-focus">False</property>
                 <property name="halign">end</property>
                 <property name="margin-left">4</property>
-                <property name="label" translatable="yes">T Elev° </property>
+                <property name="label" translatable="yes">Elev.°</property>
                 <property name="single-line-mode">True</property>
               </object>
               <packing>
@@ -13096,7 +13099,8 @@ Save NEC2 Editor data first?
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
                 <property name="hexpand">True</property>
-                <property name="label" translatable="yes">T_total</property>
+                <property name="label" translatable="yes">T&lt;sub&gt;A&lt;/sub&gt;(Elev.°)</property>
+                <property name="use-markup">True</property>
                 <property name="single-line-mode">True</property>
               </object>
               <packing>

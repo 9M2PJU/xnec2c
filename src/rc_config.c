@@ -226,7 +226,7 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Freqplots Ant Temp Toggle", .format = "%d",
 		.vars = { &rc_config.freqplots_ant_temp_togglebutton } },
 
-	{ .desc = "Freqplots Show Ant Temp (T_ant instead of T_total)", .format = "%d",
+	{ .desc = "Freqplots Show Ant Temp (Ta instead of TA)", .format = "%d",
 		.vars = { &rc_config.freqplots_show_ant_temp } },
 
 	{ .desc = "Frequency Plots Window Net Gain checkbutton state", .format = "%d",

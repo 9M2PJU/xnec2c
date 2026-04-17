@@ -1686,23 +1686,22 @@ _Plot_Frequency_Data( cairo_t *cr )
       meas_calc( &meas, valid_steps_map[idx] );
       gt_buf[idx] = (meas.gt > -999.0) ? meas.gt : 0.0;
 
-      /* Right axis: T_ant when View toggle active, T_total otherwise */
+      /* Right axis: Ta when View toggle active, TA otherwise */
       if( rc_config.freqplots_show_ant_temp )
         temp_buf[idx] = (meas.ant_temp >= 0.0) ? meas.ant_temp : 0.0;
       else
         temp_buf[idx] = (meas.ant_temp_tot >= 0.0) ? meas.ant_temp_tot : 0.0;
     }
 
-    titles[0] = _("G/T_ant (dB)");
+    titles[0] = _("G/Ta (dB)");
+    titles[1] = _("G/Ta & TA - Antenna noise temperature");
     if( rc_config.freqplots_show_ant_temp )
     {
-      titles[1] = _("G/T_ant & T_ant");
-      titles[2] = _("T_ant (K)");
+      titles[2] = _("Ta (K)");
     }
     else
     {
-      titles[1] = _("G/T_ant & T_total");
-      titles[2] = _("T_total (K)");
+      titles[2] = _("TA (K)");
     }
 
     if( num_fsteps > 0 )
