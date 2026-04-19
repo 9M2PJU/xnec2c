@@ -393,6 +393,8 @@ typedef struct
   int ant_temp_earth;     /* ant_temp_earth_t index */
   int ant_temp_interp;    /* ant_temp_method_t value */
   double ant_temp_elevation; /* Antenna elevation tilt (degrees), +=up */
+  double ant_temp_custom_t_sky;   /* Custom sky brightness temp (K) */
+  double ant_temp_custom_t_earth; /* Custom earth brightness temp (K) */
   /* Use OpenGL rendering for radiation patterns */
   int use_opengl_renderer;
 

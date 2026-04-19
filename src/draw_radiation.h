@@ -47,5 +47,8 @@ unsigned int Generate_Rdpattern_Data(double *out_r_min, double *out_r_range);
 gboolean Get_Radiation_Pattern_Data(rdpattern_data_t *data);
 void Draw_Color_Legend_Overlay(cairo_t *cr);
 
+void ant_temp_entry_set_kelvin(GtkWidget *entry, double kelvin);
+void ant_temp_entry_set_unresolved(GtkWidget *entry);
+
 #endif
 

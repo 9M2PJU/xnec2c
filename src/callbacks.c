@@ -21,6 +21,7 @@
 #include "shared.h"
 #include "opt_ui.h"
 #include "measurements.h"
+#include "draw_radiation.h"
 #include <pthread.h>
 
 #include "opengl/opengl_structure.h"
@@ -32,11 +33,12 @@
 #include "opengl/opengl_settings.h"
 
 static void common_projection_share_arcball(void);
+#endif
+
 static void noise_model_menus_populate(void);
 static void noise_interp_menu_set_active(int method);
 static void noise_interp_update_sensitivity(void);
 static void noise_interp_auto_switch(int fallback);
-#endif
 
 /* Action flag for NEC2 "card" editors */
 static int editor_action = EDITOR_NEW;
@@ -1140,28 +1142,29 @@ set_view_preset(double wr, double wi, window_t window_type)
 {
   GtkSpinButton *rot, *inc;
   projection_parameters_t *params;
-  GtkWidget *gl_widget;
 
   if( window_type == MAIN_WINDOW )
   {
     rot = rotate_structure;
     inc = incline_structure;
     params = &structure_proj_params;
-    gl_widget = structure_gl_area;
   }
   else
   {
     rot = rotate_rdpattern;
     inc = incline_rdpattern;
     params = &rdpattern_proj_params;
-    gl_widget = rdpattern_drawingarea;
   }
 
   New_Viewer_Angle(wr, wi, rot, inc, params);
 
 #ifdef HAVE_OPENGL
-  if( rc_config.use_opengl_renderer && gl_widget )
-    gl_view_reset_pan(gl_widget);
+  {
+    GtkWidget *gl_widget = (window_type == MAIN_WINDOW)
+        ? structure_gl_area : rdpattern_drawingarea;
+    if( rc_config.use_opengl_renderer && gl_widget )
+      gl_view_reset_pan(gl_widget);
+  }
 #endif
 }
 
@@ -2097,6 +2100,126 @@ on_noise_interp_activate(GtkCheckMenuItem *item, gpointer user_data)
 
   rc_config.ant_temp_interp = GPOINTER_TO_INT(user_data);
   New_Radiation_Projection_Angle();
+}
+
+/* Side context bound by the sky and earth focus-out handlers.
+ * Fields point to the rc_config slots the handler edits so the commit
+ * helper has no flag parameter. */
+typedef struct
+{
+  double   ref;            /* resolved reference temperature (K) */
+  int      ok;             /* ant_temp_resolve status (1 = ref valid) */
+  int     *model_sel;      /* &rc_config.ant_temp_{sky,earth} */
+  int      custom_enum;    /* ANT_TEMP_{SKY,EARTH}_CUSTOM */
+  double  *custom_store;   /* &rc_config.ant_temp_custom_t_{sky,earth} */
+} ant_temp_commit_ctx_t;
+
+/**
+ * ant_temp_resolve_current() - resolve sky/earth at current freq step
+ * @t_sky:   output sky brightness temperature (K)
+ * @t_earth: output earth/man-made noise temperature (K)
+ *
+ * Returns 1 when the resolve succeeded, 0 otherwise. Output parameters
+ * are valid only when the return is 1.
+ */
+static int
+ant_temp_resolve_current(double *t_sky, double *t_earth)
+{
+  return ant_temp_resolve(save.freq[calc_data.freq_step],
+      rc_config.ant_temp_sky, rc_config.ant_temp_earth,
+      rc_config.ant_temp_interp, t_sky, t_earth) == 0;
+}
+
+/**
+ * ant_temp_entry_commit() - parse an entry and commit to Custom if changed
+ * @widget: GtkEntry being edited
+ * @c:      side context with resolved reference and rc_config slots
+ *
+ * Parses the entry text. On parse failure or out-of-range, restores the
+ * displayed value from the side's resolved reference. On successful parse
+ * with delta exceeding ANT_TEMP_K_EPSILON, stores the constant, selects
+ * the Custom model for this side, snaps interp, and triggers recomputation.
+ */
+static void
+ant_temp_entry_commit(GtkWidget *widget, ant_temp_commit_ctx_t c)
+{
+  const char *text = gtk_entry_get_text(GTK_ENTRY(widget));
+  char *endptr = NULL;
+  double val = strtod(text, &endptr);
+
+  /* Parse failure or out-of-range: restore displayed value and bail */
+  if (endptr == text || val <= ANT_TEMP_K_MIN)
+  {
+    if (c.ok)
+      ant_temp_entry_set_kelvin(widget, c.ref);
+    else
+      ant_temp_entry_set_unresolved(widget);
+    return;
+  }
+
+  /* Commit when resolution failed (no reference) or delta exceeds epsilon */
+  if (!c.ok || fabs(val - c.ref) > ANT_TEMP_K_EPSILON)
+  {
+    *c.custom_store = val;
+    *c.model_sel = c.custom_enum;
+    noise_interp_auto_switch(ANT_TEMP_SNAP);
+    New_Radiation_Projection_Angle();
+  }
+}
+
+/**
+ * on_rdpattern_t_earth_focus_out() - focus-out handler for earth temp entry
+ * @_event:     unused; required by the focus-out-event GSignal signature
+ * @_user_data: unused; required by the GCallback signature
+ */
+gboolean
+on_rdpattern_t_earth_focus_out(GtkWidget *widget,
+    GdkEvent *_event, gpointer _user_data)
+{
+  double t_sky, t_earth;
+  int ok = ant_temp_resolve_current(&t_sky, &t_earth);
+  ant_temp_entry_commit(widget, (ant_temp_commit_ctx_t){
+      .ref          = t_earth,
+      .ok           = ok,
+      .model_sel    = &rc_config.ant_temp_earth,
+      .custom_enum  = ANT_TEMP_EARTH_CUSTOM,
+      .custom_store = &rc_config.ant_temp_custom_t_earth,
+  });
+  return FALSE;
+}
+
+/**
+ * on_rdpattern_t_sky_focus_out() - focus-out handler for sky temp entry
+ * @_event:     unused; required by the focus-out-event GSignal signature
+ * @_user_data: unused; required by the GCallback signature
+ */
+gboolean
+on_rdpattern_t_sky_focus_out(GtkWidget *widget,
+    GdkEvent *_event, gpointer _user_data)
+{
+  double t_sky, t_earth;
+  int ok = ant_temp_resolve_current(&t_sky, &t_earth);
+  ant_temp_entry_commit(widget, (ant_temp_commit_ctx_t){
+      .ref          = t_sky,
+      .ok           = ok,
+      .model_sel    = &rc_config.ant_temp_sky,
+      .custom_enum  = ANT_TEMP_SKY_CUSTOM,
+      .custom_store = &rc_config.ant_temp_custom_t_sky,
+  });
+  return FALSE;
+}
+
+/**
+ * on_rdpattern_ant_temp_activate() - Enter key in earth/sky temp entry
+ * @_user_data: unused; required by the GCallback signature
+ *
+ * Moves focus away so the focus-out handler applies the value.
+ */
+void
+on_rdpattern_ant_temp_activate(GtkEntry *entry, gpointer _user_data)
+{
+  GtkWidget *top = gtk_widget_get_toplevel(GTK_WIDGET(entry));
+  gtk_widget_child_focus(top, GTK_DIR_TAB_FORWARD);
 }
 
 /**

@@ -322,17 +322,23 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Symbol Overrides Window Position (root x and y)", .format = "%d,%d",
 		.vars = { &rc_config.sy_overrides_x, &rc_config.sy_overrides_y } },
 
-	{ .desc = "Antenna Temp Sky Model (0..6)", .format = "%d",
+	{ .desc = "Antenna Temp Sky Model", .format = "%d",
 		.vars = { &rc_config.ant_temp_sky } },
 
-	{ .desc = "Antenna Temp Earth Model (0..8)", .format = "%d",
+	{ .desc = "Antenna Temp Earth Model", .format = "%d",
 		.vars = { &rc_config.ant_temp_earth } },
 
-	{ .desc = "Antenna Temp Interp Method (0=Snap 1=Interp 2=Formula 3=Galactic)", .format = "%d",
+	{ .desc = "Antenna Temp Interp Method", .format = "%d",
 		.vars = { &rc_config.ant_temp_interp } },
 
 	{ .desc = "Antenna Temp Elevation (deg, +=up)", .format = "%lf",
 		.vars = { &rc_config.ant_temp_elevation } },
+
+	{ .desc = "Antenna Temp Custom Sky (K)", .format = "%lf",
+		.vars = { &rc_config.ant_temp_custom_t_sky } },
+
+	{ .desc = "Antenna Temp Custom Earth (K)", .format = "%lf",
+		.vars = { &rc_config.ant_temp_custom_t_earth } },
 
 };
 
@@ -705,11 +711,13 @@ Create_Default_Config( void )
   rc_config.freqplots_clamp_vswr = 1;
   rc_config.freqplots_round_x_axis = 0;
 
-  /* Antenna temperature defaults (DG7YBN Avg sky + DG7YBN Residential earth) */
-  rc_config.ant_temp_sky = ANT_TEMP_SKY_DG7YBN_AVG;
+  /* Antenna temperature defaults (Synth Practical Avg sky + DG7YBN Residential earth) */
+  rc_config.ant_temp_sky = ANT_TEMP_SKY_SYNTH_AVG;
   rc_config.ant_temp_earth = ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL;
   rc_config.ant_temp_interp = ANT_TEMP_INTERP;
   rc_config.ant_temp_elevation = 0.0;
+  rc_config.ant_temp_custom_t_sky = ANT_TEMP_CUSTOM_T_SKY_DEFAULT;
+  rc_config.ant_temp_custom_t_earth = ANT_TEMP_CUSTOM_T_EARTH_DEFAULT;
 
   /* For NEC2 editor window */
   rc_config.nec2_edit_width  = 0;
@@ -1015,6 +1023,32 @@ Read_Config( void )
 
   /* Close the config file pointer */
   Close_File( &fp );
+
+  /* Validate noise model indices; reset to defaults if out of range */
+  if (rc_config.ant_temp_sky < 0 || rc_config.ant_temp_sky >= ANT_TEMP_SKY_COUNT)
+  {
+    pr_warn("Invalid sky model index %d in config, resetting to default\n",
+        rc_config.ant_temp_sky);
+    rc_config.ant_temp_sky = ANT_TEMP_SKY_SYNTH_AVG;
+  }
+  if (rc_config.ant_temp_earth < 0 || rc_config.ant_temp_earth >= ANT_TEMP_EARTH_COUNT)
+  {
+    pr_warn("Invalid earth model index %d in config, resetting to default\n",
+        rc_config.ant_temp_earth);
+    rc_config.ant_temp_earth = ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL;
+  }
+  if (rc_config.ant_temp_interp < 0 || rc_config.ant_temp_interp >= ANT_TEMP_METHOD_COUNT)
+  {
+    pr_warn("Invalid interp method %d in config, resetting to default\n",
+        rc_config.ant_temp_interp);
+    rc_config.ant_temp_interp = ANT_TEMP_INTERP;
+  }
+
+  /* Custom temperatures must be positive (zero collapses the pattern) */
+  if (rc_config.ant_temp_custom_t_sky <= ANT_TEMP_K_MIN)
+    rc_config.ant_temp_custom_t_sky = ANT_TEMP_CUSTOM_T_SKY_DEFAULT;
+  if (rc_config.ant_temp_custom_t_earth <= ANT_TEMP_K_MIN)
+    rc_config.ant_temp_custom_t_earth = ANT_TEMP_CUSTOM_T_EARTH_DEFAULT;
 
   Restore_GUI_State();
 

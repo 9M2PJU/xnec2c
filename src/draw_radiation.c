@@ -319,6 +319,39 @@ Generate_Rdpattern_Data(double *out_r_min, double *out_r_range)
 
 /*-----------------------------------------------------------------------*/
 
+/**
+ * ant_temp_entry_set_kelvin() - render "%.0f K" into a noise-temperature entry
+ * @entry:  target GtkEntry; no-op if NULL or currently focused
+ * @kelvin: temperature in Kelvin
+ *
+ * Focus guard prevents clobbering a user-initiated edit in progress.
+ */
+  void
+ant_temp_entry_set_kelvin(GtkWidget *entry, double kelvin)
+{
+  if (!entry || gtk_widget_has_focus(entry))
+    return;
+
+  char buf[24];
+  snprintf(buf, sizeof(buf), "%.0f K", kelvin);
+  gtk_entry_set_text(GTK_ENTRY(entry), buf);
+}
+
+/**
+ * ant_temp_entry_set_unresolved() - show the em-dash placeholder in an entry
+ * @entry: target GtkEntry; no-op if NULL or currently focused
+ */
+  void
+ant_temp_entry_set_unresolved(GtkWidget *entry)
+{
+  if (!entry || gtk_widget_has_focus(entry))
+    return;
+
+  gtk_entry_set_text(GTK_ENTRY(entry), "— K");
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* Update_Rdpattern_UI()
  *
  * Updates radiation pattern window UI elements
@@ -390,6 +423,28 @@ Update_Rdpattern_UI(void)
       else
         snprintf(buf, sizeof(buf), "— K");
       gtk_entry_set_text(GTK_ENTRY(temp_entry), buf);
+    }
+
+    /* Populate T_earth and T_sky readouts from current noise model */
+    double t_sky_val, t_earth_val;
+    int ok = ant_temp_resolve(save.freq[fstep],
+        rc_config.ant_temp_sky, rc_config.ant_temp_earth,
+        rc_config.ant_temp_interp,
+        &t_sky_val, &t_earth_val) == 0;
+
+    GtkWidget *earth_entry = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_t_earth_entry");
+    GtkWidget *sky_entry = Builder_Get_Object(
+        rdpattern_window_builder, "rdpattern_t_sky_entry");
+    if (ok)
+    {
+      ant_temp_entry_set_kelvin(earth_entry, t_earth_val);
+      ant_temp_entry_set_kelvin(sky_entry, t_sky_val);
+    }
+    else
+    {
+      ant_temp_entry_set_unresolved(earth_entry);
+      ant_temp_entry_set_unresolved(sky_entry);
     }
   }
 
@@ -1112,8 +1167,17 @@ Set_Gain_Style( int gs )
 
   widget = Builder_Get_Object( rdpattern_window_builder, "rdpattern_gain_row_label" );
   if (widget)
-    gtk_label_set_text( GTK_LABEL(widget),
-        IS_NOISE_MODE(gs) ? "Noise" : "Gain" );
+  {
+    if (IS_NOISE_MODE(gs))
+    {
+      gtk_label_set_markup( GTK_LABEL(widget),
+          "T<sub>b</sub>(θ,φ)" );
+    }
+    else
+    {
+      gtk_label_set_text( GTK_LABEL(widget), "Gain" );
+    }
+  }
 
   /* Desensitize noise-specific controls when not in noise mode */
   gboolean noise = IS_NOISE_MODE(gs);
@@ -1573,7 +1637,7 @@ Set_Window_Labels( void )
     _("Noise Temp (log scale)"),
   };
 
-  char txt[64];
+  char txt[256];
   size_t s = sizeof( txt );
 
   if( isFlagSet(DRAW_ENABLED) )
@@ -1586,6 +1650,19 @@ Set_Window_Labels( void )
       Strlcat( txt, pol_type[calc_data.pol_type], s );
       Strlcat( txt, " - ", s );
       Strlcat( txt, scale[rc_config.gain_style], s );
+
+      /* Append noise model info when in noise display mode */
+      if( IS_NOISE_MODE(rc_config.gain_style) )
+      {
+        Strlcat( txt, " - Sky:", s );
+        Strlcat( txt, ant_temp_sky_name(rc_config.ant_temp_sky), s );
+        Strlcat( txt, " - Earth:", s );
+        Strlcat( txt, ant_temp_earth_name(rc_config.ant_temp_earth), s );
+        Strlcat( txt, " - ", s );
+        if( rc_config.ant_temp_interp >= 0 &&
+            rc_config.ant_temp_interp < ANT_TEMP_METHOD_COUNT )
+          Strlcat( txt, ant_temp_method_names[rc_config.ant_temp_interp], s );
+      }
     }
     else if( isFlagSet(DRAW_EHFIELD) )
     {

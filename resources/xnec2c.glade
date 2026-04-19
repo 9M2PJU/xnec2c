@@ -12919,7 +12919,7 @@ Save NEC2 Editor data first?
                 </child>
               </object>
               <packing>
-                <property name="left-attach">6</property>
+                <property name="left-attach">8</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>
@@ -12968,7 +12968,7 @@ Save NEC2 Editor data first?
                 <property name="caps-lock-warning">False</property>
               </object>
               <packing>
-                <property name="left-attach">7</property>
+                <property name="left-attach">9</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>
@@ -12983,7 +12983,7 @@ Save NEC2 Editor data first?
                 <property name="track-visited-links">False</property>
               </object>
               <packing>
-                <property name="left-attach">7</property>
+                <property name="left-attach">9</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -12998,7 +12998,7 @@ Save NEC2 Editor data first?
                 <property name="track-visited-links">False</property>
               </object>
               <packing>
-                <property name="left-attach">6</property>
+                <property name="left-attach">8</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -13020,7 +13020,7 @@ Save NEC2 Editor data first?
                 <accelerator key="a" signal="clicked"/>
               </object>
               <packing>
-                <property name="left-attach">5</property>
+                <property name="left-attach">7</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>
@@ -13036,7 +13036,7 @@ Save NEC2 Editor data first?
                 <signal name="toggled" handler="on_freq_apply_checkbutton_toggled" swapped="no"/>
               </object>
               <packing>
-                <property name="left-attach">5</property>
+                <property name="left-attach">7</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -13051,7 +13051,7 @@ Save NEC2 Editor data first?
                 <property name="track-visited-links">False</property>
               </object>
               <packing>
-                <property name="left-attach">4</property>
+                <property name="left-attach">6</property>
                 <property name="top-attach">0</property>
               </packing>
             </child>
@@ -13076,7 +13076,7 @@ Save NEC2 Editor data first?
                 <signal name="value-changed" handler="on_freq_spinbutton_value_changed" swapped="no"/>
               </object>
               <packing>
-                <property name="left-attach">4</property>
+                <property name="left-attach">6</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>
@@ -13123,6 +13123,76 @@ Save NEC2 Editor data first?
               </object>
               <packing>
                 <property name="left-attach">3</property>
+                <property name="top-attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="rdpattern_t_earth_header">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="hexpand">True</property>
+                <property name="label" translatable="yes">T&lt;sub&gt;earth&lt;/sub&gt;</property>
+                <property name="use-markup">True</property>
+                <property name="single-line-mode">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">4</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="rdpattern_t_earth_entry">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="editable">True</property>
+                <property name="max-length">9</property>
+                <property name="invisible-char">●</property>
+                <property name="width-chars">6</property>
+                <property name="max-width-chars">6</property>
+                <property name="text" translatable="yes">— K</property>
+                <property name="xalign">1</property>
+                <property name="shadow-type">etched-in</property>
+                <signal name="focus-out-event" handler="on_rdpattern_t_earth_focus_out" swapped="no"/>
+                <signal name="activate" handler="on_rdpattern_ant_temp_activate" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left-attach">4</property>
+                <property name="top-attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="rdpattern_t_sky_header">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="hexpand">True</property>
+                <property name="label" translatable="yes">T&lt;sub&gt;sky&lt;/sub&gt;</property>
+                <property name="use-markup">True</property>
+                <property name="single-line-mode">True</property>
+              </object>
+              <packing>
+                <property name="left-attach">5</property>
+                <property name="top-attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="rdpattern_t_sky_entry">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="editable">True</property>
+                <property name="max-length">9</property>
+                <property name="invisible-char">●</property>
+                <property name="width-chars">6</property>
+                <property name="max-width-chars">6</property>
+                <property name="text" translatable="yes">— K</property>
+                <property name="xalign">1</property>
+                <property name="shadow-type">etched-in</property>
+                <signal name="focus-out-event" handler="on_rdpattern_t_sky_focus_out" swapped="no"/>
+                <signal name="activate" handler="on_rdpattern_ant_temp_activate" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left-attach">5</property>
                 <property name="top-attach">1</property>
               </packing>
             </child>

@@ -63,6 +63,22 @@ extern const char *meas_descriptions[];
  * IEEE754 noise at exact boundary angles (e.g. cos(pi/2) ≈ 6e-17).
  */
 #define ANT_TEMP_Z_EPSILON 1e-10
+
+/* Custom-temperature edit thresholds and seed values.
+ *
+ * ANT_TEMP_K_MIN: strict lower bound for a valid Kelvin entry; values
+ * at or below this are treated as parse failure / out-of-range.
+ *
+ * ANT_TEMP_K_EPSILON: minimum delta (K) between an edited entry and
+ * the resolved model value before switching to the Custom model.
+ *
+ * ANT_TEMP_CUSTOM_T_*_DEFAULT: initial constants used when no rc file
+ * value is present or the persisted value fails validation.
+ */
+#define ANT_TEMP_K_MIN                   0.0
+#define ANT_TEMP_K_EPSILON               0.5
+#define ANT_TEMP_CUSTOM_T_SKY_DEFAULT    200.0
+#define ANT_TEMP_CUSTOM_T_EARTH_DEFAULT  1000.0
 static inline double ant_temp_z_world(
 		double tht, double phi,
 		double tht_mg, double phi_mg,
@@ -156,6 +172,7 @@ typedef enum
 	ANT_TEMP_SKY_DG7YBN_AVG,     /* galactic average, 3 bands (2025) */
 	ANT_TEMP_SKY_SYNTH_AVG,       /* synthesized practical average, 17 bands (2026) */
 	ANT_TEMP_SKY_SYNTH_MIN,       /* synthesized minimum quiet, 17 bands (2026) */
+	ANT_TEMP_SKY_CUSTOM,          /* user-defined constant, single value */
 	ANT_TEMP_SKY_COUNT,
 } ant_temp_sky_t;
 
@@ -181,6 +198,7 @@ typedef enum
 	ANT_TEMP_EARTH_DG7YBN_RURAL,
 	ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL,
 	ANT_TEMP_EARTH_DG7YBN_CITY,
+	ANT_TEMP_EARTH_CUSTOM,        /* user-defined constant, single value */
 	ANT_TEMP_EARTH_COUNT,
 } ant_temp_earth_t;
 
@@ -248,6 +266,8 @@ typedef struct
 
 int ant_temp_resolve(double freq_mhz, int sky, int earth, int interp,
 	double *t_sky, double *t_earth);
+const char *ant_temp_sky_name(int idx);
+const char *ant_temp_earth_name(int idx);
 void meas_calc(measurement_t *m, int idx);
 int meas_name_idx(char *name, int len);
 void meas_format(measurement_t *m, char *format, char *out, int outlen);

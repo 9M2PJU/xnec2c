@@ -117,6 +117,11 @@ const ant_temp_model_t sky_models[ANT_TEMP_SKY_COUNT] = {
 
 		.valid_interp = ANT_TEMP_TABLE_METHODS,
 	},
+	[ANT_TEMP_SKY_CUSTOM] = {
+		.name = "Custom",
+		/* Other fields unused: ant_temp_resolve() bypasses ant_temp_eval()
+		 * for Custom and reads rc_config.ant_temp_custom_t_sky directly. */
+	},
 };
 
 /* Earth model registry (ascending year) */
@@ -183,6 +188,11 @@ const ant_temp_model_t earth_models[ANT_TEMP_EARTH_COUNT] = {
 		.freq_mhz = ve7bqh_mhz, .temp = ve7bqh_earth[2], .freq_count = 3,
 
 		.valid_interp = ANT_TEMP_TABLE_METHODS,
+	},
+	[ANT_TEMP_EARTH_CUSTOM] = {
+		.name = "Custom",
+		/* Other fields unused: ant_temp_resolve() bypasses ant_temp_eval()
+		 * for Custom and reads rc_config.ant_temp_custom_t_earth directly. */
 	},
 };
 
@@ -318,8 +328,13 @@ int ant_temp_resolve(double freq_mhz, int sky, int earth, int interp,
 	if (earth < 0 || earth >= ANT_TEMP_EARTH_COUNT)
 		return -1;
 
-	double ts = ant_temp_eval(&sky_models[sky], freq_mhz, interp);
-	double te = ant_temp_eval(&earth_models[earth], freq_mhz, interp);
+	/* Custom models bypass table evaluation; return rc_config constants */
+	double ts = (sky == ANT_TEMP_SKY_CUSTOM)
+		? rc_config.ant_temp_custom_t_sky
+		: ant_temp_eval(&sky_models[sky], freq_mhz, interp);
+	double te = (earth == ANT_TEMP_EARTH_CUSTOM)
+		? rc_config.ant_temp_custom_t_earth
+		: ant_temp_eval(&earth_models[earth], freq_mhz, interp);
 
 	if (ts < 0.0 || te < 0.0)
 		return -1;
@@ -698,6 +713,28 @@ int meas_name_idx(char *name, int len)
  * @m:   measurement_t structure to fill
  * @idx: index into calculated data structures (not bounds-checked)
  */
+/**
+ * ant_temp_sky_name() - return display name of a sky noise model
+ * @idx: ant_temp_sky_t index
+ */
+const char *ant_temp_sky_name(int idx)
+{
+	if (idx < 0 || idx >= ANT_TEMP_SKY_COUNT)
+		return "Unknown";
+	return sky_models[idx].name;
+}
+
+/**
+ * ant_temp_earth_name() - return display name of an earth noise model
+ * @idx: ant_temp_earth_t index
+ */
+const char *ant_temp_earth_name(int idx)
+{
+	if (idx < 0 || idx >= ANT_TEMP_EARTH_COUNT)
+		return "Unknown";
+	return earth_models[idx].name;
+}
+
 void meas_calc(measurement_t *m, int idx)
 {
 	g_rec_mutex_lock(&freq_data_lock);
