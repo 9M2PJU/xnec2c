@@ -164,7 +164,7 @@ AS_IF([test "x$enable_opengl" != "xno"], [
     AC_SUBST([GL_LIBS])
     have_opengl=yes
   ], [
-    AC_MSG_WARN([OpenGL not found, using Cairo fallback only])
+    AC_MSG_ERROR([OpenGL headers or library not found. Install libGL-devel (or equivalent) or pass --disable-opengl to build without OpenGL support.])
   ])
 ])
 
