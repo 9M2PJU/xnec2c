@@ -37,6 +37,7 @@
 msaa_update_view(GtkWidget *(*get_widget)(void), int samples)
 {
   GtkWidget *w;
+  GtkWidget *gl_area;
   gl_view_state_t *state;
 
   w = get_widget();
@@ -47,7 +48,11 @@ msaa_update_view(GtkWidget *(*get_widget)(void), int samples)
   if( !state )
     return;
 
-  gtk_gl_area_make_current(GTK_GL_AREA(w));
+  gl_area = gl_view_get_gl_area(w);
+  if( !gl_area )
+    return;
+
+  gtk_gl_area_make_current(GTK_GL_AREA(gl_area));
   gl_view_recreate_msaa(state, samples);
 
   /* Rebuild peel FBOs with matching MSAA sample count so

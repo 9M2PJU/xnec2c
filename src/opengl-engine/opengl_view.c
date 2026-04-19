@@ -409,11 +409,50 @@ on_resize(GtkGLArea *area, int width, int height, gpointer user_data)
 
 /*-----------------------------------------------------------------------*/
 
+/** on_isolator_realize() - Realize handler for the GtkGLArea wrapper
+ * @wrapper: the GtkEventBox wrapping the GtkGLArea
+ * @user_data: unused
+ *
+ * GtkGLArea in GTK3 is a no-window widget (has_window=FALSE); its
+ * drawing flows into the ancestor GdkWindow that owns a native X id.
+ * Without an intermediate container that carries its own native X
+ * window, the GL surface shares the toplevel's backing pixmap, the
+ * same drawable Compiz binds via GLX_EXT_texture_from_pixmap.  When
+ * the two GLX contexts touch the same drawable, NVIDIA proprietary
+ * GLX leaves the pixmap Compiz samples in an undefined state during
+ * focus transitions, producing the observed blackout of every widget
+ * that lives under that toplevel XID.
+ *
+ * Forcing the wrapper's GdkWindow native (gdk_window_ensure_native)
+ * gives the GL surface its own XID, separating the drawable used by
+ * client-side GLX from the one Compiz's TFP binding reads.
+ */
+  static void
+on_isolator_realize(GtkWidget *wrapper, gpointer user_data)
+{
+  GdkWindow *win;
+
+  (void)user_data;
+
+  win = gtk_widget_get_window(wrapper);
+  if( win )
+    gdk_window_ensure_native(win);
+
+} /* on_isolator_realize() */
+
+/*-----------------------------------------------------------------------*/
+
 /** gl_view_create_widget() - Create GL area widget with engine wired
  * @config: view configuration
  * @scene: scene provider
  * @arcball: arcball state
  * @zoom_spinbutton: pointer to zoom spinbutton pointer
+ *
+ * Returns a GtkEventBox containing a single GtkGLArea child.  The
+ * event box carries a native X window that isolates the GL surface
+ * from the toplevel drawable.  External callers treat the returned
+ * widget as opaque; sites that need the inner GtkGLArea must call
+ * gl_view_get_gl_area().
  */
   GtkWidget*
 gl_view_create_widget(
@@ -423,6 +462,7 @@ gl_view_create_widget(
     GtkSpinButton **zoom_spinbutton)
 {
   GtkWidget *gl_area;
+  GtkWidget *isolator;
   gl_view_state_t *state;
 
   if( !config || !scene || !arcball )
@@ -458,7 +498,6 @@ gl_view_create_widget(
   gtk_gl_area_set_has_depth_buffer(GTK_GL_AREA(gl_area), TRUE);
   gtk_gl_area_set_auto_render(GTK_GL_AREA(gl_area), TRUE);
 
-  gtk_widget_set_size_request(gl_area, 400, 400);
   gtk_widget_set_hexpand(gl_area, TRUE);
   gtk_widget_set_vexpand(gl_area, TRUE);
 
@@ -471,22 +510,74 @@ gl_view_create_widget(
 
   g_object_set_data(G_OBJECT(gl_area), "gl_state", state);
 
-  return( gl_area );
+  /* Wrap the GtkGLArea in a GtkEventBox with a visible (native)
+   * GdkWindow so the GL surface has its own XID independent of the
+   * toplevel's backing pixmap.  See on_isolator_realize() above. */
+  isolator = gtk_event_box_new();
+  gtk_event_box_set_visible_window(GTK_EVENT_BOX(isolator), TRUE);
+  gtk_event_box_set_above_child(GTK_EVENT_BOX(isolator), FALSE);
+
+  gtk_widget_set_size_request(isolator, 400, 400);
+  gtk_widget_set_hexpand(isolator, TRUE);
+  gtk_widget_set_vexpand(isolator, TRUE);
+
+  gtk_container_add(GTK_CONTAINER(isolator), gl_area);
+  gtk_widget_show(gl_area);
+
+  g_signal_connect(isolator, "realize",
+      G_CALLBACK(on_isolator_realize), NULL);
+
+  return( isolator );
 
 } /* gl_view_create_widget() */
 
 /*-----------------------------------------------------------------------*/
 
+/** gl_view_get_gl_area() - Resolve a view widget handle to its GtkGLArea
+ * @widget: either the wrapper returned by gl_view_create_widget() or the
+ *          inner GtkGLArea itself
+ *
+ * Returns the inner GtkGLArea, or NULL if @widget is neither.  Sites that
+ * must issue GtkGLArea-specific calls (gtk_gl_area_make_current,
+ * gtk_gl_area_queue_render, etc.) must route through this accessor.
+ */
+  GtkWidget*
+gl_view_get_gl_area(GtkWidget *widget)
+{
+  GtkWidget *child;
+
+  if( !widget )
+    return( NULL );
+
+  if( GTK_IS_GL_AREA(widget) )
+    return( widget );
+
+  if( GTK_IS_BIN(widget) )
+  {
+    child = gtk_bin_get_child(GTK_BIN(widget));
+    if( child && GTK_IS_GL_AREA(child) )
+      return( child );
+  }
+
+  return( NULL );
+
+} /* gl_view_get_gl_area() */
+
+/*-----------------------------------------------------------------------*/
+
 /** gl_view_get_state() - Get view state from widget
- * @widget: GL area widget
+ * @widget: wrapper or inner GtkGLArea
  */
   gl_view_state_t*
 gl_view_get_state(GtkWidget *widget)
 {
-  if( !widget )
+  GtkWidget *gl_area;
+
+  gl_area = gl_view_get_gl_area(widget);
+  if( !gl_area )
     return( NULL );
 
-  return( g_object_get_data(G_OBJECT(widget), "gl_state") );
+  return( g_object_get_data(G_OBJECT(gl_area), "gl_state") );
 
 } /* gl_view_get_state() */
 

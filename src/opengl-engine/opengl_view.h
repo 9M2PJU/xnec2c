@@ -338,6 +338,11 @@ GtkWidget* gl_view_create_widget(
     GtkSpinButton **zoom_spinbutton);
 
 gl_view_state_t* gl_view_get_state(GtkWidget *widget);
+
+/* gl_view_get_gl_area() - Resolve a view widget handle to its GtkGLArea.
+ * Accepts either the wrapper returned by gl_view_create_widget() or the
+ * inner GtkGLArea.  Returns NULL for any other widget. */
+GtkWidget* gl_view_get_gl_area(GtkWidget *widget);
 void gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball);
 void gl_view_sync_arcball(GtkWidget *widget, double wr, double wi);
 void gl_view_reset_pan(GtkWidget *widget);
