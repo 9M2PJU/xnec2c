@@ -171,12 +171,9 @@ view_notify_change(view_t *v)
   /* Propagate drag accumulators to the follower so
    * view_update_spin_display reads exact double-precision angles
    * rather than a lossy float matrix roundtrip. */
+  view_sync_drag_to_follower(v);
   if( v->rotation_follower != NULL )
-  {
-    v->rotation_follower->drag_wr_deg = v->drag_wr_deg;
-    v->rotation_follower->drag_wi_deg = v->drag_wi_deg;
     view_notify_change(v->rotation_follower);
-  }
 
   v->in_notify = FALSE;
 
@@ -208,7 +205,11 @@ view_share_master(view_t *follower, view_t *master)
 
   follower->rotation_master = master;
   master->rotation_follower = follower;
-  view_notify_change(follower);
+
+  /* Notify the master so direction-2 propagation in view_notify_change
+   * seeds the follower's drag accumulators from the master's
+   * authoritative values before firing the follower's changed_cb. */
+  view_notify_change(master);
 
 } /* view_share_master() */
 

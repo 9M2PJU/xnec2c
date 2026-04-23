@@ -270,6 +270,56 @@ view_rotation_owner(view_t *v)
 }
 
 /**
+ * view_sync_drag() - Copy drag accumulators from one view to another
+ * @dst: destination view
+ * @src: source view
+ *
+ * Single definition of the two-field accumulator copy used by both
+ * sync directions: mutator-to-owner and owner-to-follower.
+ */
+static inline void
+view_sync_drag(view_t *dst, const view_t *src)
+{
+  dst->drag_wr_deg = src->drag_wr_deg;
+  dst->drag_wi_deg = src->drag_wi_deg;
+}
+
+/**
+ * view_sync_drag_to_owner() - Propagate drag accumulators from mutator to owner
+ * @v: the view that mutated its accumulators
+ *
+ * When a follower mutates rotation (via view_set_angles or
+ * view_apply_drag), the owner's accumulators must mirror the
+ * follower's so view_update_spin_display on the owner reads
+ * exact double-precision angles rather than a lossy float
+ * matrix roundtrip through Extract_View_Angles.
+ */
+static inline void
+view_sync_drag_to_owner(view_t *v)
+{
+  view_t *owner = view_rotation_owner(v);
+
+  if( owner != v )
+    view_sync_drag(owner, v);
+}
+
+/**
+ * view_sync_drag_to_follower() - Propagate drag accumulators from owner to follower
+ * @v: the owner view whose accumulators are authoritative
+ *
+ * When the owner's rotation changes, the follower's accumulators
+ * must mirror the owner's so view_update_spin_display on the
+ * follower reads exact double-precision angles rather than a lossy
+ * float matrix roundtrip through Extract_View_Angles.
+ */
+static inline void
+view_sync_drag_to_follower(view_t *v)
+{
+  if( v->rotation_follower != NULL )
+    view_sync_drag(v->rotation_follower, v);
+}
+
+/**
  * view_R() - Return the canonical rotation matrix pointer.
  *
  * Read path counterpart of view_rotation_owner().  Consumers always
