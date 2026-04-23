@@ -84,9 +84,9 @@ extern char *fork_commands[];
 /* Child process descriptors */
 extern child_proc_t **child_procs;
 
-extern projection_parameters_t
-  rdpattern_proj_params,
-  structure_proj_params;
+extern view_t
+  *rdpattern_view,
+  *structure_view;
 
 /* Number of forked child processes */
 extern int num_child_procs;
@@ -313,8 +313,6 @@ extern comments_t comments;
 
 /* Segments for drawing structure */
 extern Segment_t *structure_segs;
-
-#define MOTION_EVENTS_COUNT 8
 
 /*------------------------------------------------------------------------*/
 

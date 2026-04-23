@@ -533,7 +533,7 @@ static void _meas_calc(measurement_t *m, int idx)
 	m->gain_max = rad_pattern[idx].gtot[mgidx] + Polarization_Factor(pol, idx, mgidx);
 	m->gain_net = m->gain_max + net_gain_adjust;
 
-	m->gain_viewer = Viewer_Gain(structure_proj_params, idx);
+	m->gain_viewer = Viewer_Gain(structure_view, idx);
 	m->gain_viewer_net = m->gain_viewer + net_gain_adjust;
 
 	m->gain_max_theta = 90.0 - rad_pattern[idx].max_gain_tht[pol];

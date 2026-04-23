@@ -88,104 +88,63 @@ segment_type_to_rgb(segment_color_type_t type, float *r, float *g, float *b)
 
 /*-----------------------------------------------------------------------*/
 
-/*  Project_on_Screen()
- *
- *  Projects a point in the x,y,z co-ordinate
- *  frame of NEC2 to the x,y frame of the Screen
- */
-  static void
-Project_on_Screen(
-    projection_parameters_t *params,
-    double x, double y, double z,
-    double *xs, double *ys )
-{
-  *xs = y*params->cos_wr - x*params->sin_wr;
-  *ys = z*params->cos_wi - params->sin_wi *
-    (x*params->cos_wr + y*params->sin_wr);
-
-} /* Project_on_Screen() */
-
-/*-----------------------------------------------------------------------*/
-
-/* Set_Gdk_Segment()
- *
- *  Calculates window x,y co-ordinates of a Segment_t for
- *  drawing on Screen. Input data is a line in the xyz frame
- */
-  void
-Set_Gdk_Segment(
-    Segment_t *segm,
-    projection_parameters_t *params,
-    double x1, double y1, double z1,
-    double x2, double y2, double z2 )
-{
-  double x, y;
-
-  /* Project end 1 of seg in xyz frame to screen frame */
-  Project_on_Screen( params, x1, y1, z1, &x, &y );
-  segm->x1 = (gint)(params->x_center + params->dx_center + x*params->xy_scale);
-  segm->y1 = params->height -
-    (gint)(params->y_center + params->dy_center + y*params->xy_scale);
-
-  /* Project end 2 of seg in xyz frame to screen frame */
-  Project_on_Screen( params, x2, y2, z2, &x, &y );
-  segm->x2 = (gint)(params->x_center + params->dx_center + x*params->xy_scale);
-  segm->y2 = params->height -
-    (gint)(params->y_center + params->dy_center + y*params->xy_scale);
-
-} /* Set_Gdk_Segment() */
-
-/*-----------------------------------------------------------------------*/
-
 /*  Project_XYZ_Axes()
  *
- *  Sets Segment_t data to project xyz axes on Screen
+ *  Sets Segment_t data to project xyz axes on Screen.
+ *
+ *  The three axes differ only in which component carries r_max and
+ *  in the glyph drawn at the tip; drive both from a tiny table so the
+ *  origin, projection, and label steps run through one loop.
  */
   static void
 Project_XYZ_Axes(
     cairo_t *cr,
-    projection_parameters_t *params,
+    view_t *v,
     Segment_t *segment )
 {
-  double x, y;
+  /* axis_table - {tip offset, label} per Cartesian axis */
+  static const struct
+  {
+    double ox, oy, oz;
+    const gchar *label;
+  } axis_table[3] =
+  {
+    { 1.0, 0.0, 0.0, "x"  },
+    { 0.0, 1.0, 0.0, "y"  },
+    { 0.0, 0.0, 1.0, " z" }
+  };
+
+  double scale = view_xy_scale(v);
+  double xc    = view_x_center(v);
+  double yc    = view_y_center(v);
+  double px    = (double)v->pan_offset[0];
+  double py    = (double)v->pan_offset[1];
   PangoLayout *layout;
-  Segment_t *segm = segment;
+  int idx;
 
-  /* cairo context */
   cairo_set_source_rgb( cr, WHITE );
+  layout = gtk_widget_create_pango_layout( structure_drawingarea, NULL );
 
-  layout = gtk_widget_create_pango_layout( structure_drawingarea, "x" );
+  for( idx = 0; idx < 3; idx++ )
+  {
+    Segment_t *segm = &segment[idx];
+    double x, y;
 
-  segm->x1 = (gint)( params->x_center + params->dx_center );
-  segm->y1 = params->height - (gint)( params->y_center + params->dy_center );
-  Project_on_Screen( params, params->r_max, 0.0, 0.0, &x, &y );
-  segm->x2 = (gint)(params->x_center + params->dx_center + x*params->xy_scale);
-  segm->y2 = params->height -
-    (gint)(params->y_center + params->dy_center + y*params->xy_scale);
-  cairo_move_to( cr, (double)segm->x2, (double)segm->y2 );
-  pango_cairo_show_layout( cr, layout );
+    Project_on_Screen( v,
+        axis_table[idx].ox * v->r_max,
+        axis_table[idx].oy * v->r_max,
+        axis_table[idx].oz * v->r_max,
+        &x, &y );
 
-  segm++;
-  segm->x1 = (gint)( params->x_center + params->dx_center );
-  segm->y1 = params->height - (gint)( params->y_center + params->dy_center );
-  Project_on_Screen( params, 0.0, params->r_max, 0.0, &x, &y );
-  segm->x2 = (gint)(params->x_center + params->dx_center + x*params->xy_scale);
-  segm->y2 = params->height -
-    (gint)(params->y_center + params->dy_center + y*params->xy_scale);
-  pango_layout_set_text( layout, "y", -1 );
-  cairo_move_to( cr, (double)segm->x2, (double)segm->y2 );
-  pango_cairo_show_layout( cr, layout );
+    segm->x1 = (gint)( xc + px );
+    segm->y1 = v->height - (gint)( yc + py );
+    segm->x2 = (gint)( xc + px + x * scale );
+    segm->y2 = v->height - (gint)( yc + py + y * scale );
 
-  segm++;
-  segm->x1 = (gint)( params->x_center + params->dx_center );
-  segm->y1 = params->height - (gint)( params->y_center + params->dy_center );
-  Project_on_Screen( params, 0.0, 0.0, params->r_max, &x, &y );
-  segm->x2 = (gint)(params->x_center + params->dx_center + x*params->xy_scale);
-  segm->y2 = params->height -
-    (gint)(params->y_center + params->dy_center + y*params->xy_scale);
-  pango_layout_set_text( layout, " z", -1 );
-  cairo_move_to( cr, (double)segm->x2, (double)segm->y2 );
-  pango_cairo_show_layout( cr, layout );
+    pango_layout_set_text( layout, axis_table[idx].label, -1 );
+    cairo_move_to( cr, (double)segm->x2, (double)segm->y2 );
+    pango_cairo_show_layout( cr, layout );
+  }
 
   g_object_unref( layout );
 
@@ -198,56 +157,17 @@ Project_XYZ_Axes(
  *  Draws the xyz axes to Screen
  */
   void
-Draw_XYZ_Axes( cairo_t *cr, projection_parameters_t params )
+Draw_XYZ_Axes( cairo_t *cr, view_t *v )
 {
   static Segment_t seg[3];
 
   /* Calculate Screen co-ordinates of xyz axes */
-  Project_XYZ_Axes( cr, &params, seg );
+  Project_XYZ_Axes( cr, v, seg );
 
   /* Draw xyz axes */
   Cairo_Draw_Segments( cr, seg, 3 );
 
 } /* Draw_XYZ_Axes() */
-
-/*-----------------------------------------------------------------------*/
-
-/*  New_Projection_Parameters()
- *
- *  Calculates values for some projection parameters after
- *  a window is resized or new wire or patch data entered.
- */
-  void
-New_Projection_Parameters(
-    int width, int height,
-    projection_parameters_t *params )
-{
-  /* Half the size of drawing area */
-  double size2;
-  if( width < height )
-    size2 = (double)width / 2.0;
-  else
-    size2 = (double)height / 2.0;
-
-  /* This defines the center of the drawing areas. For the x co-ordinate
-   * half the size of the drawing area is right (for widths of odd number
-   * of pixels, so that there are even and equal number of pixels either
-   * side of center). But for the y co-ordinate we need to round up as
-   * y is from the top down and the y co-ordinate of center is calculated
-   * from height - y_center and this leads to a 1-pixel error */
-  params->x_center = (double)width / 2.0;
-  params->y_center = (double)height / 2.0 + 0.5;
-
-  if( params->r_max == 0.0 )
-    params->xy_scale1 = 1.0;
-  else
-    params->xy_scale1 = size2 / params->r_max;
-  params->xy_scale = params->xy_scale1 * params->xy_zoom;
-
-  params->width  = width;
-  params->height = height;
-
-} /* New_Projection_Parameters() */
 
 /*-----------------------------------------------------------------------*/
 

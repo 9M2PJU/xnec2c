@@ -61,6 +61,11 @@ xnec2c_SOURCES = \
     optimizers/particleswarm.c optimizers/particleswarm.h \
     optimizers/particleswarm_internal.h \
     optimizers/particleswarm_engine.c \
+    view/view_core.c view/view_core.h \
+    view/view_angles.c \
+    view/view_drag.c \
+    view/view_gtk.c \
+    view/view_presets.h \
     common.h        editors.h
 
 xnec2c_CPPFLAGS  =
@@ -108,7 +113,6 @@ xnec2c_CPPFLAGS += $(GSL_CFLAGS)
 xnec2c_LDADD    += $(GSL_LIBS)
 if HAVE_OPENGL
 xnec2c_SOURCES += \
-  opengl-engine/opengl_arcball.c opengl-engine/opengl_arcball.h \
   opengl-engine/opengl_renderer.c opengl-engine/opengl_renderer.h \
   opengl-engine/opengl_view.c opengl-engine/opengl_view.h \
   opengl-engine/opengl_view_render.c opengl-engine/opengl_view_render.h \

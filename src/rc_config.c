@@ -118,8 +118,8 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Use OpenGL Renderer for Radiation Patterns", .format = "%d",
 		.vars = { &rc_config.use_opengl_renderer } },
 
-	{ .desc = "Use Constrained Rotation for OpenGL Arcball", .format = "%d",
-		.vars = { &rc_config.arcball_constrained_rotation } },
+	{ .desc = "Use Constrained View Drag Rotation", .format = "%d",
+		.vars = { &rc_config.view_drag_constrained } },
 
 	{ .desc = "Main Window Common Projection", .format = "%d",
 		.vars = { &rc_config.main_common_projection },
@@ -240,12 +240,6 @@ rc_config_vars_t rc_config_vars[] = {
 
 	{ .desc = "NEC2 Editor Window Position (root x and y)", .format = "%d,%d",
 		.vars = { &rc_config.nec2_edit_x, &rc_config.nec2_edit_y } },
-
-	{ .desc = "Structure Projection Center x and y Offset", .format = "%lf,%lf",
-		.vars = { &structure_proj_params.dx_center, &structure_proj_params.dy_center } },
-
-	{ .desc = "Rdpattern Projection Center x and y Offset", .format = "%lf,%lf",
-		.vars = { &rdpattern_proj_params.dx_center, &rdpattern_proj_params.dy_center } },
 
 	{ .desc = "Enable Confirm Quit Dialog", .format = "%d",
 		.vars = { &rc_config.confirm_quit } },
@@ -671,7 +665,7 @@ Create_Default_Config( void )
   rc_config.opengl_msaa_samples = MSAA_OFF;
 #endif
 
-  rc_config.arcball_constrained_rotation = 1;
+  rc_config.view_drag_constrained = 1;
   rc_config.current_flow_visualization_mode = FLOW_DIR_REFERENCE_PHASE;
   opengl_config_set_defaults();
 
@@ -727,12 +721,6 @@ Create_Default_Config( void )
 
   /* Enable Quit Dialog */
   rc_config.confirm_quit = 1;
-
-  /* Structure and rdpattern center offset */
-  structure_proj_params.dx_center = 0.0;
-  structure_proj_params.dy_center = 0.0;
-  rdpattern_proj_params.dx_center = 0.0;
-  rdpattern_proj_params.dy_center = 0.0;
 
   return( TRUE );
 

@@ -95,7 +95,8 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
   state->content = content;
 
-  camera_distance = content.r_max * ARCBALL_BASE_DISTANCE_FACTOR / content.zoom;
+  camera_distance = content.r_max * GL_VIEW_BASE_DISTANCE_FACTOR /
+                    state->view->zoom;
   state->cached_camera_distance = camera_distance;
 
   /* Active survey — build mask and compute far extent in one pass */
@@ -179,9 +180,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     state->cached_near_plane = near_plane;
     state->cached_far_plane = far_plane;
 
-    arcball_get_mvp(state->arcball, mvp, mv, state->pan_offset,
-        camera_distance, content.model_scale, state->aspect, state->fov_rad,
-        near_plane, far_plane);
+    gl_view_build_mvp(state, content.model_scale, mvp, mv);
   }
 
   /* Framebuffer setup */

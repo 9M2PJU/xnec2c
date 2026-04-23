@@ -40,7 +40,7 @@ Draw_Structure_UI(void)
   Show_Viewer_Gain(
       main_window_builder,
       "main_gain_entry",
-      structure_proj_params );
+      structure_view );
 
   if( calc_data.freq_step >= 0 )
     Display_Fstep( structure_fstep_entry, calc_data.freq_step );
@@ -56,16 +56,16 @@ _Draw_Structure( cairo_t *cr )
   cairo_set_source_rgb( cr, BLACK );
   cairo_rectangle(
       cr, 0.0, 0.0,
-      (double)structure_proj_params.width,
-      (double)structure_proj_params.height);
+      (double)structure_view->width,
+      (double)structure_view->height);
   cairo_fill( cr );
 
   /* Process and draw geometry if available, else clear screen */
-  Process_Wire_Segments();
-  Process_Surface_Patches();
-  Draw_XYZ_Axes( cr, structure_proj_params );
-  Draw_Surface_Patches( cr, structure_segs+data.n, data.m );
-  Draw_Wire_Segments( cr, structure_segs, data.n );
+  Process_Wire_Segments( structure_view );
+  Process_Surface_Patches( structure_view );
+  Draw_XYZ_Axes( cr, structure_view );
+  Draw_Surface_Patches( cr, structure_view, structure_segs+data.n, data.m );
+  Draw_Wire_Segments( cr, structure_view, structure_segs, data.n );
 
   Draw_Structure_UI();
 
@@ -120,15 +120,15 @@ New_Wire_Data( void )
 
   } /* for( idx = 0; idx < data.n; idx++ ) */
 
-  /* Max value of segment r saved if appropriate */
-  if( r_max > structure_proj_params.r_max )
-    structure_proj_params.r_max = r_max;
+  /* View extent and viewport only exist in the UI process; children
+   * (created before structure_view) skip the readback harmlessly. */
+  if( structure_view != NULL )
+  {
+    if( r_max > (double)structure_view->r_max )
+      view_set_r_max( structure_view, (float)r_max );
 
-  /* Redraw structure on screen */
-  New_Projection_Parameters(
-      structure_width,
-      structure_height,
-      &structure_proj_params );
+    view_set_viewport( structure_view, structure_width, structure_height );
+  }
 
 } /* New_Wire_Data() */
 
@@ -238,15 +238,14 @@ New_Patch_Data( void )
 
   } /* for( idx = 0; idx < data.m; idx++ ) */
 
-  /* Max value of patch r saved if appropriate */
-  if( r_max > structure_proj_params.r_max )
-    structure_proj_params.r_max = r_max;
+  /* See New_Wire_Data(): skip view updates in children. */
+  if( structure_view != NULL )
+  {
+    if( r_max > (double)structure_view->r_max )
+      view_set_r_max( structure_view, (float)r_max );
 
-  /* Redraw structure on screen */
-  New_Projection_Parameters(
-      structure_width,
-      structure_height,
-      &structure_proj_params );
+    view_set_viewport( structure_view, structure_width, structure_height );
+  }
 
 } /* New_Patch_Data() */
 
@@ -257,7 +256,7 @@ New_Patch_Data( void )
  *  Processes wire segment data so they can be drawn on Screen
  */
   void
-Process_Wire_Segments( void )
+Process_Wire_Segments( view_t *v )
 {
   int idx;
 
@@ -265,7 +264,7 @@ Process_Wire_Segments( void )
   for( idx = 0; idx < data.n; idx++ )
     Set_Gdk_Segment(
         &structure_segs[idx],
-        &structure_proj_params,
+        v,
         (double)data.x1[idx],
         (double)data.y1[idx],
         (double)data.z1[idx],
@@ -282,7 +281,7 @@ Process_Wire_Segments( void )
  *  Processes surface patch data so they can be drawn on Screen
  */
   void
-Process_Surface_Patches( void )
+Process_Surface_Patches( view_t *v )
 {
   int idx, m2;
 
@@ -293,7 +292,7 @@ Process_Surface_Patches( void )
   for( idx = 0; idx < m2; idx++ )
     Set_Gdk_Segment(
         &structure_segs[idx+data.n],
-        &structure_proj_params,
+        v,
         data.px1[idx],
         data.py1[idx],
         data.pz1[idx],
@@ -311,7 +310,7 @@ Process_Surface_Patches( void )
  */
 
   void
-Draw_Wire_Segments( cairo_t *cr, Segment_t *segm, gint nseg )
+Draw_Wire_Segments( cairo_t *cr, view_t *v, Segment_t *segm, gint nseg )
 {
   /* Abort if no wire segs or new input pending */
   if( !nseg || isFlagSet(INPUT_PENDING) )
@@ -446,7 +445,7 @@ Draw_Wire_Segments( cairo_t *cr, Segment_t *segm, gint nseg )
   {
     /* Set gc attributes for segments */
     if( isFlagSet(OVERLAY_STRUCT) &&
-        (structure_proj_params.type == RDPATTERN_DRAWINGAREA) )
+        (v->type == VIEW_RDPATTERN) )
       cairo_set_source_rgb( cr, WHITE );
     else
       cairo_set_source_rgb( cr, BLUE );
@@ -513,7 +512,7 @@ Draw_Wire_Segments( cairo_t *cr, Segment_t *segm, gint nseg )
  *  Draws the line segments that represent surface patches
  */
   void
-Draw_Surface_Patches( cairo_t *cr, Segment_t *segm, gint npatch )
+Draw_Surface_Patches( cairo_t *cr, view_t *v, Segment_t *segm, gint npatch )
 {
   /* Abort if no patches */
   if( ! npatch ) return;
@@ -602,7 +601,7 @@ Draw_Surface_Patches( cairo_t *cr, Segment_t *segm, gint npatch )
 
     /* Set gc attributes for patches */
     if( isFlagSet(OVERLAY_STRUCT) &&
-        (structure_proj_params.type == RDPATTERN_DRAWINGAREA) )
+        (v->type == VIEW_RDPATTERN) )
       cairo_set_source_rgb( cr, WHITE );
     else cairo_set_source_rgb( cr, BLUE );
 
@@ -718,20 +717,18 @@ Save_Crnt_Data( int fstep )
 
 /*-----------------------------------------------------------------------*/
 
-/*  New_Structure_Projection_Angle()
+/*  Queue_Structure_Redraw()
  *
- *  Calculates new projection parameters when a
- *  structure projection angle (Wr or Wi) changes
+ *  Queues a redraw of the structure drawingarea and, when a
+ *  "viewer gain" plot is active, the frequency-plot area.
+ *
+ *  Called by view_t observers when rotation, pan or zoom change.
+ *  No projection-cache state is maintained here: view_R(), the
+ *  pan_offset and the zoom are read directly at draw time.
  */
   void
-New_Structure_Projection_Angle(void)
+Queue_Structure_Redraw(void)
 {
-  /* sin and cos of structure rotation and inclination angles */
-  structure_proj_params.sin_wr = sin(structure_proj_params.Wr/(double)TODEG);
-  structure_proj_params.cos_wr = cos(structure_proj_params.Wr/(double)TODEG);
-  structure_proj_params.sin_wi = sin(structure_proj_params.Wi/(double)TODEG);
-  structure_proj_params.cos_wi = cos(structure_proj_params.Wi/(double)TODEG);
-
   /* Trigger a redraw of structure drawingarea */
   if( structure_drawingarea )
     xnec2_widget_queue_draw( structure_drawingarea, TRUE );
@@ -744,7 +741,7 @@ New_Structure_Projection_Angle(void)
     xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 
-} /* New_Structure_Projection_Angle() */
+} /* Queue_Structure_Redraw() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -772,7 +769,7 @@ Init_Struct_Drawing( void )
 Show_Viewer_Gain(
     GtkBuilder *builder,
     gchar *widget,
-    projection_parameters_t proj_params )
+    view_t *v )
 {
   if( isFlagSet(DRAW_CURRENTS) ||
       isFlagSet(DRAW_CHARGES)  ||
@@ -782,7 +779,7 @@ Show_Viewer_Gain(
     char txt[16];
     if( isFlagSet(ENABLE_RDPAT) && (calc_data.freq_step >= 0) )
     {
-      snprintf( txt, sizeof(txt)-1, "%.2f", Viewer_Gain(proj_params, calc_data.freq_step) );
+      snprintf( txt, sizeof(txt)-1, "%.2f", Viewer_Gain(v, calc_data.freq_step) );
       gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(builder, widget)), txt );
     }
   }

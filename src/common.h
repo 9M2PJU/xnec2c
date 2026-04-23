@@ -46,6 +46,7 @@
 
 #include "measurements.h"
 #include "i18n.h"
+#include "view/view_core.h"
 
 // Define GSourceOnceFunc if compiling against an older version of GLIB:
 #if GLIB_VERSION_CUR_STABLE < G_ENCODE_VERSION(2,74)
@@ -149,7 +150,6 @@ typedef struct Segment
 /* Main Window Control flags */
 #define DRAW_CURRENTS       0x0000000000000010ll
 #define DRAW_CHARGES        0x0000000000000020ll
-#define COMMON_PROJECTION   0x0000000000000040ll
 #define FREQ_APPLY          0x0000000000000100ll
 #define MAIN_QUIT           0x0000000000000200ll
 
@@ -398,8 +398,8 @@ typedef struct
   /* Use OpenGL rendering for radiation patterns */
   int use_opengl_renderer;
 
-  /* Use constrained rotation for OpenGL arcball */
-  int arcball_constrained_rotation;
+  /* Use constrained (WR/WI-delta) rotation for Cairo and GL drag */
+  int view_drag_constrained;
 
   /* OpenGL MSAA sample count (0, 2, 4, 8, or 16) */
   int opengl_msaa_samples;
@@ -919,35 +919,6 @@ typedef struct
 
 } comments_t;
 
-/* Parameters for projecting points on screen */
-typedef struct
-{
-  double
-    Wi,         /* Angle (inclination) of Z axis to Screen, +ve to viewer */
-    Wr,         /* Rotation of X-Y plane around Z axis, +ve clockwise */
-    sin_wi,     /* sin(Wi) */
-    cos_wi,     /* cos(Wi) */
-    sin_wr,     /* sin(Wr) */
-    cos_wr,     /* cos(Wr) */
-    r_max,      /* Max distance from xyz origin of a point in antenna */
-    xy_scale1,  /* Scale factor to fit structure into drawable window */
-    xy_scale,   /* Scale factor incorporating zoom factor */
-    xy_zoom,    /* Structure Zoom factor */
-    x_center,   /* X co-ordinate of xyz axes origin in screen's drawable */
-    dx_center,  /* Displacement of center x (move projection) */
-    y_center,   /* X co-ordinate of xyz axes origin in screen's drawable */
-    dy_center;  /* Displacement of center y (move projection) */
-
-  int
-    width,   /*  Width of drawable */
-    height;  /* Height of drawable */
-
-  char type; /* Type of projection parameters struct */
-
-  gboolean reset;  /* Reset flag needed in some functions */
-
-} projection_parameters_t;
-
 /* My addition, a struct for frequency loop related data.
  * This is needed to implement multiple FR cards so
  * that a frequency sweep can be made in separate bands
@@ -1135,8 +1106,7 @@ double cang(_Complex double z);
 void zint(double sigl, double rolam, _Complex double *zint);
 /* callback_func.c */
 gboolean Save_Pixbuf(gpointer save_data);
-void New_Viewer_Angle(double wr, double wi, GtkSpinButton *wr_spb, GtkSpinButton *wi_spb, projection_parameters_t *params);
-void Motion_Event(GdkEventMotion *event, projection_parameters_t *params);
+void Motion_Event(GdkEventMotion *event, view_t *v);
 void Plot_Select(GtkToggleButton *togglebutton, unsigned long long int flag);
 gboolean Nec2_Edit_Save(void);
 void Delete_Event(gchar *mesg);
@@ -1526,8 +1496,9 @@ void Intrange_Command(int action);
 void Execute_Command(int action);
 void Zo_Command(int action);
 /* draw.c */
-void Set_Gdk_Segment(Segment_t *segm, projection_parameters_t *params, double x1, double y1, double z1, double x2, double y2, double z2);
-void Draw_XYZ_Axes(cairo_t *cr, projection_parameters_t params);
+void Set_Gdk_Segment(Segment_t *segm, view_t *v, double x1, double y1, double z1, double x2, double y2, double z2);
+void Draw_XYZ_Axes(cairo_t *cr, view_t *v);
+void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, double *ys);
 /* Availability guards for per-frequency-step data */
 #define CRNT_FSTEP_AVAILABLE(fs) \
     ((fs) >= 0 && (fs) <= calc_data.steps_total \
@@ -1539,7 +1510,6 @@ void Draw_XYZ_Axes(cairo_t *cr, projection_parameters_t params);
      && save.fstep != NULL && save.fstep[(fs)] \
      && near_field_fstep != NULL && near_field_fstep[(fs)].px != NULL)
 
-void New_Projection_Parameters(int width, int height, projection_parameters_t *params);
 void Value_to_Color(double *red, double *grn, double *blu, double val, double max);
 void Cairo_Draw_Polygon(cairo_t *cr, GdkPoint *points, int npoints);
 void Cairo_Draw_Segments(cairo_t *cr, Segment_t *segm, int nseg);
@@ -1552,9 +1522,10 @@ gboolean Animate_Near_Field(gpointer udata);
 double Polarization_Factor(int pol_type, int fstep, int idx);
 void Set_Polarization(int pol);
 void Set_Gain_Style(int gs);
-void New_Radiation_Projection_Angle(void);
+void Queue_Radiation_Redraw(void);
 void Update_Rdpattern_UI(void);
-double Viewer_Gain(projection_parameters_t proj_parameters, int fstep);
+double Viewer_Gain(view_t *v, int fstep);
+double Viewer_Noise_Value(view_t *v, int fstep);
 void Rdpattern_Window_Killed(void);
 void Set_Window_Labels(void);
 void Alloc_Rdpattern_Buffers(int nfrq, int nth, int nph);
@@ -1568,16 +1539,16 @@ double Scale_Gain( double gain, int fstep, int idx );
 void Draw_Structure(cairo_t *cr);
 void Draw_Structure_UI(void);
 void New_Patch_Data(void);
-void Process_Wire_Segments(void);
-void Process_Surface_Patches(void);
-void Draw_Wire_Segments(cairo_t *cr, Segment_t *segm, gint nseg);
-void Draw_Surface_Patches(cairo_t *cr, Segment_t *segm, gint npatch);
+void Process_Wire_Segments(view_t *v);
+void Process_Surface_Patches(view_t *v);
+void Draw_Wire_Segments(cairo_t *cr, view_t *v, Segment_t *segm, gint nseg);
+void Draw_Surface_Patches(cairo_t *cr, view_t *v, Segment_t *segm, gint npatch);
 void Alloc_Crnt_Fstep_Buffers(int nfrq);
 void Free_Crnt_Fstep_Buffers(void);
 void Save_Crnt_Data(int fstep);
-void New_Structure_Projection_Angle(void);
+void Queue_Structure_Redraw(void);
 void Init_Struct_Drawing(void);
-void Show_Viewer_Gain(GtkBuilder *builder, gchar *widget, projection_parameters_t proj_params);
+void Show_Viewer_Gain(GtkBuilder *builder, gchar *widget, view_t *v);
 /* fields.c */
 void efld(double xi, double yi, double zi, double ai, int ij);
 void gf(double zk, double *co, double *si);

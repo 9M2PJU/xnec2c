@@ -62,9 +62,6 @@ static int rdpat_translated_capacity = 0;
 /* Widget pointer for external access */
 static GtkWidget *rdpattern_gl_widget = NULL;
 
-/* Arcball for radiation pattern view */
-static arcball_state_t *rdpattern_arcball = NULL;
-
 
 /* Overlay configuration for structure rendering in rdpattern */
 static const gl_overlay_config_t rdpattern_overlay_config = {
@@ -124,10 +121,8 @@ rdpattern_scene_generate(gl_view_content_t *out)
 
   opengl_structure_show_ctrl_notice(rdpattern_gl_widget);
 
-  /* Zoom from rdpattern spinbutton, normalized to multiplier */
-  zoom = 1.0f;
-  if( rdpattern_zoom )
-    zoom = (float)gtk_spin_button_get_value(rdpattern_zoom) / 100.0f;
+  /* Zoom from view->zoom; view_set_zoom() is the authoritative writer. */
+  zoom = (rdpattern_view != NULL) ? rdpattern_view->zoom : 1.0f;
 
   if( zoom < 0.01f )
     zoom = 0.01f;
@@ -428,8 +423,15 @@ rdpattern_scene_generate(gl_view_content_t *out)
   return( TRUE );
 
 out_unlock:
+  /* Data dependency not yet satisfied (async compute, draw-style
+   * transition, transient buffer allocation failure).  Return an
+   * empty scene with a diagnostic so the render loop proceeds to
+   * glClear the framebuffer; returning FALSE would exit on_render()
+   * before clearing and freeze the last valid frame on screen. */
+  rdpattern_init_empty_scene(out, zoom);
+  out->status_message = "Radiation pattern data not ready";
   g_rec_mutex_unlock(&freq_data_lock);
-  return( FALSE );
+  return( TRUE );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -606,36 +608,28 @@ static gl_scene_provider_t rdpattern_scene_provider = {
 
 /*-----------------------------------------------------------------------*/
 
-/** rdpattern_arcball_changed_cb() - Arcball change callback for constrained rotation mode
- * @ab: arcball that changed
- * @_user_data: unused
+/** rdpattern_view_changed_cb() - view_t change callback for rdpattern view
+ * @v:           view that changed (rdpattern_view)
+ * @_user_data:  unused
  *
- * Syncs arcball WR/WI angles back to rdpattern_proj_params and
- * spin button display text when COMMON_PROJECTION is off.
+ * Queues a redraw on the rdpattern GL widget and Cairo path and
+ * refreshes the rdpattern WR/WI spin display.  Bound as changed_cb at
+ * view_new() in callbacks.c; when sharing is active the master
+ * (structure_view) reaches this callback via its rotation_follower
+ * link inside view_notify_change().
  */
-  static void
-rdpattern_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
+  void
+rdpattern_view_changed_cb(view_t *v, gpointer _user_data)
 {
-  float wr, wi;
-
   (void)_user_data;
 
-  if( arcball_get_drag_mode(ab) != ARCBALL_DRAG_CONSTRAINED )
-    return;
+  view_update_spin_display( v );
+  Queue_Radiation_Redraw();
 
-  /* When common projection is active, the structure arcball is
-   * the single point of truth — structure callback handles sync */
-  if( isFlagSet(COMMON_PROJECTION) )
-    return;
+  if( rdpattern_gl_widget )
+    xnec2_widget_queue_draw( rdpattern_gl_widget, TRUE );
 
-  arcball_get_angles(ab, &wr, &wi);
-
-  rdpattern_proj_params.Wr = (double)wr;
-  rdpattern_proj_params.Wi = (double)wi;
-
-  opengl_update_spin_display( rotate_rdpattern, rdpattern_proj_params.Wr );
-  opengl_update_spin_display( incline_rdpattern, rdpattern_proj_params.Wi );
-}
+} /* rdpattern_view_changed_cb() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -644,39 +638,17 @@ rdpattern_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
   static GtkWidget*
 opengl_rdpattern_create_widget_impl(void)
 {
-  if( !rdpattern_arcball )
-  {
-    rdpattern_arcball = arcball_new((float)MOTION_EVENTS_COUNT);
-
-    /* Initialize mode from rc_config */
-    arcball_set_drag_mode(rdpattern_arcball,
-        rc_config.arcball_constrained_rotation ?
-        ARCBALL_DRAG_CONSTRAINED : ARCBALL_DRAG_FREE);
-
-    /* Sync constrained rotation back to WR/WI and spin buttons */
-    arcball_add_callback(rdpattern_arcball,
-        rdpattern_arcball_changed_cb, NULL);
-  }
+  if( rdpattern_view == NULL )
+    return( NULL );
 
   rdpattern_gl_widget = gl_view_create_widget(
       &rdpattern_view_config,
       &rdpattern_scene_provider,
-      rdpattern_arcball,
-      &rdpattern_zoom);
+      rdpattern_view );
 
   gtk_widget_show(rdpattern_gl_widget);
 
   return( rdpattern_gl_widget );
-}
-
-/*-----------------------------------------------------------------------*/
-
-/** opengl_rdpattern_get_arcball() - Return reference to rdpattern arcball
- */
-  arcball_state_t*
-opengl_rdpattern_get_arcball(void)
-{
-  return( rdpattern_arcball );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -688,12 +660,6 @@ opengl_rdpattern_cleanup_impl(void)
 {
   rdpattern_scene_cleanup();
   rdpattern_gl_widget = NULL;
-
-  if( rdpattern_arcball )
-  {
-    arcball_free(rdpattern_arcball);
-    rdpattern_arcball = NULL;
-  }
 }
 
 /*-----------------------------------------------------------------------*/

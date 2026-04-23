@@ -47,7 +47,9 @@ on_button_press(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 
   if( event->button == 1 || event->button == 2 )
   {
-    arcball_begin_drag(state->arcball, event->button, event->x, event->y);
+    drag_button_t button = (event->button == 1) ? VIEW_DRAG_ROTATE : VIEW_DRAG_PAN;
+
+    view_begin_drag(state->view, button, (float)event->x, (float)event->y);
 
     state->drag_active = TRUE;
     gtk_widget_queue_draw(widget);
@@ -76,7 +78,7 @@ on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
   if( !state )
     return( FALSE );
 
-  arcball_end_drag(state->arcball);
+  view_end_drag(state->view);
 
   state->drag_active = FALSE;
   gtk_widget_queue_draw(widget);
@@ -92,62 +94,25 @@ on_button_release(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
  * @event: motion event
  * @user_data: view state
  *
- * Handles rotation (button 1) via arcball, and pan (button 2) with proper world-space scaling.
+ * Delegates rotation and pan accumulation to view_update_drag().
+ * Pixel-to-world conversion for pan happens in gl_view_build_mvp()
+ * at draw time so the per-view pan_offset stores screen pixels and
+ * matches the Cairo renderer.
  */
   static gboolean
 on_motion(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
   gl_view_state_t *state;
-  float dx, dy;
-  float scale;
-  int drag_button;
 
   state = (gl_view_state_t *)user_data;
 
-  if( !state || !state->arcball )
+  if( !state || !state->view )
     return( FALSE );
 
-  drag_button = arcball_get_drag_button(state->arcball);
-
-  if( drag_button == 0 )
+  if( state->view->drag_button == VIEW_DRAG_NONE )
     return( FALSE );
 
-  if( drag_button == 1 )
-  {
-    /* Rotation handled by arcball */
-    arcball_drag(state->arcball, event->x, event->y, state->viewport_height);
-  }
-  else if( drag_button == 2 )
-  {
-    /* Pan: compute pixel delta from last recorded position */
-    float last_x, last_y;
-
-    arcball_get_last_pos(state->arcball, &last_x, &last_y);
-
-    dx = event->x - last_x;
-    dy = event->y - last_y;
-
-    /* Convert pixel delta to world-space delta at model plane.
-     * Formula: 2 * distance * tan(fov/2) / viewport_height
-     * Pan translation is post-scale in MVP chain, so model_scale omitted.
-     * Aspect correction handled by projection matrix, not world-space conversion. */
-    scale = 2.0f * state->cached_camera_distance *
-            tanf(state->fov_rad / 2.0f) /
-            state->viewport_height;
-
-    state->pan_offset[0] += dx * scale;
-    state->pan_offset[1] -= dy * scale;
-
-    arcball_update_last_pos(state->arcball, event->x, event->y);
-
-    /* Notify arcball callbacks to trigger cross-view redraw */
-    arcball_notify_changed(state->arcball);
-  }
-  else
-  {
-    return( FALSE );
-  }
-
+  view_update_drag(state->view, (float)event->x, (float)event->y);
   gtk_widget_queue_draw(widget);
 
   return( TRUE );
@@ -188,11 +153,11 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
     return( state->scene->on_shift_scroll(widget, event, state) );
   }
 
-  /* Normal scroll: adjust primary zoom */
-  if( !state->zoom_spinbutton || !*state->zoom_spinbutton )
+  /* Normal scroll: adjust primary zoom via the view's bound spin */
+  if( !state->view->zoom_spin )
     return( FALSE );
 
-  spinbutton = *state->zoom_spinbutton;
+  spinbutton = state->view->zoom_spin;
   value = gtk_spin_button_get_value(spinbutton);
 
   viewport_width = (int)(state->viewport_height * state->aspect);

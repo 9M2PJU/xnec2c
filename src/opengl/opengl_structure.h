@@ -70,6 +70,12 @@ void opengl_structure_queue_draw(void);
 
 #ifdef HAVE_OPENGL
 #include "../opengl-engine/opengl_renderer.h"
+#include "../view/view_core.h"
+
+/* view_t change callback for the structure view.  Bound at view_new()
+ * so view_notify_change() fires this directly; no dynamic observer
+ * registration exists. */
+void structure_view_changed_cb(view_t *v, gpointer user_data);
 
 /* Extended vertex with UV and flow data for chevron shader.
  * First 48 bytes are layout-identical to lit_color_point_t. */
@@ -99,7 +105,6 @@ extern const gl_vertex_attrib_t opengl_structure_attribs[3];
 /* Vertex attribute layout for chevron shader (structure_vertex_t: 7 attribs) */
 extern const gl_vertex_attrib_t opengl_chevron_attribs[7];
 
-arcball_state_t* opengl_structure_get_arcball(void);
 GtkWidget* opengl_structure_get_widget(void);
 
 /* Get/set cylinder radius display scale factor */
@@ -121,9 +126,6 @@ void opengl_structure_update_shared_geometry(void);
 
 /* Return read-only pointer to shared geometry data */
 const structure_overlay_data_t* opengl_structure_get_shared_geometry(void);
-
-/* Update spin button display text without emitting value_changed signal */
-void opengl_update_spin_display(GtkSpinButton *spin, double angle);
 
 /* Timeout callback for flow phase animation (FLOW_ANIMATE flag) */
 gboolean Animate_Flow_Phase(gpointer udata);

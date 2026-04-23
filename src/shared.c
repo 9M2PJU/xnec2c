@@ -66,9 +66,9 @@ GtkSpinButton
   *rdpattern_frequency = NULL,
   *mainwin_frequency   = NULL;
 
-projection_parameters_t
-  rdpattern_proj_params,
-  structure_proj_params;
+view_t
+  *rdpattern_view    = NULL,
+  *structure_view    = NULL;
 
 /* Scroll adjustments of geometry
  * and command treeview windows */

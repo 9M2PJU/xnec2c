@@ -521,10 +521,8 @@ main (int argc, char *argv[])
   gtk_widget_get_allocation( structure_cairo_da, &allocation );
   structure_width  = allocation.width;
   structure_height = allocation.height;
-  New_Projection_Parameters(
-      structure_width, structure_height, &structure_proj_params );
 
-  /* Initialize structure projection angles from spinbuttons */
+  /* Spin buttons and entry backing the structure view */
   rotate_structure  = GTK_SPIN_BUTTON(
       Builder_Get_Object(main_window_builder, "main_rotate_spinbutton") );
   incline_structure = GTK_SPIN_BUTTON(
@@ -534,14 +532,28 @@ main (int argc, char *argv[])
   structure_fstep_entry = GTK_ENTRY(
       Builder_Get_Object(main_window_builder, "structure_fstep_entry") );
 
-  structure_proj_params.Wr =
-    gtk_spin_button_get_value(rotate_structure);
-  structure_proj_params.Wi =
-    gtk_spin_button_get_value(incline_structure);
+  /* Create the structure view before the GL widget; observers are
+   * installed inside opengl_structure_create_widget and fire during
+   * subsequent viewport/angle assignments. */
+  structure_view = view_new( VIEW_STRUCTURE,
+      rotate_structure, incline_structure, structure_zoom,
+#ifdef HAVE_OPENGL
+      structure_view_changed_cb, NULL );
+#else
+      NULL, NULL );
+#endif
+  view_set_spin_handlers( structure_view,
+      G_CALLBACK(on_main_rotate_spinbutton_value_changed),
+      G_CALLBACK(on_main_incline_spinbutton_value_changed) );
+  view_set_viewport( structure_view, structure_width, structure_height );
+  view_set_angles( structure_view,
+      gtk_spin_button_get_value( rotate_structure ),
+      gtk_spin_button_get_value( incline_structure ) );
+  view_set_drag_mode( structure_view,
+      rc_config.view_drag_constrained
+          ? VIEW_DRAG_CONSTRAINED : VIEW_DRAG_FREE );
 
-  structure_proj_params.xy_zoom = 1.0;
-
-  /* Create GL widget after proj_params initialized */
+  /* Create GL widget after the view is initialized */
 #ifdef HAVE_OPENGL
   {
     GtkWidget *box = Builder_Get_Object(main_window_builder, "structure_box");
@@ -565,12 +577,6 @@ main (int argc, char *argv[])
 #else
   structure_drawingarea = structure_cairo_da;
 #endif
-  structure_proj_params.reset = TRUE;
-  structure_proj_params.type = STRUCTURE_DRAWINGAREA;
-
-  rdpattern_proj_params.xy_zoom = 1.0;
-  rdpattern_proj_params.reset = TRUE;
-  rdpattern_proj_params.type = RDPATTERN_DRAWINGAREA;
 
   /* Signal start of xnec2c */
   SetFlag( XNEC2C_START );
@@ -730,9 +736,8 @@ Open_Input_File( gpointer arg )
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) &&
       !same_file )
   {
-    New_Viewer_Angle( 45.0, 45.0, rotate_structure,
-        incline_structure, &structure_proj_params );
-    New_Structure_Projection_Angle();
+    view_set_angles( structure_view,
+        VIEW_DEFAULT_WR, VIEW_DEFAULT_WI );
   }
 
   /* Update tracked filename for next comparison */
@@ -814,7 +819,7 @@ Open_Input_File( gpointer arg )
     gtk_widget_show( box );
 
 #ifdef HAVE_OPENGL
-    /* Establish arcball sharing for common projection on new file load */
+    /* Establish view sharing for common projection on new file load */
     if( !same_file )
     {
       opengl_common_projection_sync();

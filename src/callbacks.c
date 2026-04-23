@@ -31,8 +31,6 @@
 #include "opengl/opengl_rdpattern.h"
 #include "opengl/opengl_msaa.h"
 #include "opengl/opengl_settings.h"
-
-static void common_projection_share_arcball(void);
 #endif
 
 static void noise_model_menus_populate(void);
@@ -44,69 +42,37 @@ static void noise_interp_auto_switch(int fallback);
 static int editor_action = EDITOR_NEW;
 
 
-/* Canonical angle ranges for wrapping
- * Adjustments have wider bounds to allow triggering wrap detection */
-#define ROTATE_LOWER    0.0
-#define ROTATE_UPPER    360.0
-#define INCLINE_LOWER   -180.0
-#define INCLINE_UPPER   180.0
-
 /* Scroll increment for mouse wheel on rotation spinbuttons */
 #define SCROLL_ANGLE_INCREMENT  5.0
 
+/* Motion-event decimation: accept 1 in MOTION_EVENTS_COUNT events.
+ * Distinct from VIEW_DRAG_DIVISOR; this controls callback frequency,
+ * not drag angular sensitivity. */
+#define MOTION_EVENTS_COUNT 8
+
 /*-----------------------------------------------------------------------*/
-
-/* wrap_angle()
- *
- * Normalize angle to canonical range by wrapping at boundaries
- */
-  static double
-wrap_angle(double value, double canonical_lower, double canonical_upper)
-{
-  double range;
-  double wrapped;
-
-  range = canonical_upper - canonical_lower;
-  wrapped = value;
-
-  while( wrapped >= canonical_upper )
-  {
-    wrapped = wrapped - range;
-  }
-
-  while( wrapped < canonical_lower )
-  {
-    wrapped = wrapped + range;
-  }
-
-  return( wrapped );
-
-} /* wrap_angle() */
 
 /* handle_rotation_scroll()
  *
- * Handle mouse wheel scroll on rotation spinbuttons with 5-degree increment
+ * Handle mouse wheel scroll on rotation spinbuttons with 5-degree increment.
+ *
+ * The resulting value is passed to gtk_spin_button_set_value() which
+ * fires value-changed; view_set_angles() then rebuilds the rotation
+ * matrix and Extract_View_Angles() normalises the angles on readback.
  */
   static gboolean
-handle_rotation_scroll(GtkSpinButton *spinbutton, GdkEventScroll *event,
-    double lower, double upper)
+handle_rotation_scroll(GtkSpinButton *spinbutton, GdkEventScroll *event)
 {
-  double current, delta, new_value, wrapped;
+  double current, delta;
 
   if( event->direction != GDK_SCROLL_UP && event->direction != GDK_SCROLL_DOWN )
     return( FALSE );
 
   current = gtk_spin_button_get_value(spinbutton);
+  delta   = (event->direction == GDK_SCROLL_UP)
+              ? SCROLL_ANGLE_INCREMENT : -SCROLL_ANGLE_INCREMENT;
 
-  if( event->direction == GDK_SCROLL_UP )
-    delta = SCROLL_ANGLE_INCREMENT;
-  else
-    delta = -SCROLL_ANGLE_INCREMENT;
-
-  new_value = current + delta;
-  wrapped = wrap_angle(new_value, lower, upper);
-
-  gtk_spin_button_set_value(spinbutton, wrapped);
+  gtk_spin_button_set_value(spinbutton, current + delta);
 
   return( TRUE );
 
@@ -550,6 +516,40 @@ on_main_rdpattern_activate(
     gtk_widget_show( rdpattern_window );
     Update_Window_Titles();
 
+    /* Spin widgets must be resolved before creating the GL widget:
+     * opengl_rdpattern_create_widget() dereferences rdpattern_view,
+     * which in turn borrows the spin-button pointers. */
+    rotate_rdpattern  = GTK_SPIN_BUTTON( Builder_Get_Object(
+          rdpattern_window_builder, "rdpattern_rotate_spinbutton") );
+    incline_rdpattern = GTK_SPIN_BUTTON(Builder_Get_Object(
+          rdpattern_window_builder, "rdpattern_incline_spinbutton") );
+    rdpattern_frequency = GTK_SPIN_BUTTON(Builder_Get_Object(
+          rdpattern_window_builder, "rdpattern_freq_spinbutton") );
+    rdpattern_zoom = GTK_SPIN_BUTTON(Builder_Get_Object(
+          rdpattern_window_builder, "rdpattern_zoom_spinbutton") );
+    rdpattern_fstep_entry = GTK_ENTRY(Builder_Get_Object(
+          rdpattern_window_builder, "rdpattern_fstep_entry") ) ;
+
+    /* Create the rdpattern view before the GL widget; the GL widget
+     * constructor installs observers on rdpattern_view and returns
+     * NULL otherwise. */
+    if( rdpattern_view == NULL )
+    {
+      rdpattern_view = view_new( VIEW_RDPATTERN,
+          rotate_rdpattern, incline_rdpattern, rdpattern_zoom,
+#ifdef HAVE_OPENGL
+          rdpattern_view_changed_cb, NULL );
+#else
+          NULL, NULL );
+#endif
+      view_set_spin_handlers( rdpattern_view,
+          G_CALLBACK(on_rdpattern_rotate_spinbutton_value_changed),
+          G_CALLBACK(on_rdpattern_incline_spinbutton_value_changed) );
+      view_set_drag_mode( rdpattern_view,
+          rc_config.view_drag_constrained
+              ? VIEW_DRAG_CONSTRAINED : VIEW_DRAG_FREE );
+    }
+
 #ifdef HAVE_OPENGL
     {
       GtkWidget *box = Builder_Get_Object(
@@ -586,21 +586,7 @@ on_main_rdpattern_activate(
     rdpattern_width  = alloc.width;
     rdpattern_height = alloc.height;
 
-    New_Projection_Parameters(
-        rdpattern_width,
-        rdpattern_height,
-        &rdpattern_proj_params );
-
-    rotate_rdpattern  = GTK_SPIN_BUTTON( Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_rotate_spinbutton") );
-    incline_rdpattern = GTK_SPIN_BUTTON(Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_incline_spinbutton") );
-    rdpattern_frequency = GTK_SPIN_BUTTON(Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_freq_spinbutton") );
-    rdpattern_zoom = GTK_SPIN_BUTTON(Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_zoom_spinbutton") );
-    rdpattern_fstep_entry = GTK_ENTRY(Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_fstep_entry") ) ;
+    view_set_viewport( rdpattern_view, rdpattern_width, rdpattern_height );
 
     /* Restore radiation pattern window widgets state */
     if( rc_config.rdpattern_gain_togglebutton )
@@ -720,19 +706,10 @@ on_main_rdpattern_activate(
         GTK_SPIN_BUTTON(widget), rc_config.ant_temp_elevation);
 
 #ifdef HAVE_OPENGL
-    /* Establish arcball sharing after all initialization completes */
-    if( rc_config.use_opengl_renderer && isFlagSet(COMMON_PROJECTION) )
-    {
-      common_projection_share_arcball();
-      gl_view_sync_arcball(rdpattern_gl_area,
-          structure_proj_params.Wr, structure_proj_params.Wi);
-    }
-    else if( rc_config.use_opengl_renderer )
-    {
-      /* Initialize rdpattern arcball from its own projection angles */
-      gl_view_sync_arcball(rdpattern_gl_area,
-          rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
-    }
+    /* Establish view sharing after all initialization completes.
+     * Single entry point so persistence-to-runtime mapping lives in
+     * opengl_common_projection_sync(). */
+    opengl_common_projection_sync();
 
     /* Sync ortho toolbar button now that rdpattern window builder is ready */
     opengl_settings_sync_from_config();
@@ -948,111 +925,24 @@ on_rdpattern_left_hand_activate(
 }
 
 
-/* common_projection_arcball_cb()
- *
- * Arcball change callback for COMMON_PROJECTION.
- * Queues redraw on the other GL view when arcball is dragged.
- */
-#ifdef HAVE_OPENGL
-  static void
-common_projection_arcball_cb(arcball_state_t *ab, gpointer user_data)
-{
-  GtkWidget *widget;
-
-  widget = (GtkWidget *)user_data;
-
-  if( widget )
-    xnec2_widget_queue_draw(widget, TRUE);
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* common_projection_share_arcball()
- *
- * Swap rdpattern view to use structure arcball and register
- * cross-view redraw callbacks.
- */
-  static void
-common_projection_share_arcball(void)
-{
-  arcball_state_t *struct_ab;
-  GtkWidget *rdpat_widget;
-
-  struct_ab = opengl_structure_get_arcball();
-  rdpat_widget = opengl_rdpattern_get_widget();
-
-  if( !struct_ab || !rdpat_widget )
-    return;
-
-  gl_view_set_arcball(rdpat_widget, struct_ab);
-
-  arcball_add_callback(struct_ab,
-      common_projection_arcball_cb, rdpat_widget);
-
-  if( structure_gl_area )
-    arcball_add_callback(struct_ab,
-        common_projection_arcball_cb, structure_gl_area);
-
-  xnec2_widget_queue_draw(rdpat_widget, TRUE);
-}
-
-/*-----------------------------------------------------------------------*/
-
 /* opengl_common_projection_sync()
  *
- * Public API to establish arcball sharing for common projection.
- * Called from main.c when rdpattern window is already open during file load.
+ * Public entry point used by main.c when the rdpattern window is
+ * already open during file load.  Applies the persisted common-
+ * projection preference by installing or removing the master-follower
+ * link between the two view_t instances.
  */
+#ifdef HAVE_OPENGL
   void
 opengl_common_projection_sync(void)
 {
-  if( !rc_config.use_opengl_renderer || isFlagClear(COMMON_PROJECTION) )
+  if( rdpattern_view == NULL || structure_view == NULL )
     return;
 
-  if( !rdpattern_gl_area )
-    return;
-
-  common_projection_share_arcball();
-  gl_view_sync_arcball(rdpattern_gl_area,
-      structure_proj_params.Wr, structure_proj_params.Wi);
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* common_projection_unshare_arcball()
- *
- * Restore rdpattern view to its own arcball, copying current
- * rotation state from the shared arcball.
- */
-  static void
-common_projection_unshare_arcball(void)
-{
-  arcball_state_t *struct_ab;
-  arcball_state_t *rdpat_ab;
-  GtkWidget *rdpat_widget;
-
-  struct_ab = opengl_structure_get_arcball();
-  rdpat_ab = opengl_rdpattern_get_arcball();
-  rdpat_widget = opengl_rdpattern_get_widget();
-
-  if( struct_ab )
-  {
-    if( rdpat_widget )
-      arcball_remove_callback(struct_ab,
-          common_projection_arcball_cb, rdpat_widget);
-
-    if( structure_gl_area )
-      arcball_remove_callback(struct_ab,
-          common_projection_arcball_cb, structure_gl_area);
-  }
-
-  if( rdpat_ab && rdpat_widget )
-  {
-    if( struct_ab )
-      arcball_copy_rotation(rdpat_ab, struct_ab);
-
-    gl_view_set_arcball(rdpat_widget, rdpat_ab);
-  }
+  if( rc_config.main_common_projection )
+    view_share_master( rdpattern_view, structure_view );
+  else
+    view_unshare_master( rdpattern_view );
 }
 #endif
 
@@ -1063,47 +953,30 @@ on_common_projection_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
 {
-  /* Enable syncing of projection params
-   * for structure and rad pattern drawing */
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-  {
-    if( isFlagSet(DRAW_ENABLED) )
-    {
-      rdpattern_proj_params.Wr = structure_proj_params.Wr;
-      rdpattern_proj_params.Wi = structure_proj_params.Wi;
-      New_Viewer_Angle(
-          rdpattern_proj_params.Wr,
-          rdpattern_proj_params.Wi,
-          rotate_rdpattern,
-          incline_rdpattern,
-          &rdpattern_proj_params );
-    }
+  /* Common projection makes rdpattern_view a follower of structure_view;
+   * the follower reads the master's rotation matrix directly so no
+   * angle copy is required. */
+  gboolean active =
+      gtk_check_menu_item_get_active( GTK_CHECK_MENU_ITEM(menuitem) );
 
-#ifdef HAVE_OPENGL
-    if( rc_config.use_opengl_renderer )
-      common_projection_share_arcball();
-#endif
+  rc_config.main_common_projection = active ? 1 : 0;
 
-    SetFlag( COMMON_PROJECTION );
-  }
+  if( rdpattern_view == NULL || structure_view == NULL )
+    return;
+
+  if( active )
+    view_share_master( rdpattern_view, structure_view );
   else
-  {
-#ifdef HAVE_OPENGL
-    if( rc_config.use_opengl_renderer )
-      common_projection_unshare_arcball();
-#endif
-
-    ClearFlag( COMMON_PROJECTION );
-  }
+    view_unshare_master( rdpattern_view );
 }
 
 
 /* view_presets - indexed by preset id: 0=X axis, 1=Y axis, 2=Z axis, 3=default */
 static const struct { double wr; double wi; } view_presets[4] = {
-  {  0.0,  0.0 },
-  { 90.0,  0.0 },
-  {  0.0, 90.0 },
-  { 45.0, 45.0 },
+  { VIEW_PRESET_X_WR, VIEW_PRESET_X_WI },
+  { VIEW_PRESET_Y_WR, VIEW_PRESET_Y_WI },
+  { VIEW_PRESET_Z_WR, VIEW_PRESET_Z_WI },
+  { VIEW_DEFAULT_WR,  VIEW_DEFAULT_WI  },
 };
 
 /* preset_ids - widget IDs indexed by [win_idx][preset]; win_idx: 0=main, 1=rdpattern */
@@ -1132,40 +1005,22 @@ window_type_from_widget(GtkWidget *widget)
  * @wi:          incline angle in degrees
  * @window_type: MAIN_WINDOW for structure, RDPATTERN_WINDOW for radiation pattern
  *
- * Calls New_Viewer_Angle to set proj_params and drive the rotate/incline spinbutton
- * signals.  Those signals propagate arcball state via gl_view_sync_arcball and
- * cross-sync the opposite window when COMMON_PROJECTION is set.  Pan state is
- * independent of the signal chain; gl_view_reset_pan handles it explicitly.
+ * view_set_angles rewrites the rotation matrix and fires observers
+ * that update spin widgets and queue redraws on both renderers.
+ * view_reset_pan clears the accumulated pan offset separately so the
+ * preset lands centered.
  */
   static void
 set_view_preset(double wr, double wi, window_t window_type)
 {
-  GtkSpinButton *rot, *inc;
-  projection_parameters_t *params;
+  view_t *target =
+      (window_type == MAIN_WINDOW) ? structure_view : rdpattern_view;
 
-  if( window_type == MAIN_WINDOW )
-  {
-    rot = rotate_structure;
-    inc = incline_structure;
-    params = &structure_proj_params;
-  }
-  else
-  {
-    rot = rotate_rdpattern;
-    inc = incline_rdpattern;
-    params = &rdpattern_proj_params;
-  }
+  if( target == NULL )
+    return;
 
-  New_Viewer_Angle(wr, wi, rot, inc, params);
-
-#ifdef HAVE_OPENGL
-  {
-    GtkWidget *gl_widget = (window_type == MAIN_WINDOW)
-        ? structure_gl_area : rdpattern_drawingarea;
-    if( rc_config.use_opengl_renderer && gl_widget )
-      gl_view_reset_pan(gl_widget);
-  }
-#endif
+  view_set_angles( target, wr, wi );
+  view_reset_pan( target );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -1200,34 +1055,18 @@ on_main_rotate_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  double value, wrapped;
+  (void)spinbutton;
+  (void)user_data;
 
-  value = gtk_spin_button_get_value(spinbutton);
-  wrapped = wrap_angle(value, ROTATE_LOWER, ROTATE_UPPER);
-
-  if( wrapped != value )
-  {
-    gtk_spin_button_set_value(spinbutton, wrapped);
+  if( structure_view == NULL )
     return;
-  }
 
-  structure_proj_params.Wr = wrapped;
-
-  if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
-  {
-    gtk_spin_button_set_value(rotate_rdpattern, (gdouble)structure_proj_params.Wr);
-  }
-
-#ifdef HAVE_OPENGL
-  if( rc_config.use_opengl_renderer )
-  {
-    gl_view_sync_arcball(structure_gl_area,
-        structure_proj_params.Wr, structure_proj_params.Wi);
-  }
-#endif
-
-  New_Structure_Projection_Angle();
-  gtk_spin_button_update(spinbutton);
+  /* view_set_angles() rebuilds R and fires view_update_spin_display()
+   * via the observer; gtk_spin_button_update() is omitted because
+   * its text-to-value resync re-emits value-changed and re-enters. */
+  view_set_angles( structure_view,
+      gtk_spin_button_get_value( rotate_structure ),
+      gtk_spin_button_get_value( incline_structure ) );
 
 } /* on_main_rotate_spinbutton_value_changed() */
 
@@ -1237,34 +1076,15 @@ on_main_incline_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  double value, wrapped;
+  (void)spinbutton;
+  (void)user_data;
 
-  value = gtk_spin_button_get_value(spinbutton);
-  wrapped = wrap_angle(value, INCLINE_LOWER, INCLINE_UPPER);
-
-  if( wrapped != value )
-  {
-    gtk_spin_button_set_value(spinbutton, wrapped);
+  if( structure_view == NULL )
     return;
-  }
 
-  structure_proj_params.Wi = wrapped;
-
-  if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
-  {
-    gtk_spin_button_set_value(incline_rdpattern, (gdouble)structure_proj_params.Wi);
-  }
-
-#ifdef HAVE_OPENGL
-  if( rc_config.use_opengl_renderer )
-  {
-    gl_view_sync_arcball(structure_gl_area,
-        structure_proj_params.Wr, structure_proj_params.Wi);
-  }
-#endif
-
-  New_Structure_Projection_Angle();
-  gtk_spin_button_update(spinbutton);
+  view_set_angles( structure_view,
+      gtk_spin_button_get_value( rotate_structure ),
+      gtk_spin_button_get_value( incline_structure ) );
 
 } /* on_main_incline_spinbutton_value_changed() */
 
@@ -1276,7 +1096,7 @@ on_main_rotate_spinbutton_scroll_event(
     gpointer         user_data)
 {
   return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
-      (GdkEventScroll *)event, ROTATE_LOWER, ROTATE_UPPER) );
+      (GdkEventScroll *)event) );
 }
 
 
@@ -1287,7 +1107,7 @@ on_main_incline_spinbutton_scroll_event(
     gpointer         user_data)
 {
   return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
-      (GdkEventScroll *)event, INCLINE_LOWER, INCLINE_UPPER) );
+      (GdkEventScroll *)event) );
 }
 
 
@@ -1422,11 +1242,9 @@ on_structure_drawingarea_configure_event(
 {
   structure_width  = event->width;
   structure_height = event->height;
-  New_Projection_Parameters(
-      structure_width, structure_height,
-      &structure_proj_params );
-
-  Get_GUI_State();
+  if( structure_view != NULL )
+    view_set_viewport( structure_view,
+        structure_width, structure_height );
 
   return( TRUE );
 }
@@ -1448,7 +1266,8 @@ on_structure_drawingarea_motion_notify_event(
   cnt = 0;
 
   /* Handle motion events */
-  Motion_Event( event, &structure_proj_params );
+  if( structure_view != NULL )
+    Motion_Event( event, structure_view );
 
   return( TRUE );
 }
@@ -1806,9 +1625,12 @@ on_rdpattern_window_destroy(
     gpointer       user_data)
 {
 #ifdef HAVE_OPENGL
-  /* Remove arcball sharing callbacks before widget destruction */
-  if( isFlagSet(COMMON_PROJECTION) && rc_config.use_opengl_renderer )
-    common_projection_unshare_arcball();
+  /* Detach follower so the structure view's observer list no longer
+   * references the rdpattern view that is about to be freed. */
+  if( rdpattern_view != NULL && rdpattern_view->rotation_master != NULL )
+    view_unshare_master( rdpattern_view );
+
+  view_free( &rdpattern_view );
 #endif
 
   Rdpattern_Window_Killed();
@@ -2077,7 +1899,7 @@ on_noise_sky_activate(GtkCheckMenuItem *item, gpointer user_data)
   int idx = GPOINTER_TO_INT(user_data);
   rc_config.ant_temp_sky = idx;
   noise_interp_auto_switch(sky_models[idx].method);
-  New_Radiation_Projection_Angle();
+  Queue_Radiation_Redraw();
 }
 
 static void
@@ -2089,7 +1911,7 @@ on_noise_earth_activate(GtkCheckMenuItem *item, gpointer user_data)
   int idx = GPOINTER_TO_INT(user_data);
   rc_config.ant_temp_earth = idx;
   noise_interp_auto_switch(earth_models[idx].method);
-  New_Radiation_Projection_Angle();
+  Queue_Radiation_Redraw();
 }
 
 static void
@@ -2099,7 +1921,7 @@ on_noise_interp_activate(GtkCheckMenuItem *item, gpointer user_data)
     return;
 
   rc_config.ant_temp_interp = GPOINTER_TO_INT(user_data);
-  New_Radiation_Projection_Angle();
+  Queue_Radiation_Redraw();
 }
 
 /* Side context bound by the sky and earth focus-out handlers.
@@ -2163,7 +1985,7 @@ ant_temp_entry_commit(GtkWidget *widget, ant_temp_commit_ctx_t c)
     *c.custom_store = val;
     *c.model_sel = c.custom_enum;
     noise_interp_auto_switch(ANT_TEMP_SNAP);
-    New_Radiation_Projection_Angle();
+    Queue_Radiation_Redraw();
   }
 }
 
@@ -2328,7 +2150,7 @@ on_rdpattern_elevation_spinbutton_value_changed(
     GtkSpinButton *spinbutton, gpointer user_data)
 {
   rc_config.ant_temp_elevation = gtk_spin_button_get_value(spinbutton);
-  New_Radiation_Projection_Angle();
+  Queue_Radiation_Redraw();
 }
 
 
@@ -2417,6 +2239,20 @@ opengl_set_renderer(gboolean enable)
     return;
   }
 
+  /* Renderer toggle is the authoritative drag-neutral point.  Cairo
+   * Motion_Event writes drag_button as a side effect of every processed
+   * motion sample based on event->state; throttling via MOTION_EVENTS_COUNT
+   * can leave drag_button non-NONE after a release.  The GL on_motion
+   * handler trusts drag_button alone, so a stale Cairo drag_button would
+   * make the first mouse move over the freshly-shown GL widget look like
+   * an ongoing drag.  Clear both views unconditionally, and clear
+   * BLOCK_MOTION_EV in case a Cairo motion handler was interrupted. */
+  if( structure_view != NULL )
+    view_end_drag( structure_view );
+  if( rdpattern_view != NULL )
+    view_end_drag( rdpattern_view );
+  ClearFlag( BLOCK_MOTION_EV );
+
   rc_config.use_opengl_renderer = enable ? 1 : 0;
 
   /* Swap renderer if radiation pattern window is open */
@@ -2430,16 +2266,6 @@ opengl_set_renderer(gboolean enable)
       gtk_widget_show( rdpattern_gl_area );
       rdpattern_drawingarea = rdpattern_gl_area;
 
-      /* Sync OpenGL arcball from Cairo projection angles */
-      gl_view_sync_arcball(rdpattern_gl_area,
-          rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
-
-      /* Apply common projection arcball sharing if enabled */
-      if( isFlagSet(COMMON_PROJECTION) )
-      {
-        common_projection_share_arcball();
-      }
-
       /* Force aspect ratio update after showing GL area */
       gtk_widget_queue_resize(rdpattern_gl_area);
     }
@@ -2449,12 +2275,7 @@ opengl_set_renderer(gboolean enable)
       gtk_widget_show( rdpattern_cairo_da );
       rdpattern_drawingarea = rdpattern_cairo_da;
 
-      /* Sync Cairo scale from current zoom value */
-      rdpattern_proj_params.xy_scale =
-          rdpattern_proj_params.xy_scale1 * rdpattern_proj_params.xy_zoom;
-
-      /* Trigger Cairo projection recalculation */
-      New_Radiation_Projection_Angle();
+      Queue_Radiation_Redraw();
     }
 
     /* Signal pattern data needs refresh */
@@ -2483,10 +2304,6 @@ opengl_set_renderer(gboolean enable)
       gtk_widget_show( structure_gl_area );
       structure_drawingarea = structure_gl_area;
 
-      /* Sync OpenGL arcball from structure projection angles */
-      gl_view_sync_arcball(structure_gl_area,
-          structure_proj_params.Wr, structure_proj_params.Wi);
-
       /* Force aspect ratio update after showing GL area */
       gtk_widget_queue_resize(structure_gl_area);
     }
@@ -2495,10 +2312,6 @@ opengl_set_renderer(gboolean enable)
       gtk_widget_hide( structure_gl_area );
       gtk_widget_show( structure_cairo_da );
       structure_drawingarea = structure_cairo_da;
-
-      /* Sync Cairo scale from current zoom value */
-      structure_proj_params.xy_scale =
-          structure_proj_params.xy_scale1 * structure_proj_params.xy_zoom;
     }
 
     xnec2_widget_queue_draw( structure_drawingarea, TRUE );
@@ -2511,22 +2324,16 @@ opengl_set_renderer(gboolean enable)
 opengl_set_constrained_rotation(gboolean constrained)
 {
 #ifdef HAVE_OPENGL
-  arcball_state_t *structure_ab, *rdpattern_ab;
-  arcball_drag_mode_t mode;
+  drag_mode_t mode;
 
-  rc_config.arcball_constrained_rotation = constrained ? 1 : 0;
-  mode = constrained ? ARCBALL_DRAG_CONSTRAINED : ARCBALL_DRAG_FREE;
+  rc_config.view_drag_constrained = constrained ? 1 : 0;
+  mode = constrained ? VIEW_DRAG_CONSTRAINED : VIEW_DRAG_FREE;
 
-  structure_ab = opengl_structure_get_arcball();
-  if( structure_ab )
-    arcball_set_drag_mode(structure_ab, mode);
+  if( structure_view != NULL )
+    view_set_drag_mode( structure_view, mode );
 
-  if( isFlagClear(COMMON_PROJECTION) )
-  {
-    rdpattern_ab = opengl_rdpattern_get_arcball();
-    if( rdpattern_ab )
-      arcball_set_drag_mode(rdpattern_ab, mode);
-  }
+  if( rdpattern_view != NULL )
+    view_set_drag_mode( rdpattern_view, mode );
 #endif
 
 } /* opengl_set_constrained_rotation() */
@@ -2540,38 +2347,15 @@ on_rdpattern_rotate_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  double value, wrapped;
+  (void)spinbutton;
+  (void)user_data;
 
-  value = gtk_spin_button_get_value(spinbutton);
-  wrapped = wrap_angle(value, ROTATE_LOWER, ROTATE_UPPER);
-
-  if( wrapped != value )
-  {
-    gtk_spin_button_set_value(spinbutton, wrapped);
+  if( rdpattern_view == NULL )
     return;
-  }
 
-  rdpattern_proj_params.Wr = wrapped;
-
-  if( isFlagSet(COMMON_PROJECTION) )
-  {
-    gtk_spin_button_set_value(rotate_structure, (gdouble)rdpattern_proj_params.Wr);
-  }
-
-  if( rc_config.use_opengl_renderer )
-  {
-#ifdef HAVE_OPENGL
-    gl_view_sync_arcball(rdpattern_drawingarea,
-        rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
-    xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
-#endif
-  }
-  else
-  {
-    New_Radiation_Projection_Angle();
-  }
-
-  gtk_spin_button_update(spinbutton);
+  view_set_angles( rdpattern_view,
+      gtk_spin_button_get_value( rotate_rdpattern ),
+      gtk_spin_button_get_value( incline_rdpattern ) );
 
 } /* on_rdpattern_rotate_spinbutton_value_changed() */
 
@@ -2581,38 +2365,15 @@ on_rdpattern_incline_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  double value, wrapped;
+  (void)spinbutton;
+  (void)user_data;
 
-  value = gtk_spin_button_get_value(spinbutton);
-  wrapped = wrap_angle(value, INCLINE_LOWER, INCLINE_UPPER);
-
-  if( wrapped != value )
-  {
-    gtk_spin_button_set_value(spinbutton, wrapped);
+  if( rdpattern_view == NULL )
     return;
-  }
 
-  rdpattern_proj_params.Wi = wrapped;
-
-  if( isFlagSet(COMMON_PROJECTION) )
-  {
-    gtk_spin_button_set_value(incline_structure, (gdouble)rdpattern_proj_params.Wi);
-  }
-
-  if( rc_config.use_opengl_renderer )
-  {
-#ifdef HAVE_OPENGL
-    gl_view_sync_arcball(rdpattern_drawingarea,
-        rdpattern_proj_params.Wr, rdpattern_proj_params.Wi);
-    xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
-#endif
-  }
-  else
-  {
-    New_Radiation_Projection_Angle();
-  }
-
-  gtk_spin_button_update(spinbutton);
+  view_set_angles( rdpattern_view,
+      gtk_spin_button_get_value( rotate_rdpattern ),
+      gtk_spin_button_get_value( incline_rdpattern ) );
 
 } /* on_rdpattern_incline_spinbutton_value_changed() */
 
@@ -2624,7 +2385,7 @@ on_rdpattern_rotate_spinbutton_scroll_event(
     gpointer         user_data)
 {
   return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
-      (GdkEventScroll *)event, ROTATE_LOWER, ROTATE_UPPER) );
+      (GdkEventScroll *)event) );
 }
 
 
@@ -2635,7 +2396,7 @@ on_rdpattern_incline_spinbutton_scroll_event(
     gpointer         user_data)
 {
   return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
-      (GdkEventScroll *)event, INCLINE_LOWER, INCLINE_UPPER) );
+      (GdkEventScroll *)event) );
 }
 
 
@@ -2680,12 +2441,9 @@ on_rdpattern_drawingarea_configure_event(
 {
   rdpattern_width  = event->width;
   rdpattern_height = event->height;
-  New_Projection_Parameters(
-      rdpattern_width,
-      rdpattern_height,
-      &rdpattern_proj_params );
-
-  Get_GUI_State();
+  if( rdpattern_view != NULL )
+    view_set_viewport( rdpattern_view,
+        rdpattern_width, rdpattern_height );
 
   return( TRUE );
 }
@@ -2722,7 +2480,8 @@ on_rdpattern_drawingarea_motion_notify_event(
   cnt = 0;
 
   /* Handle motion events */
-  Motion_Event( event, &rdpattern_proj_params );
+  if( rdpattern_view != NULL )
+    Motion_Event( event, rdpattern_view );
 
   return( TRUE );
 }
@@ -2774,17 +2533,11 @@ main_view_menuitem_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
 {
-  /* Sync common projection checkbuttons */
-  if( isFlagSet(COMMON_PROJECTION) )
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-          Builder_Get_Object(main_window_builder, "main_common_projection")),
-        TRUE );
-  else
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-          Builder_Get_Object(main_window_builder, "main_common_projection")),
-        FALSE );
-
-
+  /* Sync common projection checkbutton from the persisted preference
+   * so the visible state matches rc_config at menu-open time. */
+  gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
+        Builder_Get_Object(main_window_builder, "main_common_projection")),
+      rc_config.main_common_projection ? TRUE : FALSE );
 }
 
 
@@ -2820,16 +2573,9 @@ rdpattern_view_menuitem_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
 {
-  /* Sync common projection checkbuttons */
-  if( isFlagSet(COMMON_PROJECTION) )
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-          Builder_Get_Object(rdpattern_window_builder, "rdpattern_common_projection")),
-        TRUE );
-  else
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-          Builder_Get_Object(rdpattern_window_builder, "rdpattern_common_projection")),
-        FALSE );
-
+  gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
+        Builder_Get_Object(rdpattern_window_builder, "rdpattern_common_projection")),
+      rc_config.main_common_projection ? TRUE : FALSE );
 }
 
 
@@ -5874,7 +5620,24 @@ on_structure_drawingarea_button_press_event(
     GdkEventButton  *event,
     gpointer         user_data)
 {
-  structure_proj_params.reset = TRUE;
+  drag_button_t button = (event->button == 1) ? VIEW_DRAG_ROTATE : VIEW_DRAG_PAN;
+
+  if( structure_view != NULL )
+    view_begin_drag( structure_view, button, (float)event->x, (float)event->y );
+
+  return( FALSE );
+}
+
+
+  gboolean
+on_structure_drawingarea_button_release_event(
+    GtkWidget      *widget,
+    GdkEventButton  *event,
+    gpointer         user_data)
+{
+  if( structure_view != NULL )
+    view_end_drag( structure_view );
+
   return( FALSE );
 }
 
@@ -5884,16 +5647,12 @@ on_main_zoom_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  structure_proj_params.xy_zoom = gtk_spin_button_get_value( spinbutton );
-  structure_proj_params.xy_zoom /= 100.0;
-  structure_proj_params.xy_scale =
-    structure_proj_params.xy_scale1 * structure_proj_params.xy_zoom;
+  if( structure_view == NULL )
+    return;
 
-  /* Trigger a redraw of structure drawingarea */
-  if( structure_drawingarea )
-  {
-    xnec2_widget_queue_draw( structure_drawingarea, TRUE );
-  }
+  /* Spin value is a percentage; view_t stores a unit-scale factor. */
+  view_set_zoom( structure_view,
+      (float)(gtk_spin_button_get_value( spinbutton ) / 100.0) );
 }
 
 
@@ -5902,18 +5661,10 @@ on_zoom_plus_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  if( window_type_from_widget(GTK_WIDGET(button)) == MAIN_WINDOW )
-  {
-    structure_proj_params.xy_zoom = gtk_spin_button_get_value(structure_zoom);
-    structure_proj_params.xy_zoom *= 1.1;
-    gtk_spin_button_set_value(structure_zoom, structure_proj_params.xy_zoom);
-  }
-  else
-  {
-    rdpattern_proj_params.xy_zoom = gtk_spin_button_get_value(rdpattern_zoom);
-    rdpattern_proj_params.xy_zoom *= 1.1;
-    gtk_spin_button_set_value(rdpattern_zoom, rdpattern_proj_params.xy_zoom);
-  }
+  GtkSpinButton *z = (window_type_from_widget(GTK_WIDGET(button)) == MAIN_WINDOW)
+      ? structure_zoom : rdpattern_zoom;
+
+  gtk_spin_button_set_value( z, gtk_spin_button_get_value( z ) * 1.1 );
 }
 
 
@@ -5922,18 +5673,10 @@ on_zoom_minus_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  if( window_type_from_widget(GTK_WIDGET(button)) == MAIN_WINDOW )
-  {
-    structure_proj_params.xy_zoom = gtk_spin_button_get_value(structure_zoom);
-    structure_proj_params.xy_zoom /= 1.1;
-    gtk_spin_button_set_value(structure_zoom, structure_proj_params.xy_zoom);
-  }
-  else
-  {
-    rdpattern_proj_params.xy_zoom = gtk_spin_button_get_value(rdpattern_zoom);
-    rdpattern_proj_params.xy_zoom /= 1.1;
-    gtk_spin_button_set_value(rdpattern_zoom, rdpattern_proj_params.xy_zoom);
-  }
+  GtkSpinButton *z = (window_type_from_widget(GTK_WIDGET(button)) == MAIN_WINDOW)
+      ? structure_zoom : rdpattern_zoom;
+
+  gtk_spin_button_set_value( z, gtk_spin_button_get_value( z ) / 1.1 );
 }
 
 
@@ -5942,35 +5685,25 @@ on_zoom_reset_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
+  view_t *target;
+  GtkSpinButton *z;
+
   if( window_type_from_widget(GTK_WIDGET(button)) == MAIN_WINDOW )
   {
-    gtk_spin_button_set_value(structure_zoom, 100.0);
-    structure_proj_params.reset = TRUE;
-    structure_proj_params.dx_center = 0.0;
-    structure_proj_params.dy_center = 0.0;
-    New_Projection_Parameters(
-        structure_width, structure_height, &structure_proj_params);
-    xnec2_widget_queue_draw(structure_drawingarea, TRUE);
+    target = structure_view;
+    z = structure_zoom;
   }
   else
   {
-    gtk_spin_button_set_value(rdpattern_zoom, 100.0);
-    rdpattern_proj_params.reset = TRUE;
-    rdpattern_proj_params.dx_center = 0.0;
-    rdpattern_proj_params.dy_center = 0.0;
-
-#ifdef HAVE_OPENGL
-    if( rc_config.use_opengl_renderer )
-      gl_view_reset_pan(rdpattern_drawingarea);
-    else
-#endif
-    {
-      New_Projection_Parameters(
-          rdpattern_width, rdpattern_height, &rdpattern_proj_params);
-    }
-
-    xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
+    target = rdpattern_view;
+    z = rdpattern_zoom;
   }
+
+  if( target == NULL )
+    return;
+
+  gtk_spin_button_set_value( z, 100.0 );
+  view_reset_pan( target );
 }
 
 
@@ -5980,7 +5713,24 @@ on_rdpattern_drawingarea_button_press_event(
     GdkEventButton  *event,
     gpointer         user_data)
 {
-  rdpattern_proj_params.reset = TRUE;
+  drag_button_t button = (event->button == 1) ? VIEW_DRAG_ROTATE : VIEW_DRAG_PAN;
+
+  if( rdpattern_view != NULL )
+    view_begin_drag( rdpattern_view, button, (float)event->x, (float)event->y );
+
+  return( FALSE );
+}
+
+
+  gboolean
+on_rdpattern_drawingarea_button_release_event(
+    GtkWidget      *widget,
+    GdkEventButton  *event,
+    gpointer         user_data)
+{
+  if( rdpattern_view != NULL )
+    view_end_drag( rdpattern_view );
+
   return( FALSE );
 }
 
@@ -5990,13 +5740,11 @@ on_rdpattern_zoom_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
 {
-  rdpattern_proj_params.xy_zoom  = gtk_spin_button_get_value( spinbutton );
-  rdpattern_proj_params.xy_zoom /= 100.0;
-  rdpattern_proj_params.xy_scale =
-    rdpattern_proj_params.xy_scale1 * rdpattern_proj_params.xy_zoom;
+  if( rdpattern_view == NULL )
+    return;
 
-  /* Trigger a redraw of rdpattern drawingarea */
-  xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
+  view_set_zoom( rdpattern_view,
+      (float)(gtk_spin_button_get_value( spinbutton ) / 100.0) );
 }
 
 
@@ -6009,32 +5757,22 @@ on_structure_drawingarea_scroll_event(
     gpointer         user_data)
 {
   int viewport_width, viewport_height;
-  double scale;
+  double zoom_pct, scale;
 
-  viewport_width = gtk_widget_get_allocated_width(widget);
+  viewport_width  = gtk_widget_get_allocated_width(widget);
   viewport_height = gtk_widget_get_allocated_height(widget);
 
-  structure_proj_params.xy_zoom =
-    gtk_spin_button_get_value( structure_zoom );
-
-  scale = compute_zoom_scale(viewport_width, viewport_height,
-      structure_proj_params.xy_zoom);
+  zoom_pct = gtk_spin_button_get_value( structure_zoom );
+  scale    = compute_zoom_scale( viewport_width, viewport_height, zoom_pct );
 
   if( event->scroll.direction == GDK_SCROLL_UP )
-  {
-    structure_proj_params.xy_zoom *= (1.0 + 0.1 * scale);
-  }
+    zoom_pct *= (1.0 + 0.1 * scale);
   else if( event->scroll.direction == GDK_SCROLL_DOWN )
-  {
-    structure_proj_params.xy_zoom /= (1.0 + 0.1 * scale);
-  }
+    zoom_pct /= (1.0 + 0.1 * scale);
   else
-  {
     return( FALSE );
-  }
 
-  gtk_spin_button_set_value(
-      structure_zoom, structure_proj_params.xy_zoom );
+  gtk_spin_button_set_value( structure_zoom, zoom_pct );
   return( FALSE );
 }
 
@@ -6046,32 +5784,22 @@ on_rdpattern_drawingarea_scroll_event(
     gpointer         user_data)
 {
   int viewport_width, viewport_height;
-  double scale;
+  double zoom_pct, scale;
 
-  viewport_width = gtk_widget_get_allocated_width(widget);
+  viewport_width  = gtk_widget_get_allocated_width(widget);
   viewport_height = gtk_widget_get_allocated_height(widget);
 
-  rdpattern_proj_params.xy_zoom =
-    gtk_spin_button_get_value( rdpattern_zoom );
-
-  scale = compute_zoom_scale(viewport_width, viewport_height,
-      rdpattern_proj_params.xy_zoom);
+  zoom_pct = gtk_spin_button_get_value( rdpattern_zoom );
+  scale    = compute_zoom_scale( viewport_width, viewport_height, zoom_pct );
 
   if( event->scroll.direction == GDK_SCROLL_UP )
-  {
-    rdpattern_proj_params.xy_zoom *= (1.0 + 0.1 * scale);
-  }
+    zoom_pct *= (1.0 + 0.1 * scale);
   else if( event->scroll.direction == GDK_SCROLL_DOWN )
-  {
-    rdpattern_proj_params.xy_zoom /= (1.0 + 0.1 * scale);
-  }
+    zoom_pct /= (1.0 + 0.1 * scale);
   else
-  {
     return( FALSE );
-  }
 
-  gtk_spin_button_set_value(
-      rdpattern_zoom, rdpattern_proj_params.xy_zoom );
+  gtk_spin_button_set_value( rdpattern_zoom, zoom_pct );
   return( FALSE );
 }
 

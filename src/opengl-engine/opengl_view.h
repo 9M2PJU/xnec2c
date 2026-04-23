@@ -29,6 +29,10 @@
 /* Maximum renderables per view (constrained by guint32 active_mask in render loop) */
 #define MAX_RENDERABLES 32
 
+/* Camera distance multiplier relative to scene r_max; chosen so the
+ * default fit-to-window framing matches the Cairo renderer. */
+#define GL_VIEW_BASE_DISTANCE_FACTOR 2.165f
+
 /* Number of depth-peel passes for order-independent transparency.
  * 4 covers: near patch face, far patch face, near cylinder wall,
  * far cylinder wall — or structure front/back + radiation front/back. */
@@ -237,16 +241,18 @@ typedef struct gl_view_state_s
   gl_scene_provider_t *scene;
   gl_view_content_t content;
   unsigned int last_generation;
-  arcball_state_t *arcball;
-  GtkSpinButton **zoom_spinbutton;
 
-  /* Per-view projection parameters (not in arcball, which can be shared) */
+  /* Borrowed per-view state owner (rotation, pan, zoom, drag session).
+   * See src/view/view_core.h.  GL renderer reads view_R(view),
+   * view->pan_offset, view->zoom, view->r_max on every frame. */
+  view_t *view;
+
+  /* GL-only projection inputs */
   float aspect;
   float viewport_height;
   float fov_rad;
 
-  /* Per-view pan state (independent from arcball rotation) */
-  vec2 pan_offset;
+  /* Camera distance cached for pan pixel-to-world conversion */
   float cached_camera_distance;
 
   /* Cached clip planes from main render pass — shared by all renderables
@@ -334,8 +340,7 @@ typedef struct
 GtkWidget* gl_view_create_widget(
     gl_view_config_t *config,
     gl_scene_provider_t *scene,
-    arcball_state_t *arcball,
-    GtkSpinButton **zoom_spinbutton);
+    view_t *view);
 
 gl_view_state_t* gl_view_get_state(GtkWidget *widget);
 
@@ -343,9 +348,17 @@ gl_view_state_t* gl_view_get_state(GtkWidget *widget);
  * Accepts either the wrapper returned by gl_view_create_widget() or the
  * inner GtkGLArea.  Returns NULL for any other widget. */
 GtkWidget* gl_view_get_gl_area(GtkWidget *widget);
-void gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball);
-void gl_view_sync_arcball(GtkWidget *widget, double wr, double wi);
-void gl_view_reset_pan(GtkWidget *widget);
+
+/* gl_view_build_mvp() - Compose model/view/projection matrix for a frame.
+ *
+ * Reads rotation from view_R(state->view), pan from view->pan_offset
+ * (converted from screen pixels to world units via camera distance and
+ * fov), projection from state->aspect and state->fov_rad plus
+ * cached_near_plane / cached_far_plane.  Model scale is passed
+ * explicitly so the overlay pass can select a different scale from
+ * the main-content scale without temporarily mutating shared state. */
+void gl_view_build_mvp(gl_view_state_t *state, float model_scale,
+                       mat4 mvp, mat4 mv);
 /* gl_view_setup_attribs()
  *
  * Configure vertex attribute pointers in VAO. Called once during prepare

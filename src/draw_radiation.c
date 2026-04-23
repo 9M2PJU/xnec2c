@@ -51,7 +51,6 @@ static double cached_r_range = 1.0;
  * Allows renderers to track independently whether data has changed */
 static unsigned int rdpat_gen_counter = 0;
 
-static double Viewer_Noise_Value(projection_parameters_t proj_parameters, int fstep);
 
 /*-----------------------------------------------------------------------*/
 
@@ -215,11 +214,8 @@ Generate_Rdpattern_Data(double *out_r_min, double *out_r_range)
       cached_r_min = r_min;
       cached_r_range = r_max - r_min;
 
-      rdpattern_proj_params.r_max = r_max;
-      New_Projection_Parameters(
-          rdpattern_width,
-          rdpattern_height,
-          &rdpattern_proj_params );
+      view_set_r_max( rdpattern_view, (float)r_max );
+      view_set_viewport( rdpattern_view, rdpattern_width, rdpattern_height );
 
       dth = (double)fpat.dth * (double)TORAD;
       dph = (double)fpat.dph * (double)TORAD;
@@ -293,14 +289,11 @@ Generate_Rdpattern_Data(double *out_r_min, double *out_r_range)
         }
         rad_pattern[fstep].noise_scaled_max = nmax;
         rad_pattern[fstep].noise_scaled_min = nmin;
-        rdpattern_proj_params.r_max = nmax;
+        view_set_r_max( rdpattern_view, (float)nmax );
         cached_r_min = nmin;
         cached_r_range = nmax - nmin;
 
-        New_Projection_Parameters(
-            rdpattern_width,
-            rdpattern_height,
-            &rdpattern_proj_params);
+        view_set_viewport( rdpattern_view, rdpattern_width, rdpattern_height );
       }
 
       ClearFlag( DRAW_NEW_RDPAT );
@@ -392,7 +385,7 @@ Update_Rdpattern_UI(void)
   /* Show gain (dBi) or noise density (K/sr) in direction of viewer */
   if (IS_NOISE_MODE(rc_config.gain_style))
   {
-    double ksr = Viewer_Noise_Value(rdpattern_proj_params, fstep);
+    double ksr = Viewer_Noise_Value(rdpattern_view, fstep);
     snprintf(txt, sizeof(txt) - 1, "%.2f", ksr);
     gtk_entry_set_text(GTK_ENTRY(Builder_Get_Object(
             rdpattern_window_builder, "rdpattern_viewer_gain")), txt);
@@ -402,7 +395,7 @@ Update_Rdpattern_UI(void)
     Show_Viewer_Gain(
         rdpattern_window_builder,
         "rdpattern_viewer_gain",
-        rdpattern_proj_params);
+        rdpattern_view);
   }
 
   /* Display frequency step */
@@ -544,28 +537,15 @@ Draw_Radiation_Pattern( cairo_t *cr )
   } /* if( current_gen != cairo_last_gen ) */
 
   /* Draw xyz axes to Screen */
-  Draw_XYZ_Axes( cr, rdpattern_proj_params );
+  Draw_XYZ_Axes( cr, rdpattern_view );
 
-  /* Overlay structure on Near Field pattern */
+  /* Overlay structure on Radiation pattern using rdpattern view */
   if( isFlagSet(OVERLAY_STRUCT) )
   {
-    /* Save structure projection params pointers */
-    projection_parameters_t params = structure_proj_params;
-
-    /* Divert structure drawing to rad pattern area */
-    structure_proj_params = rdpattern_proj_params;
-    structure_proj_params.r_max = params.r_max;
-    structure_proj_params.xy_scale =
-      params.xy_scale1 * rdpattern_proj_params.xy_zoom;
-
-    /* Process and draw geometry if enabled */
-    Process_Wire_Segments();
-    Process_Surface_Patches();
-    Draw_Surface_Patches( cr, structure_segs+data.n, data.m );
-    Draw_Wire_Segments( cr, structure_segs, data.n );
-
-    /* Restore structure projection params */
-    structure_proj_params = params;
+    Process_Wire_Segments( rdpattern_view );
+    Process_Surface_Patches( rdpattern_view );
+    Draw_Surface_Patches( cr, rdpattern_view, structure_segs+data.n, data.m );
+    Draw_Wire_Segments( cr, rdpattern_view, structure_segs, data.n );
 
   } /* if( isFlagSet(OVERLAY_STRUCT) ) */
 
@@ -579,7 +559,7 @@ Draw_Radiation_Pattern( cairo_t *cr )
       /* Project line segment to Screen */
       Set_Gdk_Segment(
           &segm,
-          &rdpattern_proj_params,
+          rdpattern_view,
           point_3d[pts_idx].x,
           point_3d[pts_idx].y,
           point_3d[pts_idx].z,
@@ -607,7 +587,7 @@ Draw_Radiation_Pattern( cairo_t *cr )
       /* Project line segment to Screen */
       Set_Gdk_Segment(
           &segm,
-          &rdpattern_proj_params,
+          rdpattern_view,
           point_3d[pts_idx].x,
           point_3d[pts_idx].y,
           point_3d[pts_idx].z,
@@ -689,36 +669,25 @@ Draw_Near_Field( cairo_t *cr )
 
     /* Set radiation pattern projection parametrs */
     /* Distance of field point furthest from xyz origin */
-    rdpattern_proj_params.r_max = nf->r_max + dr;
-    New_Projection_Parameters(
-        rdpattern_width,
-        rdpattern_height,
-        &rdpattern_proj_params );
+    view_set_r_max( rdpattern_view, (float)(nf->r_max + dr) );
+    view_set_viewport( rdpattern_view, rdpattern_width, rdpattern_height );
 
     ClearFlag( DRAW_NEW_EHFIELD );
 
   } /* if( isFlagSet( DRAW_NEW_EHFIELD ) */
 
   /* Draw xyz axes to Screen */
-  Draw_XYZ_Axes( cr, rdpattern_proj_params );
+  Draw_XYZ_Axes( cr, rdpattern_view );
 
   /* Overlay structure on Near Field pattern */
   if( isFlagSet(OVERLAY_STRUCT) )
   {
-    /* Save projection params pointers */
-    projection_parameters_t params = structure_proj_params;
-
-    /* Divert structure drawing to rad pattern area */
-    structure_proj_params = rdpattern_proj_params;
-
-    /* Process and draw geometry if enabled */
-    Process_Wire_Segments();
-    Process_Surface_Patches();
-    Draw_Surface_Patches( cr, structure_segs+data.n, data.m );
-    Draw_Wire_Segments( cr, structure_segs, data.n );
-
-    /* Restore structure params */
-    structure_proj_params = params;
+    /* Project geometry using the rdpattern view so it lands in
+     * the rad-pattern drawingarea; no global state mutation. */
+    Process_Wire_Segments( rdpattern_view );
+    Process_Surface_Patches( rdpattern_view );
+    Draw_Surface_Patches( cr, rdpattern_view, structure_segs+data.n, data.m );
+    Draw_Wire_Segments( cr, rdpattern_view, structure_segs, data.n );
   } /* if( isFlagSet(OVERLAY_STRUCT) ) */
 
   /* Step thru near field values */
@@ -746,7 +715,7 @@ Draw_Near_Field( cairo_t *cr )
       /* Project new line segment of
        * phi chain to the Screen */
       Set_Gdk_Segment(
-          &segm, &rdpattern_proj_params,
+          &segm, rdpattern_view,
           nf->px[idx], nf->py[idx], nf->pz[idx],
           fx, fy, fz );
 
@@ -777,7 +746,7 @@ Draw_Near_Field( cairo_t *cr )
       /* Project new line segment of
        * phi chain to the Screen */
       Set_Gdk_Segment(
-          &segm, &rdpattern_proj_params,
+          &segm, rdpattern_view,
           nf->px[idx], nf->py[idx], nf->pz[idx],
           fx, fy, fz );
 
@@ -845,7 +814,7 @@ Draw_Near_Field( cairo_t *cr )
        * Poynting vector to the Screen */
       Set_Gdk_Segment(
           &segm,
-          &rdpattern_proj_params,
+          rdpattern_view,
           nf->px[idx], nf->py[idx],
           nf->pz[idx], fx, fy, fz );
 
@@ -877,8 +846,8 @@ _Draw_Radiation( cairo_t *cr )
   cairo_set_source_rgb( cr, BLACK );
   cairo_rectangle(
       cr, 0.0, 0.0,
-      (double)rdpattern_proj_params.width,
-      (double)rdpattern_proj_params.height);
+      (double)rdpattern_view->width,
+      (double)rdpattern_view->height);
   cairo_fill( cr );
 
   /* Abort if excitation (EX card) is missing */
@@ -1110,7 +1079,7 @@ Set_Polarization( int pol )
   if( isFlagSet(INPUT_OPENED) )
   {
     g_rec_mutex_lock(&freq_data_lock);
-    Show_Viewer_Gain( main_window_builder, "main_gain_entry", structure_proj_params );
+    Show_Viewer_Gain( main_window_builder, "main_gain_entry", structure_view );
     g_rec_mutex_unlock(&freq_data_lock);
   }
 
@@ -1242,20 +1211,18 @@ Set_Gain_Style( int gs )
 
 /*-----------------------------------------------------------------------*/
 
-/*  New_Radiation_Projection_Angle()
+/*  Queue_Radiation_Redraw()
  *
- *  Calculates new projection parameters when a
- *  structure projection angle (Wr or Wi) changes
+ *  Queues a redraw of the radiation drawingarea (and the plot area
+ *  when viewer-gain or antenna-temperature plots are visible).
+ *
+ *  Called by rdpattern_view observers.  Noise modes require
+ *  full point_3d recomputation since the scaled min/max depend
+ *  on the viewing angle; DRAW_NEW_RDPAT is set to force it.
  */
   void
-New_Radiation_Projection_Angle(void)
+Queue_Radiation_Redraw(void)
 {
-  /* sin and cos of rad pattern rotation and inclination angles */
-  rdpattern_proj_params.sin_wr = sin(rdpattern_proj_params.Wr/(double)TODEG);
-  rdpattern_proj_params.cos_wr = cos(rdpattern_proj_params.Wr/(double)TODEG);
-  rdpattern_proj_params.sin_wi = sin(rdpattern_proj_params.Wi/(double)TODEG);
-  rdpattern_proj_params.cos_wi = cos(rdpattern_proj_params.Wi/(double)TODEG);
-
   /* Noise modes require full recomputation of scaled min/max */
   if (IS_NOISE_MODE(rc_config.gain_style))
   {
@@ -1277,7 +1244,7 @@ New_Radiation_Projection_Angle(void)
     xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
 
-} /* New_Radiation_Projection_Angle() */
+} /* Queue_Radiation_Redraw() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -1528,24 +1495,23 @@ Save_Nearfield_Data( int fstep )
  * (e.g. Perpenticular to the Screen)
  */
   double
-Viewer_Gain( projection_parameters_t proj_parameters, int fstep )
+Viewer_Gain( view_t *v, int fstep )
 {
-  double phi, gain;
+  double phi, theta, gain;
   int nth, nph, idx;
 
+  /* Read spherical direction of viewing axis directly from the
+   * rotation matrix; theta is polar from +Z, phi is azimuth.
+   * At the pole phi is NAN; use zero so the pattern lookup still
+   * reads the polar cell. */
+  view_get_theta_phi( v, &theta, &phi );
+  if( isnan(phi) )
+    phi = 0.0;
+
   /* Calculate theta step from proj params */
-  phi = proj_parameters.Wr;
   if( fpat.dth == 0.0 ) nth = 0;
   else
   {
-    double theta;
-    theta = fabs( 90.0 - proj_parameters.Wi );
-    if( theta > 180.0 )
-    {
-      theta = 360.0 - theta;
-      phi  -= 180.0;
-    }
-
     if( (gnd.ksymp == 2) &&
         (theta > 90.01)  &&
         (gnd.ifar != 1) )
@@ -1881,8 +1847,8 @@ Inverse_Scale_Gain(double scaled_val)
  * Returns 0.0 when the direction is occluded by a ground plane or when
  * noise environment resolution fails.
  */
-static double
-Viewer_Noise_Value(projection_parameters_t proj_parameters, int fstep)
+double
+Viewer_Noise_Value(view_t *v, int fstep)
 {
 	double phi_deg, theta_deg;
 	int nth, nph, idx, pol;
@@ -1894,22 +1860,16 @@ Viewer_Noise_Value(projection_parameters_t proj_parameters, int fstep)
 	if (pol < 0 || pol >= NUM_POL)
 		return 0.0;
 
-	/* Convert viewer angles to NEC (theta, phi) in degrees,
-	 * same coordinate mapping as Viewer_Gain(). */
-	phi_deg = proj_parameters.Wr;
+	/* Viewer direction in spherical coordinates, read from the
+	 * rotation matrix directly.  theta is polar from +Z; phi is
+	 * azimuth from +X and is NAN at the pole (viewing axis along
+	 * Z); default to zero for the pattern-grid lookup there. */
+	view_get_theta_phi( v, &theta_deg, &phi_deg );
+	if (isnan(phi_deg))
+		phi_deg = 0.0;
+
 	if (fpat.dth == 0.0)
-	{
 		theta_deg = fpat.thets;
-	}
-	else
-	{
-		theta_deg = fabs(90.0 - proj_parameters.Wi);
-		if (theta_deg > 180.0)
-		{
-			theta_deg = 360.0 - theta_deg;
-			phi_deg -= 180.0;
-		}
-	}
 
 	/* When elevation is non-zero, the 3D pattern is visually rotated
 	 * via ant_temp_rotate_point().  Apply the inverse rotation (negated
@@ -2252,7 +2212,7 @@ Get_Radiation_Pattern_Data(rdpattern_data_t *data)
   data->nph = fpat.nph;
   data->r_min = cached_r_min;
   data->r_range = cached_r_range;
-  data->r_max = rdpattern_proj_params.r_max;
+  data->r_max = (double)rdpattern_view->r_max;
   data->valid = TRUE;
 
   return( TRUE );

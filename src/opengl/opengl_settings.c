@@ -243,13 +243,13 @@ on_opengl_settings_changed(GtkWidget *widget, gpointer user_data)
       opengl_set_renderer(new_renderer);
   }
 
-  /* Constrained rotation — only call when value changes (arcball mode) */
+  /* Constrained view drag — only call when value changes */
   chk = Builder_Get_Object(opengl_settings_builder,
       "chk_constrained_rotation");
   {
     gboolean new_constrained =
         gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(chk));
-    if( new_constrained != (gboolean)rc_config.arcball_constrained_rotation )
+    if( new_constrained != (gboolean)rc_config.view_drag_constrained )
       opengl_set_constrained_rotation(new_constrained);
   }
 
@@ -425,7 +425,7 @@ opengl_settings_sync_from_config(void)
   w = Builder_Get_Object(opengl_settings_builder,
       "chk_constrained_rotation");
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),
-      rc_config.arcball_constrained_rotation);
+      rc_config.view_drag_constrained);
 
   w = Builder_Get_Object(opengl_settings_builder, "chk_orthographic");
   gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),

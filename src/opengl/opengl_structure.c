@@ -38,9 +38,6 @@ static double cylinder_radius_scale = 1.0;
 /* Widget pointer for queue_redraw */
 static GtkWidget *structure_gl_widget = NULL;
 
-/* Arcball for structure view */
-static arcball_state_t *structure_arcball = NULL;
-
 /* Vertex attribute layout for lit-color shader (shared with overlay consumers) */
 const gl_vertex_attrib_t opengl_structure_attribs[3] = {
   { "position", 3, 0 },
@@ -213,10 +210,8 @@ structure_scene_generate(gl_view_content_t *out)
   opengl_structure_update_shared_geometry();
   geom = opengl_structure_get_shared_geometry();
 
-  /* Zoom from structure spinbutton, normalized to multiplier */
-  zoom = 1.0f;
-  if( structure_zoom )
-    zoom = (float)gtk_spin_button_get_value(structure_zoom) / 100.0f;
+  /* Zoom from view->zoom; view_set_zoom() is the authoritative writer. */
+  zoom = (structure_view != NULL) ? structure_view->zoom : 1.0f;
 
   if( zoom < 0.01f )
     zoom = 0.01f;
@@ -307,60 +302,29 @@ static gl_scene_provider_t structure_scene_provider = {
 
 /*-----------------------------------------------------------------------*/
 
-/** opengl_update_spin_display() - Update spin button display text without emitting value_changed signal
- * @spin: spin button to update
- * @angle: angle value to display (rendered as integer degrees)
+/** structure_view_changed_cb() - view_t change callback for structure view
+ * @v:           view that changed (structure_view)
+ * @_user_data:  unused
+ *
+ * Invoked by view_notify_change() whenever rotation, pan, zoom or
+ * extent changes.  Queues redraws on the Cairo path (Queue_Structure_Redraw)
+ * and the GL widget, and refreshes the WR/WI spin display.  Propagation
+ * to the rdpattern view under common-projection sharing is handled
+ * internally by view_t via the rotation_follower link established by
+ * view_share_master().  Bound as changed_cb at view_new() in main.c.
  */
   void
-opengl_update_spin_display(GtkSpinButton *spin, double angle)
+structure_view_changed_cb(view_t *v, gpointer _user_data)
 {
-  gchar value[6];
-
-  snprintf( value, sizeof(value), "%d", (int)angle );
-  gtk_entry_set_text( GTK_ENTRY(spin), value );
-}
-
-/*-----------------------------------------------------------------------*/
-
-/** structure_arcball_changed_cb() - Arcball change callback for constrained rotation mode
- * @ab: arcball that changed
- * @_user_data: unused
- *
- * Syncs arcball WR/WI angles back to structure_proj_params and
- * spin button display text, matching Cairo's Motion_Event behavior.
- */
-  static void
-structure_arcball_changed_cb(arcball_state_t *ab, gpointer _user_data)
-{
-  float wr, wi;
-
   (void)_user_data;
 
-  if( arcball_get_drag_mode(ab) != ARCBALL_DRAG_CONSTRAINED )
-    return;
+  view_update_spin_display( v );
+  Queue_Structure_Redraw();
 
-  arcball_get_angles(ab, &wr, &wi);
+  if( structure_gl_widget )
+    xnec2_widget_queue_draw( structure_gl_widget, TRUE );
 
-  structure_proj_params.Wr = (double)wr;
-  structure_proj_params.Wi = (double)wi;
-
-  /* Sync trig cache and queue freqplots when PLOT_GVIEWER is active,
-   * matching Cairo's Motion_Event path. */
-  New_Structure_Projection_Angle();
-
-  opengl_update_spin_display( rotate_structure, structure_proj_params.Wr );
-  opengl_update_spin_display( incline_structure, structure_proj_params.Wi );
-
-  /* Sync rdpattern spin buttons when common projection is active */
-  if( isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION) )
-  {
-    rdpattern_proj_params.Wr = structure_proj_params.Wr;
-    rdpattern_proj_params.Wi = structure_proj_params.Wi;
-
-    opengl_update_spin_display( rotate_rdpattern, rdpattern_proj_params.Wr );
-    opengl_update_spin_display( incline_rdpattern, rdpattern_proj_params.Wi );
-  }
-}
+} /* structure_view_changed_cb() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -378,42 +342,15 @@ opengl_structure_create_widget_impl(void)
   /* Load persisted radius scale from config; zero means line mode */
   cylinder_radius_scale = rc_config.opengl_cylinder_radius_scale;
 
-  if( !structure_arcball )
-  {
-    structure_arcball = arcball_new((float)MOTION_EVENTS_COUNT);
-
-    /* Initialize mode from rc_config */
-    arcball_set_drag_mode(structure_arcball,
-        rc_config.arcball_constrained_rotation ?
-        ARCBALL_DRAG_CONSTRAINED : ARCBALL_DRAG_FREE);
-
-    /* Sync constrained rotation back to WR/WI and spin buttons */
-    arcball_add_callback(structure_arcball,
-        structure_arcball_changed_cb, NULL);
-  }
-
-  /* Initialize arcball from current projection angles */
-  arcball_set_view(structure_arcball,
-      (float)structure_proj_params.Wr,
-      (float)structure_proj_params.Wi);
+  if( structure_view == NULL )
+    return( NULL );
 
   structure_gl_widget = gl_view_create_widget(
       &structure_view_config,
       &structure_scene_provider,
-      structure_arcball,
-      &structure_zoom);
+      structure_view );
 
   return( structure_gl_widget );
-}
-
-/*-----------------------------------------------------------------------*/
-
-/** opengl_structure_get_arcball() - Return reference to structure arcball
- */
-  arcball_state_t*
-opengl_structure_get_arcball(void)
-{
-  return( structure_arcball );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -435,12 +372,6 @@ opengl_structure_cleanup_impl(void)
 {
   structure_scene_cleanup();
   structure_gl_widget = NULL;
-
-  if( structure_arcball )
-  {
-    arcball_free(structure_arcball);
-    structure_arcball = NULL;
-  }
 }
 
 #endif /* HAVE_OPENGL */

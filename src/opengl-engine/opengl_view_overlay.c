@@ -137,15 +137,10 @@ gl_overlay_prepare(void *ctx, float r_max)
 
   /* Compute and cache own MVP with user-adjusted model scale.
    * Projection parameters (near/far) shared with main render pass
-   * so all renderables produce comparable depth values. */
-  {
-    float ovl_model_scale = gl_overlay_effective_scale(ovl);
-
-    arcball_get_mvp(view->arcball, ovl->cached_mvp, ovl->cached_mv,
-        view->pan_offset, view->cached_camera_distance, ovl_model_scale,
-        view->aspect, view->fov_rad,
-        view->cached_near_plane, view->cached_far_plane);
-  }
+   * so all renderables produce comparable depth values; only the
+   * uniform model scale differs from the main-content pass. */
+  gl_view_build_mvp(view, gl_overlay_effective_scale(ovl),
+      ovl->cached_mvp, ovl->cached_mv);
 
 } /* gl_overlay_prepare() */
 

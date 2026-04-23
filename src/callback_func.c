@@ -52,143 +52,21 @@ Save_Pixbuf( gpointer save_data )
 
 /*-----------------------------------------------------------------------*/
 
-/* Set_Spin_Button()
- *
- * Sets the value of a spin button
- */
-  static void
-Set_Spin_Button( GtkSpinButton *spin, gdouble value )
-{
-  /* Save original value and set new */
-  gdouble sav = gtk_spin_button_get_value( spin );
-  gtk_spin_button_set_value( spin, value );
-
-  /* Issue a value_changed signal if needed (given same values) */
-  if( sav == value )
-    g_signal_emit_by_name( G_OBJECT(spin), "value_changed", NULL );
-
-} /* Set_Spin_Button() */
-
-/*-----------------------------------------------------------------------*/
-
-/* New_Viewer_Angle()
- *
- * Sets parameters for a new viewer angle
- */
-  void
-New_Viewer_Angle(
-    double wr, double wi,
-    GtkSpinButton *wr_spb,
-    GtkSpinButton *wi_spb,
-    projection_parameters_t *params )
-{
-  /* Recalculate projection parameters */
-  params->Wr = wr;
-  params->Wi = wi;
-
-  /* Set new value */
-  Set_Spin_Button( wr_spb, (gdouble)params->Wr );
-  Set_Spin_Button( wi_spb, (gdouble)params->Wi );
-
-} /* New_Viewer_Angle() */
-
-/*-----------------------------------------------------------------------*/
-
 /* Motion_Event()
  *
- * Handles pointer motion event on drawingareas
+ * Handles pointer motion event on drawingareas.
+ *
+ * Drag state is set by on_*_drawingarea_button_press_event and cleared
+ * by on_*_drawingarea_button_release_event.  This handler only
+ * accumulates pointer deltas; observers handle redraw and spin display.
  */
   void
 Motion_Event(
     GdkEventMotion *event,
-    projection_parameters_t *params )
+    view_t *v )
 {
-  /* Save previous pointer position */
-  static gdouble x_prev = 0.0, y_prev = 0.0;
-
-  gdouble x = event->x;
-  gdouble y = event->y;
-  gdouble dx, dy;
-  gchar value[6];
-  size_t s = sizeof( value );
-
   SetFlag( BLOCK_MOTION_EV );
-
-  /* Initialize saved x,y */
-  if( params->reset )
-  {
-    x_prev = x;
-    y_prev = y;
-    params->reset = FALSE;
-  }
-
-  /* Recalculate projection parameters
-   * according to pointer motion */
-  dx = x - x_prev;
-  dy = y - y_prev;
-  x_prev = x;
-  y_prev = y;
-
-  /* Other buttons are used for moving axes on screen */
-  if( event->state & GDK_BUTTON1_MASK )
-  {
-    /* Set the structure rotate/incline spinbuttons */
-    if( isFlagSet(COMMON_PROJECTION) ||
-        (params->type == STRUCTURE_DRAWINGAREA) )
-    {
-      structure_proj_params.Wr -= dx / (gdouble)MOTION_EVENTS_COUNT;
-      structure_proj_params.Wi += dy / (gdouble)MOTION_EVENTS_COUNT;
-      snprintf( value, s, "%d", (int)structure_proj_params.Wr );
-      gtk_entry_set_text( GTK_ENTRY(rotate_structure), value );
-      snprintf( value, s, "%d", (int)structure_proj_params.Wi );
-      gtk_entry_set_text( GTK_ENTRY(incline_structure), value );
-    }
-
-    /* Set the rdpattern rotate/incline spinbuttons */
-    if( (isFlagSet(DRAW_ENABLED) && isFlagSet(COMMON_PROJECTION)) ||
-        (params->type == RDPATTERN_DRAWINGAREA) )
-    {
-      rdpattern_proj_params.Wr -= dx / (gdouble)MOTION_EVENTS_COUNT;
-      rdpattern_proj_params.Wi += dy / (gdouble)MOTION_EVENTS_COUNT;
-      snprintf( value, s, "%d", (int)rdpattern_proj_params.Wr );
-      gtk_entry_set_text( GTK_ENTRY(rotate_rdpattern), value );
-      snprintf( value, s, "%d", (int)rdpattern_proj_params.Wi );
-      gtk_entry_set_text( GTK_ENTRY(incline_rdpattern), value );
-    }
-
-    /* Rotate/incline structure */
-    if( params->type == STRUCTURE_DRAWINGAREA )
-    {
-      New_Structure_Projection_Angle();
-      if( isFlagSet(DRAW_ENABLED) &&
-          isFlagSet(COMMON_PROJECTION) )
-        New_Radiation_Projection_Angle();
-    }
-    else if( params->type == RDPATTERN_DRAWINGAREA )
-    {
-      /* Rotate/incline rdpattern */
-      New_Radiation_Projection_Angle();
-      if( isFlagSet(COMMON_PROJECTION) )
-        New_Structure_Projection_Angle();
-    }
-  }    /* if( event->state & GDK_BUTTON1_MASK ) */
-  else
-  {
-    /* Move structure or rdpattern axes on screen */
-    params->dx_center += dx;
-    params->dy_center -= dy;
-
-    if( params->type == STRUCTURE_DRAWINGAREA )
-    {
-      xnec2_widget_queue_draw( structure_drawingarea, TRUE );
-    }
-
-    if( params->type == RDPATTERN_DRAWINGAREA )
-    {
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-    }
-  }
-
+  view_update_drag( v, (float)event->x, (float)event->y );
   ClearFlag( BLOCK_MOTION_EV );
 
 } /* Motion_Event() */
@@ -451,35 +329,23 @@ Main_Rdpattern_Activate( gboolean from_menu )
           Builder_Get_Object(rdpattern_window_builder,
             "rdpattern_overlay_structure")), TRUE );
 
-  /* Sync common projection spinbuttons */
-  if( isFlagSet(COMMON_PROJECTION) )
+  /* Sync common projection spinbuttons from the master view. */
+  if( rdpattern_view != NULL && rdpattern_view->rotation_master != NULL )
   {
-    gchar value[6];
-    size_t s = sizeof( value ) - 1;
-
-    rdpattern_proj_params.Wr = structure_proj_params.Wr;
-    rdpattern_proj_params.Wi = structure_proj_params.Wi;
-    snprintf( value, s, "%d", (int)rdpattern_proj_params.Wr );
-    value[s] = '\0';
-    gtk_entry_set_text( GTK_ENTRY(rotate_rdpattern), value );
-    snprintf( value, s, "%d", (int)rdpattern_proj_params.Wi );
-    value[s] = '\0';
-    gtk_entry_set_text( GTK_ENTRY(incline_rdpattern), value );
+    view_update_spin_display( rdpattern_view );
   }
-  else  /* Initialize radiation pattern projection angles */
+  else if( rdpattern_view != NULL )
   {
-    rdpattern_proj_params.Wr =
-      gtk_spin_button_get_value(rotate_rdpattern);
-    rdpattern_proj_params.Wi =
-      gtk_spin_button_get_value(incline_rdpattern);
+    /* Initialize radiation pattern projection from its spin widgets */
+    double wr = gtk_spin_button_get_value( rotate_rdpattern );
+    double wi = gtk_spin_button_get_value( incline_rdpattern );
+    view_set_angles( rdpattern_view, wr, wi );
   }
-  New_Radiation_Projection_Angle();
 
   /* Reset zoom value */
-  rdpattern_proj_params.xy_zoom  = gtk_spin_button_get_value( rdpattern_zoom );
-  rdpattern_proj_params.xy_zoom /= 100.0;
-  rdpattern_proj_params.xy_scale =
-    rdpattern_proj_params.xy_scale1 * rdpattern_proj_params.xy_zoom;
+  if( rdpattern_view != NULL )
+    view_set_zoom( rdpattern_view,
+        (float)(gtk_spin_button_get_value( rdpattern_zoom ) / 100.0) );
 
   /* Redo currents if not reaching this function
    * from the menu callback (e.g. not user action) */

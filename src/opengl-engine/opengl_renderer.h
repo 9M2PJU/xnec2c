@@ -25,7 +25,6 @@
 #ifdef HAVE_OPENGL
 #include <epoxy/gl.h>
 #include "opengl_math.h"
-#include "opengl_arcball.h"
 
 /* Vertex attribute descriptor */
 typedef struct

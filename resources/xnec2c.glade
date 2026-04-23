@@ -11921,7 +11921,7 @@ Save NEC2 Editor data first?
                     <property name="height-request">400</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="events">GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
+                    <property name="events">GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
                     <property name="margin-left">2</property>
                     <property name="margin-right">2</property>
                     <property name="margin-top">2</property>
@@ -11929,6 +11929,7 @@ Save NEC2 Editor data first?
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
                     <signal name="button-press-event" handler="on_structure_drawingarea_button_press_event" swapped="no"/>
+                    <signal name="button-release-event" handler="on_structure_drawingarea_button_release_event" swapped="no"/>
                     <signal name="configure-event" handler="on_structure_drawingarea_configure_event" swapped="no"/>
                     <signal name="draw" handler="on_structure_drawingarea_draw" swapped="no"/>
                     <signal name="motion-notify-event" handler="on_structure_drawingarea_motion_notify_event" swapped="no"/>
@@ -13265,7 +13266,7 @@ Save NEC2 Editor data first?
                     <property name="height-request">400</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="events">GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
+                    <property name="events">GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
                     <property name="margin-left">2</property>
                     <property name="margin-right">2</property>
                     <property name="margin-top">2</property>
@@ -13273,6 +13274,7 @@ Save NEC2 Editor data first?
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
                     <signal name="button-press-event" handler="on_rdpattern_drawingarea_button_press_event" swapped="no"/>
+                    <signal name="button-release-event" handler="on_rdpattern_drawingarea_button_release_event" swapped="no"/>
                     <signal name="configure-event" handler="on_rdpattern_drawingarea_configure_event" swapped="no"/>
                     <signal name="draw" handler="on_rdpattern_drawingarea_draw" swapped="no"/>
                     <signal name="motion-notify-event" handler="on_rdpattern_drawingarea_motion_notify_event" swapped="no"/>

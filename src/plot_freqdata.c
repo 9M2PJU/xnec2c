@@ -1545,7 +1545,7 @@ _Plot_Frequency_Data( cairo_t *cr )
 
     /* Calcs are done for all freq steps */
     for( idx = 0; idx < num_fsteps; idx++ )
-      vgain[idx] = Viewer_Gain( structure_proj_params, valid_steps_map[idx] );
+      vgain[idx] = Viewer_Gain( structure_view, valid_steps_map[idx] );
 
     /* Plot net gain if selected */
     if( isFlagSet(PLOT_NETGAIN) )

@@ -445,8 +445,7 @@ on_isolator_realize(GtkWidget *wrapper, gpointer user_data)
 /** gl_view_create_widget() - Create GL area widget with engine wired
  * @config: view configuration
  * @scene: scene provider
- * @arcball: arcball state
- * @zoom_spinbutton: pointer to zoom spinbutton pointer
+ * @view: per-view rotation/pan/zoom/drag owner (borrowed, non-NULL)
  *
  * Returns a GtkEventBox containing a single GtkGLArea child.  The
  * event box carries a native X window that isolates the GL surface
@@ -458,29 +457,24 @@ on_isolator_realize(GtkWidget *wrapper, gpointer user_data)
 gl_view_create_widget(
     gl_view_config_t *config,
     gl_scene_provider_t *scene,
-    arcball_state_t *arcball,
-    GtkSpinButton **zoom_spinbutton)
+    view_t *view)
 {
   GtkWidget *gl_area;
   GtkWidget *isolator;
   gl_view_state_t *state;
 
-  if( !config || !scene || !arcball )
+  if( !config || !scene || !view )
     return( NULL );
 
   state = g_new0(gl_view_state_t, 1);
 
   state->config = config;
   state->scene = scene;
-  state->arcball = arcball;
-  state->zoom_spinbutton = zoom_spinbutton;
+  state->view = view;
   state->last_generation = (unsigned int)-1;
   state->fov_rad = glm_rad(60.0f);
   state->aspect = 1.0f;
   state->viewport_height = 1.0f;
-
-  /* Initialize per-view pan state */
-  glm_vec2_zero(state->pan_offset);
   state->cached_camera_distance = 1.0f;
 
   /* Initialize overlay scale adjustment (1.0 = default from overlay_generate) */
@@ -583,63 +577,69 @@ gl_view_get_state(GtkWidget *widget)
 
 /*-----------------------------------------------------------------------*/
 
-/** gl_view_set_arcball() - Set the arcball reference for a view
- * @widget: GL area widget
- * @arcball: arcball state
+/** gl_view_build_mvp() - Compose model-view-projection for one frame
+ * @state:       view engine state
+ * @model_scale: uniform scale applied to the model; caller selects
+ *               content vs overlay scale without mutating shared state
+ * @mvp:         receives projection * view * model
+ * @mv_dest:     receives view * model (no projection)
+ *
+ * Consumes view_R(state->view) for rotation, state->view->pan_offset
+ * converted from screen pixels to world units via camera distance,
+ * fov and viewport height.  Projection mode and planes come from
+ * state.
  */
   void
-gl_view_set_arcball(GtkWidget *widget, arcball_state_t *arcball)
+gl_view_build_mvp(gl_view_state_t *state, float model_scale,
+                  mat4 mvp, mat4 mv_dest)
 {
-  gl_view_state_t *state;
+  mat4 view_mat, proj, model, trans;
+  vec3 eye_pos, center_pos, up;
+  float distance = state->cached_camera_distance;
+  float aspect = state->aspect;
+  float fov_rad = state->fov_rad;
+  float near_plane = state->cached_near_plane;
+  float far_plane = state->cached_far_plane;
+  float pan_scale;
+  float pan_x, pan_y;
+  float (*R)[4] = view_R(state->view);
 
-  state = gl_view_get_state(widget);
+  glm_mat4_identity(model);
+  glm_mat4_copy(R, model);
+  glm_scale(model, (vec3){model_scale, model_scale, model_scale});
 
-  if( !state || !arcball )
-    return;
+  /* Convert pan from screen pixels (as Cairo stores them) to world
+   * units at the model plane.  Pan enters the MVP chain post-scale. */
+  pan_scale = 2.0f * distance * tanf(fov_rad / 2.0f) /
+              state->viewport_height;
+  pan_x = state->view->pan_offset[0] * pan_scale;
+  pan_y = state->view->pan_offset[1] * pan_scale;
 
-  state->arcball = arcball;
+  glm_mat4_identity(trans);
+  glm_translate(trans, (vec3){pan_x, pan_y, 0.0f});
+  glm_mat4_mul(trans, model, model);
 
-} /* gl_view_set_arcball() */
+  glm_vec3_copy((vec3){0.0f, 0.0f, distance}, eye_pos);
+  glm_vec3_zero(center_pos);
+  glm_vec3_copy((vec3){0.0f, 1.0f, 0.0f}, up);
 
-/*-----------------------------------------------------------------------*/
+  glm_lookat(eye_pos, center_pos, up, view_mat);
 
-/** gl_view_sync_arcball() - Sync arcball rotation from angles
- * @widget: GL area widget
- * @wr: rotation angle (real component)
- * @wi: rotation angle (imaginary component)
- */
-  void
-gl_view_sync_arcball(GtkWidget *widget, double wr, double wi)
-{
-  gl_view_state_t *state;
+  if( rc_config.opengl_orthographic )
+  {
+    float half_h = distance * tanf(fov_rad / 2.0f);
+    glm_ortho(-half_h * aspect, half_h * aspect, -half_h, half_h,
+        near_plane, far_plane, proj);
+  }
+  else
+  {
+    glm_perspective(fov_rad, aspect, near_plane, far_plane, proj);
+  }
 
-  state = gl_view_get_state(widget);
+  glm_mat4_mul(view_mat, model, mv_dest);
+  glm_mat4_mul(proj, view_mat, mvp);
+  glm_mat4_mul(mvp, model, mvp);
 
-  if( !state || !state->arcball )
-    return;
-
-  arcball_set_view(state->arcball, (float)wr, (float)wi);
-  arcball_notify_changed(state->arcball);
-
-} /* gl_view_sync_arcball() */
-
-/*-----------------------------------------------------------------------*/
-
-/** gl_view_reset_pan() - Reset pan offset to center the view
- * @widget: GL area widget
- */
-  void
-gl_view_reset_pan(GtkWidget *widget)
-{
-  gl_view_state_t *state;
-
-  state = gl_view_get_state(widget);
-
-  if( !state )
-    return;
-
-  glm_vec2_zero(state->pan_offset);
-
-} /* gl_view_reset_pan() */
+} /* gl_view_build_mvp() */
 
 #endif /* HAVE_OPENGL */

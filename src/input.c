@@ -402,7 +402,12 @@ datagn( void )
   data.m=0;
   data.mp=0;
   isct=0;
-  structure_proj_params.r_max = 0.0;
+
+  /* Forked children inherit parent memory but never allocate structure_view
+   * (creation happens after the fork in main.c).  Skip the UI-side extent
+   * reset when no view is attached. */
+  if( structure_view != NULL )
+    view_set_r_max( structure_view, 0.0f );
 
   readgm_reset_count();
 
