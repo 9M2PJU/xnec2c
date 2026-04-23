@@ -29,6 +29,8 @@
 #define TEXT_GRADIENT_SPACING 8  /* Spacing between text and gradient bar in pixels */
 #define LINE_WIDTH 2            /* Width of lines in pixels */
 
+static double Inverse_Scale_Gain(double scaled_val);
+
 static const char *nearfield_animation_error_msg =
   N_("Animation requires near field data.\n\n"
      "E-field animation: Add NE card to NEC file\n"
@@ -367,20 +369,38 @@ Update_Rdpattern_UI(void)
   if( !rad_pattern[fstep].max_gain || !rad_pattern[fstep].min_gain )
     return;
 
-  /* Show max gain on color code bar */
-  snprintf( txt, sizeof(txt)-1, "%.2f", rad_pattern[fstep].max_gain[pol] );
-  gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_colorcode_maxlabel")),
-      txt );
+  /* Show max and min on color code bar; values are noise density (K/sr)
+   * in noise mode, gain (dBi) otherwise */
+  if (IS_NOISE_MODE(rc_config.gain_style))
+  {
+    /* Inverse_Scale_Gain recovers K/sr from log-compressed noise_scaled values */
+    snprintf(txt, sizeof(txt)-1, "%.0f",
+        Inverse_Scale_Gain(rad_pattern[fstep].noise_scaled_max));
+    gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
+            rdpattern_window_builder, "rdpattern_colorcode_maxlabel")),
+        txt);
 
-  /* Show min gain on color code bar, clamped to COLOR_MIN_GAIN */
-  double color_min_gain = rad_pattern[fstep].min_gain[pol];
-  if( color_min_gain < COLOR_MIN_GAIN )
-    color_min_gain = COLOR_MIN_GAIN;
-  snprintf( txt, sizeof(txt)-1, "%.2f", color_min_gain );
-  gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_colorcode_minlabel")),
-      txt );
+    snprintf(txt, sizeof(txt)-1, "%.0f",
+        Inverse_Scale_Gain(rad_pattern[fstep].noise_scaled_min));
+    gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
+            rdpattern_window_builder, "rdpattern_colorcode_minlabel")),
+        txt);
+  }
+  else
+  {
+    snprintf(txt, sizeof(txt)-1, "%.2f", rad_pattern[fstep].max_gain[pol]);
+    gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
+            rdpattern_window_builder, "rdpattern_colorcode_maxlabel")),
+        txt);
+
+    double color_min_gain = rad_pattern[fstep].min_gain[pol];
+    if (color_min_gain < COLOR_MIN_GAIN)
+      color_min_gain = COLOR_MIN_GAIN;
+    snprintf(txt, sizeof(txt)-1, "%.2f", color_min_gain);
+    gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
+            rdpattern_window_builder, "rdpattern_colorcode_minlabel")),
+        txt);
+  }
 
   /* Show gain (dBi) or noise density (K/sr) in direction of viewer */
   if (IS_NOISE_MODE(rc_config.gain_style))
@@ -2131,7 +2151,7 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
       if (noise_mode)
         snprintf(txt, sizeof(txt)-1, "%.0f", db_val);
       else
-        snprintf(txt, sizeof(txt)-1, "%.2f dBi", db_val);
+        snprintf(txt, sizeof(txt)-1, "%.2f", db_val);
       cairo_set_source_rgb(cr, WHITE);
       /* Right-justify absolute gain values with normal weight */
       cairo_select_font_face(cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
