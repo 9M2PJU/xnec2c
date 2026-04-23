@@ -168,6 +168,16 @@ view_notify_change(view_t *v)
   if( v->changed_cb != NULL )
     v->changed_cb(v, v->changed_user);
 
+  /* Propagate drag accumulators to the follower so
+   * view_update_spin_display reads exact double-precision angles
+   * rather than a lossy float matrix roundtrip. */
+  if( v->rotation_follower != NULL )
+  {
+    v->rotation_follower->drag_wr_deg = v->drag_wr_deg;
+    v->rotation_follower->drag_wi_deg = v->drag_wi_deg;
+    view_notify_change(v->rotation_follower);
+  }
+
   v->in_notify = FALSE;
 
 } /* view_notify_change() */

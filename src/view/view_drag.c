@@ -138,6 +138,18 @@ view_apply_drag(view_t *v, float dx, float dy)
     v->drag_wr_deg -= (double)dx / (double)v->motion_divisor;
     v->drag_wi_deg += (double)dy / (double)v->motion_divisor;
     Build_View_Rotation_Matrix(owner->R, v->drag_wr_deg, v->drag_wi_deg);
+
+    /* Sync accumulators to owner so view_update_spin_display on the
+     * master reads exact values and the view_notify_change propagation
+     * to the follower copies fresh values rather than stale ones.
+     * view_set_angles() performs the same sync on its write path;
+     * this function bypasses view_set_angles() so the sync is
+     * repeated here. */
+    if( owner != v )
+    {
+      owner->drag_wr_deg = v->drag_wr_deg;
+      owner->drag_wi_deg = v->drag_wi_deg;
+    }
   }
   else
   {

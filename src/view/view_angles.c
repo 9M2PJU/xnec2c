@@ -113,6 +113,16 @@ view_set_angles(view_t *v, double wr_deg, double wi_deg)
   v->drag_wr_deg = wr_deg;
   v->drag_wi_deg = wi_deg;
 
+  /* When a follower edits the master's matrix, keep the master's
+   * accumulators in sync so view_update_spin_display on the master
+   * reads the exact double-precision angles, not a lossy float
+   * roundtrip through Extract_View_Angles. */
+  if( owner != v )
+  {
+    owner->drag_wr_deg = wr_deg;
+    owner->drag_wi_deg = wi_deg;
+  }
+
   Extract_View_Angles(owner->R, &cur_wr, &cur_wi);
   if( !isnan(cur_wr) &&
       fabs(cur_wr - wr_deg) < VIEW_ANGLE_EPS &&
