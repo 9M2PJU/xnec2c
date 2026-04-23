@@ -36,24 +36,21 @@ void opengl_common_projection_sync(void);
  * SIGNAL_BLOCK/SIGNAL_UNBLOCK in programmatic update sites. */
 void on_freq_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 
-/* Suppress -Wpedantic warnings from the g_signal_handlers_block_by_func macro,
- * which internally casts a function pointer to gpointer (forbidden by ISO C).
- * This cast is intentional and correct for GLib signal handling. */
+/* ISO C forbids casting a function pointer to gpointer (void *) directly.
+ * A union reinterpret is defined behavior under C99/C11 and avoids that cast.
+ * g_signal_handlers_block_by_func is bypassed in favor of the underlying
+ * g_signal_handlers_block_matched to keep the cast site visible and explicit. */
 #define SIGNAL_BLOCK(widget, func) \
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS \
-  _Pragma("GCC diagnostic push") \
-  _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-  g_signal_handlers_block_by_func((widget), (func), NULL); \
-  _Pragma("GCC diagnostic pop") \
-  G_GNUC_END_IGNORE_DEPRECATIONS
+  do { \
+    union { GCallback cb; gpointer p; } _u = { .cb = (GCallback)(func) }; \
+    g_signal_handlers_block_matched((widget), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, _u.p, NULL); \
+  } while(0)
 
 #define SIGNAL_UNBLOCK(widget, func) \
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS \
-  _Pragma("GCC diagnostic push") \
-  _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-  g_signal_handlers_unblock_by_func((widget), (func), NULL); \
-  _Pragma("GCC diagnostic pop") \
-  G_GNUC_END_IGNORE_DEPRECATIONS
+  do { \
+    union { GCallback cb; gpointer p; } _u = { .cb = (GCallback)(func) }; \
+    g_signal_handlers_unblock_matched((widget), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, _u.p, NULL); \
+  } while(0)
 
 #endif
 
