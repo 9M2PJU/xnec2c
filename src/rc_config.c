@@ -633,7 +633,7 @@ Create_Default_Config( void )
   rc_config.main_vertical   = 0;
   rc_config.main_right_hand = 0;
   rc_config.main_left_hand  = 0;
-  rc_config.main_loop_start = 0;
+  rc_config.main_loop_start = 1;
   rc_config.main_rotate_spinbutton  = 45;
   rc_config.main_incline_spinbutton = 45;
   rc_config.main_zoom_spinbutton    = 100;
@@ -846,12 +846,6 @@ Restore_GUI_State( void )
   {
     widget = Builder_Get_Object( main_window_builder, "main_left_hand" );
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-  }
-
-  if( rc_config.main_loop_start )
-  {
-    widget = Builder_Get_Object( main_window_builder, "main_loop_start" );
-    gtk_button_clicked( GTK_BUTTON(widget) );
   }
 
 #ifdef HAVE_OPENGL

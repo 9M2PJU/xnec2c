@@ -134,7 +134,7 @@ fetch_freq_data( void )
   }
 
   g_rec_mutex_unlock(&freq_data_lock);
-  return Start_Frequency_Loop_Greenline();
+  return FALSE;
 }
 
 /**
@@ -166,7 +166,8 @@ user_set_frequency( double fmhz )
 {
   freq_display_update( fmhz );
   calc_data.freq_mhz = fmhz;
-  fetch_freq_data();
+  if( !fetch_freq_data() )
+    Start_Frequency_Loop_Greenline();
 }
 
 /* Frequency_Scale_Geometry()

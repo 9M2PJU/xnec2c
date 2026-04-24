@@ -834,15 +834,7 @@ Open_Input_File( gpointer arg )
     GtkWidget *box = Builder_Get_Object( freqplots_window_builder, "freqplots_box" );
     gtk_widget_show( box );
     if( rc_config.main_loop_start || isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
-    {
       Main_Freqplots_Activate();
-      Start_Frequency_Loop();
-    }
-  }
-  else if( isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
-  {
-    /* Optimizer active: start freq loop without freq plots window */
-    Start_Frequency_Loop();
   }
 
   /* Restore main window projection settings */
@@ -865,6 +857,9 @@ Open_Input_File( gpointer arg )
 
     ClearFlag( XNEC2C_START );
   }
+
+  if( rc_config.main_loop_start || isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
+    Start_Frequency_Loop();
 
   /* Open NEC2 editor if there is a saved geometry state */
   GtkMenuItem *menu_item;

@@ -184,11 +184,14 @@ rdpattern_scene_generate(gl_view_content_t *out)
     return( TRUE );
   }
 
-  /* Near-field selected but NE/NH cards absent or data not yet valid */
+  /* Near-field selected but NE/NH cards absent or data not yet computed */
   if( isFlagSet(DRAW_EHFIELD) )
   {
     rdpattern_init_empty_scene(out, zoom);
-    out->status_message = "Near field requires NE or NH cards in the NEC file";
+    if( isFlagClear(ENABLE_NEAREH) )
+      out->status_message = "Near field requires NE or NH cards in the NEC file";
+    else
+      out->status_message = "Press ▶ to start the frequency loop";
     g_rec_mutex_unlock(&freq_data_lock);
     return( TRUE );
   }
@@ -429,7 +432,10 @@ out_unlock:
    * glClear the framebuffer; returning FALSE would exit on_render()
    * before clearing and freeze the last valid frame on screen. */
   rdpattern_init_empty_scene(out, zoom);
-  out->status_message = "Radiation pattern data not ready";
+  if( isFlagClear(FREQ_LOOP_DONE) )
+    out->status_message = "Press ▶ to start the frequency loop";
+  else
+    out->status_message = "Radiation pattern data not ready";
   g_rec_mutex_unlock(&freq_data_lock);
   return( TRUE );
 }
