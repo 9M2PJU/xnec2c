@@ -151,6 +151,39 @@ void print_fr_plot(fr_plot_t *p)
 		p->freq_loop_data->freq_steps);
 }
 
+/**
+ * fmhz_within_display_range - test whether a frequency lies within any visible plot panel
+ * @fmhz: frequency in MHz to test
+ *
+ * Iterates the fr_plots array and returns TRUE when @fmhz falls within the
+ * display scale range (min_fscale..max_fscale) of any valid panel.  The display
+ * range can be wider than the underlying FR card data range (e.g. when a single-
+ * frequency card is expanded by Fit_to_Scale for visualization).
+ *
+ * Returns FALSE when fr_plots is not yet initialized or no panel covers @fmhz.
+ */
+gboolean
+fmhz_within_display_range( double fmhz )
+{
+  int i, n;
+
+  if (fr_plots == NULL || calc_data.ngraph < 1 || calc_data.FR_cards < 1)
+    return FALSE;
+
+  n = calc_data.ngraph * calc_data.FR_cards;
+  for (i = 0; i < n; i++)
+  {
+    if (!FR_PLOT_T_IS_VALID(&fr_plots[i]))
+      continue;
+
+    if (fmhz >= fr_plots[i].min_fscale - 1e-6
+        && fmhz <= fr_plots[i].max_fscale + 1e-6)
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
 /* draw_text:
  * cr:      cairo object
  * widget:  the widget being drawn on

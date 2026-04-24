@@ -26,5 +26,7 @@
 #define LEFT    1
 #define RIGHT   2
 
+gboolean fmhz_within_display_range( double fmhz );
+
 #endif
 

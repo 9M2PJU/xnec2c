@@ -24,6 +24,7 @@
 #include "shared.h"
 #include "mathlib.h"
 #include "opt_ui.h"
+#include "plot_freqdata.h"
 /* Only nec2_eval_signal() is called from xnec2c.c; avoid pulling
  * gsl headers (via opt_simple.h) which conflict with openblas cblas. */
 extern void nec2_eval_signal(void);
@@ -1047,6 +1048,11 @@ fmhz_save_reset_if_stale(void)
         && calc_data.fmhz_save <= fld->max_freq + 1e-6)
       return FALSE;
   }
+
+  /* fmhz_save is visible in a plot panel whose display range exceeds the FR
+   * card data range (e.g. single-frequency card expanded by Fit_to_Scale) */
+  if (fmhz_within_display_range(calc_data.fmhz_save))
+    return FALSE;
 
   /* fmhz_save is outside all FR card ranges; find lowest-VSWR step */
   double best_vswr = 1e30;
