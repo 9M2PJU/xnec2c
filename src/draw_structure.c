@@ -123,16 +123,16 @@ New_Wire_Data( void )
   for( idx = 0; idx < data.n; idx++ )
   {
     r = sqrt(
-        (double)data.x1[idx] * (double)data.x1[idx] +
-        (double)data.y1[idx] * (double)data.y1[idx] +
-        (double)data.z1[idx] * (double)data.z1[idx] );
+        (double) data.segments[idx].x1 * (double) data.segments[idx].x1 +
+        (double) data.segments[idx].y1 * (double) data.segments[idx].y1 +
+        (double) data.segments[idx].z1 * (double) data.segments[idx].z1);
     if( r > r_max )
       r_max = r;
 
     r = sqrt(
-        (double)data.x2[idx] * (double)data.x2[idx] +
-        (double)data.y2[idx] * (double)data.y2[idx] +
-        (double)data.z2[idx] * (double)data.z2[idx] );
+        (double) data.segments[idx].x2 * (double) data.segments[idx].x2 +
+        (double) data.segments[idx].y2 * (double) data.segments[idx].y2 +
+        (double) data.segments[idx].z2 * (double) data.segments[idx].z2);
     if( r > r_max )
       r_max = r;
 
@@ -173,13 +173,8 @@ New_Patch_Data( void )
   size_t mreq;
 
   /* Allocate memory for patch line segments */
-  mreq = (size_t)(2 * data.m) * sizeof(double);
-  mem_realloc( (void **)&data.px1, mreq, "in draw_structure.c" );
-  mem_realloc( (void **)&data.py1, mreq, "in draw_structure.c" );
-  mem_realloc( (void **)&data.pz1, mreq, "in draw_structure.c" );
-  mem_realloc( (void **)&data.px2, mreq, "in draw_structure.c" );
-  mem_realloc( (void **)&data.py2, mreq, "in draw_structure.c" );
-  mem_realloc( (void **)&data.pz2, mreq, "in draw_structure.c" );
+  mreq = (size_t)(2 * data.m) * sizeof(patch_line_t);
+  mem_realloc((void **)&data.patch_lines, mreq, "in draw_structure.c");
 
   /* Find point furthest from xyz axes origin */
   r_max = 0.0;
@@ -188,69 +183,65 @@ New_Patch_Data( void )
     i = 2 * idx;
 
     /* Side/2 of square representing a patch (sqrt of patch area) */
-    s = (double)sqrt( data.pbi[idx] ) / 2.0;
+    s = (double)sqrt(data.patches[idx].pbi) / 2.0;
 
     /* Projection of s on xyz components of t1 */
-    sx = s * (double)data.t1x[idx];
-    sy = s * (double)data.t1y[idx];
-    sz = s * (double)data.t1z[idx];
+    sx = s * (double) data.patches[idx].t1x;
+    sy = s * (double) data.patches[idx].t1y;
+    sz = s * (double) data.patches[idx].t1z;
 
     /* End 1 of line seg parallel to t1 vector */
-    data.px1[i] = (double)data.px[idx] + sx;
-    data.py1[i] = (double)data.py[idx] + sy;
-    data.pz1[i] = (double)data.pz[idx] + sz;
+    data.patch_lines[i].px1 = (double) data.patches[idx].px + sx;
+    data.patch_lines[i].py1 = (double) data.patches[idx].py + sy;
+    data.patch_lines[i].pz1 = (double) data.patches[idx].pz + sz;
 
     /* Its distance from XYZ origin */
-    r = sqrt(
-        data.px1[i]*data.px1[i] +
-        data.py1[i]*data.py1[i] +
-        data.pz1[i]*data.pz1[i] );
+    r = sqrt(data.patch_lines[i].px1*data.patch_lines[i].px1 +
+             data.patch_lines[i].py1*data.patch_lines[i].py1 +
+             data.patch_lines[i].pz1*data.patch_lines[i].pz1);
     if( r > r_max )
       r_max = r;
 
     /* End 2 of line seg parallel to t1 vector */
-    data.px2[i] = (double)data.px[idx] - sx;
-    data.py2[i] = (double)data.py[idx] - sy;
-    data.pz2[i] = (double)data.pz[idx] - sz;
+    data.patch_lines[i].px2 = (double) data.patches[idx].px - sx;
+    data.patch_lines[i].py2 = (double) data.patches[idx].py - sy;
+    data.patch_lines[i].pz2 = (double) data.patches[idx].pz - sz;
 
     /* Its distance from XYZ origin */
-    r = sqrt(
-        data.px2[i]*data.px2[i] +
-        data.py2[i]*data.py2[i] +
-        data.pz2[i]*data.pz2[i] );
+    r = sqrt(data.patch_lines[i].px2*data.patch_lines[i].px2 +
+             data.patch_lines[i].py2*data.patch_lines[i].py2 +
+             data.patch_lines[i].pz2*data.patch_lines[i].pz2);
     if( r > r_max )
       r_max = r;
 
     i++;
 
     /* Projection of s on xyz components of t2 */
-    sx = s * (double)data.t2x[idx];
-    sy = s * (double)data.t2y[idx];
-    sz = s * (double)data.t2z[idx];
+    sx = s * (double) data.patches[idx].t2x;
+    sy = s * (double) data.patches[idx].t2y;
+    sz = s * (double) data.patches[idx].t2z;
 
     /* End 1 of line parallel to t2 vector */
-    data.px1[i] = (double)data.px[idx] + sx;
-    data.py1[i] = (double)data.py[idx] + sy;
-    data.pz1[i] = (double)data.pz[idx] + sz;
+    data.patch_lines[i].px1 = (double) data.patches[idx].px + sx;
+    data.patch_lines[i].py1 = (double) data.patches[idx].py + sy;
+    data.patch_lines[i].pz1 = (double) data.patches[idx].pz + sz;
 
     /* Its distance from XYZ origin */
-    r = sqrt(
-        data.px1[i]*data.px1[i] +
-        data.py1[i]*data.py1[i] +
-        data.pz1[i]*data.pz1[i] );
+    r = sqrt(data.patch_lines[i].px1*data.patch_lines[i].px1 +
+             data.patch_lines[i].py1*data.patch_lines[i].py1 +
+             data.patch_lines[i].pz1*data.patch_lines[i].pz1);
     if( r > r_max )
       r_max = r;
 
     /* End 2 of line parallel to t2 vector */
-    data.px2[i] = (double)data.px[idx] - sx;
-    data.py2[i] = (double)data.py[idx] - sy;
-    data.pz2[i] = (double)data.pz[idx] - sz;
+    data.patch_lines[i].px2 = (double) data.patches[idx].px - sx;
+    data.patch_lines[i].py2 = (double) data.patches[idx].py - sy;
+    data.patch_lines[i].pz2 = (double) data.patches[idx].pz - sz;
 
     /* Its distance from XYZ origin */
-    r = sqrt(
-        data.px2[i]*data.px2[i] +
-        data.py2[i]*data.py2[i] +
-        data.pz2[i]*data.pz2[i] );
+    r = sqrt(data.patch_lines[i].px2*data.patch_lines[i].px2 +
+             data.patch_lines[i].py2*data.patch_lines[i].py2 +
+             data.patch_lines[i].pz2*data.patch_lines[i].pz2);
     if( r > r_max )
       r_max = r;
 
@@ -283,12 +274,12 @@ Process_Wire_Segments( view_t *v )
     Set_Gdk_Segment(
         &structure_segs[idx],
         v,
-        (double)data.x1[idx],
-        (double)data.y1[idx],
-        (double)data.z1[idx],
-        (double)data.x2[idx],
-        (double)data.y2[idx],
-        (double)data.z2[idx] );
+        (double) data.segments[idx].x1,
+        (double) data.segments[idx].y1,
+        (double) data.segments[idx].z1,
+        (double) data.segments[idx].x2,
+        (double) data.segments[idx].y2,
+        (double) data.segments[idx].z2);
 
 } /* Process_Wire_Segments() */
 
@@ -311,12 +302,12 @@ Process_Surface_Patches( view_t *v )
     Set_Gdk_Segment(
         &structure_segs[idx+data.n],
         v,
-        data.px1[idx],
-        data.py1[idx],
-        data.pz1[idx],
-        data.px2[idx],
-        data.py2[idx],
-        data.pz2[idx] );
+        data.patch_lines[idx].px1,
+        data.patch_lines[idx].py1,
+        data.patch_lines[idx].pz1,
+        data.patch_lines[idx].px2,
+        data.patch_lines[idx].py2,
+        data.patch_lines[idx].pz2);
 
 } /* Process_Surface_Patches() */
 
@@ -563,12 +554,12 @@ Draw_Surface_Patches( cairo_t *cr, view_t *v, Segment_t *segm, gint npatch )
       cz = cf->cur[j+2];
 
       /* Calculate current along t1 and t2 tangent vectors */
-      ct1 = cx*(double)data.t1x[i] +
-        cy*(double)data.t1y[i] +
-        cz*(double)data.t1z[i];
-      ct2 = cx*(double)data.t2x[i] +
-        cy*(double)data.t2y[i] +
-        cz*(double)data.t2z[i];
+      ct1 = cx*(double) data.patches[i].t1x +
+        cy*(double) data.patches[i].t1y +
+        cz*(double) data.patches[i].t1z;
+      ct2 = cx*(double) data.patches[i].t2x +
+        cy*(double) data.patches[i].t2y +
+        cz*(double) data.patches[i].t2z;
 
       /* Save current magnitudes */
       ct1m[i] = (double)cabs( ct1 );

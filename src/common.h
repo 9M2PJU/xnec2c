@@ -583,6 +583,49 @@ typedef struct
 } text_vertex_t;
 #endif /* HAVE_OPENGL */
 
+/*** Per-element structs for wire, patch, and near-field data ***/
+
+/* Per-wire-segment geometry, connectivity, and tag data */
+typedef struct
+{
+  double x1, y1, z1;       /* End 1 coordinates */
+  double x2, y2, z2;       /* End 2 coordinates */
+  double x, y, z;          /* Segment center coordinates */
+  double si, bi;            /* Length and radius */
+  double cab, sab, salp;   /* Direction cosines */
+  int icon1, icon2;         /* End connectivity */
+  int itag;                 /* Tag number */
+} wire_segment_t;
+
+/* Per-surface-patch geometry and orientation */
+typedef struct
+{
+  double t1x, t1y, t1z;    /* Tangent vector 1 */
+  double t2x, t2y, t2z;    /* Tangent vector 2 */
+  double px, py, pz;       /* Patch center coordinates */
+  double pbi;               /* Surface area */
+  double psalp;             /* Z component - sin(a) */
+} surface_patch_t;
+
+/* Per-patch plot line endpoints, 2*m entries */
+typedef struct
+{
+  double px1, py1, pz1;    /* Line endpoint 1 */
+  double px2, py2, pz2;    /* Line endpoint 2 */
+} patch_line_t;
+
+/* Per-sample near-field E/H magnitude, phase, real components, and coordinates */
+typedef struct
+{
+  double ex, ey, ez;            /* E-field magnitude and phase */
+  double hx, hy, hz;            /* H-field magnitude and phase */
+  double fex, fey, fez;         /* E-field phasor */
+  double fhx, fhy, fhz;         /* H-field phasor */
+  double erx, ery, erz, er;     /* E-field real components + magnitude */
+  double hrx, hry, hrz, hr;     /* H-field real components + magnitude */
+  double px, py, pz;            /* Field point coordinates */
+} near_field_point_t;
+
 /*** Structs encapsulating global ("common") variables ***/
 /* common  /crnt/ */
 typedef struct
@@ -610,35 +653,14 @@ typedef struct
     npm,    /* = n+m  */
     np2m,   /* = n+2m */
     np3m,   /* = n+3m */
-    ipsym,  /* Symmetry flag */
-    *icon1, /* Segments end 1 connection */
-    *icon2, /* Segments end 2 connection */
-    *itag;  /* Segments tag number */
+    ipsym;  /* Symmetry flag */
 
-  /* Wire segment data */
-  double
-    *x1, *y1, *z1,  /* End 1 coordinates of wire segments */
-    *x2, *y2, *z2,  /* End 2 coordinates of wire segments */
-    *x, *y, *z,     /* Coordinates of segment centers */
-    *si, *bi,       /* Length and radius of segments  */
-    *cab,           /* cos(a)*cos(b) */
-    *sab,           /* cos(a)*sin(b) */
-    *salp,          /* Z component - sin(a) */
+  /* Wavelength in meters */
+  double wlam;
 
-    /* Surface patch data */
-    *t1x, *t1y, *t1z,   /* Coordinates of t1 vector */
-    *t2x, *t2y, *t2z,   /* Coordinates of t2 vector */
-    *px, *py, *pz,      /* Coordinates of patch center */
-    *pbi,               /* Patch surface area */
-    *psalp,             /* Z component - sin(a) */
-
-    /* Wavelength in meters */
-    wlam;
-
-  /* My addition, for plotting patches */
-  double
-    *px1, *py1, *pz1,
-    *px2, *py2, *pz2;
+  wire_segment_t *segments;
+  surface_patch_t *patches;
+  patch_line_t *patch_lines;
 
 } data_t;
 
@@ -1062,25 +1084,16 @@ typedef struct
 /* Near E/H field data */
 typedef struct
 {
-  double
-    /* Magnitude and phase of E/H fields */
-    *ex, *ey, *ez, *hx, *hy, *hz,
-    *fex, *fey, *fez, *fhx, *fhy, *fhz,
-    /* Real part of E and H field values */
-    *erx, *ery, *erz, *er,
-    *hrx, *hry, *hrz, *hr;
-
   /* Max of E/H field values */
-  double
-    max_er, max_hr;
+  double max_er, max_hr;
 
-  /* Co-ordinates of field points and
-   * max distance from xyz origin */
-  double
-    *px, *py, *pz, r_max;
+  /* Max distance from xyz origin */
+  double r_max;
 
   /* Animation step in rads */
   double anim_step;
+
+  near_field_point_t *points;
 
 } near_field_t;
 
@@ -1521,7 +1534,7 @@ void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, doub
 #define NF_FSTEP_AVAILABLE(fs) \
     ((fs) >= 0 && (fs) <= calc_data.steps_total \
      && save.fstep != NULL && save.fstep[(fs)] \
-     && near_field_fstep != NULL && near_field_fstep[(fs)].px != NULL)
+     && near_field_fstep != NULL && near_field_fstep[(fs)].points != NULL)
 
 void Value_to_Color(double *red, double *grn, double *blu, double val, double max);
 void Cairo_Draw_Polygon(cairo_t *cr, GdkPoint *points, int npoints);

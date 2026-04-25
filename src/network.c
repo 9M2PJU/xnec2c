@@ -166,7 +166,7 @@ netwk( complex double *cmx, int *ip, complex double *einc )
         for( i = 0; i < irow1; i++ )
         {
           isc1= ipnt[i]-1;
-          asmx= data.si[isc1];
+          asmx= data.segments[isc1].si;
 
           for( j = 0; j < neqt; j++ )
             rhs[j] = CPLX_00;
@@ -392,9 +392,9 @@ netwk( complex double *cmx, int *ip, complex double *einc )
         if( isc1 == -1)
         {
           cmn[irow1+irow1*ndimn] -=
-            cmplx( y11r, y11i)* data.si[nseg1-1];
+            cmplx( y11r, y11i)* data.segments[nseg1 - 1].si;
           cmn[irow1+irow2*ndimn] -=
-            cmplx( y12r, y12i)* data.si[nseg1-1];
+            cmplx( y12r, y12i)* data.segments[nseg1 - 1].si;
         }
         else
         {
@@ -407,9 +407,9 @@ netwk( complex double *cmx, int *ip, complex double *einc )
         if( isc2 == -1)
         {
           cmn[irow2+irow2*ndimn] -=
-            cmplx( y22r, y22i)* data.si[nseg2-1];
+            cmplx( y22r, y22i)* data.segments[nseg2 - 1].si;
           cmn[irow2+irow1*ndimn] -=
-            cmplx( y12r, y12i)* data.si[nseg2-1];
+            cmplx( y12r, y12i)* data.segments[nseg2 - 1].si;
         }
         else
         {
@@ -484,7 +484,7 @@ netwk( complex double *cmx, int *ip, complex double *einc )
     for( i = 0; i < nteq; i++ )
     {
       irow1= nteqa[i]-1;
-      vlt= rhnt[i]* data.si[irow1]* data.wlam;
+      vlt= rhnt[i]* data.segments[irow1].si * data.wlam;
       cux= einc[irow1]* data.wlam;
       netcx.zped= vlt/ cux;
       pwr=.5* creal( vlt* conj( cux));
@@ -574,7 +574,7 @@ netwk( complex double *cmx, int *ip, complex double *einc )
       cux= cmplx( crnt.air[isc1], crnt.aii[isc1]);
       ymit= cmplx( crnt.bir[isc1], crnt.bii[isc1]);
       netcx.zped= cmplx( crnt.cir[isc1], crnt.cii[isc1]);
-      pwr= data.si[isc1]* M_2PI*.5;
+      pwr= data.segments[isc1].si * M_2PI*.5;
       cux=( cux- ymit* sin( pwr) +
           netcx.zped* cos( pwr))* data.wlam;
       netcx.zped= vlt/ cux;
@@ -669,7 +669,7 @@ load( int *ldtyp, int *ldtag, int *ldtagf, int *ldtagt,
     {
       if( ldtags != 0)
       {
-        if( ldtags != data.itag[i])
+        if( ldtags != data.segments[i].itag)
           continue;
 
         if( ldtagf[istepx] != 0)
@@ -688,29 +688,29 @@ load( int *ldtyp, int *ldtag, int *ldtagf, int *ldtagt,
       switch( jump )
       {
         case 1:
-          zt= zlr[istepx]/ data.si[i] +
-            tpcj* zli[istepx]/( data.si[i]* data.wlam);
+          zt= zlr[istepx]/ data.segments[i].si +
+            tpcj* zli[istepx]/(data.segments[i].si * data.wlam);
           if( fabs( zlc[istepx]) > 1.0e-20)
-            zt += data.wlam/( tpcj* data.si[i]* zlc[istepx]);
+            zt += data.wlam/( tpcj* data.segments[i].si * zlc[istepx]);
           break;
 
         case 2:
-          zt= tpcj* data.si[i]* zlc[istepx]/ data.wlam;
+          zt= tpcj* data.segments[i].si * zlc[istepx]/ data.wlam;
           if( fabs( zli[istepx]) > 1.0e-20)
-            zt += data.si[i]* data.wlam/( tpcj* zli[istepx]);
+            zt += data.segments[i].si * data.wlam/( tpcj* zli[istepx]);
           if( fabs( zlr[istepx]) > 1.0e-20)
-            zt += data.si[i]/ zlr[istepx];
+            zt += data.segments[i].si / zlr[istepx];
           zt=1.0/ zt;
           break;
 
         case 3:
           zt= zlr[istepx]* data.wlam+ tpcj* zli[istepx];
           if( fabs( zlc[istepx]) > 1.0e-20)
-            zt += 1.0/( tpcj* data.si[i]* data.si[i]* zlc[istepx]);
+            zt += 1.0/( tpcj* data.segments[i].si * data.segments[i].si * zlc[istepx]);
           break;
 
         case 4:
-          zt= tpcj* data.si[i]* data.si[i]* zlc[istepx];
+          zt= tpcj* data.segments[i].si * data.segments[i].si * zlc[istepx];
           if( fabs( zli[istepx]) > 1.0e-20)
             zt += 1.0/( tpcj* zli[istepx]);
           if( fabs( zlr[istepx]) > 1.0e-20)
@@ -719,11 +719,11 @@ load( int *ldtyp, int *ldtag, int *ldtagf, int *ldtagt,
           break;
 
         case 5:
-          zt= cmplx( zlr[istepx], zli[istepx])/ data.si[i];
+          zt= cmplx( zlr[istepx], zli[istepx])/ data.segments[i].si;
           break;
 
         case 6:
-          zint( zlr[istepx]* data.wlam, data.bi[i], &zt );
+          zint( zlr[istepx]* data.wlam, data.segments[i].bi, &zt );
 
       } /* switch( jump ) */
 

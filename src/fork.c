@@ -240,17 +240,14 @@ Pass_Freq_Data( void )
     /* Notify parent to read near field data */
     Write_Pipe( num_child_procs, "nfeh", 4, TRUE );
 
-    /* Near E field data */
-    if( fpat.nfeh & NEAR_EFIELD )
-      buff_size +=
-        (size_t)( 10 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
-    /* Near H field data */
-    if( fpat.nfeh & NEAR_HFIELD )
-      buff_size +=
-        (size_t)( 10 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
-    /* Co-ordinates of field points */
+    /* Near field points array (all E/H/coordinate fields) */
     buff_size +=
-      (size_t)( 3 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
+      (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t) +
+      sizeof(double); /* r_max */
+    if( fpat.nfeh & NEAR_EFIELD )
+      buff_size += sizeof(double); /* max_er */
+    if( fpat.nfeh & NEAR_HFIELD )
+      buff_size += sizeof(double); /* max_hr */
   }
   else /* Notify parent not to read near field data */
     Write_Pipe( num_child_procs, "noeh", 4, TRUE );
@@ -319,48 +316,16 @@ Pass_Freq_Data( void )
   /* Near field data */
   if( isFlagSet(ENABLE_NEAREH) )
   {
-    /* Magnitude and phase of E field */
-    if( fpat.nfeh & NEAR_EFIELD )
-    {
-      cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(double);
-      Mem_Copy( buff, (char *)near_field.ex, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.ey, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.ez, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.fex, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.fey, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.fez, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.erx, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.ery, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.erz, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.er, cnt, WRITE );
-      cnt = sizeof(double);
-      Mem_Copy( buff, (char *)&near_field.max_er, cnt, WRITE );
-    }
+    /* Near field points array (all E/H/coordinate fields) */
+    cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t);
+    Mem_Copy( buff, (char *)near_field.points, cnt, WRITE );
 
-    /* Magnitude and phase of H fields */
-    if( fpat.nfeh & NEAR_HFIELD )
-    {
-      cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(double);
-      Mem_Copy( buff, (char *)near_field.hx, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.hy, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.hz, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.fhx, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.fhy, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.fhz, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.hrx, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.hry, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.hrz, cnt, WRITE );
-      Mem_Copy( buff, (char *)near_field.hr, cnt, WRITE );
-      cnt = sizeof(double);
-      Mem_Copy( buff, (char *)&near_field.max_hr, cnt, WRITE );
-    }
-
-    /* Co-ordinates of field points */
-    cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(double);
-    Mem_Copy( buff, (char *)near_field.px, cnt, WRITE );
-    Mem_Copy( buff, (char *)near_field.py, cnt, WRITE );
-    Mem_Copy( buff, (char *)near_field.pz, cnt, WRITE );
+    /* Scalar summary values */
     cnt = sizeof(double);
+    if( fpat.nfeh & NEAR_EFIELD )
+      Mem_Copy( buff, (char *)&near_field.max_er, cnt, WRITE );
+    if( fpat.nfeh & NEAR_HFIELD )
+      Mem_Copy( buff, (char *)&near_field.max_hr, cnt, WRITE );
     Mem_Copy( buff, (char *)&near_field.r_max, cnt, WRITE );
 
 
@@ -575,17 +540,14 @@ Get_Freq_Data( int idx, int fstep )
   /* Get near field data if enabled */
   if( strcmp(nfeh, "nfeh") == 0 )
   {
-    /* Near E field data */
-    if( fpat.nfeh & NEAR_EFIELD )
-      buff_size +=
-        (size_t)( 10 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
-    /* Near H field data */
-    if( fpat.nfeh & NEAR_HFIELD )
-      buff_size +=
-        (size_t)( 10 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
-    /* Co-ordinates of field points */
+    /* Near field points array (all E/H/coordinate fields) */
     buff_size +=
-      (size_t)( 3 * fpat.nrx * fpat.nry * fpat.nrz + 1 ) * sizeof(double);
+      (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t) +
+      sizeof(double); /* r_max */
+    if( fpat.nfeh & NEAR_EFIELD )
+      buff_size += sizeof(double); /* max_er */
+    if( fpat.nfeh & NEAR_HFIELD )
+      buff_size += sizeof(double); /* max_hr */
   }
 
   /* Allocate data buffer */
@@ -655,48 +617,16 @@ Get_Freq_Data( int idx, int fstep )
   /* Get near field data if signaled by child */
   if( strcmp(nfeh, "nfeh") == 0 )
   {
-    /* Magnitude and phase of E field */
-    if( fpat.nfeh & NEAR_EFIELD )
-    {
-      cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(double);
-      Mem_Copy( buff, (char *)near_field.ex, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.ey, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.ez, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.fex, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.fey, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.fez, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.erx, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.ery, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.erz, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.er, cnt, READ );
-      cnt = sizeof(double);
-      Mem_Copy( buff, (char *)&near_field.max_er, cnt, READ );
-    }
+    /* Near field points array (all E/H/coordinate fields) */
+    cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t);
+    Mem_Copy( buff, (char *)near_field.points, cnt, READ );
 
-    /* Magnitude and phase of H fields */
-    if( fpat.nfeh & NEAR_HFIELD )
-    {
-      cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(double);
-      Mem_Copy( buff, (char *)near_field.hx, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.hy, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.hz, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.fhx, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.fhy, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.fhz, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.hrx, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.hry, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.hrz, cnt, READ );
-      Mem_Copy( buff, (char *)near_field.hr, cnt, READ );
-      cnt = sizeof(double);
-      Mem_Copy( buff, (char *)&near_field.max_hr, cnt, READ );
-    }
-
-    /* Co-ordinates of field points */
-    cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(double);
-    Mem_Copy( buff, (char *)near_field.px, cnt, READ );
-    Mem_Copy( buff, (char *)near_field.py, cnt, READ );
-    Mem_Copy( buff, (char *)near_field.pz, cnt, READ );
+    /* Scalar summary values */
     cnt = sizeof(double);
+    if( fpat.nfeh & NEAR_EFIELD )
+      Mem_Copy( buff, (char *)&near_field.max_er, cnt, READ );
+    if( fpat.nfeh & NEAR_HFIELD )
+      Mem_Copy( buff, (char *)&near_field.max_hr, cnt, READ );
     Mem_Copy( buff, (char *)&near_field.r_max, cnt, READ );
 
 

@@ -181,14 +181,14 @@ opengl_rdpattern_generate_nf_lines(void)
     {
       /* Poynting vector: E x H */
       pov[ipv].x =
-        nf->ery[ipv] * nf->hrz[ipv] -
-        nf->hry[ipv] * nf->erz[ipv];
+        nf->points[ipv].ery * nf->points[ipv].hrz -
+        nf->points[ipv].hry * nf->points[ipv].erz;
       pov[ipv].y =
-        nf->erz[ipv] * nf->hrx[ipv] -
-        nf->hrz[ipv] * nf->erx[ipv];
+        nf->points[ipv].erz * nf->points[ipv].hrx -
+        nf->points[ipv].hrz * nf->points[ipv].erx;
       pov[ipv].z =
-        nf->erx[ipv] * nf->hry[ipv] -
-        nf->hrx[ipv] * nf->ery[ipv];
+        nf->points[ipv].erx * nf->points[ipv].hry -
+        nf->points[ipv].hrx * nf->points[ipv].ery;
       pov[ipv].r = sqrt(
           pov[ipv].x * pov[ipv].x +
           pov[ipv].y * pov[ipv].y +
@@ -207,21 +207,21 @@ opengl_rdpattern_generate_nf_lines(void)
     /* Draw Near E Field */
     if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
       line_idx = nf_field_line(nf_lines, line_idx,
-          nf->px[idx], nf->py[idx], nf->pz[idx],
-          nf->erx[idx], nf->ery[idx], nf->erz[idx],
-          dr, nf->er[idx], nf->max_er);
+          nf->points[idx].px, nf->points[idx].py, nf->points[idx].pz,
+          nf->points[idx].erx, nf->points[idx].ery, nf->points[idx].erz,
+          dr, nf->points[idx].er, nf->max_er);
 
     /* Draw Near H Field */
     if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
       line_idx = nf_field_line(nf_lines, line_idx,
-          nf->px[idx], nf->py[idx], nf->pz[idx],
-          nf->hrx[idx], nf->hry[idx], nf->hrz[idx],
-          dr, nf->hr[idx], nf->max_hr);
+          nf->points[idx].px, nf->points[idx].py, nf->points[idx].pz,
+          nf->points[idx].hrx, nf->points[idx].hry, nf->points[idx].hrz,
+          dr, nf->points[idx].hr, nf->max_hr);
 
     /* Draw Poynting Vector */
     if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
       line_idx = nf_field_line(nf_lines, line_idx,
-          nf->px[idx], nf->py[idx], nf->pz[idx],
+          nf->points[idx].px, nf->points[idx].py, nf->points[idx].pz,
           pov[idx].x, pov[idx].y, pov[idx].z,
           dr, pov[idx].r, pov_max);
   }

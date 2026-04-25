@@ -505,15 +505,15 @@ datagn( void )
         {
           for( i = 0; i < data.n; i++ )
           {
-            if( (data.itag[i] >= itg) && (data.itag[i] <= ns) )
+            if( (data.segments[i].itag >= itg) && (data.segments[i].itag <= ns) )
             {
-              data.x1[i]= data.x1[i]* xw1;
-              data.y1[i]= data.y1[i]* xw1;
-              data.z1[i]= data.z1[i]* xw1;
-              data.x2[i]= data.x2[i]* xw1;
-              data.y2[i]= data.y2[i]* xw1;
-              data.z2[i]= data.z2[i]* xw1;
-              data.bi[i]= data.bi[i]* xw1;
+              data.segments[i].x1 = data.segments[i].x1 * xw1;
+              data.segments[i].y1 = data.segments[i].y1 * xw1;
+              data.segments[i].z1 = data.segments[i].z1 * xw1;
+              data.segments[i].x2 = data.segments[i].x2 * xw1;
+              data.segments[i].y2 = data.segments[i].y2 * xw1;
+              data.segments[i].z2 = data.segments[i].z2 * xw1;
+              data.segments[i].bi = data.segments[i].bi * xw1;
             }
           }
           /* FIXME corrects errors when GS follows GX but this is just a work-around */
@@ -522,22 +522,22 @@ datagn( void )
         }
         else for( i = 0; i < data.n; i++ )
         {
-          data.x1[i]= data.x1[i]* xw1;
-          data.y1[i]= data.y1[i]* xw1;
-          data.z1[i]= data.z1[i]* xw1;
-          data.x2[i]= data.x2[i]* xw1;
-          data.y2[i]= data.y2[i]* xw1;
-          data.z2[i]= data.z2[i]* xw1;
-          data.bi[i]= data.bi[i]* xw1;
+          data.segments[i].x1 = data.segments[i].x1 * xw1;
+          data.segments[i].y1 = data.segments[i].y1 * xw1;
+          data.segments[i].z1 = data.segments[i].z1 * xw1;
+          data.segments[i].x2 = data.segments[i].x2 * xw1;
+          data.segments[i].y2 = data.segments[i].y2 * xw1;
+          data.segments[i].z2 = data.segments[i].z2 * xw1;
+          data.segments[i].bi = data.segments[i].bi * xw1;
         }
 
         yw1= xw1* xw1;
         for( i = 0; i < data.m; i++ )
         {
-          data.px[i] = data.px[i]* xw1;
-          data.py[i] = data.py[i]* xw1;
-          data.pz[i] = data.pz[i]* xw1;
-          data.pbi[i]= data.pbi[i]* yw1;
+          data.patches[i].px = data.patches[i].px * xw1;
+          data.patches[i].py = data.patches[i].py * xw1;
+          data.patches[i].pz = data.patches[i].pz * xw1;
+          data.patches[i].pbi = data.patches[i].pbi * yw1;
         }
         continue;
 
@@ -578,45 +578,36 @@ datagn( void )
 
         if( data.n != 0)
         {
-          /* Allocate wire buffers */
-          mreq = (size_t)data.n * sizeof(double);
-          mem_realloc( (void **)&data.si,   mreq, "in input.c" );
-          mem_realloc( (void **)&data.sab,  mreq, "in input.c" );
-          mem_realloc( (void **)&data.cab,  mreq, "in input.c" );
-          mem_realloc( (void **)&data.salp, mreq, "in input.c" );
-          mem_realloc( (void **)&data.x, mreq, "in input.c" );
-          mem_realloc( (void **)&data.y, mreq, "in input.c" );
-          mem_realloc( (void **)&data.z, mreq, "in input.c" );
-
+          /* Segments already allocated; compute derived fields */
           for( i = 0; i < data.n; i++ )
           {
-            xw1= data.x2[i]- data.x1[i];
-            yw1= data.y2[i]- data.y1[i];
-            zw1= data.z2[i]- data.z1[i];
-            data.x[i]=( data.x1[i]+ data.x2[i])/2.0;
-            data.y[i]=( data.y1[i]+ data.y2[i])/2.0;
-            data.z[i]=( data.z1[i]+ data.z2[i])/2.0;
+            xw1= data.segments[i].x2 - data.segments[i].x1;
+            yw1= data.segments[i].y2 - data.segments[i].y1;
+            zw1= data.segments[i].z2 - data.segments[i].z1;
+            data.segments[i].x=(data.segments[i].x1 + data.segments[i].x2)/2.0;
+            data.segments[i].y=(data.segments[i].y1 + data.segments[i].y2)/2.0;
+            data.segments[i].z=(data.segments[i].z1 + data.segments[i].z2)/2.0;
             xw2= xw1* xw1+ yw1* yw1+ zw1* zw1;
             yw2= sqrt( xw2);
             //yw2=( xw2/yw2 + yw2)/2.0;
-            data.si[i]= yw2;
-            data.cab[i]= xw1/ yw2;
-            data.sab[i]= yw1/ yw2;
+            data.segments[i].si = yw2;
+            data.segments[i].cab = xw1/ yw2;
+            data.segments[i].sab = yw1/ yw2;
 
             xw2= zw1/ yw2;
             if( xw2 > 1.0)
               xw2=1.0;
             if( xw2 < -1.0)
               xw2=-1.0;
-            data.salp[i]= xw2;
+            data.segments[i].salp = xw2;
 
             //xw2= asin( xw2)* TD;
             //yw2= atan2( yw1, xw1)* TD;
 
-            if( (data.si[i] <= 1.0e-20) || (data.bi[i] <= 0.0) )
+            if( (data.segments[i].si <= 1.0e-20) || (data.segments[i].bi <= 0.0) )
             {
               pr_err("segment data error: tag=%d si=%lf, bi=%lf\n",
-                     i + 1, data.si[i], data.bi[i]);
+                     i + 1, data.segments[i].si, data.segments[i].bi);
               Stop( ERR_OK, _("Segment data error, zero-length line?  See console.") );
               return( FALSE );
             }
@@ -629,12 +620,12 @@ datagn( void )
         {
           for( i = 0; i < data.m; i++ )
           {
-            xw1=( data.t1y[i]* data.t2z[i] -
-                data.t1z[i]* data.t2y[i])* data.psalp[i];
-            yw1=( data.t1z[i]* data.t2x[i] -
-                data.t1x[i]* data.t2z[i])* data.psalp[i];
-            zw1=( data.t1x[i]* data.t2y[i] -
-                data.t1y[i]* data.t2x[i])* data.psalp[i];
+            xw1=(data.patches[i].t1y * data.patches[i].t2z -
+                 data.patches[i].t1z * data.patches[i].t2y)* data.patches[i].psalp;
+            yw1=(data.patches[i].t1z * data.patches[i].t2x -
+                 data.patches[i].t1x * data.patches[i].t2z)* data.patches[i].psalp;
+            zw1=(data.patches[i].t1x * data.patches[i].t2y -
+                 data.patches[i].t1y * data.patches[i].t2x)* data.patches[i].psalp;
           } /* for( i = 0; i < data.m; i++ ) */
 
         } /* if( data.m != 0) */
@@ -915,11 +906,11 @@ Read_Geometry( void )
   if( data.n > 0 )
     for( idx = 0; idx < data.n; idx++ )
     {
-      save.xtemp[idx]  = data.x[idx];
-      save.ytemp[idx]  = data.y[idx];
-      save.ztemp[idx]  = data.z[idx];
-      save.sitemp[idx] = data.si[idx];
-      save.bitemp[idx] = data.bi[idx];
+      save.xtemp[idx]  = data.segments[idx].x;
+      save.ytemp[idx]  = data.segments[idx].y;
+      save.ztemp[idx]  = data.segments[idx].z;
+      save.sitemp[idx] = data.segments[idx].si;
+      save.bitemp[idx] = data.segments[idx].bi;
     }
 
   if( data.m > 0 )
@@ -928,10 +919,10 @@ Read_Geometry( void )
       int j;
 
       j = idx + data.n;
-      save.xtemp[j]  = data.px[idx];
-      save.ytemp[j]  = data.py[idx];
-      save.ztemp[j]  = data.pz[idx];
-      save.bitemp[j] = data.pbi[idx];
+      save.xtemp[j]  = data.patches[idx].px;
+      save.ytemp[j]  = data.patches[idx].py;
+      save.ztemp[j]  = data.patches[idx].pz;
+      save.bitemp[j] = data.patches[idx].pbi;
     }
 
   /* Refresh SY overrides window if visible */
@@ -1370,7 +1361,7 @@ Read_Commands( void )
             if( (itmp3 == 0) && (itmp4 == 0) ) /* All segs of tag loaded */
             {
               for( idx = 0; idx < data.n; idx++ )
-                if( data.itag[idx] == itmp2 )
+                if(data.segments[idx].itag == itmp2 )
                 {
                   mreq = (size_t)(zload.nldseg + 1) * sizeof(int);
                   mem_realloc( (void **)&zload.ldsegn, mreq, "in input.c" );

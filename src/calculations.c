@@ -58,7 +58,7 @@ tbf( int i, int icap )
   segj.jsno=0;
   pp=0.0;
   ix = i-1;
-  jcox= data.icon1[ix];
+  jcox= data.segments[ix].icon1;
 
   if( jcox > PCHCON)
     jcox= i;
@@ -83,7 +83,7 @@ tbf( int i, int icap )
       segj.jsno++;
       jsnox = segj.jsno-1;
       segj.jco[jsnox]= jcox;
-      d= M_PI* data.si[jcoxx];
+      d= M_PI* data.segments[jcoxx].si;
       sdh= sin( d);
       cdh= cos( d);
       sd=2.0* sdh* cdh;
@@ -95,7 +95,7 @@ tbf( int i, int icap )
       }
       else omc=1.0- cdh* cdh+ sdh* sdh;
 
-      aj=1.0/( log(1.0/( M_PI* data.bi[jcoxx]))-.577215664);
+      aj=1.0/( log(1.0/( M_PI* data.segments[jcoxx].bi))-.577215664);
       pp= pp- omc/ sd* aj;
       segj.ax[jsnox]= aj/ sd* sig;
       segj.bx[jsnox]= aj/(2.0* cdh);
@@ -104,9 +104,9 @@ tbf( int i, int icap )
       if( jcox != i)
       {
         if( jend == 1)
-          jcox= data.icon2[jcoxx];
+          jcox= data.segments[jcoxx].icon2;
         else
-          jcox= data.icon1[jcoxx];
+          jcox= data.segments[jcoxx].icon1;
 
         if( abs(jcox) != i )
         {
@@ -130,7 +130,7 @@ tbf( int i, int icap )
     pp=0.0;
     njun1= segj.jsno;
 
-    jcox= data.icon2[ix];
+    jcox= data.segments[ix].icon2;
     if( jcox > PCHCON)
       jcox= i;
 
@@ -144,7 +144,7 @@ tbf( int i, int icap )
   njun2= segj.jsno- njun1;
   jsnop= segj.jsno;
   segj.jco[jsnop]= i;
-  d= M_PI* data.si[ix];
+  d= M_PI* data.segments[ix].si;
   sdh= sin( d);
   cdh= cos( d);
   sd=2.0* sdh* cdh;
@@ -157,7 +157,7 @@ tbf( int i, int icap )
   }
   else omc=1.0- cd;
 
-  ap=1.0/( log(1.0/( M_PI* data.bi[ix]))-.577215664);
+  ap=1.0/( log(1.0/( M_PI* data.segments[ix].bi))-.577215664);
   aj= ap;
 
   if( njun1 == 0)
@@ -170,7 +170,7 @@ tbf( int i, int icap )
         xxi=0.0;
       else
       {
-        qp= M_PI* data.bi[ix];
+        qp= M_PI* data.segments[ix].bi;
         xxi= qp* qp;
         xxi= qp*(1.0-.5* xxi)/(1.0- xxi);
       }
@@ -185,7 +185,7 @@ tbf( int i, int icap )
     if( icap == 0) xxi=0.0;
     else
     {
-      qp= M_PI* data.bi[ix];
+      qp= M_PI* data.segments[ix].bi;
       xxi= qp* qp;
       xxi= qp*(1.0-.5* xxi)/(1.0- xxi);
     }
@@ -214,7 +214,7 @@ tbf( int i, int icap )
       xxi=0.0;
     else
     {
-      qm= M_PI* data.bi[ix];
+      qm= M_PI* data.segments[ix].bi;
       xxi= qm* qm;
       xxi= qm*(1.0-.5* xxi)/(1.0- xxi);
     }
@@ -274,14 +274,14 @@ void qdsrc( int is, complex double v, complex double *e )
   complex double curd, etk, ets, etc;
 
   is--;
-  i= data.icon1[is];
-  data.icon1[is]=0;
+  i= data.segments[is].icon1;
+  data.segments[is].icon1=0;
   tbf( is+1,0);
-  data.icon1[is]= i;
-  dataj.s= data.si[is]*.5;
-  curd= CCJ * v/(( log(2.0 * dataj.s/ data.bi[is])-1.0) *
-      ( segj.bx[segj.jsno-1] * cos( M_2PI* dataj.s) +
-        segj.cx[segj.jsno-1] * sin( M_2PI* dataj.s))* data.wlam);
+  data.segments[is].icon1 = i;
+  dataj.s= data.segments[is].si*.5;
+  curd= CCJ * v/(( log(2.0 * dataj.s/ data.segments[is].bi)-1.0) *
+                 ( segj.bx[segj.jsno-1] * cos( M_2PI* dataj.s) +
+                  segj.cx[segj.jsno-1] * sin( M_2PI* dataj.s))* data.wlam);
   vsorc.vqds[vsorc.nqds]= v;
   vsorc.iqds[vsorc.nqds]= is+1;
   vsorc.nqds++;
@@ -290,32 +290,32 @@ void qdsrc( int is, complex double v, complex double *e )
   {
     j= segj.jco[jx]-1;
     jp1 = j+1;
-    dataj.s= data.si[j];
-    dataj.b= data.bi[j];
-    dataj.xj= data.x[j];
-    dataj.yj= data.y[j];
-    dataj.zj= data.z[j];
-    dataj.cabj= data.cab[j];
-    dataj.sabj= data.sab[j];
-    dataj.salpj= data.salp[j];
+    dataj.s= data.segments[j].si;
+    dataj.b= data.segments[j].bi;
+    dataj.xj= data.segments[j].x;
+    dataj.yj= data.segments[j].y;
+    dataj.zj= data.segments[j].z;
+    dataj.cabj= data.segments[j].cab;
+    dataj.sabj= data.segments[j].sab;
+    dataj.salpj= data.segments[j].salp;
 
     if( dataj.iexk != 0)
     {
-      ipr= data.icon1[j];
+      ipr= data.segments[j].icon1;
 
       if (ipr > PCHCON) dataj.ind1=2;
       else if( ipr < 0 )
       {
         ipr= -ipr;
         ipr--;
-        if( -data.icon1[ipr-1] != jp1 )
+        if( -data.segments[ipr - 1].icon1 != jp1 )
           dataj.ind1=2;
         else
         {
-          xi= fabs( dataj.cabj* data.cab[ipr]+ dataj.sabj*
-              data.sab[ipr]+ dataj.salpj* data.salp[ipr]);
+          xi= fabs( dataj.cabj* data.segments[ipr].cab + dataj.sabj*
+                   data.segments[ipr].sab + dataj.salpj* data.segments[ipr].salp);
           if( (xi < 0.999999) ||
-              (fabs(data.bi[ipr]/dataj.b-1.0) > 1.0e-6) )
+              (fabs(data.segments[ipr].bi/dataj.b-1.0) > 1.0e-6) )
             dataj.ind1=2;
           else
             dataj.ind1=0;
@@ -328,14 +328,14 @@ void qdsrc( int is, complex double v, complex double *e )
         ipr--;
         if( ipr != j )
         {
-          if( data.icon2[ipr] != jp1)
+          if(data.segments[ipr].icon2 != jp1)
             dataj.ind1=2;
           else
           {
-            xi= fabs( dataj.cabj* data.cab[ipr]+ dataj.sabj*
-                data.sab[ipr]+ dataj.salpj* data.salp[ipr]);
+            xi= fabs( dataj.cabj* data.segments[ipr].cab + dataj.sabj*
+                     data.segments[ipr].sab + dataj.salpj* data.segments[ipr].salp);
             if( (xi < 0.999999) ||
-                (fabs(data.bi[ipr]/dataj.b-1.0) > 1.0e-6) )
+                (fabs(data.segments[ipr].bi/dataj.b-1.0) > 1.0e-6) )
               dataj.ind1=2;
             else
               dataj.ind1=0;
@@ -350,20 +350,20 @@ void qdsrc( int is, complex double v, complex double *e )
         }
       } /* else */
 
-      ipr= data.icon2[j];
+      ipr= data.segments[j].icon2;
       if (ipr > PCHCON) dataj.ind2=2;
       else if( ipr < 0 )
       {
         ipr = -ipr;
         ipr--;
-        if( -data.icon2[ipr] != jp1 )
+        if( -data.segments[ipr].icon2 != jp1 )
           dataj.ind1=2;
         else
         {
-          xi= fabs( dataj.cabj* data.cab[ipr]+ dataj.sabj *
-              data.sab[ipr]+ dataj.salpj* data.salp[ipr]);
+          xi= fabs( dataj.cabj* data.segments[ipr].cab + dataj.sabj *
+                   data.segments[ipr].sab + dataj.salpj* data.segments[ipr].salp);
           if( (xi < 0.999999) ||
-              (fabs(data.bi[ipr]/dataj.b-1.0) > 1.0e-6) )
+              (fabs(data.segments[ipr].bi/dataj.b-1.0) > 1.0e-6) )
             dataj.ind1=2;
           else
             dataj.ind1=0;
@@ -376,14 +376,14 @@ void qdsrc( int is, complex double v, complex double *e )
         ipr--;
         if( ipr != j )
         {
-          if( data.icon1[ipr] != jp1)
+          if(data.segments[ipr].icon1 != jp1)
             dataj.ind2=2;
           else
           {
-            xi= fabs( dataj.cabj* data.cab[ipr]+ dataj.sabj*
-                data.sab[ipr]+ dataj.salpj* data.salp[ipr]);
+            xi= fabs( dataj.cabj* data.segments[ipr].cab + dataj.sabj*
+                     data.segments[ipr].sab + dataj.salpj* data.segments[ipr].salp);
             if( (xi < 0.9999990) ||
-                (fabs(data.bi[ipr]/dataj.b-1.0) > 1.0e-6) )
+                (fabs(data.segments[ipr].bi/dataj.b-1.0) > 1.0e-6) )
               dataj.ind2=2;
             else
               dataj.ind2=0;
@@ -403,14 +403,14 @@ void qdsrc( int is, complex double v, complex double *e )
     for( i = 0; i < data.n; i++ )
     {
       ij= i- j;
-      xi= data.x[i];
-      yi= data.y[i];
-      zi= data.z[i];
-      ai= data.bi[i];
+      xi= data.segments[i].x;
+      yi= data.segments[i].y;
+      zi= data.segments[i].z;
+      ai= data.segments[i].bi;
       efld( xi, yi, zi, ai, ij);
-      cabi= data.cab[i];
-      sabi= data.sab[i];
-      salpi= data.salp[i];
+      cabi= data.segments[i].cab;
+      sabi= data.segments[i].sab;
+      salpi= data.segments[i].salp;
       etk= dataj.exk* cabi+ dataj.eyk* sabi+ dataj.ezk* salpi;
       ets= dataj.exs* cabi+ dataj.eys* sabi+ dataj.ezs* salpi;
       etc= dataj.exc* cabi+ dataj.eyc* sabi+ dataj.ezc* salpi;
@@ -423,28 +423,28 @@ void qdsrc( int is, complex double v, complex double *e )
       i1= data.n-1;
       for( i = 0; i < data.m; i++ )
       {
-        xi= data.px[i];
-        yi= data.py[i];
-        zi= data.pz[i];
+        xi= data.patches[i].px;
+        yi= data.patches[i].py;
+        zi= data.patches[i].pz;
         hsfld( xi, yi, zi, 0.0);
         i1++;
-        tx= data.t2x[i];
-        ty= data.t2y[i];
-        tz= data.t2z[i];
+        tx= data.patches[i].t2x;
+        ty= data.patches[i].t2y;
+        tz= data.patches[i].t2z;
         etk= dataj.exk* tx+ dataj.eyk* ty+ dataj.ezk* tz;
         ets= dataj.exs* tx+ dataj.eys* ty+ dataj.ezs* tz;
         etc= dataj.exc* tx+ dataj.eyc* ty+ dataj.ezc* tz;
         e[i1] += ( etk* segj.ax[jx]+ ets* segj.bx[jx]+
-            etc* segj.cx[jx] )* curd* data.psalp[i];
+            etc* segj.cx[jx] )* curd* data.patches[i].psalp;
         i1++;
-        tx= data.t1x[i];
-        ty= data.t1y[i];
-        tz= data.t1z[i];
+        tx= data.patches[i].t1x;
+        ty= data.patches[i].t1y;
+        tz= data.patches[i].t1z;
         etk= dataj.exk* tx+ dataj.eyk* ty+ dataj.ezk* tz;
         ets= dataj.exs* tx+ dataj.eys* ty+ dataj.ezs* tz;
         etc= dataj.exc* tx+ dataj.eyc* ty+ dataj.ezc* tz;
         e[i1] += ( etk* segj.ax[jx]+ ets* segj.bx[jx]+
-            etc* segj.cx[jx])* curd* data.psalp[i];
+            etc* segj.cx[jx])* curd* data.patches[i].psalp;
       }
 
     } /* if( m != 0) */
@@ -504,14 +504,14 @@ void cabc( complex double *curx)
       for( is = 0; is < vsorc.nqds; is++ )
       {
         i= vsorc.iqds[is]-1;
-        jx= data.icon1[i];
-        data.icon1[i]=0;
+        jx= data.segments[i].icon1;
+        data.segments[i].icon1=0;
         tbf(i+1,0);
-        data.icon1[i]= jx;
-        sh= data.si[i]*.5;
-        curd= CCJ* vsorc.vqds[is]/( (log(2.0* sh/ data.bi[i])-1.0) *
-            (segj.bx[segj.jsno-1]* cos(M_2PI* sh)+ segj.cx[segj.jsno-1] *
-             sin(M_2PI* sh))* data.wlam );
+        data.segments[i].icon1 = jx;
+        sh= data.segments[i].si*.5;
+        curd= CCJ* vsorc.vqds[is]/( (log(2.0* sh/ data.segments[i].bi)-1.0) *
+                                   (segj.bx[segj.jsno-1]* cos(M_2PI* sh)+ segj.cx[segj.jsno-1] *
+                                    sin(M_2PI* sh))* data.wlam );
         ar= creal( curd);
         ai= cimag( curd);
 
@@ -548,9 +548,9 @@ void cabc( complex double *curx)
     jco2 -= 3;
     cs1= curx[jco1];
     cs2= curx[jco1+1];
-    curx[jco2]  = cs1* data.t1x[data.m-i]+ cs2* data.t2x[data.m-i];
-    curx[jco2+1]= cs1* data.t1y[data.m-i]+ cs2* data.t2y[data.m-i];
-    curx[jco2+2]= cs1* data.t1z[data.m-i]+ cs2* data.t2z[data.m-i];
+    curx[jco2]  = cs1* data.patches[data.m - i].t1x + cs2* data.patches[data.m - i].t2x;
+    curx[jco2+1]= cs1* data.patches[data.m - i].t1y + cs2* data.patches[data.m - i].t2y;
+    curx[jco2+2]= cs1* data.patches[data.m - i].t1z + cs2* data.patches[data.m - i].t2z;
   }
 
   return;
@@ -995,7 +995,7 @@ sbf( int i, int is, double *aa, double *bb, double *cc )
   pp=0.0;
   ix=i-1;
 
-  jcox= data.icon1[ix];
+  jcox= data.segments[ix].icon1;
   if( jcox > PCHCON)
     jcox= i;
 
@@ -1017,7 +1017,7 @@ sbf( int i, int is, double *aa, double *bb, double *cc )
 
       jcoxx = jcox-1;
       jsno++;
-      d= M_PI* data.si[jcoxx];
+      d= M_PI* data.segments[jcoxx].si;
       sdh= sin( d);
       cdh= cos( d);
       sd=2.0* sdh* cdh;
@@ -1029,7 +1029,7 @@ sbf( int i, int is, double *aa, double *bb, double *cc )
       }
       else omc=1.0- cdh* cdh+ sdh* sdh;
 
-      aj=1.0/( log(1.0/( M_PI* data.bi[jcoxx]))-.577215664);
+      aj=1.0/( log(1.0/( M_PI* data.segments[jcoxx].bi))-.577215664);
       pp -= omc/ sd* aj;
 
       if( jcox == is)
@@ -1043,9 +1043,9 @@ sbf( int i, int is, double *aa, double *bb, double *cc )
       if( jcox != i )
       {
         if( jend != 1)
-          jcox= data.icon1[jcoxx];
+          jcox= data.segments[jcoxx].icon1;
         else
-          jcox= data.icon2[jcoxx];
+          jcox= data.segments[jcoxx].icon2;
 
         if( abs(jcox) != i )
         {
@@ -1069,7 +1069,7 @@ sbf( int i, int is, double *aa, double *bb, double *cc )
     pp=0.0;
     njun1= jsno;
 
-    jcox= data.icon2[ix];
+    jcox= data.segments[ix].icon2;
     if( jcox > PCHCON)
       jcox= i;
 
@@ -1081,7 +1081,7 @@ sbf( int i, int is, double *aa, double *bb, double *cc )
   while( jcox != 0 );
 
   njun2= jsno- njun1;
-  d= M_PI* data.si[ix];
+  d= M_PI* data.segments[ix].si;
   sdh= sin( d);
   cdh= cos( d);
   sd=2.0* sdh* cdh;
@@ -1094,7 +1094,7 @@ sbf( int i, int is, double *aa, double *bb, double *cc )
   }
   else omc=1.0- cd;
 
-  ap=1.0/( log(1.0/( M_PI* data.bi[ix])) -.577215664);
+  ap=1.0/( log(1.0/( M_PI* data.segments[ix].bi)) -.577215664);
   aj= ap;
 
   if( njun1 == 0)
@@ -1102,14 +1102,14 @@ sbf( int i, int is, double *aa, double *bb, double *cc )
     if( njun2 == 0)
     {
       *aa =-1.0;
-      qp= M_PI* data.bi[ix];
+      qp= M_PI* data.segments[ix].bi;
       xxi= qp* qp;
       xxi= qp*(1.0-.5* xxi)/(1.0- xxi);
       *cc=1.0/( cdh- xxi* sdh);
       return;
     }
 
-    qp= M_PI* data.bi[ix];
+    qp= M_PI* data.segments[ix].bi;
     xxi= qp* qp;
     xxi= qp*(1.0-.5* xxi)/(1.0- xxi);
     qp=-( omc+ xxi* sd)/( sd*( ap+ xxi* pp)+ cd*( xxi* ap- pp));
@@ -1133,7 +1133,7 @@ sbf( int i, int is, double *aa, double *bb, double *cc )
 
   if( njun2 == 0)
   {
-    qm= M_PI* data.bi[ix];
+    qm= M_PI* data.segments[ix].bi;
     xxi= qm* qm;
     xxi= qm*(1.0-.5* xxi)/(1.0- xxi);
     qm=( omc+ xxi* sd)/( sd*( aj- xxi* pm)+ cd*( pm+ xxi* aj));
@@ -1196,7 +1196,7 @@ trio( int j )
 
   segj.jsno=0;
   jx = j-1;
-  jcox= data.icon1[jx];
+  jcox= data.segments[jx].icon1;
 
   if( jcox <= PCHCON)
   {
@@ -1206,7 +1206,7 @@ trio( int j )
 
   if( (jcox == 0) || (jcox > PCHCON) )
   {
-    jcox= data.icon2[jx];
+    jcox= data.segments[jx].icon2;
 
     if( jcox <= PCHCON)
     {
@@ -1267,9 +1267,9 @@ trio( int j )
       segj.jco[jsnox]= jcox;
 
       if( jend != 1)
-        jcox= data.icon1[jcoxx];
+        jcox= data.segments[jcoxx].icon1;
       else
-        jcox= data.icon2[jcoxx];
+        jcox= data.segments[jcoxx].icon2;
 
       if( jcox == 0 )
       {
@@ -1283,7 +1283,7 @@ trio( int j )
     if( iend == 1)
       break;
 
-    jcox= data.icon2[jx];
+    jcox= data.segments[jx].icon2;
 
     if( jcox > PCHCON)
       break;

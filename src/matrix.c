@@ -73,15 +73,15 @@ cmss( int j1, int j2, int im1, int im2,
     ii1 += 2;
     ii2 = ii1+1;
 
-    t1xi= data.t1x[il]* data.psalp[il];
-    t1yi= data.t1y[il]* data.psalp[il];
-    t1zi= data.t1z[il]* data.psalp[il];
-    t2xi= data.t2x[il]* data.psalp[il];
-    t2yi= data.t2y[il]* data.psalp[il];
-    t2zi= data.t2z[il]* data.psalp[il];
-    xi= data.px[il];
-    yi= data.py[il];
-    zi= data.pz[il];
+    t1xi= data.patches[il].t1x * data.patches[il].psalp;
+    t1yi= data.patches[il].t1y * data.patches[il].psalp;
+    t1zi= data.patches[il].t1z * data.patches[il].psalp;
+    t2xi= data.patches[il].t2x * data.patches[il].psalp;
+    t2yi= data.patches[il].t2y * data.patches[il].psalp;
+    t2zi= data.patches[il].t2z * data.patches[il].psalp;
+    xi= data.patches[il].px;
+    yi= data.patches[il].py;
+    zi= data.patches[il].pz;
 
     /* loop over source patches */
     jj1=-2;
@@ -91,16 +91,16 @@ cmss( int j1, int j2, int im1, int im2,
       jj1 += 2;
       jj2 = jj1+1;
 
-      dataj.s= data.pbi[jl];
-      dataj.xj= data.px[jl];
-      dataj.yj= data.py[jl];
-      dataj.zj= data.pz[jl];
-      dataj.t1xj= data.t1x[jl];
-      dataj.t1yj= data.t1y[jl];
-      dataj.t1zj= data.t1z[jl];
-      dataj.t2xj= data.t2x[jl];
-      dataj.t2yj= data.t2y[jl];
-      dataj.t2zj= data.t2z[jl];
+      dataj.s= data.patches[jl].pbi;
+      dataj.xj= data.patches[jl].px;
+      dataj.yj= data.patches[jl].py;
+      dataj.zj= data.patches[jl].pz;
+      dataj.t1xj= data.patches[jl].t1x;
+      dataj.t1yj= data.patches[jl].t1y;
+      dataj.t1zj= data.patches[jl].t1z;
+      dataj.t2xj= data.patches[jl].t2x;
+      dataj.t2yj= data.patches[jl].t2y;
+      dataj.t2zj= data.patches[jl].t2z;
 
       hintg( xi, yi, zi);
 
@@ -165,14 +165,14 @@ cmws( int j, int i1, int i2, complex double *cmx,
   complex double etk, ets, etc;
 
   j--;
-  dataj.s= data.si[j];
-  dataj.b= data.bi[j];
-  dataj.xj= data.x[j];
-  dataj.yj= data.y[j];
-  dataj.zj= data.z[j];
-  dataj.cabj= data.cab[j];
-  dataj.sabj= data.sab[j];
-  dataj.salpj= data.salp[j];
+  dataj.s= data.segments[j].si;
+  dataj.b= data.segments[j].bi;
+  dataj.xj= data.segments[j].x;
+  dataj.yj= data.segments[j].y;
+  dataj.zj= data.segments[j].z;
+  dataj.cabj= data.segments[j].cab;
+  dataj.sabj= data.segments[j].sab;
+  dataj.salpj= data.segments[j].salp;
 
   /* observation loop */
   ipr= -1;
@@ -185,39 +185,39 @@ cmws( int j, int i1, int i2, complex double *cmx,
     if( (ik != 0) || (ipr == 0) )
     {
       js= ipatch-1;
-      xi= data.px[js];
-      yi= data.py[js];
-      zi= data.pz[js];
+      xi= data.patches[js].px;
+      yi= data.patches[js].py;
+      zi= data.patches[js].pz;
       hsfld( xi, yi, zi, 0.0);
 
       if( ik != 0 )
       {
-        tx= data.t2x[js];
-        ty= data.t2y[js];
-        tz= data.t2z[js];
+        tx= data.patches[js].t2x;
+        ty= data.patches[js].t2y;
+        tz= data.patches[js].t2z;
       }
       else
       {
-        tx= data.t1x[js];
-        ty= data.t1y[js];
-        tz= data.t1z[js];
+        tx= data.patches[js].t1x;
+        ty= data.patches[js].t1y;
+        tz= data.patches[js].t1z;
       }
 
     } /* if( (ik != 0) || (ipr == 0) ) */
     else
     {
-      tx= data.t1x[js];
-      ty= data.t1y[js];
-      tz= data.t1z[js];
+      tx= data.patches[js].t1x;
+      ty= data.patches[js].t1y;
+      tz= data.patches[js].t1z;
 
     } /* if( (ik != 0) || (ipr == 0) ) */
 
     etk=-( dataj.exk* tx+ dataj.eyk* ty +
-        dataj.ezk* tz)* data.psalp[js];
+        dataj.ezk* tz)* data.patches[js].psalp;
     ets=-( dataj.exs* tx+ dataj.eys* ty +
-        dataj.ezs* tz)* data.psalp[js];
+        dataj.ezs* tz)* data.patches[js].psalp;
     etc=-( dataj.exc* tx+ dataj.eyc* ty +
-        dataj.ezc* tz)* data.psalp[js];
+        dataj.ezc* tz)* data.patches[js].psalp;
 
     /* fill matrix elements.  element locations */
     /* determined by connection data. */
@@ -282,38 +282,38 @@ cmww( int j, int i1, int i2, complex double *cmx,
   /* set source segment parameters */
   jx = j;
   j--;
-  dataj.s= data.si[j];
-  dataj.b= data.bi[j];
-  dataj.xj= data.x[j];
-  dataj.yj= data.y[j];
-  dataj.zj= data.z[j];
-  dataj.cabj= data.cab[j];
-  dataj.sabj= data.sab[j];
-  dataj.salpj= data.salp[j];
+  dataj.s= data.segments[j].si;
+  dataj.b= data.segments[j].bi;
+  dataj.xj= data.segments[j].x;
+  dataj.yj= data.segments[j].y;
+  dataj.zj= data.segments[j].z;
+  dataj.cabj= data.segments[j].cab;
+  dataj.sabj= data.segments[j].sab;
+  dataj.salpj= data.segments[j].salp;
 
   /* decide whether ext. t.w. approx. can be used */
   if( dataj.iexk != 0)
   {
-    ipr = data.icon1[j];
+    ipr = data.segments[j].icon1;
     if (ipr > PCHCON) dataj.ind1 = 0;
     else if( ipr < 0 )
     {
       ipr= -ipr;
       iprx= ipr-1;
 
-      if( -data.icon1[iprx] != jx )
+      if( -data.segments[iprx].icon1 != jx )
         dataj.ind1=2;
       else
       {
-        xi= fabs( dataj.cabj* data.cab[iprx]+ dataj.sabj*
-            data.sab[iprx]+ dataj.salpj* data.salp[iprx]);
+        xi= fabs( dataj.cabj* data.segments[iprx].cab + dataj.sabj*
+                 data.segments[iprx].sab + dataj.salpj* data.segments[iprx].salp);
         if( (xi < 0.999999) ||
-            (fabs(data.bi[iprx]/dataj.b-1.0) > 1.0e-6) )
+            (fabs(data.segments[iprx].bi/dataj.b-1.0) > 1.0e-6) )
           dataj.ind1=2;
         else
           dataj.ind1=0;
 
-      } /* if( -data.icon1[iprx] != jx ) */
+      } /* if( -data.segments[iprx].icon1 != jx ) */
 
     } /* if( ipr < 0 ) */
     else
@@ -325,19 +325,19 @@ cmww( int j, int i1, int i2, complex double *cmx,
       {
         if( ipr != jx )
         {
-          if( data.icon2[iprx] != jx )
+          if(data.segments[iprx].icon2 != jx )
             dataj.ind1=2;
           else
           {
-            xi= fabs( dataj.cabj* data.cab[iprx]+ dataj.sabj*
-                data.sab[iprx]+ dataj.salpj* data.salp[iprx]);
+            xi= fabs( dataj.cabj* data.segments[iprx].cab + dataj.sabj*
+                     data.segments[iprx].sab + dataj.salpj* data.segments[iprx].salp);
             if( (xi < 0.999999) ||
-                (fabs(data.bi[iprx]/dataj.b-1.0) > 1.0e-6) )
+                (fabs(data.segments[iprx].bi/dataj.b-1.0) > 1.0e-6) )
               dataj.ind1=2;
             else
               dataj.ind1=0;
 
-          } /* if( data.icon2[iprx] != jx ) */
+          } /* if( data.segments[iprx].icon2 != jx ) */
 
         } /* if( ipr != jx ) */
         else if( (dataj.cabj* dataj.cabj +
@@ -350,25 +350,25 @@ cmww( int j, int i1, int i2, complex double *cmx,
 
     } /* if( ipr < 0 ) */
 
-    ipr = data.icon2[j];
+    ipr = data.segments[j].icon2;
     if (ipr > PCHCON) dataj.ind2 = 2;
     else if( ipr < 0 )
     {
       ipr= -ipr;
       iprx = ipr-1;
-      if( -data.icon2[iprx] != jx )
+      if( -data.segments[iprx].icon2 != jx )
         dataj.ind2=2;
       else
       {
-        xi= fabs( dataj.cabj* data.cab[iprx]+ dataj.sabj*
-            data.sab[iprx]+ dataj.salpj* data.salp[iprx]);
+        xi= fabs( dataj.cabj* data.segments[iprx].cab + dataj.sabj*
+                 data.segments[iprx].sab + dataj.salpj* data.segments[iprx].salp);
         if( (xi < 0.99999) ||
-            (fabs(data.bi[iprx]/dataj.b-1.0) > 1.0e-6) )
+            (fabs(data.segments[iprx].bi/dataj.b-1.0) > 1.0e-6) )
           dataj.ind2=2;
         else
           dataj.ind2=0;
 
-      } /* if( -data.icon1[iprx] != jx ) */
+      } /* if( -data.segments[iprx].icon2 != jx ) */
 
     } /* if( ipr < 0 ) */
     else
@@ -380,19 +380,19 @@ cmww( int j, int i1, int i2, complex double *cmx,
       {
         if( ipr != jx )
         {
-          if( data.icon1[iprx] != jx )
+          if(data.segments[iprx].icon1 != jx )
             dataj.ind2=2;
           else
           {
-            xi= fabs( dataj.cabj* data.cab[iprx]+ dataj.sabj*
-                data.sab[iprx]+ dataj.salpj* data.salp[iprx]);
+            xi= fabs( dataj.cabj* data.segments[iprx].cab + dataj.sabj*
+                     data.segments[iprx].sab + dataj.salpj* data.segments[iprx].salp);
             if( (xi < 0.999999) ||
-                (fabs(data.bi[iprx]/dataj.b-1.0) > 1.0e-6) )
+                (fabs(data.segments[iprx].bi/dataj.b-1.0) > 1.0e-6) )
               dataj.ind2=2;
             else
               dataj.ind2=0;
 
-          } /* if( data.icon2[iprx] != jx ) */
+          } /* if( data.segments[iprx].icon1 != jx ) */
 
         } /* if( ipr != jx ) */
         else if( (dataj.cabj* dataj.cabj +
@@ -413,13 +413,13 @@ cmww( int j, int i1, int i2, complex double *cmx,
   {
     ipr++;
     ij= i-j;
-    xi= data.x[i];
-    yi= data.y[i];
-    zi= data.z[i];
-    ai= data.bi[i];
-    cabi= data.cab[i];
-    sabi= data.sab[i];
-    salpi= data.salp[i];
+    xi= data.segments[i].x;
+    yi= data.segments[i].y;
+    zi= data.segments[i].z;
+    ai= data.segments[i].bi;
+    cabi= data.segments[i].cab;
+    sabi= data.segments[i].sab;
+    salpi= data.segments[i].salp;
 
     efld( xi, yi, zi, ai, ij);
 
@@ -658,23 +658,23 @@ cmsw( int j1, int j2, int i1, int i2, complex double *cmx,
     for( i = i1-1; i < i2; i++ )
     {
       k++;
-      xi= data.x[i];
-      yi= data.y[i];
-      zi= data.z[i];
-      cabi= data.cab[i];
-      sabi= data.sab[i];
-      salpi= data.salp[i];
+      xi= data.segments[i].x;
+      yi= data.segments[i].y;
+      zi= data.segments[i].z;
+      cabi= data.segments[i].cab;
+      sabi= data.segments[i].sab;
+      salpi= data.segments[i].salp;
       ipch=0;
 
-      if( data.icon1[i] >= PCHCON)
+      if(data.segments[i].icon1 >= PCHCON)
       {
-        ipch= data.icon1[i]-PCHCON;
+        ipch= data.segments[i].icon1-PCHCON;
         fsign=-1.0;
       }
 
-      if( data.icon2[i] >= PCHCON)
+      if(data.segments[i].icon2 >= PCHCON)
       {
-        ipch= data.icon2[i]-PCHCON;
+        ipch= data.segments[i].icon2-PCHCON;
         fsign=1.0;
       }
 
@@ -684,16 +684,16 @@ cmsw( int j1, int j2, int i1, int i2, complex double *cmx,
       {
         jl += 2;
         js = j-1;
-        dataj.t1xj= data.t1x[js];
-        dataj.t1yj= data.t1y[js];
-        dataj.t1zj= data.t1z[js];
-        dataj.t2xj= data.t2x[js];
-        dataj.t2yj= data.t2y[js];
-        dataj.t2zj= data.t2z[js];
-        dataj.xj= data.px[js];
-        dataj.yj= data.py[js];
-        dataj.zj= data.pz[js];
-        dataj.s= data.pbi[js];
+        dataj.t1xj= data.patches[js].t1x;
+        dataj.t1yj= data.patches[js].t1y;
+        dataj.t1zj= data.patches[js].t1z;
+        dataj.t2xj= data.patches[js].t2x;
+        dataj.t2yj= data.patches[js].t2y;
+        dataj.t2zj= data.patches[js].t2z;
+        dataj.xj= data.patches[js].px;
+        dataj.yj= data.patches[js].py;
+        dataj.zj= data.patches[js].pz;
+        dataj.s= data.patches[js].pbi;
 
         /* ground loop */
         for( ip = 1; ip <= gnd.ksymp; ip++ )
@@ -706,7 +706,7 @@ cmsw( int j1, int j2, int i1, int i2, complex double *cmx,
             {
               pcint( xi, yi, zi, cabi, sabi, salpi, emel);
 
-              pyl= M_PI* data.si[i]* fsign;
+              pyl= M_PI* data.segments[i].si * fsign;
               pxl= sin( pyl);
               pyl= cos( pyl);
               dataj.exc= emel[8]* fsign;
@@ -805,7 +805,7 @@ etmns( double p1, double p2, double p3, double p4,
       for( i = 0; i < vsorc.nsant; i++ )
       {
         is= vsorc.isant[i]-1;
-        e[is]= -vsorc.vsant[i]/( data.si[is]* data.wlam);
+        e[is]= -vsorc.vsant[i]/(data.segments[is].si * data.wlam);
       }
     }
 
@@ -864,9 +864,9 @@ etmns( double p1, double p2, double p3, double p4,
       {
         for( i = 0; i < data.n; i++ )
         {
-          arg= -M_2PI*( wx* data.x[i]+ wy* data.y[i]+ wz* data.z[i]);
-          e[i]=-( pxl* data.cab[i]+ pyl* data.sab[i]+ pzl*
-              data.salp[i])* cmplx( cos( arg), sin( arg));
+          arg= -M_2PI*( wx* data.segments[i].x + wy* data.segments[i].y + wz* data.segments[i].z);
+          e[i]=-( pxl* data.segments[i].cab + pyl* data.segments[i].sab + pzl*
+                 data.segments[i].salp)* cmplx( cos( arg), sin( arg));
         }
 
         if( gnd.ksymp != 1)
@@ -878,9 +878,9 @@ etmns( double p1, double p2, double p3, double p4,
 
           for( i = 0; i < data.n; i++ )
           {
-            arg= -M_2PI*( wx* data.x[i]+ wy* data.y[i]- wz* data.z[i]);
-            e[i]= e[i]-( cx* data.cab[i]+ cy* data.sab[i]+
-                cz* data.salp[i])* cmplx(cos( arg), sin( arg));
+            arg= -M_2PI*( wx* data.segments[i].x + wy* data.segments[i].y - wz* data.segments[i].z);
+            e[i]= e[i]-( cx* data.segments[i].cab + cy* data.segments[i].sab +
+                        cz* data.segments[i].salp)* cmplx(cos( arg), sin( arg));
           }
 
         } /* if( gnd.ksymp != 1) */
@@ -897,14 +897,14 @@ etmns( double p1, double p2, double p3, double p4,
         i++;
         i1 += 2;
         i2 = i1+1;
-        arg= -M_2PI*( wx* data.px[i] +
-            wy* data.py[i]+ wz* data.pz[i]);
+        arg= -M_2PI*( wx* data.patches[i].px +
+                     wy* data.patches[i].py + wz* data.patches[i].pz);
         tt1= cmplx( cos( arg), sin( arg)) *
-          data.psalp[i]* RETA;
-        e[i2]=( qx* data.t1x[i]+ qy* data.t1y[i] +
-            qz* data.t1z[i])* tt1;
-        e[i1]=( qx* data.t2x[i]+ qy* data.t2y[i] +
-            qz* data.t2z[i])* tt1;
+          data.patches[i].psalp * RETA;
+        e[i2]=( qx* data.patches[i].t1x + qy* data.patches[i].t1y +
+               qz* data.patches[i].t1z)* tt1;
+        e[i1]=( qx* data.patches[i].t2x + qy* data.patches[i].t2y +
+               qz* data.patches[i].t2z)* tt1;
       }
 
       if( gnd.ksymp == 1)
@@ -922,14 +922,14 @@ etmns( double p1, double p2, double p3, double p4,
         i++;
         i1 += 2;
         i2 = i1+1;
-        arg= -M_2PI*( wx* data.px[i] +
-            wy* data.py[i]- wz* data.pz[i]);
+        arg= -M_2PI*( wx* data.patches[i].px +
+                     wy* data.patches[i].py - wz* data.patches[i].pz);
         tt1= cmplx( cos( arg), sin( arg)) *
-          data.psalp[i]* RETA;
-        e[i2]= e[i2]+( cx* data.t1x[i]+ cy *
-            data.t1y[i]+ cz* data.t1z[i])* tt1;
-        e[i1]= e[i1]+( cx* data.t2x[i]+ cy *
-            data.t2y[i]+ cz* data.t2z[i])* tt1;
+          data.patches[i].psalp * RETA;
+        e[i2]= e[i2]+( cx* data.patches[i].t1x + cy *
+                      data.patches[i].t1y + cz* data.patches[i].t1z)* tt1;
+        e[i1]= e[i1]+( cx* data.patches[i].t2x + cy *
+                      data.patches[i].t2y + cz* data.patches[i].t2z)* tt1;
       }
       return;
 
@@ -948,9 +948,9 @@ etmns( double p1, double p2, double p3, double p4,
 
       for( i = 0; i < data.n; i++ )
       {
-        arg= -M_2PI*( wx* data.x[i]+ wy* data.y[i] + wz* data.z[i]);
-        e[i]=-( cx* data.cab[i]+ cy* data.sab[i] +
-            cz * data.salp[i])* cmplx( cos( arg), sin( arg));
+        arg= -M_2PI*( wx* data.segments[i].x + wy* data.segments[i].y + wz* data.segments[i].z);
+        e[i]=-( cx* data.segments[i].cab + cy* data.segments[i].sab +
+               cz * data.segments[i].salp)* cmplx( cos( arg), sin( arg));
       }
 
       if( gnd.ksymp != 1)
@@ -962,9 +962,9 @@ etmns( double p1, double p2, double p3, double p4,
 
         for( i = 0; i < data.n; i++ )
         {
-          arg= -M_2PI*( wx* data.x[i]+ wy* data.y[i]- wz* data.z[i]);
-          e[i]= e[i]-( cx* data.cab[i]+ cy* data.sab[i]+
-              cz* data.salp[i])* cmplx(cos( arg), sin( arg));
+          arg= -M_2PI*( wx* data.segments[i].x + wy* data.segments[i].y - wz* data.segments[i].z);
+          e[i]= e[i]-( cx* data.segments[i].cab + cy* data.segments[i].sab +
+                      cz* data.segments[i].salp)* cmplx(cos( arg), sin( arg));
         }
 
       } /* if( gnd.ksymp != 1) */
@@ -985,14 +985,14 @@ etmns( double p1, double p2, double p3, double p4,
       i++;
       i1 += 2;
       i2 = i1+1;
-      arg= -M_2PI*( wx* data.px[i] +
-          wy* data.py[i]+ wz* data.pz[i]);
+      arg= -M_2PI*( wx* data.patches[i].px +
+                   wy* data.patches[i].py + wz* data.patches[i].pz);
       tt2= cmplx( cos( arg),
-          sin( arg)) * data.psalp[i] * RETA;
-      e[i2]=( cx* data.t1x[i] +
-          cy* data.t1y[i]+ cz* data.t1z[i])* tt2;
-      e[i1]=( cx* data.t2x[i] +
-          cy* data.t2y[i]+ cz* data.t2z[i])* tt2;
+          sin( arg)) * data.patches[i].psalp * RETA;
+      e[i2]=( cx* data.patches[i].t1x +
+             cy* data.patches[i].t1y + cz* data.patches[i].t1z)* tt2;
+      e[i1]=( cx* data.patches[i].t2x +
+             cy* data.patches[i].t2y + cz* data.patches[i].t2z)* tt2;
     }
 
     if( gnd.ksymp == 1)
@@ -1010,14 +1010,14 @@ etmns( double p1, double p2, double p3, double p4,
       i++;
       i1 += 2;
       i2 = i1+1;
-      arg= -M_2PI*( wx* data.px[i] +
-          wy* data.py[i]- wz* data.pz[i]);
+      arg= -M_2PI*( wx* data.patches[i].px +
+                   wy* data.patches[i].py - wz* data.patches[i].pz);
       tt1= cmplx( cos( arg), sin( arg)) *
-        data.psalp[i]* RETA;
-      e[i2]= e[i2]+( cx* data.t1x[i]+ cy *
-          data.t1y[i]+ cz* data.t1z[i])* tt1;
-      e[i1]= e[i1]+( cx* data.t2x[i]+ cy *
-          data.t2y[i]+ cz* data.t2z[i])* tt1;
+        data.patches[i].psalp * RETA;
+      e[i2]= e[i2]+( cx* data.patches[i].t1x + cy *
+                    data.patches[i].t1y + cz* data.patches[i].t1z)* tt1;
+      e[i1]= e[i1]+( cx* data.patches[i].t2x + cy *
+                    data.patches[i].t2y + cz* data.patches[i].t2z)* tt1;
     }
 
     return;
@@ -1040,15 +1040,15 @@ etmns( double p1, double p2, double p3, double p4,
     {
       i1 += 2;
       i2 = i1+1;
-      pxl= data.px[is]- p1;
-      pyl= data.py[is]- p2;
-      pzl= data.pz[is]- p3;
+      pxl= data.patches[is].px - p1;
+      pyl= data.patches[is].py - p2;
+      pzl= data.patches[is].pz - p3;
     }
     else
     {
-      pxl= data.x[i]- p1;
-      pyl= data.y[i]- p2;
-      pzl= data.z[i]- p3;
+      pxl= data.segments[i].x - p1;
+      pyl= data.segments[i].y - p2;
+      pzl= data.segments[i].z - p3;
     }
 
     rs= pxl* pxl+ pyl* pyl+ pzl* pzl;
@@ -1093,8 +1093,8 @@ etmns( double p1, double p2, double p3, double p4,
       cx= ezh* wx+ erh* qx;
       cy= ezh* wy+ erh* qy;
       cz= ezh* wz+ erh* qz;
-      e[i]=-( cx* data.cab[i] +
-          cy* data.sab[i]+ cz* data.salp[i]);
+      e[i]=-( cx* data.segments[i].cab +
+             cy* data.segments[i].sab + cz* data.segments[i].salp);
     }
     else
     {
@@ -1102,14 +1102,14 @@ etmns( double p1, double p2, double p3, double p4,
       pyl= wz* qx- wx* qz;
       pzl= wx* qy- wy* qx;
       tt2= dsh* tt1* cmplx(1.0/ r, M_2PI) /
-        r* sth* data.psalp[is];
+        r* sth* data.patches[is].psalp;
       cx= tt2* pxl;
       cy= tt2* pyl;
       cz= tt2* pzl;
-      e[i2]= cx* data.t1x[is] +
-        cy* data.t1y[is]+ cz* data.t1z[is];
-      e[i1]= cx* data.t2x[is] +
-        cy* data.t2y[is]+ cz* data.t2z[is];
+      e[i2]= cx* data.patches[is].t1x +
+        cy* data.patches[is].t1y + cz* data.patches[is].t1z;
+      e[i1]= cx* data.patches[is].t2x +
+        cy* data.patches[is].t2y + cz* data.patches[is].t2z;
       is++;
     } /* if( i < data.n) */
 

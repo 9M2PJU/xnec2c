@@ -189,11 +189,11 @@ Frequency_Scale_Geometry(void)
   {
     for( idx = 0; idx < data.n; idx++ )
     {
-      data.x[idx] = save.xtemp[idx] * fr;
-      data.y[idx] = save.ytemp[idx] * fr;
-      data.z[idx] = save.ztemp[idx] * fr;
-      data.si[idx]= save.sitemp[idx]* fr;
-      data.bi[idx]= save.bitemp[idx]* fr;
+      data.segments[idx].x = save.xtemp[idx] * fr;
+      data.segments[idx].y = save.ytemp[idx] * fr;
+      data.segments[idx].z = save.ztemp[idx] * fr;
+      data.segments[idx].si = save.sitemp[idx]* fr;
+      data.segments[idx].bi = save.bitemp[idx]* fr;
     }
   }
 
@@ -205,10 +205,10 @@ Frequency_Scale_Geometry(void)
       int j;
 
       j = idx + data.n;
-      data.px[idx] = save.xtemp[j] * fr;
-      data.py[idx] = save.ytemp[j] * fr;
-      data.pz[idx] = save.ztemp[j] * fr;
-      data.pbi[idx]= save.bitemp[j]* fr2;
+      data.patches[idx].px = save.xtemp[j] * fr;
+      data.patches[idx].py = save.ytemp[j] * fr;
+      data.patches[idx].pz = save.ztemp[j] * fr;
+      data.patches[idx].pbi = save.bitemp[j]* fr2;
     }
   }
 
@@ -384,9 +384,9 @@ Set_Network_Data( void )
 
           idx4 = netcx.iseg1[j]-1;
           idx5 = netcx.iseg2[j]-1;
-          xx = data.x[idx5]- data.x[idx4];
-          yy = data.y[idx5]- data.y[idx4];
-          zz = data.z[idx5]- data.z[idx4];
+          xx = data.segments[idx5].x - data.segments[idx4].x;
+          yy = data.segments[idx5].y - data.segments[idx4].y;
+          zz = data.segments[idx5].z - data.segments[idx4].z;
           netcx.x11i[j] = data.wlam* sqrt( xx*xx + yy*yy + zz*zz );
         }
 
@@ -455,7 +455,7 @@ Power_Loss( void )
     /* Calculate power loss in segment */
     if( (zload.nload != 0) &&
         (fabs(creal(zload.zarray[i])) >= 1.0e-20) )
-      fpat.ploss += 0.5* cmg* cmg* creal( zload.zarray[i])* data.si[i];
+      fpat.ploss += 0.5* cmg* cmg* creal( zload.zarray[i])* data.segments[i].si;
 
   } /* for( i = 0; i < n; i++ ) */
 

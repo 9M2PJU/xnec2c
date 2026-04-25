@@ -158,8 +158,8 @@ get_patch_tangent_projections(int idx,
   complex double cur_y = cf->cur[ci + 1];
   complex double cur_z = cf->cur[ci + 2];
 
-  *ct1 = cur_x * data.t1x[idx] + cur_y * data.t1y[idx] + cur_z * data.t1z[idx];
-  *ct2 = cur_x * data.t2x[idx] + cur_y * data.t2y[idx] + cur_z * data.t2z[idx];
+  *ct1 = cur_x * data.patches[idx].t1x + cur_y * data.patches[idx].t1y + cur_z * data.patches[idx].t1z;
+  *ct2 = cur_x * data.patches[idx].t2x + cur_y * data.patches[idx].t2y + cur_z * data.patches[idx].t2z;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -205,9 +205,9 @@ get_patch_current_magnitude(int idx)
   static void
 get_patch_normal(int idx, float *nx, float *ny, float *nz)
 {
-  *nx = (float)(data.t1y[idx] * data.t2z[idx] - data.t1z[idx] * data.t2y[idx]);
-  *ny = (float)(data.t1z[idx] * data.t2x[idx] - data.t1x[idx] * data.t2z[idx]);
-  *nz = (float)(data.t1x[idx] * data.t2y[idx] - data.t1y[idx] * data.t2x[idx]);
+  *nx = (float)(data.patches[idx].t1y * data.patches[idx].t2z - data.patches[idx].t1z * data.patches[idx].t2y);
+  *ny = (float)(data.patches[idx].t1z * data.patches[idx].t2x - data.patches[idx].t1x * data.patches[idx].t2z);
+  *nz = (float)(data.patches[idx].t1x * data.patches[idx].t2y - data.patches[idx].t1y * data.patches[idx].t2x);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -370,9 +370,9 @@ calculate_excitation_center(double *cx, double *cy, double *cz)
     seg_idx = vsorc.isant[idx] - 1;
     if( seg_idx >= 0 && seg_idx < data.n )
     {
-      sum_x += (data.x1[seg_idx] + data.x2[seg_idx]) / 2.0;
-      sum_y += (data.y1[seg_idx] + data.y2[seg_idx]) / 2.0;
-      sum_z += (data.z1[seg_idx] + data.z2[seg_idx]) / 2.0;
+      sum_x += (data.segments[seg_idx].x1 + data.segments[seg_idx].x2) / 2.0;
+      sum_y += (data.segments[seg_idx].y1 + data.segments[seg_idx].y2) / 2.0;
+      sum_z += (data.segments[seg_idx].z1 + data.segments[seg_idx].z2) / 2.0;
       count++;
     }
   }
@@ -382,9 +382,9 @@ calculate_excitation_center(double *cx, double *cy, double *cz)
     seg_idx = vsorc.ivqd[idx] - 1;
     if( seg_idx >= 0 && seg_idx < data.n )
     {
-      sum_x += (data.x1[seg_idx] + data.x2[seg_idx]) / 2.0;
-      sum_y += (data.y1[seg_idx] + data.y2[seg_idx]) / 2.0;
-      sum_z += (data.z1[seg_idx] + data.z2[seg_idx]) / 2.0;
+      sum_x += (data.segments[seg_idx].x1 + data.segments[seg_idx].x2) / 2.0;
+      sum_y += (data.segments[seg_idx].y1 + data.segments[seg_idx].y2) / 2.0;
+      sum_z += (data.segments[seg_idx].z1 + data.segments[seg_idx].z2) / 2.0;
       count++;
     }
   }
@@ -426,9 +426,9 @@ generate_segments_lines(gl_draw_batch_t *batch, structure_draw_mode_t mode, doub
     /* Normal perpendicular to segment axis for consistent lighting.
      * Matches cylinder cross-section logic so lines shade like
      * the visible side of the cylinder they replace. */
-    dx = data.x2[idx] - data.x1[idx];
-    dy = data.y2[idx] - data.y1[idx];
-    dz = data.z2[idx] - data.z1[idx];
+    dx = data.segments[idx].x2 - data.segments[idx].x1;
+    dy = data.segments[idx].y2 - data.segments[idx].y1;
+    dz = data.segments[idx].z2 - data.segments[idx].z1;
     len = sqrt(dx * dx + dy * dy + dz * dz);
 
     if( len > 1e-10 )
@@ -466,14 +466,16 @@ generate_segments_lines(gl_draw_batch_t *batch, structure_draw_mode_t mode, doub
 
     /* Endpoint 1 */
     verts[vidx++] = (structure_vertex_t){
-        .point  = {(float)data.x1[idx], (float)data.y1[idx], (float)data.z1[idx]},
+        .point  = {(float) data.segments[idx].x1,
+(float) data.segments[idx].y1, (float) data.segments[idx].z1},
         .normal = {nx, ny, nz},
         .color  = {r, g, b, 1.0f},
     };
 
     /* Endpoint 2 */
     verts[vidx++] = (structure_vertex_t){
-        .point  = {(float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx]},
+        .point  = {(float) data.segments[idx].x2,
+(float) data.segments[idx].y2, (float) data.segments[idx].z2},
         .normal = {nx, ny, nz},
         .color  = {r, g, b, 1.0f},
     };
@@ -512,18 +514,18 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
     get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
 
     /* Quad corners: c0(+t1,+t2) c1(-t1,+t2) c2(-t1,-t2) c3(+t1,-t2) */
-    c0x = (float)(save.xtemp[j] + s * data.t1x[idx] + s * data.t2x[idx]);
-    c0y = (float)(save.ytemp[j] + s * data.t1y[idx] + s * data.t2y[idx]);
-    c0z = (float)(save.ztemp[j] + s * data.t1z[idx] + s * data.t2z[idx]);
-    c1x = (float)(save.xtemp[j] - s * data.t1x[idx] + s * data.t2x[idx]);
-    c1y = (float)(save.ytemp[j] - s * data.t1y[idx] + s * data.t2y[idx]);
-    c1z = (float)(save.ztemp[j] - s * data.t1z[idx] + s * data.t2z[idx]);
-    c2x = (float)(save.xtemp[j] - s * data.t1x[idx] - s * data.t2x[idx]);
-    c2y = (float)(save.ytemp[j] - s * data.t1y[idx] - s * data.t2y[idx]);
-    c2z = (float)(save.ztemp[j] - s * data.t1z[idx] - s * data.t2z[idx]);
-    c3x = (float)(save.xtemp[j] + s * data.t1x[idx] - s * data.t2x[idx]);
-    c3y = (float)(save.ytemp[j] + s * data.t1y[idx] - s * data.t2y[idx]);
-    c3z = (float)(save.ztemp[j] + s * data.t1z[idx] - s * data.t2z[idx]);
+    c0x = (float)(save.xtemp[j] + s * data.patches[idx].t1x + s * data.patches[idx].t2x);
+    c0y = (float)(save.ytemp[j] + s * data.patches[idx].t1y + s * data.patches[idx].t2y);
+    c0z = (float)(save.ztemp[j] + s * data.patches[idx].t1z + s * data.patches[idx].t2z);
+    c1x = (float)(save.xtemp[j] - s * data.patches[idx].t1x + s * data.patches[idx].t2x);
+    c1y = (float)(save.ytemp[j] - s * data.patches[idx].t1y + s * data.patches[idx].t2y);
+    c1z = (float)(save.ztemp[j] - s * data.patches[idx].t1z + s * data.patches[idx].t2z);
+    c2x = (float)(save.xtemp[j] - s * data.patches[idx].t1x - s * data.patches[idx].t2x);
+    c2y = (float)(save.ytemp[j] - s * data.patches[idx].t1y - s * data.patches[idx].t2y);
+    c2z = (float)(save.ztemp[j] - s * data.patches[idx].t1z - s * data.patches[idx].t2z);
+    c3x = (float)(save.xtemp[j] + s * data.patches[idx].t1x - s * data.patches[idx].t2x);
+    c3y = (float)(save.ytemp[j] + s * data.patches[idx].t1y - s * data.patches[idx].t2y);
+    c3z = (float)(save.ztemp[j] + s * data.patches[idx].t1z - s * data.patches[idx].t2z);
 
     /* Box outline: 4 edges as GL_LINES pairs (8 vertices) */
     verts[vidx++] = (structure_vertex_t){
@@ -589,12 +591,12 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
         float acx = (float)save.xtemp[j];
         float acy = (float)save.ytemp[j];
         float acz = (float)save.ztemp[j];
-        float st1x = (float)(s * data.t1x[idx]);
-        float st1y = (float)(s * data.t1y[idx]);
-        float st1z = (float)(s * data.t1z[idx]);
-        float st2x = (float)(s * data.t2x[idx]);
-        float st2y = (float)(s * data.t2y[idx]);
-        float st2z = (float)(s * data.t2z[idx]);
+        float st1x = (float)(s * data.patches[idx].t1x);
+        float st1y = (float)(s * data.patches[idx].t1y);
+        float st1z = (float)(s * data.patches[idx].t1z);
+        float st2x = (float)(s * data.patches[idx].t2x);
+        float st2y = (float)(s * data.patches[idx].t2y);
+        float st2z = (float)(s * data.patches[idx].t2z);
         int k;
 
         for( k = 0; k < ARROW_VERTEX_COUNT; k++ )
@@ -654,7 +656,7 @@ generate_segments_cylinders(gl_draw_batch_t *batch, structure_draw_mode_t mode, 
     get_segment_color(idx, mode, cmax, &r, &g, &b);
 
     /* Scale radius with fabs for safety, clamp to minimum visible */
-    radius = fabs(data.bi[idx]) * cylinder_radius_scale;
+    radius = fabs(data.segments[idx].bi) * cylinder_radius_scale;
 
     if( radius < min_visible )
     {
@@ -662,8 +664,10 @@ generate_segments_cylinders(gl_draw_batch_t *batch, structure_draw_mode_t mode, 
     }
 
     {
-      point_f_3d_t seg_p1 = {(float)data.x1[idx], (float)data.y1[idx], (float)data.z1[idx]};
-      point_f_3d_t seg_p2 = {(float)data.x2[idx], (float)data.y2[idx], (float)data.z2[idx]};
+      point_f_3d_t seg_p1 = {(float) data.segments[idx].x1,
+(float) data.segments[idx].y1, (float) data.segments[idx].z1};
+      point_f_3d_t seg_p2 = {(float) data.segments[idx].x2,
+(float) data.segments[idx].y2, (float) data.segments[idx].z2};
       rgba_f_t seg_color = {r, g, b, 1.0f};
 
       cyl_vidx = opengl_lit_cylinder_append(&mesh, 0,
@@ -712,18 +716,18 @@ generate_patches_triangles(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
     get_patch_normal(idx, &nx, &ny, &nz);
 
     /* Quad corners: c0(+t1,+t2) c1(-t1,+t2) c2(-t1,-t2) c3(+t1,-t2) */
-    c0x = (float)(save.xtemp[j] + s * data.t1x[idx] + s * data.t2x[idx]);
-    c0y = (float)(save.ytemp[j] + s * data.t1y[idx] + s * data.t2y[idx]);
-    c0z = (float)(save.ztemp[j] + s * data.t1z[idx] + s * data.t2z[idx]);
-    c1x = (float)(save.xtemp[j] - s * data.t1x[idx] + s * data.t2x[idx]);
-    c1y = (float)(save.ytemp[j] - s * data.t1y[idx] + s * data.t2y[idx]);
-    c1z = (float)(save.ztemp[j] - s * data.t1z[idx] + s * data.t2z[idx]);
-    c2x = (float)(save.xtemp[j] - s * data.t1x[idx] - s * data.t2x[idx]);
-    c2y = (float)(save.ytemp[j] - s * data.t1y[idx] - s * data.t2y[idx]);
-    c2z = (float)(save.ztemp[j] - s * data.t1z[idx] - s * data.t2z[idx]);
-    c3x = (float)(save.xtemp[j] + s * data.t1x[idx] - s * data.t2x[idx]);
-    c3y = (float)(save.ytemp[j] + s * data.t1y[idx] - s * data.t2y[idx]);
-    c3z = (float)(save.ztemp[j] + s * data.t1z[idx] - s * data.t2z[idx]);
+    c0x = (float)(save.xtemp[j] + s * data.patches[idx].t1x + s * data.patches[idx].t2x);
+    c0y = (float)(save.ytemp[j] + s * data.patches[idx].t1y + s * data.patches[idx].t2y);
+    c0z = (float)(save.ztemp[j] + s * data.patches[idx].t1z + s * data.patches[idx].t2z);
+    c1x = (float)(save.xtemp[j] - s * data.patches[idx].t1x + s * data.patches[idx].t2x);
+    c1y = (float)(save.ytemp[j] - s * data.patches[idx].t1y + s * data.patches[idx].t2y);
+    c1z = (float)(save.ztemp[j] - s * data.patches[idx].t1z + s * data.patches[idx].t2z);
+    c2x = (float)(save.xtemp[j] - s * data.patches[idx].t1x - s * data.patches[idx].t2x);
+    c2y = (float)(save.ytemp[j] - s * data.patches[idx].t1y - s * data.patches[idx].t2y);
+    c2z = (float)(save.ztemp[j] - s * data.patches[idx].t1z - s * data.patches[idx].t2z);
+    c3x = (float)(save.xtemp[j] + s * data.patches[idx].t1x - s * data.patches[idx].t2x);
+    c3y = (float)(save.ytemp[j] + s * data.patches[idx].t1y - s * data.patches[idx].t2y);
+    c3z = (float)(save.ztemp[j] + s * data.patches[idx].t1z - s * data.patches[idx].t2z);
 
     get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
     get_patch_flow_data(idx, mode, cmax, fd);
@@ -848,14 +852,12 @@ opengl_structure_generate_geometry(
   r_max = 0.0;
   for( idx = 0; idx < data.n; idx++ )
   {
-    double r1 = sqrt(
-        data.x1[idx] * data.x1[idx] +
-        data.y1[idx] * data.y1[idx] +
-        data.z1[idx] * data.z1[idx]);
-    double r2 = sqrt(
-        data.x2[idx] * data.x2[idx] +
-        data.y2[idx] * data.y2[idx] +
-        data.z2[idx] * data.z2[idx]);
+    double r1 = sqrt(data.segments[idx].x1 * data.segments[idx].x1 +
+                     data.segments[idx].y1 * data.segments[idx].y1 +
+                     data.segments[idx].z1 * data.segments[idx].z1);
+    double r2 = sqrt(data.segments[idx].x2 * data.segments[idx].x2 +
+                     data.segments[idx].y2 * data.segments[idx].y2 +
+                     data.segments[idx].z2 * data.segments[idx].z2);
 
     if( r1 > r_max )
       r_max = r1;
@@ -869,12 +871,12 @@ opengl_structure_generate_geometry(
   {
     int j = idx + data.n;
     double s = sqrt(save.bitemp[j]) / 2.0;
-    double dx1 = s * data.t1x[idx];
-    double dy1 = s * data.t1y[idx];
-    double dz1 = s * data.t1z[idx];
-    double dx2 = s * data.t2x[idx];
-    double dy2 = s * data.t2y[idx];
-    double dz2 = s * data.t2z[idx];
+    double dx1 = s * data.patches[idx].t1x;
+    double dy1 = s * data.patches[idx].t1y;
+    double dz1 = s * data.patches[idx].t1z;
+    double dx2 = s * data.patches[idx].t2x;
+    double dy2 = s * data.patches[idx].t2y;
+    double dz2 = s * data.patches[idx].t2z;
     int corner;
 
     for( corner = 0; corner < 4; corner++ )

@@ -56,26 +56,18 @@ fflds( double rox, double roy, double roz,
     complex double *scur, complex double *ex,
     complex double *ey, complex double *ez )
 {
-  double *xs, *ys, *zs, *s;
-  int j, i, k;
+  int j, k;
   double arg;
   complex double ct;
-
-  xs = data.px;
-  ys = data.py;
-  zs = data.pz;
-  s = data.pbi;
 
   *ex=CPLX_00;
   *ey=CPLX_00;
   *ez=CPLX_00;
 
-  i= -1;
   for( j = 0; j < data.m; j++ )
   {
-    i++;
-    arg= M_2PI*( rox* xs[i]+ roy* ys[i]+ roz* zs[i]);
-    ct= cmplx( cos( arg)* s[i], sin( arg)* s[i]);
+    arg= M_2PI*( rox* data.patches[j].px+ roy* data.patches[j].py+ roz* data.patches[j].pz);
+    ct= cmplx( cos( arg)* data.patches[j].pbi, sin( arg)* data.patches[j].pbi);
     k=3*j;
     *ex += scur[k  ]* ct;
     *ey += scur[k+1]* ct;
@@ -172,8 +164,8 @@ ffld( double thet, double phi,
       /* loop over structure segments */
       for( i = 0; i < data.n; i++ )
       {
-        omega=-( rox* data.cab[i] + roy* data.sab[i]+ roz* data.salp[i]);
-        el= M_PI* data.si[i];
+        omega=-( rox* data.segments[i].cab + roy* data.segments[i].sab + roz* data.segments[i].salp);
+        el= M_PI* data.segments[i].si;
         sill= omega* el;
         top= el+ sill;
         bot= el- sill;
@@ -197,15 +189,15 @@ ffld( double thet, double phi,
         c= el*( boo+ too);
         rr= a* crnt.air[i]+ b* crnt.bii[i]+ c* crnt.cir[i];
         ri= a* crnt.aii[i]- b* crnt.bir[i]+ c* crnt.cii[i];
-        arg= M_2PI*( data.x[i]* rox+ data.y[i]* roy+ data.z[i]* roz);
+        arg= M_2PI*(data.segments[i].x * rox+ data.segments[i].y * roy+ data.segments[i].z * roz);
 
         if( (k != 1) || (gnd.ifar < 2) )
         {
           /* summation for far field integral */
           exa= cmplx( cos( arg), sin( arg))* cmplx( rr, ri);
-          cix= cix+ exa* data.cab[i];
-          ciy= ciy+ exa* data.sab[i];
-          ciz= ciz+ exa* data.salp[i];
+          cix= cix+ exa* data.segments[i].cab;
+          ciy= ciy+ exa* data.segments[i].sab;
+          ciz= ciz+ exa* data.segments[i].salp;
           continue;
         }
 
@@ -213,8 +205,8 @@ ffld( double thet, double phi,
         /* in cliff and ground screen problems */
 
         /* specular point distance */
-        dr= data.z[i]* tthet;
-        d= dr* phy+ data.x[i];
+        dr= data.segments[i].z * tthet;
+        d= dr* phy+ data.segments[i].x;
         if( gnd.ifar == 2)
         {
           if(( gnd.cl- d) > 0.0)
@@ -231,7 +223,7 @@ ffld( double thet, double phi,
         } /* if( gnd.ifar == 2) */
         else
         {
-          d= sqrt( d*d + (data.y[i]-dr*phx)*(data.y[i]-dr*phx) );
+          d= sqrt( d*d + (data.segments[i].y-dr*phx)*(data.segments[i].y-dr*phx) );
           if( gnd.ifar == 3)
           {
             if(( gnd.cl- d) > 0.0)
@@ -268,7 +260,7 @@ ffld( double thet, double phi,
               else
               {
                 if( gnd.ifar == 5)
-                  d= dr* phy+ data.x[i];
+                  d= dr* phy+ data.segments[i].x;
 
                 if(( gnd.cl- d) > 0.0)
                 {
@@ -293,9 +285,9 @@ ffld( double thet, double phi,
         /* contribution of each image segment modified by */
         /* reflection coef, for cliff and ground screen problems */
         exa= cmplx( cos( arg), sin( arg))* cmplx( rr, ri);
-        tix= exa* data.cab[i];
-        tiy= exa* data.sab[i];
-        tiz= exa* data.salp[i];
+        tix= exa* data.segments[i].cab;
+        tiy= exa* data.segments[i].sab;
+        tiz= exa* data.segments[i].salp;
         cdp=( tix* phx+ tiy* phy)*( rrh- rrv);
         cix= cix+ tix* rrv+ cdp* phx;
         ciy= ciy+ tiy* rrv+ cdp* phy;
@@ -445,11 +437,11 @@ gfld( double rho, double phi, double rz,
   /* summation of field from individual segments */
   for( i = 0; i < data.n; i++ )
   {
-    dx= data.cab[i];
-    dy= data.sab[i];
-    dz= data.salp[i];
-    rix= rx- data.x[i];
-    riy= ry- data.y[i];
+    dx= data.segments[i].cab;
+    dy= data.segments[i].sab;
+    dz= data.segments[i].salp;
+    rix= rx- data.segments[i].x;
+    riy= ry- data.segments[i].y;
     rhs= rix* rix+ riy* riy;
     rhp= sqrt( rhs);
 
@@ -479,7 +471,7 @@ gfld( double rho, double phi, double rz,
       sph= rhy;
     }
 
-    el= M_PI* data.si[i];
+    el= M_PI* data.segments[i].si;
     rfl=-1.0;
 
     /* integration of (current)*(phase factor)
@@ -488,7 +480,7 @@ gfld( double rho, double phi, double rz,
     for( k = 0; k < 2; k++ )
     {
       rfl= -rfl;
-      riz= rz- data.z[i]* rfl;
+      riz= rz- data.segments[i].z * rfl;
       rxyz= sqrt( rix* rix+ riy* riy+ riz* riz);
       rnx= rix/ rxyz;
       rny= riy/ rxyz;
@@ -519,8 +511,8 @@ gfld( double rho, double phi, double rz,
         b* crnt.bii[i]+ c* crnt.cir[i];
       ri= a* crnt.aii[i] -
         b* crnt.bir[i]+ c* crnt.cii[i];
-      arg= M_2PI*( data.x[i] *
-          rnx+ data.y[i]* rny+ data.z[i]* rnz* rfl);
+      arg= M_2PI*(data.segments[i].x *
+                  rnx+ data.segments[i].y * rny+ data.segments[i].z * rnz* rfl);
       exa= cmplx( cos( arg), sin( arg))* cmplx( rr, ri)/ M_2PI;
 
       if( k != 1 )

@@ -104,19 +104,9 @@ arc( int itg, int ns, double rada,
     double ang, dang, xs1, xs2, zs1, zs2;
     size_t mreq;
 
-    /* Reallocate tags buffer */
-    mreq = (size_t)(data.n + data.m) * sizeof(int);
-    mem_realloc( (void **)&data.itag, mreq, "in geometry.c" );
-
-    /* Reallocate wire buffers */
-    mreq = (size_t)data.n * sizeof(double);
-    mem_realloc( (void **)&data.x1, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.y1, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.z1, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.x2, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.y2, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.z2, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.bi, mreq, "in geometry.c" );
+    /* Reallocate wire segments */
+    mreq = (size_t)(data.n + data.m) * sizeof(wire_segment_t);
+    mem_realloc((void **)&data.segments, mreq, "in geometry.c");
 
     ang= ang1* TORAD;
     dang=( ang2- ang1)* TORAD/ ns;
@@ -128,17 +118,17 @@ arc( int itg, int ns, double rada,
       ang += dang;
       xs2= rada* cos( ang);
       zs2= rada* sin( ang);
-      data.x1[i]= xs1;
+      data.segments[i].x1 = xs1;
 
-      data.y1[i]=0.0;
-      data.z1[i]= zs1;
-      data.x2[i]= xs2;
-      data.y2[i]=0.0;
-      data.z2[i]= zs2;
+      data.segments[i].y1=0.0;
+      data.segments[i].z1 = zs1;
+      data.segments[i].x2 = xs2;
+      data.segments[i].y2=0.0;
+      data.segments[i].z2 = zs2;
       xs1= xs2;
       zs1= zs2;
-      data.bi[i]= rad;
-      data.itag[i]= itg;
+      data.segments[i].bi = rad;
+      data.segments[i].itag = itg;
 
     } /* for( i = ist; i < data.n; i++ ) */
 
@@ -167,18 +157,8 @@ subph( int nx, int ny )
   if( ny == 0 ) data.m += 3;
   else data.m += 4;
 
-  mreq = (size_t)data.m * sizeof(double);
-  mem_realloc( (void **)&data.px,  mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.py,  mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.pz,  mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t1x, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t1y, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t1z, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t2x, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t2y, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t2z, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.pbi, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.psalp, mreq, "in geometry.c" );
+  mreq = (size_t)data.m * sizeof(surface_patch_t);
+  mem_realloc((void **)&data.patches, mreq, "in geometry.c");
   if( !CHILD )
   {
     mreq = (size_t)(data.n + 2 * data.m) * sizeof(Segment_t);
@@ -191,35 +171,35 @@ subph( int nx, int ny )
     for( iy = data.m-1; iy > nx+2; iy-- )
     {
       ix = iy-3;
-      data.px[iy]= data.px[ix];
-      data.py[iy]= data.py[ix];
-      data.pz[iy]= data.pz[ix];
-      data.pbi[iy]= data.pbi[ix];
-      data.psalp[iy]= data.psalp[ix];
-      data.t1x[iy]= data.t1x[ix];
-      data.t1y[iy]= data.t1y[ix];
-      data.t1z[iy]= data.t1z[ix];
-      data.t2x[iy]= data.t2x[ix];
-      data.t2y[iy]= data.t2y[ix];
-      data.t2z[iy]= data.t2z[ix];
+      data.patches[iy].px = data.patches[ix].px;
+      data.patches[iy].py = data.patches[ix].py;
+      data.patches[iy].pz = data.patches[ix].pz;
+      data.patches[iy].pbi = data.patches[ix].pbi;
+      data.patches[iy].psalp = data.patches[ix].psalp;
+      data.patches[iy].t1x = data.patches[ix].t1x;
+      data.patches[iy].t1y = data.patches[ix].t1y;
+      data.patches[iy].t1z = data.patches[ix].t1z;
+      data.patches[iy].t2x = data.patches[ix].t2x;
+      data.patches[iy].t2y = data.patches[ix].t2y;
+      data.patches[iy].t2z = data.patches[ix].t2z;
     }
 
   } /* if( (ny == 0) || (nx != m) ) */
 
   /* divide patch for connection */
   mi= nx-1;
-  xs= data.px[mi];
-  ys= data.py[mi];
-  zs= data.pz[mi];
-  xa= data.pbi[mi]/4.0;
+  xs= data.patches[mi].px;
+  ys= data.patches[mi].py;
+  zs= data.patches[mi].pz;
+  xa= data.patches[mi].pbi/4.0;
   xst= sqrt( xa)/2.0;
-  s1x= data.t1x[mi];
-  s1y= data.t1y[mi];
-  s1z= data.t1z[mi];
-  s2x= data.t2x[mi];
-  s2y= data.t2y[mi];
-  s2z= data.t2z[mi];
-  saln= data.psalp[mi];
+  s1x= data.patches[mi].t1x;
+  s1y= data.patches[mi].t1y;
+  s1z= data.patches[mi].t1z;
+  s2x= data.patches[mi].t2x;
+  s2y= data.patches[mi].t2y;
+  s2z= data.patches[mi].t2z;
+  saln= data.patches[mi].psalp;
   xt= xst;
   yt= xst;
 
@@ -233,17 +213,17 @@ subph( int nx, int ny )
 
   for( ix = 1; ix <= 4; ix++ )
   {
-    data.px[mia]= xs+ xt* s1x+ yt* s2x;
-    data.py[mia]= ys+ xt* s1y+ yt* s2y;
-    data.pz[mia]= zs+ xt* s1z+ yt* s2z;
-    data.pbi[mia]= xa;
-    data.t1x[mia]= s1x;
-    data.t1y[mia]= s1y;
-    data.t1z[mia]= s1z;
-    data.t2x[mia]= s2x;
-    data.t2y[mia]= s2y;
-    data.t2z[mia]= s2z;
-    data.psalp[mia]= saln;
+    data.patches[mia].px = xs+ xt* s1x+ yt* s2x;
+    data.patches[mia].py = ys+ xt* s1y+ yt* s2y;
+    data.patches[mia].pz = zs+ xt* s1z+ yt* s2z;
+    data.patches[mia].pbi = xa;
+    data.patches[mia].t1x = s1x;
+    data.patches[mia].t1y = s1y;
+    data.patches[mia].t1z = s1z;
+    data.patches[mia].t2x = s2x;
+    data.patches[mia].t2y = s2y;
+    data.patches[mia].t2z = s2z;
+    data.patches[mia].psalp = saln;
 
     if( ix == 2)
       yt= -yt;
@@ -258,7 +238,7 @@ subph( int nx, int ny )
     data.mp += 3;
 
   if( ny > 0 )
-    data.pz[mi]=10000.0;
+    data.patches[mi].pz=10000.0;
 
   /* Process new patches created */
   if( ! CHILD )
@@ -317,21 +297,20 @@ conect( int ignd )
 
   if( data.n != 0)
   {
-    /* Allocate memory to connections */
-    mreq = (size_t)(data.n + data.m) * sizeof(int);
-    mem_realloc( (void **)&data.icon1, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.icon2, mreq, "in geometry.c" );
+    /* Allocate wire segments for connectivity */
+    mreq = (size_t)(data.n + data.m) * sizeof(wire_segment_t);
+    mem_realloc((void **)&data.segments, mreq, "in geometry.c");
 
     for( i = 0; i < data.n; i++ )
     {
-      data.icon1[i] = data.icon2[i] = 0;
+      data.segments[i].icon1 = data.segments[i].icon2 = 0;
       iz = i+1;
-      xi1= data.x1[i];
-      yi1= data.y1[i];
-      zi1= data.z1[i];
-      xi2= data.x2[i];
-      yi2= data.y2[i];
-      zi2= data.z2[i];
+      xi1= data.segments[i].x1;
+      yi1= data.segments[i].y1;
+      zi1= data.segments[i].z1;
+      xi2= data.segments[i].x2;
+      yi2= data.segments[i].y2;
+      zi2= data.segments[i].z2;
       slen = calc_connection_threshold(xi1, yi1, zi1, xi2, yi2, zi2);
 
       /* determine connection data for end 1 of segment. */
@@ -348,8 +327,8 @@ conect( int ignd )
 
         if( zi1 <= slen)
         {
-          data.icon1[i]= iz;
-          data.z1[i]=0.0;
+          data.segments[i].icon1 = iz;
+          data.segments[i].z1=0.0;
           jump = TRUE;
 
         } /* if( zi1 <= slen) */
@@ -366,16 +345,16 @@ conect( int ignd )
             ic=0;
 
         if (points_would_connect(xi1, yi1, zi1,
-                               data.x1[ic], data.y1[ic], data.z1[ic],
+                               data.segments[ic].x1, data.segments[ic].y1, data.segments[ic].z1,
                                slen)) {
-          data.icon1[i]= -(ic+1);
+          data.segments[i].icon1 = -(ic+1);
           break;
         }
 
         if (points_would_connect(xi1, yi1, zi1,
-                               data.x2[ic], data.y2[ic], data.z2[ic],
+                               data.segments[ic].x2, data.segments[ic].y2, data.segments[ic].z2,
                                slen)) {
-          data.icon1[i]= (ic+1);
+          data.segments[i].icon1 = (ic+1);
           break;
         }
 
@@ -396,7 +375,7 @@ conect( int ignd )
 
         if( zi2 <= slen)
         {
-          if( data.icon1[i] == iz )
+          if(data.segments[i].icon1 == iz )
           {
             pr_err("geometry data error: segment %d lies in ground plane\n", iz);
             Stop( ERR_OK, _("Geometry data error\n"
@@ -404,8 +383,8 @@ conect( int ignd )
             return( FALSE );
           }
 
-          data.icon2[i]= iz;
-          data.z2[i]=0.0;
+          data.segments[i].icon2 = iz;
+          data.segments[i].z2=0.0;
           continue;
 
         } /* if( zi2 <= slen) */
@@ -420,16 +399,16 @@ conect( int ignd )
           ic=0;
 
         if (points_would_connect(xi2, yi2, zi2,
-                               data.x1[ic], data.y1[ic], data.z1[ic],
+                               data.segments[ic].x1, data.segments[ic].y1, data.segments[ic].z1,
                                slen)) {
-          data.icon2[i]= (ic+1);
+          data.segments[i].icon2 = (ic+1);
           break;
         }
 
         if (points_would_connect(xi2, yi2, zi2,
-                               data.x2[ic], data.y2[ic], data.z2[ic],
+                               data.segments[ic].x2, data.segments[ic].y2, data.segments[ic].z2,
                                slen)) {
-          data.icon2[i]= -(ic+1);
+          data.segments[i].icon2 = -(ic+1);
           break;
         }
 
@@ -445,31 +424,31 @@ conect( int ignd )
       while( ++i <= data.m )
       {
         ix++;
-        xs= data.px[ix];
-        ys= data.py[ix];
-        zs= data.pz[ix];
+        xs= data.patches[ix].px;
+        ys= data.patches[ix].py;
+        zs= data.patches[ix].pz;
 
         for( iseg = 0; iseg < data.n; iseg++ )
         {
-          xi1= data.x1[iseg];
-          yi1= data.y1[iseg];
-          zi1= data.z1[iseg];
-          xi2= data.x2[iseg];
-          yi2= data.y2[iseg];
-          zi2= data.z2[iseg];
+          xi1= data.segments[iseg].x1;
+          yi1= data.segments[iseg].y1;
+          zi1= data.segments[iseg].z1;
+          xi2= data.segments[iseg].x2;
+          yi2= data.segments[iseg].y2;
+          zi2= data.segments[iseg].z2;
           slen = calc_connection_threshold(xi1, yi1, zi1, xi2, yi2, zi2);
 
           /* for first end of segment */
           /* connection - divide patch into 4 patches at present array loc. */
           if (points_would_connect(xi1, yi1, zi1, xs, ys, zs, slen)) {
-            data.icon1[iseg]=PCHCON+ i;
+            data.segments[iseg].icon1=PCHCON+ i;
             ic=0;
             subph( i, ic );
             break;
           }
 
           if (points_would_connect(xi2, yi2, zi2, xs, ys, zs, slen)) {
-            data.icon2[iseg]=PCHCON+ i;
+            data.segments[iseg].icon2=PCHCON+ i;
             ic=0;
             subph( i, ic );
             break;
@@ -510,12 +489,12 @@ conect( int ignd )
     jx = j+1;
     iend=-1;
     jend=-1;
-    ix= data.icon1[j];
+    ix= data.segments[j].icon1;
     ic=1;
     segj.jco[0]= -jx;
-    xa= data.x1[j];
-    ya= data.y1[j];
-    za= data.z1[j];
+    xa= data.segments[j].x1;
+    ya= data.segments[j].y1;
+    za= data.segments[j].z1;
 
     while( TRUE )
     {
@@ -561,17 +540,17 @@ conect( int ignd )
           ixx = ix-1;
           if( jend != 1)
           {
-            xa= xa+ data.x1[ixx];
-            ya= ya+ data.y1[ixx];
-            za= za+ data.z1[ixx];
-            ix= data.icon1[ixx];
+            xa= xa+ data.segments[ixx].x1;
+            ya= ya+ data.segments[ixx].y1;
+            za= za+ data.segments[ixx].z1;
+            ix= data.segments[ixx].icon1;
             continue;
           }
 
-          xa= xa+ data.x2[ixx];
-          ya= ya+ data.y2[ixx];
-          za= za+ data.z2[ixx];
-          ix= data.icon2[ixx];
+          xa= xa+ data.segments[ixx].x2;
+          ya= ya+ data.segments[ixx].y2;
+          za= za+ data.segments[ixx].z2;
+          ix= data.segments[ixx].icon2;
 
         } /* do */
         while( ix != 0 );
@@ -581,12 +560,12 @@ conect( int ignd )
         {
           iend=1;
           jend=1;
-          ix= data.icon2[j];
+          ix= data.segments[j].icon2;
           ic=1;
           segj.jco[0]= jx;
-          xa= data.x2[j];
-          ya= data.y2[j];
-          za= data.z2[j];
+          xa= data.segments[j].x2;
+          ya= data.segments[j].y2;
+          za= data.segments[j].z2;
           continue;
         }
 
@@ -602,16 +581,16 @@ conect( int ignd )
           {
             ix= -ix;
             ixx = ix-1;
-            data.x1[ixx]= xa;
-            data.y1[ixx]= ya;
-            data.z1[ixx]= za;
+            data.segments[ixx].x1 = xa;
+            data.segments[ixx].y1 = ya;
+            data.segments[ixx].z1 = za;
             continue;
           }
 
           ixx = ix-1;
-          data.x2[ixx]= xa;
-          data.y2[ixx]= ya;
-          data.z2[ixx]= za;
+          data.segments[ixx].x2 = xa;
+          data.segments[ixx].y2 = ya;
+          data.segments[ixx].z2 = za;
 
         } /* for( i = 0; i < ic; i++ ) */
 
@@ -624,12 +603,12 @@ conect( int ignd )
 
       iend=1;
       jend=1;
-      ix= data.icon2[j];
+      ix= data.segments[j].icon2;
       ic=1;
       segj.jco[0]= jx;
-      xa= data.x2[j];
-      ya= data.y2[j];
-      za= data.z2[j];
+      xa= data.segments[j].x2;
+      ya= data.segments[j].y2;
+      za= data.segments[j].z2;
 
     } /* while( TRUE ) */
 
@@ -673,19 +652,9 @@ helix(
     tsp = -tsp;
   }
 
-  /* Reallocate tags buffer */
-  mreq = (size_t)data.n * sizeof(int);
-  mem_realloc( (void **)&data.itag, mreq, "in geometry.c" );
-
-  /* Reallocate wire buffers */
-  mreq = (size_t)data.n * sizeof(double);
-  mem_realloc( (void **)&data.x1, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.y1, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.z1, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.x2, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.y2, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.z2, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.bi, mreq, "in geometry.c" );
+  /* Reallocate wire segments */
+  mreq = (size_t)data.n * sizeof(wire_segment_t);
+  mem_realloc((void **)&data.segments, mreq, "in geometry.c");
 
   /* For a proper helix */
   if( (hl != 0.0) && (tsp != 0.0) )
@@ -694,29 +663,29 @@ helix(
     zinc = hl / (double)ns;
     for( i = ist; i < data.n; i++ )
     {
-      data.bi[i] = rad;
-      data.itag[i] = itg;
-      data.z1[i] = z;
+      data.segments[i].bi = rad;
+      data.segments[i].itag = itg;
+      data.segments[i].z1 = z;
       z += zinc;
-      data.z2[i] = z;
+      data.segments[i].z2 = z;
 
       if( a2 == a1)
       {
-        data.x1[i]= a1* cos(M_2PI* data.z1[i]/ tsp);
-        data.y1[i]= b1* sin(M_2PI* data.z1[i]/ tsp);
-        data.x2[i]= a1* cos(M_2PI* data.z2[i]/ tsp);
-        data.y2[i]= b1* sin(M_2PI* data.z2[i]/ tsp);
+        data.segments[i].x1 = a1* cos(M_2PI* data.segments[i].z1 / tsp);
+        data.segments[i].y1 = b1* sin(M_2PI* data.segments[i].z1 / tsp);
+        data.segments[i].x2 = a1* cos(M_2PI* data.segments[i].z2 / tsp);
+        data.segments[i].y2 = b1* sin(M_2PI* data.segments[i].z2 / tsp);
       }
       else
       {
-        data.x1[i]=( a1+( a2- a1)* data.z1[i] / hl)*
-          cos(M_2PI* data.z1[i]/ tsp);
-        data.y1[i]=( b1+( b2- b1)* data.z1[i] / hl)*
-          sin(M_2PI* data.z1[i]/ tsp);
-        data.x2[i]=( a1+( a2- a1)* data.z2[i] / hl)*
-          cos(M_2PI* data.z2[i]/ tsp);
-        data.y2[i]=( b1+( b2- b1)* data.z2[i] / hl)*
-          sin(M_2PI* data.z2[i]/ tsp);
+        data.segments[i].x1=( a1+( a2- a1)* data.segments[i].z1 / hl)*
+          cos(M_2PI* data.segments[i].z1 / tsp);
+        data.segments[i].y1=( b1+( b2- b1)* data.segments[i].z1 / hl)*
+          sin(M_2PI* data.segments[i].z1 / tsp);
+        data.segments[i].x2=( a1+( a2- a1)* data.segments[i].z2 / hl)*
+          cos(M_2PI* data.segments[i].z2 / tsp);
+        data.segments[i].y2=( b1+( b2- b1)* data.segments[i].z2 / hl)*
+          sin(M_2PI* data.segments[i].z2 / tsp);
       } /* if( a2 == a1) */
 
     } /* for( i = ist; i < data.n; i++ ) */
@@ -731,18 +700,18 @@ helix(
 
     for( i = ist; i < data.n; i++ )
     {
-      data.bi[i] = rad;
-      data.itag[i] = itg;
-      data.z1[i] = 0.0;
-      data.z2[i] = 0.0;
+      data.segments[i].bi = rad;
+      data.segments[i].itag = itg;
+      data.segments[i].z1 = 0.0;
+      data.segments[i].z2 = 0.0;
 
-      data.x1[i]= a1 * cos( phi );
-      data.y1[i]= b1 * sin( phi );
+      data.segments[i].x1 = a1 * cos( phi );
+      data.segments[i].y1 = b1 * sin( phi );
       a1 -= da;
       b1 -= db;
       phi += dphi;
-      data.x2[i]= a1 * cos( phi );
-      data.y2[i]= b1 * sin( phi );
+      data.segments[i].x2 = a1 * cos( phi );
+      data.segments[i].y2 = b1 * sin( phi );
 
     } /* for( i = ist; i < data.n; i++ ) */
   }
@@ -780,7 +749,7 @@ isegno( int itagi, int mx)
 
     for( i = 0; i < data.n; i++ )
     {
-      if( data.itag[i] != itagi )
+      if(data.segments[i].itag != itagi )
         continue;
 
       icnt++;
@@ -867,41 +836,31 @@ move( double rox, double roy,
     else
     {
       k= data.n;
-      /* Reallocate tags buffer */
-      mreq = (size_t)(data.n + data.m + (data.n + 1 - i1) * nrpt) * sizeof(int);
-      mem_realloc( (void **)&data.itag, mreq, "in geometry.c" );
-
-      /* Reallocate wire buffers */
-      mreq = (size_t)(data.n + (data.n + 1 - i1) * nrpt) * sizeof(double);
-      mem_realloc( (void **)&data.x1, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.y1, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.z1, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.x2, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.y2, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.z2, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.bi, mreq, "in geometry.c" );
+      /* Reallocate wire segments */
+      mreq = (size_t)(data.n + data.m + (data.n + 1 - i1) * nrpt) * sizeof(wire_segment_t);
+      mem_realloc((void **)&data.segments, mreq, "in geometry.c");
     }
 
     for( ir = 0; ir < nrp; ir++ )
     {
       for( i = i1-1; i < data.n; i++ )
       {
-        xi= data.x1[i];
-        yi= data.y1[i];
-        zi= data.z1[i];
-        data.x1[k]= xi* xx+ yi* xy+ zi* xz+ xs;
-        data.y1[k]= xi* yx+ yi* yy+ zi* yz+ ys;
-        data.z1[k]= xi* zx+ yi* zy+ zi* zz+ zs;
-        xi= data.x2[i];
-        yi= data.y2[i];
-        zi= data.z2[i];
-        data.x2[k]= xi* xx+ yi* xy+ zi* xz+ xs;
-        data.y2[k]= xi* yx+ yi* yy+ zi* yz+ ys;
-        data.z2[k]= xi* zx+ yi* zy+ zi* zz+ zs;
-        data.bi[k]= data.bi[i];
-        data.itag[k]= data.itag[i];
-        if( data.itag[i] != 0)
-          data.itag[k]= data.itag[i]+ itgi;
+        xi= data.segments[i].x1;
+        yi= data.segments[i].y1;
+        zi= data.segments[i].z1;
+        data.segments[k].x1 = xi* xx+ yi* xy+ zi* xz+ xs;
+        data.segments[k].y1 = xi* yx+ yi* yy+ zi* yz+ ys;
+        data.segments[k].z1 = xi* zx+ yi* zy+ zi* zz+ zs;
+        xi= data.segments[i].x2;
+        yi= data.segments[i].y2;
+        zi= data.segments[i].z2;
+        data.segments[k].x2 = xi* xx+ yi* xy+ zi* xz+ xs;
+        data.segments[k].y2 = xi* yx+ yi* yy+ zi* yz+ ys;
+        data.segments[k].z2 = xi* zx+ yi* zy+ zi* zz+ zs;
+        data.segments[k].bi = data.segments[i].bi;
+        data.segments[k].itag = data.segments[i].itag;
+        if(data.segments[i].itag != 0)
+          data.segments[k].itag = data.segments[i].itag + itgi;
 
         k++;
 
@@ -922,43 +881,33 @@ move( double rox, double roy,
     else k = data.m;
 
     /* Reallocate patch buffers */
-    mreq = (size_t)(data.m * (nrpt + 1)) * sizeof(double);
-    mem_realloc( (void **)&data.px,  mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.py,  mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.pz,  mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t1x, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t1y, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t1z, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t2x, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t2y, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t2z, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.pbi, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.psalp, mreq, "in geometry.c" );
+    mreq = (size_t)(data.m * (nrpt + 1)) * sizeof(surface_patch_t);
+    mem_realloc((void **)&data.patches, mreq, "in geometry.c");
 
     for( ii = 0; ii < nrp; ii++ )
     {
       for( i = i1; i < data.m; i++ )
       {
-        xi= data.px[i];
-        yi= data.py[i];
-        zi= data.pz[i];
-        data.px[k]= xi* xx+ yi* xy+ zi* xz+ xs;
-        data.py[k]= xi* yx+ yi* yy+ zi* yz+ ys;
-        data.pz[k]= xi* zx+ yi* zy+ zi* zz+ zs;
-        xi= data.t1x[i];
-        yi= data.t1y[i];
-        zi= data.t1z[i];
-        data.t1x[k]= xi* xx+ yi* xy+ zi* xz;
-        data.t1y[k]= xi* yx+ yi* yy+ zi* yz;
-        data.t1z[k]= xi* zx+ yi* zy+ zi* zz;
-        xi= data.t2x[i];
-        yi= data.t2y[i];
-        zi= data.t2z[i];
-        data.t2x[k]= xi* xx+ yi* xy+ zi* xz;
-        data.t2y[k]= xi* yx+ yi* yy+ zi* yz;
-        data.t2z[k]= xi* zx+ yi* zy+ zi* zz;
-        data.psalp[k]= data.psalp[i];
-        data.pbi[k]= data.pbi[i];
+        xi= data.patches[i].px;
+        yi= data.patches[i].py;
+        zi= data.patches[i].pz;
+        data.patches[k].px = xi* xx+ yi* xy+ zi* xz+ xs;
+        data.patches[k].py = xi* yx+ yi* yy+ zi* yz+ ys;
+        data.patches[k].pz = xi* zx+ yi* zy+ zi* zz+ zs;
+        xi= data.patches[i].t1x;
+        yi= data.patches[i].t1y;
+        zi= data.patches[i].t1z;
+        data.patches[k].t1x = xi* xx+ yi* xy+ zi* xz;
+        data.patches[k].t1y = xi* yx+ yi* yy+ zi* yz;
+        data.patches[k].t1z = xi* zx+ yi* zy+ zi* zz;
+        xi= data.patches[i].t2x;
+        yi= data.patches[i].t2y;
+        zi= data.patches[i].t2z;
+        data.patches[k].t2x = xi* xx+ yi* xy+ zi* xz;
+        data.patches[k].t2y = xi* yx+ yi* yy+ zi* yz;
+        data.patches[k].t2z = xi* zx+ yi* zy+ zi* zz;
+        data.patches[k].psalp = data.patches[i].psalp;
+        data.patches[k].pbi = data.patches[i].pbi;
         k++;
 
       } /* for( i = i1; i < data.m; i++ ) */
@@ -1007,28 +956,18 @@ patch(
   mi= data.m-1;
 
   /* Reallocate patch buffers */
-  mreq = (size_t)data.m * sizeof(double);
-  mem_realloc( (void **)&data.px,  mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.py,  mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.pz,  mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t1x, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t1y, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t1z, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t2x, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t2y, mreq, "in geometry.c");
-  mem_realloc( (void **)&data.t2z, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.pbi, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.psalp, mreq, "in geometry.c" );
+  mreq = (size_t)data.m * sizeof(surface_patch_t);
+  mem_realloc((void **)&data.patches, mreq, "in geometry.c");
 
   if( nx > 0) ntp=2;
   else ntp= ny;
 
   if( ntp <= 1)
   {
-    data.px[mi]= ax1;
-    data.py[mi]= ay1;
-    data.pz[mi]= az1;
-    data.pbi[mi]= az2;
+    data.patches[mi].px = ax1;
+    data.patches[mi].py = ay1;
+    data.patches[mi].pz = az1;
+    data.patches[mi].pbi = az2;
     znv= cos( ax2);
     xnv= znv* cos( ay2);
     ynv= znv* sin( ay2);
@@ -1037,15 +976,15 @@ patch(
 
     if( xa >= 1.0e-6)
     {
-      data.t1x[mi]= -ynv/ xa;
-      data.t1y[mi]= xnv/ xa;
-      data.t1z[mi]=0.0;
+      data.patches[mi].t1x = -ynv/ xa;
+      data.patches[mi].t1y = xnv/ xa;
+      data.patches[mi].t1z=0.0;
     }
     else
     {
-      data.t1x[mi]=1.0;
-      data.t1y[mi]=0.0;
-      data.t1z[mi]=0.0;
+      data.patches[mi].t1x=1.0;
+      data.patches[mi].t1y=0.0;
+      data.patches[mi].t1z=0.0;
     }
 
   } /* if( ntp <= 1) */
@@ -1076,25 +1015,25 @@ patch(
     ynv= ynv/ xa;
     znv= znv/ xa;
     xst= sqrt( s1x* s1x+ s1y* s1y+ s1z* s1z);
-    data.t1x[mi]= s1x/ xst;
-    data.t1y[mi]= s1y/ xst;
-    data.t1z[mi]= s1z/ xst;
+    data.patches[mi].t1x = s1x/ xst;
+    data.patches[mi].t1y = s1y/ xst;
+    data.patches[mi].t1z = s1z/ xst;
 
     if( ntp <= 2)
     {
-      data.px[mi]= ax1+.5*( s1x+ s2x);
-      data.py[mi]= ay1+.5*( s1y+ s2y);
-      data.pz[mi]= az1+.5*( s1z+ s2z);
-      data.pbi[mi]= xa;
+      data.patches[mi].px = ax1+.5*( s1x+ s2x);
+      data.patches[mi].py = ay1+.5*( s1y+ s2y);
+      data.patches[mi].pz = az1+.5*( s1z+ s2z);
+      data.patches[mi].pbi = xa;
     }
     else
     {
       if( ntp != 4)
       {
-        data.px[mi]=( ax1+ ax2+ ax3)/3.0;
-        data.py[mi]=( ay1+ ay2+ ay3)/3.0;
-        data.pz[mi]=( az1+ az2+ az3)/3.0;
-        data.pbi[mi]=.5* xa;
+        data.patches[mi].px=( ax1+ ax2+ ax3)/3.0;
+        data.patches[mi].py=( ay1+ ay2+ ay3)/3.0;
+        data.patches[mi].pz=( az1+ az2+ az3)/3.0;
+        data.patches[mi].pbi=.5* xa;
       }
       else
       {
@@ -1109,13 +1048,13 @@ patch(
         zn2= s1x* s2y- s1y* s2x;
         xst= sqrt( xn2* xn2+ yn2* yn2+ zn2* zn2);
         double salpn=1.0/(3.0*( xa+ xst));
-        data.px[mi]=( xa*( ax1+ ax2+ ax3) +
+        data.patches[mi].px=( xa*( ax1+ ax2+ ax3) +
             xst*( ax1+ ax3+ ax4))* salpn;
-        data.py[mi]=( xa*( ay1+ ay2+ ay3) +
+        data.patches[mi].py=( xa*( ay1+ ay2+ ay3) +
             xst*( ay1+ ay3+ ay4))* salpn;
-        data.pz[mi]=( xa*( az1+ az2+ az3) +
+        data.patches[mi].pz=( xa*( az1+ az2+ az3) +
             xst*( az1+ az3+ az4))* salpn;
-        data.pbi[mi]=.5*( xa+ xst);
+        data.patches[mi].pbi=.5*( xa+ xst);
         s1x=( xnv* xn2+ ynv* yn2+ znv* zn2)/ xst;
 
         if( s1x <= 0.9998)
@@ -1132,10 +1071,10 @@ patch(
 
   } /* if( ntp <= 1) */
 
-  data.t2x[mi]= ynv* data.t1z[mi]- znv* data.t1y[mi];
-  data.t2y[mi]= znv* data.t1x[mi]- xnv* data.t1z[mi];
-  data.t2z[mi]= xnv* data.t1y[mi]- ynv* data.t1x[mi];
-  data.psalp[mi]=1.0;
+  data.patches[mi].t2x = ynv* data.patches[mi].t1z - znv* data.patches[mi].t1y;
+  data.patches[mi].t2y = znv* data.patches[mi].t1x - xnv* data.patches[mi].t1z;
+  data.patches[mi].t2z = xnv* data.patches[mi].t1y - ynv* data.patches[mi].t1x;
+  data.patches[mi].psalp=1.0;
 
   if( nx != 0)
   {
@@ -1144,28 +1083,18 @@ patch(
 
     data.m += nx*ny-1;
     /* Reallocate patch buffers */
-    mreq = (size_t)data.m * sizeof(double);
-    mem_realloc( (void **)&data.px,  mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.py,  mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.pz,  mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t1x, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t1y, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t1z, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t2x, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t2y, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t2z, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.pbi, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.psalp, mreq, "in geometry.c" );
+    mreq = (size_t)data.m * sizeof(surface_patch_t);
+    mem_realloc((void **)&data.patches, mreq, "in geometry.c");
 
-    xn2= data.px[mi]- s1x- s2x;
-    yn2= data.py[mi]- s1y- s2y;
-    zn2= data.pz[mi]- s1z- s2z;
-    xs= data.t1x[mi];
-    ys= data.t1y[mi];
-    zs= data.t1z[mi];
-    xt= data.t2x[mi];
-    yt= data.t2y[mi];
-    zt= data.t2z[mi];
+    xn2= data.patches[mi].px - s1x- s2x;
+    yn2= data.patches[mi].py - s1y- s2y;
+    zn2= data.patches[mi].pz - s1z- s2z;
+    xs= data.patches[mi].t1x;
+    ys= data.patches[mi].t1y;
+    zs= data.patches[mi].t1z;
+    xt= data.patches[mi].t2x;
+    yt= data.patches[mi].t2y;
+    zt= data.patches[mi].t2z;
 
     for( iy = 0; iy < ny; iy++ )
     {
@@ -1176,17 +1105,17 @@ patch(
       for( ix = 1; ix <= nx; ix++ )
       {
         xst= (double)ix;
-        data.px[mi]= xn2+ xst* s1x;
-        data.py[mi]= yn2+ xst* s1y;
-        data.pz[mi]= zn2+ xst* s1z;
-        data.pbi[mi]= xa;
-        data.psalp[mi]=1.0;
-        data.t1x[mi]= xs;
-        data.t1y[mi]= ys;
-        data.t1z[mi]= zs;
-        data.t2x[mi]= xt;
-        data.t2y[mi]= yt;
-        data.t2z[mi]= zt;
+        data.patches[mi].px = xn2+ xst* s1x;
+        data.patches[mi].py = yn2+ xst* s1y;
+        data.patches[mi].pz = zn2+ xst* s1z;
+        data.patches[mi].pbi = xa;
+        data.patches[mi].psalp=1.0;
+        data.patches[mi].t1x = xs;
+        data.patches[mi].t1y = ys;
+        data.patches[mi].t1z = zs;
+        data.patches[mi].t2x = xt;
+        data.patches[mi].t2y = yt;
+        data.patches[mi].t2z = zt;
         mi++;
       } /* for( ix = 0; ix < nx; ix++ ) */
 
@@ -1229,25 +1158,15 @@ reflc( int ix, int iy, int iz, int iti, int nop )
 
       if( data.n > 0 )
       {
-        /* Reallocate tags buffer */
-        mreq = (size_t)(2 * data.n + data.m) * sizeof(int);
-        mem_realloc( (void **)&data.itag, mreq, "in geometry.c" );
-
-        /* Reallocate wire buffers */
-        mreq = (size_t)(2 * data.n) * sizeof(double);
-        mem_realloc( (void **)&data.x1, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.y1, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.z1, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.x2, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.y2, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.z2, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.bi, mreq, "in geometry.c" );
+        /* Reallocate wire segments */
+        mreq = (size_t)(2 * data.n + data.m) * sizeof(wire_segment_t);
+        mem_realloc((void **)&data.segments, mreq, "in geometry.c");
 
         for( i = 0; i < data.n; i++ )
         {
           nx= i+ data.n;
-          e1= data.z1[i];
-          e2= data.z2[i];
+          e1= data.segments[i].z1;
+          e2= data.segments[i].z2;
 
           if( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
           {
@@ -1257,20 +1176,20 @@ reflc( int ix, int iy, int iz, int iti, int nop )
             return( FALSE );
           }
 
-          data.x1[nx]= data.x1[i];
-          data.y1[nx]= data.y1[i];
-          data.z1[nx]= -e1;
-          data.x2[nx]= data.x2[i];
-          data.y2[nx]= data.y2[i];
-          data.z2[nx]= -e2;
-          itagi= data.itag[i];
+          data.segments[nx].x1 = data.segments[i].x1;
+          data.segments[nx].y1 = data.segments[i].y1;
+          data.segments[nx].z1 = -e1;
+          data.segments[nx].x2 = data.segments[i].x2;
+          data.segments[nx].y2 = data.segments[i].y2;
+          data.segments[nx].z2 = -e2;
+          itagi= data.segments[i].itag;
 
           if( itagi == 0)
-            data.itag[nx]=0;
+            data.segments[nx].itag=0;
           if( itagi != 0)
-            data.itag[nx]= itagi+ iti;
+            data.segments[nx].itag = itagi+ iti;
 
-          data.bi[nx]= data.bi[i];
+          data.segments[nx].bi = data.segments[i].bi;
 
         } /* for( i = 0; i < data.n; i++ ) */
 
@@ -1282,23 +1201,13 @@ reflc( int ix, int iy, int iz, int iti, int nop )
       if( data.m > 0 )
       {
         /* Reallocate patch buffers */
-        mreq = (size_t)(2 * data.m) * sizeof(double);
-        mem_realloc( (void **)&data.px,  mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.py,  mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.pz,  mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t1x, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t1y, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t1z, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t2x, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t2y, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t2z, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.pbi, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.psalp, mreq, "in geometry.c" );
+        mreq = (size_t)(2 * data.m) * sizeof(surface_patch_t);
+        mem_realloc((void **)&data.patches, mreq, "in geometry.c");
 
         for( i = 0; i < data.m; i++ )
         {
           nx = i+data.m;
-          if( fabs(data.pz[i]) <= 1.0e-10)
+          if( fabs(data.patches[i].pz) <= 1.0e-10)
           {
             pr_err("geometry data error: patch %d lies in plane of symmetry\n", i + 1);
             Stop( ERR_OK, _("Geometry data error\n"
@@ -1306,17 +1215,17 @@ reflc( int ix, int iy, int iz, int iti, int nop )
             return( FALSE );
           }
 
-          data.px[nx]= data.px[i];
-          data.py[nx]= data.py[i];
-          data.pz[nx]= -data.pz[i];
-          data.t1x[nx]= data.t1x[i];
-          data.t1y[nx]= data.t1y[i];
-          data.t1z[nx]= -data.t1z[i];
-          data.t2x[nx]= data.t2x[i];
-          data.t2y[nx]= data.t2y[i];
-          data.t2z[nx]= -data.t2z[i];
-          data.psalp[nx]= -data.psalp[i];
-          data.pbi[nx]= data.pbi[i];
+          data.patches[nx].px = data.patches[i].px;
+          data.patches[nx].py = data.patches[i].py;
+          data.patches[nx].pz = -data.patches[i].pz;
+          data.patches[nx].t1x = data.patches[i].t1x;
+          data.patches[nx].t1y = data.patches[i].t1y;
+          data.patches[nx].t1z = -data.patches[i].t1z;
+          data.patches[nx].t2x = data.patches[i].t2x;
+          data.patches[nx].t2y = data.patches[i].t2y;
+          data.patches[nx].t2z = -data.patches[i].t2z;
+          data.patches[nx].psalp = -data.patches[i].psalp;
+          data.patches[nx].pbi = data.patches[i].pbi;
         }
 
         data.m= data.m*2;
@@ -1330,24 +1239,15 @@ reflc( int ix, int iy, int iz, int iti, int nop )
     {
       if( data.n > 0)
       {
-        /* Reallocate tags buffer */
-        mreq = (size_t)(2 * data.n) * sizeof(int);
-        mem_realloc( (void **)&data.itag, mreq, "in geometry.c" );
-        /* Reallocate wire buffers */
-        mreq = (size_t)(2 * data.n) * sizeof(double);
-        mem_realloc( (void **)&data.x1, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.y1, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.z1, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.x2, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.y2, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.z2, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.bi, mreq, "in geometry.c" );
+        /* Reallocate wire segments */
+        mreq = (size_t)(2 * data.n) * sizeof(wire_segment_t);
+        mem_realloc((void **)&data.segments, mreq, "in geometry.c");
 
         for( i = 0; i < data.n; i++ )
         {
           nx= i+ data.n;
-          e1= data.y1[i];
-          e2= data.y2[i];
+          e1= data.segments[i].y1;
+          e2= data.segments[i].y2;
 
           if( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
           {
@@ -1357,20 +1257,20 @@ reflc( int ix, int iy, int iz, int iti, int nop )
             return( FALSE );
           }
 
-          data.x1[nx]= data.x1[i];
-          data.y1[nx]= -e1;
-          data.z1[nx]= data.z1[i];
-          data.x2[nx]= data.x2[i];
-          data.y2[nx]= -e2;
-          data.z2[nx]= data.z2[i];
-          itagi= data.itag[i];
+          data.segments[nx].x1 = data.segments[i].x1;
+          data.segments[nx].y1 = -e1;
+          data.segments[nx].z1 = data.segments[i].z1;
+          data.segments[nx].x2 = data.segments[i].x2;
+          data.segments[nx].y2 = -e2;
+          data.segments[nx].z2 = data.segments[i].z2;
+          itagi= data.segments[i].itag;
 
           if( itagi == 0)
-            data.itag[nx]=0;
+            data.segments[nx].itag=0;
           if( itagi != 0)
-            data.itag[nx]= itagi+ iti;
+            data.segments[nx].itag = itagi+ iti;
 
-          data.bi[nx]= data.bi[i];
+          data.segments[nx].bi = data.segments[i].bi;
 
         } /* for( i = n2-1; i < data.n; i++ ) */
 
@@ -1382,23 +1282,13 @@ reflc( int ix, int iy, int iz, int iti, int nop )
       if( data.m > 0 )
       {
         /* Reallocate patch buffers */
-        mreq = (size_t)(2 * data.m) * sizeof(double);
-        mem_realloc( (void **)&data.px,  mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.py,  mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.pz,  mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t1x, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t1y, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t1z, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t2x, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t2y, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.t2z, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.pbi, mreq, "in geometry.c" );
-        mem_realloc( (void **)&data.psalp, mreq, "in geometry.c" );
+        mreq = (size_t)(2 * data.m) * sizeof(surface_patch_t);
+        mem_realloc((void **)&data.patches, mreq, "in geometry.c");
 
         for( i = 0; i < data.m; i++ )
         {
           nx= i+data.m;
-          if( fabs( data.py[i]) <= 1.0e-10)
+          if( fabs(data.patches[i].py) <= 1.0e-10)
           {
             pr_err("geometry data error: patch %d lies in plane of symmetry\n", i + 1);
             Stop( ERR_OK, _("Geometry data error\n"
@@ -1406,17 +1296,17 @@ reflc( int ix, int iy, int iz, int iti, int nop )
             return( FALSE );
           }
 
-          data.px[nx]= data.px[i];
-          data.py[nx]= -data.py[i];
-          data.pz[nx]= data.pz[i];
-          data.t1x[nx]= data.t1x[i];
-          data.t1y[nx]= -data.t1y[i];
-          data.t1z[nx]= data.t1z[i];
-          data.t2x[nx]= data.t2x[i];
-          data.t2y[nx]= -data.t2y[i];
-          data.t2z[nx]= data.t2z[i];
-          data.psalp[nx]= -data.psalp[i];
-          data.pbi[nx]= data.pbi[i];
+          data.patches[nx].px = data.patches[i].px;
+          data.patches[nx].py = -data.patches[i].py;
+          data.patches[nx].pz = data.patches[i].pz;
+          data.patches[nx].t1x = data.patches[i].t1x;
+          data.patches[nx].t1y = -data.patches[i].t1y;
+          data.patches[nx].t1z = data.patches[i].t1z;
+          data.patches[nx].t2x = data.patches[i].t2x;
+          data.patches[nx].t2y = -data.patches[i].t2y;
+          data.patches[nx].t2z = data.patches[i].t2z;
+          data.patches[nx].psalp = -data.patches[i].psalp;
+          data.patches[nx].pbi = data.patches[i].pbi;
 
         } /* for( i = m2; i <= data.m; i++ ) */
 
@@ -1431,25 +1321,15 @@ reflc( int ix, int iy, int iz, int iti, int nop )
 
     if( data.n > 0 )
     {
-      /* Reallocate tags buffer */
-      mreq = (size_t)(2 * data.n) * sizeof(int);
-      mem_realloc( (void **)&data.itag, mreq, "in geometry.c" );
-
-      /* Reallocate wire buffers */
-      mreq = (size_t)(2 * data.n) * sizeof(double);
-      mem_realloc( (void **)&data.x1, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.y1, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.z1, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.x2, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.y2, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.z2, mreq, "in geometry.c" );
-      mem_realloc( (void **)&data.bi, mreq, "in geometry.c" );
+      /* Reallocate wire segments */
+      mreq = (size_t)(2 * data.n) * sizeof(wire_segment_t);
+      mem_realloc((void **)&data.segments, mreq, "in geometry.c");
 
       for( i = 0; i < data.n; i++ )
       {
         nx= i+ data.n;
-        e1= data.x1[i];
-        e2= data.x2[i];
+        e1= data.segments[i].x1;
+        e2= data.segments[i].x2;
 
         if( (fabs(e1)+fabs(e2) <= 1.0e-5) || (e1*e2 < -1.0e-6) )
         {
@@ -1459,20 +1339,20 @@ reflc( int ix, int iy, int iz, int iti, int nop )
           return( FALSE );
         }
 
-        data.x1[nx]= -e1;
-        data.y1[nx]= data.y1[i];
-        data.z1[nx]= data.z1[i];
-        data.x2[nx]= -e2;
-        data.y2[nx]= data.y2[i];
-        data.z2[nx]= data.z2[i];
-        itagi= data.itag[i];
+        data.segments[nx].x1 = -e1;
+        data.segments[nx].y1 = data.segments[i].y1;
+        data.segments[nx].z1 = data.segments[i].z1;
+        data.segments[nx].x2 = -e2;
+        data.segments[nx].y2 = data.segments[i].y2;
+        data.segments[nx].z2 = data.segments[i].z2;
+        itagi= data.segments[i].itag;
 
         if( itagi == 0)
-          data.itag[nx]=0;
+          data.segments[nx].itag=0;
         if( itagi != 0)
-          data.itag[nx]= itagi+ iti;
+          data.segments[nx].itag = itagi+ iti;
 
-        data.bi[nx]= data.bi[i];
+        data.segments[nx].bi = data.segments[i].bi;
       }
 
       data.n= data.n*2;
@@ -1482,23 +1362,13 @@ reflc( int ix, int iy, int iz, int iti, int nop )
     if( data.m == 0 ) return( TRUE );
 
     /* Reallocate patch buffers */
-    mreq = (size_t)(2 * data.m) * sizeof(double);
-    mem_realloc( (void **)&data.px,  mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.py,  mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.pz,  mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t1x, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t1y, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t1z, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t2x, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t2y, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.t2z, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.pbi, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.psalp, mreq, "in geometry.c" );
+    mreq = (size_t)(2 * data.m) * sizeof(surface_patch_t);
+    mem_realloc((void **)&data.patches, mreq, "in geometry.c");
 
     for( i = 0; i < data.m; i++ )
     {
       nx= i+data.m;
-      if( fabs( data.px[i]) <= 1.0e-10)
+      if( fabs(data.patches[i].px) <= 1.0e-10)
       {
         pr_err("geometry data error: patch %d lies in plane of symmetry\n", i + 1);
         Stop( ERR_OK, _("Geometry data error\n"
@@ -1506,17 +1376,17 @@ reflc( int ix, int iy, int iz, int iti, int nop )
         return( FALSE );
       }
 
-      data.px[nx]= -data.px[i];
-      data.py[nx]= data.py[i];
-      data.pz[nx]= data.pz[i];
-      data.t1x[nx]= -data.t1x[i];
-      data.t1y[nx]= data.t1y[i];
-      data.t1z[nx]= data.t1z[i];
-      data.t2x[nx]= -data.t2x[i];
-      data.t2y[nx]= data.t2y[i];
-      data.t2z[nx]= data.t2z[i];
-      data.psalp[nx]= -data.psalp[i];
-      data.pbi[nx]= data.pbi[i];
+      data.patches[nx].px = -data.patches[i].px;
+      data.patches[nx].py = data.patches[i].py;
+      data.patches[nx].pz = data.patches[i].pz;
+      data.patches[nx].t1x = -data.patches[i].t1x;
+      data.patches[nx].t1y = data.patches[i].t1y;
+      data.patches[nx].t1z = data.patches[i].t1z;
+      data.patches[nx].t2x = -data.patches[i].t2x;
+      data.patches[nx].t2y = data.patches[i].t2y;
+      data.patches[nx].t2z = data.patches[i].t2z;
+      data.patches[nx].psalp = -data.patches[i].psalp;
+      data.patches[nx].pbi = data.patches[i].pbi;
     }
 
     data.m= data.m*2;
@@ -1536,40 +1406,30 @@ reflc( int ix, int iy, int iz, int iti, int nop )
     data.n *= nop;
     nx= data.np;
 
-    /* Reallocate tags buffer */
-    mreq = (size_t)data.n * sizeof(int);
-    mem_realloc( (void **)&data.itag, mreq, "in geometry.c" );
-
-    /* Reallocate wire buffers */
-    mreq = (size_t)data.n * sizeof(double);
-    mem_realloc( (void **)&data.x1, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.y1, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.z1, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.x2, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.y2, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.z2, mreq, "in geometry.c" );
-    mem_realloc( (void **)&data.bi, mreq, "in geometry.c" );
+    /* Reallocate wire segments */
+    mreq = (size_t)data.n * sizeof(wire_segment_t);
+    mem_realloc((void **)&data.segments, mreq, "in geometry.c");
 
     for( i = nx; i < data.n; i++ )
     {
       k= i- data.np;
-      xk= data.x1[k];
-      yk= data.y1[k];
-      data.x1[i]= xk* cs- yk* ss;
-      data.y1[i]= xk* ss+ yk* cs;
-      data.z1[i]= data.z1[k];
-      xk= data.x2[k];
-      yk= data.y2[k];
-      data.x2[i]= xk* cs- yk* ss;
-      data.y2[i]= xk* ss+ yk* cs;
-      data.z2[i]= data.z2[k];
-      data.bi[i]= data.bi[k];
-      itagi= data.itag[k];
+      xk= data.segments[k].x1;
+      yk= data.segments[k].y1;
+      data.segments[i].x1 = xk* cs- yk* ss;
+      data.segments[i].y1 = xk* ss+ yk* cs;
+      data.segments[i].z1 = data.segments[k].z1;
+      xk= data.segments[k].x2;
+      yk= data.segments[k].y2;
+      data.segments[i].x2 = xk* cs- yk* ss;
+      data.segments[i].y2 = xk* ss+ yk* cs;
+      data.segments[i].z2 = data.segments[k].z2;
+      data.segments[i].bi = data.segments[k].bi;
+      itagi= data.segments[k].itag;
 
       if( itagi == 0)
-        data.itag[i]=0;
+        data.segments[i].itag=0;
       if( itagi != 0)
-        data.itag[i]= itagi+ iti;
+        data.segments[i].itag = itagi+ iti;
     }
 
   } /* if( data.n >= n2) */
@@ -1580,39 +1440,29 @@ reflc( int ix, int iy, int iz, int iti, int nop )
   nx= data.mp;
 
   /* Reallocate patch buffers */
-  mreq = (size_t)data.m * sizeof(double);
-  mem_realloc( (void **)&data.px,  mreq, "in geometry.c"  );
-  mem_realloc( (void **)&data.py,  mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.pz,  mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t1x, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t1y, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t1z, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t2x, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t2y, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.t2z, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.pbi, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.psalp, mreq, "in geometry.c" );
+  mreq = (size_t)data.m * sizeof(surface_patch_t);
+  mem_realloc((void **)&data.patches, mreq, "in geometry.c");
 
   for( i = nx; i < data.m; i++ )
   {
     k = i-data.mp;
-    xk= data.px[k];
-    yk= data.py[k];
-    data.px[i]= xk* cs- yk* ss;
-    data.py[i]= xk* ss+ yk* cs;
-    data.pz[i]= data.pz[k];
-    xk= data.t1x[k];
-    yk= data.t1y[k];
-    data.t1x[i]= xk* cs- yk* ss;
-    data.t1y[i]= xk* ss+ yk* cs;
-    data.t1z[i]= data.t1z[k];
-    xk= data.t2x[k];
-    yk= data.t2y[k];
-    data.t2x[i]= xk* cs- yk* ss;
-    data.t2y[i]= xk* ss+ yk* cs;
-    data.t2z[i]= data.t2z[k];
-    data.psalp[i]= data.psalp[k];
-    data.pbi[i]= data.pbi[k];
+    xk= data.patches[k].px;
+    yk= data.patches[k].py;
+    data.patches[i].px = xk* cs- yk* ss;
+    data.patches[i].py = xk* ss+ yk* cs;
+    data.patches[i].pz = data.patches[k].pz;
+    xk= data.patches[k].t1x;
+    yk= data.patches[k].t1y;
+    data.patches[i].t1x = xk* cs- yk* ss;
+    data.patches[i].t1y = xk* ss+ yk* cs;
+    data.patches[i].t1z = data.patches[k].t1z;
+    xk= data.patches[k].t2x;
+    yk= data.patches[k].t2y;
+    data.patches[i].t2x = xk* cs- yk* ss;
+    data.patches[i].t2y = xk* ss+ yk* cs;
+    data.patches[i].t2z = data.patches[k].t2z;
+    data.patches[i].psalp = data.patches[k].psalp;
+    data.patches[i].pbi = data.patches[k].pbi;
 
   } /* for( i = nx; i < data.m; i++ ) */
 
@@ -1627,24 +1477,33 @@ verify_self_connections(void)
 {
   gboolean retval = TRUE;
   for (int i = 0; i < data.n; i++) {
-    double slen = calc_connection_threshold(data.x1[i], data.y1[i], data.z1[i],
-                                          data.x2[i], data.y2[i], data.z2[i]);
-    double sep = calc_manhattan_distance(data.x1[i], data.y1[i], data.z1[i],
-                                       data.x2[i], data.y2[i], data.z2[i]);
+    double slen = calc_connection_threshold(data.segments[i].x1,
+                                            data.segments[i].y1,
+                                            data.segments[i].z1,
+                                            data.segments[i].x2,
+                                            data.segments[i].y2,
+                                            data.segments[i].z2);
+    double sep = calc_manhattan_distance(data.segments[i].x1,
+                                         data.segments[i].y1,
+                                         data.segments[i].z1,
+                                         data.segments[i].x2,
+                                         data.segments[i].y2,
+                                         data.segments[i].z2);
     if (sep <= slen) {
       static int last_tag = -1;
       static int msg_count = 0;
-      if (data.itag[i] != last_tag) {
-        last_tag = data.itag[i];
+      if (data.segments[i].itag != last_tag) {
+        last_tag = data.segments[i].itag;
         msg_count = 0;
       }
       if (msg_count < 3) {
         pr_warn("tag=%d/seg=%d: endpoint distance=%.3e is too close (below connection threshold=%.3e); segment will connect to itself\n",
-          data.itag[i], i+1, sep, slen);
+          data.segments[i].itag, i+1, sep, slen);
         msg_count++;
       }
       else if (msg_count == 3) {
-        pr_warn("tag=%d: suppressing additional self-connection warnings\n", data.itag[i]);
+        pr_warn("tag=%d: suppressing additional self-connection warnings\n",
+                data.segments[i].itag);
         msg_count++;
       }
       retval = FALSE;
@@ -1663,38 +1522,44 @@ verify_segment_overlaps(void)
       if (i == j) continue;
       
       /* Check if segments connect at endpoints */
-      double slen = calc_connection_threshold(data.x1[i], data.y1[i], data.z1[i],
-                                            data.x2[i], data.y2[i], data.z2[i]);
-      if (points_would_connect(data.x1[i], data.y1[i], data.z1[i],
-                             data.x1[j], data.y1[j], data.z1[j], slen) ||
-          points_would_connect(data.x1[i], data.y1[i], data.z1[i],
-                             data.x2[j], data.y2[j], data.z2[j], slen) ||
-          points_would_connect(data.x2[i], data.y2[i], data.z2[i],
-                             data.x1[j], data.y1[j], data.z1[j], slen) ||
-          points_would_connect(data.x2[i], data.y2[i], data.z2[i],
-                             data.x2[j], data.y2[j], data.z2[j], slen)) {
+      double slen = calc_connection_threshold(data.segments[i].x1,
+                                              data.segments[i].y1,
+                                              data.segments[i].z1,
+                                              data.segments[i].x2,
+                                              data.segments[i].y2,
+                                              data.segments[i].z2);
+      if (points_would_connect(data.segments[i].x1, data.segments[i].y1, data.segments[i].z1,
+                               data.segments[j].x1, data.segments[j].y1, data.segments[j].z1, slen) ||
+          points_would_connect(data.segments[i].x1, data.segments[i].y1, data.segments[i].z1,
+                               data.segments[j].x2, data.segments[j].y2, data.segments[j].z2, slen) ||
+          points_would_connect(data.segments[i].x2, data.segments[i].y2, data.segments[i].z2,
+                               data.segments[j].x1, data.segments[j].y1, data.segments[j].z1, slen) ||
+          points_would_connect(data.segments[i].x2, data.segments[i].y2, data.segments[i].z2,
+                               data.segments[j].x2, data.segments[j].y2, data.segments[j].z2, slen)) {
         continue;
       }
 
       /* Check if segments are too close along their length */
-      double dx = data.x1[j] - data.x1[i];
-      double dy = data.y1[j] - data.y1[i];
-      double dz = data.z1[j] - data.z1[i];
+      double dx = data.segments[j].x1 - data.segments[i].x1;
+      double dy = data.segments[j].y1 - data.segments[i].y1;
+      double dz = data.segments[j].z1 - data.segments[i].z1;
       double mid_dist = sqrt(dx*dx + dy*dy + dz*dz);
       if (mid_dist <= SMIN * mid_dist * 2) {
         static int last_tag = -1;
         static int msg_count = 0;
-        if (data.itag[i] != last_tag) {
-          last_tag = data.itag[i];
+        if (data.segments[i].itag != last_tag) {
+          last_tag = data.segments[i].itag;
           msg_count = 0;
         }
           if (msg_count < 3) {
             pr_warn("tag=%d/seg=%d: distance=%.3e to tag=%d/seg=%d closer than 2x connection threshold %.3e; unintended connections possible\n",
-              data.itag[i], i+1, mid_dist, data.itag[j], j+1, SMIN * mid_dist * 2);
+              data.segments[i].itag, i+1, mid_dist, data.segments[j].itag,
+              j+1, SMIN * mid_dist * 2);
             msg_count++;
           }
           else if (msg_count == 3) {
-            pr_warn("tag=%d: suppressing additional overlap warnings\n", data.itag[i]);
+            pr_warn("tag=%d: suppressing additional overlap warnings\n",
+                    data.segments[i].itag);
             msg_count++;
           }
         retval = FALSE;
@@ -1711,55 +1576,65 @@ verify_relative_lengths(void)
 {
   gboolean retval = TRUE;
   for (int i = 0; i < data.n; i++) {
-    double xi = data.x2[i] - data.x1[i];
-    double yi = data.y2[i] - data.y1[i];
-    double zi = data.z2[i] - data.z1[i];
+    double xi = data.segments[i].x2 - data.segments[i].x1;
+    double yi = data.segments[i].y2 - data.segments[i].y1;
+    double zi = data.segments[i].z2 - data.segments[i].z1;
     double seg_len = sqrt(xi*xi + yi*yi + zi*zi);
     
     for (int j = 0; j < data.n; j++) {
       if (i == j) continue;
-      double xj = data.x2[j] - data.x1[j];
-      double yj = data.y2[j] - data.y1[j];
-      double zj = data.z2[j] - data.z1[j];
+      double xj = data.segments[j].x2 - data.segments[j].x1;
+      double yj = data.segments[j].y2 - data.segments[j].y1;
+      double zj = data.segments[j].z2 - data.segments[j].z1;
       double other_len = sqrt(xj*xj + yj*yj + zj*zj);
       if (seg_len < other_len * 0.01) {
         /* Calculate connection thresholds for both segments */
-        double slen_i = calc_connection_threshold(data.x1[i], data.y1[i], data.z1[i],
-                                                data.x2[i], data.y2[i], data.z2[i]);
-        double slen_j = calc_connection_threshold(data.x1[j], data.y1[j], data.z1[j],
-                                                data.x2[j], data.y2[j], data.z2[j]);
+        double slen_i = calc_connection_threshold(data.segments[i].x1,
+                                                  data.segments[i].y1,
+                                                  data.segments[i].z1,
+                                                  data.segments[i].x2,
+                                                  data.segments[i].y2,
+                                                  data.segments[i].z2);
+        double slen_j = calc_connection_threshold(data.segments[j].x1,
+                                                  data.segments[j].y1,
+                                                  data.segments[j].z1,
+                                                  data.segments[j].x2,
+                                                  data.segments[j].y2,
+                                                  data.segments[j].z2);
         
         /* Check if any endpoint of segment i is within either threshold of any endpoint of segment j */
-        if ((calc_manhattan_distance(data.x1[i], data.y1[i], data.z1[i],
-                                   data.x1[j], data.y1[j], data.z1[j]) <= slen_i) ||
-            (calc_manhattan_distance(data.x1[i], data.y1[i], data.z1[i],
-                                   data.x2[j], data.y2[j], data.z2[j]) <= slen_i) ||
-            (calc_manhattan_distance(data.x2[i], data.y2[i], data.z2[i],
-                                   data.x1[j], data.y1[j], data.z1[j]) <= slen_i) ||
-            (calc_manhattan_distance(data.x2[i], data.y2[i], data.z2[i],
-                                   data.x2[j], data.y2[j], data.z2[j]) <= slen_i) ||
-            (calc_manhattan_distance(data.x1[i], data.y1[i], data.z1[i],
-                                   data.x1[j], data.y1[j], data.z1[j]) <= slen_j) ||
-            (calc_manhattan_distance(data.x1[i], data.y1[i], data.z1[i],
-                                   data.x2[j], data.y2[j], data.z2[j]) <= slen_j) ||
-            (calc_manhattan_distance(data.x2[i], data.y2[i], data.z2[i],
-                                   data.x1[j], data.y1[j], data.z1[j]) <= slen_j) ||
-            (calc_manhattan_distance(data.x2[i], data.y2[i], data.z2[i],
-                                   data.x2[j], data.y2[j], data.z2[j]) <= slen_j)) {
+        if ((calc_manhattan_distance(data.segments[i].x1, data.segments[i].y1, data.segments[i].z1,
+                                     data.segments[j].x1, data.segments[j].y1, data.segments[j].z1) <= slen_i) ||
+            (calc_manhattan_distance(data.segments[i].x1, data.segments[i].y1, data.segments[i].z1,
+                                     data.segments[j].x2, data.segments[j].y2, data.segments[j].z2) <= slen_i) ||
+            (calc_manhattan_distance(data.segments[i].x2, data.segments[i].y2, data.segments[i].z2,
+                                     data.segments[j].x1, data.segments[j].y1, data.segments[j].z1) <= slen_i) ||
+            (calc_manhattan_distance(data.segments[i].x2, data.segments[i].y2, data.segments[i].z2,
+                                     data.segments[j].x2, data.segments[j].y2, data.segments[j].z2) <= slen_i) ||
+            (calc_manhattan_distance(data.segments[i].x1, data.segments[i].y1, data.segments[i].z1,
+                                     data.segments[j].x1, data.segments[j].y1, data.segments[j].z1) <= slen_j) ||
+            (calc_manhattan_distance(data.segments[i].x1, data.segments[i].y1, data.segments[i].z1,
+                                     data.segments[j].x2, data.segments[j].y2, data.segments[j].z2) <= slen_j) ||
+            (calc_manhattan_distance(data.segments[i].x2, data.segments[i].y2, data.segments[i].z2,
+                                     data.segments[j].x1, data.segments[j].y1, data.segments[j].z1) <= slen_j) ||
+            (calc_manhattan_distance(data.segments[i].x2, data.segments[i].y2, data.segments[i].z2,
+                                     data.segments[j].x2, data.segments[j].y2, data.segments[j].z2) <= slen_j)) {
           
           static int last_tag = -1;
           static int msg_count = 0;
-          if (data.itag[i] != last_tag) {
-            last_tag = data.itag[i];
+          if (data.segments[i].itag != last_tag) {
+            last_tag = data.segments[i].itag;
             msg_count = 0;
           }
           if (msg_count < 3) {
             pr_warn("tag=%d/seg=%d: length=%.3e is too short (and close enough) to tag=%d/seg=%d length=%.3e that connection detection may fail or short\n",
-              data.itag[i], i+1, seg_len, data.itag[j], j+1, other_len);
+              data.segments[i].itag, i+1, seg_len, data.segments[j].itag, j+1,
+              other_len);
             msg_count++;
           }
           else if (msg_count == 3) {
-            pr_warn("tag=%d: suppressing additional connection detection may fail or short warnings\n", data.itag[i]);
+            pr_warn("tag=%d: suppressing additional connection detection may fail or short warnings\n",
+                    data.segments[i].itag);
             msg_count++;
           }
           retval = FALSE;
@@ -1777,26 +1652,27 @@ verify_wavelength_limits(double wavelength)
 {
   gboolean retval = TRUE;
   for (int i = 0; i < data.n; i++) {
-    double xi = data.x2[i] - data.x1[i];
-    double yi = data.y2[i] - data.y1[i];
-    double zi = data.z2[i] - data.z1[i];
+    double xi = data.segments[i].x2 - data.segments[i].x1;
+    double yi = data.segments[i].y2 - data.segments[i].y1;
+    double zi = data.segments[i].z2 - data.segments[i].z1;
     double seg_len = sqrt(xi*xi + yi*yi + zi*zi);
     double seg_lambda = seg_len / wavelength;
 
     if (seg_lambda < 0.001) {
       static int last_tag_short = -1;
       static int msg_count_short = 0;
-      if (data.itag[i] != last_tag_short) {
-        last_tag_short = data.itag[i];
+      if (data.segments[i].itag != last_tag_short) {
+        last_tag_short = data.segments[i].itag;
         msg_count_short = 0;
       }
       if (msg_count_short < 3) {
         pr_err("tag=%d/seg=%d: length/wavelength ratio of %.3f < 0.001; similarity of current components leads to numerical inaccuracies (min=0.001, fine=0.05, recommended <= 0.1)\n",
-          data.itag[i], i+1, seg_lambda);
+          data.segments[i].itag, i+1, seg_lambda);
         msg_count_short++;
       }
       else if (msg_count_short == 3) {
-        pr_err("tag=%d: suppressing additional short wavelength ratio errors\n", data.itag[i]);
+        pr_err("tag=%d: suppressing additional short wavelength ratio errors\n",
+               data.segments[i].itag);
         msg_count_short++;
       }
       retval = FALSE;
@@ -1804,17 +1680,18 @@ verify_wavelength_limits(double wavelength)
     else if (seg_lambda > 0.1) {
       static int last_tag_long = -1;
       static int msg_count_long = 0;
-      if (data.itag[i] != last_tag_long) {
-        last_tag_long = data.itag[i];
+      if (data.segments[i].itag != last_tag_long) {
+        last_tag_long = data.segments[i].itag;
         msg_count_long = 0;
       }
       if (msg_count_long < 3) {
         pr_warn("tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.1; current sampling resolution limited by segment spacing (min=0.001, fine=0.05, recommended <= 0.1)\n",
-          data.itag[i], i+1, seg_lambda);
+          data.segments[i].itag, i+1, seg_lambda);
         msg_count_long++;
       }
       else if (msg_count_long == 3) {
-        pr_warn("tag=%d: suppressing additional long wavelength ratio warnings\n", data.itag[i]);
+        pr_warn("tag=%d: suppressing additional long wavelength ratio warnings\n",
+                data.segments[i].itag);
         msg_count_long++;
       }
       retval = FALSE;
@@ -1822,17 +1699,18 @@ verify_wavelength_limits(double wavelength)
     else if (seg_lambda > 0.05) {
       static int last_tag_info = -1;
       static int msg_count_info = 0;
-      if (data.itag[i] != last_tag_info) {
-        last_tag_info = data.itag[i];
+      if (data.segments[i].itag != last_tag_info) {
+        last_tag_info = data.segments[i].itag;
         msg_count_info = 0;
       }
       if (msg_count_info < 3) {
         pr_info("tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.05; shorter segments increase accuracy in regions of rapid current change (min=0.001, fine=0.05, recommended <=0.1)\n",
-          data.itag[i], i+1, seg_lambda);
+          data.segments[i].itag, i+1, seg_lambda);
         msg_count_info++;
       }
       else if (msg_count_info == 3) {
-        pr_info("tag=%d: suppressing additional accuracy improvement suggestions\n", data.itag[i]);
+        pr_info("tag=%d: suppressing additional accuracy improvement suggestions\n",
+                data.segments[i].itag);
         msg_count_info++;
       }
     }
@@ -1846,28 +1724,29 @@ verify_kernel_limits(void)
 {
   gboolean retval = TRUE;
   for (int i = 0; i < data.n; i++) {
-    double xi = data.x2[i] - data.x1[i];
-    double yi = data.y2[i] - data.y1[i];
-    double zi = data.z2[i] - data.z1[i];
+    double xi = data.segments[i].x2 - data.segments[i].x1;
+    double yi = data.segments[i].y2 - data.segments[i].y1;
+    double zi = data.segments[i].z2 - data.segments[i].z1;
     double seg_len = sqrt(xi*xi + yi*yi + zi*zi);
-    double delta_a = seg_len / data.bi[i];
+    double delta_a = seg_len / data.segments[i].bi;
 
     if (!calc_data.iexk)
     {
       if (delta_a < 2.0) {
         static int last_tag_std_err = -1;
         static int msg_count_std_err = 0;
-        if (data.itag[i] != last_tag_std_err) {
-          last_tag_std_err = data.itag[i];
+        if (data.segments[i].itag != last_tag_std_err) {
+          last_tag_std_err = data.segments[i].itag;
           msg_count_std_err = 0;
         }
           if (msg_count_std_err < 3) {
             pr_err("tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; standard thin-wire kernel field error exceeds 1%% by a large margin (min=2.0, 1%%accurate=8.0)\n",
-              data.itag[i], i+1, delta_a);
+              data.segments[i].itag, i+1, delta_a);
             msg_count_std_err++;
           }
           else if (msg_count_std_err == 3) {
-            pr_err("tag=%d: suppressing additional standard kernel ratio errors\n", data.itag[i]);
+            pr_err("tag=%d: suppressing additional standard kernel ratio errors\n",
+                   data.segments[i].itag);
             msg_count_std_err++;
           }
         retval = FALSE;
@@ -1875,17 +1754,18 @@ verify_kernel_limits(void)
       else if (delta_a < 8.0) {
         static int last_tag_std_warn = -1;
         static int msg_count_std_warn = 0;
-        if (data.itag[i] != last_tag_std_warn) {
-          last_tag_std_warn = data.itag[i];
+        if (data.segments[i].itag != last_tag_std_warn) {
+          last_tag_std_warn = data.segments[i].itag;
           msg_count_std_warn = 0;
         }
           if (msg_count_std_warn < 3) {
             pr_warn("tag=%d/seg=%d: length/radius ratio of %.1f < 8.0; standard thin-wire kernel field error exceeds 1%% (min=2.0, 1%%accurate=8.0)\n",
-              data.itag[i], i+1, delta_a);
+              data.segments[i].itag, i+1, delta_a);
             msg_count_std_warn++;
           }
           else if (msg_count_std_warn == 3) {
-            pr_warn("tag=%d: suppressing additional standard kernel ratio warnings\n", data.itag[i]);
+            pr_warn("tag=%d: suppressing additional standard kernel ratio warnings\n",
+                    data.segments[i].itag);
             msg_count_std_warn++;
           }
       }
@@ -1895,17 +1775,18 @@ verify_kernel_limits(void)
       if (delta_a < 0.5) {
         static int last_tag_ext_err = -1;
         static int msg_count_ext_err = 0;
-        if (data.itag[i] != last_tag_ext_err) {
-          last_tag_ext_err = data.itag[i];
+        if (data.segments[i].itag != last_tag_ext_err) {
+          last_tag_ext_err = data.segments[i].itag;
           msg_count_ext_err = 0;
         }
           if (msg_count_ext_err < 3) {
             pr_err("tag=%d/seg=%d: length/radius ratio of %.1f < 0.5; extended thin-wire kernel field error exceeds 1%% by a large margin (min=0.5, 1%%accurate=2.0)\n",
-              data.itag[i], i+1, delta_a);
+              data.segments[i].itag, i+1, delta_a);
             msg_count_ext_err++;
           }
           else if (msg_count_ext_err == 3) {
-            pr_err("tag=%d: suppressing additional extended kernel ratio errors\n", data.itag[i]);
+            pr_err("tag=%d: suppressing additional extended kernel ratio errors\n",
+                   data.segments[i].itag);
             msg_count_ext_err++;
           }
         retval = FALSE;
@@ -1913,17 +1794,18 @@ verify_kernel_limits(void)
       else if (delta_a < 2.0) {
         static int last_tag_ext_warn = -1;
         static int msg_count_ext_warn = 0;
-        if (data.itag[i] != last_tag_ext_warn) {
-          last_tag_ext_warn = data.itag[i];
+        if (data.segments[i].itag != last_tag_ext_warn) {
+          last_tag_ext_warn = data.segments[i].itag;
           msg_count_ext_warn = 0;
         }
           if (msg_count_ext_warn < 3) {
             pr_warn("tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; extended thin-wire kernel field error exceeds 1%% (min=0.5, 1%%accurate=2.0)\n",
-              data.itag[i], i+1, delta_a);
+              data.segments[i].itag, i+1, delta_a);
             msg_count_ext_warn++;
           }
           else if (msg_count_ext_warn == 3) {
-            pr_warn("tag=%d: suppressing additional extended kernel ratio warnings\n", data.itag[i]);
+            pr_warn("tag=%d: suppressing additional extended kernel ratio warnings\n",
+                    data.segments[i].itag);
             msg_count_ext_warn++;
           }
       }
@@ -1991,19 +1873,9 @@ wire( double xw1, double yw1, double zw1,
   data.mp= data.m;
   data.ipsym=0;
 
-  /* Reallocate tags buffer */
-  mreq = (size_t)data.n * sizeof(int);
-  mem_realloc( (void **)&data.itag, mreq, "in geometry.c" );
-
-  /* Reallocate wire buffers */
-  mreq = (size_t)data.n * sizeof(double);
-  mem_realloc( (void **)&data.x1, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.y1, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.z1, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.x2, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.y2, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.z2, mreq, "in geometry.c" );
-  mem_realloc( (void **)&data.bi, mreq, "in geometry.c" );
+  /* Reallocate wire segments */
+  mreq = (size_t)data.n * sizeof(wire_segment_t);
+  mem_realloc((void **)&data.segments, mreq, "in geometry.c");
 
   xd= xw2- xw1;
   yd= yw2- yw1;
@@ -2035,17 +1907,17 @@ wire( double xw1, double yw1, double zw1,
 
   for( i = ist; i < data.n; i++ )
   {
-    data.itag[i]= itg;
+    data.segments[i].itag = itg;
     xs2= xs1+ xd* delz;
     ys2= ys1+ yd* delz;
     zs2= zs1+ zd* delz;
-    data.x1[i]= xs1;
-    data.y1[i]= ys1;
-    data.z1[i]= zs1;
-    data.x2[i]= xs2;
-    data.y2[i]= ys2;
-    data.z2[i]= zs2;
-    data.bi[i]= radz;
+    data.segments[i].x1 = xs1;
+    data.segments[i].y1 = ys1;
+    data.segments[i].z1 = zs1;
+    data.segments[i].x2 = xs2;
+    data.segments[i].y2 = ys2;
+    data.segments[i].z2 = zs2;
+    data.segments[i].bi = radz;
     delz= delz* rd;
     radz= radz* rrad;
     xs1= xs2;
@@ -2053,9 +1925,9 @@ wire( double xw1, double yw1, double zw1,
     zs1= zs2;
   }
 
-  data.x2[data.n-1]= xw2;
-  data.y2[data.n-1]= yw2;
-  data.z2[data.n-1]= zw2;
+  data.segments[data.n - 1].x2 = xw2;
+  data.segments[data.n - 1].y2 = yw2;
+  data.segments[data.n - 1].z2 = zw2;
 
   return;
 }

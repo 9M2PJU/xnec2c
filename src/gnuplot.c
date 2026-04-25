@@ -237,19 +237,19 @@ Save_RadPattern_Gnuplot_Data( char *filename )
       /* Write e-field out to file [DJS] */
       for( idx = 0; idx < npts; idx++ )
       {
-        fscale = dr / nf->er[idx];
-        fx = nf->px[idx] + nf->erx[idx] * fscale;
-        fy = nf->py[idx] + nf->ery[idx] * fscale;
-        fz = nf->pz[idx] + nf->erz[idx] * fscale;
+        fscale = dr / nf->points[idx].er;
+        fx = nf->points[idx].px + nf->points[idx].erx * fscale;
+        fy = nf->points[idx].py + nf->points[idx].ery * fscale;
+        fz = nf->points[idx].pz + nf->points[idx].erz * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
-            nf->px[idx],
-            nf->py[idx],
-            nf->pz[idx],
-            fx - nf->px[idx],
-            fy - nf->py[idx],
-            fz - nf->pz[idx] );
+            nf->points[idx].px,
+            nf->points[idx].py,
+            nf->points[idx].pz,
+            fx - nf->points[idx].px,
+            fy - nf->points[idx].py,
+            fz - nf->points[idx].pz);
       }
     } /* if( isFlagSet(DRAW_EFIELD) */
 
@@ -260,19 +260,19 @@ Save_RadPattern_Gnuplot_Data( char *filename )
       /* Write h-field out to file [DJS] */
       for( idx = 0; idx < npts; idx++ )
       {
-        fscale = dr / nf->hr[idx];
-        fx = nf->px[idx] + nf->hrx[idx] * fscale;
-        fy = nf->py[idx] + nf->hry[idx] * fscale;
-        fz = nf->pz[idx] + nf->hrz[idx] * fscale;
+        fscale = dr / nf->points[idx].hr;
+        fx = nf->points[idx].px + nf->points[idx].hrx * fscale;
+        fy = nf->points[idx].py + nf->points[idx].hry * fscale;
+        fz = nf->points[idx].pz + nf->points[idx].hrz * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
-            nf->px[idx],
-            nf->py[idx],
-            nf->pz[idx],
-            fx - nf->px[idx],
-            fy - nf->py[idx],
-            fz - nf->pz[idx] );
+            nf->points[idx].px,
+            nf->points[idx].py,
+            nf->points[idx].pz,
+            fx - nf->points[idx].px,
+            fy - nf->points[idx].py,
+            fz - nf->points[idx].pz);
       }
     } /* if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) ) */
 
@@ -310,14 +310,14 @@ Save_RadPattern_Gnuplot_Data( char *filename )
         for( ipv = 0; ipv < npts; ipv++ )
         {
           pov_x[ipv] =
-            nf->ery[ipv] * nf->hrz[ipv] -
-            nf->hry[ipv] * nf->erz[ipv];
+            nf->points[ipv].ery * nf->points[ipv].hrz -
+            nf->points[ipv].hry * nf->points[ipv].erz;
           pov_y[ipv] =
-            nf->erz[ipv] * nf->hrx[ipv] -
-            nf->hrz[ipv] * nf->erx[ipv];
+            nf->points[ipv].erz * nf->points[ipv].hrx -
+            nf->points[ipv].hrz * nf->points[ipv].erx;
           pov_z[ipv] =
-            nf->erx[ipv] * nf->hry[ipv] -
-            nf->hrx[ipv] * nf->ery[ipv];
+            nf->points[ipv].erx * nf->points[ipv].hry -
+            nf->points[ipv].hrx * nf->points[ipv].ery;
           pov_r[ipv] = sqrt(
               pov_x[ipv] * pov_x[ipv] +
               pov_y[ipv] * pov_y[ipv] +
@@ -334,18 +334,18 @@ Save_RadPattern_Gnuplot_Data( char *filename )
         /* Scaled field values are used to set one end of a
          * line segment that represents direction of field.
          * The other end is set by the field point co-ordinates */
-        fx = nf->px[idx] + pov_x[idx] * fscale;
-        fy = nf->py[idx] + pov_y[idx] * fscale;
-        fz = nf->pz[idx] + pov_z[idx] * fscale;
+        fx = nf->points[idx].px + pov_x[idx] * fscale;
+        fy = nf->points[idx].py + pov_y[idx] * fscale;
+        fz = nf->points[idx].pz + pov_z[idx] * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
-            nf->px[idx],
-            nf->py[idx],
-            nf->pz[idx],
-            fx - nf->px[idx],
-            fy - nf->py[idx],
-            fz - nf->pz[idx] );
+            nf->points[idx].px,
+            nf->points[idx].py,
+            nf->points[idx].pz,
+            fx - nf->points[idx].px,
+            fy - nf->points[idx].py,
+            fz - nf->points[idx].pz);
       } /* for( idx = 0; idx < npts; idx++ ) */
 
     } /* if( isFlagSet(DRAW_POYNTING) ) */
@@ -520,8 +520,12 @@ Save_Struct_Gnuplot_Data( char *filename )
     for( idx = 0; idx < m2; idx++ )
     {
       fprintf( fp, "%10.3E %10.3E %10.3E\n%10.3E %10.3E %10.3E\n",
-          (double)data.px1[idx], (double)data.py1[idx], (double)data.pz1[idx],
-          (double)data.px2[idx], (double)data.py2[idx], (double)data.pz2[idx] );
+          (double) data.patch_lines[idx].px1,
+          (double) data.patch_lines[idx].py1,
+          (double) data.patch_lines[idx].pz1,
+          (double) data.patch_lines[idx].px2,
+          (double) data.patch_lines[idx].py2,
+          (double) data.patch_lines[idx].pz2);
 
       /* Two blank lines after each segment prevents gnuplot splot connecting non-adjacent points */
       fprintf( fp, "\n\n" );
@@ -540,20 +544,24 @@ Save_Struct_Gnuplot_Data( char *filename )
 
     /* Output first segment outside loop to enable separation of wires */
     fprintf( fp, "%10.3E %10.3E %10.3E\n%10.3E %10.3E %10.3E\n",
-        (double)data.x1[0], (double)data.y1[0], (double)data.z1[0],
-        (double)data.x2[0], (double)data.y2[0], (double)data.z2[0] );
+        (double) data.segments[0].x1, (double) data.segments[0].y1,
+        (double) data.segments[0].z1,
+        (double) data.segments[0].x2, (double) data.segments[0].y2,
+        (double) data.segments[0].z2);
 
     /* Start from second segment and check for connection of ends */
     for( idx = 1; idx < data.n; idx++ )
     {
       /* Leave a 2-line gap to next segment */
-      if( (data.icon1[idx] == 0) || (data.icon1[idx] == (idx+1)) )
+      if( (data.segments[idx].icon1 == 0) || (data.segments[idx].icon1 == (idx+1)) )
         fprintf( fp, "\n\n" );
       fprintf( fp, "%10.3E %10.3E %10.3E\n%10.3E %10.3E %10.3E\n",
-          (double)data.x1[idx], (double)data.y1[idx], (double)data.z1[idx],
-          (double)data.x2[idx], (double)data.y2[idx], (double)data.z2[idx] );
+          (double) data.segments[idx].x1, (double) data.segments[idx].y1,
+          (double) data.segments[idx].z1,
+          (double) data.segments[idx].x2, (double) data.segments[idx].y2,
+          (double) data.segments[idx].z2);
       /* Leave a 2-line gap to next segment */
-      if( (data.icon2[idx] == 0) || (data.icon2[idx] == (idx+1)) )
+      if( (data.segments[idx].icon2 == 0) || (data.segments[idx].icon2 == (idx+1)) )
         fprintf( fp, "\n\n" );
 
     } /* for( idx = 1; idx < data.n; idx++ ) */
@@ -603,7 +611,7 @@ void Save_Currents_CSV(char *filename)
 			"%.17g,%.17g,%.17g,"  // Charge (C)
 			"%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n",
 			calc_data.freq_mhz,
-			idx+1, data.itag[idx],
+			idx+1, data.segments[idx].itag,
 
 			// Currents
 			creal(cf->cur[idx]) * wavelength,
@@ -616,8 +624,10 @@ void Save_Currents_CSV(char *filename)
 			cabs(cmplx(cf->bir[idx], cf->bii[idx])) * charge_scale,
 
 			// Segment endpoints
-			data.x1[idx], data.y1[idx], data.z1[idx],
-			data.x2[idx], data.y2[idx], data.z2[idx]);
+			data.segments[idx].x1, data.segments[idx].y1,
+			data.segments[idx].z1,
+			data.segments[idx].x2, data.segments[idx].y2,
+			data.segments[idx].z2);
 	}
 
 	setlocale(LC_NUMERIC, orig_numeric_locale);
@@ -675,12 +685,12 @@ void Save_Patch_Currents_CSV(char *filename)
 		cz = cf->cur[j + 2];
 
 		/* Project current onto t1 and t2 tangent vectors */
-		ct1 = cx * (double)data.t1x[idx] +
-		      cy * (double)data.t1y[idx] +
-		      cz * (double)data.t1z[idx];
-		ct2 = cx * (double)data.t2x[idx] +
-		      cy * (double)data.t2y[idx] +
-		      cz * (double)data.t2z[idx];
+		ct1 = cx * (double) data.patches[idx].t1x +
+		      cy * (double) data.patches[idx].t1y +
+		      cz * (double) data.patches[idx].t1z;
+		ct2 = cx * (double) data.patches[idx].t2x +
+		      cy * (double) data.patches[idx].t2y +
+		      cz * (double) data.patches[idx].t2z;
 
 		fprintf(fp, "%.6f,%d,%.17g,"
 			"%.17g,%.17g,%.17g,"
@@ -688,10 +698,10 @@ void Save_Patch_Currents_CSV(char *filename)
 			"%.17g,%.17g\n",
 			calc_data.freq_mhz,
 			idx + 1,
-			(double)data.pbi[idx],
-			(double)data.px[idx],
-			(double)data.py[idx],
-			(double)data.pz[idx],
+			(double) data.patches[idx].pbi,
+			(double) data.patches[idx].px,
+			(double) data.patches[idx].py,
+			(double) data.patches[idx].pz,
 			creal(cx), cimag(cx),
 			creal(cy), cimag(cy),
 			creal(cz), cimag(cz),

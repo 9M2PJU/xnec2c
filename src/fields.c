@@ -1206,18 +1206,18 @@ nefld( double xob, double yob,
   {
     for( i = 0; i < data.n; i++ )
     {
-      dataj.xj= xob- data.x[i];
-      dataj.yj= yob- data.y[i];
-      dataj.zj= zob- data.z[i];
-      zp= data.cab[i]* dataj.xj+ data.sab[i] *
-        dataj.yj+ data.salp[i]* dataj.zj;
+      dataj.xj= xob- data.segments[i].x;
+      dataj.yj= yob- data.segments[i].y;
+      dataj.zj= zob- data.segments[i].z;
+      zp= data.segments[i].cab * dataj.xj+ data.segments[i].sab *
+        dataj.yj+ data.segments[i].salp * dataj.zj;
 
-      if( fabs( zp) > 0.5001* data.si[i])
+      if( fabs( zp) > 0.5001* data.segments[i].si)
         continue;
 
       zp= dataj.xj* dataj.xj+ dataj.yj* dataj.yj +
         dataj.zj* dataj.zj- zp* zp;
-      dataj.xj= data.bi[i];
+      dataj.xj= data.segments[i].bi;
 
       if( zp > 0.9* dataj.xj* dataj.xj)
         continue;
@@ -1230,18 +1230,18 @@ nefld( double xob, double yob,
     for( i = 0; i < data.n; i++ )
     {
       ix = i+1;
-      dataj.s= data.si[i];
-      dataj.b= data.bi[i];
-      dataj.xj= data.x[i];
-      dataj.yj= data.y[i];
-      dataj.zj= data.z[i];
-      dataj.cabj= data.cab[i];
-      dataj.sabj= data.sab[i];
-      dataj.salpj= data.salp[i];
+      dataj.s= data.segments[i].si;
+      dataj.b= data.segments[i].bi;
+      dataj.xj= data.segments[i].x;
+      dataj.yj= data.segments[i].y;
+      dataj.zj= data.segments[i].z;
+      dataj.cabj= data.segments[i].cab;
+      dataj.sabj= data.segments[i].sab;
+      dataj.salpj= data.segments[i].salp;
 
       if( dataj.iexk != 0)
       {
-        ipr= data.icon1[i];
+        ipr= data.segments[i].icon1;
 
         if (ipr > PCHCON) dataj.ind1 = 2;
         else if( ipr < 0 )
@@ -1249,14 +1249,14 @@ nefld( double xob, double yob,
           ipr = -ipr;
           iprx = ipr-1;
 
-          if( -data.icon1[iprx] != ix )
+          if( -data.segments[iprx].icon1 != ix )
             dataj.ind1=2;
           else
           {
-            xi= fabs( dataj.cabj* data.cab[iprx]+ dataj.sabj*
-                data.sab[iprx]+ dataj.salpj* data.salp[iprx]);
+            xi= fabs( dataj.cabj* data.segments[iprx].cab + dataj.sabj*
+                     data.segments[iprx].sab + dataj.salpj* data.segments[iprx].salp);
             if( (xi < 0.999999) ||
-                (fabs(data.bi[iprx]/dataj.b-1.0) > 1.0e-6) )
+                (fabs(data.segments[iprx].bi/dataj.b-1.0) > 1.0e-6) )
               dataj.ind1=2;
             else
               dataj.ind1=0;
@@ -1270,14 +1270,14 @@ nefld( double xob, double yob,
 
           if( ipr != ix )
           {
-            if( data.icon2[iprx] != ix )
+            if(data.segments[iprx].icon2 != ix )
               dataj.ind1=2;
             else
             {
-              xi= fabs( dataj.cabj* data.cab[iprx]+ dataj.sabj*
-                  data.sab[iprx]+ dataj.salpj* data.salp[iprx]);
+              xi= fabs( dataj.cabj* data.segments[iprx].cab + dataj.sabj*
+                       data.segments[iprx].sab + dataj.salpj* data.segments[iprx].salp);
               if( (xi < 0.999999) ||
-                  (fabs(data.bi[iprx]/dataj.b-1.0) > 1.0e-6) )
+                  (fabs(data.segments[iprx].bi/dataj.b-1.0) > 1.0e-6) )
                 dataj.ind1=2;
               else
                 dataj.ind1=0;
@@ -1293,7 +1293,7 @@ nefld( double xob, double yob,
           }
         } /* else */
 
-        ipr= data.icon2[i];
+        ipr= data.segments[i].icon2;
 
         if (ipr > PCHCON) dataj.ind2 = 2;
         else if( ipr < 0 )
@@ -1301,14 +1301,14 @@ nefld( double xob, double yob,
           ipr = -ipr;
           iprx = ipr-1;
 
-          if( -data.icon2[iprx] != ix )
+          if( -data.segments[iprx].icon2 != ix )
             dataj.ind1=2;
           else
           {
-            xi= fabs( dataj.cabj* data.cab[iprx]+ dataj.sabj*
-                data.sab[iprx]+ dataj.salpj* data.salp[iprx]);
+            xi= fabs( dataj.cabj* data.segments[iprx].cab + dataj.sabj*
+                     data.segments[iprx].sab + dataj.salpj* data.segments[iprx].salp);
             if( (xi < 0.999999) ||
-                (fabs(data.bi[iprx]/dataj.b-1.0) > 1.0e-6) )
+                (fabs(data.segments[iprx].bi/dataj.b-1.0) > 1.0e-6) )
               dataj.ind1=2;
             else
               dataj.ind1=0;
@@ -1322,14 +1322,14 @@ nefld( double xob, double yob,
 
           if( ipr != ix )
           {
-            if( data.icon1[iprx] != ix )
+            if(data.segments[iprx].icon1 != ix )
               dataj.ind2=2;
             else
             {
-              xi= fabs( dataj.cabj* data.cab[iprx]+ dataj.sabj*
-                  data.sab[iprx]+ dataj.salpj* data.salp[iprx]);
+              xi= fabs( dataj.cabj* data.segments[iprx].cab + dataj.sabj*
+                       data.segments[iprx].sab + dataj.salpj* data.segments[iprx].salp);
               if( (xi < 0.999999) ||
-                  (fabs(data.bi[iprx]/dataj.b-1.0) > 1.0e-6) )
+                  (fabs(data.segments[iprx].bi/dataj.b-1.0) > 1.0e-6) )
                 dataj.ind2=2;
               else
                 dataj.ind2=0;
@@ -1366,16 +1366,16 @@ nefld( double xob, double yob,
   jc= data.n-1;
   for( i = 0; i < data.m; i++ )
   {
-    dataj.s= data.pbi[i];
-    dataj.xj= data.px[i];
-    dataj.yj= data.py[i];
-    dataj.zj= data.pz[i];
-    dataj.t1xj= data.t1x[i];
-    dataj.t1yj= data.t1y[i];
-    dataj.t1zj= data.t1z[i];
-    dataj.t2xj= data.t2x[i];
-    dataj.t2yj= data.t2y[i];
-    dataj.t2zj= data.t2z[i];
+    dataj.s= data.patches[i].pbi;
+    dataj.xj= data.patches[i].px;
+    dataj.yj= data.patches[i].py;
+    dataj.zj= data.patches[i].pz;
+    dataj.t1xj= data.patches[i].t1x;
+    dataj.t1yj= data.patches[i].t1y;
+    dataj.t1zj= data.patches[i].t1z;
+    dataj.t2xj= data.patches[i].t2x;
+    dataj.t2yj= data.patches[i].t2y;
+    dataj.t2zj= data.patches[i].t2z;
     jc += 3;
     acx= dataj.t1xj* crnt.cur[jc-2]+ dataj.t1yj *
       crnt.cur[jc-1]+ dataj.t1zj* crnt.cur[jc];
@@ -1419,18 +1419,18 @@ nhfld( double xob, double yob,
   {
     for( i = 0; i < data.n; i++ )
     {
-      dataj.xj= xob- data.x[i];
-      dataj.yj= yob- data.y[i];
-      dataj.zj= zob- data.z[i];
-      zp= data.cab[i]* dataj.xj+ data.sab[i] *
-        dataj.yj+ data.salp[i]* dataj.zj;
+      dataj.xj= xob- data.segments[i].x;
+      dataj.yj= yob- data.segments[i].y;
+      dataj.zj= zob- data.segments[i].z;
+      zp= data.segments[i].cab * dataj.xj+ data.segments[i].sab *
+        dataj.yj+ data.segments[i].salp * dataj.zj;
 
-      if( fabs( zp) > 0.5001* data.si[i])
+      if( fabs( zp) > 0.5001* data.segments[i].si)
         continue;
 
       zp= dataj.xj* dataj.xj+ dataj.yj* dataj.yj +
         dataj.zj* dataj.zj- zp* zp;
-      dataj.xj= data.bi[i];
+      dataj.xj= data.segments[i].bi;
 
       if( zp > 0.9* dataj.xj* dataj.xj)
         continue;
@@ -1441,14 +1441,14 @@ nhfld( double xob, double yob,
 
     for( i = 0; i < data.n; i++ )
     {
-      dataj.s= data.si[i];
-      dataj.b= data.bi[i];
-      dataj.xj= data.x[i];
-      dataj.yj= data.y[i];
-      dataj.zj= data.z[i];
-      dataj.cabj= data.cab[i];
-      dataj.sabj= data.sab[i];
-      dataj.salpj= data.salp[i];
+      dataj.s= data.segments[i].si;
+      dataj.b= data.segments[i].bi;
+      dataj.xj= data.segments[i].x;
+      dataj.yj= data.segments[i].y;
+      dataj.zj= data.segments[i].z;
+      dataj.cabj= data.segments[i].cab;
+      dataj.sabj= data.segments[i].sab;
+      dataj.salpj= data.segments[i].salp;
       hsfld( xob, yob, zob, ax);
       acx= cmplx( crnt.air[i], crnt.aii[i]);
       bcx= cmplx( crnt.bir[i], crnt.bii[i]);
@@ -1466,16 +1466,16 @@ nhfld( double xob, double yob,
   jc= data.n-1;
   for( i = 0; i < data.m; i++ )
   {
-    dataj.s= data.pbi[i];
-    dataj.xj= data.px[i];
-    dataj.yj= data.py[i];
-    dataj.zj= data.pz[i];
-    dataj.t1xj= data.t1x[i];
-    dataj.t1yj= data.t1y[i];
-    dataj.t1zj= data.t1z[i];
-    dataj.t2xj= data.t2x[i];
-    dataj.t2yj= data.t2y[i];
-    dataj.t2zj= data.t2z[i];
+    dataj.s= data.patches[i].pbi;
+    dataj.xj= data.patches[i].px;
+    dataj.yj= data.patches[i].py;
+    dataj.zj= data.patches[i].pz;
+    dataj.t1xj= data.patches[i].t1x;
+    dataj.t1yj= data.patches[i].t1y;
+    dataj.t1zj= data.patches[i].t1z;
+    dataj.t2xj= data.patches[i].t2x;
+    dataj.t2yj= data.patches[i].t2y;
+    dataj.t2zj= data.patches[i].t2z;
     hintg( xob, yob, zob);
     jc += 3;
     acx= dataj.t1xj* crnt.cur[jc-2]+ dataj.t1yj *
@@ -1554,18 +1554,20 @@ Near_Field_Total(
     if( nfeh == 1 ) /* Magnetic field */
     {
       Nf_Peak_Vector( exm, eym, ezm, fx, fy, fz,
-                      &near_field.hrx[idx], &near_field.hry[idx],
-                      &near_field.hrz[idx], &near_field.hr[idx] );
-      if( near_field.max_hr < near_field.hr[idx] )
-        near_field.max_hr = near_field.hr[idx];
+                      &near_field.points[idx].hrx,
+                      &near_field.points[idx].hry,
+                      &near_field.points[idx].hrz, &near_field.points[idx].hr);
+      if( near_field.max_hr < near_field.points[idx].hr)
+        near_field.max_hr = near_field.points[idx].hr;
     }
     else /* Electric field */
     {
       Nf_Peak_Vector( exm, eym, ezm, fx, fy, fz,
-                      &near_field.erx[idx], &near_field.ery[idx],
-                      &near_field.erz[idx], &near_field.er[idx] );
-      if( near_field.max_er < near_field.er[idx] )
-        near_field.max_er = near_field.er[idx];
+                      &near_field.points[idx].erx,
+                      &near_field.points[idx].ery,
+                      &near_field.points[idx].erz, &near_field.points[idx].er);
+      if( near_field.max_er < near_field.points[idx].er)
+        near_field.max_er = near_field.points[idx].er;
     }
   }
 
@@ -1644,15 +1646,14 @@ nfpat( int nfeh )
         Near_Field_Total( ex, ey, ez, nfeh, idx );
 
         /* Save field point co-ordinates */
-        near_field.px[idx] = (double)xob;
-        near_field.py[idx] = (double)yob;
-        near_field.pz[idx] = (double)zob;
+        near_field.points[idx].px = (double)xob;
+        near_field.points[idx].py = (double)yob;
+        near_field.points[idx].pz = (double)zob;
 
         /* Find max distance from xyz origin */
-        r = sqrt(
-            near_field.px[idx] * near_field.px[idx] +
-            near_field.py[idx] * near_field.py[idx] +
-            near_field.pz[idx] * near_field.pz[idx] );
+        r = sqrt(near_field.points[idx].px * near_field.points[idx].px +
+                 near_field.points[idx].py * near_field.points[idx].py +
+                 near_field.points[idx].pz * near_field.points[idx].pz);
         if( near_field.r_max < r )
           near_field.r_max = r;
 
@@ -1665,21 +1666,21 @@ nfpat( int nfeh )
 
         if( nfeh == 1 ) /* Magnetic field */
         {
-          near_field.hx[idx]  = (double)tmp1;
-          near_field.hy[idx]  = (double)tmp3;
-          near_field.hz[idx]  = (double)tmp5;
-          near_field.fhx[idx] = (double)(tmp2 * TORAD);
-          near_field.fhy[idx] = (double)(tmp4 * TORAD);
-          near_field.fhz[idx] = (double)(tmp6 * TORAD);
+          near_field.points[idx].hx  = (double)tmp1;
+          near_field.points[idx].hy  = (double)tmp3;
+          near_field.points[idx].hz  = (double)tmp5;
+          near_field.points[idx].fhx = (double)(tmp2 * TORAD);
+          near_field.points[idx].fhy = (double)(tmp4 * TORAD);
+          near_field.points[idx].fhz = (double)(tmp6 * TORAD);
         }
         else /* Electric field */
         {
-          near_field.ex[idx]  = (double)tmp1;
-          near_field.ey[idx]  = (double)tmp3;
-          near_field.ez[idx]  = (double)tmp5;
-          near_field.fex[idx] = (double)(tmp2 * TORAD);
-          near_field.fey[idx] = (double)(tmp4 * TORAD);
-          near_field.fez[idx] = (double)(tmp6 * TORAD);
+          near_field.points[idx].ex  = (double)tmp1;
+          near_field.points[idx].ey  = (double)tmp3;
+          near_field.points[idx].ez  = (double)tmp5;
+          near_field.points[idx].fex = (double)(tmp2 * TORAD);
+          near_field.points[idx].fey = (double)(tmp4 * TORAD);
+          near_field.points[idx].fez = (double)(tmp6 * TORAD);
         }
 
         idx++;
