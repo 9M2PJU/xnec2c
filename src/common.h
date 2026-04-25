@@ -165,7 +165,6 @@ typedef struct Segment
 #define PLOT_QUIT           0x0000000000100000ll
 #define PLOT_SMITH          0x0000000000200000ll
 #define PLOT_ANT_TEMP       0x0100000000000000ll
-#define PLOT_FLAGS          0x01400000003FFC00ll
 
 /* Radiation Pattern Control flags */
 #define DRAW_GAIN           0x0000000000400000ll
@@ -181,7 +180,18 @@ typedef struct Segment
 #define NEAREH_ANIMATE      0x0000000200000000ll
 #define ENABLE_RDPAT        0x0000000400000000ll
 #define ENABLE_NEAREH       0x0000000800000000ll
-#define DRAW_FLAGS          0x00000003FFC00000ll
+#define DRAW_FLAGS ( \
+  DRAW_GAIN         | \
+  DRAW_EFIELD       | \
+  DRAW_HFIELD       | \
+  DRAW_EHFIELD      | \
+  DRAW_POYNTING     | \
+  DRAW_ENABLED      | \
+  DRAW_QUIT         | \
+  DRAW_NEW_RDPAT    | \
+  DRAW_NEW_EHFIELD  | \
+  OVERLAY_STRUCT    | \
+  NEAREH_ANIMATE )
 
 /*** Filechooser response related flags ***/
 #define NEC2_EDIT_SAVE      0x0000001000000000ll /* Save NEC2 editor data to a file */
@@ -192,7 +202,15 @@ typedef struct Segment
 #define STRUCT_GNUPLOT_SAVE 0x0000020000000000ll /* Save structure as gnuplot data */
 #define OPEN_INPUT          0x0000040000000000ll /* Open a NEC2 input file flag */
 #define OPEN_NEW_NEC2       0x0000080000000000ll /* Open a new NEC2 project flag */
-#define ALL_CHOOSER_FLAGS   0x00000FF000000000ll
+#define ALL_CHOOSER_FLAGS ( \
+  NEC2_EDIT_SAVE      | \
+  NEC2_SAVE           | \
+  IMAGE_SAVE          | \
+  RDPAT_GNUPLOT_SAVE  | \
+  PLOTS_GNUPLOT_SAVE  | \
+  STRUCT_GNUPLOT_SAVE | \
+  OPEN_INPUT          | \
+  OPEN_NEW_NEC2 )
 
 /* Other flags */
 #define ERROR_CONDX         0x0000100000000000ll
