@@ -970,6 +970,10 @@ Read_Commands( void )
     netcx.neq2 = 0;
   }
 
+  /* Card-presence flags: cleared here so Read_Commands is the single
+   * owner; each card handler below re-sets when the card is parsed. */
+  ClearFlag( ENABLE_RDPAT | ENABLE_NEAREH | ENABLE_EXCITN );
+
   /* default values for input parameters and flags */
   calc_data.rkh = 1.0;
   calc_data.iexk = 0;

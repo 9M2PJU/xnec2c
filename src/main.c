@@ -618,7 +618,6 @@ Open_Input_File( gpointer arg )
    * make any synchronous GTK calls which would hang waiting for
    * this Open_Input_File() to return, but Open_Input_File() would be
    * waiting for Stop_Frequency_Loop() and deadlock. */
-  ClearFlag( OPEN_INPUT_FLAGS );
   SetFlag( INPUT_PENDING );
 
   /* Invalidate freq loop preconditions before Stop_Frequency_Loop so that
@@ -636,6 +635,8 @@ Open_Input_File( gpointer arg )
    * leaking pth_freq_loop and floop_state.  Stop_Frequency_Loop is
    * idempotent — it checks pth_freq_loop internally and no-ops safely. */
   Stop_Frequency_Loop();
+
+  ClearFlag( INPUT_OPENED );
 
   /* Close open files if any */
   Close_File( &input_fp );

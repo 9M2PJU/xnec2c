@@ -27,12 +27,5 @@
 #include "nec2_model.h"
 #include <sys/wait.h>
 
-#define OPEN_INPUT_FLAGS \
-  RDPAT_FLAGS       | \
-  FREQ_LOOP_FLAGS   | \
-  PLOT_FREQ_LINE    | \
-  ENABLE_EXCITN     | \
-  INPUT_OPENED
-
 #endif
 

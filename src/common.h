@@ -184,7 +184,6 @@ typedef struct Segment
 #define ENABLE_RDPAT        0x0000000400000000ll
 #define ENABLE_NEAREH       0x0000000800000000ll
 #define DRAW_FLAGS          0x00000003FFC00000ll
-#define RDPAT_FLAGS         0x0000000C00000000ll
 
 /*** Filechooser response related flags ***/
 #define NEC2_EDIT_SAVE      0x0000001000000000ll /* Save NEC2 editor data to a file */
