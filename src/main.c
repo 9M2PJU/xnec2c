@@ -885,11 +885,16 @@ Open_Input_File( gpointer arg )
   opengl_structure_invalidate();
 #endif
 
-  /* Redraw structure with updated geometry regardless of overlay state */
-  xnec2_widget_queue_draw( structure_drawingarea, TRUE );
+  /* Redraw structure with updated geometry regardless of overlay state.
+   * During optimization freq_step_update_ui_idle_force handles post-
+   * completion draws, so suppress here. */
+  if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
+  {
+    xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 #ifdef HAVE_OPENGL
-  opengl_structure_queue_draw();
+    opengl_structure_queue_draw();
 #endif
+  }
 
   /* Close symbol overrides window if no symbols defined */
   sy_overrides_close_if_empty();
