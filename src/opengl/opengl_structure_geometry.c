@@ -958,7 +958,8 @@ opengl_structure_update_shared_geometry(void)
   if( current_mode != structure_last_mode ||
       batch_count == 0 ||
       cylinder_radius_scale != structure_last_radius_scale ||
-      (is_current_mode && (calc_data.freq_step != last_fstep || extra_slot_changed)) )
+      (is_current_mode && CRNT_FSTEP_AVAILABLE(calc_data.freq_step) &&
+       (calc_data.freq_step != last_fstep || extra_slot_changed)) )
   {
     structure_last_mode = current_mode;
     opengl_structure_generate_geometry(current_mode, cylinder_radius_scale);

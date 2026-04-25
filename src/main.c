@@ -864,20 +864,17 @@ Open_Input_File( gpointer arg )
   if( isFlagSet(DRAW_CHARGES) )
     Main_Charges_Togglebutton_Toggled( TRUE );
 
-  /* Invalidate cached OpenGL geometry so next render uses fresh data */
-#ifdef HAVE_OPENGL
-  opengl_structure_invalidate();
-#endif
-
   /* Redraw structure with updated geometry regardless of overlay state.
-   * During optimization freq_step_update_ui_idle_force handles post-
-   * completion draws, so suppress here. */
+   * During optimization freq_step_update_ui_idle_force handles both
+   * invalidation and draws after valid data is ready, so suppress here
+   * to prevent expose-driven rebuilds seeing freq_step=-1 (gray flash). */
   if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
-    xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 #ifdef HAVE_OPENGL
+    opengl_structure_invalidate();
     opengl_structure_queue_draw();
 #endif
+    xnec2_widget_queue_draw( structure_drawingarea, TRUE );
   }
 
   /* Close symbol overrides window if no symbols defined */

@@ -187,6 +187,14 @@ rdpattern_scene_generate(gl_view_content_t *out)
   /* Near-field selected but NE/NH cards absent or data not yet computed */
   if( isFlagSet(DRAW_EHFIELD) )
   {
+    /* During optimization, keep previous frame rather than flashing
+     * an empty scene while the freq loop is in flight. */
+    if( isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
+    {
+      g_rec_mutex_unlock(&freq_data_lock);
+      return( FALSE );
+    }
+
     rdpattern_init_empty_scene(out, zoom);
     if( isFlagClear(ENABLE_NEAREH) )
       out->status_message = "Near field requires NE or NH cards in the NEC file";
@@ -431,6 +439,14 @@ out_unlock:
    * empty scene with a diagnostic so the render loop proceeds to
    * glClear the framebuffer; returning FALSE would exit on_render()
    * before clearing and freeze the last valid frame on screen. */
+
+  /* During optimization, freeze previous frame to avoid flicker */
+  if( isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
+  {
+    g_rec_mutex_unlock(&freq_data_lock);
+    return( FALSE );
+  }
+
   rdpattern_init_empty_scene(out, zoom);
   if( isFlagClear(FREQ_LOOP_DONE) )
     out->status_message = "Press ▶ to start the frequency loop";
