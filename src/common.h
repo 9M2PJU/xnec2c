@@ -145,7 +145,6 @@ typedef struct Segment
 #define FREQ_LOOP_DONE      0x0000000000000002ll
 #define FREQ_LOOP_INIT      0x0000000000000004ll
 #define FREQ_LOOP_STOP      0x0000000000000008ll
-#define FREQ_LOOP_FLAGS     0x000000000000000Fll
 
 /* Main Window Control flags */
 #define DRAW_CURRENTS       0x0000000000000010ll
@@ -161,7 +160,6 @@ typedef struct Segment
 #define PLOT_GVIEWER        0x0000000000004000ll
 #define PLOT_NETGAIN        0x0000000000008000ll
 #define PLOT_GAIN_DIR       0x0000000000010000ll
-#define PLOT_FREQ_LINE      0x0000000000020000ll
 #define PLOT_SELECT         0x0000000000040000ll
 #define PLOT_ENABLED        0x0000000000080000ll
 #define PLOT_QUIT           0x0000000000100000ll

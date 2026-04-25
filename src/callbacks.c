@@ -243,7 +243,6 @@ on_new_activate(
   if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
     calc_data.fmhz_save = 0.0;
-    ClearFlag( PLOT_FREQ_LINE );
   }
 
   /* Prompt user to save NEC2 data */
@@ -279,7 +278,6 @@ on_open_input_activate(
   if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
     calc_data.fmhz_save = 0.0;
-    ClearFlag( PLOT_FREQ_LINE );
   }
 
   /* Prompt user to save NEC2 data */

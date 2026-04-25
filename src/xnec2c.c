@@ -1082,8 +1082,6 @@ fmhz_save_reset_if_stale(void)
     calc_data.fmhz_save, save.freq[best_step], best_vswr);
 
   calc_data.fmhz_save = save.freq[best_step];
-  SetFlag(PLOT_FREQ_LINE);
-
   /* Queue the full UI update on the GTK main thread via the single
    * point of truth for user-selected frequency changes. */
   g_idle_add_once((GSourceOnceFunc)fmhz_save_apply_idle, NULL);
@@ -1119,10 +1117,6 @@ freq_loop_finalize( freq_loop_state_t *state )
    * on the GTK main thread which handles all UI updates. */
   if( !fmhz_save_reset_if_stale() )
   {
-    /* Green line visible on frequency plot if its data was computed */
-    if( calc_data.fmhz_save > 0.0 && save.fstep[calc_data.steps_total] )
-      SetFlag( PLOT_FREQ_LINE );
-
     int display = freq_loop_display_step();
     if( display >= 0 )
       g_idle_add_once( (GSourceOnceFunc)freq_step_update_ui_idle_force,
