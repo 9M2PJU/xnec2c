@@ -490,12 +490,6 @@ main (int argc, char *argv[])
   main_window = create_main_window( &main_window_builder );
   gtk_window_set_title( GTK_WINDOW(main_window), PACKAGE_STRING );
 
-  gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_hbox1") );
-  gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_hbox2") );
-  gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_grid1") );
-  gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_view_menuitem") );
-  gtk_widget_hide( Builder_Get_Object(main_window_builder, "structure_frame") );
-  gtk_widget_hide( Builder_Get_Object(main_window_builder, "optimizer_output") );
   calc_data.zo = 50.0;
   calc_data.freq_loop_data = NULL;
 
@@ -636,8 +630,6 @@ Open_Input_File( gpointer arg )
    * idempotent — it checks pth_freq_loop internally and no-ops safely. */
   Stop_Frequency_Loop();
 
-  ClearFlag( INPUT_OPENED );
-
   /* Close open files if any */
   Close_File( &input_fp );
 
@@ -672,13 +664,6 @@ Open_Input_File( gpointer arg )
   g_rec_mutex_unlock(&freq_data_lock);
   if( !ok )
   {
-    /* Hide main control buttons etc */
-    gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_hbox1") );
-    gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_hbox2") );
-    gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_grid1") );
-    gtk_widget_hide( Builder_Get_Object(main_window_builder, "main_view_menuitem") );
-    gtk_widget_hide( Builder_Get_Object(main_window_builder, "structure_frame") );
-
     /* Close plot/rdpat windows if open */
     Gtk_Widget_Destroy( &rdpattern_window );
     Gtk_Widget_Destroy( &freqplots_window );
@@ -695,7 +680,6 @@ Open_Input_File( gpointer arg )
    * Open_Input_File to the GTK thread via g_idle_add; Stop_Frequency_Loop
    * at entry joins any compute thread before proceeding. */
 
-  SetFlag( INPUT_OPENED );
   gtk_widget_show( Builder_Get_Object(main_window_builder, "optimizer_output") );
 
   /* Ask child processes to read input file */

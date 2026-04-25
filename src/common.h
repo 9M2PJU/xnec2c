@@ -231,8 +231,6 @@ typedef struct Segment
 /* Block motion events till ready */
 #define BLOCK_MOTION_EV     0x0010000000000000ll
 
-/* Indicate that an input file is open */
-#define INPUT_OPENED        0x0020000000000000ll
 
 /* Signal start of xnec2c */
 #define XNEC2C_START        0x0040000000000000ll

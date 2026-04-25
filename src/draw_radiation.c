@@ -1096,12 +1096,9 @@ Set_Polarization( int pol )
   Set_Window_Labels();
 
   /* Show gain in direction of viewer */
-  if( isFlagSet(INPUT_OPENED) )
-  {
-    g_rec_mutex_lock(&freq_data_lock);
-    Show_Viewer_Gain( main_window_builder, "main_gain_entry", structure_view );
-    g_rec_mutex_unlock(&freq_data_lock);
-  }
+  g_rec_mutex_lock(&freq_data_lock);
+  Show_Viewer_Gain( main_window_builder, "main_gain_entry", structure_view );
+  g_rec_mutex_unlock(&freq_data_lock);
 
   /* Enable redraw of rad pattern */
   SetFlag( DRAW_NEW_RDPAT );

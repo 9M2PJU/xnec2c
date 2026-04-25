@@ -64,6 +64,24 @@ _Draw_Structure( cairo_t *cr )
   Process_Wire_Segments( structure_view );
   Process_Surface_Patches( structure_view );
   Draw_XYZ_Axes( cr, structure_view );
+
+  /* Prompt user to open a file when no geometry is loaded */
+  if( data.n == 0 && data.m == 0 )
+  {
+    const char *msg = "File ▸ Open to load an NEC file";
+    cairo_text_extents_t ext;
+
+    cairo_select_font_face( cr, "Sans",
+        CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL );
+    cairo_set_font_size( cr, 14.0 );
+    cairo_set_source_rgb( cr, 0.6, 0.6, 0.6 );
+    cairo_text_extents( cr, msg, &ext );
+    cairo_move_to( cr,
+        (structure_view->width  - ext.width)  / 2.0 - ext.x_bearing,
+        (structure_view->height - ext.height) / 2.0 - ext.y_bearing );
+    cairo_show_text( cr, msg );
+  }
+
   Draw_Surface_Patches( cr, structure_view, structure_segs+data.n, data.m );
   Draw_Wire_Segments( cr, structure_view, structure_segs, data.n );
 

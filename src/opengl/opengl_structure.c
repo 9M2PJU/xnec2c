@@ -227,6 +227,10 @@ structure_scene_generate(gl_view_content_t *out)
   out->show_gradient = FALSE;
   out->generation = geom->generation;
 
+  /* Prompt user to open a file when no geometry is loaded */
+  if( geom->batch_count == 0 )
+    out->status_message = "File ▸ Open to load an NEC file";
+
   g_rec_mutex_unlock(&freq_data_lock);
   return( TRUE );
 }

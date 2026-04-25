@@ -682,13 +682,6 @@ on_main_rdpattern_activate(
     else
       gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
 
-    if( isFlagClear(INPUT_OPENED) )
-    {
-      GtkWidget *box =
-        Builder_Get_Object( rdpattern_window_builder, "rdpattern_box" );
-      gtk_widget_hide( box );
-    }
-
     Main_Rdpattern_Activate( TRUE );
 
     /* Restore gain style */
@@ -857,13 +850,6 @@ on_main_freqplots_activate(
         widget = Builder_Get_Object(
             freqplots_window_builder, "freqplots_round_x_axis" );
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      }
-
-      if( isFlagClear(INPUT_OPENED) )
-      {
-        GtkWidget *box =
-          Builder_Get_Object( freqplots_window_builder, "freqplots_box" );
-        gtk_widget_hide( box );
       }
 
       if( (rc_config.main_loop_start || isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS)) && isFlagClear(FREQ_LOOP_DONE))
