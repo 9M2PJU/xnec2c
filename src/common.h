@@ -164,7 +164,7 @@ typedef struct Segment
 #define PLOT_ENABLED        0x0000000000080000ll
 #define PLOT_QUIT           0x0000000000100000ll
 #define PLOT_SMITH          0x0000000000200000ll
-#define PLOT_ANT_TEMP       0x0100000000000000ll
+#define PLOT_ANT_TEMP       0x0000000000020000ll
 
 /* Radiation Pattern Control flags */
 #define DRAW_GAIN           0x0000000000400000ll
