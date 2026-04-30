@@ -185,9 +185,6 @@ typedef struct {
 
 typedef ssize_t (*pipe_fn_t)(int, char *, ssize_t, gboolean);
 
-/* Scratch byte for DRAW_NEW_RDPAT flag serialization across pipe */
-static char rdpat_flag;
-
 static size_t size_npm_dbl(void)   { return (size_t)data.npm  * sizeof(double); }
 static size_t size_np3m_cdbl(void) { return (size_t)data.np3m * sizeof(complex double); }
 static size_t size_nphth_dbl(void) { return (size_t)(fpat.nph * fpat.nth) * sizeof(double); }
@@ -253,7 +250,6 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
     { rad_pattern[fstep].min_gain_idx, NULL,           NUM_POL * sizeof(int),    FREQ_COND_RDPAT  },
     { rad_pattern[fstep].sens,         size_nphth_int, 0,                        FREQ_COND_RDPAT  },
     { &rad_pattern[fstep].efficiency,  NULL,           sizeof(double),           FREQ_COND_RDPAT  },
-    { &rdpat_flag,                     NULL,           sizeof(char),             FREQ_COND_RDPAT  },
     /* Near field data */
     { near_field.points,               size_nf_points, 0,                        FREQ_COND_NEAREH },
     { &near_field.max_er,              NULL,           sizeof(double),           FREQ_COND_NEAR_E },
@@ -287,7 +283,6 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
   static void
 Pass_Freq_Data( void )
 {
-  rdpat_flag = isFlagSet(DRAW_NEW_RDPAT) ? 1 : 0;
   freq_fields_xfer(0, num_child_procs, Write_Pipe);
 
 } /* Pass_Freq_Data() */
@@ -455,7 +450,7 @@ Get_Freq_Data( int idx, int fstep )
   if (!freq_fields_xfer(fstep, idx, PRead_Pipe))
     return 0;
 
-  if (rdpat_flag)
+  if (isFlagSet(ENABLE_RDPAT))
     SetFlag(DRAW_NEW_RDPAT);
 
   return 1;
