@@ -167,30 +167,115 @@ Read_Pipe( int idx, char *str, ssize_t len, gboolean err )
 
 /*------------------------------------------------------------------------*/
 
-/* Mem_Copy()
- *
- * Copies between buffers using memcpy()
- */
-  static void
-Mem_Copy( char *buff, char *var, size_t cnt, gboolean wrt )
-{
-  static int idx;
+/* Transfer condition for frequency-domain pipe fields */
+enum freq_field_cond {
+  FREQ_COND_ALWAYS,
+  FREQ_COND_RDPAT,
+  FREQ_COND_NEAREH,
+  FREQ_COND_NEAR_E,
+  FREQ_COND_NEAR_H
+};
 
-  /* Clear idx to buffer */
-  if( !cnt )
+typedef struct {
+  void *ptr;
+  size_t (*get_size)(void);
+  size_t size;
+  int cond;
+} freq_field_t;
+
+typedef ssize_t (*pipe_fn_t)(int, char *, ssize_t, gboolean);
+
+/* Scratch byte for DRAW_NEW_RDPAT flag serialization across pipe */
+static char rdpat_flag;
+
+static size_t size_npm_dbl(void)   { return (size_t)data.npm  * sizeof(double); }
+static size_t size_np3m_cdbl(void) { return (size_t)data.np3m * sizeof(complex double); }
+static size_t size_nphth_dbl(void) { return (size_t)(fpat.nph * fpat.nth) * sizeof(double); }
+static size_t size_nphth_int(void) { return (size_t)(fpat.nph * fpat.nth) * sizeof(int); }
+static size_t size_nf_points(void) { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t); }
+
+/* freq_field_active()
+ *
+ * Returns TRUE if the given transfer condition is satisfied by
+ * the current flag state.
+ */
+static gboolean
+freq_field_active(int cond)
+{
+  switch (cond)
   {
-    idx = 0;
-    return;
+    case FREQ_COND_ALWAYS: return TRUE;
+    case FREQ_COND_RDPAT:  return isFlagSet(ENABLE_RDPAT);
+    case FREQ_COND_NEAREH: return isFlagSet(ENABLE_NEAREH);
+    case FREQ_COND_NEAR_E: return isFlagSet(ENABLE_NEAREH) && (fpat.nfeh & NEAR_EFIELD);
+    case FREQ_COND_NEAR_H: return isFlagSet(ENABLE_NEAREH) && (fpat.nfeh & NEAR_HFIELD);
+    default: abort();
+  }
+}
+
+/* freq_fields_xfer()
+ *
+ * Single schema for frequency-data pipe transfer.  Each field is piped
+ * directly via pipe_fn (Write_Pipe from child, PRead_Pipe from parent).
+ * Both parent and child parse the same NEC2 input file via Read_Commands(),
+ * so ENABLE_NEAREH and ENABLE_RDPAT are identical on both sides; the
+ * field table is therefore evaluated identically by both caller sites.
+ */
+static int
+freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
+{
+  /* Local (non-static) array; runtime pointer values go directly in initializers */
+  freq_field_t fields[] = {
+    /* Current and charge data */
+    { crnt.air,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
+    { crnt.aii,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
+    { crnt.bir,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
+    { crnt.bii,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
+    { crnt.cir,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
+    { crnt.cii,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
+    { crnt.cur,                        size_np3m_cdbl, 0,                        FREQ_COND_ALWAYS },
+    /* Impedance data (fstep=0 on child, fstep=N on parent) */
+    { &impedance_data.zreal[fstep],    NULL,           sizeof(double),           FREQ_COND_ALWAYS },
+    { &impedance_data.zimag[fstep],    NULL,           sizeof(double),           FREQ_COND_ALWAYS },
+    { &impedance_data.zmagn[fstep],    NULL,           sizeof(double),           FREQ_COND_ALWAYS },
+    { &impedance_data.zphase[fstep],   NULL,           sizeof(double),           FREQ_COND_ALWAYS },
+    /* Network data */
+    { &netcx.zped,                     NULL,           sizeof(complex double),   FREQ_COND_ALWAYS },
+    /* Radiation pattern data */
+    { rad_pattern[fstep].gtot,         size_nphth_dbl, 0,                        FREQ_COND_RDPAT  },
+    { rad_pattern[fstep].tilt,         size_nphth_dbl, 0,                        FREQ_COND_RDPAT  },
+    { rad_pattern[fstep].axrt,         size_nphth_dbl, 0,                        FREQ_COND_RDPAT  },
+    { rad_pattern[fstep].max_gain,     NULL,           NUM_POL * sizeof(double), FREQ_COND_RDPAT  },
+    { rad_pattern[fstep].min_gain,     NULL,           NUM_POL * sizeof(double), FREQ_COND_RDPAT  },
+    { rad_pattern[fstep].max_gain_tht, NULL,           NUM_POL * sizeof(double), FREQ_COND_RDPAT  },
+    { rad_pattern[fstep].max_gain_phi, NULL,           NUM_POL * sizeof(double), FREQ_COND_RDPAT  },
+    { rad_pattern[fstep].max_gain_idx, NULL,           NUM_POL * sizeof(int),    FREQ_COND_RDPAT  },
+    { rad_pattern[fstep].min_gain_idx, NULL,           NUM_POL * sizeof(int),    FREQ_COND_RDPAT  },
+    { rad_pattern[fstep].sens,         size_nphth_int, 0,                        FREQ_COND_RDPAT  },
+    { &rad_pattern[fstep].efficiency,  NULL,           sizeof(double),           FREQ_COND_RDPAT  },
+    { &rdpat_flag,                     NULL,           sizeof(char),             FREQ_COND_RDPAT  },
+    /* Near field data */
+    { near_field.points,               size_nf_points, 0,                        FREQ_COND_NEAREH },
+    { &near_field.max_er,              NULL,           sizeof(double),           FREQ_COND_NEAR_E },
+    { &near_field.max_hr,              NULL,           sizeof(double),           FREQ_COND_NEAR_H },
+    { &near_field.r_max,               NULL,           sizeof(double),           FREQ_COND_NEAREH },
+  };
+
+  int nfields = (int)(sizeof(fields) / sizeof(fields[0]));
+
+  for (int i = 0; i < nfields; i++)
+  {
+    if (!freq_field_active(fields[i].cond))
+      continue;
+
+    size_t sz = fields[i].get_size ? fields[i].get_size() : fields[i].size;
+
+    if (pipe_fn(pipe_idx, fields[i].ptr, (ssize_t)sz, TRUE) < 0)
+      return 0;
   }
 
-  /* If child process writing data */
-  if( wrt )
-    memcpy( &buff[idx], var, cnt );
-  else /* Parent reading data */
-    memcpy( var, &buff[idx], cnt );
-  idx += (int)cnt;
-
-} /* Mem_Copy() */
+  return 1;
+}
 
 /*------------------------------------------------------------------------*/
 
@@ -202,139 +287,8 @@ Mem_Copy( char *buff, char *var, size_t cnt, gboolean wrt )
   static void
 Pass_Freq_Data( void )
 {
-  char *buff = NULL, flag;
-  size_t cnt, buff_size;
-
-  /*** Total of bytes to read/write thru pipe ***/
-  buff_size =
-    /* Current & charge data (a, b, c, ir & ii) */
-    (size_t)(6 * data.npm) * sizeof( double ) +
-    /* Complex current (crnt.cur) */
-    (size_t)data.np3m * sizeof( complex double ) +
-    /* Impedance data */
-    4 * sizeof(double) +
-    /* Network data */
-    sizeof(complex double);
-
-  /* Radiation pattern data if enabled */
-  if( isFlagSet(ENABLE_RDPAT) )
-  {
-    buff_size +=
-      /* Gain total, tilt, axial ratio */
-      (size_t)(3 * fpat.nph * fpat.nth) * sizeof(double) +
-      /* max & min gain, tht & phi angles */
-      (size_t)(4 * NUM_POL) * sizeof(double) +
-      /* max and min gain index */
-      (size_t)(2 * NUM_POL) * sizeof(int) +
-      /* Polarization sens */
-      (size_t)(fpat.nph * fpat.nth) * sizeof(int) +
-      /* Radiation efficiency */
-      sizeof(double) +
-      /* New pattern flag */
-      sizeof( char );
-  }
-
-  /* Near field data if NE/NH cards present in NEC file */
-  if( isFlagSet(ENABLE_NEAREH) )
-  {
-    /* Notify parent to read near field data */
-    Write_Pipe( num_child_procs, "nfeh", 4, TRUE );
-
-    /* Near field points array (all E/H/coordinate fields) */
-    buff_size +=
-      (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t) +
-      sizeof(double); /* r_max */
-    if( fpat.nfeh & NEAR_EFIELD )
-      buff_size += sizeof(double); /* max_er */
-    if( fpat.nfeh & NEAR_HFIELD )
-      buff_size += sizeof(double); /* max_hr */
-  }
-  else /* Notify parent not to read near field data */
-    Write_Pipe( num_child_procs, "noeh", 4, TRUE );
-
-  /* Allocate data buffers */
-  mem_alloc( (void **)&buff, buff_size, "in fork.c" );
-
-  /* Clear buffer index in this function */
-  Mem_Copy( buff, buff, 0, WRITE );
-
-  /* Pass on current and charge data */
-  cnt =  (size_t)data.npm * sizeof( double );
-  Mem_Copy( buff, (char *)crnt.air, cnt, WRITE );
-  Mem_Copy( buff, (char *)crnt.aii, cnt, WRITE );
-  Mem_Copy( buff, (char *)crnt.bir, cnt, WRITE );
-  Mem_Copy( buff, (char *)crnt.bii, cnt, WRITE );
-  Mem_Copy( buff, (char *)crnt.cir, cnt, WRITE );
-  Mem_Copy( buff, (char *)crnt.cii, cnt, WRITE );
-
-  cnt = (size_t)data.np3m * sizeof( complex double );
-  Mem_Copy( buff, (char *)crnt.cur, cnt, WRITE );
-
-  /* Impedance data */
-  cnt = sizeof(double);
-  Mem_Copy( buff, (char *)&impedance_data.zreal[0],  cnt, WRITE );
-  Mem_Copy( buff, (char *)&impedance_data.zimag[0],  cnt, WRITE );
-  Mem_Copy( buff, (char *)&impedance_data.zmagn[0],  cnt, WRITE );
-  Mem_Copy( buff, (char *)&impedance_data.zphase[0], cnt, WRITE );
-
-  /* Network data */
-  cnt = sizeof(complex double);
-  Mem_Copy( buff, (char *)&netcx.zped, cnt, WRITE );
-
-  /* Pass on radiation pattern data if enabled */
-  if( isFlagSet(ENABLE_RDPAT) )
-  {
-    cnt = (size_t)(fpat.nph * fpat.nth) * sizeof(double);
-    Mem_Copy( buff, (char *)rad_pattern[0].gtot, cnt, WRITE );
-    Mem_Copy( buff, (char *)rad_pattern[0].tilt, cnt, WRITE );
-    Mem_Copy( buff, (char *)rad_pattern[0].axrt, cnt, WRITE );
-
-    cnt = (size_t)NUM_POL * sizeof(double);
-    Mem_Copy( buff, (char *)rad_pattern[0].max_gain, cnt, WRITE );
-    Mem_Copy( buff, (char *)rad_pattern[0].min_gain, cnt, WRITE );
-    Mem_Copy( buff, (char *)rad_pattern[0].max_gain_tht, cnt, WRITE );
-    Mem_Copy( buff, (char *)rad_pattern[0].max_gain_phi, cnt, WRITE );
-
-    cnt = (size_t)NUM_POL * sizeof(int);
-    Mem_Copy( buff, (char *)rad_pattern[0].max_gain_idx, cnt, WRITE );
-    Mem_Copy( buff, (char *)rad_pattern[0].min_gain_idx, cnt, WRITE );
-
-    cnt = (size_t)(fpat.nph * fpat.nth) * sizeof(int);
-    Mem_Copy( buff, (char *)rad_pattern[0].sens, cnt, WRITE );
-
-    cnt = sizeof(double);
-    Mem_Copy( buff, (char *)&rad_pattern[0].efficiency, cnt, WRITE );
-
-    if( isFlagSet(DRAW_NEW_RDPAT) )
-      flag = 1;
-    else
-      flag = 0;
-    cnt = sizeof( char );
-    Mem_Copy( buff, &flag, cnt, WRITE );
-  }
-
-  /* Near field data */
-  if( isFlagSet(ENABLE_NEAREH) )
-  {
-    /* Near field points array (all E/H/coordinate fields) */
-    cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t);
-    Mem_Copy( buff, (char *)near_field.points, cnt, WRITE );
-
-    /* Scalar summary values */
-    cnt = sizeof(double);
-    if( fpat.nfeh & NEAR_EFIELD )
-      Mem_Copy( buff, (char *)&near_field.max_er, cnt, WRITE );
-    if( fpat.nfeh & NEAR_HFIELD )
-      Mem_Copy( buff, (char *)&near_field.max_hr, cnt, WRITE );
-    Mem_Copy( buff, (char *)&near_field.r_max, cnt, WRITE );
-
-
-  } /* if( isFlagSet(ENABLE_NEAREH) ) */
-
-  /* Pass data accumulated in buffer if child */
-  Write_Pipe( num_child_procs, buff, (ssize_t)buff_size, TRUE );
-
-  free_ptr( (void **)&buff );
+  rdpat_flag = isFlagSet(DRAW_NEW_RDPAT) ? 1 : 0;
+  freq_fields_xfer(0, num_child_procs, Write_Pipe);
 
 } /* Pass_Freq_Data() */
 
@@ -498,141 +452,11 @@ static ssize_t PRead_Pipe(int idx, char *str, ssize_t len, gboolean err)
   int
 Get_Freq_Data( int idx, int fstep )
 {
-  char *buff = NULL, flag;
-  char nfeh[5];
-  size_t cnt, buff_size;
+  if (!freq_fields_xfer(fstep, idx, PRead_Pipe))
+    return 0;
 
-  /*** Total of bytes to read/write thru pipe ***/
-  buff_size =
-    /* Current & charge data (a, b, c ir & ii) */
-    (size_t)(6 * data.npm) * sizeof( double ) +
-    /* Complex current (crnt.cur) */
-    (size_t)data.np3m * sizeof( complex double ) +
-    /* Impedance data */
-    4 * sizeof(double) +
-    /* Network data */
-    sizeof(complex double);
-
-  /* Radiation pattern data if enabled */
-  if( isFlagSet(ENABLE_RDPAT) )
-  {
-    buff_size +=
-      /* Gain total, tilt, axial ratio */
-      (size_t)(3 * fpat.nph * fpat.nth) * sizeof(double) +
-      /* max & min gain, tht & phi angles */
-      (size_t)(4 * NUM_POL) * sizeof(double) +
-      /* max and min gain index */
-      (size_t)(2 * NUM_POL) * sizeof(int) +
-      /* Polarization sens */
-      (size_t)(fpat.nph * fpat.nth) * sizeof(int) +
-      /* Radiation efficiency */
-      sizeof(double) +
-      /* New pattern flag */
-      sizeof( char );
-  }
-
-  /* Notification to read near field data */
-  if (PRead_Pipe( idx, nfeh, 4, TRUE ) < 0)
-	  return 0;
-
-  nfeh[4] = '\0';
-
-  /* Get near field data if enabled */
-  if( strcmp(nfeh, "nfeh") == 0 )
-  {
-    /* Near field points array (all E/H/coordinate fields) */
-    buff_size +=
-      (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t) +
-      sizeof(double); /* r_max */
-    if( fpat.nfeh & NEAR_EFIELD )
-      buff_size += sizeof(double); /* max_er */
-    if( fpat.nfeh & NEAR_HFIELD )
-      buff_size += sizeof(double); /* max_hr */
-  }
-
-  /* Allocate data buffer */
-  mem_alloc( (void **)&buff, buff_size, "in fork.c" );
-
-  /* Clear buffer index in Mem_Copy()Mem_Copy( */
-  Mem_Copy( NULL, NULL, 0, READ );
-
-  /* Get data accumulated in buffer if child */
-  if (PRead_Pipe( idx, buff, (ssize_t)buff_size, TRUE ) < 0)
-  {
-	  free_ptr((void **)&buff);
-	  return 0;
-  }
-
-  /* Get current and charge data */
-  cnt =  (size_t)data.npm * sizeof( double );
-  Mem_Copy( buff, (char *)crnt.air, cnt, READ );
-  Mem_Copy( buff, (char *)crnt.aii, cnt, READ );
-  Mem_Copy( buff, (char *)crnt.bir, cnt, READ );
-  Mem_Copy( buff, (char *)crnt.bii, cnt, READ );
-  Mem_Copy( buff, (char *)crnt.cir, cnt, READ );
-  Mem_Copy( buff, (char *)crnt.cii, cnt, READ );
-
-  cnt = (size_t)data.np3m * sizeof( complex double );
-  Mem_Copy( buff, (char *)crnt.cur, cnt, READ );
-
-  /* Get impedance data */
-  cnt = sizeof(double);
-  Mem_Copy( buff, (char *)&impedance_data.zreal[fstep],  cnt, READ );
-  Mem_Copy( buff, (char *)&impedance_data.zimag[fstep],  cnt, READ );
-  Mem_Copy( buff, (char *)&impedance_data.zmagn[fstep],  cnt, READ );
-  Mem_Copy( buff, (char *)&impedance_data.zphase[fstep], cnt, READ );
-
-  /* Get network data */
-  cnt = sizeof(complex double);
-  Mem_Copy( buff, (char *)&netcx.zped, cnt, READ );
-
-  /* Get radiation pattern data if enabled */
-  if( isFlagSet(ENABLE_RDPAT) )
-  {
-    cnt = (size_t)(fpat.nph * fpat.nth) * sizeof(double);
-    Mem_Copy( buff, (char *)rad_pattern[fstep].gtot, cnt, READ );
-    Mem_Copy( buff, (char *)rad_pattern[fstep].tilt, cnt, READ );
-    Mem_Copy( buff, (char *)rad_pattern[fstep].axrt, cnt, READ );
-
-    cnt = (size_t)NUM_POL * sizeof(double);
-    Mem_Copy( buff, (char *)rad_pattern[fstep].max_gain, cnt, READ );
-    Mem_Copy( buff, (char *)rad_pattern[fstep].min_gain, cnt, READ );
-    Mem_Copy( buff, (char *)rad_pattern[fstep].max_gain_tht, cnt, READ );
-    Mem_Copy( buff, (char *)rad_pattern[fstep].max_gain_phi, cnt, READ );
-
-    cnt = (size_t)NUM_POL * sizeof(int);
-    Mem_Copy( buff, (char *)rad_pattern[fstep].max_gain_idx, cnt, READ );
-    Mem_Copy( buff, (char *)rad_pattern[fstep].min_gain_idx, cnt, READ );
-
-    cnt = (size_t)(fpat.nph * fpat.nth) * sizeof(int);
-    Mem_Copy( buff, (char *)rad_pattern[fstep].sens, cnt, READ );
-
-    cnt = sizeof(double);
-    Mem_Copy( buff, (char *)&rad_pattern[fstep].efficiency, cnt, READ );
-
-    Mem_Copy( buff, &flag, sizeof(flag), READ );
-    if( flag ) SetFlag( DRAW_NEW_RDPAT );
-  }
-
-  /* Get near field data if signaled by child */
-  if( strcmp(nfeh, "nfeh") == 0 )
-  {
-    /* Near field points array (all E/H/coordinate fields) */
-    cnt = (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t);
-    Mem_Copy( buff, (char *)near_field.points, cnt, READ );
-
-    /* Scalar summary values */
-    cnt = sizeof(double);
-    if( fpat.nfeh & NEAR_EFIELD )
-      Mem_Copy( buff, (char *)&near_field.max_er, cnt, READ );
-    if( fpat.nfeh & NEAR_HFIELD )
-      Mem_Copy( buff, (char *)&near_field.max_hr, cnt, READ );
-    Mem_Copy( buff, (char *)&near_field.r_max, cnt, READ );
-
-
-  } /* if nfeh */
-
-  free_ptr( (void **)&buff );
+  if (rdpat_flag)
+    SetFlag(DRAW_NEW_RDPAT);
 
   return 1;
 } /* Get_Freq_Data() */
