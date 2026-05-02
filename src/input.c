@@ -44,6 +44,8 @@
 
 #include "input.h"
 #include "shared.h"
+#include "prerender/prerender_state.h"
+#include "prerender/prerender_aggregate.h"
 #include "geometry.h"
 #include "sy_overrides.h"
 #include "utils.h"
@@ -388,7 +390,6 @@ datagn( void )
   };
 
   int nwire, isct, itg, iy=0, iz;
-  size_t mreq;
   int ix, i, ns, gm_num; /* geometry card id as a number */
   double rad, xs1, xs2, ys1, ys2, zs1, zs2;
   double x3=0, y3=0, z3=0, x4=0, y4=0, z4=0;
@@ -1631,6 +1632,19 @@ Read_Commands( void )
       {
         Alloc_Nearfield_Buffers( fpat.nrx, fpat.nry, fpat.nrz );
         Alloc_Nearfield_Fstep_Buffers( calc_data.steps_total + 1 );
+      }
+      prerender_state_alloc( calc_data.steps_total + 1 );
+
+      /* nf_dr_norm reads fpat NF fields set by NE/NH cards above; both
+       * parent and child require it for Prerender_Near_Field. */
+      compute_nf_dr_norm();
+
+      /* Trig tables and edge topology are parent-only: the child has no
+       * consumer for trig tables or ff topology. */
+      if( !CHILD )
+      {
+        compute_trig_tables();
+        compute_ff_topology();
       }
       SetFlag( ENABLE_RDPAT );
     }

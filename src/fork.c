@@ -19,6 +19,9 @@
 
 #include "fork.h"
 #include "shared.h"
+#include "measurements.h"
+#include "prerender/prerender_color.h"
+#include "prerender/prerender_state.h"
 #include "mathlib.h"
 
 /*-----------------------------------------------------------------------*/
@@ -173,7 +176,8 @@ enum freq_field_cond {
   FREQ_COND_RDPAT,
   FREQ_COND_NEAREH,
   FREQ_COND_NEAR_E,
-  FREQ_COND_NEAR_H
+  FREQ_COND_NEAR_H,
+  FREQ_COND_NEAR_EH_BOTH
 };
 
 typedef struct {
@@ -185,11 +189,14 @@ typedef struct {
 
 typedef ssize_t (*pipe_fn_t)(int, char *, ssize_t, gboolean);
 
-static size_t size_npm_dbl(void)   { return (size_t)data.npm  * sizeof(double); }
-static size_t size_np3m_cdbl(void) { return (size_t)data.np3m * sizeof(complex double); }
-static size_t size_nphth_dbl(void) { return (size_t)(fpat.nph * fpat.nth) * sizeof(double); }
-static size_t size_nphth_int(void) { return (size_t)(fpat.nph * fpat.nth) * sizeof(int); }
-static size_t size_nf_points(void) { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t); }
+static size_t size_npm_dbl(void)        { return (size_t)data.npm  * sizeof(double); }
+static size_t size_np3m_cdbl(void)      { return (size_t)data.np3m * sizeof(complex double); }
+static size_t size_nphth_dbl(void)      { return (size_t)(fpat.nph * fpat.nth) * sizeof(double); }
+static size_t size_nphth_int(void)      { return (size_t)(fpat.nph * fpat.nth) * sizeof(int); }
+static size_t size_nf_points(void)      { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t); }
+static size_t size_nf_vectors(void)     { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(nf_vector_t); }
+static size_t size_seg_rgb(void)        { return (size_t)data.n  * sizeof(rgb_f_t); }
+static size_t size_patch_rgb(void)      { return (size_t)data.m  * sizeof(rgb_f_t); }
 
 /* freq_field_active()
  *
@@ -205,7 +212,8 @@ freq_field_active(int cond)
     case FREQ_COND_RDPAT:  return isFlagSet(ENABLE_RDPAT);
     case FREQ_COND_NEAREH: return isFlagSet(ENABLE_NEAREH);
     case FREQ_COND_NEAR_E: return isFlagSet(ENABLE_NEAREH) && (fpat.nfeh & NEAR_EFIELD);
-    case FREQ_COND_NEAR_H: return isFlagSet(ENABLE_NEAREH) && (fpat.nfeh & NEAR_HFIELD);
+    case FREQ_COND_NEAR_H:       return isFlagSet(ENABLE_NEAREH) && (fpat.nfeh & NEAR_HFIELD);
+    case FREQ_COND_NEAR_EH_BOTH: return isFlagSet(ENABLE_NEAREH) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD);
     default: abort();
   }
 }
@@ -250,11 +258,30 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
     { rad_pattern[fstep].min_gain_idx, NULL,           NUM_POL * sizeof(int),    FREQ_COND_RDPAT  },
     { rad_pattern[fstep].sens,         size_nphth_int, 0,                        FREQ_COND_RDPAT  },
     { &rad_pattern[fstep].efficiency,  NULL,           sizeof(double),           FREQ_COND_RDPAT  },
+    /* Per-fstep noise temperature table (allocated alongside rad_pattern[]) */
+    { &noise_temp[fstep],              NULL,              sizeof(noise_temp_t),  FREQ_COND_RDPAT  },
+    /* Per-fstep structure colors (current/charge RGB + cmin/cmax) */
+    { struct_colors[fstep].wire_crnt_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
+    { struct_colors[fstep].wire_chrg_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
+    { struct_colors[fstep].patch_crnt_rgb, size_patch_rgb, 0,                   FREQ_COND_ALWAYS },
+    { struct_colors[fstep].patch_t1_rgb,   size_patch_rgb, 0,                   FREQ_COND_ALWAYS },
+    { struct_colors[fstep].patch_t2_rgb,   size_patch_rgb, 0,                   FREQ_COND_ALWAYS },
+    { &struct_colors[fstep].wire_crnt_cmin, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
+    { &struct_colors[fstep].wire_crnt_cmax, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
+    { &struct_colors[fstep].wire_chrg_cmin, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
+    { &struct_colors[fstep].wire_chrg_cmax, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
+    { &struct_colors[fstep].patch_crnt_cmin, NULL,         sizeof(float),       FREQ_COND_ALWAYS },
+    { &struct_colors[fstep].patch_crnt_cmax, NULL,         sizeof(float),       FREQ_COND_ALWAYS },
     /* Near field data */
     { near_field.points,               size_nf_points, 0,                        FREQ_COND_NEAREH },
     { &near_field.max_er,              NULL,           sizeof(double),           FREQ_COND_NEAR_E },
     { &near_field.max_hr,              NULL,           sizeof(double),           FREQ_COND_NEAR_H },
     { &near_field.r_max,               NULL,           sizeof(double),           FREQ_COND_NEAREH },
+    /* Per-fstep near-field prerender vectors (allocated in Prerender_Near_Field) */
+    { &nf_pre[fstep].pov_max,          NULL,           sizeof(float),            FREQ_COND_NEAREH },
+    { nf_pre[fstep].e_vecs,            size_nf_vectors, 0,                       FREQ_COND_NEAR_E },
+    { nf_pre[fstep].h_vecs,            size_nf_vectors, 0,                       FREQ_COND_NEAR_H },
+    { nf_pre[fstep].pov_vecs,          size_nf_vectors, 0,                       FREQ_COND_NEAR_EH_BOTH },
   };
 
   int nfields = (int)(sizeof(fields) / sizeof(fields[0]));

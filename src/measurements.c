@@ -4,6 +4,8 @@
 #define clog10(z) (clog(z) / log(10))
 
 /* Interpolation method names for config and UI */
+noise_temp_t *noise_temp = NULL;
+
 const char *ant_temp_method_names[ANT_TEMP_METHOD_COUNT] = {
 	[ANT_TEMP_SNAP]     = "Snap",
 	[ANT_TEMP_INTERP]   = "Interpolate",
@@ -343,6 +345,90 @@ int ant_temp_resolve(double freq_mhz, int sky, int earth, int interp,
 	*t_earth = te;
 
 	return 0;
+}
+
+/**
+ * ant_temp_fill_fstep() - Fill per-fstep noise temperature table
+ * @fstep: frequency step index
+ *
+ * Iterates all (sky × method) and (earth × method) combinations via the
+ * static ant_temp_eval().  Custom model slots store sentinel -1.0; the
+ * parent substitutes rc_config.ant_temp_custom_t_* at display time.
+ * Called in the child process after NEC engine completes.
+ */
+  void
+ant_temp_fill_fstep(int fstep)
+{
+  int sky, earth, method;
+  double freq;
+
+  if( noise_temp == NULL || fstep < 0 )
+    return;
+
+  freq = save.freq[fstep];
+
+  for( sky = 0; sky < ANT_TEMP_SKY_COUNT; sky++ )
+  {
+    for( method = 0; method < ANT_TEMP_METHOD_COUNT; method++ )
+    {
+      if( sky == ANT_TEMP_SKY_CUSTOM )
+        noise_temp[fstep].t_sky[sky][method] = -1.0;
+      else
+        noise_temp[fstep].t_sky[sky][method] =
+          ant_temp_eval(&sky_models[sky], freq, method);
+    }
+  }
+
+  for( earth = 0; earth < ANT_TEMP_EARTH_COUNT; earth++ )
+  {
+    for( method = 0; method < ANT_TEMP_METHOD_COUNT; method++ )
+    {
+      if( earth == ANT_TEMP_EARTH_CUSTOM )
+        noise_temp[fstep].t_earth[earth][method] = -1.0;
+      else
+        noise_temp[fstep].t_earth[earth][method] =
+          ant_temp_eval(&earth_models[earth], freq, method);
+    }
+  }
+}
+
+/**
+ * noise_temp_resolve() - Resolve per-fstep noise temperatures from table
+ * @fstep:   frequency step index
+ * @t_sky:   output sky noise temperature (K); set to 0.0 when table not allocated
+ * @t_earth: output earth noise temperature (K); set to 0.0 when table not allocated
+ *
+ * Reads rc_config sky/earth model indices and interpolation method, looks
+ * up precomputed values in noise_temp[fstep], and substitutes
+ * rc_config.ant_temp_custom_t_* for sentinel -1.0 (custom model slots).
+ * Called only when IS_NOISE_MODE(rc_config.gain_style) is true.
+ */
+  void
+noise_temp_resolve(int fstep, double *t_sky, double *t_earth)
+{
+  *t_sky   = 0.0;
+  *t_earth = 0.0;
+
+  if( noise_temp == NULL )
+  {
+    static gboolean warned = FALSE;
+    if( !warned )
+    {
+      warned = TRUE;
+      pr_warn("noise_temp_resolve: noise_temp table not allocated; t_sky/t_earth defaulting to 0\n");
+    }
+    return;
+  }
+
+  int sky   = rc_config.ant_temp_sky;
+  int earth = rc_config.ant_temp_earth;
+  int meth  = rc_config.ant_temp_interp;
+
+  double ts = noise_temp[fstep].t_sky[sky][meth];
+  double te = noise_temp[fstep].t_earth[earth][meth];
+
+  *t_sky   = (ts < 0.0) ? rc_config.ant_temp_custom_t_sky   : ts;
+  *t_earth = (te < 0.0) ? rc_config.ant_temp_custom_t_earth : te;
 }
 
 // Ordering doesn't matter here because we use [] indexes,

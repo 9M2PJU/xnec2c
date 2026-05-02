@@ -19,6 +19,8 @@
 
 #include "draw_structure.h"
 #include "shared.h"
+#include "prerender/prerender_aggregate.h"
+#include "prerender/prerender_color.h"
 #include "opengl/opengl_structure.h"
 
 /*-----------------------------------------------------------------------*/
@@ -52,6 +54,9 @@ Draw_Structure_UI(void)
   void
 _Draw_Structure( cairo_t *cr )
 {
+  if( structure_view == NULL )
+    return;
+
   /* Clear drawingarea */
   cairo_set_source_rgb( cr, BLACK );
   cairo_rectangle(
@@ -112,31 +117,9 @@ New_Wire_Data( void )
   /* Abort if no wire data */
   if( data.n == 0 ) return;
 
-  double
-    r,     /* Distance of a point from XYZ origin */
-    r_max; /* Maximum value of above */
-
-  int idx;
-
-  /* Find segment end furthest from xyz axes origin */
-  r_max = 0.0;
-  for( idx = 0; idx < data.n; idx++ )
-  {
-    r = sqrt(
-        (double) data.segments[idx].x1 * (double) data.segments[idx].x1 +
-        (double) data.segments[idx].y1 * (double) data.segments[idx].y1 +
-        (double) data.segments[idx].z1 * (double) data.segments[idx].z1);
-    if( r > r_max )
-      r_max = r;
-
-    r = sqrt(
-        (double) data.segments[idx].x2 * (double) data.segments[idx].x2 +
-        (double) data.segments[idx].y2 * (double) data.segments[idx].y2 +
-        (double) data.segments[idx].z2 * (double) data.segments[idx].z2);
-    if( r > r_max )
-      r_max = r;
-
-  } /* for( idx = 0; idx < data.n; idx++ ) */
+  /* geom_pre.scene_radius: max endpoint distance over all wire segments
+   * and patch corners, computed at file load in Prerender_Aggregate(). */
+  double r_max = geom_pre.scene_radius;
 
   /* View extent and viewport only exist in the UI process; children
    * (created before structure_view) skip the readback harmlessly. */
@@ -663,6 +646,8 @@ Alloc_Crnt_Fstep_Buffers( int nfrq )
 
   }
 
+  alloc_struct_colors(nfrq);
+
 } /* Alloc_Crnt_Fstep_Buffers() */
 
 /*-----------------------------------------------------------------------*/
@@ -689,6 +674,7 @@ Free_Crnt_Fstep_Buffers( void )
   }
 
   free_ptr( (void **)&crnt_fstep );
+  free_struct_colors();
 
 } /* Free_Crnt_Fstep_Buffers() */
 
@@ -764,8 +750,11 @@ Init_Struct_Drawing( void )
   /* We need n segs for wires + 2m for patces */
   size_t mreq = (size_t)(data.n + 2*data.m) * sizeof(Segment_t);
   mem_realloc( (void **)&structure_segs, mreq, "in draw_structure.c" );
+  Prerender_Aggregate();
   New_Wire_Data();
   New_Patch_Data();
+  if( !CHILD )
+    init_geometry_colors();
 }
 
 /*-----------------------------------------------------------------------*/

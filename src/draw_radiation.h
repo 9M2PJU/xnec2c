@@ -21,14 +21,7 @@
 #define DRAW_RADIATION_H        1
 
 #include "common.h"
-
-/* Point in 3d xyz axes */
-typedef struct
-{
-  double
-    x, y, z, r;
-
-} point_3d_t;
+#include "prerender/prerender_state.h"
 
 /* Radiation pattern data accessor */
 typedef struct
@@ -49,6 +42,8 @@ void Draw_Color_Legend_Overlay(cairo_t *cr);
 
 void ant_temp_entry_set_kelvin(GtkWidget *entry, double kelvin);
 void ant_temp_entry_set_unresolved(GtkWidget *entry);
+
+double Scale_Gain(double gain, int fstep, int idx);
 
 #endif
 

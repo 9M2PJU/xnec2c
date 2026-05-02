@@ -1545,6 +1545,8 @@ void Cairo_Draw_Lines(cairo_t *cr, GdkPoint *points, int npoints);
 int Draw_Radiation(cairo_t *cr);
 gboolean Validate_Nearfield_Animation(void);
 gboolean Animate_Near_Field(gpointer udata);
+double Scale_Gain_Resolved(double gain, int fstep, int idx,
+    double t_sky, double t_earth);
 double Polarization_Factor(int pol_type, int fstep, int idx);
 void Set_Polarization(int pol);
 void Set_Gain_Style(int gs);

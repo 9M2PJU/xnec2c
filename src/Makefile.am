@@ -66,6 +66,11 @@ xnec2c_SOURCES = \
     view/view_drag.c \
     view/view_gtk.c \
     view/view_presets.h \
+    prerender/prerender_state.c     prerender/prerender_state.h \
+    prerender/prerender_aggregate.c prerender/prerender_aggregate.h \
+    prerender/prerender_color.c     prerender/prerender_color.h \
+    prerender/prerender_farfield.c  prerender/prerender_farfield.h \
+    prerender/prerender_nearfield.c prerender/prerender_nearfield.h \
     common.h        editors.h
 
 xnec2c_CPPFLAGS  =

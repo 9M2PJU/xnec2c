@@ -236,6 +236,19 @@ extern const ant_temp_model_t earth_models[ANT_TEMP_EARTH_COUNT];
 
 extern const char *ant_temp_method_names[ANT_TEMP_METHOD_COUNT];
 
+/* Per-fstep noise temperature table (Tier 2).
+ * Filled by ant_temp_fill_fstep() in the child; read by
+ * ff_presentation_recompute() in the parent.
+ * Custom model slots store sentinel -1.0; parent substitutes
+ * rc_config.ant_temp_custom_t_* at display time. */
+typedef struct
+{
+  double t_sky[ANT_TEMP_SKY_COUNT][ANT_TEMP_METHOD_COUNT];
+  double t_earth[ANT_TEMP_EARTH_COUNT][ANT_TEMP_METHOD_COUNT];
+} noise_temp_t;
+
+extern noise_temp_t *noise_temp;
+
 typedef struct
 {
 	union {
@@ -266,6 +279,8 @@ typedef struct
 
 int ant_temp_resolve(double freq_mhz, int sky, int earth, int interp,
 	double *t_sky, double *t_earth);
+void ant_temp_fill_fstep(int fstep);
+void noise_temp_resolve(int fstep, double *t_sky, double *t_earth);
 const char *ant_temp_sky_name(int idx);
 const char *ant_temp_earth_name(int idx);
 void meas_calc(measurement_t *m, int idx);

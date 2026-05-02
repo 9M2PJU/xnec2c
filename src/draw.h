@@ -21,21 +21,7 @@
 #define DRAW_H      1
 
 #include "common.h"
-
-/* Segment color classification for structure rendering */
-typedef enum
-{
-  SEG_COLOR_NORMAL = 0,     /* Unloaded wire - BLUE */
-  SEG_COLOR_LOADED,         /* Any load type - YELLOW */
-  SEG_COLOR_EXCITATION      /* Voltage/current source - RED */
-
-} segment_color_type_t;
-
-/* Determine color type for segment (1-indexed segment number) */
-segment_color_type_t get_segment_color_type(int seg_num);
-
-/* Convert segment color type to RGB values */
-void segment_type_to_rgb(segment_color_type_t type, float *r, float *g, float *b);
+#include "prerender/prerender_color.h"
 
 #endif
 

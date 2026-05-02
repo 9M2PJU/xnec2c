@@ -63,23 +63,50 @@ static unsigned int rdpat_gen_counter = 0;
  */
 double Scale_Gain( double gain, int fstep, int idx )
 {
-  /* Scaled rad pattern gain and pol factor */
-  double scaled_rad = 0.0;
+  double t_sky = 0.0, t_earth = 0.0;
+
+  /* Resolve noise temperatures from per-fstep table when in noise mode.
+   * Custom model slots store sentinel -1.0; substitute rc_config values. */
+  if( IS_NOISE_MODE(rc_config.gain_style) )
+    noise_temp_resolve(fstep, &t_sky, &t_earth);
 
   gain += Polarization_Factor( calc_data.pol_type, fstep, idx );
+  return Scale_Gain_Resolved( gain, fstep, idx, t_sky, t_earth );
 
-  /* Clamp unrecognized gain styles to linear power.
-   * Future styles (e.g. 5+) will add cases below;
-   * callers with older Scale_Gain get safe fallback. */
+} /* Scale_Gain() */
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * Scale_Gain_Resolved() - Map a gain value to a pattern radius
+ * @gain:    raw gain value (dBi) before polarization factor
+ * @fstep:   frequency step index
+ * @idx:     pattern vertex index
+ * @t_sky:   sky noise temperature (K); read only when gain_style is a noise mode
+ * @t_earth: earth noise temperature (K); read only when gain_style is a noise mode
+ *
+ * Applies the active gain style (rc_config.gain_style) to convert a raw gain
+ * value into a pattern radius.  Noise-mode callers supply pre-resolved t_sky
+ * and t_earth from noise_temp[fstep]; non-noise callers pass 0.0 for both.
+ */
+  double
+Scale_Gain_Resolved(double gain, int fstep, int idx,
+    double t_sky, double t_earth)
+{
+  double scaled_rad = 0.0;
+
   int gs = rc_config.gain_style;
+
+  /* Clamp unrecognized gain styles, future styles add cases below; callers
+   * with older Scale_Gain get safe fallback */
   if( gs < 0 || gs >= NUM_SCALES )
   {
     static gboolean warned = FALSE;
     if( !warned )
     {
-      pr_err("gain_style %d out of range [0..%d], defaulting to GS_LINP\n",
-          gs, NUM_SCALES - 1);
       warned = TRUE;
+      pr_err("Scale_Gain_Resolved: gain_style %d out of range [0..%d], defaulting to GS_LINP\n",
+          gs, NUM_SCALES - 1);
     }
     gs = GS_LINP;
   }
@@ -87,15 +114,15 @@ double Scale_Gain( double gain, int fstep, int idx )
   switch( gs )
   {
     case GS_LINP:
-      scaled_rad = pow(10.0, (gain/10.0));
+      scaled_rad = pow(10.0, (gain / 10.0));
       break;
 
     case GS_LINV:
-      scaled_rad = pow(10.0, (gain/20.0));
+      scaled_rad = pow(10.0, (gain / 20.0));
       break;
 
     case GS_ARRL:
-      scaled_rad = exp( 0.058267 * gain );
+      scaled_rad = exp(0.058267 * gain);
       break;
 
     case GS_LOG:
@@ -103,38 +130,21 @@ double Scale_Gain( double gain, int fstep, int idx )
       if( scaled_rad < -40 )
         scaled_rad = 0.0;
       else
-        scaled_rad = scaled_rad /40.0 + 1.0;
+        scaled_rad = scaled_rad / 40.0 + 1.0;
       break;
 
     /* Noise temperature gain scales */
     case GS_NOISE:
     case GS_NOISE_LOG:
       {
-        double t_sky, t_earth;
-        if (ant_temp_resolve(save.freq[fstep],
-              rc_config.ant_temp_sky, rc_config.ant_temp_earth,
-              rc_config.ant_temp_interp,
-              &t_sky, &t_earth) < 0)
-        {
-          static gboolean warned = FALSE;
-          if (!warned)
-          {
-            warned = TRUE;
-            pr_warn("Scale_Gain: ant_temp_resolve failed for %.3f MHz sky=%d earth=%d\n",
-                save.freq[fstep], rc_config.ant_temp_sky, rc_config.ant_temp_earth);
-          }
-          scaled_rad = 0.0;
-          break;
-        }
-
         int ith = idx % fpat.nth;
         int iph = idx / fpat.nth;
         double tht = (fpat.thets + ith * fpat.dth) * M_PI / 180.0;
         double phi = (fpat.phis  + iph * fpat.dph) * M_PI / 180.0;
 
         int pol = calc_data.pol_type;
-        double tht_mg = rad_pattern[fstep].max_gain_tht[pol] * M_PI / 180.0;
-        double phi_mg = rad_pattern[fstep].max_gain_phi[pol] * M_PI / 180.0;
+        double tht_mg  = rad_pattern[fstep].max_gain_tht[pol] * M_PI / 180.0;
+        double phi_mg  = rad_pattern[fstep].max_gain_phi[pol] * M_PI / 180.0;
         double elev_rad = rc_config.ant_temp_elevation * M_PI / 180.0;
 
         double z_w = ant_temp_z_world(tht, phi, tht_mg, phi_mg, elev_rad);
@@ -144,19 +154,22 @@ double Scale_Gain( double gain, int fstep, int idx )
         double half_w   = 0.5 * fmax(fpat.dth, fpat.dph) * M_PI / 180.0;
         double alpha    = fmax(0.0, fmin(1.0, (z_w + half_w) / (2.0 * half_w)));
         double t_bright = alpha * t_sky + (1.0 - alpha) * t_earth;
-        double g_lin = pow(10.0, gain / 10.0);
+        double g_lin    = pow(10.0, gain / 10.0);
 
         /* Noise temperature density (K/sr): resolution-independent.
-         * fabs(sin(tht)): NEC2 allows tht > 180 deg as a coordinate convenience;
-         * (360-tht, phi+180) is the same physical direction with positive sin.
-         * The solid angle element dOmega = sin(tht)*dth*dphi must be non-negative. */
+         * fabs(sin(tht)): NEC2 allows tht > 180 deg as a coordinate
+         * convenience; (360-tht, phi+180) is the same physical direction
+         * with positive sin.  The solid angle element dOmega =
+         * sin(tht)dthdphi non-negative */
         double cell_k = g_lin * t_bright * fabs(sin(tht)) / (4.0 * M_PI);
 
-        if (rc_config.gain_style == GS_NOISE)
+        if( rc_config.gain_style == GS_NOISE )
           scaled_rad = cell_k;
         else
+        {
           /* Log-compressed for visualization; recoverable to K */
           scaled_rad = log10(1.0 + cell_k);
+        }
       }
       break;
 
@@ -164,11 +177,11 @@ double Scale_Gain( double gain, int fstep, int idx )
       scaled_rad = 0.0;
       break;
 
-  } /* switch( rc_config.gain_style ) */
+  } /* switch( gs ) */
 
-  return( scaled_rad );
+  return scaled_rad;
 
-} /* Scale_Gain() */
+} /* Scale_Gain_Resolved() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -1652,6 +1665,11 @@ _Alloc_Rdpattern_Buffers( int nfrq, int nth, int nph )
     mreq = (size_t)(nph * nth) * sizeof(int);
     mem_alloc( (void **)&(rad_pattern[idx].sens), mreq, "in draw_radiation.c" );
   }
+
+  /* Per-fstep noise temperature table (Tier 2) */
+  mreq = (size_t)nfrq * sizeof(noise_temp_t);
+  mem_realloc( (void **)&noise_temp, mreq, "in draw_radiation.c" );
+  memset( noise_temp, 0, mreq );
 
 } /* Alloc_Rdpattern_Buffers() */
 

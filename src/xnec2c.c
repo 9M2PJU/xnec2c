@@ -22,6 +22,10 @@
 #include "xnec2c.h"
 #include "callbacks.h"
 #include "shared.h"
+#include "measurements.h"
+#include "prerender/prerender_color.h"
+#include "prerender/prerender_farfield.h"
+#include "prerender/prerender_nearfield.h"
 #include "mathlib.h"
 #include "opt_ui.h"
 #include "plot_freqdata.h"
@@ -575,13 +579,24 @@ New_Frequency( void )
   /* Near field calculation */
   Near_Field_Pattern();
 
-  /* Save per-step results under lock for both interactive and loop paths.
-   * During the freq loop the non-forked path enters here via dispatch;
-   * the forked path saves in freq_loop_collect under its own lock. */
+  /* Per-fstep noise temperature table: frequency is fixed here, so all
+   * sky/earth model × method combinations are deterministic and hoistable. */
+  ant_temp_fill_fstep( calc_data.freq_step );
+
+  /* Save per-step results before prerender so struct_colors_fill_fstep and
+   * Prerender_Near_Field read current crnt_fstep / near_field_fstep data. */
+  Save_Crnt_Data( calc_data.freq_step );
+  Save_Nearfield_Data( calc_data.freq_step );
+
+  /* Child-deterministic per-fstep prerender: no user-mutable inputs enter
+   * these functions. */
+  struct_colors_fill_fstep( calc_data.freq_step );
+
+  if( isFlagSet(ENABLE_NEAREH) )
+    Prerender_Near_Field( calc_data.freq_step );
+
   if( !CHILD )
   {
-    Save_Crnt_Data( calc_data.freq_step );
-    Save_Nearfield_Data( calc_data.freq_step );
     if( save.fstep != NULL && calc_data.freq_step >= 0 )
       save.fstep[calc_data.freq_step] = 1;
   }

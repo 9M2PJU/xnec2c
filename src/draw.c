@@ -22,72 +22,6 @@
 
 /*-----------------------------------------------------------------------*/
 
-/* get_segment_color_type()
- *
- * Determine color classification for a segment based on excitation and loading.
- * Priority: excitation > load > normal (matching Cairo draw_structure.c logic)
- */
-  segment_color_type_t
-get_segment_color_type(int seg_num)
-{
-  int idx;
-
-  /* Check excitation sources (highest priority) */
-  for( idx = 0; idx < vsorc.nsant; idx++ )
-  {
-    if( vsorc.isant[idx] == seg_num )
-      return( SEG_COLOR_EXCITATION );
-  }
-
-  for( idx = 0; idx < vsorc.nvqd; idx++ )
-  {
-    if( vsorc.ivqd[idx] == seg_num )
-      return( SEG_COLOR_EXCITATION );
-  }
-
-  /* Check loaded segments */
-  for( idx = 0; idx < zload.nldseg; idx++ )
-  {
-    if( zload.ldsegn[idx] == seg_num )
-      return( SEG_COLOR_LOADED );
-  }
-
-  return( SEG_COLOR_NORMAL );
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* segment_type_to_rgb()
- *
- * Convert segment color type to RGB float values (matches common.h colors)
- */
-  void
-segment_type_to_rgb(segment_color_type_t type, float *r, float *g, float *b)
-{
-  switch( type )
-  {
-    case SEG_COLOR_EXCITATION:
-      *r = 1.0f;
-      *g = 0.0f;
-      *b = 0.0f;
-      break;
-
-    case SEG_COLOR_LOADED:
-      *r = 1.0f;
-      *g = 1.0f;
-      *b = 0.0f;
-      break;
-
-    case SEG_COLOR_NORMAL:
-      *r = 0.0f;
-      *g = 0.0f;
-      *b = 1.0f;
-      break;
-  }
-}
-
-/*-----------------------------------------------------------------------*/
-
 /*  Project_XYZ_Axes()
  *
  *  Sets Segment_t data to project xyz axes on Screen.
@@ -168,62 +102,6 @@ Draw_XYZ_Axes( cairo_t *cr, view_t *v )
   Cairo_Draw_Segments( cr, seg, 3 );
 
 } /* Draw_XYZ_Axes() */
-
-/*-----------------------------------------------------------------------*/
-
-/* Value_to_Color()
- *
- * Produces an rgb color to represent an
- * input value relative to a maximum value
- */
-  void
-Value_to_Color( double *red, double *grn, double *blu, double val, double max )
-{
-  int ival;
-
-  /* Scale val so that normalized ival is 0-1279 */
-  ival = (int)(1279.0 * val / max);
-
-  /* Color hue according to imag value */
-  switch( ival/256 )
-  {
-    case 0: /* 0-255 : magenta to blue */
-      *red = 255.0 - (double)ival;
-      *grn = 0.0;
-      *blu = 255.0;
-      break;
-
-    case 1: /* 256-511 : blue to cyan */
-      *red = 0.0;
-      *grn = (double)ival - 256.0;
-      *blu = 255.0;
-      break;
-
-    case 2: /* 512-767 : cyan to green */
-      *red = 0.0;
-      *grn = 255.0;
-      *blu = 767.0 - (double)ival;
-      break;
-
-    case 3: /* 768-1023 : green to yellow */
-      *red = (double)ival - 768.0;
-      *grn = 255.0;
-      *blu = 0.0;
-      break;
-
-    case 4: /* 1024-1279 : yellow to red */
-      *red = 255.0;
-      *grn = 1279.0 - (double)ival;
-      *blu = 0.0;
-
-  } /* switch( imag / 256 ) */
-
-  /* Scale values between 0.0-1.0 */
-  *red /= 255.0;
-  *grn /= 255.0;
-  *blu /= 255.0;
-
-} /* Value_to_Color() */
 
 /*-----------------------------------------------------------------------*/
 
