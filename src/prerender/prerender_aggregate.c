@@ -1,0 +1,316 @@
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ *  The official website and doumentation for xnec2c is available here:
+ *    https://www.xnec2c.org/
+ */
+
+/*
+ * prerender_aggregate: Tier 1 geometry-derived aggregate scalars.
+ *
+ * Computes scene_radius (from wire endpoints and patch corners),
+ * excitation_center (centroid of excitation source segments),
+ * nf_dr_norm (near-field normalization distance), and radiation
+ * pattern trig tables.  Called once after geometry is established.
+ */
+#include "prerender_aggregate.h"
+#include "../shared.h"
+
+/*-----------------------------------------------------------------------*/
+
+static inline double
+dist3(double x, double y, double z)
+{
+  return sqrt(x*x + y*y + z*z);
+}
+
+/**
+ * scan_wire_radius() - Find max distance from origin over wire endpoints
+ * @r_max: current maximum, updated in place
+ */
+static void
+scan_wire_radius(double *r_max)
+{
+  int idx;
+  double r;
+
+  for( idx = 0; idx < data.n; idx++ )
+  {
+    r = dist3(data.segments[idx].x1,
+              data.segments[idx].y1,
+              data.segments[idx].z1);
+    if( r > *r_max )
+      *r_max = r;
+
+    r = dist3(data.segments[idx].x2,
+              data.segments[idx].y2,
+              data.segments[idx].z2);
+    if( r > *r_max )
+      *r_max = r;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * scan_patch_radius() - Find max distance from origin over all four patch corners
+ * @r_max: current maximum, updated in place
+ *
+ * Corners are center ± s*t1 ± s*t2 (four diagonal combinations).
+ */
+static void
+scan_patch_radius(double *r_max)
+{
+  int idx;
+  double s, r;
+  double px, py, pz;
+  double s1x, s1y, s1z, s2x, s2y, s2z;
+
+  for( idx = 0; idx < data.m; idx++ )
+  {
+    s = sqrt(data.patches[idx].pbi) / 2.0;
+    px = data.patches[idx].px;
+    py = data.patches[idx].py;
+    pz = data.patches[idx].pz;
+
+    s1x = s * data.patches[idx].t1x;
+    s1y = s * data.patches[idx].t1y;
+    s1z = s * data.patches[idx].t1z;
+
+    s2x = s * data.patches[idx].t2x;
+    s2y = s * data.patches[idx].t2y;
+    s2z = s * data.patches[idx].t2z;
+
+    /* All four diagonal corners: center ± t1 ± t2 */
+    r = dist3(px + s1x + s2x, py + s1y + s2y, pz + s1z + s2z);
+    if( r > *r_max ) *r_max = r;
+
+    r = dist3(px + s1x - s2x, py + s1y - s2y, pz + s1z - s2z);
+    if( r > *r_max ) *r_max = r;
+
+    r = dist3(px - s1x + s2x, py - s1y + s2y, pz - s1z + s2z);
+    if( r > *r_max ) *r_max = r;
+
+    r = dist3(px - s1x - s2x, py - s1y - s2y, pz - s1z - s2z);
+    if( r > *r_max ) *r_max = r;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * compute_excitation_center() - Centroid of all excitation source segments
+ */
+static void
+compute_excitation_center(void)
+{
+  int idx, seg_idx, count;
+  double cx, cy, cz;
+
+  cx = cy = cz = 0.0;
+  count = 0;
+
+  /* Voltage sources (1-indexed segment numbers) */
+  for( idx = 0; idx < vsorc.nsant; idx++ )
+  {
+    seg_idx = vsorc.isant[idx] - 1;
+    if( seg_idx >= 0 && seg_idx < data.n )
+    {
+      cx += data.segments[seg_idx].x;
+      cy += data.segments[seg_idx].y;
+      cz += data.segments[seg_idx].z;
+      count++;
+    }
+  }
+
+  /* Current sources */
+  for( idx = 0; idx < vsorc.nvqd; idx++ )
+  {
+    seg_idx = vsorc.ivqd[idx] - 1;
+    if( seg_idx >= 0 && seg_idx < data.n )
+    {
+      cx += data.segments[seg_idx].x;
+      cy += data.segments[seg_idx].y;
+      cz += data.segments[seg_idx].z;
+      count++;
+    }
+  }
+
+  if( count > 0 )
+  {
+    geom_pre.excitation_cx = cx / count;
+    geom_pre.excitation_cy = cy / count;
+    geom_pre.excitation_cz = cz / count;
+    geom_pre.has_excitation = TRUE;
+  }
+  else
+  {
+    geom_pre.excitation_cx = 0.0;
+    geom_pre.excitation_cy = 0.0;
+    geom_pre.excitation_cz = 0.0;
+    geom_pre.has_excitation = FALSE;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * compute_nf_dr_norm() - Near-field normalization distance
+ *
+ * Matches the dr computation from Draw_Near_Field():
+ * spherical → dxnr, rectangular → euclidean(dxnr, dynr, dznr)/1.75.
+ */
+  void
+compute_nf_dr_norm(void)
+{
+  if( fpat.near )
+  {
+    /* Spherical coordinates */
+    geom_pre.nf_dr_norm = (double)fpat.dxnr;
+  }
+  else
+  {
+    /* Rectangular coordinates */
+    geom_pre.nf_dr_norm = sqrt(
+        (double)fpat.dxnr * (double)fpat.dxnr +
+        (double)fpat.dynr * (double)fpat.dynr +
+        (double)fpat.dznr * (double)fpat.dznr) / 1.75;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * compute_trig_tables() - Precompute sin/cos/solid_angle for radiation grid
+ *
+ * Allocates and fills geom_pre trig tables from fpat grid parameters.
+ * Called once at geometry load; avoids repeated trig per vertex per frame.
+ */
+  void
+compute_trig_tables(void)
+{
+  int i;
+  double dth_rad = (double)fpat.dth * (double)TORAD;
+  double dph_rad = (double)fpat.dph * (double)TORAD;
+
+  free_ptr((void **)&geom_pre.sin_theta);
+  free_ptr((void **)&geom_pre.cos_theta);
+  free_ptr((void **)&geom_pre.sin_phi);
+  free_ptr((void **)&geom_pre.cos_phi);
+  free_ptr((void **)&geom_pre.solid_angle);
+
+  if( fpat.nth <= 0 || fpat.nph <= 0 )
+    return;
+
+  mem_alloc((void **)&geom_pre.sin_theta, (size_t)fpat.nth * sizeof(double), __LOCATION__);
+  mem_alloc((void **)&geom_pre.cos_theta, (size_t)fpat.nth * sizeof(double), __LOCATION__);
+  mem_alloc((void **)&geom_pre.solid_angle, (size_t)fpat.nth * sizeof(double), __LOCATION__);
+  mem_alloc((void **)&geom_pre.sin_phi, (size_t)fpat.nph * sizeof(double), __LOCATION__);
+  mem_alloc((void **)&geom_pre.cos_phi, (size_t)fpat.nph * sizeof(double), __LOCATION__);
+
+  for( i = 0; i < fpat.nth; i++ )
+  {
+    double tht = ((double)fpat.thets + (double)i * (double)fpat.dth) * (double)TORAD;
+    geom_pre.sin_theta[i] = sin(tht);
+    geom_pre.cos_theta[i] = cos(tht);
+    geom_pre.solid_angle[i] = fabs(sin(tht)) * dth_rad * dph_rad;
+  }
+
+  for( i = 0; i < fpat.nph; i++ )
+  {
+    double phi = ((double)fpat.phis + (double)i * (double)fpat.dph) * (double)TORAD;
+    geom_pre.sin_phi[i] = sin(phi);
+    geom_pre.cos_phi[i] = cos(phi);
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+  void
+Prerender_Aggregate(void)
+{
+  double r_max = 0.0;
+
+  if( data.n > 0 )
+    scan_wire_radius(&r_max);
+
+  if( data.m > 0 )
+    scan_patch_radius(&r_max);
+
+  geom_pre.scene_radius = r_max;
+
+  compute_excitation_center();
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * compute_ff_topology() - Populate geom_pre far-field edge topology tables
+ *
+ * Writes theta_topo[], phi_topo[], n_theta_edges, n_phi_edges into geom_pre.
+ * Topology is frequency-independent (grid connectivity depends only on fpat
+ * dimensions).  Called once at RP-card time, parent-only.
+ */
+  void
+compute_ff_topology(void)
+{
+  int nth, nph, col_idx, pts_idx;
+  size_t mreq;
+
+  free_ptr((void **)&geom_pre.theta_topo);
+  free_ptr((void **)&geom_pre.phi_topo);
+  geom_pre.n_theta_edges = 0;
+  geom_pre.n_phi_edges   = 0;
+
+  if( fpat.nth < 2 || fpat.nph < 2 )
+    return;
+
+  geom_pre.n_theta_edges = (fpat.nth - 1) * fpat.nph;
+  mreq = (size_t)geom_pre.n_theta_edges * sizeof(ff_edge_topo_t);
+  mem_alloc((void **)&geom_pre.theta_topo, mreq, __LOCATION__);
+
+  col_idx = 0;
+  pts_idx = 0;
+  for( nph = 0; nph < fpat.nph; nph++ )
+  {
+    for( nth = 1; nth < fpat.nth; nth++ )
+    {
+      geom_pre.theta_topo[col_idx].va = (uint32_t)pts_idx;
+      geom_pre.theta_topo[col_idx].vb = (uint32_t)(pts_idx + 1);
+      col_idx++;
+      pts_idx++;
+    }
+    pts_idx++;
+  }
+
+  geom_pre.n_phi_edges = fpat.nth * (fpat.nph - 1);
+  mreq = (size_t)geom_pre.n_phi_edges * sizeof(ff_edge_topo_t);
+  mem_alloc((void **)&geom_pre.phi_topo, mreq, __LOCATION__);
+
+  col_idx = 0;
+  for( nth = 0; nth < fpat.nth; nth++ )
+  {
+    pts_idx = nth;
+    for( nph = 1; nph < fpat.nph; nph++ )
+    {
+      geom_pre.phi_topo[col_idx].va = (uint32_t)pts_idx;
+      geom_pre.phi_topo[col_idx].vb = (uint32_t)(pts_idx + fpat.nth);
+      col_idx++;
+      pts_idx += fpat.nth;
+    }
+  }
+}
+
+/*-----------------------------------------------------------------------*/

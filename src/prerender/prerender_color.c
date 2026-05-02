@@ -1,0 +1,405 @@
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ *  The official website and doumentation for xnec2c is available here:
+ *    https://www.xnec2c.org/
+ */
+
+/*
+ * prerender_color: renderer-agnostic color mapping functions.
+ *
+ * No Cairo, no OpenGL, no GTK dependencies.
+ */
+#include "prerender_color.h"
+#include "../shared.h"
+
+rgb_f_t *seg_rgb   = NULL;
+rgb_f_t *patch_rgb = NULL;
+
+struct_colors_t *struct_colors = NULL;
+
+static int allocated_steps = 0;
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * get_segment_color_type() - Classify a wire segment
+ * @seg_num: 1-indexed segment number (matches vsorc.isant, zload.ldsegn)
+ *
+ * Priority: excitation > loaded > network > normal.
+ */
+  segment_color_type_t
+get_segment_color_type(int seg_num)
+{
+  int idx;
+
+  /* Excitation sources (highest priority) */
+  for( idx = 0; idx < vsorc.nsant; idx++ )
+  {
+    if( vsorc.isant[idx] == seg_num )
+      return SEG_COLOR_EXCITATION;
+  }
+
+  for( idx = 0; idx < vsorc.nvqd; idx++ )
+  {
+    if( vsorc.ivqd[idx] == seg_num )
+      return SEG_COLOR_EXCITATION;
+  }
+
+  /* Loaded segments */
+  for( idx = 0; idx < zload.nldseg; idx++ )
+  {
+    if( zload.ldsegn[idx] == seg_num )
+      return SEG_COLOR_LOADED;
+  }
+
+  return SEG_COLOR_NORMAL;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * segment_type_to_rgb() - Map classification to display color
+ * @type: segment classification
+ * @r:    output red [0..1]
+ * @g:    output green [0..1]
+ * @b:    output blue [0..1]
+ */
+  void
+segment_type_to_rgb(segment_color_type_t type, float *r, float *g, float *b)
+{
+  switch( type )
+  {
+    case SEG_COLOR_EXCITATION:
+      *r = 1.0f;
+      *g = 0.0f;
+      *b = 0.0f;
+      break;
+
+    case SEG_COLOR_LOADED:
+      *r = 1.0f;
+      *g = 1.0f;
+      *b = 0.0f;
+      break;
+
+    case SEG_COLOR_NORMAL:
+      *r = 0.0f;
+      *g = 0.0f;
+      *b = 1.0f;
+      break;
+
+    default:
+      BUG("segment_type_to_rgb: unknown type %d\n", type);
+      break;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * Value_to_Color() - Map a scalar to an RGB rainbow ramp
+ * @red: output red channel [0..1]
+ * @grn: output green channel [0..1]
+ * @blu: output blue channel [0..1]
+ * @val: input value
+ * @max: normalization maximum
+ *
+ * Produces magenta→blue→cyan→green→yellow→red for val in [0..max].
+ */
+  void
+Value_to_Color(double *red, double *grn, double *blu, double val, double max)
+{
+  int ival;
+
+  /* Scale val so that normalized ival is 0-1279 */
+  ival = (int)(1279.0 * val / max);
+
+  switch( ival / 256 )
+  {
+    case 0: /* 0-255 : magenta to blue */
+      *red = 255.0 - (double)ival;
+      *grn = 0.0;
+      *blu = 255.0;
+      break;
+
+    case 1: /* 256-511 : blue to cyan */
+      *red = 0.0;
+      *grn = (double)ival - 256.0;
+      *blu = 255.0;
+      break;
+
+    case 2: /* 512-767 : cyan to green */
+      *red = 0.0;
+      *grn = 255.0;
+      *blu = 767.0 - (double)ival;
+      break;
+
+    case 3: /* 768-1023 : green to yellow */
+      *red = (double)ival - 768.0;
+      *grn = 255.0;
+      *blu = 0.0;
+      break;
+
+    case 4: /* 1024-1279 : yellow to red */
+      *red = 255.0;
+      *grn = 1279.0 - (double)ival;
+      *blu = 0.0;
+      break;
+
+    default: /* Clamp out-of-range to endpoints */
+      if( ival < 0 )
+      {
+        *red = 255.0;
+        *grn = 0.0;
+        *blu = 255.0;
+      }
+      else
+      {
+        *red = 255.0;
+        *grn = 0.0;
+        *blu = 0.0;
+      }
+      break;
+  }
+
+  /* Scale channels to [0..1] */
+  *red /= 255.0;
+  *grn /= 255.0;
+  *blu /= 255.0;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * alloc_struct_colors() - Allocate per-fstep struct_colors array
+ * @nfrq: total frequency steps
+ */
+  void
+alloc_struct_colors(int nfrq)
+{
+  int i;
+  size_t mreq;
+
+  if( nfrq <= 0 )
+    return;
+
+  mreq = (size_t)nfrq * sizeof(struct_colors_t);
+  mem_realloc( (void **)&struct_colors, mreq, "in prerender_color.c" );
+  memset( struct_colors, 0, mreq );
+  allocated_steps = nfrq;
+
+  for( i = 0; i < nfrq; i++ )
+  {
+    if( data.n > 0 )
+    {
+      mreq = (size_t)data.n * sizeof(rgb_f_t);
+      mem_alloc( (void **)&struct_colors[i].wire_crnt_rgb, mreq, "in prerender_color.c" );
+      mem_alloc( (void **)&struct_colors[i].wire_chrg_rgb, mreq, "in prerender_color.c" );
+    }
+
+    if( data.m > 0 )
+    {
+      mreq = (size_t)data.m * sizeof(rgb_f_t);
+      mem_alloc( (void **)&struct_colors[i].patch_crnt_rgb, mreq, "in prerender_color.c" );
+      mem_alloc( (void **)&struct_colors[i].patch_t1_rgb,   mreq, "in prerender_color.c" );
+      mem_alloc( (void **)&struct_colors[i].patch_t2_rgb,   mreq, "in prerender_color.c" );
+    }
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * free_struct_colors() - Release struct_colors and geometry color arrays
+ */
+  void
+free_struct_colors(void)
+{
+  int i;
+  int nfrq;
+
+  if( struct_colors != NULL )
+  {
+    nfrq = allocated_steps;
+    for( i = 0; i < nfrq; i++ )
+    {
+      free_ptr( (void **)&struct_colors[i].wire_crnt_rgb );
+      free_ptr( (void **)&struct_colors[i].wire_chrg_rgb );
+      free_ptr( (void **)&struct_colors[i].patch_crnt_rgb );
+      free_ptr( (void **)&struct_colors[i].patch_t1_rgb );
+      free_ptr( (void **)&struct_colors[i].patch_t2_rgb );
+    }
+    free_ptr( (void **)&struct_colors );
+  }
+
+  free_ptr( (void **)&seg_rgb );
+  free_ptr( (void **)&patch_rgb );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * init_geometry_colors() - Compute Tier 1 seg_rgb/patch_rgb at file load
+ */
+  void
+init_geometry_colors(void)
+{
+  int i;
+  size_t mreq;
+  float r, g, b;
+  segment_color_type_t ctype;
+
+  if( data.n > 0 )
+  {
+    mreq = (size_t)data.n * sizeof(rgb_f_t);
+    mem_realloc( (void **)&seg_rgb, mreq, "in prerender_color.c" );
+
+    for( i = 0; i < data.n; i++ )
+    {
+      ctype = get_segment_color_type(i + 1);
+      segment_type_to_rgb(ctype, &r, &g, &b);
+      seg_rgb[i].r = r;
+      seg_rgb[i].g = g;
+      seg_rgb[i].b = b;
+    }
+  }
+
+  if( data.m > 0 )
+  {
+    mreq = (size_t)data.m * sizeof(rgb_f_t);
+    mem_realloc( (void **)&patch_rgb, mreq, "in prerender_color.c" );
+
+    /* Patches use SEG_COLOR_NORMAL blue constant */
+    segment_type_to_rgb(SEG_COLOR_NORMAL, &r, &g, &b);
+    for( i = 0; i < data.m; i++ )
+    {
+      patch_rgb[i].r = r;
+      patch_rgb[i].g = g;
+      patch_rgb[i].b = b;
+    }
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * struct_colors_fill_fstep() - Compute Tier 2 wire/patch colors for one fstep
+ * @fstep: frequency step index
+ *
+ * Reads crnt_fstep[fstep] current/charge amplitudes.  Scans magnitude
+ * range, then maps each segment/patch via Value_to_Color().
+ */
+  void
+struct_colors_fill_fstep(int fstep)
+{
+  int i;
+  double cabs_val, cmax_wire_crnt, cmax_wire_chrg, cmax_patch;
+  double cmin_wire_crnt, cmin_wire_chrg, cmin_patch;
+  complex double c;
+
+  if( struct_colors == NULL
+      || fstep < 0
+      || fstep > calc_data.steps_total
+      || crnt_fstep == NULL
+      || crnt_fstep[fstep].cur == NULL )
+    return;
+
+  cmax_wire_crnt = 0.0;
+  cmax_wire_chrg = 0.0;
+  cmax_patch     = 0.0;
+  cmin_wire_crnt = 1e30;
+  cmin_wire_chrg = 1e30;
+  cmin_patch     = 1e30;
+
+  /* Scan wire current magnitudes (cur array: data.np3m complex doubles;
+   * wire segments are the first data.n entries at index i) */
+  for( i = 0; i < data.n; i++ )
+  {
+    c = crnt_fstep[fstep].cur[i];
+    cabs_val = cabs(c);
+    if( cabs_val > cmax_wire_crnt ) cmax_wire_crnt = cabs_val;
+    if( cabs_val < cmin_wire_crnt ) cmin_wire_crnt = cabs_val;
+  }
+
+  /* Scan wire charge magnitudes (bir/bii arrays) */
+  for( i = 0; i < data.n; i++ )
+  {
+    cabs_val = hypot(crnt_fstep[fstep].bir[i], crnt_fstep[fstep].bii[i]);
+    if( cabs_val > cmax_wire_chrg ) cmax_wire_chrg = cabs_val;
+    if( cabs_val < cmin_wire_chrg ) cmin_wire_chrg = cabs_val;
+  }
+
+  /* Scan patch current magnitudes (cur array, patches follow wires at
+   * index ci = data.n + 3*i) */
+  for( i = 0; i < data.m; i++ )
+  {
+    int ci = data.n + 3 * i;
+    double mag = cabs(crnt_fstep[fstep].cur[ci]);
+    if( mag > cmax_patch ) cmax_patch = mag;
+    if( mag < cmin_patch ) cmin_patch = mag;
+  }
+
+  /* Store range scalars */
+  struct_colors[fstep].wire_crnt_cmin  = (float)cmin_wire_crnt;
+  struct_colors[fstep].wire_crnt_cmax  = (float)cmax_wire_crnt;
+  struct_colors[fstep].wire_chrg_cmin  = (float)cmin_wire_chrg;
+  struct_colors[fstep].wire_chrg_cmax  = (float)cmax_wire_chrg;
+  struct_colors[fstep].patch_crnt_cmin = (float)cmin_patch;
+  struct_colors[fstep].patch_crnt_cmax = (float)cmax_patch;
+
+  /* Map wire current colors */
+  if( struct_colors[fstep].wire_crnt_rgb != NULL && cmax_wire_crnt > 0.0 )
+  {
+    for( i = 0; i < data.n; i++ )
+    {
+      cabs_val = cabs(crnt_fstep[fstep].cur[i]);
+      struct_colors[fstep].wire_crnt_rgb[i] = color_from_value(cabs_val, cmax_wire_crnt);
+    }
+  }
+
+  /* Map wire charge colors */
+  if( struct_colors[fstep].wire_chrg_rgb != NULL && cmax_wire_chrg > 0.0 )
+  {
+    for( i = 0; i < data.n; i++ )
+    {
+      cabs_val = hypot(crnt_fstep[fstep].bir[i], crnt_fstep[fstep].bii[i]);
+      struct_colors[fstep].wire_chrg_rgb[i] = color_from_value(cabs_val, cmax_wire_chrg);
+    }
+  }
+
+  /* Map patch current colors: cur[ci+0..ci+2] are patch, t1, t2 components */
+  if( struct_colors[fstep].patch_crnt_rgb != NULL && cmax_patch > 0.0 )
+  {
+    int has_tangents = (struct_colors[fstep].patch_t1_rgb != NULL);
+
+    for( i = 0; i < data.m; i++ )
+    {
+      int ci = data.n + 3 * i;
+      rgb_f_t *dests[3] = {
+        &struct_colors[fstep].patch_crnt_rgb[i],
+        has_tangents ? &struct_colors[fstep].patch_t1_rgb[i] : NULL,
+        has_tangents ? &struct_colors[fstep].patch_t2_rgb[i] : NULL
+      };
+      int j;
+      for( j = 0; j < 3; j++ )
+      {
+        if( dests[j] != NULL )
+          *dests[j] = color_from_value(cabs(crnt_fstep[fstep].cur[ci + j]), cmax_patch);
+      }
+    }
+  }
+}
+
+/*-----------------------------------------------------------------------*/
