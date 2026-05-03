@@ -37,10 +37,6 @@ static int rdpat_line_count = 0;
 static lit_color_point_t *nf_lines = NULL;
 static int nf_line_count = 0;
 
-/* Poynting vector per-sample data */
-typedef struct { double x, y, z, r; } poynting_vec_t;
-static poynting_vec_t *pov = NULL;
-
 /* Generation counters for change detection */
 static unsigned int rdpat_ff_generation = 0;
 static unsigned int rdpat_nf_generation = 0;
@@ -77,153 +73,61 @@ nf_line_append(
 
 /*-----------------------------------------------------------------------*/
 
-/** nf_field_line() - Build a single near-field vector line from origin and field components
- * @buf: vertex buffer
- * @line_idx: starting index in buf
- * @px: origin x coordinate
- * @py: origin y coordinate
- * @pz: origin z coordinate
- * @comp_x: field vector x component
- * @comp_y: field vector y component
- * @comp_z: field vector z component
- * @dr: normalization scale distance
- * @magnitude: field vector magnitude
- * @max_val: maximum magnitude for color mapping
+/** opengl_rdpattern_generate_nf_field_lines() - Convert prerendered NF vectors to GL line geometry
+ * @origins:  sample point positions [npts]
+ * @npts:     number of near-field sample points
+ * @fields:   dispatch-resolved vector sets (precomputed displacement + color)
+ * @n_fields: number of active field sets (0-3)
+ * @dr:       normalization scale distance (for endpoint computation)
  *
- * Scales vector by dr / magnitude; colors by magnitude / max_val.
- * Returns line_idx advanced by 2.
- */
-  static int
-nf_field_line(
-    lit_color_point_t *buf, int line_idx,
-    double px, double py, double pz,
-    double comp_x, double comp_y, double comp_z,
-    double dr, double magnitude, double max_val)
-{
-  double fscale;
-  double red, grn, blu;
-
-  point_f_3d_t org = { (float)px, (float)py, (float)pz };
-
-  fscale = dr / magnitude;
-  point_f_3d_t end = {
-    (float)(px + comp_x * fscale),
-    (float)(py + comp_y * fscale),
-    (float)(pz + comp_z * fscale)
-  };
-
-  Value_to_Color(&red, &grn, &blu, magnitude, max_val);
-  rgba_f_t col = { (float)red, (float)grn, (float)blu, 1.0f };
-
-  return( nf_line_append(buf, line_idx, org, end, col) );
-}
-
-/*-----------------------------------------------------------------------*/
-
-/** opengl_rdpattern_generate_nf_lines() - Generate line geometry for near-field vectors
- *
- * Returns total line count, or -1 if near-field data is unavailable.
+ * Iterates each field set, emitting one line per sample point per set.
+ * Zero field-type branching — backend receives only data to iterate.
+ * Returns total line count, or -1 on empty input.
  */
   int
-opengl_rdpattern_generate_nf_lines(void)
+opengl_rdpattern_generate_nf_field_lines(
+    const near_field_point_t *origins, int npts,
+    const nf_field_set_t *fields, int n_fields,
+    double dr)
 {
-  int idx, npts, line_idx;
+  int fi, idx, line_idx;
   int total_lines;
-  double dr;
-  double pov_max;
   size_t mreq;
 
-  int fstep = calc_data.freq_step;
-  if( isFlagClear(ENABLE_NEAREH) || !NF_FSTEP_AVAILABLE(fstep) )
+  if( n_fields <= 0 || npts <= 0 )
     return( -1 );
 
-  near_field_t *nf = &near_field_fstep[fstep];
+  total_lines = n_fields * npts;
 
-  npts = fpat.nrx * fpat.nry * fpat.nrz;
-
-  /* Count total lines needed for all enabled field types */
-  total_lines = 0;
-  if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
-    total_lines += npts;
-  if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    total_lines += npts;
-  if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-    total_lines += npts;
-
-  if( total_lines == 0 )
-    return( -1 );
-
-  /* Normalization scale factor */
-  if( fpat.near )
-    dr = (double)fpat.dxnr;
-  else
-    dr = sqrt(
-        (double)fpat.dxnr * (double)fpat.dxnr +
-        (double)fpat.dynr * (double)fpat.dynr +
-        (double)fpat.dznr * (double)fpat.dznr ) / 1.75;
-
-  /* Allocate line buffer for all enabled fields */
   mreq = (size_t)total_lines * 2 * sizeof(lit_color_point_t);
   mem_realloc((void **)&nf_lines, mreq, __LOCATION__);
 
-  /* Calculate Poynting vector if enabled */
-  pov_max = 0.0;
-  if( isFlagSet(DRAW_POYNTING) &&
-      (fpat.nfeh & NEAR_EFIELD) &&
-      (fpat.nfeh & NEAR_HFIELD) )
-  {
-    int ipv;
-
-    mreq = (size_t)npts * sizeof(poynting_vec_t);
-    mem_realloc((void **)&pov, mreq, __LOCATION__);
-
-    for( ipv = 0; ipv < npts; ipv++ )
-    {
-      /* Poynting vector: E x H */
-      pov[ipv].x =
-        nf->points[ipv].ery * nf->points[ipv].hrz -
-        nf->points[ipv].hry * nf->points[ipv].erz;
-      pov[ipv].y =
-        nf->points[ipv].erz * nf->points[ipv].hrx -
-        nf->points[ipv].hrz * nf->points[ipv].erx;
-      pov[ipv].z =
-        nf->points[ipv].erx * nf->points[ipv].hry -
-        nf->points[ipv].hrx * nf->points[ipv].ery;
-      pov[ipv].r = sqrt(
-          pov[ipv].x * pov[ipv].x +
-          pov[ipv].y * pov[ipv].y +
-          pov[ipv].z * pov[ipv].z );
-
-      if( pov_max < pov[ipv].r )
-        pov_max = pov[ipv].r;
-    }
-  }
-
-  /* Generate line vertices for all enabled field types */
   line_idx = 0;
 
-  for( idx = 0; idx < npts; idx++ )
+  for( fi = 0; fi < n_fields; fi++ )
   {
-    /* Draw Near E Field */
-    if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
-      line_idx = nf_field_line(nf_lines, line_idx,
-          nf->points[idx].px, nf->points[idx].py, nf->points[idx].pz,
-          nf->points[idx].erx, nf->points[idx].ery, nf->points[idx].erz,
-          dr, nf->points[idx].er, nf->max_er);
+    const nf_vector_t *vecs = fields[fi].vecs;
 
-    /* Draw Near H Field */
-    if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-      line_idx = nf_field_line(nf_lines, line_idx,
-          nf->points[idx].px, nf->points[idx].py, nf->points[idx].pz,
-          nf->points[idx].hrx, nf->points[idx].hry, nf->points[idx].hrz,
-          dr, nf->points[idx].hr, nf->max_hr);
+    for( idx = 0; idx < npts; idx++ )
+    {
+      point_f_3d_t org = {
+        (float)origins[idx].px,
+        (float)origins[idx].py,
+        (float)origins[idx].pz
+      };
 
-    /* Draw Poynting Vector */
-    if( isFlagSet(DRAW_POYNTING) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-      line_idx = nf_field_line(nf_lines, line_idx,
-          nf->points[idx].px, nf->points[idx].py, nf->points[idx].pz,
-          pov[idx].x, pov[idx].y, pov[idx].z,
-          dr, pov[idx].r, pov_max);
+      point_f_3d_t end = {
+        org.x + vecs[idx].dx,
+        org.y + vecs[idx].dy,
+        org.z + vecs[idx].dz
+      };
+
+      rgba_f_t col = {
+        vecs[idx].rgb[0], vecs[idx].rgb[1], vecs[idx].rgb[2], 1.0f
+      };
+
+      line_idx = nf_line_append(nf_lines, line_idx, org, end, col);
+    }
   }
 
   nf_line_count = total_lines;
@@ -231,7 +135,7 @@ opengl_rdpattern_generate_nf_lines(void)
 
   return( nf_line_count );
 
-} /* opengl_rdpattern_generate_nf_lines() */
+} /* opengl_rdpattern_generate_nf_field_lines() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -586,7 +490,6 @@ opengl_rdpattern_geometry_cleanup(void)
   free_ptr((void **)&nf_lines);
   nf_line_count = 0;
 
-  free_ptr((void **)&pov);
 }
 
 /*-----------------------------------------------------------------------*/

@@ -194,18 +194,19 @@ opengl_structure_show_ctrl_notice(GtkWidget *widget)
 /*-----------------------------------------------------------------------*/
 
 /** gl_draw_structure() - Structure leaf: update shared geometry and populate batches
- * @ctx:  gl_view_content_t to fill
- * @zoom: current zoom factor
+ * @ctx:    gl_view_content_t to fill
+ * @zoom:   current zoom factor
+ * @params: dispatch-resolved draw parameters (precomputed colors)
  *
  * Always returns TRUE; sets status_message when no geometry is loaded.
  */
   static gboolean
-gl_draw_structure(void *ctx, float zoom)
+gl_draw_structure(void *ctx, float zoom, const struct_draw_params_t *params)
 {
   gl_view_content_t *out = (gl_view_content_t *)ctx;
   const structure_overlay_data_t *geom;
 
-  opengl_structure_update_shared_geometry();
+  opengl_structure_update_shared_geometry_with_params(params);
   geom = opengl_structure_get_shared_geometry();
 
   memcpy(out->batches, geom->batches,
@@ -259,7 +260,7 @@ structure_scene_generate(gl_view_content_t *out)
   if( zoom < 0.01f )
     zoom = 0.01f;
 
-  return render((void *)out, &gl_struct_ops, RENDER_VIEW_STRUCTURE, zoom);
+  return render((void *)out, &gl_struct_ops, RENDER_VIEW_STRUCTURE, zoom, 1.0);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -303,18 +304,17 @@ static gl_view_config_t structure_view_config = {
   .on_gl_init_failed = opengl_gl_init_failed
 };
 
-/** opengl_structure_ground_plane_is_active() - Report whether ground plane should render
+/** opengl_structure_ground_plane_is_active() - Report whether ground plane renderable is visible
  * @_ctx: unused context pointer
  *
- * Ground plane is visible when a real ground is defined and enabled,
- * matching the NEC2 perfect/real ground condition used during calculation.
+ * Delegates to gnd_has_real_ground() — parse-time immutable predicate.
  */
   static gboolean
 opengl_structure_ground_plane_is_active(void *_ctx)
 {
   (void)_ctx;
 
-  return( gnd.ksymp == 2 && gnd.iperf >= 0 );
+  return( gnd_has_real_ground() );
 
 } /* opengl_structure_ground_plane_is_active() */
 
@@ -462,18 +462,12 @@ advance_view_flow_phase(GtkWidget *w, float step)
  * @udata: unused
  *
  * Advances flow_phase on both structure and rdpattern GL views by
- * near_field.anim_step radians per tick. Returns FALSE to stop the
- * timeout when FLOW_ANIMATE is cleared.
+ * near_field.anim_step radians per tick.  Lifecycle managed externally
+ * by callbacks.c via g_source_remove(flow_anim_tag).
  */
   gboolean
 Animate_Flow_Phase(gpointer udata)
 {
-
-  if( isFlagClear(FLOW_ANIMATE) )
-  {
-    flow_anim_tag = 0;
-    return( FALSE );
-  }
 
   advance_view_flow_phase(
       structure_gl_widget, (float)near_field.anim_step);

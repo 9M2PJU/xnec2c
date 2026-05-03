@@ -21,6 +21,7 @@
 #define OPENGL_STRUCTURE_GEOMETRY_H 1
 
 #include "opengl_structure.h"
+#include "../render/render_dispatch.h"
 
 #ifdef HAVE_OPENGL
 
@@ -29,6 +30,9 @@ void opengl_structure_geometry_cleanup(void);
 
 /* Mark cached geometry stale so next render regenerates from NEC2 data */
 void opengl_structure_geometry_invalidate(void);
+
+/* Check staleness and regenerate shared geometry using dispatch-resolved params */
+void opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *params);
 
 
 #endif /* HAVE_OPENGL */

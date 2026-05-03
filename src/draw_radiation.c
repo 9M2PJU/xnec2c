@@ -19,6 +19,7 @@
 
 #include "draw_radiation.h"
 #include "measurements.h"
+#include "prerender/prerender_nearfield.h"
 #include "shared.h"
 
 #ifdef HAVE_OPENGL
@@ -1030,6 +1031,9 @@ Animate_Near_Field( gpointer udata )
   if( wt >= (double)M_2PI )
     wt = 0.0;
 
+  /* Sync prerender vectors so GL backend reads current animation phase */
+  Prerender_Near_Field( fstep );
+
   g_rec_mutex_unlock(&freq_data_lock);
 
   xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
@@ -1401,6 +1405,9 @@ Recompute_Near_Field_Vectors( int fstep, gboolean snapshot )
         nf->max_hr = nf->points[i].hr;
     }
   }
+
+  /* Sync nf_pre so GL backend reads the recomputed phase data */
+  Prerender_Near_Field( fstep );
 
 } /* Recompute_Near_Field_Vectors() */
 

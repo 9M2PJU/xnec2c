@@ -281,6 +281,12 @@ extern ggrid_t ggrid;
 /* common  /gnd/ */
 extern gnd_t gnd;
 
+/* Real ground predicate: TRUE when NEC2 GN card defined a real or
+ * perfect ground (ksymp==2) with a valid ground type (iperf>=0).
+ * Parse-time immutable after input processing. */
+static inline gboolean
+gnd_has_real_ground(void) { return( gnd.ksymp == 2 && gnd.iperf >= 0 ); }
+
 /* common  /gwav/ */
 extern gwav_t gwav;
 

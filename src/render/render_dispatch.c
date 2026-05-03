@@ -122,6 +122,18 @@ render_check_rdpattern(render_check_result_t *r)
     r->status = RENDER_NO_MODE;
     r->message = render_rdpattern_mode_message();
   }
+
+  r->overlay_active = isFlagSet(OVERLAY_STRUCT);
+}
+
+/*-----------------------------------------------------------------------*/
+
+static render_check_result_t last_rdpat_check;
+
+  const render_check_result_t *
+render_get_last_rdpat_check(void)
+{
+  return( &last_rdpat_check );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -129,7 +141,8 @@ render_check_rdpattern(render_check_result_t *r)
   render_check_result_t
 render_check(render_view_t view)
 {
-  render_check_result_t r = { RENDER_OK, RENDER_MODE_NONE, -1, NULL, FALSE };
+  render_check_result_t r = { .status = RENDER_OK, .mode = RENDER_MODE_NONE,
+    .fstep = -1, .message = NULL, .show_gradient = FALSE, .overlay_active = FALSE };
 
   r.fstep = calc_data.freq_step;
 
@@ -146,7 +159,8 @@ render_check(render_view_t view)
 /*-----------------------------------------------------------------------*/
 
   gboolean
-render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom)
+render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom,
+    double overlay_scale_adj)
 {
   render_check_result_t r;
   gboolean ok;
@@ -154,6 +168,9 @@ render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom)
   g_rec_mutex_lock(&freq_data_lock);
 
   r = render_check(view);
+
+  if( view == RENDER_VIEW_RDPATTERN && r.status != RENDER_SUPPRESS )
+    last_rdpat_check = r;
 
   if( r.status == RENDER_SUPPRESS )
   {
@@ -173,16 +190,92 @@ render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom)
   switch( r.mode )
   {
     case RENDER_MODE_FARFIELD:
-      ok = ops->draw_farfield(ctx, r.fstep, zoom);
+    {
+      ff_draw_params_t ff = { .active = FALSE, .x = 0.0f, .y = 0.0f, .z = 0.0f,
+        .view_scale = 1.0f, .scale_adj = overlay_scale_adj };
+
+      if( r.overlay_active && geom_pre.has_excitation )
+      {
+        ff.active     = TRUE;
+        ff.x          = (float)geom_pre.excitation_cx;
+        ff.y          = (float)geom_pre.excitation_cy;
+        ff.z          = (float)geom_pre.excitation_cz;
+        ff.view_scale = (float)geom_pre.scene_radius;
+      }
+
+      ok = ops->draw_farfield(ctx, r.fstep, zoom, &ff);
       break;
+    }
 
     case RENDER_MODE_NEARFIELD:
-      ok = ops->draw_nearfield(ctx, r.fstep, zoom);
+    {
+      near_field_t *nf = &near_field_fstep[r.fstep];
+      nf_pre_t *np = &nf_pre[r.fstep];
+      int npts = fpat.nrx * fpat.nry * fpat.nrz;
+      nf_field_set_t fields[NF_FIELD_SETS_MAX];
+      int n_fields = 0;
+      double dr = geom_pre.nf_dr_norm;
+
+      if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) && np->e_vecs )
+      {
+        fields[n_fields].vecs = np->e_vecs;
+        n_fields++;
+      }
+
+      if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) && np->h_vecs )
+      {
+        fields[n_fields].vecs = np->h_vecs;
+        n_fields++;
+      }
+
+      if( isFlagSet(DRAW_POYNTING) &&
+          (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) &&
+          np->pov_vecs )
+      {
+        fields[n_fields].vecs = np->pov_vecs;
+        n_fields++;
+      }
+
+      if( n_fields > 0 )
+        ok = ops->draw_nearfield(ctx, zoom, nf->points, npts,
+            fields, n_fields, dr, nf->r_max);
+      else
+        ok = FALSE;
       break;
+    }
 
     case RENDER_MODE_STRUCTURE:
-      ok = ops->draw_structure(ctx, zoom);
+    {
+      struct_draw_params_t params;
+      int fs = r.fstep;
+
+      if( isFlagSet(DRAW_CURRENTS) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
+      {
+        params.wire_colors  = struct_colors[fs].wire_crnt_rgb;
+        params.patch_colors = struct_colors[fs].patch_crnt_rgb;
+        params.cmax = fmax((double)struct_colors[fs].wire_crnt_cmax,
+                           (double)struct_colors[fs].patch_crnt_cmax);
+        params.show_flow = TRUE;
+      }
+      else if( isFlagSet(DRAW_CHARGES) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
+      {
+        params.wire_colors  = struct_colors[fs].wire_chrg_rgb;
+        params.patch_colors = patch_rgb;
+        params.cmax = (double)struct_colors[fs].wire_chrg_cmax;
+        params.show_flow = FALSE;
+      }
+      else
+      {
+        params.wire_colors  = seg_rgb;
+        params.patch_colors = patch_rgb;
+        params.cmax = 0.0;
+        params.show_flow = FALSE;
+      }
+
+      params.fstep = fs;
+      ok = ops->draw_structure(ctx, zoom, &params);
       break;
+    }
 
     default:
       BUG("render: unhandled mode %d\n", r.mode);

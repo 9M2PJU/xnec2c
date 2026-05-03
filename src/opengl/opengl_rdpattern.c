@@ -43,18 +43,9 @@
  * RDPAT_SURFACE_BOTH_DIM (0.30) and RDPAT_SURFACE_DIM (0.47). */
 #define RDPAT_BOTH_SURFACE_DIM_RATIO 0.64f
 
-/* Last far-field NEC generation seen — staleness detection */
-static unsigned int rdpat_last_ff_gen = 0;
 
-/* Last draw style seen — forces regeneration on style change */
-static int rdpat_last_draw_style = -1;
-
-/* Track translation state to detect changes */
-static gboolean rdpat_last_translate_state = FALSE;
-
-/* Cache overlay model scale adjustment for translation */
+/* Overlay model scale adjustment — written by scroll handler, read by scene generator */
 static double rdpat_ovl_scale_adj = 1.0;
-static double rdpat_last_ovl_scale_adj = 1.0;
 
 /* Translated far-field points buffer for excitation center offset */
 static point_3d_t *rdpat_translated_points = NULL;
@@ -90,38 +81,49 @@ rdpattern_overlay_base_scale(float r_max, float view_scale)
 
 /*-----------------------------------------------------------------------*/
 
-/** gl_rdpat_draw_nearfield() - Near-field leaf: generate NF lines and populate batches
- * @ctx:   gl_view_content_t to fill
- * @fstep: current frequency step
- * @zoom:  current zoom factor
+/** gl_rdpat_draw_nearfield() - Near-field leaf: convert prerendered vectors to GL batches
+ * @ctx:      gl_view_content_t to fill
+ * @zoom:     current zoom factor
+ * @origins:  sample point positions [npts]
+ * @npts:     number of near-field sample points
+ * @fields:   dispatch-resolved vector sets (0-3 active field types)
+ * @n_fields: number of active field sets
+ * @dr:       normalization scale distance
+ * @r_max:    maximum distance from origin for view scaling
  *
- * Returns TRUE when batches are populated, FALSE on data dependency failure.
+ * One GL batch per field set. Backend iterates — zero field-type branching.
  */
   static gboolean
-gl_rdpat_draw_nearfield(void *ctx, int fstep, float zoom)
+gl_rdpat_draw_nearfield(void *ctx, float zoom,
+    const near_field_point_t *origins, int npts,
+    const nf_field_set_t *fields, int n_fields,
+    double dr, double r_max)
 {
   gl_view_content_t *out = (gl_view_content_t *)ctx;
-  near_field_t *nf = &near_field_fstep[fstep];
-  int line_count;
-  int nf_count;
-  lit_color_point_t *nf_buf;
+  int total_lines;
 
-  line_count = opengl_rdpattern_generate_nf_lines();
-  if( line_count <= 0 )
+  total_lines = opengl_rdpattern_generate_nf_field_lines(
+      origins, npts, fields, n_fields, dr);
+  if( total_lines <= 0 )
     return FALSE;
 
-  /* Near-field positions overlap structure in same coordinate space;
-   * no translation needed (excitation already aligned). */
-  nf_buf = opengl_rdpattern_get_nf_lines(&nf_count);
-  out->batches[0].vertices = nf_buf;
-  out->batches[0].vertex_count = nf_count * 2;
-  out->batches[0].draw_mode = GL_LINES;
-  out->batches[0].color_dim = rc_config.brightness_nearfield;
-  out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_nearfield);
-  out->batch_count = 1;
+  /* Near-field positions overlap structure in same coordinate space */
+  {
+    int nf_count;
+    lit_color_point_t *nf_buf;
+
+    nf_buf = opengl_rdpattern_get_nf_lines(&nf_count);
+    out->batches[0].vertices = nf_buf;
+    out->batches[0].vertex_count = nf_count * 2;
+    out->batches[0].draw_mode = GL_LINES;
+    out->batches[0].color_dim = rc_config.brightness_nearfield;
+    out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_nearfield);
+    out->batch_count = 1;
+  }
+
   out->vertex_stride = (int)sizeof(lit_color_point_t);
-  out->r_max = (float)nf->r_max;
-  out->clip_extent = (float)nf->r_max;
+  out->r_max = (float)r_max;
+  out->clip_extent = (float)(r_max + dr);
   out->zoom = zoom;
   out->model_scale = 1.0f;
   out->generation = opengl_rdpattern_get_nf_generation();
@@ -133,20 +135,22 @@ gl_rdpat_draw_nearfield(void *ctx, int fstep, float zoom)
 
 /** gl_rdpat_draw_farfield() - Far-field leaf: tessellate gain pattern and populate batches
  * @ctx:   gl_view_content_t to fill
- * @fstep: current frequency step (unused; Generate_Rdpattern_Data reads global state)
+ * @_fstep: current frequency step (unused; Generate_Rdpattern_Data reads global state)
  * @zoom:  current zoom factor
+ * @ff: dispatch-resolved far-field draw parameters
  *
- * Reads OVERLAY_STRUCT to apply excitation-center translation — a geometry
- * manipulation decision, not a content-selection decision.
  * Returns TRUE when batches are populated, FALSE on data dependency failure.
  */
   static gboolean
-gl_rdpat_draw_farfield(void *ctx, int _fstep, float zoom)
+gl_rdpat_draw_farfield(void *ctx, int _fstep, float zoom, const ff_draw_params_t *ff)
 {
+  static double last_ff_scale_adj = 1.0;
+  static unsigned int last_ff_gen = 0;
+  static int last_draw_style = -1;
+  static gboolean last_translate_state = FALSE;
   gl_view_content_t *out = (gl_view_content_t *)ctx;
   gboolean translate_to_excitation;
   float offset_x, offset_y, offset_z;
-  const structure_overlay_data_t *geom = NULL;
   unsigned int current_gen;
   double r_min, r_range;
   rdpattern_data_t rd_data;
@@ -154,26 +158,11 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, float zoom)
   float off_len;
   float r_max;
 
-  /* fstep unused: Generate_Rdpattern_Data reads calc_data.freq_step */
-  (void)_fstep;
-
   off_len = 0.0f;
-  translate_to_excitation = FALSE;
-  offset_x = 0.0f;
-  offset_y = 0.0f;
-  offset_z = 0.0f;
-
-  if( isFlagSet(OVERLAY_STRUCT) )
-  {
-    geom = opengl_structure_get_shared_geometry();
-    if( geom && geom->has_excitation_center )
-    {
-      translate_to_excitation = TRUE;
-      offset_x = (float)geom->excitation_center_x;
-      offset_y = (float)geom->excitation_center_y;
-      offset_z = (float)geom->excitation_center_z;
-    }
-  }
+  translate_to_excitation = ff->active;
+  offset_x = ff->x;
+  offset_y = ff->y;
+  offset_z = ff->z;
 
   current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
   if( current_gen == 0 )
@@ -194,8 +183,8 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, float zoom)
     npts = rd_data.nth * rd_data.nph;
 
     /* Scale offset from structure coords to radiation pattern coords */
-    model_scale = rdpattern_overlay_base_scale(r_max, geom->view_scale)
-        * (float)rdpat_ovl_scale_adj;
+    model_scale = rdpattern_overlay_base_scale(r_max, ff->view_scale)
+        * (float)ff->scale_adj;
 
     scaled_off_x = offset_x * model_scale;
     scaled_off_y = offset_y * model_scale;
@@ -226,10 +215,10 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, float zoom)
 
   /* Regenerate geometry on data change, translation state change,
    * scale change, or draw style change */
-  if( current_gen != rdpat_last_ff_gen ||
-      rc_config.rdpattern_draw_style != rdpat_last_draw_style ||
-      translate_to_excitation != rdpat_last_translate_state ||
-      (translate_to_excitation && rdpat_ovl_scale_adj != rdpat_last_ovl_scale_adj) )
+  if( current_gen != last_ff_gen ||
+      rc_config.rdpattern_draw_style != last_draw_style ||
+      translate_to_excitation != last_translate_state ||
+      (translate_to_excitation && ff->scale_adj != last_ff_scale_adj) )
   {
     gboolean need_tris =
       (rc_config.rdpattern_draw_style == RDPAT_STYLE_SURFACE ||
@@ -256,10 +245,10 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, float zoom)
         return FALSE;
     }
 
-    rdpat_last_ff_gen = current_gen;
-    rdpat_last_draw_style = rc_config.rdpattern_draw_style;
-    rdpat_last_translate_state = translate_to_excitation;
-    rdpat_last_ovl_scale_adj = rdpat_ovl_scale_adj;
+    last_ff_gen = current_gen;
+    last_draw_style = rc_config.rdpattern_draw_style;
+    last_translate_state = translate_to_excitation;
+    last_ff_scale_adj = ff->scale_adj;
   }
 
   /* Populate batches per draw style */
@@ -389,7 +378,8 @@ rdpattern_scene_generate(gl_view_content_t *out)
   if( zoom < 0.01f )
     zoom = 0.01f;
 
-  return render((void *)out, &gl_rdpat_ops, RENDER_VIEW_RDPATTERN, zoom);
+  return render((void *)out, &gl_rdpat_ops, RENDER_VIEW_RDPATTERN, zoom,
+      rdpat_ovl_scale_adj);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -434,11 +424,11 @@ rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer vie
 
   state = (gl_view_state_t *)view_state;
 
-  if( !state || isFlagClear(OVERLAY_STRUCT) )
+  if( !state || !render_get_last_rdpat_check()->overlay_active )
     return( FALSE );
 
-  /* Scale adjustment only applies to far-field (gain) view */
-  if( isFlagClear(DRAW_GAIN) )
+  /* Scale adjustment only applies to far-field view */
+  if( render_get_last_rdpat_check()->mode != RENDER_MODE_FARFIELD )
     return( FALSE );
 
   /* Compute scale factor matching zoom behavior */
@@ -454,7 +444,6 @@ rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer vie
   else
     return( FALSE );
 
-  /* Cache for use in translation calculation */
   rdpat_ovl_scale_adj = state->ovl_model_scale_adj;
 
   xnec2_widget_queue_draw(widget, TRUE);
@@ -468,7 +457,7 @@ rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer vie
  * @primary: primary scene content (rdpattern geometry)
  * @out: overlay scene content to populate
  *
- * Returns structure geometry for overlay when OVERLAY_STRUCT is set.
+ * Returns structure geometry for overlay when dispatch resolved overlay_active.
  * Computes physical scale ratio from structure to radiation pattern.
  */
   static gboolean
@@ -477,7 +466,8 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
   const structure_overlay_data_t *geom;
   static gboolean notice_shown = FALSE;
 
-  if( isFlagClear(OVERLAY_STRUCT) || (data.n <= 0 && data.m <= 0) || !primary )
+  if( !render_get_last_rdpat_check()->overlay_active ||
+      (data.n <= 0 && data.m <= 0) || !primary )
     return( FALSE );
 
   /* Show notice on first activation */
@@ -488,8 +478,6 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
     notice_shown = TRUE;
   }
 
-  /* Ensure shared geometry is fresh */
-  opengl_structure_update_shared_geometry();
   geom = opengl_structure_get_shared_geometry();
 
   if( !geom || geom->batch_count <= 0 )
@@ -503,7 +491,7 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
 
   /* Scale structure to match radiation pattern space for far-field,
    * use 1:1 for near-field (both already in meters) */
-  if( isFlagSet(DRAW_GAIN) )
+  if( render_get_last_rdpat_check()->mode == RENDER_MODE_FARFIELD )
   {
     out->model_scale = rdpattern_overlay_base_scale(primary->r_max, geom->view_scale);
     out->scale_adj_locked = FALSE;
@@ -535,7 +523,7 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
 rdpattern_axes_is_active(void *ctx)
 {
   (void)ctx;
-  return( isFlagSet(DRAW_GAIN) || isFlagSet(DRAW_EHFIELD) );
+  return( render_get_last_rdpat_check()->mode != RENDER_MODE_NONE );
 }
 
 /*-----------------------------------------------------------------------*/

@@ -22,13 +22,18 @@
 
 #include "common.h"
 #include "../draw_radiation.h"
+#include "../render/render_dispatch.h"
 
 #ifdef HAVE_OPENGL
 #include "../shared.h"
 
-/* Generate line geometry for near-field vectors.
- * Returns line count, or -1 if near-field is inactive or invalid. */
-int opengl_rdpattern_generate_nf_lines(void);
+/* Generate line geometry from dispatch-resolved near-field vector sets.
+ * Iterates fields[0..n_fields-1], converting nf_vector_t to lit_color_point_t pairs.
+ * Returns total line count, or -1 on failure. */
+int opengl_rdpattern_generate_nf_field_lines(
+    const near_field_point_t *origins, int npts,
+    const nf_field_set_t *fields, int n_fields,
+    double dr);
 
 /* Tessellate point_3d buffer into colored triangles.
  * Returns triangle count, or -1 on invalid input. */

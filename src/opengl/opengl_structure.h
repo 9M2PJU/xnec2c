@@ -21,15 +21,7 @@
 #define OPENGL_STRUCTURE_H 1
 
 #include "common.h"
-
-/* Draw mode for structure rendering */
-typedef enum
-{
-  STRUCTURE_DRAW_GEOMETRY = 0,
-  STRUCTURE_DRAW_CURRENTS,
-  STRUCTURE_DRAW_CHARGES
-
-} structure_draw_mode_t;
+#include "../render/render_dispatch.h"
 
 /* Flow direction visualization mode for patch currents */
 typedef enum
@@ -120,14 +112,13 @@ gboolean opengl_structure_on_ctrl_scroll(
  * Called from scene_generate; shared guard across all views. */
 void opengl_structure_show_ctrl_notice(GtkWidget *widget);
 
-/* Update shared geometry buffer from global data/crnt/flags.
- * Call before reading shared geometry to ensure freshness. */
-void opengl_structure_update_shared_geometry(void);
+/* Update shared geometry buffer using dispatch-resolved draw parameters. */
+void opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *params);
 
 /* Return read-only pointer to shared geometry data */
 const structure_overlay_data_t* opengl_structure_get_shared_geometry(void);
 
-/* Timeout callback for flow phase animation (FLOW_ANIMATE flag) */
+/* Timeout callback for flow phase animation; lifecycle managed by callbacks.c */
 gboolean Animate_Flow_Phase(gpointer udata);
 
 /* Reset flow phase to zero on both CPU geometry and GPU views */

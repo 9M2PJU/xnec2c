@@ -20,7 +20,6 @@
 #include "opengl_structure_geometry.h"
 #include "opengl_structure.h"
 #include "../shared.h"
-#include "../draw.h"
 
 #ifdef HAVE_OPENGL
 
@@ -86,7 +85,7 @@ static const float arrow_template_uvs[ARROW_VERTEX_COUNT][2] = {
 static gl_draw_batch_t batches[GL_VIEW_MAX_BATCHES];
 static int batch_count = 0;
 static unsigned int structure_geometry_generation = 1;
-static structure_draw_mode_t structure_last_mode = STRUCTURE_DRAW_GEOMETRY;
+static const rgb_f_t *last_wire_colors = NULL;
 static float structure_view_scale = 1.0f;
 
 /* Track previous radius scale to detect changes requiring regeneration */
@@ -97,45 +96,6 @@ static double structure_last_radius_scale = CYLINDER_RADIUS_SCALE_DEFAULT;
 static structure_overlay_data_t shared_overlay_data = { 0 };
 
 /*-----------------------------------------------------------------------*/
-
-/** opengl_structure_get_draw_mode() - Derive draw mode from global flags
- */
-  static structure_draw_mode_t
-opengl_structure_get_draw_mode(void)
-{
-  if( isFlagSet(DRAW_CURRENTS) )
-    return( STRUCTURE_DRAW_CURRENTS );
-
-  if( isFlagSet(DRAW_CHARGES) )
-    return( STRUCTURE_DRAW_CHARGES );
-
-  return( STRUCTURE_DRAW_GEOMETRY );
-
-} /* opengl_structure_get_draw_mode() */
-
-/*-----------------------------------------------------------------------*/
-
-/** get_segment_magnitude() - Compute current or charge magnitude for a segment
- * @idx: segment index into crnt arrays
- * @mode: STRUCTURE_DRAW_CURRENTS or STRUCTURE_DRAW_CHARGES
- */
-  static double
-get_segment_magnitude(int idx, structure_draw_mode_t mode)
-{
-  int fstep = calc_data.freq_step;
-  if( idx < 0 || !CRNT_FSTEP_AVAILABLE(fstep) )
-    return( 0.0 );
-
-  crnt_t *cf = &crnt_fstep[fstep];
-
-  if( mode == STRUCTURE_DRAW_CURRENTS )
-    return( cabs(cf->cur[idx]) );
-
-  if( mode == STRUCTURE_DRAW_CHARGES )
-    return( cabs(cmplx(cf->bir[idx], cf->bii[idx])) );
-
-  return( 0.0 );
-}
 
 /*-----------------------------------------------------------------------*/
 
@@ -164,41 +124,6 @@ get_patch_tangent_projections(int idx,
 
 /*-----------------------------------------------------------------------*/
 
-/** get_patch_tangent_magnitudes() - Project patch current onto tangent axes (magnitude only)
- * @idx: patch index (0-based into data.m)
- * @ct1m: output magnitude along t1
- * @ct2m: output magnitude along t2
- *
- * Wrapper around get_patch_tangent_projections() for callers
- * that need only magnitudes (color mapping, RSS computation).
- */
-  static void
-get_patch_tangent_magnitudes(int idx, double *ct1m, double *ct2m)
-{
-  complex double ct1, ct2;
-
-  get_patch_tangent_projections(idx, &ct1, &ct2);
-  *ct1m = cabs(ct1);
-  *ct2m = cabs(ct2);
-}
-
-/*-----------------------------------------------------------------------*/
-
-/** get_patch_current_magnitude() - RSS magnitude of patch surface currents
- * @idx: patch index (0-based into data.m)
- */
-  static double
-get_patch_current_magnitude(int idx)
-{
-  double ct1m, ct2m;
-
-  get_patch_tangent_magnitudes(idx, &ct1m, &ct2m);
-
-  return( sqrt(ct1m * ct1m + ct2m * ct2m) );
-}
-
-/*-----------------------------------------------------------------------*/
-
 /** get_patch_normal() - Surface normal via cross product of t1 and t2
  * @idx: patch index (0-based into data.m)
  */
@@ -212,61 +137,25 @@ get_patch_normal(int idx, float *nx, float *ny, float *nz)
 
 /*-----------------------------------------------------------------------*/
 
-/** get_patch_color() - Determine patch display color based on draw mode
- * @idx: patch index (0-based into data.m)
- * @mode: current structure draw mode
- * @cmax: maximum current magnitude for color scaling
- */
-  static void
-get_patch_color(int idx, structure_draw_mode_t mode, double cmax,
-    float *out_r, float *out_g, float *out_b)
-{
-  int fstep = calc_data.freq_step;
-  if( mode == STRUCTURE_DRAW_CURRENTS && cmax > 0.0
-      && CRNT_FSTEP_AVAILABLE(fstep) )
-  {
-    double mag = get_patch_current_magnitude(idx);
-    double red, grn, blu;
-
-    Value_to_Color(&red, &grn, &blu, mag, cmax);
-    *out_r = (float)red;
-    *out_g = (float)grn;
-    *out_b = (float)blu;
-  }
-  else if( mode == STRUCTURE_DRAW_CHARGES )
-  {
-    *out_r = 0.5f;
-    *out_g = 0.5f;
-    *out_b = 0.5f;
-  }
-  else
-  {
-    *out_r = 0.2f;
-    *out_g = 0.4f;
-    *out_b = 0.9f;
-  }
-}
-
 /*-----------------------------------------------------------------------*/
 
 /** get_patch_flow_data() - Populate flow_data with complex tangent projections
- * @idx: patch index (0-based into data.m)
- * @mode: current structure draw mode
- * @cmax: maximum current magnitude for ratio scaling
- * @fd: output array of 4 floats {Re(ct1), Im(ct1), Re(ct2), Im(ct2)}
- *      scaled by mag_ratio so the shader can derive both direction and intensity
+ * @idx:       patch index (0-based into data.m)
+ * @show_flow: TRUE when current-flow visualization is active
+ * @cmax:      maximum current magnitude for ratio scaling
+ * @fd:        output array of 4 floats {Re(ct1), Im(ct1), Re(ct2), Im(ct2)}
+ *             scaled by mag_ratio so the shader can derive both direction and intensity
  *
  * All four components are zero when current data is absent or below threshold.
  * The shader computes instantaneous direction at arbitrary phase from these
  * complex components, enabling all visualization modes without CPU recomputation.
  */
   static void
-get_patch_flow_data(int idx, structure_draw_mode_t mode, double cmax,
+get_patch_flow_data(int idx, gboolean show_flow, double cmax,
     float *fd)
 {
   int fstep = calc_data.freq_step;
-  if( mode == STRUCTURE_DRAW_CURRENTS && cmax > 0.0
-      && CRNT_FSTEP_AVAILABLE(fstep) )
+  if( show_flow && cmax > 0.0 && CRNT_FSTEP_AVAILABLE(fstep) )
   {
     complex double ct1, ct2;
     double scale;
@@ -297,52 +186,6 @@ get_patch_flow_data(int idx, structure_draw_mode_t mode, double cmax,
  * Omitted fields default to zero (tangent1/tangent2 for flat vertices). */
 
 /*-----------------------------------------------------------------------*/
-
-/** get_segment_color() - Determine color for a segment based on type and draw mode
- * @idx: segment index
- * @mode: current draw mode (geometry, currents, or charges)
- * @cmax: maximum magnitude for heat map scaling
- * @r: output red component
- * @g: output green component
- * @b: output blue component
- *
- * GEOMETRY mode uses get_segment_color_type() from draw.c;
- * CURRENTS/CHARGES mode uses heat map based on magnitude.
- */
-  static void
-get_segment_color(
-    int idx,
-    structure_draw_mode_t mode,
-    double cmax,
-    float *r, float *g, float *b)
-{
-  if( mode == STRUCTURE_DRAW_GEOMETRY )
-  {
-    /* Use shared color logic from draw.c (idx+1 for 1-indexed seg_num) */
-    segment_color_type_t type = get_segment_color_type(idx + 1);
-    segment_type_to_rgb(type, r, g, b);
-    return;
-  }
-
-  /* Currents or charges mode: color by magnitude using heat map */
-  if( cmax > 0.0 )
-  {
-    double mag = get_segment_magnitude(idx, mode);
-    double red, grn, blu;
-
-    Value_to_Color(&red, &grn, &blu, mag, cmax);
-    *r = (float)red;
-    *g = (float)grn;
-    *b = (float)blu;
-  }
-  else
-  {
-    /* No data: default gray */
-    *r = 0.5f;
-    *g = 0.5f;
-    *b = 0.5f;
-  }
-}
 
 /*-----------------------------------------------------------------------*/
 
@@ -403,14 +246,13 @@ calculate_excitation_center(double *cx, double *cy, double *cz)
 /*-----------------------------------------------------------------------*/
 
 /** generate_segments_lines() - Emit GL_LINES vertices for wire segments
- * @batch: draw batch with pre-allocated vertices buffer
- * @mode: draw mode (geometry, currents, or charges)
- * @cmax: maximum current/charge magnitude for color scaling
+ * @batch:  draw batch with pre-allocated vertices buffer
+ * @params: dispatch-resolved draw parameters (precomputed colors)
  *
  * Populates batch with 2 vertices per segment. Sets vertex_count.
  */
   static void
-generate_segments_lines(gl_draw_batch_t *batch, structure_draw_mode_t mode, double cmax)
+generate_segments_lines(gl_draw_batch_t *batch, const struct_draw_params_t *params)
 {
   int idx, vidx = 0;
   float r, g, b;
@@ -421,7 +263,9 @@ generate_segments_lines(gl_draw_batch_t *batch, structure_draw_mode_t mode, doub
     double dx, dy, dz, len;
     float nx, ny, nz;
 
-    get_segment_color(idx, mode, cmax, &r, &g, &b);
+    r = params->wire_colors[idx].r;
+    g = params->wire_colors[idx].g;
+    b = params->wire_colors[idx].b;
 
     /* Normal perpendicular to segment axis for consistent lighting.
      * Matches cylinder cross-section logic so lines shade like
@@ -487,16 +331,15 @@ generate_segments_lines(gl_draw_batch_t *batch, structure_draw_mode_t mode, doub
 /*-----------------------------------------------------------------------*/
 
 /** generate_patches_wireframe() - Emit GL_LINES vertices for patch outlines and arrows
- * @batch: draw batch with pre-allocated vertices buffer
- * @mode: draw mode (geometry, currents, or charges)
- * @cmax: maximum current/charge magnitude for color scaling
+ * @batch:  draw batch with pre-allocated vertices buffer
+ * @params: dispatch-resolved draw parameters (precomputed colors)
  *
- * Emits box outline (8 vertices) per patch.  When mode is STRUCTURE_DRAW_CURRENTS
+ * Emits box outline (8 vertices) per patch.  When params->show_flow is TRUE
  * and magnitude exceeds threshold, also emits directional arrow (up to 14 vertices).
  * Sets batch vertex_count.
  */
   static void
-generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, double cmax)
+generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *params)
 {
   int idx, vidx = 0;
   structure_vertex_t *verts = (structure_vertex_t *)batch->vertices;
@@ -511,7 +354,9 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
     float c2x, c2y, c2z, c3x, c3y, c3z;
 
     get_patch_normal(idx, &nx, &ny, &nz);
-    get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
+    p_r = params->patch_colors[idx].r;
+    p_g = params->patch_colors[idx].g;
+    p_b = params->patch_colors[idx].b;
 
     /* Quad corners: c0(+t1,+t2) c1(-t1,+t2) c2(-t1,-t2) c3(+t1,-t2) */
     c0x = (float)(save.xtemp[j] + s * data.patches[idx].t1x + s * data.patches[idx].t2x);
@@ -572,11 +417,11 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
       gboolean emit_arrow = FALSE;
       float fd[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-      if( mode == STRUCTURE_DRAW_CURRENTS )
+      if( params->show_flow )
       {
         float mag_ratio;
 
-        get_patch_flow_data(idx, mode, cmax, fd);
+        get_patch_flow_data(idx, params->show_flow, params->cmax, fd);
 
         mag_ratio = (float)sqrt(
             fd[0] * fd[0] + fd[1] * fd[1] +
@@ -620,16 +465,15 @@ generate_patches_wireframe(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
 /*-----------------------------------------------------------------------*/
 
 /** generate_segments_cylinders() - Emit GL_TRIANGLES vertices for cylinder wire segments
- * @batch: draw batch with pre-allocated vertices buffer
- * @mode: draw mode (geometry, currents, or charges)
- * @cmax: maximum current/charge magnitude for color scaling
+ * @batch:                draw batch with pre-allocated vertices buffer
+ * @params:               dispatch-resolved draw parameters (precomputed colors)
  * @cylinder_radius_scale: user-adjustable radius multiplier
- * @r_max: maximum model extent for minimum-visible scaling
+ * @r_max:                maximum model extent for minimum-visible scaling
  *
  * Populates batch with cylinder vertices per segment. Sets vertex_count.
  */
   static void
-generate_segments_cylinders(gl_draw_batch_t *batch, structure_draw_mode_t mode, double cmax,
+generate_segments_cylinders(gl_draw_batch_t *batch, const struct_draw_params_t *params,
     double cylinder_radius_scale, double r_max)
 {
   int idx, vidx = 0;
@@ -653,7 +497,9 @@ generate_segments_cylinders(gl_draw_batch_t *batch, structure_draw_mode_t mode, 
     mesh.vertices = cyl_temp;
     mesh.vertex_count = cyl_vcount;
 
-    get_segment_color(idx, mode, cmax, &r, &g, &b);
+    r = params->wire_colors[idx].r;
+    g = params->wire_colors[idx].g;
+    b = params->wire_colors[idx].b;
 
     /* Scale radius with fabs for safety, clamp to minimum visible */
     radius = fabs(data.segments[idx].bi) * cylinder_radius_scale;
@@ -691,15 +537,14 @@ generate_segments_cylinders(gl_draw_batch_t *batch, structure_draw_mode_t mode, 
 /*-----------------------------------------------------------------------*/
 
 /** generate_patches_triangles() - Emit GL_TRIANGLES vertices for filled patch quads
- * @batch: draw batch with pre-allocated vertices buffer
- * @mode: draw mode (geometry, currents, or charges)
- * @cmax: maximum current/charge magnitude for color scaling
+ * @batch:  draw batch with pre-allocated vertices buffer
+ * @params: dispatch-resolved draw parameters (precomputed colors)
  *
  * Emits 6 vertices (2 triangles) per patch with UV and flow data.
  * Sets batch vertex_count.
  */
   static void
-generate_patches_triangles(gl_draw_batch_t *batch, structure_draw_mode_t mode, double cmax)
+generate_patches_triangles(gl_draw_batch_t *batch, const struct_draw_params_t *params)
 {
   int idx, vidx = 0;
   structure_vertex_t *verts = (structure_vertex_t *)batch->vertices;
@@ -729,8 +574,10 @@ generate_patches_triangles(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
     c3y = (float)(save.ytemp[j] + s * data.patches[idx].t1y - s * data.patches[idx].t2y);
     c3z = (float)(save.ztemp[j] + s * data.patches[idx].t1z - s * data.patches[idx].t2z);
 
-    get_patch_color(idx, mode, cmax, &p_r, &p_g, &p_b);
-    get_patch_flow_data(idx, mode, cmax, fd);
+    p_r = params->patch_colors[idx].r;
+    p_g = params->patch_colors[idx].g;
+    p_b = params->patch_colors[idx].b;
+    get_patch_flow_data(idx, params->show_flow, params->cmax, fd);
 
     /* Triangle 1: c0(1,1), c1(0,1), c2(0,0) */
     verts[vidx++] = (structure_vertex_t){
@@ -779,7 +626,7 @@ generate_patches_triangles(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
 /*-----------------------------------------------------------------------*/
 
 /** opengl_structure_generate_geometry() - Generate geometry for antenna wire segments and patches
- * @mode: draw mode (geometry, currents, or charges)
+ * @params:               dispatch-resolved draw parameters (precomputed colors)
  * @cylinder_radius_scale: user-adjustable radius multiplier
  *
  * Populates batches[0] (segments) and batches[1] (patches) with independent
@@ -787,12 +634,11 @@ generate_patches_triangles(gl_draw_batch_t *batch, structure_draw_mode_t mode, d
  */
   static void
 opengl_structure_generate_geometry(
-    structure_draw_mode_t mode,
+    const struct_draw_params_t *params,
     double cylinder_radius_scale)
 {
   int idx;
   int seg_verts, patch_verts;
-  double cmax;
   double r_max;
   gboolean seg_line_mode, patch_wireframe;
 
@@ -821,32 +667,6 @@ opengl_structure_generate_geometry(
   if( data.m > 0 )
     mem_realloc((void **)&batches[1].vertices,
         (size_t)patch_verts * sizeof(structure_vertex_t), __LOCATION__);
-
-  /* Find max magnitude for color scaling (wires + patch currents) */
-  cmax = 0.0;
-  int fstep = calc_data.freq_step;
-  if( (mode == STRUCTURE_DRAW_CURRENTS || mode == STRUCTURE_DRAW_CHARGES)
-      && CRNT_FSTEP_AVAILABLE(fstep) )
-  {
-    for( idx = 0; idx < data.n; idx++ )
-    {
-      double mag = get_segment_magnitude(idx, mode);
-      if( mag > cmax )
-        cmax = mag;
-    }
-
-    /* Patch current magnitudes (currents mode only; no patch charge data) */
-    if( mode == STRUCTURE_DRAW_CURRENTS )
-    {
-      for( idx = 0; idx < data.m; idx++ )
-      {
-        double mag = get_patch_current_magnitude(idx);
-
-        if( mag > cmax )
-          cmax = mag;
-      }
-    }
-  }
 
   /* Find maximum distance from origin for scaling */
   r_max = 0.0;
@@ -900,9 +720,9 @@ opengl_structure_generate_geometry(
 
   /* Generate segment batch */
   if( seg_line_mode )
-    generate_segments_lines(&batches[0], mode, cmax);
+    generate_segments_lines(&batches[0], params);
   else
-    generate_segments_cylinders(&batches[0], mode, cmax,
+    generate_segments_cylinders(&batches[0], params,
         cylinder_radius_scale, r_max);
 
   batches[0].draw_mode = seg_line_mode ? GL_LINES : GL_TRIANGLES;
@@ -911,9 +731,9 @@ opengl_structure_generate_geometry(
   if( data.m > 0 )
   {
     if( patch_wireframe )
-      generate_patches_wireframe(&batches[1], mode, cmax);
+      generate_patches_wireframe(&batches[1], params);
     else
-      generate_patches_triangles(&batches[1], mode, cmax);
+      generate_patches_triangles(&batches[1], params);
 
     batches[1].draw_mode = patch_wireframe ? GL_LINES : GL_TRIANGLES;
     batches[1].polygon_offset = TRUE;
@@ -927,24 +747,15 @@ opengl_structure_generate_geometry(
 
 /*-----------------------------------------------------------------------*/
 
-/** opengl_structure_update_shared_geometry() - Check staleness of shared geometry and regenerate if needed
+/** opengl_structure_update_shared_geometry_with_params() - Check staleness and regenerate shared geometry
+ * @params: dispatch-resolved draw parameters (precomputed colors, cmax, show_flow)
  *
- * Called by both structure window and rdpattern overlay before rendering.
+ * Called by the structure window's render() path.  Regenerates when colors,
+ * fstep, radius scale, or geometry has changed.
  */
   void
-opengl_structure_update_shared_geometry(void)
+opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *params)
 {
-  structure_draw_mode_t current_mode;
-  double cylinder_radius_scale;
-
-  current_mode = opengl_structure_get_draw_mode();
-  cylinder_radius_scale = opengl_structure_get_radius_scale();
-
-  /* Check if current mode requires current/charge data */
-  gboolean is_current_mode =
-    (current_mode == STRUCTURE_DRAW_CURRENTS ||
-     current_mode == STRUCTURE_DRAW_CHARGES);
-
   static int last_fstep = -1;
 
   /* Track freq_mhz separately: freq_step stays at steps_total for all
@@ -952,22 +763,26 @@ opengl_structure_update_shared_geometry(void)
    * to detect data changes in the extra slot. */
   static double last_freq_mhz = -1.0;
 
+  double cylinder_radius_scale;
+
+  cylinder_radius_scale = opengl_structure_get_radius_scale();
+
   gboolean extra_slot_changed =
     (calc_data.freq_step == calc_data.steps_total &&
      calc_data.freq_mhz != last_freq_mhz);
 
-  /* Regenerate on mode change, empty buffer, or new current data */
-  if( current_mode != structure_last_mode ||
+  /* Regenerate on color pointer change (mode/fstep change), empty buffer, new data, or scale change */
+  if( params->wire_colors != last_wire_colors ||
       batch_count == 0 ||
       cylinder_radius_scale != structure_last_radius_scale ||
-      (is_current_mode && CRNT_FSTEP_AVAILABLE(calc_data.freq_step) &&
+      (params->cmax > 0.0 && CRNT_FSTEP_AVAILABLE(calc_data.freq_step) &&
        (calc_data.freq_step != last_fstep || extra_slot_changed)) )
   {
-    structure_last_mode = current_mode;
-    opengl_structure_generate_geometry(current_mode, cylinder_radius_scale);
+    last_wire_colors = params->wire_colors;
+    opengl_structure_generate_geometry(params, cylinder_radius_scale);
 
     /* Prevent redundant regeneration on subsequent expose events */
-    if( is_current_mode )
+    if( params->cmax > 0.0 )
     {
       last_fstep = calc_data.freq_step;
       last_freq_mhz = calc_data.freq_mhz;
