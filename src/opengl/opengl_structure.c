@@ -27,6 +27,7 @@
 #include "opengl_settings.h"
 #include "../opengl-engine/opengl_view.h"
 #include "../opengl-engine/opengl_view_notice.h"
+#include "../render/render_dispatch.h"
 
 /* Maximum allowed radius scale */
 #define CYLINDER_RADIUS_SCALE_MAX 100.0
@@ -192,29 +193,20 @@ opengl_structure_show_ctrl_notice(GtkWidget *widget)
 
 /*-----------------------------------------------------------------------*/
 
-/** structure_scene_generate() - Scene provider generate callback
- * @out: view content to populate
+/** gl_draw_structure() - Structure leaf: update shared geometry and populate batches
+ * @ctx:  gl_view_content_t to fill
+ * @zoom: current zoom factor
  *
- * Delegates to shared geometry updater, then fills view content.
+ * Always returns TRUE; sets status_message when no geometry is loaded.
  */
   static gboolean
-structure_scene_generate(gl_view_content_t *out)
+gl_draw_structure(void *ctx, float zoom)
 {
-  g_rec_mutex_lock(&freq_data_lock);
-
+  gl_view_content_t *out = (gl_view_content_t *)ctx;
   const structure_overlay_data_t *geom;
-  float zoom;
-
-  opengl_structure_show_ctrl_notice(structure_gl_widget);
 
   opengl_structure_update_shared_geometry();
   geom = opengl_structure_get_shared_geometry();
-
-  /* Zoom from view->zoom; view_set_zoom() is the authoritative writer. */
-  zoom = (structure_view != NULL) ? structure_view->zoom : 1.0f;
-
-  if( zoom < 0.01f )
-    zoom = 0.01f;
 
   memcpy(out->batches, geom->batches,
       (size_t)geom->batch_count * sizeof(geom->batches[0]));
@@ -224,15 +216,50 @@ structure_scene_generate(gl_view_content_t *out)
   out->clip_extent = out->r_max;
   out->zoom = zoom;
   out->model_scale = 1.0f;
-  out->show_gradient = FALSE;
   out->generation = geom->generation;
 
   /* Prompt user to open a file when no geometry is loaded */
   if( geom->batch_count == 0 )
-    out->status_message = "File ▸ Open to load an NEC file";
+    out->status_message = STATUS_MSG_OPEN_FILE;
 
-  g_rec_mutex_unlock(&freq_data_lock);
-  return( TRUE );
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* Backend vtable for structure GL scene.
+ * draw_farfield and draw_nearfield are NULL: render_check never resolves
+ * RENDER_MODE_FARFIELD or RENDER_MODE_NEARFIELD for RENDER_VIEW_STRUCTURE. */
+static const render_ops_t gl_struct_ops =
+{
+  .draw_farfield  = NULL,
+  .draw_nearfield = NULL,
+  .draw_structure = gl_draw_structure,
+  .init_empty     = gl_view_init_empty,
+  .set_status     = gl_view_set_status,
+  .set_gradient   = gl_view_set_gradient,
+};
+
+/*-----------------------------------------------------------------------*/
+
+/** structure_scene_generate() - Scene provider generate callback
+ * @out: view content to populate
+ *
+ * Thin wrapper: extracts zoom and delegates to unified render() dispatch.
+ */
+  static gboolean
+structure_scene_generate(gl_view_content_t *out)
+{
+  float zoom;
+
+  opengl_structure_show_ctrl_notice(structure_gl_widget);
+
+  /* Zoom from view->zoom; view_set_zoom() is the authoritative writer. */
+  zoom = (structure_view != NULL) ? structure_view->zoom : 1.0f;
+  if( zoom < 0.01f )
+    zoom = 0.01f;
+
+  return render((void *)out, &gl_struct_ops, RENDER_VIEW_STRUCTURE, zoom);
 }
 
 /*-----------------------------------------------------------------------*/

@@ -95,6 +95,46 @@ typedef struct
 
 } gl_view_content_t;
 
+/** gl_view_init_empty() - Initialize a gl_view_content_t for an empty scene
+ * @ctx:  gl_view_content_t (passed as void* through render_ops_t)
+ * @zoom: zoom factor to set in the scene
+ */
+static inline void
+gl_view_init_empty(void *ctx, float zoom)
+{
+  gl_view_content_t *out = (gl_view_content_t *)ctx;
+
+  out->batch_count = 0;
+  out->r_max = 1.5f;
+  out->clip_extent = 1.5f;
+  out->zoom = zoom;
+  out->model_scale = 1.0f;
+}
+
+/** gl_view_set_status() - Set the status message on a gl_view_content_t
+ * @ctx: gl_view_content_t (passed as void* through render_ops_t)
+ * @msg: STATUS_MSG_* string constant, or NULL
+ */
+static inline void
+gl_view_set_status(void *ctx, const char *msg)
+{
+  gl_view_content_t *out = (gl_view_content_t *)ctx;
+
+  out->status_message = msg;
+}
+
+/** gl_view_set_gradient() - Enable or disable gradient display
+ * @ctx:  gl_view_content_t (passed as void* through render_ops_t)
+ * @show: TRUE to display gradient key
+ */
+static inline void
+gl_view_set_gradient(void *ctx, gboolean show)
+{
+  gl_view_content_t *out = (gl_view_content_t *)ctx;
+
+  out->show_gradient = show;
+}
+
 /* Notice position within the GL viewport */
 typedef enum
 {

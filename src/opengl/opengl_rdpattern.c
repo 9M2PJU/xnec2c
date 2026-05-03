@@ -29,6 +29,7 @@
 
 #include "../opengl-engine/opengl_view.h"
 #include "../opengl-engine/opengl_view_notice.h"
+#include "../render/render_dispatch.h"
 
 /* Default structure overlay extent as multiple of radiation pattern r_max */
 #define OVERLAY_DEFAULT_EXTENT 1.25f
@@ -89,45 +90,74 @@ rdpattern_overlay_base_scale(float r_max, float view_scale)
 
 /*-----------------------------------------------------------------------*/
 
-/** rdpattern_init_empty_scene() - Populate a minimal scene with no geometry
- * @out: scene content to initialize
- * @zoom: zoom factor to set in the scene
+/** gl_rdpat_draw_nearfield() - Near-field leaf: generate NF lines and populate batches
+ * @ctx:   gl_view_content_t to fill
+ * @fstep: current frequency step
+ * @zoom:  current zoom factor
  *
- * Caller sets status_message after return.  Only non-zero fields are set;
- * caller provides the struct zero-initialized via {0}.
+ * Returns TRUE when batches are populated, FALSE on data dependency failure.
  */
-  static void
-rdpattern_init_empty_scene(gl_view_content_t *out, float zoom)
+  static gboolean
+gl_rdpat_draw_nearfield(void *ctx, int fstep, float zoom)
 {
-  out->batch_count = 0;
-  out->r_max = 1.0f;
-  out->clip_extent = 1.0f;
+  gl_view_content_t *out = (gl_view_content_t *)ctx;
+  near_field_t *nf = &near_field_fstep[fstep];
+  int line_count;
+  int nf_count;
+  lit_color_point_t *nf_buf;
+
+  line_count = opengl_rdpattern_generate_nf_lines();
+  if( line_count <= 0 )
+    return FALSE;
+
+  /* Near-field positions overlap structure in same coordinate space;
+   * no translation needed (excitation already aligned). */
+  nf_buf = opengl_rdpattern_get_nf_lines(&nf_count);
+  out->batches[0].vertices = nf_buf;
+  out->batches[0].vertex_count = nf_count * 2;
+  out->batches[0].draw_mode = GL_LINES;
+  out->batches[0].color_dim = rc_config.brightness_nearfield;
+  out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_nearfield);
+  out->batch_count = 1;
+  out->vertex_stride = (int)sizeof(lit_color_point_t);
+  out->r_max = (float)nf->r_max;
+  out->clip_extent = (float)nf->r_max;
   out->zoom = zoom;
   out->model_scale = 1.0f;
+  out->generation = opengl_rdpattern_get_nf_generation();
+
+  return TRUE;
 }
 
 /*-----------------------------------------------------------------------*/
 
+/** gl_rdpat_draw_farfield() - Far-field leaf: tessellate gain pattern and populate batches
+ * @ctx:   gl_view_content_t to fill
+ * @fstep: current frequency step (unused; Generate_Rdpattern_Data reads global state)
+ * @zoom:  current zoom factor
+ *
+ * Reads OVERLAY_STRUCT to apply excitation-center translation — a geometry
+ * manipulation decision, not a content-selection decision.
+ * Returns TRUE when batches are populated, FALSE on data dependency failure.
+ */
   static gboolean
-rdpattern_scene_generate(gl_view_content_t *out)
+gl_rdpat_draw_farfield(void *ctx, int _fstep, float zoom)
 {
-  float zoom;
-  float r_max;
+  gl_view_content_t *out = (gl_view_content_t *)ctx;
   gboolean translate_to_excitation;
   float offset_x, offset_y, offset_z;
   const structure_overlay_data_t *geom = NULL;
+  unsigned int current_gen;
+  double r_min, r_range;
+  rdpattern_data_t rd_data;
+  point_3d_t *points_to_use;
+  float off_len;
+  float r_max;
 
-  g_rec_mutex_lock(&freq_data_lock);
+  /* fstep unused: Generate_Rdpattern_Data reads calc_data.freq_step */
+  (void)_fstep;
 
-  opengl_structure_show_ctrl_notice(rdpattern_gl_widget);
-
-  /* Zoom from view->zoom; view_set_zoom() is the authoritative writer. */
-  zoom = (rdpattern_view != NULL) ? rdpattern_view->zoom : 1.0f;
-
-  if( zoom < 0.01f )
-    zoom = 0.01f;
-
-  /* Check if we need to translate pattern to excitation center */
+  off_len = 0.0f;
   translate_to_excitation = FALSE;
   offset_x = 0.0f;
   offset_y = 0.0f;
@@ -139,321 +169,227 @@ rdpattern_scene_generate(gl_view_content_t *out)
     if( geom && geom->has_excitation_center )
     {
       translate_to_excitation = TRUE;
-
       offset_x = (float)geom->excitation_center_x;
       offset_y = (float)geom->excitation_center_y;
       offset_z = (float)geom->excitation_center_z;
     }
   }
 
-  /* Near-field rendering path */
-  int fstep = calc_data.freq_step;
-  if( isFlagSet(DRAW_EHFIELD) && isFlagSet(ENABLE_NEAREH)
-      && NF_FSTEP_AVAILABLE(fstep) )
+  current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
+  if( current_gen == 0 )
+    return FALSE;
+
+  if( !Get_Radiation_Pattern_Data(&rd_data) || !rd_data.valid )
+    return FALSE;
+
+  r_max = (float)rd_data.r_max;
+  points_to_use = rd_data.points;
+
+  if( translate_to_excitation )
   {
-    near_field_t *nf = &near_field_fstep[fstep];
-    int line_count;
-    int nf_count;
-    lit_color_point_t *nf_buf;
+    int npts, i;
+    float model_scale;
+    float scaled_off_x, scaled_off_y, scaled_off_z;
 
-    line_count = opengl_rdpattern_generate_nf_lines();
-    if( line_count <= 0 )
-      goto out_unlock;
+    npts = rd_data.nth * rd_data.nph;
 
-    r_max = (float)nf->r_max;
+    /* Scale offset from structure coords to radiation pattern coords */
+    model_scale = rdpattern_overlay_base_scale(r_max, geom->view_scale)
+        * (float)rdpat_ovl_scale_adj;
 
-    /* Near-field positions directly overlap structure in same coordinate space;
-     * no translation needed (excitation already aligned) */
+    scaled_off_x = offset_x * model_scale;
+    scaled_off_y = offset_y * model_scale;
+    scaled_off_z = offset_z * model_scale;
 
-    nf_buf = opengl_rdpattern_get_nf_lines(&nf_count);
-    out->batches[0].vertices = nf_buf;
-    out->batches[0].vertex_count = nf_count * 2;
-    out->batches[0].draw_mode = GL_LINES;
-    out->batches[0].color_dim = rc_config.brightness_nearfield;
-    out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_nearfield);
-    out->batch_count = 1;
-    out->vertex_stride = (int)sizeof(lit_color_point_t);
-    out->r_max = r_max;
-    out->clip_extent = r_max;
-    out->zoom = zoom;
-    out->model_scale = 1.0f;
-    out->show_gradient = FALSE;
-    out->generation = opengl_rdpattern_get_nf_generation();
+    off_len = (float)sqrt(
+        (double)(scaled_off_x * scaled_off_x +
+                 scaled_off_y * scaled_off_y +
+                 scaled_off_z * scaled_off_z));
 
-    g_rec_mutex_unlock(&freq_data_lock);
-    return( TRUE );
-  }
-
-  /* Near-field selected but NE/NH cards absent or data not yet computed */
-  if( isFlagSet(DRAW_EHFIELD) )
-  {
-    /* During optimization, keep previous frame rather than flashing
-     * an empty scene while the freq loop is in flight. */
-    if( isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
+    if( npts > rdpat_translated_capacity )
     {
-      g_rec_mutex_unlock(&freq_data_lock);
-      return( FALSE );
+      size_t mreq = (size_t)npts * sizeof(point_3d_t);
+      mem_realloc((void **)&rdpat_translated_points, mreq, __LOCATION__);
+      rdpat_translated_capacity = npts;
     }
 
-    rdpattern_init_empty_scene(out, zoom);
-    if( isFlagClear(ENABLE_NEAREH) )
-      out->status_message = "Near field requires NE or NH cards in the NEC file";
-    else
-      out->status_message = "Press ▶ to start the frequency loop";
-    g_rec_mutex_unlock(&freq_data_lock);
-    return( TRUE );
-  }
-
-  /* Far-field (gain) rendering path */
-  if( isFlagSet(DRAW_GAIN) )
-  {
-    unsigned int current_gen;
-    double r_min, r_range;
-    rdpattern_data_t rd_data;
-    point_3d_t *points_to_use;
-    float off_len;
-
-    off_len = 0.0f;
-
-    /* No RP card — cannot compute gain pattern */
-    if( isFlagClear(ENABLE_RDPAT) )
+    for( i = 0; i < npts; i++ )
     {
-      rdpattern_init_empty_scene(out, zoom);
-      out->status_message = "Gain pattern requires an RP card in the NEC file";
-      g_rec_mutex_unlock(&freq_data_lock);
-      return( TRUE );
+      rdpat_translated_points[i].x = rd_data.points[i].x + (double)scaled_off_x;
+      rdpat_translated_points[i].y = rd_data.points[i].y + (double)scaled_off_y;
+      rdpat_translated_points[i].z = rd_data.points[i].z + (double)scaled_off_z;
+      rdpat_translated_points[i].r = rd_data.points[i].r;
     }
 
-    current_gen = Generate_Rdpattern_Data(&r_min, &r_range);
-    if( current_gen == 0 )
-      goto out_unlock;
+    points_to_use = rdpat_translated_points;
+  }
 
-    if( !Get_Radiation_Pattern_Data(&rd_data) || !rd_data.valid )
-      goto out_unlock;
+  /* Regenerate geometry on data change, translation state change,
+   * scale change, or draw style change */
+  if( current_gen != rdpat_last_ff_gen ||
+      rc_config.rdpattern_draw_style != rdpat_last_draw_style ||
+      translate_to_excitation != rdpat_last_translate_state ||
+      (translate_to_excitation && rdpat_ovl_scale_adj != rdpat_last_ovl_scale_adj) )
+  {
+    gboolean need_tris =
+      (rc_config.rdpattern_draw_style == RDPAT_STYLE_SURFACE ||
+       rc_config.rdpattern_draw_style == RDPAT_STYLE_BOTH);
+    gboolean need_lines =
+      (rc_config.rdpattern_draw_style == RDPAT_STYLE_WIREFRAME ||
+       rc_config.rdpattern_draw_style == RDPAT_STYLE_BOTH);
 
-    r_max = (float)rd_data.r_max;
-
-    points_to_use = rd_data.points;
-
-    if( translate_to_excitation )
+    if( need_tris )
     {
-      int npts, i;
-      float model_scale;
-      float scaled_off_x, scaled_off_y, scaled_off_z;
+      int tri_count = opengl_rdpattern_generate_triangles(
+          points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
 
-      npts = rd_data.nth * rd_data.nph;
-
-      /* Scale offset from structure coords to radiation pattern coords */
-      model_scale = rdpattern_overlay_base_scale(r_max, geom->view_scale)
-          * (float)rdpat_ovl_scale_adj;
-
-      scaled_off_x = offset_x * model_scale;
-      scaled_off_y = offset_y * model_scale;
-      scaled_off_z = offset_z * model_scale;
-
-      off_len = (float)sqrt(
-          (double)(scaled_off_x * scaled_off_x +
-                   scaled_off_y * scaled_off_y +
-                   scaled_off_z * scaled_off_z));
-
-      if( npts > rdpat_translated_capacity )
-      {
-        size_t mreq = (size_t)npts * sizeof(point_3d_t);
-        mem_realloc((void **)&rdpat_translated_points, mreq, __LOCATION__);
-        rdpat_translated_capacity = npts;
-      }
-
-      for( i = 0; i < npts; i++ )
-      {
-        rdpat_translated_points[i].x = rd_data.points[i].x + (double)scaled_off_x;
-        rdpat_translated_points[i].y = rd_data.points[i].y + (double)scaled_off_y;
-        rdpat_translated_points[i].z = rd_data.points[i].z + (double)scaled_off_z;
-        rdpat_translated_points[i].r = rd_data.points[i].r;
-      }
-
-      points_to_use = rdpat_translated_points;
+      if( tri_count <= 0 )
+        return FALSE;
     }
 
-    /* Regenerate geometry on data change, translation state change,
-     * scale change, or draw style change */
-    if( current_gen != rdpat_last_ff_gen ||
-        rc_config.rdpattern_draw_style != rdpat_last_draw_style ||
-        translate_to_excitation != rdpat_last_translate_state ||
-        (translate_to_excitation && rdpat_ovl_scale_adj != rdpat_last_ovl_scale_adj) )
+    if( need_lines )
     {
-      gboolean need_tris =
-        (rc_config.rdpattern_draw_style == RDPAT_STYLE_SURFACE ||
-         rc_config.rdpattern_draw_style == RDPAT_STYLE_BOTH);
-      gboolean need_lines =
-        (rc_config.rdpattern_draw_style == RDPAT_STYLE_WIREFRAME ||
-         rc_config.rdpattern_draw_style == RDPAT_STYLE_BOTH);
+      int line_count = opengl_rdpattern_generate_lines(
+          points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
 
-      if( need_tris )
-      {
-        int tri_count = opengl_rdpattern_generate_triangles(
-            points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
-
-        if( tri_count <= 0 )
-          goto out_unlock;
-      }
-
-      if( need_lines )
-      {
-        int line_count = opengl_rdpattern_generate_lines(
-            points_to_use, rd_data.nth, rd_data.nph, r_min, r_range);
-
-        if( line_count <= 0 )
-          goto out_unlock;
-      }
-
-      rdpat_last_ff_gen = current_gen;
-      rdpat_last_draw_style = rc_config.rdpattern_draw_style;
-      rdpat_last_translate_state = translate_to_excitation;
-      rdpat_last_ovl_scale_adj = rdpat_ovl_scale_adj;
+      if( line_count <= 0 )
+        return FALSE;
     }
 
-    /* Populate batches per draw style */
-    switch( rc_config.rdpattern_draw_style )
+    rdpat_last_ff_gen = current_gen;
+    rdpat_last_draw_style = rc_config.rdpattern_draw_style;
+    rdpat_last_translate_state = translate_to_excitation;
+    rdpat_last_ovl_scale_adj = rdpat_ovl_scale_adj;
+  }
+
+  /* Populate batches per draw style */
+  switch( rc_config.rdpattern_draw_style )
+  {
+    case RDPAT_STYLE_SURFACE:
     {
-      case RDPAT_STYLE_SURFACE:
-      {
-        int tri_count;
-        lit_color_triangle_t *tri_buf =
-          opengl_rdpattern_get_triangles(&tri_count);
+      int tri_count;
+      lit_color_triangle_t *tri_buf =
+        opengl_rdpattern_get_triangles(&tri_count);
 
-        if( tri_count == 0 )
-          goto out_unlock;
+      if( tri_count == 0 )
+        return FALSE;
 
-        out->batches[0].vertices = tri_buf;
-        out->batches[0].vertex_count = tri_count * 3;
-        out->batches[0].draw_mode = GL_TRIANGLES;
-        out->batches[0].polygon_offset = FALSE;
-        out->batches[0].color_dim = rc_config.brightness_rdpat_surface;
-        out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
-        out->batch_count = 1;
-        break;
-      }
-
-      case RDPAT_STYLE_WIREFRAME:
-      {
-        int line_count;
-        lit_color_point_t *line_buf =
-          opengl_rdpattern_get_lines(&line_count);
-
-        if( line_count == 0 )
-          goto out_unlock;
-
-        out->batches[0].vertices = line_buf;
-        out->batches[0].vertex_count = line_count * 2;
-        out->batches[0].draw_mode = GL_LINES;
-        out->batches[0].polygon_offset = FALSE;
-        out->batches[0].color_dim = rc_config.brightness_rdpat_wire;
-        out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
-        out->batch_count = 1;
-        break;
-      }
-
-      case RDPAT_STYLE_BOTH:
-      {
-        int tri_count, line_count;
-        lit_color_triangle_t *tri_buf =
-          opengl_rdpattern_get_triangles(&tri_count);
-        lit_color_point_t *line_buf =
-          opengl_rdpattern_get_lines(&line_count);
-
-        if( tri_count == 0 || line_count == 0 )
-          goto out_unlock;
-
-        /* Surface pushed behind wireframe via glPolygonOffset */
-        out->batches[0].vertices = tri_buf;
-        out->batches[0].vertex_count = tri_count * 3;
-        out->batches[0].draw_mode = GL_TRIANGLES;
-        out->batches[0].polygon_offset = TRUE;
-        out->batches[0].color_dim =
-            rc_config.brightness_rdpat_surface * RDPAT_BOTH_SURFACE_DIM_RATIO;
-        out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
-
-        out->batches[1].vertices = line_buf;
-        out->batches[1].vertex_count = line_count * 2;
-        out->batches[1].draw_mode = GL_LINES;
-        out->batches[1].polygon_offset = FALSE;
-        out->batches[1].color_dim = rc_config.brightness_rdpat_wire;
-        out->batches[1].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
-        out->batch_count = 2;
-        break;
-      }
-
-      default:
-        pr_err("rdpattern: invalid draw style %d, using surface\n",
-            rc_config.rdpattern_draw_style);
-        rc_config.rdpattern_draw_style = RDPAT_STYLE_SURFACE;
-        goto out_unlock;
+      out->batches[0].vertices = tri_buf;
+      out->batches[0].vertex_count = tri_count * 3;
+      out->batches[0].draw_mode = GL_TRIANGLES;
+      out->batches[0].polygon_offset = FALSE;
+      out->batches[0].color_dim = rc_config.brightness_rdpat_surface;
+      out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
+      out->batch_count = 1;
+      break;
     }
 
-    out->vertex_stride = (int)sizeof(lit_color_point_t);
+    case RDPAT_STYLE_WIREFRAME:
+    {
+      int line_count;
+      lit_color_point_t *line_buf =
+        opengl_rdpattern_get_lines(&line_count);
 
-    out->r_max = r_max;
+      if( line_count == 0 )
+        return FALSE;
 
-    /* Clip extent accounts for excitation center translation so
-     * clip planes encompass shifted geometry without altering
-     * camera distance or overlay scaling (which depend on r_max) */
-    out->clip_extent = r_max + off_len;
-    out->zoom = zoom;
-    out->model_scale = 1.0f;
-    out->show_gradient = isFlagSet(DRAW_GAIN) && rc_config.rdpattern_gradient_key;
-    out->generation = opengl_rdpattern_get_ff_generation();
+      out->batches[0].vertices = line_buf;
+      out->batches[0].vertex_count = line_count * 2;
+      out->batches[0].draw_mode = GL_LINES;
+      out->batches[0].polygon_offset = FALSE;
+      out->batches[0].color_dim = rc_config.brightness_rdpat_wire;
+      out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
+      out->batch_count = 1;
+      break;
+    }
 
-    g_rec_mutex_unlock(&freq_data_lock);
-    return( TRUE );
+    case RDPAT_STYLE_BOTH:
+    {
+      int tri_count, line_count;
+      lit_color_triangle_t *tri_buf =
+        opengl_rdpattern_get_triangles(&tri_count);
+      lit_color_point_t *line_buf =
+        opengl_rdpattern_get_lines(&line_count);
+
+      if( tri_count == 0 || line_count == 0 )
+        return FALSE;
+
+      /* Surface pushed behind wireframe via glPolygonOffset */
+      out->batches[0].vertices = tri_buf;
+      out->batches[0].vertex_count = tri_count * 3;
+      out->batches[0].draw_mode = GL_TRIANGLES;
+      out->batches[0].polygon_offset = TRUE;
+      out->batches[0].color_dim =
+          rc_config.brightness_rdpat_surface * RDPAT_BOTH_SURFACE_DIM_RATIO;
+      out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
+
+      out->batches[1].vertices = line_buf;
+      out->batches[1].vertex_count = line_count * 2;
+      out->batches[1].draw_mode = GL_LINES;
+      out->batches[1].polygon_offset = FALSE;
+      out->batches[1].color_dim = rc_config.brightness_rdpat_wire;
+      out->batches[1].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
+      out->batch_count = 2;
+      break;
+    }
+
+    default:
+      pr_err("rdpattern: invalid draw style %d, using surface\n",
+          rc_config.rdpattern_draw_style);
+      rc_config.rdpattern_draw_style = RDPAT_STYLE_SURFACE;
+      return FALSE;
   }
 
-  /* Neither near-field nor far-field is active; return a minimal scene so
-   * the render loop proceeds to clear the framebuffer to black.
-   * Include card availability diagnostics so the user knows what
-   * capabilities the NEC file provides on initial window load. */
-  rdpattern_init_empty_scene(out, zoom);
+  out->vertex_stride = (int)sizeof(lit_color_point_t);
 
-  if( isFlagClear(ENABLE_RDPAT) && isFlagClear(ENABLE_NEAREH) )
-  {
-    out->status_message = "No RP or NE/NH cards in the NEC file";
-  }
-  else if( isFlagClear(ENABLE_RDPAT) )
-  {
-    out->status_message = "Select Near Field (no RP card for gain pattern)";
-  }
-  else if( isFlagClear(ENABLE_NEAREH) )
-  {
-    out->status_message = "Select Gain Pattern (no NE/NH cards for near field)";
-  }
-  else
-  {
-    out->status_message = "Select Gain Pattern or Near Field";
-  }
+  out->r_max = r_max;
 
-  g_rec_mutex_unlock(&freq_data_lock);
-  return( TRUE );
+  /* Clip extent accounts for excitation center translation so
+   * clip planes encompass shifted geometry without altering
+   * camera distance or overlay scaling (which depend on r_max) */
+  out->clip_extent = r_max + off_len;
+  out->zoom = zoom;
+  out->model_scale = 1.0f;
+  out->generation = opengl_rdpattern_get_ff_generation();
 
-out_unlock:
-  /* Data dependency not yet satisfied (async compute, draw-style
-   * transition, transient buffer allocation failure).  Return an
-   * empty scene with a diagnostic so the render loop proceeds to
-   * glClear the framebuffer; returning FALSE would exit on_render()
-   * before clearing and freeze the last valid frame on screen. */
+  return TRUE;
+}
 
-  /* During optimization, freeze previous frame to avoid flicker */
-  if( isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
-  {
-    g_rec_mutex_unlock(&freq_data_lock);
-    return( FALSE );
-  }
+/*-----------------------------------------------------------------------*/
 
-  rdpattern_init_empty_scene(out, zoom);
-  if( isFlagClear(FREQ_LOOP_DONE) )
-    out->status_message = "Press ▶ to start the frequency loop";
-  else
-    out->status_message = "Radiation pattern data not ready";
-  g_rec_mutex_unlock(&freq_data_lock);
-  return( TRUE );
+/* Backend vtable for radiation pattern GL scene.
+ * draw_structure is NULL: render_check never resolves RENDER_MODE_STRUCTURE
+ * for RENDER_VIEW_RDPATTERN. */
+static const render_ops_t gl_rdpat_ops =
+{
+  .draw_farfield  = gl_rdpat_draw_farfield,
+  .draw_nearfield = gl_rdpat_draw_nearfield,
+  .draw_structure = NULL,
+  .init_empty     = gl_view_init_empty,
+  .set_status     = gl_view_set_status,
+  .set_gradient   = gl_view_set_gradient,
+};
+
+/*-----------------------------------------------------------------------*/
+
+/** rdpattern_scene_generate() - Scene provider generate callback
+ * @out: view content to populate
+ *
+ * Thin wrapper: extracts zoom and delegates to unified render() dispatch.
+ */
+  static gboolean
+rdpattern_scene_generate(gl_view_content_t *out)
+{
+  float zoom;
+
+  opengl_structure_show_ctrl_notice(rdpattern_gl_widget);
+
+  /* Zoom from view->zoom; view_set_zoom() is the authoritative writer. */
+  zoom = (rdpattern_view != NULL) ? rdpattern_view->zoom : 1.0f;
+  if( zoom < 0.01f )
+    zoom = 0.01f;
+
+  return render((void *)out, &gl_rdpat_ops, RENDER_VIEW_RDPATTERN, zoom);
 }
 
 /*-----------------------------------------------------------------------*/
