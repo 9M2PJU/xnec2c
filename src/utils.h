@@ -41,5 +41,8 @@
 gboolean build_companion_path(const char *src, const char *ext,
     char *buf, size_t buflen);
 
+char **_get_backtrace(void);
+void _print_backtrace(char **strings);
+
 #endif
 

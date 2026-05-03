@@ -45,6 +45,7 @@
 #endif
 
 #include "measurements.h"
+#include "mem.h"
 #include "i18n.h"
 #include "view/view_core.h"
 
@@ -1759,11 +1760,6 @@ int Load_Line(char *buff, FILE *pfile);
 void xnec2c_set_omp_cpus(void);
 void clock_print_elapsed(char *msg, clockid_t clk_id, struct timespec *start);
 void clock_print_elapsed_when(char *msg, clockid_t clk_id, struct timespec *start, float min_sec);
-void mem_alloc(void **ptr, size_t req, gchar *str);
-void mem_realloc(void **ptr, size_t req, gchar *str);
-void mem_backtrace(void *ptr);
-void mem_obj_dump(void *ptr);
-void free_ptr(void **ptr);
 gboolean Open_File(FILE **fp, char *fname, const char *mode);
 void Close_File(FILE **fp);
 void Display_Fstep(GtkEntry *entry, int fstep);
