@@ -129,6 +129,15 @@ typedef struct
 render_check_result_t render_check(view_type_t view_type);
 
 /**
+ * render_get_last_rdpat_check() - Return cached rdpattern precondition result
+ *
+ * Returns a pointer to the render_check_result_t from the most recent render()
+ * call for VIEW_RDPATTERN.  Consumers read overlay_active and mode instead of
+ * re-evaluating content-selection flags.  Valid after the first rdpattern render().
+ */
+const render_check_result_t *render_get_last_rdpat_check(void);
+
+/**
  * render() - Unified render entry point for all backends
  * @ctx:  backend context (cast to gl_view_content_t* for GL, cairo context for Cairo)
  * @ops:  backend vtable

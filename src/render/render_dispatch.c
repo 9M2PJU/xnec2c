@@ -32,6 +32,23 @@
 #include "../rdpattern_ui.h"
 #include "../draw_structure.h"
 
+/* Last render_check result for the rdpattern view; updated by render() on every call */
+static render_check_result_t last_rdpat_check;
+
+/**
+ * render_get_last_rdpat_check() - Return cached rdpattern precondition result
+ *
+ * Returns a pointer to the result of the most recent render_check() call made
+ * for VIEW_RDPATTERN.  Consumers (overlay provider, shift-scroll handler, axes
+ * callback) read overlay_active and mode from this cache instead of re-evaluating
+ * content-selection flags.  Valid after the first rdpattern render() call.
+ */
+const render_check_result_t *
+render_get_last_rdpat_check(void)
+{
+  return &last_rdpat_check;
+}
+
 /* Cairo backend operations vtable for structure window */
 const render_ops_t cairo_struct_ops =
 {
@@ -245,6 +262,9 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
   g_rec_mutex_lock(&freq_data_lock);
 
   r = render_check(view->type);
+
+  if( view->type == VIEW_RDPATTERN )
+    last_rdpat_check = r;
 
   if( r.status == RENDER_SUPPRESS )
   {

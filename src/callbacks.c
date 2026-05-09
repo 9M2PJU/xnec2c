@@ -5768,6 +5768,12 @@ on_rdpattern_drawingarea_scroll_event(
   viewport_width  = gtk_widget_get_allocated_width(widget);
   viewport_height = gtk_widget_get_allocated_height(widget);
 
+  /* Shift+scroll adjusts overlay structure scale; zoom is unaffected */
+  if( event->scroll.state & GDK_SHIFT_MASK )
+    return rdpattern_overlay_shift_scroll(event->scroll.direction,
+        viewport_width, viewport_height,
+        rc_config.rdpattern_overlay_scale_adj * 100.0);
+
   zoom_pct = gtk_spin_button_get_value( rdpattern_zoom );
   scale    = compute_zoom_scale( viewport_width, viewport_height, zoom_pct );
 

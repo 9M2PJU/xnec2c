@@ -20,6 +20,7 @@
 #include "rdpattern_ui.h"
 #include "measurements.h"
 #include "prerender/prerender_nearfield.h"
+#include "render/render_dispatch.h"
 #include "shared.h"
 
 #ifdef HAVE_OPENGL
@@ -676,6 +677,43 @@ Queue_Radiation_Redraw(void)
   }
 
 } /* Queue_Radiation_Redraw() */
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * rdpattern_overlay_shift_scroll() - Adjust overlay structure scale from scroll input
+ * @dir:      GDK_SCROLL_UP or GDK_SCROLL_DOWN
+ * @vp_w:     viewport width in pixels
+ * @vp_h:     viewport height in pixels
+ * @zoom_pct: current overlay scale as percentage (rdpattern_overlay_scale_adj * 100.0)
+ *
+ * Reads the cached dispatch result to gate on overlay_active and far-field mode.
+ * Mutates rc_config.rdpattern_overlay_scale_adj and queues a rdpattern redraw.
+ * Returns TRUE when the event was consumed.
+ */
+  gboolean
+rdpattern_overlay_shift_scroll(GdkScrollDirection dir,
+    int vp_w, int vp_h, double zoom_pct)
+{
+  const render_check_result_t *rc = render_get_last_rdpat_check();
+  double scale;
+
+  if( !rc->overlay_active || rc->mode != RENDER_MODE_FARFIELD )
+    return FALSE;
+
+  scale = compute_zoom_scale(vp_w, vp_h, zoom_pct);
+
+  if( dir == GDK_SCROLL_UP )
+    rc_config.rdpattern_overlay_scale_adj *= (1.0 + 0.1 * scale);
+  else if( dir == GDK_SCROLL_DOWN )
+    rc_config.rdpattern_overlay_scale_adj /= (1.0 + 0.1 * scale);
+  else
+    return FALSE;
+
+  xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
+
+  return TRUE;
+}
 
 /*-----------------------------------------------------------------------*/
 

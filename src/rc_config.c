@@ -151,6 +151,9 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "OpenGL Cylinder Radius Scale", .format = "%lf",
 		.vars = { &rc_config.opengl_cylinder_radius_scale } },
 
+	{ .desc = "Rdpattern Overlay Scale Adjustment", .format = "%lf",
+		.vars = { &rc_config.rdpattern_overlay_scale_adj } },
+
 	{ .desc = "Current Flow Visualization Mode", .format = "%d",
 		.vars = { &rc_config.current_flow_visualization_mode } },
 

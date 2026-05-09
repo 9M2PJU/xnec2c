@@ -30,5 +30,19 @@ void ant_temp_entry_set_unresolved(GtkWidget *entry);
 
 double Scale_Gain(double gain, int fstep, int idx);
 
+/**
+ * rdpattern_overlay_shift_scroll() - Adjust overlay structure scale from scroll input
+ * @dir:      GDK_SCROLL_UP or GDK_SCROLL_DOWN
+ * @vp_w:     viewport width in pixels
+ * @vp_h:     viewport height in pixels
+ * @zoom_pct: current overlay scale as percentage (rdpattern_overlay_scale_adj * 100.0)
+ *
+ * Gates on cached dispatch result: overlay_active and RENDER_MODE_FARFIELD.
+ * Mutates rc_config.rdpattern_overlay_scale_adj and queues a rdpattern redraw.
+ * Returns TRUE when the event was consumed, FALSE otherwise.
+ */
+gboolean rdpattern_overlay_shift_scroll(GdkScrollDirection dir,
+    int vp_w, int vp_h, double zoom_pct);
+
 #endif
 

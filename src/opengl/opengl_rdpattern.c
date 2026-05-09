@@ -361,36 +361,19 @@ rdpattern_scene_cleanup(void)
  * @view_state: pointer to gl_view_state_t
  */
   static gboolean
-rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer view_state)
+rdpattern_on_shift_scroll(GtkWidget *_widget, GdkEventScroll *event, gpointer view_state)
 {
-  gl_view_state_t *state;
-  double scale;
+  /* _widget unused: gl_scene_provider_t.on_shift_scroll interface mandates the parameter;
+   * the shared handler queues rdpattern_drawingarea (swapped global) instead. */
+  gl_view_state_t *state = (gl_view_state_t *)view_state;
 
-  state = (gl_view_state_t *)view_state;
+  if( !state )
+    return FALSE;
 
-  if( !state || !isFlagSet(OVERLAY_STRUCT) )
-    return( FALSE );
-
-  /* Scale adjustment only applies to far-field view */
-  if( isFlagClear(DRAW_GAIN) )
-    return( FALSE );
-
-  /* Compute scale factor matching zoom behavior */
-  scale = compute_zoom_scale(
+  return rdpattern_overlay_shift_scroll(event->direction,
       (int)(state->viewport_height * state->aspect),
       (int)state->viewport_height,
       rc_config.rdpattern_overlay_scale_adj * 100.0);
-
-  if( event->direction == GDK_SCROLL_UP )
-    rc_config.rdpattern_overlay_scale_adj *= (1.0 + 0.1 * scale);
-  else if( event->direction == GDK_SCROLL_DOWN )
-    rc_config.rdpattern_overlay_scale_adj /= (1.0 + 0.1 * scale);
-  else
-    return( FALSE );
-
-  xnec2_widget_queue_draw(widget, TRUE);
-
-  return( TRUE );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -407,9 +390,10 @@ rdpattern_on_shift_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer vie
 rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *out)
 {
   const structure_overlay_data_t *geom;
+  const render_check_result_t *rc = render_get_last_rdpat_check();
   static gboolean notice_shown = FALSE;
 
-  if( !isFlagSet(OVERLAY_STRUCT) ||
+  if( !rc->overlay_active ||
       (data.n <= 0 && data.m <= 0) || !primary )
     return( FALSE );
 
@@ -438,7 +422,7 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
    * Near-field: structure and field vectors share the same space (scale 1.0). */
   float structure_extent = (float)geom_pre.scene_radius;
   int fstep = calc_data.freq_step;
-  if( isFlagSet(DRAW_GAIN) && structure_extent > 0.0f
+  if( rc->mode == RENDER_MODE_FARFIELD && structure_extent > 0.0f
       && ff_pre != NULL && fstep >= 0 )
   {
     out->model_scale = ff_pre[fstep].overlay_base_scale;
@@ -469,7 +453,7 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
 rdpattern_axes_is_active(void *ctx)
 {
   (void)ctx;
-  return( isFlagSet(DRAW_GAIN) || isFlagSet(DRAW_EHFIELD) );
+  return( render_get_last_rdpat_check()->mode != RENDER_MODE_NONE );
 }
 
 /*-----------------------------------------------------------------------*/
