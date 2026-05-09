@@ -18,9 +18,8 @@ xnec2c_SOURCES = \
     cmnd_edit.c     cmnd_edit.h \
     geom_edit.c     geom_edit.h \
     gnuplot.c       gnuplot.h \
-    draw.c          draw.h \
     draw_structure.c draw_structure.h \
-    draw_radiation.c draw_radiation.h \
+    rdpattern_ui.c   rdpattern_ui.h \
     fields.c        fields.h \
     fork.c          fork.h \
     geometry.c      geometry.h \
@@ -73,6 +72,12 @@ xnec2c_SOURCES = \
     prerender/prerender_nearfield.c prerender/prerender_nearfield.h \
     render/render_dispatch.c        render/render_dispatch.h \
     render/render_message.c         render/render_message.h \
+    cairo/cairo_draw.h \
+    cairo/cairo_axes.c \
+    cairo/cairo_project.c \
+    cairo/cairo_farfield.c \
+    cairo/cairo_nearfield.c \
+    cairo/cairo_structure.c \
     common.h        editors.h
 
 xnec2c_CPPFLAGS  =

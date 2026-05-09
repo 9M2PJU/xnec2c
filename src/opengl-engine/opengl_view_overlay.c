@@ -84,7 +84,7 @@ gl_overlay_effective_scale(const gl_overlay_ctx_t *ovl)
   if( ovl->ovl_content.scale_adj_locked )
     return( ovl->ovl_content.model_scale );
 
-  return( ovl->ovl_content.model_scale * ovl->view->ovl_model_scale_adj );
+  return( ovl->ovl_content.model_scale * (float)rc_config.rdpattern_overlay_scale_adj );
 
 } /* gl_overlay_effective_scale() */
 

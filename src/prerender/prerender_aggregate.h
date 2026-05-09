@@ -25,10 +25,19 @@
 /**
  * Prerender_Aggregate() - Compute geometry-derived aggregate scalars
  *
- * Populates geom_pre.scene_radius, excitation_center, nf_dr_norm.
- * Called once after geometry is established (file load).
+ * Populates geom_pre.scene_radius. Called once at GE-card time after
+ * geometry is established. Does not require excitation data.
  */
 void Prerender_Aggregate(void);
+
+/**
+ * compute_excitation_center() - Centroid of excitation source segments
+ *
+ * Reads vsorc.isant/ivqd (populated by EX-card) to compute
+ * geom_pre.excitation_cx/cy/cz. Called at end of Read_Commands(),
+ * parent-only, after all cards including EX have been parsed.
+ */
+void compute_excitation_center(void);
 
 /**
  * compute_trig_tables() - Populate geom_pre sin/cos/solid_angle tables

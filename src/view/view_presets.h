@@ -61,8 +61,4 @@
 #define VIEW_ANGLE_EPS 1.0e-6
 #define VIEW_ZOOM_EPS  1.0e-6f
 
-/* Scene-extent epsilon used by view_xy_scale1() to detect an
- * uninitialised r_max (no geometry loaded yet). */
-#define VIEW_RMAX_EPS  1.0e-6f
-
 #endif /* VIEW_PRESETS_H */

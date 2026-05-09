@@ -27,6 +27,34 @@
 
 #include "render_dispatch.h"
 #include "../shared.h"
+#include "../cairo/cairo_draw.h"
+#include "../prerender/prerender_farfield.h"
+#include "../rdpattern_ui.h"
+#include "../draw_structure.h"
+
+/* Cairo backend operations vtable for structure window */
+const render_ops_t cairo_struct_ops =
+{
+  .draw_farfield        = NULL,
+  .draw_nearfield       = NULL,
+  .draw_structure       = cairo_draw_structure,
+  .draw_axes            = cairo_draw_axes,
+  .init_empty           = cairo_init_empty,
+  .set_status           = cairo_set_status,
+  .set_gradient         = cairo_set_gradient,
+};
+
+/* Cairo backend operations vtable for radiation pattern window */
+const render_ops_t cairo_rdpat_ops =
+{
+  .draw_farfield        = cairo_draw_farfield,
+  .draw_nearfield       = cairo_draw_nearfield,
+  .draw_structure       = cairo_draw_structure,
+  .draw_axes            = cairo_draw_axes,
+  .init_empty           = cairo_init_empty,
+  .set_status           = cairo_set_status,
+  .set_gradient         = cairo_set_gradient,
+};
 
 /*-----------------------------------------------------------------------*/
 
@@ -99,6 +127,13 @@ render_check_farfield(render_check_result_t *r)
     return;
   }
 
+  if( r->fstep < 0 )
+  {
+    r->status = RENDER_NO_DATA;
+    r->message = STATUS_MSG_NO_RDPAT_DATA;
+    return;
+  }
+
   r->mode = RENDER_MODE_FARFIELD;
   r->show_gradient = rc_config.rdpattern_gradient_key;
 }
@@ -128,26 +163,24 @@ render_check_rdpattern(render_check_result_t *r)
 
 /*-----------------------------------------------------------------------*/
 
-static render_check_result_t last_rdpat_check;
-
-  const render_check_result_t *
-render_get_last_rdpat_check(void)
-{
-  return( &last_rdpat_check );
-}
-
 /*-----------------------------------------------------------------------*/
 
   render_check_result_t
-render_check(render_view_t view)
+render_check(view_type_t view_type)
 {
   render_check_result_t r = { .status = RENDER_OK, .mode = RENDER_MODE_NONE,
     .fstep = -1, .message = NULL, .show_gradient = FALSE, .overlay_active = FALSE };
 
   r.fstep = calc_data.freq_step;
 
-  if( view == RENDER_VIEW_STRUCTURE )
+  if( view_type == VIEW_STRUCTURE )
   {
+    if( data.n == 0 && data.m == 0 )
+    {
+      r.status = RENDER_NO_GEOMETRY;
+      r.message = STATUS_MSG_OPEN_FILE;
+      return r;
+    }
     r.mode = RENDER_MODE_STRUCTURE;
     return r;
   }
@@ -158,19 +191,60 @@ render_check(render_view_t view)
 
 /*-----------------------------------------------------------------------*/
 
+/** build_struct_draw_params() - Resolve structure draw colors from current flags
+ * @fstep: frequency step index
+ *
+ * Selects wire_colors and patch_colors from precomputed struct_colors
+ * based on DRAW_CURRENTS / DRAW_CHARGES flags, or falls back to
+ * geometry-mode seg_rgb / patch_rgb.
+ */
+  static struct_draw_params_t
+build_struct_draw_params(int fstep)
+{
+  struct_draw_params_t params;
+  int fs = fstep;
+
+  if( isFlagSet(DRAW_CURRENTS) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
+  {
+    params.wire_colors  = struct_colors[fs].wire_crnt_rgb;
+    params.wire_widths  = seg_width;
+    params.patch_colors = struct_colors[fs].patch_crnt_rgb;
+    params.cmax = fmax((double)struct_colors[fs].wire_crnt_cmax,
+                       (double)struct_colors[fs].patch_crnt_cmax);
+    params.show_flow = TRUE;
+  }
+  else if( isFlagSet(DRAW_CHARGES) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
+  {
+    params.wire_colors  = struct_colors[fs].wire_chrg_rgb;
+    params.wire_widths  = seg_width;
+    params.patch_colors = patch_rgb;
+    params.cmax = (double)struct_colors[fs].wire_chrg_cmax;
+    params.show_flow = FALSE;
+  }
+  else
+  {
+    params.wire_colors  = seg_rgb;
+    params.wire_widths  = seg_width;
+    params.patch_colors = patch_rgb;
+    params.cmax = 0.0;
+    params.show_flow = FALSE;
+  }
+
+  params.fstep = fs;
+  return params;
+}
+
+/*-----------------------------------------------------------------------*/
+
   gboolean
-render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom,
-    double overlay_scale_adj)
+render(void *ctx, const render_ops_t *ops, view_t *view)
 {
   render_check_result_t r;
   gboolean ok;
 
   g_rec_mutex_lock(&freq_data_lock);
 
-  r = render_check(view);
-
-  if( view == RENDER_VIEW_RDPATTERN && r.status != RENDER_SUPPRESS )
-    last_rdpat_check = r;
+  r = render_check(view->type);
 
   if( r.status == RENDER_SUPPRESS )
   {
@@ -180,7 +254,9 @@ render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom,
 
   if( r.status != RENDER_OK )
   {
-    ops->init_empty(ctx, zoom);
+    ops->init_empty(ctx);
+    if( r.status == RENDER_NO_GEOMETRY && ops->draw_axes != NULL )
+      ops->draw_axes(ctx, 1.5f);
     ops->set_status(ctx, r.message);
     ops->set_gradient(ctx, FALSE);
     g_rec_mutex_unlock(&freq_data_lock);
@@ -191,19 +267,47 @@ render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom,
   {
     case RENDER_MODE_FARFIELD:
     {
-      ff_draw_params_t ff = { .active = FALSE, .x = 0.0f, .y = 0.0f, .z = 0.0f,
-        .view_scale = 1.0f, .scale_adj = overlay_scale_adj };
+      ff_draw_params_t ff = { .x = 0.0f, .y = 0.0f, .z = 0.0f,
+        .pattern_radius = 0.0f, .off_len = 0.0f };
 
-      if( r.overlay_active && geom_pre.has_excitation )
+      ff_presentation_recompute(r.fstep);
+      ff.pattern_radius = (ff_pre != NULL) ? ff_pre[r.fstep].pattern_radius : 1.0f;
+
+      /* model_scale maps structure-space meters to pattern-space units.
+       * Base scale from prerender; interactive scale_adj applied here. */
+      float base_scale = (ff_pre != NULL)
+          ? ff_pre[r.fstep].overlay_base_scale : 1.0f;
+      float model_scale = base_scale
+          * (float)rc_config.rdpattern_overlay_scale_adj;
+
+      /* Pre-scale excitation centroid from structure space to pattern space.
+       * Zero coordinates produce identity transform when no excitation exists. */
+      if( r.overlay_active && isFlagSet(ENABLE_EXCITN) )
       {
-        ff.active     = TRUE;
-        ff.x          = (float)geom_pre.excitation_cx;
-        ff.y          = (float)geom_pre.excitation_cy;
-        ff.z          = (float)geom_pre.excitation_cz;
-        ff.view_scale = (float)geom_pre.scene_radius;
+        ff.x = (float)geom_pre.excitation_cx * model_scale;
+        ff.y = (float)geom_pre.excitation_cy * model_scale;
+        ff.z = (float)geom_pre.excitation_cz * model_scale;
+        ff.off_len = sqrtf(ff.x * ff.x + ff.y * ff.y + ff.z * ff.z);
       }
 
-      ok = ops->draw_farfield(ctx, r.fstep, zoom, &ff);
+      /* overlay_extent: structure-space extent that maps to the same pixel
+       * positions as GL's model_scale matrix transform.
+       * Derivation: p/R == p*model_scale/pattern_radius -> R = pattern_radius/model_scale */
+      float overlay_extent = (model_scale > 0.001f)
+          ? ff.pattern_radius / model_scale
+          : (float)geom_pre.scene_radius;
+
+      if( ops->draw_axes != NULL )
+        ops->draw_axes(ctx, ff.pattern_radius);
+
+      /* Overlay draws behind pattern; pattern lines on top */
+      if( r.overlay_active && ops->draw_structure != NULL )
+      {
+        struct_draw_params_t sparams = build_struct_draw_params(r.fstep);
+        ops->draw_structure(ctx, overlay_extent, &sparams);
+      }
+
+      ok = ops->draw_farfield(ctx, r.fstep, &ff);
       break;
     }
 
@@ -236,44 +340,37 @@ render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom,
         n_fields++;
       }
 
+      /* Near-field overlay: structure in meters, same space as field vectors */
+      float nf_overlay_extent = (float)nf->r_max;
+
+      if( ops->draw_axes != NULL )
+        ops->draw_axes(ctx, (float)nf->r_max);
+
+      if( r.overlay_active && ops->draw_structure != NULL )
+      {
+        struct_draw_params_t sparams = build_struct_draw_params(r.fstep);
+        ops->draw_structure(ctx, nf_overlay_extent, &sparams);
+      }
+
+      ClearFlag(DRAW_NEW_EHFIELD);
+
       if( n_fields > 0 )
-        ok = ops->draw_nearfield(ctx, zoom, nf->points, npts,
+      {
+        ok = ops->draw_nearfield(ctx, nf->points, npts,
             fields, n_fields, dr, nf->r_max);
+      }
       else
         ok = FALSE;
+
       break;
     }
 
     case RENDER_MODE_STRUCTURE:
     {
-      struct_draw_params_t params;
-      int fs = r.fstep;
-
-      if( isFlagSet(DRAW_CURRENTS) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
-      {
-        params.wire_colors  = struct_colors[fs].wire_crnt_rgb;
-        params.patch_colors = struct_colors[fs].patch_crnt_rgb;
-        params.cmax = fmax((double)struct_colors[fs].wire_crnt_cmax,
-                           (double)struct_colors[fs].patch_crnt_cmax);
-        params.show_flow = TRUE;
-      }
-      else if( isFlagSet(DRAW_CHARGES) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
-      {
-        params.wire_colors  = struct_colors[fs].wire_chrg_rgb;
-        params.patch_colors = patch_rgb;
-        params.cmax = (double)struct_colors[fs].wire_chrg_cmax;
-        params.show_flow = FALSE;
-      }
-      else
-      {
-        params.wire_colors  = seg_rgb;
-        params.patch_colors = patch_rgb;
-        params.cmax = 0.0;
-        params.show_flow = FALSE;
-      }
-
-      params.fstep = fs;
-      ok = ops->draw_structure(ctx, zoom, &params);
+      struct_draw_params_t params = build_struct_draw_params(r.fstep);
+      if( ops->draw_axes != NULL )
+        ops->draw_axes(ctx, (float)geom_pre.scene_radius);
+      ok = ops->draw_structure(ctx, (float)geom_pre.scene_radius, &params);
       break;
     }
 
@@ -300,7 +397,7 @@ render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom,
      * proceed to glClear, replacing stale content with a diagnostic.
      * Returning FALSE would skip the clear and freeze the last valid
      * frame on screen (desirable only during optimization above). */
-    ops->init_empty(ctx, zoom);
+    ops->init_empty(ctx);
     ops->set_status(ctx,
         isFlagSet(FREQ_LOOP_DONE)
         ? STATUS_MSG_NOT_READY
@@ -312,7 +409,59 @@ render(void *ctx, const render_ops_t *ops, render_view_t view, float zoom,
 
   ops->set_gradient(ctx, r.show_gradient);
 
+  /* Post-render UI updates (under lock, main thread) */
+  if( view->type == VIEW_STRUCTURE )
+  {
+    Draw_Structure_UI();
+  }
+  else if( r.mode == RENDER_MODE_FARFIELD )
+  {
+    Update_Rdpattern_UI();
+  }
+
   g_rec_mutex_unlock(&freq_data_lock);
+  return TRUE;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * render_cairo() - GTK3 draw signal handler for Cairo rendering
+ * @widget:    the GtkDrawingArea receiving the draw signal
+ * @cr:        Cairo context provided by GTK
+ * @user_data: unused
+ *
+ * Determines the view from the widget identity, builds a
+ * cairo_render_ctx_t, and dispatches through render() with the
+ * appropriate Cairo backend ops vtable.
+ */
+  gboolean
+render_cairo(cairo_t *cr, view_t *v, const render_ops_t *ops)
+{
+  if( isFlagSet(INPUT_PENDING) )
+    return FALSE;
+
+  /* ERROR_CONDX: no rendering but return TRUE to stop GTK signal
+   * propagation (prevents further draw handler invocations). */
+  if( isFlagSet(ERROR_CONDX) )
+    return TRUE;
+
+  if( v == NULL )
+    return FALSE;
+
+  cairo_render_ctx_t ctx =
+  {
+    .cr     = cr,
+    .view   = v,
+  };
+
+  /* Clear drawing surface */
+  cairo_set_source_rgb(cr, BLACK);
+  cairo_rectangle(cr, 0.0, 0.0, (double)v->width, (double)v->height);
+  cairo_fill(cr);
+
+  render((void *)&ctx, ops, v);
+
   return TRUE;
 }
 

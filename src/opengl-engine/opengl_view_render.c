@@ -75,7 +75,6 @@ gl_view_setup_attribs(
 on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 {
   gl_view_state_t *state;
-  gl_view_content_t content = {0};
   gl_render_params_t render_params = {0};
   mat4 mvp, mv;
   float camera_distance;
@@ -89,13 +88,11 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   if( !state || !state->initialized )
     return( FALSE );
 
-  /* Data acquisition preamble */
-  if( !state->scene->generate(&content) )
+  /* Data acquisition preamble: scene writes directly into state->content */
+  if( !state->scene->generate(state) )
     return( FALSE );
 
-  state->content = content;
-
-  camera_distance = content.r_max * GL_VIEW_BASE_DISTANCE_FACTOR /
+  camera_distance = state->content.r_max * GL_VIEW_BASE_DISTANCE_FACTOR /
                     state->view->zoom;
   state->cached_camera_distance = camera_distance;
 
@@ -138,7 +135,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
 
       if( r->far_extent )
       {
-        ext = r->far_extent(r->ctx, content.r_max);
+        ext = r->far_extent(r->ctx, state->content.r_max);
 
         if( ext > effective_far )
           effective_far = ext;
@@ -146,12 +143,12 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     }
 
     /* clip_extent accounts for translation offsets; all providers set it */
-    if( effective_far < content.clip_extent )
+    if( effective_far < state->content.clip_extent )
     {
-      effective_far = content.clip_extent;
+      effective_far = state->content.clip_extent;
     }
 
-    nearest_point = camera_distance - content.clip_extent;
+    nearest_point = camera_distance - state->content.clip_extent;
     farthest_point = camera_distance + effective_far;
 
     /* Extra margin provides window-space headroom for per-patch
@@ -180,7 +177,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     state->cached_near_plane = near_plane;
     state->cached_far_plane = far_plane;
 
-    gl_view_build_mvp(state, content.model_scale, mvp, mv);
+    gl_view_build_mvp(state, state->content.model_scale, mvp, mv);
   }
 
   /* Framebuffer setup */
@@ -208,7 +205,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     if( eff_alpha < 1.0f || r->force_peel )
       continue;
 
-    r->prepare(r->ctx, content.r_max);
+    r->prepare(r->ctx, state->content.r_max);
 
     /* Opaque pass: peel_pass=0 (no discard in shader) */
     glm_mat4_copy(mvp, render_params.mvp);
@@ -252,7 +249,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
        * sort_order assumption about containment direction. */
       if( r->far_extent )
       {
-        items[trans_count].depth = r->far_extent(r->ctx, content.r_max);
+        items[trans_count].depth = r->far_extent(r->ctx, state->content.r_max);
       }
       else
       {
@@ -289,7 +286,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
         ? state->msaa_fbo : (GLuint)default_fbo;
 
       gl_view_peel_render(state, active_fbo, mvp, mv,
-          items, trans_count, content.r_max);
+          items, trans_count, state->content.r_max);
     }
     else if( trans_count > 0 )
     {
@@ -302,7 +299,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     state->scene->post_render();
 
   /* 2D HUD — screen-space, rendered to MSAA FBO */
-  if( state->overlay && content.show_gradient )
+  if( state->overlay && state->content.show_gradient )
     gradient_overlay_render(state->overlay);
 
   /* Surface dimensions for 2D notice overlay */

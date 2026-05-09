@@ -60,7 +60,6 @@ view_new(view_type_t type,
 
   glm_vec2_zero(v->pan_offset);
   v->zoom           = 1.0f;
-  v->r_max          = 0.0f;
   v->width          = 0;
   v->height         = 0;
   v->type           = type;
@@ -114,15 +113,6 @@ view_set_viewport(view_t *v, int width, int height)
   view_notify_change(v);
 
 } /* view_set_viewport() */
-
-/** view_set_r_max() - Record scene half-extent and notify observers */
-  void
-view_set_r_max(view_t *v, float r_max)
-{
-  v->r_max = r_max;
-  view_notify_change(v);
-
-} /* view_set_r_max() */
 
 /** view_set_zoom() - Set zoom factor (1.0 == fit-to-viewport)
  *

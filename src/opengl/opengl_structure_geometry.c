@@ -20,6 +20,7 @@
 #include "opengl_structure_geometry.h"
 #include "opengl_structure.h"
 #include "../shared.h"
+#include "../prerender/prerender_state.h"
 
 #ifdef HAVE_OPENGL
 
@@ -86,8 +87,6 @@ static gl_draw_batch_t batches[GL_VIEW_MAX_BATCHES];
 static int batch_count = 0;
 static unsigned int structure_geometry_generation = 1;
 static const rgb_f_t *last_wire_colors = NULL;
-static float structure_view_scale = 1.0f;
-
 /* Track previous radius scale to detect changes requiring regeneration */
 static double structure_last_radius_scale = CYLINDER_RADIUS_SCALE_DEFAULT;
 
@@ -187,61 +186,6 @@ get_patch_flow_data(int idx, gboolean show_flow, double cmax,
 
 /*-----------------------------------------------------------------------*/
 
-/*-----------------------------------------------------------------------*/
-
-/** calculate_excitation_center() - Calculate the 3D center point of all excitation segments
- * @cx: output x coordinate of center
- * @cy: output y coordinate of center
- * @cz: output z coordinate of center
- *
- * Returns TRUE if at least one excitation segment was found.
- */
-  static gboolean
-calculate_excitation_center(double *cx, double *cy, double *cz)
-{
-  int idx, seg_idx;
-  int count;
-  double sum_x, sum_y, sum_z;
-
-  sum_x = 0.0;
-  sum_y = 0.0;
-  sum_z = 0.0;
-  count = 0;
-
-  for( idx = 0; idx < vsorc.nsant; idx++ )
-  {
-    seg_idx = vsorc.isant[idx] - 1;
-    if( seg_idx >= 0 && seg_idx < data.n )
-    {
-      sum_x += (data.segments[seg_idx].x1 + data.segments[seg_idx].x2) / 2.0;
-      sum_y += (data.segments[seg_idx].y1 + data.segments[seg_idx].y2) / 2.0;
-      sum_z += (data.segments[seg_idx].z1 + data.segments[seg_idx].z2) / 2.0;
-      count++;
-    }
-  }
-
-  for( idx = 0; idx < vsorc.nvqd; idx++ )
-  {
-    seg_idx = vsorc.ivqd[idx] - 1;
-    if( seg_idx >= 0 && seg_idx < data.n )
-    {
-      sum_x += (data.segments[seg_idx].x1 + data.segments[seg_idx].x2) / 2.0;
-      sum_y += (data.segments[seg_idx].y1 + data.segments[seg_idx].y2) / 2.0;
-      sum_z += (data.segments[seg_idx].z1 + data.segments[seg_idx].z2) / 2.0;
-      count++;
-    }
-  }
-
-  if( count == 0 )
-    return( FALSE );
-
-  *cx = sum_x / (double)count;
-  *cy = sum_y / (double)count;
-  *cz = sum_z / (double)count;
-
-  return( TRUE );
-
-}
 
 /*-----------------------------------------------------------------------*/
 
@@ -637,15 +581,12 @@ opengl_structure_generate_geometry(
     const struct_draw_params_t *params,
     double cylinder_radius_scale)
 {
-  int idx;
   int seg_verts, patch_verts;
-  double r_max;
   gboolean seg_line_mode, patch_wireframe;
 
   if( data.n <= 0 && data.m <= 0 )
   {
     batch_count = 0;
-    structure_view_scale = 1.0f;
     return;
   }
 
@@ -668,62 +609,12 @@ opengl_structure_generate_geometry(
     mem_realloc((void **)&batches[1].vertices,
         (size_t)patch_verts * sizeof(structure_vertex_t), __LOCATION__);
 
-  /* Find maximum distance from origin for scaling */
-  r_max = 0.0;
-  for( idx = 0; idx < data.n; idx++ )
-  {
-    double r1 = sqrt(data.segments[idx].x1 * data.segments[idx].x1 +
-                     data.segments[idx].y1 * data.segments[idx].y1 +
-                     data.segments[idx].z1 * data.segments[idx].z1);
-    double r2 = sqrt(data.segments[idx].x2 * data.segments[idx].x2 +
-                     data.segments[idx].y2 * data.segments[idx].y2 +
-                     data.segments[idx].z2 * data.segments[idx].z2);
-
-    if( r1 > r_max )
-      r_max = r1;
-
-    if( r2 > r_max )
-      r_max = r2;
-  }
-
-  /* Extend r_max to include patch corners (unscaled coordinates) */
-  for( idx = 0; idx < data.m; idx++ )
-  {
-    int j = idx + data.n;
-    double s = sqrt(save.bitemp[j]) / 2.0;
-    double dx1 = s * data.patches[idx].t1x;
-    double dy1 = s * data.patches[idx].t1y;
-    double dz1 = s * data.patches[idx].t1z;
-    double dx2 = s * data.patches[idx].t2x;
-    double dy2 = s * data.patches[idx].t2y;
-    double dz2 = s * data.patches[idx].t2z;
-    int corner;
-
-    for( corner = 0; corner < 4; corner++ )
-    {
-      double sx1 = (corner & 1) ? 1.0 : -1.0;
-      double sx2 = (corner & 2) ? 1.0 : -1.0;
-      double cpx = save.xtemp[j] + sx1 * dx1 + sx2 * dx2;
-      double cpy = save.ytemp[j] + sx1 * dy1 + sx2 * dy2;
-      double cpz = save.ztemp[j] + sx1 * dz1 + sx2 * dz2;
-      double rd = sqrt(cpx * cpx + cpy * cpy + cpz * cpz);
-
-      if( rd > r_max )
-        r_max = rd;
-    }
-  }
-
-  if( r_max < 0.001 )
-    r_max = 1.0;
-
-  structure_view_scale = (float)r_max;
-
   /* Generate segment batch */
   if( seg_line_mode )
     generate_segments_lines(&batches[0], params);
   else
     generate_segments_cylinders(&batches[0], params,
-        cylinder_radius_scale, r_max);
+        cylinder_radius_scale, geom_pre.scene_radius);
 
   batches[0].draw_mode = seg_line_mode ? GL_LINES : GL_TRIANGLES;
 
@@ -793,13 +684,9 @@ opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *
         (size_t)batch_count * sizeof(batches[0]));
     shared_overlay_data.batch_count = batch_count;
     shared_overlay_data.vertex_stride = (int)sizeof(structure_vertex_t);
-    shared_overlay_data.view_scale = structure_view_scale;
+    shared_overlay_data.view_scale = (float)geom_pre.scene_radius;
     shared_overlay_data.generation = structure_geometry_generation;
-    shared_overlay_data.has_excitation_center =
-        calculate_excitation_center(
-            &shared_overlay_data.excitation_center_x,
-            &shared_overlay_data.excitation_center_y,
-            &shared_overlay_data.excitation_center_z);
+    /* Excitation center lives in geom_pre (Tier 1) */
   }
 
   /* Per-batch visual parameters read from rc_config every frame.

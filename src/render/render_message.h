@@ -33,6 +33,7 @@
 #define STATUS_MSG_SELECT_MODE      "Select Gain Pattern or Near Field"
 #define STATUS_MSG_START_FREQLOOP   "Press ▶ to start the frequency loop"
 #define STATUS_MSG_NOT_READY        "Radiation pattern data not ready"
+#define STATUS_MSG_NO_RDPAT_DATA    "Waiting for frequency data"
 
 /**
  * Draw_Centered_Message() - Render a centered status message on a Cairo surface

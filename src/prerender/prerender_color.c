@@ -26,6 +26,7 @@
 #include "../shared.h"
 
 rgb_f_t *seg_rgb   = NULL;
+float   *seg_width = NULL;
 rgb_f_t *patch_rgb = NULL;
 
 struct_colors_t *struct_colors = NULL;
@@ -58,11 +59,14 @@ get_segment_color_type(int seg_num)
       return SEG_COLOR_EXCITATION;
   }
 
-  /* Loaded segments */
+  /* Loaded segments — resistivity (ldtype==5) gets a distinct classification
+   * so segment_type_to_width() can assign the correct line width. */
   for( idx = 0; idx < zload.nldseg; idx++ )
   {
     if( zload.ldsegn[idx] == seg_num )
-      return SEG_COLOR_LOADED;
+      return (zload.ldtype[idx] == 5)
+          ? SEG_COLOR_LOADED_RESISTIVITY
+          : SEG_COLOR_LOADED;
   }
 
   return SEG_COLOR_NORMAL;
@@ -89,6 +93,7 @@ segment_type_to_rgb(segment_color_type_t type, float *r, float *g, float *b)
       break;
 
     case SEG_COLOR_LOADED:
+    case SEG_COLOR_LOADED_RESISTIVITY:
       *r = 1.0f;
       *g = 1.0f;
       *b = 0.0f;
@@ -103,6 +108,33 @@ segment_type_to_rgb(segment_color_type_t type, float *r, float *g, float *b)
     default:
       BUG("segment_type_to_rgb: unknown type %d\n", type);
       break;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * segment_type_to_width() - Map segment classification to Cairo line width
+ * @type: segment color classification
+ */
+  float
+segment_type_to_width(segment_color_type_t type)
+{
+  switch( type )
+  {
+    case SEG_COLOR_EXCITATION:
+      return 5.0f;
+
+    case SEG_COLOR_LOADED:
+      return 9.0f;
+
+    case SEG_COLOR_NORMAL:
+    case SEG_COLOR_LOADED_RESISTIVITY:
+      return 2.0f;
+
+    default:
+      BUG("segment_type_to_width: unknown type %d\n", type);
+      return 2.0f;
   }
 }
 
@@ -213,8 +245,6 @@ alloc_struct_colors(int nfrq)
     {
       mreq = (size_t)data.m * sizeof(rgb_f_t);
       mem_alloc( (void **)&struct_colors[i].patch_crnt_rgb, mreq, "in prerender_color.c" );
-      mem_alloc( (void **)&struct_colors[i].patch_t1_rgb,   mreq, "in prerender_color.c" );
-      mem_alloc( (void **)&struct_colors[i].patch_t2_rgb,   mreq, "in prerender_color.c" );
     }
   }
 }
@@ -238,13 +268,12 @@ free_struct_colors(void)
       free_ptr( (void **)&struct_colors[i].wire_crnt_rgb );
       free_ptr( (void **)&struct_colors[i].wire_chrg_rgb );
       free_ptr( (void **)&struct_colors[i].patch_crnt_rgb );
-      free_ptr( (void **)&struct_colors[i].patch_t1_rgb );
-      free_ptr( (void **)&struct_colors[i].patch_t2_rgb );
     }
     free_ptr( (void **)&struct_colors );
   }
 
   free_ptr( (void **)&seg_rgb );
+  free_ptr( (void **)&seg_width );
   free_ptr( (void **)&patch_rgb );
 }
 
@@ -266,6 +295,9 @@ init_geometry_colors(void)
     mreq = (size_t)data.n * sizeof(rgb_f_t);
     mem_realloc( (void **)&seg_rgb, mreq, "in prerender_color.c" );
 
+    mreq = (size_t)data.n * sizeof(float);
+    mem_realloc( (void **)&seg_width, mreq, "in prerender_color.c" );
+
     for( i = 0; i < data.n; i++ )
     {
       ctype = get_segment_color_type(i + 1);
@@ -273,6 +305,7 @@ init_geometry_colors(void)
       seg_rgb[i].r = r;
       seg_rgb[i].g = g;
       seg_rgb[i].b = b;
+      seg_width[i] = segment_type_to_width(ctype);
     }
   }
 
@@ -379,25 +412,14 @@ struct_colors_fill_fstep(int fstep)
     }
   }
 
-  /* Map patch current colors: cur[ci+0..ci+2] are patch, t1, t2 components */
+  /* Map patch current colors from patch normal component cur[ci+0] */
   if( struct_colors[fstep].patch_crnt_rgb != NULL && cmax_patch > 0.0 )
   {
-    int has_tangents = (struct_colors[fstep].patch_t1_rgb != NULL);
-
     for( i = 0; i < data.m; i++ )
     {
       int ci = data.n + 3 * i;
-      rgb_f_t *dests[3] = {
-        &struct_colors[fstep].patch_crnt_rgb[i],
-        has_tangents ? &struct_colors[fstep].patch_t1_rgb[i] : NULL,
-        has_tangents ? &struct_colors[fstep].patch_t2_rgb[i] : NULL
-      };
-      int j;
-      for( j = 0; j < 3; j++ )
-      {
-        if( dests[j] != NULL )
-          *dests[j] = color_from_value(cabs(crnt_fstep[fstep].cur[ci + j]), cmax_patch);
-      }
+      struct_colors[fstep].patch_crnt_rgb[i] =
+          color_from_value(cabs(crnt_fstep[fstep].cur[ci]), cmax_patch);
     }
   }
 }

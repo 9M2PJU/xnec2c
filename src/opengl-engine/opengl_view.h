@@ -74,6 +74,9 @@ gl_batch_min_alpha(const gl_draw_batch_t *batches, int count)
   return min_alpha;
 }
 
+/* Forward declaration so gl_scene_provider_t can reference gl_view_state_t */
+typedef struct gl_view_state_s gl_view_state_t;
+
 /* View content provided by scene generator */
 typedef struct
 {
@@ -82,58 +85,17 @@ typedef struct
   int vertex_stride;
   float r_max;
   float clip_extent;
-  float zoom;
   float model_scale;
   gboolean show_gradient;
   unsigned int generation;
 
-  /* When TRUE, engine uses model_scale as-is (no ovl_model_scale_adj) */
+  /* When TRUE, engine uses model_scale as-is (no overlay scale adjustment) */
   gboolean scale_adj_locked;
 
   /* Centered text overlay rendered when no data to display; NULL = none */
   const char *status_message;
 
 } gl_view_content_t;
-
-/** gl_view_init_empty() - Initialize a gl_view_content_t for an empty scene
- * @ctx:  gl_view_content_t (passed as void* through render_ops_t)
- * @zoom: zoom factor to set in the scene
- */
-static inline void
-gl_view_init_empty(void *ctx, float zoom)
-{
-  gl_view_content_t *out = (gl_view_content_t *)ctx;
-
-  out->batch_count = 0;
-  out->r_max = 1.5f;
-  out->clip_extent = 1.5f;
-  out->zoom = zoom;
-  out->model_scale = 1.0f;
-}
-
-/** gl_view_set_status() - Set the status message on a gl_view_content_t
- * @ctx: gl_view_content_t (passed as void* through render_ops_t)
- * @msg: STATUS_MSG_* string constant, or NULL
- */
-static inline void
-gl_view_set_status(void *ctx, const char *msg)
-{
-  gl_view_content_t *out = (gl_view_content_t *)ctx;
-
-  out->status_message = msg;
-}
-
-/** gl_view_set_gradient() - Enable or disable gradient display
- * @ctx:  gl_view_content_t (passed as void* through render_ops_t)
- * @show: TRUE to display gradient key
- */
-static inline void
-gl_view_set_gradient(void *ctx, gboolean show)
-{
-  gl_view_content_t *out = (gl_view_content_t *)ctx;
-
-  out->show_gradient = show;
-}
 
 /* Notice position within the GL viewport */
 typedef enum
@@ -230,7 +192,7 @@ typedef struct
 /* Scene provider interface */
 typedef struct
 {
-  gboolean (*generate)(gl_view_content_t *out);
+  gboolean (*generate)(gl_view_state_t *state);
   void (*post_render)(void);
   void (*cleanup)(void);
 
@@ -284,7 +246,7 @@ typedef struct gl_view_state_s
 
   /* Borrowed per-view state owner (rotation, pan, zoom, drag session).
    * See src/view/view_core.h.  GL renderer reads view_R(view),
-   * view->pan_offset, view->zoom, view->r_max on every frame. */
+   * view->pan_offset, view->zoom on every frame. */
   view_t *view;
 
   /* GL-only projection inputs */
@@ -299,9 +261,6 @@ typedef struct gl_view_state_s
    * so depth values are in the same projection space */
   float cached_near_plane;
   float cached_far_plane;
-
-  /* Overlay scale adjustment (user-controlled via shift+scroll) */
-  float ovl_model_scale_adj;
 
   /* Notice overlay state (unified transient + persistent) */
   gboolean notice_active;
@@ -365,6 +324,45 @@ typedef struct gl_view_state_s
   gboolean initialized;
 
 } gl_view_state_t;
+
+/** gl_view_init_empty() - Initialize content for an empty scene
+ * @ctx: gl_view_state_t (passed as void* through render_ops_t)
+ */
+static inline void
+gl_view_init_empty(void *ctx)
+{
+  gl_view_state_t *state = (gl_view_state_t *)ctx;
+  gl_view_content_t *out = &state->content;
+
+  out->batch_count = 0;
+  out->r_max = 1.5f;
+  out->clip_extent = 1.5f;
+  out->model_scale = 1.0f;
+}
+
+/** gl_view_set_status() - Set the status message on content
+ * @ctx: gl_view_state_t (passed as void* through render_ops_t)
+ * @msg: STATUS_MSG_* string constant, or NULL
+ */
+static inline void
+gl_view_set_status(void *ctx, const char *msg)
+{
+  gl_view_state_t *state = (gl_view_state_t *)ctx;
+
+  state->content.status_message = msg;
+}
+
+/** gl_view_set_gradient() - Enable or disable gradient display
+ * @ctx:  gl_view_state_t (passed as void* through render_ops_t)
+ * @show: TRUE to display gradient key
+ */
+static inline void
+gl_view_set_gradient(void *ctx, gboolean show)
+{
+  gl_view_state_t *state = (gl_view_state_t *)ctx;
+
+  state->content.show_gradient = show;
+}
 
 /* Sorting entry for the transparent render pass */
 typedef struct

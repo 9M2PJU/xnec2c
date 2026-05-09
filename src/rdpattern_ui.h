@@ -17,27 +17,12 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef DRAW_RADIATION_H
-#define DRAW_RADIATION_H        1
+#ifndef RDPATTERN_UI_H
+#define RDPATTERN_UI_H  1
 
 #include "common.h"
 #include "prerender/prerender_state.h"
 
-/* Radiation pattern data accessor */
-typedef struct
-{
-  point_3d_t *points;
-  int nth;
-  int nph;
-  double r_min;
-  double r_range;
-  double r_max;
-  gboolean valid;
-
-} rdpattern_data_t;
-
-unsigned int Generate_Rdpattern_Data(double *out_r_min, double *out_r_range);
-gboolean Get_Radiation_Pattern_Data(rdpattern_data_t *data);
 void Draw_Color_Legend_Overlay(cairo_t *cr);
 
 void ant_temp_entry_set_kelvin(GtkWidget *entry, double kelvin);

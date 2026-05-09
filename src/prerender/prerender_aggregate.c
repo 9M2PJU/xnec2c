@@ -113,7 +113,7 @@ scan_patch_radius(double *r_max)
 /**
  * compute_excitation_center() - Centroid of all excitation source segments
  */
-static void
+  void
 compute_excitation_center(void)
 {
   int idx, seg_idx, count;
@@ -153,14 +153,12 @@ compute_excitation_center(void)
     geom_pre.excitation_cx = cx / count;
     geom_pre.excitation_cy = cy / count;
     geom_pre.excitation_cz = cz / count;
-    geom_pre.has_excitation = TRUE;
   }
   else
   {
     geom_pre.excitation_cx = 0.0;
     geom_pre.excitation_cy = 0.0;
     geom_pre.excitation_cz = 0.0;
-    geom_pre.has_excitation = FALSE;
   }
 }
 
@@ -250,8 +248,6 @@ Prerender_Aggregate(void)
     scan_patch_radius(&r_max);
 
   geom_pre.scene_radius = r_max;
-
-  compute_excitation_center();
 }
 
 /*-----------------------------------------------------------------------*/

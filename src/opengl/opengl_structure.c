@@ -194,16 +194,17 @@ opengl_structure_show_ctrl_notice(GtkWidget *widget)
 /*-----------------------------------------------------------------------*/
 
 /** gl_draw_structure() - Structure leaf: update shared geometry and populate batches
- * @ctx:    gl_view_content_t to fill
- * @zoom:   current zoom factor
+ * @ctx:    gl_view_state_s (passed as void* through render_ops_t)
+ * @extent: content half-extent for projection scaling
  * @params: dispatch-resolved draw parameters (precomputed colors)
  *
  * Always returns TRUE; sets status_message when no geometry is loaded.
  */
   static gboolean
-gl_draw_structure(void *ctx, float zoom, const struct_draw_params_t *params)
+gl_draw_structure(void *ctx, float extent, const struct_draw_params_t *params)
 {
-  gl_view_content_t *out = (gl_view_content_t *)ctx;
+  gl_view_state_t *state = (gl_view_state_t *)ctx;
+  gl_view_content_t *out = &state->content;
   const structure_overlay_data_t *geom;
 
   opengl_structure_update_shared_geometry_with_params(params);
@@ -213,9 +214,8 @@ gl_draw_structure(void *ctx, float zoom, const struct_draw_params_t *params)
       (size_t)geom->batch_count * sizeof(geom->batches[0]));
   out->batch_count = geom->batch_count;
   out->vertex_stride = geom->vertex_stride;
-  out->r_max = (geom->batch_count > 0) ? geom->view_scale : 1.5f;
+  out->r_max = (geom->batch_count > 0) ? extent : 1.5f;
   out->clip_extent = out->r_max;
-  out->zoom = zoom;
   out->model_scale = 1.0f;
   out->generation = geom->generation;
 
@@ -230,12 +230,13 @@ gl_draw_structure(void *ctx, float zoom, const struct_draw_params_t *params)
 
 /* Backend vtable for structure GL scene.
  * draw_farfield and draw_nearfield are NULL: render_check never resolves
- * RENDER_MODE_FARFIELD or RENDER_MODE_NEARFIELD for RENDER_VIEW_STRUCTURE. */
+ * RENDER_MODE_FARFIELD or RENDER_MODE_NEARFIELD for VIEW_STRUCTURE. */
 static const render_ops_t gl_struct_ops =
 {
   .draw_farfield  = NULL,
   .draw_nearfield = NULL,
-  .draw_structure = gl_draw_structure,
+  .draw_structure       = gl_draw_structure,
+  .draw_axes      = NULL,
   .init_empty     = gl_view_init_empty,
   .set_status     = gl_view_set_status,
   .set_gradient   = gl_view_set_gradient,
@@ -244,23 +245,16 @@ static const render_ops_t gl_struct_ops =
 /*-----------------------------------------------------------------------*/
 
 /** structure_scene_generate() - Scene provider generate callback
- * @out: view content to populate
+ * @state: view state; scene writes into state->content
  *
- * Thin wrapper: extracts zoom and delegates to unified render() dispatch.
+ * Delegates to unified render() dispatch with state as ctx.
  */
   static gboolean
-structure_scene_generate(gl_view_content_t *out)
+structure_scene_generate(gl_view_state_t *state)
 {
-  float zoom;
-
   opengl_structure_show_ctrl_notice(structure_gl_widget);
 
-  /* Zoom from view->zoom; view_set_zoom() is the authoritative writer. */
-  zoom = (structure_view != NULL) ? structure_view->zoom : 1.0f;
-  if( zoom < 0.01f )
-    zoom = 0.01f;
-
-  return render((void *)out, &gl_struct_ops, RENDER_VIEW_STRUCTURE, zoom, 1.0);
+  return render((void *)state, &gl_struct_ops, structure_view);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -275,20 +269,11 @@ structure_scene_cleanup(void)
 
 /*-----------------------------------------------------------------------*/
 
-/** structure_scene_post_render() - Scene provider post-render callback
- *
- * Updates structure-window UI readouts (viewer gain, frequency step)
- * after each rendered frame, matching the Cairo draw path via the
- * shared Draw_Structure_UI() helper.
- */
+/** structure_scene_post_render() - Scene provider post-render callback */
   static void
 structure_scene_post_render(void)
 {
-  g_rec_mutex_lock(&freq_data_lock);
-  Draw_Structure_UI();
-  g_rec_mutex_unlock(&freq_data_lock);
-
-} /* structure_scene_post_render() */
+}
 
 /*-----------------------------------------------------------------------*/
 

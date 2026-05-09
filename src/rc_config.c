@@ -591,6 +591,7 @@ opengl_config_set_defaults( void )
   rc_config.opengl_transparent_on_click = 1;
   rc_config.opengl_orthographic = 1;
   rc_config.opengl_cylinder_radius_scale = 1.0;
+  rc_config.rdpattern_overlay_scale_adj = 1.0;
   rc_config.opengl_msaa_samples = MSAA_4X;
   rc_config.rdpattern_draw_style = RDPAT_STYLE_BOTH;
 }

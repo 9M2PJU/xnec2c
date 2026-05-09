@@ -21,7 +21,8 @@
 #include "shared.h"
 #include "opt_ui.h"
 #include "measurements.h"
-#include "draw_radiation.h"
+#include "rdpattern_ui.h"
+#include "render/render_dispatch.h"
 #include <pthread.h>
 
 #include "opengl/opengl_structure.h"
@@ -1263,12 +1264,9 @@ on_structure_drawingarea_draw(
     cairo_t         *cr,
     gpointer         user_data)
 {
-  /* No redraws if new input pending */
-  if( isFlagSet(INPUT_PENDING) )
-    return( FALSE );
-
-  Draw_Structure( cr );
-  return( TRUE );
+  (void)widget;
+  (void)user_data;
+  return render_cairo(cr, structure_view, &cairo_struct_ops);
 }
 
 
@@ -2439,12 +2437,9 @@ on_rdpattern_drawingarea_draw(
     cairo_t         *cr,
     gpointer         user_data)
 {
-  /* No redraws if new input pending */
-  if( isFlagSet(INPUT_PENDING) )
-    return( FALSE );
-
-  Draw_Radiation( cr );
-  return( TRUE );
+  (void)widget;
+  (void)user_data;
+  return render_cairo(cr, rdpattern_view, &cairo_rdpat_ops);
 }
 
 

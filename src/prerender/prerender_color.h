@@ -32,6 +32,7 @@ typedef enum
 {
   SEG_COLOR_NORMAL = 0,
   SEG_COLOR_LOADED,
+  SEG_COLOR_LOADED_RESISTIVITY,   /* ldtype == 5: resistivity, drawn width 2.0 */
   SEG_COLOR_EXCITATION,
 } segment_color_type_t;
 
@@ -60,6 +61,7 @@ void Value_to_Color(
 void segment_type_to_rgb(segment_color_type_t type,
     float *r, float *g, float *b);
 
+
 /**
  * get_segment_color_type() - Classify a wire segment by excitation/load/network
  * @seg_num: 1-indexed segment number (matches vsorc.isant, zload.ldsegn)
@@ -67,6 +69,17 @@ void segment_type_to_rgb(segment_color_type_t type,
  * Returns the classification for coloring in geometry display mode.
  */
 segment_color_type_t get_segment_color_type(int seg_num);
+
+/**
+ * segment_type_to_width() - Map segment classification to Cairo line width
+ * @type: segment color classification
+ *
+ * Returns the geometry-mode line width in Cairo units:
+ *   NORMAL / LOADED_RESISTIVITY → 2.0
+ *   LOADED                      → 9.0
+ *   EXCITATION                  → 5.0
+ */
+float segment_type_to_width(segment_color_type_t type);
 
 /*-----------------------------------------------------------------------
  * Per-vertex RGB color (float precision, renderer-agnostic)
@@ -107,8 +120,6 @@ typedef struct
   rgb_f_t *wire_crnt_rgb;     /* [data.n] wire current magnitude colors */
   rgb_f_t *wire_chrg_rgb;     /* [data.n] wire charge density colors */
   rgb_f_t *patch_crnt_rgb;    /* [data.m] patch current magnitude colors */
-  rgb_f_t *patch_t1_rgb;      /* [data.m] patch t1 tangent component colors */
-  rgb_f_t *patch_t2_rgb;      /* [data.m] patch t2 tangent component colors */
   float    wire_crnt_cmin;
   float    wire_crnt_cmax;
   float    wire_chrg_cmin;
@@ -121,6 +132,7 @@ typedef struct
  * Tier 1 geometry color arrays (file-load time, frequency-independent)
  *----------------------------------------------------------------------*/
 extern rgb_f_t *seg_rgb;    /* [data.n] blue/yellow/red per segment type */
+extern float   *seg_width;  /* [data.n] Cairo line width per segment type */
 extern rgb_f_t *patch_rgb;  /* [data.m] blue constant */
 
 /*-----------------------------------------------------------------------

@@ -43,12 +43,6 @@ typedef struct
   float view_scale;
   unsigned int generation;
 
-  /* Excitation center coordinates in structure space */
-  gboolean has_excitation_center;
-  double excitation_center_x;
-  double excitation_center_y;
-  double excitation_center_z;
-
 } structure_overlay_data_t;
 
 /* Public API - always available, stubs when no OpenGL */

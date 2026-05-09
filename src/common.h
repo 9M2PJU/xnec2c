@@ -420,6 +420,9 @@ typedef struct
   /* OpenGL cylinder radius display scale factor */
   double opengl_cylinder_radius_scale;
 
+  /* Overlay structure scale adjustment (user shift+scroll) */
+  double rdpattern_overlay_scale_adj;
+
   /* Main window common projection toggle */
   int main_common_projection;
 
@@ -1522,8 +1525,8 @@ void Intrange_Command(int action);
 void Execute_Command(int action);
 void Zo_Command(int action);
 /* draw.c */
-void Set_Gdk_Segment(Segment_t *segm, view_t *v, double x1, double y1, double z1, double x2, double y2, double z2);
-void Draw_XYZ_Axes(cairo_t *cr, view_t *v);
+void Set_Gdk_Segment(Segment_t *segm, view_t *v, double scale, double x1, double y1, double z1, double x2, double y2, double z2);
+void Draw_XYZ_Axes(cairo_t *cr, view_t *v, float extent);
 void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, double *ys);
 /* Availability guards for per-frequency-step data */
 #define CRNT_FSTEP_AVAILABLE(fs) \
@@ -1537,12 +1540,12 @@ void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, doub
      && near_field_fstep != NULL && near_field_fstep[(fs)].points != NULL)
 
 void Value_to_Color(double *red, double *grn, double *blu, double val, double max);
+/* cairo/cairo_project.c */
 void Cairo_Draw_Polygon(cairo_t *cr, GdkPoint *points, int npoints);
 void Cairo_Draw_Segments(cairo_t *cr, Segment_t *segm, int nseg);
 void Cairo_Draw_Line(cairo_t *cr, int x1, int y1, int x2, int y2);
 void Cairo_Draw_Lines(cairo_t *cr, GdkPoint *points, int npoints);
-/* draw_radiation.c */
-int Draw_Radiation(cairo_t *cr);
+/* rdpattern_ui.c */
 gboolean Validate_Nearfield_Animation(void);
 gboolean Animate_Near_Field(gpointer udata);
 double Scale_Gain_Resolved(double gain, int fstep, int idx,
@@ -1564,13 +1567,10 @@ void Save_Nearfield_Data(int fstep);
 void Free_Draw_Buffers(void);
 double Scale_Gain( double gain, int fstep, int idx );
 /* draw_structure.c */
-void Draw_Structure(cairo_t *cr);
 void Draw_Structure_UI(void);
 void New_Patch_Data(void);
-void Process_Wire_Segments(view_t *v);
-void Process_Surface_Patches(view_t *v);
-void Draw_Wire_Segments(cairo_t *cr, view_t *v, Segment_t *segm, gint nseg);
-void Draw_Surface_Patches(cairo_t *cr, view_t *v, Segment_t *segm, gint npatch);
+void Process_Wire_Segments(view_t *v, double scale);
+void Process_Surface_Patches(view_t *v, double scale);
 void Alloc_Crnt_Fstep_Buffers(int nfrq);
 void Free_Crnt_Fstep_Buffers(void);
 void Save_Crnt_Data(int fstep);

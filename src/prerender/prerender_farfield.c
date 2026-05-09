@@ -31,6 +31,9 @@
 #include "../shared.h"
 #include "../measurements.h"
 
+/* Structure overlay extent as multiple of radiation pattern r_max */
+#define FF_OVERLAY_DEFAULT_EXTENT 1.25f
+
 /*-----------------------------------------------------------------------*/
 
 /**
@@ -176,6 +179,14 @@ ff_presentation_recompute(int fstep)
 
   fp->pattern_radius = (float)r_max;
   fp->r_min = (float)r_min;
+
+  /* Base scale for structure overlay (without interactive scale_adj) */
+  if( geom_pre.scene_radius > 0.001 )
+    fp->overlay_base_scale = FF_OVERLAY_DEFAULT_EXTENT
+        * (float)r_max / (float)geom_pre.scene_radius;
+  else
+    fp->overlay_base_scale = 1.0f;
+
   fp->generation++;
 
   /* Edge colors from averaged vertex radii */

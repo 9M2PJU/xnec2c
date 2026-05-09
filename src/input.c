@@ -46,6 +46,7 @@
 #include "shared.h"
 #include "prerender/prerender_state.h"
 #include "prerender/prerender_aggregate.h"
+#include "prerender/prerender_color.h"
 #include "geometry.h"
 #include "sy_overrides.h"
 #include "utils.h"
@@ -403,12 +404,6 @@ datagn( void )
   data.m=0;
   data.mp=0;
   isct=0;
-
-  /* Forked children inherit parent memory but never allocate structure_view
-   * (creation happens after the fork in main.c).  Skip the UI-side extent
-   * reset when no view is attached. */
-  if( structure_view != NULL )
-    view_set_r_max( structure_view, 0.0f );
 
   readgm_reset_count();
 
@@ -1647,6 +1642,14 @@ Read_Commands( void )
         compute_ff_topology();
       }
       SetFlag( ENABLE_RDPAT );
+    }
+
+    /* Excitation-dependent geometry: EX-card populates vsorc before this
+     * point, so centroid and segment type colors are computed correctly. */
+    if( !CHILD )
+    {
+      compute_excitation_center();
+      init_geometry_colors();
     }
 
     /* Symbol table persists for UI access after file load */

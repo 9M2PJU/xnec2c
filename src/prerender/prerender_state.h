@@ -55,7 +55,6 @@ typedef struct
   double  excitation_cx;
   double  excitation_cy;
   double  excitation_cz;
-  gboolean has_excitation;
   double  nf_dr_norm;
 
   /* Radiation pattern grid trig tables [fpat.nth] / [fpat.nph] */
@@ -84,6 +83,7 @@ typedef struct
 {
   float       pattern_radius;
   float       r_min;
+  float       overlay_base_scale; /* Structure-to-pattern scale without scale_adj */
   uint32_t    generation;     /* Incremented by ff_presentation_recompute() */
   point_3d_t *vertices;       /* [fpat.nth * fpat.nph] */
   rgb_f_t    *theta_rgb;      /* [geom_pre.n_theta_edges] */

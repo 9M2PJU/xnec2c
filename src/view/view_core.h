@@ -81,8 +81,7 @@ struct view_s
   /* Zoom factor (1.0 == fit-to-viewport). */
   float   zoom;
 
-  /* Scene extent and viewport geometry. */
-  float   r_max;
+  /* Viewport geometry. */
   int     width;
   int     height;
 
@@ -161,9 +160,6 @@ void view_free(view_t **vp);
 
 /** view_set_viewport() - Record drawable size */
 void view_set_viewport(view_t *v, int width, int height);
-
-/** view_set_r_max() - Record scene half-extent */
-void view_set_r_max(view_t *v, float r_max);
 
 /** view_set_zoom() - Set zoom factor (1.0 == fit-to-viewport) */
 void view_set_zoom(view_t *v, float zoom);
@@ -330,9 +326,14 @@ static inline float (*view_R(view_t *v))[4]
   return( view_rotation_owner(v)->R );
 }
 
-/** view_xy_scale1() - Base pixel-per-unit scale (no zoom) */
+/**
+ * view_projection_scale() - Pixel-per-unit scale for a given extent
+ *
+ * Computes screen pixels per model unit from viewport half-size, content
+ * extent, and zoom factor.  Returns 1.0 when extent is zero (no geometry).
+ */
 static inline double
-view_xy_scale1(const view_t *v)
+view_projection_scale(const view_t *v, float extent, float zoom)
 {
   double size2;
 
@@ -341,17 +342,10 @@ view_xy_scale1(const view_t *v)
   else
     size2 = (double)v->height / 2.0;
 
-  if( fabsf(v->r_max) < VIEW_RMAX_EPS )
+  if( extent <= 0.0f )
     return( 1.0 );
 
-  return( size2 / (double)v->r_max );
-}
-
-/** view_xy_scale() - Effective pixel-per-unit scale including zoom */
-static inline double
-view_xy_scale(const view_t *v)
-{
-  return( view_xy_scale1(v) * (double)v->zoom );
+  return( (size2 / (double)extent) * (double)zoom );
 }
 
 /** view_x_center() - Screen X of the xyz origin */

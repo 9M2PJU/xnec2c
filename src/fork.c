@@ -264,8 +264,6 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
     { struct_colors[fstep].wire_crnt_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
     { struct_colors[fstep].wire_chrg_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
     { struct_colors[fstep].patch_crnt_rgb, size_patch_rgb, 0,                   FREQ_COND_ALWAYS },
-    { struct_colors[fstep].patch_t1_rgb,   size_patch_rgb, 0,                   FREQ_COND_ALWAYS },
-    { struct_colors[fstep].patch_t2_rgb,   size_patch_rgb, 0,                   FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_crnt_cmin, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_crnt_cmax, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_chrg_cmin, NULL,          sizeof(float),       FREQ_COND_ALWAYS },

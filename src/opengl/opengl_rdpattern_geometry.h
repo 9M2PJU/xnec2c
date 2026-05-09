@@ -21,7 +21,7 @@
 #define OPENGL_RDPATTERN_GEOMETRY_H 1
 
 #include "common.h"
-#include "../draw_radiation.h"
+#include "../rdpattern_ui.h"
 #include "../render/render_dispatch.h"
 
 #ifdef HAVE_OPENGL

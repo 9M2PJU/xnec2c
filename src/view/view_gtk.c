@@ -158,17 +158,16 @@ Project_on_Screen(view_t *v,
 /**
  * Set_Gdk_Segment() - Project a line in xyz frame to screen pixel segment
  *
- * Applies view_xy_scale(), view_x_center(), view_y_center() and the
+ * Applies caller-provided scale, view_x_center(), view_y_center() and the
  * pan offset to the two projected endpoints.  Y axis is flipped
  * because Cairo uses top-down coordinates.
  */
   void
-Set_Gdk_Segment(Segment_t *segm, view_t *v,
+Set_Gdk_Segment(Segment_t *segm, view_t *v, double scale,
                 double x1, double y1, double z1,
                 double x2, double y2, double z2)
 {
   double x, y;
-  double scale = view_xy_scale(v);
   double xc    = view_x_center(v);
   double yc    = view_y_center(v);
   double px    = (double)v->pan_offset[0];

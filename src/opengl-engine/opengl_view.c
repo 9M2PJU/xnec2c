@@ -477,9 +477,6 @@ gl_view_create_widget(
   state->viewport_height = 1.0f;
   state->cached_camera_distance = 1.0f;
 
-  /* Initialize overlay scale adjustment (1.0 = default from overlay_generate) */
-  state->ovl_model_scale_adj = 1.0f;
-
   /* Initialize notice state */
   state->notice_active = FALSE;
   state->notice_text = NULL;

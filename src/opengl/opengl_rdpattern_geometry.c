@@ -20,8 +20,7 @@
 #include "opengl_rdpattern_geometry.h"
 #include "../opengl-engine/opengl_cylinder.h"
 #include "../shared.h"
-#include "../draw.h"
-#include "../draw_radiation.h"
+#include "../rdpattern_ui.h"
 
 #ifdef HAVE_OPENGL
 
