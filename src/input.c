@@ -44,8 +44,11 @@
 
 #include "input.h"
 #include "shared.h"
+#include "structure_ui.h"
+#include "rdpattern_ui.h"
 #include "prerender/prerender_state.h"
 #include "prerender/prerender_aggregate.h"
+#include "prerender/prerender_rdpattern.h"
 #include "prerender/prerender_color.h"
 #include "geometry.h"
 #include "sy_overrides.h"
@@ -538,10 +541,7 @@ datagn( void )
         continue;
 
       case GE: /* "ge" card, terminate structure geometry input. */
-        /* My addition, for drawing */
-        if( ((data.n > 0) || (data.m > 0)) && !CHILD )
-          Init_Struct_Drawing();
-        else if( (data.n == 0) && (data.m == 0) )
+        if( (data.n == 0) && (data.m == 0) )
         {
           Stop( ERR_OK, _("No geometry data cards") );
           return( FALSE );
@@ -629,6 +629,11 @@ datagn( void )
         data.npm  = data.n+data.m;
         data.np2m = data.n+2*data.m;
         data.np3m = data.n+3*data.m;
+
+        /* Initialize structure drawing after symmetry expansion and
+         * derived-field computation so data.n and data.m are final. */
+        if( ((data.n > 0) || (data.m > 0)) && !CHILD )
+          Init_Struct_Drawing();
 
         return( TRUE );
 

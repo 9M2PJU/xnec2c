@@ -17,10 +17,17 @@
  *    https://www.xnec2c.org/
  */
 
-#ifndef DRAW_STRUCTURE_H
-#define DRAW_STRUCTURE_H        1
+#ifndef STRUCTURE_UI_H
+#define STRUCTURE_UI_H  1
 
 #include "common.h"
 
-#endif
+void Draw_Structure_UI(void);
+void Show_Viewer_Gain(GtkBuilder *builder, gchar *widget, view_t *v);
+void Alloc_Crnt_Fstep_Buffers(int nfrq);
+void Free_Crnt_Fstep_Buffers(void);
+void Save_Crnt_Data(int fstep);
+void Queue_Structure_Redraw(void);
+void Init_Struct_Drawing(void);
 
+#endif

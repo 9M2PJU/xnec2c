@@ -134,10 +134,10 @@ draw_wire_segments(cairo_t *cr, view_t *v, Segment_t *segm, gint nseg,
  * @cr:     Cairo context
  * @v:      view for segment coordinates
  * @segm:   projected patch segment array [npatch*2]
- * @npatch: number of patches (two line segments each)
+ * @npatch: number of patches (four rectangle edges each)
  * @params: dispatch-resolved draw parameters (colors)
  *
- * When params->cmax > 0 (current mode): draws each patch t1/t2 line
+ * When params->cmax > 0 (current mode): draws each patch rectangle
  * in precomputed per-patch colors from struct_colors.
  * When params->cmax == 0 (geometry mode): draws all patches in the
  * base color from params->patch_colors[0].
@@ -156,22 +156,19 @@ draw_surface_patches(cairo_t *cr, view_t *v, Segment_t *segm, gint npatch,
   {
     for( idx = 0; idx < npatch; idx++ )
     {
-      int j = 2 * idx;
+      int j = 4 * idx;
+      int k;
 
-      /* t1 direction */
       cairo_set_source_rgb(cr,
           (double)params->patch_colors[idx].r,
           (double)params->patch_colors[idx].g,
           (double)params->patch_colors[idx].b);
-      Cairo_Draw_Line(cr,
-          segm[j].x1, segm[j].y1,
-          segm[j].x2, segm[j].y2);
 
-      /* t2 direction — same per-patch color from dispatch */
-      j++;
-      Cairo_Draw_Line(cr,
-          segm[j].x1, segm[j].y1,
-          segm[j].x2, segm[j].y2);
+      /* 4 rectangle edges per patch */
+      for( k = 0; k < 4; k++ )
+        Cairo_Draw_Line(cr,
+            segm[j + k].x1, segm[j + k].y1,
+            segm[j + k].x2, segm[j + k].y2);
     }
     return;
   }
@@ -181,7 +178,7 @@ draw_surface_patches(cairo_t *cr, view_t *v, Segment_t *segm, gint npatch,
       (double)params->patch_colors[0].r,
       (double)params->patch_colors[0].g,
       (double)params->patch_colors[0].b);
-  int nsg = 2 * npatch;
+  int nsg = 4 * npatch;
   for( idx = 0; idx < nsg; idx++ )
   {
     Cairo_Draw_Line(cr,

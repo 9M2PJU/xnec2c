@@ -46,12 +46,13 @@ void Cairo_Draw_Line(cairo_t *cr, int x1, int y1, int x2, int y2);
 void Cairo_Draw_Lines(cairo_t *cr, GdkPoint *points, int npoints);
 
 /*-----------------------------------------------------------------------
- * 3D to 2D projection and structure data (draw_structure.c)
+ * 3D to 2D projection and structure data (cairo_project.c)
  *----------------------------------------------------------------------*/
+
+extern Segment_t *structure_segs;
 
 void Process_Wire_Segments(view_t *v, double scale);
 void Process_Surface_Patches(view_t *v, double scale);
-void Init_Struct_Drawing(void);
 
 /*-----------------------------------------------------------------------
  * Axes (cairo_axes.c)

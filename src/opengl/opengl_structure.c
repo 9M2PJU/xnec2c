@@ -28,6 +28,8 @@
 #include "../opengl-engine/opengl_view.h"
 #include "../opengl-engine/opengl_view_notice.h"
 #include "../render/render_dispatch.h"
+#include "../rdpattern_ui.h"
+#include "../structure_ui.h"
 
 /* Maximum allowed radius scale */
 #define CYLINDER_RADIUS_SCALE_MAX 100.0

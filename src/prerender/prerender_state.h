@@ -69,6 +69,9 @@ typedef struct
   ff_edge_topo_t *phi_topo;     /* [fpat.nth * (fpat.nph-1)] */
   int             n_theta_edges;
   int             n_phi_edges;
+
+  /* Precomputed patch rectangle corners [data.m] */
+  patch_corners_t *patch_corners;
 } geom_pre_t;
 
 /*-----------------------------------------------------------------------

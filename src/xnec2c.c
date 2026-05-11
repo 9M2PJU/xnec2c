@@ -29,6 +29,8 @@
 #include "mathlib.h"
 #include "opt_ui.h"
 #include "plot_freqdata.h"
+#include "rdpattern_ui.h"
+#include "structure_ui.h"
 /* Only nec2_eval_signal() is called from xnec2c.c; avoid pulling
  * gsl headers (via opt_simple.h) which conflict with openblas cblas. */
 extern void nec2_eval_signal(void);

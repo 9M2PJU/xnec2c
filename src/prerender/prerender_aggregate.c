@@ -18,12 +18,11 @@
  */
 
 /*
- * prerender_aggregate: Tier 1 geometry-derived aggregate scalars.
+ * prerender_aggregate: Tier 1 structure-geometry prerender.
  *
- * Computes scene_radius (from wire endpoints and patch corners),
- * excitation_center (centroid of excitation source segments),
- * nf_dr_norm (near-field normalization distance), and radiation
- * pattern trig tables.  Called once after geometry is established.
+ * Computes scene_radius (max origin distance over wire endpoints and
+ * patch corners) and precomputes patch_corners (4 rectangle corners
+ * per surface patch).  Called once at GE-card time.
  */
 #include "prerender_aggregate.h"
 #include "../shared.h"
@@ -65,18 +64,26 @@ scan_wire_radius(double *r_max)
 /*-----------------------------------------------------------------------*/
 
 /**
- * scan_patch_radius() - Find max distance from origin over all four patch corners
- * @r_max: current maximum, updated in place
+ * New_Patch_Data() - Precompute patch rectangle corners and return patch r_max
  *
- * Corners are center ± s*t1 ± s*t2 (four diagonal combinations).
+ * Allocates geom_pre.patch_corners[data.m]. In a single loop per patch,
+ * stores all four corners (center ± s*t1 ± s*t2) and scans them for the
+ * maximum distance from origin, which is returned for use by Prerender_Aggregate().
  */
-static void
-scan_patch_radius(double *r_max)
+  double
+New_Patch_Data(void)
 {
   int idx;
-  double s, r;
+  double s, r, r_max = 0.0;
   double px, py, pz;
   double s1x, s1y, s1z, s2x, s2y, s2z;
+  size_t mreq;
+
+  if( data.m == 0 )
+    return 0.0;
+
+  mreq = (size_t)data.m * sizeof(patch_corners_t);
+  mem_realloc((void **)&geom_pre.patch_corners, mreq, __LOCATION__);
 
   for( idx = 0; idx < data.m; idx++ )
   {
@@ -93,145 +100,49 @@ scan_patch_radius(double *r_max)
     s2y = s * data.patches[idx].t2y;
     s2z = s * data.patches[idx].t2z;
 
-    /* All four diagonal corners: center ± t1 ± t2 */
-    r = dist3(px + s1x + s2x, py + s1y + s2y, pz + s1z + s2z);
-    if( r > *r_max ) *r_max = r;
+    /* c0: center + s*t1 + s*t2 */
+    geom_pre.patch_corners[idx].c0x = px + s1x + s2x;
+    geom_pre.patch_corners[idx].c0y = py + s1y + s2y;
+    geom_pre.patch_corners[idx].c0z = pz + s1z + s2z;
 
-    r = dist3(px + s1x - s2x, py + s1y - s2y, pz + s1z - s2z);
-    if( r > *r_max ) *r_max = r;
+    /* c1: center - s*t1 + s*t2 */
+    geom_pre.patch_corners[idx].c1x = px - s1x + s2x;
+    geom_pre.patch_corners[idx].c1y = py - s1y + s2y;
+    geom_pre.patch_corners[idx].c1z = pz - s1z + s2z;
 
-    r = dist3(px - s1x + s2x, py - s1y + s2y, pz - s1z + s2z);
-    if( r > *r_max ) *r_max = r;
+    /* c2: center - s*t1 - s*t2 */
+    geom_pre.patch_corners[idx].c2x = px - s1x - s2x;
+    geom_pre.patch_corners[idx].c2y = py - s1y - s2y;
+    geom_pre.patch_corners[idx].c2z = pz - s1z - s2z;
 
-    r = dist3(px - s1x - s2x, py - s1y - s2y, pz - s1z - s2z);
-    if( r > *r_max ) *r_max = r;
-  }
-}
+    /* c3: center + s*t1 - s*t2 */
+    geom_pre.patch_corners[idx].c3x = px + s1x - s2x;
+    geom_pre.patch_corners[idx].c3y = py + s1y - s2y;
+    geom_pre.patch_corners[idx].c3z = pz + s1z - s2z;
 
-/*-----------------------------------------------------------------------*/
+    /* Scan all four corners for maximum distance from origin */
+    r = dist3(geom_pre.patch_corners[idx].c0x,
+              geom_pre.patch_corners[idx].c0y,
+              geom_pre.patch_corners[idx].c0z);
+    if( r > r_max ) r_max = r;
 
-/**
- * compute_excitation_center() - Centroid of all excitation source segments
- */
-  void
-compute_excitation_center(void)
-{
-  int idx, seg_idx, count;
-  double cx, cy, cz;
+    r = dist3(geom_pre.patch_corners[idx].c1x,
+              geom_pre.patch_corners[idx].c1y,
+              geom_pre.patch_corners[idx].c1z);
+    if( r > r_max ) r_max = r;
 
-  cx = cy = cz = 0.0;
-  count = 0;
+    r = dist3(geom_pre.patch_corners[idx].c2x,
+              geom_pre.patch_corners[idx].c2y,
+              geom_pre.patch_corners[idx].c2z);
+    if( r > r_max ) r_max = r;
 
-  /* Voltage sources (1-indexed segment numbers) */
-  for( idx = 0; idx < vsorc.nsant; idx++ )
-  {
-    seg_idx = vsorc.isant[idx] - 1;
-    if( seg_idx >= 0 && seg_idx < data.n )
-    {
-      cx += data.segments[seg_idx].x;
-      cy += data.segments[seg_idx].y;
-      cz += data.segments[seg_idx].z;
-      count++;
-    }
-  }
-
-  /* Current sources */
-  for( idx = 0; idx < vsorc.nvqd; idx++ )
-  {
-    seg_idx = vsorc.ivqd[idx] - 1;
-    if( seg_idx >= 0 && seg_idx < data.n )
-    {
-      cx += data.segments[seg_idx].x;
-      cy += data.segments[seg_idx].y;
-      cz += data.segments[seg_idx].z;
-      count++;
-    }
+    r = dist3(geom_pre.patch_corners[idx].c3x,
+              geom_pre.patch_corners[idx].c3y,
+              geom_pre.patch_corners[idx].c3z);
+    if( r > r_max ) r_max = r;
   }
 
-  if( count > 0 )
-  {
-    geom_pre.excitation_cx = cx / count;
-    geom_pre.excitation_cy = cy / count;
-    geom_pre.excitation_cz = cz / count;
-  }
-  else
-  {
-    geom_pre.excitation_cx = 0.0;
-    geom_pre.excitation_cy = 0.0;
-    geom_pre.excitation_cz = 0.0;
-  }
-}
-
-/*-----------------------------------------------------------------------*/
-
-/**
- * compute_nf_dr_norm() - Near-field normalization distance
- *
- * Matches the dr computation from Draw_Near_Field():
- * spherical → dxnr, rectangular → euclidean(dxnr, dynr, dznr)/1.75.
- */
-  void
-compute_nf_dr_norm(void)
-{
-  if( fpat.near )
-  {
-    /* Spherical coordinates */
-    geom_pre.nf_dr_norm = (double)fpat.dxnr;
-  }
-  else
-  {
-    /* Rectangular coordinates */
-    geom_pre.nf_dr_norm = sqrt(
-        (double)fpat.dxnr * (double)fpat.dxnr +
-        (double)fpat.dynr * (double)fpat.dynr +
-        (double)fpat.dznr * (double)fpat.dznr) / 1.75;
-  }
-}
-
-/*-----------------------------------------------------------------------*/
-
-/**
- * compute_trig_tables() - Precompute sin/cos/solid_angle for radiation grid
- *
- * Allocates and fills geom_pre trig tables from fpat grid parameters.
- * Called once at geometry load; avoids repeated trig per vertex per frame.
- */
-  void
-compute_trig_tables(void)
-{
-  int i;
-  double dth_rad = (double)fpat.dth * (double)TORAD;
-  double dph_rad = (double)fpat.dph * (double)TORAD;
-
-  free_ptr((void **)&geom_pre.sin_theta);
-  free_ptr((void **)&geom_pre.cos_theta);
-  free_ptr((void **)&geom_pre.sin_phi);
-  free_ptr((void **)&geom_pre.cos_phi);
-  free_ptr((void **)&geom_pre.solid_angle);
-
-  if( fpat.nth <= 0 || fpat.nph <= 0 )
-    return;
-
-  mem_alloc((void **)&geom_pre.sin_theta, (size_t)fpat.nth * sizeof(double), __LOCATION__);
-  mem_alloc((void **)&geom_pre.cos_theta, (size_t)fpat.nth * sizeof(double), __LOCATION__);
-  mem_alloc((void **)&geom_pre.solid_angle, (size_t)fpat.nth * sizeof(double), __LOCATION__);
-  mem_alloc((void **)&geom_pre.sin_phi, (size_t)fpat.nph * sizeof(double), __LOCATION__);
-  mem_alloc((void **)&geom_pre.cos_phi, (size_t)fpat.nph * sizeof(double), __LOCATION__);
-
-  for( i = 0; i < fpat.nth; i++ )
-  {
-    double tht = ((double)fpat.thets + (double)i * (double)fpat.dth) * (double)TORAD;
-    geom_pre.sin_theta[i] = sin(tht);
-    geom_pre.cos_theta[i] = cos(tht);
-    geom_pre.solid_angle[i] = fabs(sin(tht)) * dth_rad * dph_rad;
-  }
-
-  for( i = 0; i < fpat.nph; i++ )
-  {
-    double phi = ((double)fpat.phis + (double)i * (double)fpat.dph) * (double)TORAD;
-    geom_pre.sin_phi[i] = sin(phi);
-    geom_pre.cos_phi[i] = cos(phi);
-  }
+  return r_max;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -245,68 +156,13 @@ Prerender_Aggregate(void)
     scan_wire_radius(&r_max);
 
   if( data.m > 0 )
-    scan_patch_radius(&r_max);
+  {
+    double patch_r_max = New_Patch_Data();
+    if( patch_r_max > r_max )
+      r_max = patch_r_max;
+  }
 
   geom_pre.scene_radius = r_max;
-}
-
-/*-----------------------------------------------------------------------*/
-
-/**
- * compute_ff_topology() - Populate geom_pre far-field edge topology tables
- *
- * Writes theta_topo[], phi_topo[], n_theta_edges, n_phi_edges into geom_pre.
- * Topology is frequency-independent (grid connectivity depends only on fpat
- * dimensions).  Called once at RP-card time, parent-only.
- */
-  void
-compute_ff_topology(void)
-{
-  int nth, nph, col_idx, pts_idx;
-  size_t mreq;
-
-  free_ptr((void **)&geom_pre.theta_topo);
-  free_ptr((void **)&geom_pre.phi_topo);
-  geom_pre.n_theta_edges = 0;
-  geom_pre.n_phi_edges   = 0;
-
-  if( fpat.nth < 2 || fpat.nph < 2 )
-    return;
-
-  geom_pre.n_theta_edges = (fpat.nth - 1) * fpat.nph;
-  mreq = (size_t)geom_pre.n_theta_edges * sizeof(ff_edge_topo_t);
-  mem_alloc((void **)&geom_pre.theta_topo, mreq, __LOCATION__);
-
-  col_idx = 0;
-  pts_idx = 0;
-  for( nph = 0; nph < fpat.nph; nph++ )
-  {
-    for( nth = 1; nth < fpat.nth; nth++ )
-    {
-      geom_pre.theta_topo[col_idx].va = (uint32_t)pts_idx;
-      geom_pre.theta_topo[col_idx].vb = (uint32_t)(pts_idx + 1);
-      col_idx++;
-      pts_idx++;
-    }
-    pts_idx++;
-  }
-
-  geom_pre.n_phi_edges = fpat.nth * (fpat.nph - 1);
-  mreq = (size_t)geom_pre.n_phi_edges * sizeof(ff_edge_topo_t);
-  mem_alloc((void **)&geom_pre.phi_topo, mreq, __LOCATION__);
-
-  col_idx = 0;
-  for( nth = 0; nth < fpat.nth; nth++ )
-  {
-    pts_idx = nth;
-    for( nph = 1; nph < fpat.nph; nph++ )
-    {
-      geom_pre.phi_topo[col_idx].va = (uint32_t)pts_idx;
-      geom_pre.phi_topo[col_idx].vb = (uint32_t)(pts_idx + fpat.nth);
-      col_idx++;
-      pts_idx += fpat.nth;
-    }
-  }
 }
 
 /*-----------------------------------------------------------------------*/

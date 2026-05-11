@@ -610,12 +610,14 @@ typedef struct
   double psalp;             /* Z component - sin(a) */
 } surface_patch_t;
 
-/* Per-patch plot line endpoints, 2*m entries */
+/* Per-patch 4 rectangle corners, 1 entry per patch */
 typedef struct
 {
-  double px1, py1, pz1;    /* Line endpoint 1 */
-  double px2, py2, pz2;    /* Line endpoint 2 */
-} patch_line_t;
+  double c0x, c0y, c0z;    /* center + s*t1 + s*t2 */
+  double c1x, c1y, c1z;    /* center - s*t1 + s*t2 */
+  double c2x, c2y, c2z;    /* center - s*t1 - s*t2 */
+  double c3x, c3y, c3z;    /* center + s*t1 - s*t2 */
+} patch_corners_t;
 
 /* Per-sample near-field E/H magnitude, phase, real components, and coordinates */
 typedef struct
@@ -663,7 +665,6 @@ typedef struct
 
   wire_segment_t *segments;
   surface_patch_t *patches;
-  patch_line_t *patch_lines;
 
 } data_t;
 
@@ -1566,17 +1567,6 @@ void Free_Nearfield_Fstep_Buffers(void);
 void Save_Nearfield_Data(int fstep);
 void Free_Draw_Buffers(void);
 double Scale_Gain( double gain, int fstep, int idx );
-/* draw_structure.c */
-void Draw_Structure_UI(void);
-void New_Patch_Data(void);
-void Process_Wire_Segments(view_t *v, double scale);
-void Process_Surface_Patches(view_t *v, double scale);
-void Alloc_Crnt_Fstep_Buffers(int nfrq);
-void Free_Crnt_Fstep_Buffers(void);
-void Save_Crnt_Data(int fstep);
-void Queue_Structure_Redraw(void);
-void Init_Struct_Drawing(void);
-void Show_Viewer_Gain(GtkBuilder *builder, gchar *widget, view_t *v);
 /* fields.c */
 void efld(double xi, double yi, double zi, double ai, int ij);
 void gf(double zk, double *co, double *si);

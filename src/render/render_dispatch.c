@@ -30,7 +30,7 @@
 #include "../cairo/cairo_draw.h"
 #include "../prerender/prerender_farfield.h"
 #include "../rdpattern_ui.h"
-#include "../draw_structure.h"
+#include "../structure_ui.h"
 
 /* Last render_check result for the rdpattern view; updated by render() on every call */
 static render_check_result_t last_rdpat_check;

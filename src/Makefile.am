@@ -18,8 +18,8 @@ xnec2c_SOURCES = \
     cmnd_edit.c     cmnd_edit.h \
     geom_edit.c     geom_edit.h \
     gnuplot.c       gnuplot.h \
-    draw_structure.c draw_structure.h \
     rdpattern_ui.c   rdpattern_ui.h \
+    structure_ui.c   structure_ui.h \
     fields.c        fields.h \
     fork.c          fork.h \
     geometry.c      geometry.h \
@@ -67,6 +67,7 @@ xnec2c_SOURCES = \
     view/view_presets.h \
     prerender/prerender_state.c     prerender/prerender_state.h \
     prerender/prerender_aggregate.c prerender/prerender_aggregate.h \
+    prerender/prerender_rdpattern.c prerender/prerender_rdpattern.h \
     prerender/prerender_color.c     prerender/prerender_color.h \
     prerender/prerender_farfield.c  prerender/prerender_farfield.h \
     prerender/prerender_nearfield.c prerender/prerender_nearfield.h \

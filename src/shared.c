@@ -207,9 +207,6 @@ near_field_t near_field;
 /* Per-frequency-step near field storage */
 near_field_t *near_field_fstep = NULL;
 
-/* Segments for drawing structure */
-Segment_t *structure_segs = NULL;
-
 /* Global tag number for geometry editors */
 gint tag_num = 0;
 

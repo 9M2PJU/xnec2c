@@ -19,6 +19,7 @@
 
 #include "gnuplot.h"
 #include "shared.h"
+#include "prerender/prerender_state.h"
 
 // Touchstone save types:
 enum {
@@ -510,26 +511,34 @@ Save_Struct_Gnuplot_Data( char *filename )
   /* Output if patch segs and no new input pending */
   if( data.m && isFlagClear(INPUT_PENDING) )
   {
-    int idx, m2;
+    int idx;
 
     /* Output segments data */
     fprintf( fp, _("# structure patch segments\n") );
 
-    /* Output all patch segments with blank line after each */
-    m2 = data.m * 2;
-    for( idx = 0; idx < m2; idx++ )
+    /* Output all patch rectangle edges (4 per patch).
+     * Two blank lines after each edge prevent gnuplot splot
+     * from connecting non-adjacent points. */
+    for( idx = 0; idx < data.m; idx++ )
     {
-      fprintf( fp, "%10.3E %10.3E %10.3E\n%10.3E %10.3E %10.3E\n",
-          (double) data.patch_lines[idx].px1,
-          (double) data.patch_lines[idx].py1,
-          (double) data.patch_lines[idx].pz1,
-          (double) data.patch_lines[idx].px2,
-          (double) data.patch_lines[idx].py2,
-          (double) data.patch_lines[idx].pz2);
+      patch_corners_t *pc = &geom_pre.patch_corners[idx];
 
-      /* Two blank lines after each segment prevents gnuplot splot connecting non-adjacent points */
-      fprintf( fp, "\n\n" );
-    } /* for( idx = 0; idx < m2; idx++ ) */
+      /* Edge c0-c1 */
+      fprintf( fp, "%10.3E %10.3E %10.3E\n%10.3E %10.3E %10.3E\n\n\n",
+          pc->c0x, pc->c0y, pc->c0z, pc->c1x, pc->c1y, pc->c1z );
+
+      /* Edge c1-c2 */
+      fprintf( fp, "%10.3E %10.3E %10.3E\n%10.3E %10.3E %10.3E\n\n\n",
+          pc->c1x, pc->c1y, pc->c1z, pc->c2x, pc->c2y, pc->c2z );
+
+      /* Edge c2-c3 */
+      fprintf( fp, "%10.3E %10.3E %10.3E\n%10.3E %10.3E %10.3E\n\n\n",
+          pc->c2x, pc->c2y, pc->c2z, pc->c3x, pc->c3y, pc->c3z );
+
+      /* Edge c3-c0 */
+      fprintf( fp, "%10.3E %10.3E %10.3E\n%10.3E %10.3E %10.3E\n\n\n",
+          pc->c3x, pc->c3y, pc->c3z, pc->c0x, pc->c0y, pc->c0z );
+    } /* for( idx = 0; idx < data.m; idx++ ) */
 
     fprintf( fp, "\n\n" );
   } /* if( data.m && isFlagSet(INPUT_PENDING) ) */

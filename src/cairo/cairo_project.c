@@ -18,11 +18,14 @@
  */
 
 /*
- * cairo_project: Cairo drawing primitives.
+ * cairo_project: Cairo drawing primitives and structure projection.
  */
 #include "cairo_draw.h"
+#include "../geometry.h"
 #include "../shared.h"
-#include "../prerender/prerender_aggregate.h"
+
+/* 2D projected segments for Cairo structure rendering */
+Segment_t *structure_segs = NULL;
 
 /*-----------------------------------------------------------------------
  * Drawing primitives
@@ -76,5 +79,78 @@ Cairo_Draw_Lines(cairo_t *cr, GdkPoint *points, int npoints)
     cairo_line_to(cr, (double)points[idx].x, (double)points[idx].y);
   cairo_stroke(cr);
 }
+
+/*-----------------------------------------------------------------------*/
+
+/*  Process_Wire_Segments()
+ *
+ *  Processes wire segment data so they can be drawn on Screen
+ */
+  void
+Process_Wire_Segments( view_t *v, double scale )
+{
+  int idx;
+
+  if( structure_segs == NULL )
+    return;
+
+  /* Project all wire segs from xyz frame to screen frame */
+  for( idx = 0; idx < data.n; idx++ )
+    Set_Gdk_Segment(
+        &structure_segs[idx],
+        v,
+        scale,
+        (double) data.segments[idx].x1,
+        (double) data.segments[idx].y1,
+        (double) data.segments[idx].z1,
+        (double) data.segments[idx].x2,
+        (double) data.segments[idx].y2,
+        (double) data.segments[idx].z2);
+
+} /* Process_Wire_Segments() */
+
+/*-----------------------------------------------------------------------*/
+
+/*  Process_Surface_Patches()
+ *
+ *  Processes surface patch data so they can be drawn on Screen.
+ *  Each patch is represented by 4 rectangle edges from geom_pre.patch_corners.
+ *  Occupies structure_segs[data.n + 4*idx] through [data.n + 4*idx + 3].
+ */
+  void
+Process_Surface_Patches( view_t *v, double scale )
+{
+  int idx;
+
+  if( geom_pre.patch_corners == NULL || structure_segs == NULL )
+    return;
+
+  for( idx = 0; idx < data.m; idx++ )
+  {
+    int base = data.n + 4 * idx;
+    patch_corners_t *pc = &geom_pre.patch_corners[idx];
+
+    /* Edge c0-c1 */
+    Set_Gdk_Segment(&structure_segs[base + 0], v, scale,
+        pc->c0x, pc->c0y, pc->c0z,
+        pc->c1x, pc->c1y, pc->c1z);
+
+    /* Edge c1-c2 */
+    Set_Gdk_Segment(&structure_segs[base + 1], v, scale,
+        pc->c1x, pc->c1y, pc->c1z,
+        pc->c2x, pc->c2y, pc->c2z);
+
+    /* Edge c2-c3 */
+    Set_Gdk_Segment(&structure_segs[base + 2], v, scale,
+        pc->c2x, pc->c2y, pc->c2z,
+        pc->c3x, pc->c3y, pc->c3z);
+
+    /* Edge c3-c0 */
+    Set_Gdk_Segment(&structure_segs[base + 3], v, scale,
+        pc->c3x, pc->c3y, pc->c3z,
+        pc->c0x, pc->c0y, pc->c0z);
+  }
+
+} /* Process_Surface_Patches() */
 
 /*-----------------------------------------------------------------------*/

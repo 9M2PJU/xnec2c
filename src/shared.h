@@ -227,9 +227,6 @@ extern near_field_t near_field;
 /* Per-frequency-step near field storage */
 extern near_field_t *near_field_fstep;
 
-/* Segments for drawing structure */
-extern Segment_t *structure_segs ;
-
 /* Global tag number for geometry editors */
 extern gint tag_num;
 
@@ -317,8 +314,6 @@ extern zload_t zload;
 /* Comment cards storage */
 extern comments_t comments;
 
-/* Segments for drawing structure */
-extern Segment_t *structure_segs;
 
 /*------------------------------------------------------------------------*/
 

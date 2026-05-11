@@ -131,6 +131,10 @@ prerender_state_free(void)
   geom_pre.n_theta_edges = 0;
   geom_pre.n_phi_edges   = 0;
 
+  /* patch_corners holds geometry computed at GE-card time. It is only
+   * freed and reallocated by New_Patch_Data() on file reload; unlike the
+   * RP/EX-card fields above, it must survive frequency-sweep restarts. */
+
   allocated_steps = 0;
 }
 

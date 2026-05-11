@@ -159,12 +159,6 @@ subph( int nx, int ny )
 
   mreq = (size_t)data.m * sizeof(surface_patch_t);
   mem_realloc((void **)&data.patches, mreq, "in geometry.c");
-  if( !CHILD )
-  {
-    mreq = (size_t)(data.n + 2 * data.m) * sizeof(Segment_t);
-    mem_realloc( (void **)&structure_segs, mreq, "in geometry.c" );
-  }
-
   /* Shift patches to make room for new ones */
   if( (ny == 0) && (nx != data.m) )
   {
@@ -241,8 +235,6 @@ subph( int nx, int ny )
     data.patches[mi].pz=10000.0;
 
   /* Process new patches created */
-  if( ! CHILD )
-    New_Patch_Data();
 
   return;
 }

@@ -23,45 +23,20 @@
 #include "prerender_state.h"
 
 /**
+ * New_Patch_Data() - Precompute patch rectangle corners into geom_pre.patch_corners
+ *
+ * Allocates geom_pre.patch_corners[data.m], fills all four corners per patch
+ * (center ± s*t1 ± s*t2), and returns the maximum distance from origin across
+ * all corners. Called by Prerender_Aggregate(); parent-only.
+ */
+double New_Patch_Data(void);
+
+/**
  * Prerender_Aggregate() - Compute geometry-derived aggregate scalars
  *
- * Populates geom_pre.scene_radius. Called once at GE-card time after
- * geometry is established. Does not require excitation data.
+ * Populates geom_pre.scene_radius and geom_pre.patch_corners. Called once
+ * at GE-card time after geometry is established. Does not require excitation data.
  */
 void Prerender_Aggregate(void);
-
-/**
- * compute_excitation_center() - Centroid of excitation source segments
- *
- * Reads vsorc.isant/ivqd (populated by EX-card) to compute
- * geom_pre.excitation_cx/cy/cz. Called at end of Read_Commands(),
- * parent-only, after all cards including EX have been parsed.
- */
-void compute_excitation_center(void);
-
-/**
- * compute_trig_tables() - Populate geom_pre sin/cos/solid_angle tables
- *
- * Called from input.c RP-card block after SetFlag(ENABLE_RDPAT) and
- * fpat dimensions are finalized.  fpat.nth and fpat.nph must be valid.
- */
-void compute_trig_tables(void);
-
-/**
- * compute_ff_topology() - Populate geom_pre far-field edge topology tables
- *
- * Writes theta_topo[], phi_topo[], n_theta_edges, n_phi_edges from fpat grid.
- * Called once at RP-card time alongside compute_trig_tables(), parent-only.
- */
-void compute_ff_topology(void);
-
-/**
- * compute_nf_dr_norm() - Compute near-field normalization distance
- *
- * Reads fpat.near/dxnr/dynr/dznr (set by NE/NH cards) and writes
- * geom_pre.nf_dr_norm.  Called at RP-card time after NF cards are
- * processed, outside !CHILD so both parent and child populate the field.
- */
-void compute_nf_dr_norm(void);
 
 #endif

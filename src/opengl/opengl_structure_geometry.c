@@ -288,10 +288,11 @@ generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *p
   int idx, vidx = 0;
   structure_vertex_t *verts = (structure_vertex_t *)batch->vertices;
 
+  if( geom_pre.patch_corners == NULL )
+    return;
+
   for( idx = 0; idx < data.m; idx++ )
   {
-    int j = idx + data.n;
-    double s = sqrt(save.bitemp[j]) / 2.0;
     float nx, ny, nz;
     float p_r, p_g, p_b;
     float c0x, c0y, c0z, c1x, c1y, c1z;
@@ -302,19 +303,19 @@ generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *p
     p_g = params->patch_colors[idx].g;
     p_b = params->patch_colors[idx].b;
 
-    /* Quad corners: c0(+t1,+t2) c1(-t1,+t2) c2(-t1,-t2) c3(+t1,-t2) */
-    c0x = (float)(save.xtemp[j] + s * data.patches[idx].t1x + s * data.patches[idx].t2x);
-    c0y = (float)(save.ytemp[j] + s * data.patches[idx].t1y + s * data.patches[idx].t2y);
-    c0z = (float)(save.ztemp[j] + s * data.patches[idx].t1z + s * data.patches[idx].t2z);
-    c1x = (float)(save.xtemp[j] - s * data.patches[idx].t1x + s * data.patches[idx].t2x);
-    c1y = (float)(save.ytemp[j] - s * data.patches[idx].t1y + s * data.patches[idx].t2y);
-    c1z = (float)(save.ztemp[j] - s * data.patches[idx].t1z + s * data.patches[idx].t2z);
-    c2x = (float)(save.xtemp[j] - s * data.patches[idx].t1x - s * data.patches[idx].t2x);
-    c2y = (float)(save.ytemp[j] - s * data.patches[idx].t1y - s * data.patches[idx].t2y);
-    c2z = (float)(save.ztemp[j] - s * data.patches[idx].t1z - s * data.patches[idx].t2z);
-    c3x = (float)(save.xtemp[j] + s * data.patches[idx].t1x - s * data.patches[idx].t2x);
-    c3y = (float)(save.ytemp[j] + s * data.patches[idx].t1y - s * data.patches[idx].t2y);
-    c3z = (float)(save.ztemp[j] + s * data.patches[idx].t1z - s * data.patches[idx].t2z);
+    /* Quad corners from precomputed geometry */
+    c0x = (float)geom_pre.patch_corners[idx].c0x;
+    c0y = (float)geom_pre.patch_corners[idx].c0y;
+    c0z = (float)geom_pre.patch_corners[idx].c0z;
+    c1x = (float)geom_pre.patch_corners[idx].c1x;
+    c1y = (float)geom_pre.patch_corners[idx].c1y;
+    c1z = (float)geom_pre.patch_corners[idx].c1z;
+    c2x = (float)geom_pre.patch_corners[idx].c2x;
+    c2y = (float)geom_pre.patch_corners[idx].c2y;
+    c2z = (float)geom_pre.patch_corners[idx].c2z;
+    c3x = (float)geom_pre.patch_corners[idx].c3x;
+    c3y = (float)geom_pre.patch_corners[idx].c3y;
+    c3z = (float)geom_pre.patch_corners[idx].c3z;
 
     /* Box outline: 4 edges as GL_LINES pairs (8 vertices) */
     verts[vidx++] = (structure_vertex_t){
@@ -377,6 +378,8 @@ generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *p
 
       if( emit_arrow )
       {
+        int j = idx + data.n;
+        double s = sqrt(save.bitemp[j]) / 2.0;
         float acx = (float)save.xtemp[j];
         float acy = (float)save.ytemp[j];
         float acz = (float)save.ztemp[j];
@@ -493,10 +496,11 @@ generate_patches_triangles(gl_draw_batch_t *batch, const struct_draw_params_t *p
   int idx, vidx = 0;
   structure_vertex_t *verts = (structure_vertex_t *)batch->vertices;
 
+  if( geom_pre.patch_corners == NULL )
+    return;
+
   for( idx = 0; idx < data.m; idx++ )
   {
-    int j = idx + data.n;
-    double s = sqrt(save.bitemp[j]) / 2.0;
     float nx, ny, nz;
     float p_r, p_g, p_b;
     float fd[4];
@@ -504,19 +508,19 @@ generate_patches_triangles(gl_draw_batch_t *batch, const struct_draw_params_t *p
 
     get_patch_normal(idx, &nx, &ny, &nz);
 
-    /* Quad corners: c0(+t1,+t2) c1(-t1,+t2) c2(-t1,-t2) c3(+t1,-t2) */
-    c0x = (float)(save.xtemp[j] + s * data.patches[idx].t1x + s * data.patches[idx].t2x);
-    c0y = (float)(save.ytemp[j] + s * data.patches[idx].t1y + s * data.patches[idx].t2y);
-    c0z = (float)(save.ztemp[j] + s * data.patches[idx].t1z + s * data.patches[idx].t2z);
-    c1x = (float)(save.xtemp[j] - s * data.patches[idx].t1x + s * data.patches[idx].t2x);
-    c1y = (float)(save.ytemp[j] - s * data.patches[idx].t1y + s * data.patches[idx].t2y);
-    c1z = (float)(save.ztemp[j] - s * data.patches[idx].t1z + s * data.patches[idx].t2z);
-    c2x = (float)(save.xtemp[j] - s * data.patches[idx].t1x - s * data.patches[idx].t2x);
-    c2y = (float)(save.ytemp[j] - s * data.patches[idx].t1y - s * data.patches[idx].t2y);
-    c2z = (float)(save.ztemp[j] - s * data.patches[idx].t1z - s * data.patches[idx].t2z);
-    c3x = (float)(save.xtemp[j] + s * data.patches[idx].t1x - s * data.patches[idx].t2x);
-    c3y = (float)(save.ytemp[j] + s * data.patches[idx].t1y - s * data.patches[idx].t2y);
-    c3z = (float)(save.ztemp[j] + s * data.patches[idx].t1z - s * data.patches[idx].t2z);
+    /* Quad corners from precomputed geometry */
+    c0x = (float)geom_pre.patch_corners[idx].c0x;
+    c0y = (float)geom_pre.patch_corners[idx].c0y;
+    c0z = (float)geom_pre.patch_corners[idx].c0z;
+    c1x = (float)geom_pre.patch_corners[idx].c1x;
+    c1y = (float)geom_pre.patch_corners[idx].c1y;
+    c1z = (float)geom_pre.patch_corners[idx].c1z;
+    c2x = (float)geom_pre.patch_corners[idx].c2x;
+    c2y = (float)geom_pre.patch_corners[idx].c2y;
+    c2z = (float)geom_pre.patch_corners[idx].c2z;
+    c3x = (float)geom_pre.patch_corners[idx].c3x;
+    c3y = (float)geom_pre.patch_corners[idx].c3y;
+    c3z = (float)geom_pre.patch_corners[idx].c3z;
 
     p_r = params->patch_colors[idx].r;
     p_g = params->patch_colors[idx].g;

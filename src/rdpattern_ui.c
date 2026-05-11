@@ -22,6 +22,7 @@
 #include "prerender/prerender_nearfield.h"
 #include "render/render_dispatch.h"
 #include "shared.h"
+#include "structure_ui.h"
 
 #ifdef HAVE_OPENGL
 #include "opengl/opengl_rdpattern.h"
