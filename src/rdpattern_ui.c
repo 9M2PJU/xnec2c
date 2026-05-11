@@ -864,7 +864,8 @@ Recompute_Near_Field_Vectors( int fstep, gboolean snapshot )
   void
 Save_Nearfield_Data( int fstep )
 {
-  if( near_field_fstep == NULL
+  if( isFlagClear(ENABLE_NEAREH)
+      || near_field_fstep == NULL
       || fstep < 0 || fstep > calc_data.steps_total
       || near_field_fstep[fstep].points == NULL)
     return;
