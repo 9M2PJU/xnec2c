@@ -507,7 +507,6 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
   }
   else
   {
-    ClearFlag( NEAREH_ANIMATE );
     ClearFlag( DRAW_EHFIELD );
 
     /* Clear radiation pattern drawingarea */

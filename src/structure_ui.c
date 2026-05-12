@@ -235,6 +235,56 @@ Queue_Structure_Redraw(void)
 
 /*-----------------------------------------------------------------------*/
 
+/** Animate_Phase() - Unified animation tick callback
+ * @_udata: unused
+ *
+ * Returns G_SOURCE_REMOVE immediately when ANIMATE is cleared.
+ * Otherwise advances flow_phase by one anim_step, dispatches to all
+ * active animation consumers, then queues redraws.  Animate_Phase owns
+ * all queue decisions; compute_near_field_frame() is pure computation.
+ */
+  gboolean
+Animate_Phase(gpointer _udata)
+{
+  if( isFlagClear(ANIMATE) )
+  {
+    anim_tag = 0;
+    return( G_SOURCE_REMOVE );
+  }
+
+  flow_phase += (float)near_field.anim_step;
+  if( flow_phase >= (float)M_2PI )
+    flow_phase -= (float)M_2PI;
+
+  /* Near-field computation only runs when EH field visualization is active */
+  if( isFlagSet(DRAW_EHFIELD) )
+    compute_near_field_frame((double)flow_phase);
+
+  xnec2_widget_queue_draw( structure_drawingarea, TRUE );
+
+  /* Queue rdpattern for near-field visualization or patch arrow overlay */
+  if( isFlagSet(DRAW_EHFIELD) ||
+      (isFlagSet(OVERLAY_STRUCT) && data.m > 0) )
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
+
+  return( G_SOURCE_CONTINUE );
+
+} /* Animate_Phase() */
+
+/*-----------------------------------------------------------------------*/
+
+/** reset_animation_phase() - Zero the shared animation phase
+ *
+ * Called when animation stops to return arrows to reference direction.
+ */
+  void
+reset_animation_phase(void)
+{
+  flow_phase = 0.0f;
+}
+
+/*-----------------------------------------------------------------------*/
+
 /*  Init_Struct_Drawing()
  *
  *  Initializes drawing parameters after geometry input

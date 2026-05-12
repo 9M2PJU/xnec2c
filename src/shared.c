@@ -191,9 +191,11 @@ gboolean FORKED = FALSE;
 /* Used to kill window deleted by user */
 GtkWidget *kill_window = NULL;
 
-/* Animation timeout callback tags */
+/* Animation timeout callback tag */
 guint anim_tag = 0;
-guint flow_anim_tag = 0;
+
+/* Shared flow phase advanced by unified tick, read by all backends */
+float flow_phase = 0.0f;
 
 /* Frequency loop idle function tag */
 guint floop_tag = 0;

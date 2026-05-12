@@ -112,12 +112,6 @@ void opengl_structure_update_shared_geometry_with_params(const struct_draw_param
 /* Return read-only pointer to shared geometry data */
 const structure_overlay_data_t* opengl_structure_get_shared_geometry(void);
 
-/* Timeout callback for flow phase animation; lifecycle managed by callbacks.c */
-gboolean Animate_Flow_Phase(gpointer udata);
-
-/* Reset flow phase to zero on both CPU geometry and GPU views */
-void opengl_structure_reset_flow_phase(void);
-
 #endif
 
 #endif /* OPENGL_STRUCTURE_H */

@@ -22,6 +22,7 @@
 #include "opt_ui.h"
 #include "measurements.h"
 #include "rdpattern_ui.h"
+#include "structure_ui.h"
 #include "render/render_dispatch.h"
 #include <pthread.h>
 
@@ -2686,26 +2687,14 @@ update_animation_parameters(void)
     g_source_remove( anim_tag );
   anim_tag = 0;
 
-  if( flow_anim_tag > 0 )
-    g_source_remove( flow_anim_tag );
-  flow_anim_tag = 0;
-
-  /* Install independent timers for each active animation */
-  if( isFlagSet(NEAREH_ANIMATE) )
-    anim_tag = g_timeout_add( intval, Animate_Near_Field, NULL );
-
-  if( isFlagSet(FLOW_ANIMATE) )
-#ifdef HAVE_OPENGL
-    flow_anim_tag = g_timeout_add( intval, Animate_Flow_Phase, NULL );
-#else
-    flow_anim_tag = 0;
-#endif
+  if( isFlagSet(ANIMATE) )
+    anim_tag = g_timeout_add( intval, Animate_Phase, NULL );
 }
 
   static gboolean
 apply_animation_delayed(gpointer user_data)
 {
-  if( isFlagSet(FLOW_ANIMATE) || isFlagSet(NEAREH_ANIMATE) )
+  if( isFlagSet(ANIMATE) )
     update_animation_parameters();
 
   animation_apply_timer = 0;
@@ -2720,7 +2709,7 @@ on_animate_spinbutton_value_changed(
   gtk_spin_button_update( spinbutton );
 
   /* Skip live update if no animation is active */
-  if( isFlagClear(FLOW_ANIMATE) && isFlagClear(NEAREH_ANIMATE) )
+  if( isFlagClear(ANIMATE) )
     return;
 
   if( animation_apply_timer != 0 )
@@ -2741,7 +2730,7 @@ on_animate_spinbutton_focus_out_event(
     animation_apply_timer = 0;
   }
 
-  if( isFlagSet(FLOW_ANIMATE) || isFlagSet(NEAREH_ANIMATE) )
+  if( isFlagSet(ANIMATE) )
     update_animation_parameters();
 
   return( FALSE );
@@ -2752,13 +2741,20 @@ on_animation_applybutton_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  /* Flow animation always applicable when patches exist */
-  SetFlag( FLOW_ANIMATE );
+  /* Reject when nothing can animate */
+  if( data.m == 0 && !(fpat.nfeh & (NEAR_EFIELD | NEAR_HFIELD)) )
+  {
+    Notice( GTK_BUTTONS_OK, _("Animation"),
+        _("Animation requires surface patches (SP/SM NEC cards)"
+          " or near-field data (NE/NH NEC cards)") );
+    return;
+  }
 
-  /* Near field animation requires valid EH field setup */
-  if( isFlagSet(DRAW_EHFIELD) && Validate_Nearfield_Animation() )
-    SetFlag( NEAREH_ANIMATE );
+  /* Validate near-field setup only when no patches can animate */
+  if( data.m == 0 && isFlagSet(DRAW_EHFIELD) && !Validate_Nearfield_Animation() )
+    return;
 
+  SetFlag( ANIMATE );
   update_animation_parameters();
 }
 
@@ -2768,19 +2764,12 @@ on_animation_cancelbutton_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
-  ClearFlag( FLOW_ANIMATE );
-  ClearFlag( NEAREH_ANIMATE );
-#ifdef HAVE_OPENGL
-  opengl_structure_reset_flow_phase();
-#endif
+  ClearFlag( ANIMATE );
+  reset_animation_phase();
 
   if( anim_tag )
     g_source_remove( anim_tag );
   anim_tag = 0;
-
-  if( flow_anim_tag )
-    g_source_remove( flow_anim_tag );
-  flow_anim_tag = 0;
 }
 
 
@@ -2911,19 +2900,12 @@ on_animate_dialog_destroy(
     gpointer       user_data)
 {
   /* Stop all animations when dialog closes */
-  ClearFlag( FLOW_ANIMATE );
-  ClearFlag( NEAREH_ANIMATE );
-#ifdef HAVE_OPENGL
-  opengl_structure_reset_flow_phase();
-#endif
+  ClearFlag( ANIMATE );
+  reset_animation_phase();
 
   if( anim_tag )
     g_source_remove( anim_tag );
   anim_tag = 0;
-
-  if( flow_anim_tag )
-    g_source_remove( flow_anim_tag );
-  flow_anim_tag = 0;
 
   animate_dialog = NULL;
   g_object_unref( animate_dialog_builder );

@@ -211,9 +211,11 @@ extern GtkTreeView *selected_treeview;
 /* Used to kill window deleted by user */
 extern GtkWidget *kill_window ;
 
-/* Animation timeout callback tags */
+/* Animation timeout callback tag */
 extern guint anim_tag;
-extern guint flow_anim_tag;
+
+/* Shared flow phase advanced by unified tick, read by all backends */
+extern float flow_phase;
 
 /* Frequency loop idle function tag */
 extern guint floop_tag;

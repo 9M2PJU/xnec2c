@@ -177,7 +177,7 @@ typedef struct Segment
 #define DRAW_NEW_RDPAT      0x0000000020000000ll
 #define DRAW_NEW_EHFIELD    0x0000000040000000ll
 #define OVERLAY_STRUCT      0x0000000080000000ll
-#define NEAREH_ANIMATE      0x0000000200000000ll
+#define ANIMATE             0x0000000200000000ll
 #define ENABLE_RDPAT        0x0000000400000000ll
 #define ENABLE_NEAREH       0x0000000800000000ll
 #define DRAW_FLAGS ( \
@@ -191,7 +191,7 @@ typedef struct Segment
   DRAW_NEW_RDPAT    | \
   DRAW_NEW_EHFIELD  | \
   OVERLAY_STRUCT    | \
-  NEAREH_ANIMATE )
+  ANIMATE )
 
 /*** Filechooser response related flags ***/
 #define NEC2_EDIT_SAVE      0x0000001000000000ll /* Save NEC2 editor data to a file */
@@ -237,9 +237,6 @@ typedef struct Segment
 
 // Suppress intermediate redraws during frequency loops
 #define SUPPRESS_INTERMEDIATE_REDRAWS    0x0080000000000000ll
-
-/* Patch current flow direction phase animation active */
-#define FLOW_ANIMATE        0x0100000000000000ll
 
 /* SY optimizer evaluation in progress — suppresses inotify reload */
 #define SY_OPTIMIZER_ACTIVE 0x0200000000000000ll
@@ -1548,7 +1545,7 @@ void Cairo_Draw_Line(cairo_t *cr, int x1, int y1, int x2, int y2);
 void Cairo_Draw_Lines(cairo_t *cr, GdkPoint *points, int npoints);
 /* rdpattern_ui.c */
 gboolean Validate_Nearfield_Animation(void);
-gboolean Animate_Near_Field(gpointer udata);
+void compute_near_field_frame(double wt);
 double Scale_Gain_Resolved(double gain, int fstep, int idx,
     double t_sky, double t_earth);
 double Polarization_Factor(int pol_type, int fstep, int idx);

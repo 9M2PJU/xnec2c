@@ -353,32 +353,23 @@ Validate_Nearfield_Animation( void )
 
 /*-----------------------------------------------------------------------*/
 
-  gboolean
-Animate_Near_Field( gpointer udata )
+/** compute_near_field_frame() - Compute one near-field animation frame at phase wt
+ * @wt: excitation phase (radians, omega*t)
+ *
+ * Acquires freq_data_lock, computes real E/H field components for all
+ * near-field points at the given phase, updates per-point maxima, and
+ * calls Prerender_Near_Field().  Returns silently when frequency-step
+ * data is not yet available or point storage is absent.
+ * Animate_Phase() owns all widget queue decisions.
+ */
+  void
+compute_near_field_frame(double wt)
 {
-  /* omega*t = 2*pi*f*t = Time-varying phase of excitation */
-  static double wt = 0.0;
   int idx, npts;
-
-  if( isFlagClear(NEAREH_ANIMATE) )
-    return( FALSE );
-
-  if( !Validate_Nearfield_Animation() )
-  {
-    ClearFlag( NEAREH_ANIMATE );
-    if( anim_tag > 0 )
-    {
-      g_source_remove( anim_tag );
-      anim_tag = 0;
-    }
-    if( animate_dialog != NULL )
-      Gtk_Widget_Destroy( &animate_dialog );
-    return( FALSE );
-  }
 
   int fstep = calc_data.freq_step;
   if( !NF_FSTEP_AVAILABLE(fstep) )
-    return( FALSE );
+    return;
 
   g_rec_mutex_lock(&freq_data_lock);
 
@@ -430,21 +421,12 @@ Animate_Near_Field( gpointer udata )
 
   } /* for( idx = 0; idx < npts; idx++ ) */
 
-  /* Increment excitation phase, keep < 2pi */
-  wt += near_field.anim_step;
-  if( wt >= (double)M_2PI )
-    wt = 0.0;
-
-  /* Sync prerender vectors so GL backend reads current animation phase */
+  /* Sync prerender vectors so all backends read current animation phase */
   Prerender_Near_Field( fstep );
 
   g_rec_mutex_unlock(&freq_data_lock);
 
-  xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-
-  return( TRUE );
-
-} /* Animate_Near_Field() */
+} /* compute_near_field_frame() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -948,7 +930,7 @@ Rdpattern_Window_Killed( void )
   if( animate_dialog != NULL )
   {
     Gtk_Widget_Destroy( &animate_dialog );
-    ClearFlag( NEAREH_ANIMATE );
+    ClearFlag( ANIMATE );
     if( anim_tag ) g_source_remove( anim_tag );
     anim_tag = 0;
   }

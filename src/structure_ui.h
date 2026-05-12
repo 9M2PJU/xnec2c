@@ -29,5 +29,7 @@ void Free_Crnt_Fstep_Buffers(void);
 void Save_Crnt_Data(int fstep);
 void Queue_Structure_Redraw(void);
 void Init_Struct_Drawing(void);
+gboolean Animate_Phase(gpointer udata);
+void reset_animation_phase(void);
 
 #endif
