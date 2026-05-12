@@ -85,6 +85,9 @@ New_Patch_Data(void)
   mreq = (size_t)data.m * sizeof(patch_corners_t);
   mem_realloc((void **)&geom_pre.patch_corners, mreq, __LOCATION__);
 
+  mreq = (size_t)data.m * sizeof(patch_tangent_frame_t);
+  mem_realloc((void **)&geom_pre.patch_tangent_frame, mreq, __LOCATION__);
+
   for( idx = 0; idx < data.m; idx++ )
   {
     s = sqrt(data.patches[idx].pbi) / 2.0;
@@ -99,6 +102,16 @@ New_Patch_Data(void)
     s2x = s * data.patches[idx].t2x;
     s2y = s * data.patches[idx].t2y;
     s2z = s * data.patches[idx].t2z;
+
+    geom_pre.patch_tangent_frame[idx].cx   = px;
+    geom_pre.patch_tangent_frame[idx].cy   = py;
+    geom_pre.patch_tangent_frame[idx].cz   = pz;
+    geom_pre.patch_tangent_frame[idx].st1x = s1x;
+    geom_pre.patch_tangent_frame[idx].st1y = s1y;
+    geom_pre.patch_tangent_frame[idx].st1z = s1z;
+    geom_pre.patch_tangent_frame[idx].st2x = s2x;
+    geom_pre.patch_tangent_frame[idx].st2y = s2y;
+    geom_pre.patch_tangent_frame[idx].st2z = s2z;
 
     /* c0: center + s*t1 + s*t2 */
     geom_pre.patch_corners[idx].c0x = px + s1x + s2x;

@@ -378,17 +378,16 @@ generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *p
 
       if( emit_arrow )
       {
-        int j = idx + data.n;
-        double s = sqrt(save.bitemp[j]) / 2.0;
-        float acx = (float)save.xtemp[j];
-        float acy = (float)save.ytemp[j];
-        float acz = (float)save.ztemp[j];
-        float st1x = (float)(s * data.patches[idx].t1x);
-        float st1y = (float)(s * data.patches[idx].t1y);
-        float st1z = (float)(s * data.patches[idx].t1z);
-        float st2x = (float)(s * data.patches[idx].t2x);
-        float st2y = (float)(s * data.patches[idx].t2y);
-        float st2z = (float)(s * data.patches[idx].t2z);
+        const patch_tangent_frame_t *tf = &geom_pre.patch_tangent_frame[idx];
+        float acx  = (float)tf->cx;
+        float acy  = (float)tf->cy;
+        float acz  = (float)tf->cz;
+        float st1x = (float)tf->st1x;
+        float st1y = (float)tf->st1y;
+        float st1z = (float)tf->st1z;
+        float st2x = (float)tf->st2x;
+        float st2y = (float)tf->st2y;
+        float st2z = (float)tf->st2z;
         int k;
 
         for( k = 0; k < ARROW_VERTEX_COUNT; k++ )

@@ -48,6 +48,20 @@ typedef struct
  * Tier 1 — Geometry-derived (frequency-independent)
  *----------------------------------------------------------------------*/
 
+/* Patch center and s-scaled tangent axes (s = sqrt(patch_area)/2).
+ * Computed once in New_Patch_Data(); consumed by both GL and Cairo renderers.
+ *
+ * Duplicates data.patches[i].{px,py,pz} and t1/t2 scaled by s; grouped here
+ * so all per-frame arrow rendering inputs are co-located in one struct.
+ * May also reduce cache pressure in hot paths that would otherwise span
+ * data.patches and a separate s computation. */
+typedef struct
+{
+  double cx,  cy,  cz;    /* patch center */
+  double st1x, st1y, st1z; /* s * t1 tangent vector */
+  double st2x, st2y, st2z; /* s * t2 tangent vector */
+} patch_tangent_frame_t;
+
 /* Geometry-derived aggregate state, computed once at file load. */
 typedef struct
 {
@@ -72,6 +86,9 @@ typedef struct
 
   /* Precomputed patch rectangle corners [data.m] */
   patch_corners_t *patch_corners;
+
+  /* Precomputed patch tangent frame [data.m]: center and s-scaled axes */
+  patch_tangent_frame_t *patch_tangent_frame;
 } geom_pre_t;
 
 /*-----------------------------------------------------------------------
