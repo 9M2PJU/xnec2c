@@ -981,6 +981,16 @@ guint g_idle_add_once_sync(GSourceOnceFunc function, gpointer data)
  * (MSAA rebuild, input event repaints) that are below this gate's
  * abstraction level.
  */
+/* GSourceFunc wrapper for gtk_widget_queue_draw.
+ * Used by xnec2_widget_queue_draw via g_main_context_invoke_full
+ * so that main-thread callers mark the widget dirty synchronously
+ * while background-thread callers marshal at GDK_PRIORITY_REDRAW. */
+static gboolean queue_draw_cb(gpointer w)
+{
+	gtk_widget_queue_draw(GTK_WIDGET(w));
+	return G_SOURCE_REMOVE;
+}
+
 void xnec2_widget_queue_draw(GtkWidget *w, gboolean force)
 {
 	if( !force &&
@@ -991,7 +1001,8 @@ void xnec2_widget_queue_draw(GtkWidget *w, gboolean force)
 		return;
 	}
 
-	g_idle_add_once((GSourceOnceFunc)gtk_widget_queue_draw, w);
+	g_main_context_invoke_full(NULL, GDK_PRIORITY_REDRAW,
+			queue_draw_cb, w, NULL);
 }
 /*------------------------------------------------------------------*/
 
