@@ -164,9 +164,9 @@ gl_overlay_render(void *ctx, const gl_render_params_t *params)
   glUniformMatrix4fv(ovl->u_mv_location, 1, GL_FALSE,
       (float *)ovl->cached_mv);
   glUniform1i(ovl->flow_mode_location, rc_config.current_flow_visualization_mode);
-  glUniform1f(ovl->u_phase_location, ovl->view->flow_phase);
-  glUniform1f(ovl->u_cos_phase_location, cosf(ovl->view->flow_phase));
-  glUniform1f(ovl->u_sin_phase_location, sinf(ovl->view->flow_phase));
+  glUniform1f(ovl->u_phase_location, params->flow_phase);
+  glUniform1f(ovl->u_cos_phase_location, cosf(params->flow_phase));
+  glUniform1f(ovl->u_sin_phase_location, sinf(params->flow_phase));
 
   /* Bind LIC noise texture to unit 1 (shared with scene via view state) */
   if( ovl->view->noise_tex != 0 )

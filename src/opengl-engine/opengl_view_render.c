@@ -212,6 +212,7 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     glm_mat4_copy(mv, render_params.mv);
     render_params.alpha = eff_alpha;
     render_params.peel_pass = 0;
+    render_params.flow_phase = flow_phase;
     r->render(r->ctx, &render_params);
   }
 

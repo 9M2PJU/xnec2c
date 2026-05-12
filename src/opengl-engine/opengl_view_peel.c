@@ -421,6 +421,7 @@ gl_view_peel_render(gl_view_state_t *state, GLuint active_fbo,
     glm_mat4_copy(mvp, render_params.mvp);
     glm_mat4_copy(mv, render_params.mv);
     render_params.peel_pass = k;
+    render_params.flow_phase = flow_phase;
 
     /* --- Sub-pass A: depth discovery ---
      * Color mask OFF, depth write ON, GL_LESS.

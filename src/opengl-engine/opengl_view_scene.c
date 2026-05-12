@@ -133,9 +133,9 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
   /* Flow direction mode and phase animation offset.
    * Locations are -1 for shaders without these uniforms (no-op). */
   glUniform1i(sc->flow_mode_location, rc_config.current_flow_visualization_mode);
-  glUniform1f(sc->u_phase_location, view->flow_phase);
-  glUniform1f(sc->u_cos_phase_location, cosf(view->flow_phase));
-  glUniform1f(sc->u_sin_phase_location, sinf(view->flow_phase));
+  glUniform1f(sc->u_phase_location, params->flow_phase);
+  glUniform1f(sc->u_cos_phase_location, cosf(params->flow_phase));
+  glUniform1f(sc->u_sin_phase_location, sinf(params->flow_phase));
 
   /* Bind LIC noise texture to unit 1 */
   if( view->noise_tex != 0 )

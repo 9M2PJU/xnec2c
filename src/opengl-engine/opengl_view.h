@@ -128,6 +128,9 @@ typedef struct gl_render_params_s
    * sub-pass B of coplanar accumulation. */
   int coplanar_pass;
 
+  /* Animation phase (radians) for flow direction shaders */
+  float flow_phase;
+
 } gl_render_params_t;
 
 /* Uniform locations for depth-peel discard logic (shared by all peel-aware shaders) */
@@ -275,9 +278,6 @@ typedef struct gl_view_state_s
   int notice_surf_width;
   int notice_surf_height;
   gboolean notice_surface_valid;
-
-  /* Patch current flow phase animation offset (radians) */
-  float flow_phase;
 
   /* LIC noise texture (256x256 grayscale, shared by all renderables) */
   GLuint noise_tex;
