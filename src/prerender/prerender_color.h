@@ -117,9 +117,15 @@ color_from_value(double val, double max)
  *----------------------------------------------------------------------*/
 typedef struct
 {
-  rgb_f_t *wire_crnt_rgb;     /* [data.n] wire current magnitude colors */
-  rgb_f_t *wire_chrg_rgb;     /* [data.n] wire charge density colors */
-  rgb_f_t *patch_crnt_rgb;    /* [data.m] patch current magnitude colors */
+  rgb_f_t *wire_crnt_rgb;       /* [data.n] wire current magnitude colors */
+  rgb_f_t *wire_chrg_rgb;       /* [data.n] wire charge density colors */
+  rgb_f_t *patch_crnt_rgb;      /* [data.m] patch current magnitude colors */
+
+  /* Precomputed tangent-axis phasor projections normalized by cmax.
+   * [i][0..3] = {Re(ct1), Im(ct1), Re(ct2), Im(ct2)} / cmax_patch.
+   * Zeroed when no current data is available for this fstep. */
+  float (*patch_flow_data)[4]; /* [data.m][4] */
+
   float    wire_crnt_cmin;
   float    wire_crnt_cmax;
   float    wire_chrg_cmin;
@@ -139,6 +145,22 @@ extern rgb_f_t *patch_rgb;  /* [data.m] blue constant */
  * Tier 2 per-fstep color arrays
  *----------------------------------------------------------------------*/
 extern struct_colors_t *struct_colors;
+
+/**
+ * get_precomputed_flow_data() - Copy precomputed patch flow phasors into fd[4]
+ * @fstep: frequency step index
+ * @idx:   patch index (0-based into data.m)
+ * @fd:    output {Re(ct1), Im(ct1), Re(ct2), Im(ct2)} / cmax_patch
+ */
+static inline void
+get_precomputed_flow_data(int fstep, int idx, float fd[4])
+{
+  const float *pfd = struct_colors[fstep].patch_flow_data[idx];
+  fd[0] = pfd[0];
+  fd[1] = pfd[1];
+  fd[2] = pfd[2];
+  fd[3] = pfd[3];
+}
 
 /**
  * alloc_struct_colors() - Allocate per-fstep struct_colors array

@@ -197,6 +197,7 @@ static size_t size_nf_points(void)      { return (size_t)(fpat.nrx * fpat.nry * 
 static size_t size_nf_vectors(void)     { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(nf_vector_t); }
 static size_t size_seg_rgb(void)        { return (size_t)data.n  * sizeof(rgb_f_t); }
 static size_t size_patch_rgb(void)      { return (size_t)data.m  * sizeof(rgb_f_t); }
+static size_t size_patch_flow(void)     { return (size_t)data.m  * 4 * sizeof(float); }
 
 /* freq_field_active()
  *
@@ -264,6 +265,7 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
     { struct_colors[fstep].wire_crnt_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
     { struct_colors[fstep].wire_chrg_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
     { struct_colors[fstep].patch_crnt_rgb, size_patch_rgb, 0,                   FREQ_COND_ALWAYS },
+    { struct_colors[fstep].patch_flow_data, size_patch_flow, 0,                FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_crnt_cmin, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_crnt_cmax, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_chrg_cmin, NULL,          sizeof(float),       FREQ_COND_ALWAYS },

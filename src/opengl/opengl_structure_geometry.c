@@ -21,6 +21,7 @@
 #include "opengl_structure.h"
 #include "../shared.h"
 #include "../prerender/prerender_state.h"
+#include "../prerender/prerender_color.h"
 
 #ifdef HAVE_OPENGL
 
@@ -96,33 +97,6 @@ static structure_overlay_data_t shared_overlay_data = { 0 };
 
 /*-----------------------------------------------------------------------*/
 
-/*-----------------------------------------------------------------------*/
-
-/** get_patch_tangent_projections() - Project patch current onto tangent axes as complex phasors
- * @idx: patch index (0-based into data.m)
- * @ct1: output complex projection onto t1
- * @ct2: output complex projection onto t2
- *
- * Preserves phase information needed for polarization analysis.
- * Caller must ensure crnt_fstep[fstep] is valid and idx is in range.
- */
-  static void
-get_patch_tangent_projections(int idx,
-    complex double *ct1, complex double *ct2)
-{
-  int fstep = calc_data.freq_step;
-  crnt_t *cf = &crnt_fstep[fstep];
-  int ci = data.n + idx * 3;
-  complex double cur_x = cf->cur[ci];
-  complex double cur_y = cf->cur[ci + 1];
-  complex double cur_z = cf->cur[ci + 2];
-
-  *ct1 = cur_x * data.patches[idx].t1x + cur_y * data.patches[idx].t1y + cur_z * data.patches[idx].t1z;
-  *ct2 = cur_x * data.patches[idx].t2x + cur_y * data.patches[idx].t2y + cur_z * data.patches[idx].t2z;
-}
-
-/*-----------------------------------------------------------------------*/
-
 /** get_patch_normal() - Surface normal via cross product of t1 and t2
  * @idx: patch index (0-based into data.m)
  */
@@ -137,46 +111,6 @@ get_patch_normal(int idx, float *nx, float *ny, float *nz)
 /*-----------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------*/
-
-/** get_patch_flow_data() - Populate flow_data with complex tangent projections
- * @idx:       patch index (0-based into data.m)
- * @show_flow: TRUE when current-flow visualization is active
- * @cmax:      maximum current magnitude for ratio scaling
- * @fd:        output array of 4 floats {Re(ct1), Im(ct1), Re(ct2), Im(ct2)}
- *             scaled by mag_ratio so the shader can derive both direction and intensity
- *
- * All four components are zero when current data is absent or below threshold.
- * The shader computes instantaneous direction at arbitrary phase from these
- * complex components, enabling all visualization modes without CPU recomputation.
- */
-  static void
-get_patch_flow_data(int idx, gboolean show_flow, double cmax,
-    float *fd)
-{
-  int fstep = calc_data.freq_step;
-  if( show_flow && cmax > 0.0 && CRNT_FSTEP_AVAILABLE(fstep) )
-  {
-    complex double ct1, ct2;
-    double scale;
-
-    get_patch_tangent_projections(idx, &ct1, &ct2);
-    scale = 1.0 / cmax;
-
-    /* Normalize by cmax so sqrt(dot(fd,fd)) recovers mag_ratio (0..1).
-     * Phase relationships preserved; shader computes direction at any phase. */
-    fd[0] = (float)(creal(ct1) * scale);
-    fd[1] = (float)(cimag(ct1) * scale);
-    fd[2] = (float)(creal(ct2) * scale);
-    fd[3] = (float)(cimag(ct2) * scale);
-  }
-  else
-  {
-    fd[0] = 0.0f;
-    fd[1] = 0.0f;
-    fd[2] = 0.0f;
-    fd[3] = 0.0f;
-  }
-}
 
 /*-----------------------------------------------------------------------*/
 
@@ -366,8 +300,7 @@ generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *p
       {
         float mag_ratio;
 
-        get_patch_flow_data(idx, params->show_flow, params->cmax, fd);
-
+        get_precomputed_flow_data(calc_data.freq_step, idx, fd);
         mag_ratio = (float)sqrt(
             fd[0] * fd[0] + fd[1] * fd[1] +
             fd[2] * fd[2] + fd[3] * fd[3]);
@@ -524,7 +457,7 @@ generate_patches_triangles(gl_draw_batch_t *batch, const struct_draw_params_t *p
     p_r = params->patch_colors[idx].r;
     p_g = params->patch_colors[idx].g;
     p_b = params->patch_colors[idx].b;
-    get_patch_flow_data(idx, params->show_flow, params->cmax, fd);
+    get_precomputed_flow_data(calc_data.freq_step, idx, fd);
 
     /* Triangle 1: c0(1,1), c1(0,1), c2(0,0) */
     verts[vidx++] = (structure_vertex_t){

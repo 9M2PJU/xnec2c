@@ -245,6 +245,9 @@ alloc_struct_colors(int nfrq)
     {
       mreq = (size_t)data.m * sizeof(rgb_f_t);
       mem_alloc( (void **)&struct_colors[i].patch_crnt_rgb, mreq, "in prerender_color.c" );
+
+      mreq = (size_t)data.m * 4 * sizeof(float);
+      mem_alloc( (void **)&struct_colors[i].patch_flow_data, mreq, "in prerender_color.c" );
     }
   }
 }
@@ -268,6 +271,7 @@ free_struct_colors(void)
       free_ptr( (void **)&struct_colors[i].wire_crnt_rgb );
       free_ptr( (void **)&struct_colors[i].wire_chrg_rgb );
       free_ptr( (void **)&struct_colors[i].patch_crnt_rgb );
+      free_ptr( (void **)&struct_colors[i].patch_flow_data );
     }
     free_ptr( (void **)&struct_colors );
   }
@@ -420,6 +424,37 @@ struct_colors_fill_fstep(int fstep)
       int ci = data.n + 3 * i;
       struct_colors[fstep].patch_crnt_rgb[i] =
           color_from_value(cabs(crnt_fstep[fstep].cur[ci]), cmax_patch);
+    }
+  }
+
+  /* Precompute patch tangent-axis phasor projections for arrow rendering */
+  if( struct_colors[fstep].patch_flow_data != NULL )
+  {
+    if( cmax_patch > 0.0 )
+    {
+      double scale = 1.0 / cmax_patch;
+      for( i = 0; i < data.m; i++ )
+      {
+        int ci = data.n + 3 * i;
+        complex double cur_x = crnt_fstep[fstep].cur[ci];
+        complex double cur_y = crnt_fstep[fstep].cur[ci + 1];
+        complex double cur_z = crnt_fstep[fstep].cur[ci + 2];
+        complex double ct1 = cur_x * data.patches[i].t1x
+                           + cur_y * data.patches[i].t1y
+                           + cur_z * data.patches[i].t1z;
+        complex double ct2 = cur_x * data.patches[i].t2x
+                           + cur_y * data.patches[i].t2y
+                           + cur_z * data.patches[i].t2z;
+        struct_colors[fstep].patch_flow_data[i][0] = (float)(creal(ct1) * scale);
+        struct_colors[fstep].patch_flow_data[i][1] = (float)(cimag(ct1) * scale);
+        struct_colors[fstep].patch_flow_data[i][2] = (float)(creal(ct2) * scale);
+        struct_colors[fstep].patch_flow_data[i][3] = (float)(cimag(ct2) * scale);
+      }
+    }
+    else
+    {
+      memset(struct_colors[fstep].patch_flow_data, 0,
+             (size_t)data.m * 4 * sizeof(float));
     }
   }
 }
