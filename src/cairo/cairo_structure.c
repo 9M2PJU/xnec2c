@@ -53,6 +53,8 @@ draw_wire_segments(cairo_t *cr, view_t *v, Segment_t *segm, gint nseg,
 
   int idx;
 
+  cairo_set_line_width(cr, 2.0);
+
   /* Draw networks */
   for( idx = 0; idx < netcx.nonet; idx++ )
   {
@@ -150,6 +152,8 @@ draw_surface_patches(cairo_t *cr, view_t *v, Segment_t *segm, gint npatch,
     return;
 
   int idx;
+
+  cairo_set_line_width(cr, 1.0);
 
   /* Current mode: per-patch precomputed colors */
   if( params->cmax > 0.0 )

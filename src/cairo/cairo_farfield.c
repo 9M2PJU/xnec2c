@@ -58,6 +58,8 @@ cairo_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
 
   double scale = view_projection_scale(v, ff->pattern_radius, v->zoom);
 
+  cairo_set_line_width(cr, 2.0);
+
   /* Draw theta-direction edges */
   for( idx = 0; idx < geom_pre.n_theta_edges; idx++ )
   {

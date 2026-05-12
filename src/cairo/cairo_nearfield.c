@@ -58,6 +58,8 @@ cairo_draw_nearfield(void *ctx,
 
   double scale = view_projection_scale(v, (float)r_max, v->zoom);
 
+  cairo_set_line_width(cr, 2.0);
+
   (void)dr;
 
   /* Draw each dispatch-assembled field vector set */
