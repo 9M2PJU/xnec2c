@@ -71,6 +71,7 @@ xnec2c_SOURCES = \
     prerender/prerender_color.c     prerender/prerender_color.h \
     prerender/prerender_farfield.c  prerender/prerender_farfield.h \
     prerender/prerender_nearfield.c prerender/prerender_nearfield.h \
+    prerender/prerender_patch_arrow.c prerender/prerender_patch_arrow.h \
     render/render_dispatch.c        render/render_dispatch.h \
     render/render_message.c         render/render_message.h \
     cairo/cairo_draw.h \

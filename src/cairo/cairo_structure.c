@@ -26,7 +26,63 @@
  */
 #include "cairo_draw.h"
 #include "../shared.h"
+#include "../prerender/prerender_patch_arrow.h"
+#include "../prerender/prerender_state.h"
+#include "../prerender/prerender_color.h"
 #include "../rdpattern_ui.h"
+
+/* Cairo-local world-space arrow segment (3D endpoints, one edge per arrow line) */
+typedef struct
+{
+  double x1, y1, z1;
+  double x2, y2, z2;
+} arrow_seg_3d_t;
+
+/** patch_arrow_to_world() - Rotate arrow template and map to world coordinates
+ * @idx:   patch index (0-based into data.m)
+ * @fd:    precomputed flow data {Re(ct1),Im(ct1),Re(ct2),Im(ct2)} / cmax
+ * @phase: current animation phase (radians)
+ * @segs:  output array of ARROW_LINE_COUNT world-space segments
+ *
+ * Reads center and tangent axes from geom_pre.patch_tangent_frame[idx].
+ * Computes instantaneous flow direction at phase, rotates arrow template,
+ * maps each UV vertex to world via:
+ *   world = center + 2*(rot_u * st1 + rot_v * st2)
+ */
+static void
+patch_arrow_to_world(int idx, const float fd[4], float phase,
+    arrow_seg_3d_t segs[ARROW_LINE_COUNT])
+{
+  const patch_tangent_frame_t *tf = &geom_pre.patch_tangent_frame[idx];
+  double cp = cos((double)phase);
+  double sp = sin((double)phase);
+  double re1 = (double)fd[0] * cp - (double)fd[1] * sp;
+  double re2 = (double)fd[2] * cp - (double)fd[3] * sp;
+  double angle = atan2(re2, re1);
+  double ca = cos(angle);
+  double sa = sin(angle);
+
+  int k;
+  for( k = 0; k < ARROW_LINE_COUNT; k++ )
+  {
+    double u0 = (double)arrow_template[k].u1 - 0.5;
+    double v0 = (double)arrow_template[k].v1 - 0.5;
+    double ru0 = u0 * ca - v0 * sa;
+    double rv0 = u0 * sa + v0 * ca;
+
+    double u1 = (double)arrow_template[k].u2 - 0.5;
+    double v1 = (double)arrow_template[k].v2 - 0.5;
+    double ru1 = u1 * ca - v1 * sa;
+    double rv1 = u1 * sa + v1 * ca;
+
+    segs[k].x1 = tf->cx + 2.0 * (ru0 * tf->st1x + rv0 * tf->st2x);
+    segs[k].y1 = tf->cy + 2.0 * (ru0 * tf->st1y + rv0 * tf->st2y);
+    segs[k].z1 = tf->cz + 2.0 * (ru0 * tf->st1z + rv0 * tf->st2z);
+    segs[k].x2 = tf->cx + 2.0 * (ru1 * tf->st1x + rv1 * tf->st2x);
+    segs[k].y2 = tf->cy + 2.0 * (ru1 * tf->st1y + rv1 * tf->st2y);
+    segs[k].z2 = tf->cz + 2.0 * (ru1 * tf->st1z + rv1 * tf->st2z);
+  }
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -145,8 +201,8 @@ draw_wire_segments(cairo_t *cr, view_t *v, Segment_t *segm, gint nseg,
  * base color from params->patch_colors[0].
  */
   static void
-draw_surface_patches(cairo_t *cr, view_t *v, Segment_t *segm, gint npatch,
-    const struct_draw_params_t *params)
+draw_surface_patches(cairo_t *cr, view_t *v, double scale, Segment_t *segm,
+    gint npatch, const struct_draw_params_t *params)
 {
   if( !npatch )
     return;
@@ -162,6 +218,8 @@ draw_surface_patches(cairo_t *cr, view_t *v, Segment_t *segm, gint npatch,
     {
       int j = 4 * idx;
       int k;
+      float fd[4];
+      float mag_ratio;
 
       cairo_set_source_rgb(cr,
           (double)params->patch_colors[idx].r,
@@ -173,6 +231,31 @@ draw_surface_patches(cairo_t *cr, view_t *v, Segment_t *segm, gint npatch,
         Cairo_Draw_Line(cr,
             segm[j + k].x1, segm[j + k].y1,
             segm[j + k].x2, segm[j + k].y2);
+
+      /* Draw flow arrow when current data is above threshold */
+      if( params->show_flow )
+      {
+        int fstep = calc_data.freq_step;
+        get_precomputed_flow_data(fstep, idx, fd);
+        mag_ratio = (float)sqrt(
+            fd[0] * fd[0] + fd[1] * fd[1] +
+            fd[2] * fd[2] + fd[3] * fd[3]);
+
+        if( mag_ratio > FLOW_MAG_THRESHOLD )
+        {
+          arrow_seg_3d_t arrow[ARROW_LINE_COUNT];
+          patch_arrow_to_world(idx, fd, flow_phase, arrow);
+
+          for( k = 0; k < ARROW_LINE_COUNT; k++ )
+          {
+            Segment_t s;
+            Set_Gdk_Segment(&s, v, scale,
+                arrow[k].x1, arrow[k].y1, arrow[k].z1,
+                arrow[k].x2, arrow[k].y2, arrow[k].z2);
+            Cairo_Draw_Line(cr, s.x1, s.y1, s.x2, s.y2);
+          }
+        }
+      }
     }
     return;
   }
@@ -217,7 +300,7 @@ cairo_draw_structure(void *ctx, float extent,
   Process_Surface_Patches(v, scale);
 
   /* Draw patches below wires */
-  draw_surface_patches(cr, v, structure_segs + data.n, data.m, params);
+  draw_surface_patches(cr, v, scale, structure_segs + data.n, data.m, params);
   draw_wire_segments(cr, v, structure_segs, data.n, params);
 
   return TRUE;

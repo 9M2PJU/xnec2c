@@ -22,6 +22,7 @@
 #include "../shared.h"
 #include "../prerender/prerender_state.h"
 #include "../prerender/prerender_color.h"
+#include "../prerender/prerender_patch_arrow.h"
 
 #ifdef HAVE_OPENGL
 
@@ -37,49 +38,6 @@
 /* Number of sides for cylinder rendering */
 #define STRUCTURE_CYLINDER_SEGMENTS 24
 
-/* Arrow geometry in UV patch space (0..1 range), 80% of box */
-#define LINE_ARROW_TAIL_OFF    -0.24f
-#define LINE_ARROW_NECK_OFF     0.04f
-#define LINE_ARROW_TIP_OFF      0.28f
-#define LINE_ARROW_SHAFT_HW     0.024f
-#define LINE_ARROW_HEAD_HS      0.096f
-
-/* Arrow template: 7 line segments (14 UV endpoints) at angle=0 (pointing +U).
- *   s0────────s1
- *   │     ┌────a_left
- *   │     │   ╱
- *   │     │  tip
- *   │     │   ╲
- *   │     └────a_right
- *   s3────────s2
- */
-#define ARROW_S0U (0.5f + LINE_ARROW_TAIL_OFF)
-#define ARROW_S0V (0.5f + LINE_ARROW_SHAFT_HW)
-#define ARROW_S1U (0.5f + LINE_ARROW_NECK_OFF)
-#define ARROW_S1V (0.5f + LINE_ARROW_SHAFT_HW)
-#define ARROW_S2U (0.5f + LINE_ARROW_NECK_OFF)
-#define ARROW_S2V (0.5f - LINE_ARROW_SHAFT_HW)
-#define ARROW_S3U (0.5f + LINE_ARROW_TAIL_OFF)
-#define ARROW_S3V (0.5f - LINE_ARROW_SHAFT_HW)
-#define ARROW_ALU (0.5f + LINE_ARROW_NECK_OFF)
-#define ARROW_ALV (0.5f + LINE_ARROW_HEAD_HS)
-#define ARROW_ARU (0.5f + LINE_ARROW_NECK_OFF)
-#define ARROW_ARV (0.5f - LINE_ARROW_HEAD_HS)
-#define ARROW_TPU (0.5f + LINE_ARROW_TIP_OFF)
-#define ARROW_TPV 0.5f
-
-#define ARROW_LINE_COUNT   7
-#define ARROW_VERTEX_COUNT 14
-
-static const float arrow_template_uvs[ARROW_VERTEX_COUNT][2] = {
-  { ARROW_S0U, ARROW_S0V }, { ARROW_S1U, ARROW_S1V },  /* shaft top */
-  { ARROW_S3U, ARROW_S3V }, { ARROW_S2U, ARROW_S2V },  /* shaft bottom */
-  { ARROW_S0U, ARROW_S0V }, { ARROW_S3U, ARROW_S3V },  /* tail cap */
-  { ARROW_S1U, ARROW_S1V }, { ARROW_ALU, ARROW_ALV },   /* top notch */
-  { ARROW_ALU, ARROW_ALV }, { ARROW_TPU, ARROW_TPV },   /* top arm */
-  { ARROW_S2U, ARROW_S2V }, { ARROW_ARU, ARROW_ARV },   /* bottom notch */
-  { ARROW_ARU, ARROW_ARV }, { ARROW_TPU, ARROW_TPV },   /* bottom arm */
-};
 
 
 
@@ -305,7 +263,7 @@ generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *p
             fd[0] * fd[0] + fd[1] * fd[1] +
             fd[2] * fd[2] + fd[3] * fd[3]);
 
-        if( mag_ratio > 0.01f )
+        if( mag_ratio > FLOW_MAG_THRESHOLD )
           emit_arrow = TRUE;
       }
 
@@ -325,10 +283,12 @@ generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *p
 
         for( k = 0; k < ARROW_VERTEX_COUNT; k++ )
         {
+          float uv_u, uv_v;
+          arrow_template_uv(k, &uv_u, &uv_v);
           verts[vidx++] = (structure_vertex_t){
               .point = {acx, acy, acz}, .normal = {nx, ny, nz},
               .color = {p_r, p_g, p_b, 1.0f},
-              .uv = {arrow_template_uvs[k][0], arrow_template_uvs[k][1]},
+              .uv = {uv_u, uv_v},
               .flow_data = {fd[0], fd[1], fd[2], fd[3]},
               .tangent1 = {st1x, st1y, st1z},
               .tangent2 = {st2x, st2y, st2z},
