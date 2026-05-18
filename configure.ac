@@ -81,6 +81,8 @@ test "x$enable_cflags_setting" = xyes && CFLAGS=""
 
 # Checks for programs.
 AC_PROG_CC
+AX_CHECK_COMPILE_FLAG([-std=gnu11], [CFLAGS="$CFLAGS -std=gnu11"], [
+  AC_MSG_WARN([-std=gnu11 not supported; _Static_assert may be unavailable])])
 AM_PROG_CC_C_O()dnl remove this line when requiring automake >= 1.14
 AC_PROG_MAKE_SET
 AC_PROG_SED
