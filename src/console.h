@@ -7,27 +7,27 @@
 #include <stdarg.h>
 
 // DOS color order, but VT100 escape codes:
-#define  COLOR_BLACK          "\x1b[0;30m"
-#define  COLOR_BLUE           "\x1b[0;34m"
-#define  COLOR_GREEN          "\x1b[0;32m"
-#define  COLOR_CYAN           "\x1b[0;36m"
-#define  COLOR_RED            "\x1b[0;31m"
-#define  COLOR_MAGENTA        "\x1b[0;35m"
-#define  COLOR_YELLOW         "\x1b[0;33m"
-#define  COLOR_WHITE          "\x1b[0;37m"
+#define  ANSI_BLACK          "\x1b[0;30m"
+#define  ANSI_BLUE           "\x1b[0;34m"
+#define  ANSI_GREEN          "\x1b[0;32m"
+#define  ANSI_CYAN           "\x1b[0;36m"
+#define  ANSI_RED            "\x1b[0;31m"
+#define  ANSI_MAGENTA        "\x1b[0;35m"
+#define  ANSI_YELLOW         "\x1b[0;33m"
+#define  ANSI_WHITE          "\x1b[0;37m"
 
-#define  COLOR_BRIGHTBLACK    "\x1b[1;30m"
-#define  COLOR_DARKGRAY       COLOR_BRIGHTBLACK
+#define  ANSI_BRIGHTBLACK    "\x1b[1;30m"
+#define  ANSI_DARKGRAY       ANSI_BRIGHTBLACK
 
-#define  COLOR_BRIGHTBLUE     "\x1b[1;34m"
-#define  COLOR_BRIGHTGREEN    "\x1b[1;32m"
-#define  COLOR_BRIGHTRED      "\x1b[1;31m"
-#define  COLOR_BRIGHTCYAN     "\x1b[1;36m"
-#define  COLOR_BRIGHTMAGENTA  "\x1b[1;35m"
-#define  COLOR_BRIGHTWHITE    "\x1b[1;37m"
-#define  COLOR_BRIGHTYELLOW   "\x1b[1;33m"
+#define  ANSI_BRIGHTBLUE     "\x1b[1;34m"
+#define  ANSI_BRIGHTGREEN    "\x1b[1;32m"
+#define  ANSI_BRIGHTRED      "\x1b[1;31m"
+#define  ANSI_BRIGHTCYAN     "\x1b[1;36m"
+#define  ANSI_BRIGHTMAGENTA  "\x1b[1;35m"
+#define  ANSI_BRIGHTWHITE    "\x1b[1;37m"
+#define  ANSI_BRIGHTYELLOW   "\x1b[1;33m"
 
-#define  COLOR_NONE           "\x1b[0m"
+#define  ANSI_NONE           "\x1b[0m"
 
 // Thanks to @RichardHansen: https://stackoverflow.com/a/11172679/14055985
 // This provides a '##' free version for macro comma separation:

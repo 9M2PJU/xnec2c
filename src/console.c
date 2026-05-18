@@ -1,24 +1,24 @@
 #include "console.h"
 
 const char *colors[] = {
-	COLOR_BLACK,
-	COLOR_BLUE,
-	COLOR_GREEN,
-	COLOR_CYAN,
-	COLOR_RED,
-	COLOR_MAGENTA,
-	COLOR_YELLOW,
-	COLOR_WHITE,
+	ANSI_BLACK,
+	ANSI_BLUE,
+	ANSI_GREEN,
+	ANSI_CYAN,
+	ANSI_RED,
+	ANSI_MAGENTA,
+	ANSI_YELLOW,
+	ANSI_WHITE,
 
-	COLOR_DARKGRAY,
-	COLOR_BRIGHTBLUE,
-	COLOR_BRIGHTGREEN,
-	COLOR_BRIGHTRED,
-	COLOR_BRIGHTCYAN,
-	COLOR_BRIGHTMAGENTA,
-	COLOR_BRIGHTWHITE,
-	COLOR_BRIGHTYELLOW,
-	COLOR_NONE,
+	ANSI_DARKGRAY,
+	ANSI_BRIGHTBLUE,
+	ANSI_BRIGHTGREEN,
+	ANSI_BRIGHTRED,
+	ANSI_BRIGHTCYAN,
+	ANSI_BRIGHTMAGENTA,
+	ANSI_BRIGHTWHITE,
+	ANSI_BRIGHTYELLOW,
+	ANSI_NONE,
 	NULL
 };
 
@@ -36,14 +36,14 @@ const char *pr_levels[] =
 };
 
 const char *pr_colors[] = {
-	COLOR_BRIGHTRED,    	// BUG
-	COLOR_BRIGHTRED,   	 	// ALERT
-	COLOR_BRIGHTYELLOW, 	// CRIT
-	COLOR_RED,				// ERR
-	COLOR_YELLOW,			// WARN
-	COLOR_BRIGHTCYAN,		// NOTICE
-	COLOR_BRIGHTBLUE,		// INFO
-	COLOR_BRIGHTWHITE,		// DEBUG
+	ANSI_BRIGHTRED,    	// BUG
+	ANSI_BRIGHTRED,   	 	// ALERT
+	ANSI_BRIGHTYELLOW, 	// CRIT
+	ANSI_RED,				// ERR
+	ANSI_YELLOW,			// WARN
+	ANSI_BRIGHTCYAN,		// NOTICE
+	ANSI_BRIGHTBLUE,		// INFO
+	ANSI_BRIGHTWHITE,		// DEBUG
 	NULL
 };
 
@@ -62,11 +62,11 @@ inline void _xnec2c_printf(int level, const char *file, const char *func, const 
 	if (rc_config.debug || level <= PR_ALERT)
 		fprintf(stderr, "%s[%d %s:%s]%s\t%s:%d: ",
 			pr_colors[level], getpid(), pr_levels[level], func, 
-			COLOR_NONE,
+			ANSI_NONE,
 			file, line);
 	else
 		fprintf(stderr, "%s[%s]%s ",
-			pr_colors[level], pr_levels[level], COLOR_NONE);
+			pr_colors[level], pr_levels[level], ANSI_NONE);
 
 	// Try to use the local language if possible:
 	vfprintf(stderr, _(format), args);
