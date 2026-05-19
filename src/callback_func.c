@@ -18,6 +18,7 @@
  */
 
 #include "callback_func.h"
+#include "cairo/cairo_draw.h"
 #include "shared.h"
 
 #include "opengl/opengl_structure.h"
@@ -398,6 +399,21 @@ Main_Freqplots_Activate( void )
 
 /*-----------------------------------------------------------------------*/
 
+/** rdpattern_trigger_redraw() - Shared tail for rdpattern mode activation:
+ *  fetch frequency data when drawing is enabled and no frequency loop is
+ *  running, then update window labels.
+ */
+  static void
+rdpattern_trigger_redraw(void)
+{
+  if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
+    fetch_freq_data();
+
+  Set_Window_Labels();
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* Rdpattern_Gain_Togglebutton_Toggled()
  *
  * Callback function for Rad Pattern window Gain button
@@ -405,7 +421,6 @@ Main_Freqplots_Activate( void )
   void
 Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
 {
-  /* Enable or not gain (radiation) pattern plotting */
   if( flag )
   {
     SetFlag( DRAW_GAIN );
@@ -433,24 +448,17 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
     }
 #endif
 
-    /* Redraw radiation pattern drawingarea */
-    if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
-      fetch_freq_data();
-
-    Set_Window_Labels();
+    /* Enable gain (radiation) pattern plotting */
+    rdpattern_trigger_redraw();
   }
   else
   {
+    /* Disable gain pattern; clear drawingarea if no mode active */
     ClearFlag( DRAW_GAIN );
-    /* Clear radiation pattern drawingarea */
     if( isFlagClear(DRAW_EHFIELD) && isFlagSet(DRAW_ENABLED) )
-    {
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-    }
     Free_Draw_Buffers();
   }
-
-  return;
 } /* Rdpattern_Gain_Togglebutton_Toggled() */
 
 /*-----------------------------------------------------------------------*/
@@ -462,7 +470,6 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
   void
 Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
 {
-  /* Enable or not E/H fields plotting */
   if( flag )
   {
     SetFlag( DRAW_EHFIELD );
@@ -492,31 +499,23 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
     /* Delegate near field calculations to child
      * processes if forked and near field data valid */
     if( FORKED )
-    {
       Alloc_Nearfield_Buffers(fpat.nrx, fpat.nry, fpat.nrz);
-    }
 
-    /* Redraw radiation pattern drawingarea */
+    /* Mark nearfield data stale before triggering redraw;
+     * flag must be set inside the same guard as fetch_freq_data */
     if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
-    {
       SetFlag( DRAW_NEW_EHFIELD );
-      fetch_freq_data();
-    }
 
-    Set_Window_Labels();
+    /* Enable E/H field plotting */
+    rdpattern_trigger_redraw();
   }
   else
   {
+    /* Disable E/H field; clear drawingarea if no mode active */
     ClearFlag( DRAW_EHFIELD );
-
-    /* Clear radiation pattern drawingarea */
     if( isFlagClear(DRAW_GAIN) && isFlagSet(DRAW_ENABLED) )
-    {
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-    }
-
   }
-
 } /* Rdpattern_EH_Togglebutton_Toggled() */
 
 /*-----------------------------------------------------------------------*/
