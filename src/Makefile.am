@@ -74,6 +74,7 @@ xnec2c_SOURCES = \
     prerender/prerender_patch_arrow.c prerender/prerender_patch_arrow.h \
     render/render_dispatch.c        render/render_dispatch.h \
     render/render_message.c         render/render_message.h \
+    render/gradient_cache.c         render/gradient_cache.h \
     cairo/cairo_draw.h \
     cairo/cairo_axes.c \
     cairo/cairo_project.c \
