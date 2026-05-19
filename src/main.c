@@ -579,8 +579,6 @@ main (int argc, char *argv[])
   gboolean new = TRUE;
   if( strlen(rc_config.input_file) > 0 )
     g_idle_add( Open_Input_File, (gpointer)(&new) );
-  else
-    SetFlag( INPUT_PENDING );
 
   init_mathlib_menu();
 

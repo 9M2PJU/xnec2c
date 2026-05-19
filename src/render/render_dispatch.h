@@ -25,6 +25,9 @@
 #include "../prerender/prerender_state.h"
 #include "render_message.h"
 
+/* Axis half-extent used for empty-scene placeholders (no geometry loaded) */
+#define RENDER_EMPTY_AXIS_EXTENT 1.5f
+
 /* Content mode resolved by render_check() */
 typedef enum
 {

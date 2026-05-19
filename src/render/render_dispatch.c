@@ -188,6 +188,14 @@ render_check(view_type_t view_type)
   render_check_result_t r = { .status = RENDER_OK, .mode = RENDER_MODE_NONE,
     .fstep = -1, .message = NULL, .show_gradient = FALSE, .overlay_active = FALSE };
 
+  /* No content available while input file is being parsed */
+  if( isFlagSet(INPUT_PENDING) )
+  {
+    r.status = RENDER_NO_GEOMETRY;
+    r.message = STATUS_MSG_OPEN_FILE;
+    return r;
+  }
+
   r.fstep = calc_data.freq_step;
 
   if( view_type == VIEW_STRUCTURE )
@@ -259,10 +267,17 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
   render_check_result_t r;
   gboolean ok;
 
+  if( view == NULL )
+    return FALSE;
+
+  if( isFlagSet(ERROR_CONDX) )
+    return FALSE;
+
   g_rec_mutex_lock(&freq_data_lock);
 
   r = render_check(view->type);
 
+  /* r is immutable past this point; cache for external consumers */
   if( view->type == VIEW_RDPATTERN )
     last_rdpat_check = r;
 
@@ -274,9 +289,10 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
 
   if( r.status != RENDER_OK )
   {
-    ops->init_empty(ctx);
-    if( r.status == RENDER_NO_GEOMETRY && ops->draw_axes != NULL )
-      ops->draw_axes(ctx, 1.5f);
+    if( ops->init_empty != NULL )
+      ops->init_empty(ctx);
+    if( ops->draw_axes != NULL )
+      ops->draw_axes(ctx, RENDER_EMPTY_AXIS_EXTENT);
     ops->set_status(ctx, r.message);
     ops->set_gradient(ctx, FALSE);
     g_rec_mutex_unlock(&freq_data_lock);
@@ -417,7 +433,8 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
      * proceed to glClear, replacing stale content with a diagnostic.
      * Returning FALSE would skip the clear and freeze the last valid
      * frame on screen (desirable only during optimization above). */
-    ops->init_empty(ctx);
+    if( ops->init_empty != NULL )
+      ops->init_empty(ctx);
     ops->set_status(ctx,
         isFlagSet(FREQ_LOOP_DONE)
         ? STATUS_MSG_NOT_READY
