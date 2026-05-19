@@ -71,10 +71,13 @@ typedef void (* GSourceOnceFunc) (gpointer user_data);
 
 typedef struct Segment
 {
-  gint x1;
-  gint x2;
-  gint y1;
-  gint y2;
+  gint  x1;
+  gint  x2;
+  gint  y1;
+  gint  y2;
+  float z_mid; /* camera-axis midpoint depth from Set_Gdk_Segment */
+  float r, g, b; /* RGB color [0.0, 1.0] */
+  float width;   /* line width in pixels */
 } Segment_t;
 
 /* commonly used complex constants */
@@ -115,17 +118,61 @@ typedef struct Segment
 #define STRUCTURE_DRAWINGAREA   1
 #define RDPATTERN_DRAWINGAREA   2
 
-/* Some colors for settinn cairo context */
-#define WHITE   1.0, 1.0, 1.0
-#define RED     1.0, 0.0, 0.0
-#define YELLOW  1.0, 1.0, 0.0
-#define GREEN      0.0, 1.0, 0.0
-#define DARK_GREEN 0.0, 0.5, 0.0
-#define CYAN    0.0, 1.0, 1.0
-#define BLUE    0.0, 0.0, 1.0
-#define MAGENTA 1.0, 0.0, 1.0
-#define GREY    0.5, 0.5, 0.5
-#define BLACK   0.0, 0.0, 0.0
+/* Per-vertex RGB color (float precision, renderer-agnostic) */
+typedef struct { float r, g, b; } rgb_f_t;
+
+/* Named color constants for rendering */
+extern const rgb_f_t COLOR_WHITE;
+extern const rgb_f_t COLOR_RED;
+extern const rgb_f_t COLOR_YELLOW;
+extern const rgb_f_t COLOR_GREEN;
+extern const rgb_f_t COLOR_DARK_GREEN;
+extern const rgb_f_t COLOR_CYAN;
+extern const rgb_f_t COLOR_BLUE;
+extern const rgb_f_t COLOR_MAGENTA;
+extern const rgb_f_t COLOR_GREY;
+extern const rgb_f_t COLOR_BLACK;
+
+/* Comma-separated expansion for legacy cairo_set_source_rgb(cr, COLOR) calls */
+#define WHITE      (double)(COLOR_WHITE.r),      (double)(COLOR_WHITE.g),      (double)(COLOR_WHITE.b)
+#define RED        (double)(COLOR_RED.r),        (double)(COLOR_RED.g),        (double)(COLOR_RED.b)
+#define YELLOW     (double)(COLOR_YELLOW.r),     (double)(COLOR_YELLOW.g),     (double)(COLOR_YELLOW.b)
+#define GREEN      (double)(COLOR_GREEN.r),      (double)(COLOR_GREEN.g),      (double)(COLOR_GREEN.b)
+#define DARK_GREEN (double)(COLOR_DARK_GREEN.r), (double)(COLOR_DARK_GREEN.g), (double)(COLOR_DARK_GREEN.b)
+#define CYAN       (double)(COLOR_CYAN.r),       (double)(COLOR_CYAN.g),       (double)(COLOR_CYAN.b)
+#define BLUE       (double)(COLOR_BLUE.r),       (double)(COLOR_BLUE.g),       (double)(COLOR_BLUE.b)
+#define MAGENTA    (double)(COLOR_MAGENTA.r),    (double)(COLOR_MAGENTA.g),    (double)(COLOR_MAGENTA.b)
+#define GREY       (double)(COLOR_GREY.r),       (double)(COLOR_GREY.g),       (double)(COLOR_GREY.b)
+#define BLACK      (double)(COLOR_BLACK.r),      (double)(COLOR_BLACK.g),      (double)(COLOR_BLACK.b)
+
+/**
+ * seg_set_color() - Assign a named color to a Segment_t
+ * @s: target segment
+ * @c: color constant
+ */
+static inline void
+seg_set_color(Segment_t *s, rgb_f_t c)
+{
+  s->r = c.r;
+  s->g = c.g;
+  s->b = c.b;
+}
+
+/* Float-comparison helpers with ε tolerance (1e-6 default).
+ * fl_feq(a,b) = |a-b| <= ε; fl_flt: a < b-ε; fl_fgt: a > b+ε */
+#define FL_EPS 1e-6f
+static inline int fl_feq(float a, float b) { return fabsf(a - b) <= FL_EPS; }
+static inline int fl_flt(float a, float b) { return a < b - FL_EPS; }
+static inline int fl_fgt(float a, float b) { return a > b + FL_EPS; }
+
+/* Double-precision comparison helpers (same semantics as fl_* above) */
+#define DL_EPS 1e-9
+static inline int dl_feq(double a, double b) { return fabs(a - b) <= DL_EPS; }
+static inline int dl_flt(double a, double b) { return a < b - DL_EPS; }
+static inline int dl_fgt(double a, double b) { return a > b + DL_EPS; }
+
+/* Parameterized double-precision equality with caller-specified tolerance */
+static inline int dl_feq_eps(double a, double b, double eps) { return fabs(a - b) <= eps; }
 
 /* For read/write pipes */
 #define READ    0
@@ -455,6 +502,12 @@ typedef struct
   float transparency_nearfield;
   float transparency_ground_plane;
   float transparency_axes;
+
+  /* Cairo rendering settings */
+  cairo_antialias_t cairo_antialias;   /* CAIRO_ANTIALIAS_{DEFAULT,FAST,NONE} */
+  int               cairo_depth_bins;  /* >=1 z quantization bins for painter's algorithm depth sorting */
+  int               cairo_color_quant; /* 0=off, N=quantization levels (64,128,256) */
+  cairo_line_cap_t  cairo_line_cap;    /* CAIRO_LINE_CAP_{BUTT,ROUND,SQUARE} */
 } rc_config_t;
 
 typedef struct {

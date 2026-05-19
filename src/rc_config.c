@@ -154,6 +154,18 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Rdpattern Overlay Scale Adjustment", .format = "%lf",
 		.vars = { &rc_config.rdpattern_overlay_scale_adj } },
 
+	{ .desc = "Cairo Anti-Aliasing Mode", .format = "%d",
+		.vars = { &rc_config.cairo_antialias } },
+
+	{ .desc = "Cairo Depth Bins", .format = "%d",
+		.vars = { &rc_config.cairo_depth_bins } },
+
+	{ .desc = "Cairo Color Quantization Levels", .format = "%d",
+		.vars = { &rc_config.cairo_color_quant } },
+
+	{ .desc = "Cairo Line Cap Style", .format = "%d",
+		.vars = { &rc_config.cairo_line_cap } },
+
 	{ .desc = "Current Flow Visualization Mode", .format = "%d",
 		.vars = { &rc_config.current_flow_visualization_mode } },
 

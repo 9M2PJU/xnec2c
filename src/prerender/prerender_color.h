@@ -81,13 +81,7 @@ segment_color_type_t get_segment_color_type(int seg_num);
  */
 float segment_type_to_width(segment_color_type_t type);
 
-/*-----------------------------------------------------------------------
- * Per-vertex RGB color (float precision, renderer-agnostic)
- *----------------------------------------------------------------------*/
-typedef struct
-{
-  float r, g, b;
-} rgb_f_t;
+/* rgb_f_t defined in common.h */
 
 /**
  * color_from_value() - Map a scalar to an rgb_f_t via the rainbow ramp
