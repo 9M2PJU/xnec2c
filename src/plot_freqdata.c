@@ -29,6 +29,7 @@
  */
 
 #include "plot_freqdata.h"
+#include "cairo/cairo_draw.h"
 #include "shared.h"
 #include "opt_ui.h"
 

@@ -18,17 +18,19 @@
  */
 
 /*
- * render_dispatch: unified precondition checking, mode selection, and dispatch.
+ * render_dispatch: presentation-layer orchestration for all render views.
  *
  * Single entry point render() acquires freq_data_lock, evaluates all content
- * flags via render_check(), and calls through the render_ops_t vtable.  Backends
- * are leaf functions: zero flag evaluation, zero lock management.
+ * flags via render_check(), and calls through the render_ops_t vtable.
+ * This module is the presentation layer: it resolves what to draw, resolves
+ * resources (gradient cache), and drives backend leaf renderers.  Backends
+ * (Cairo scenebuffer, OpenGL scene graph) are rendering-layer functions:
+ * zero flag evaluation, zero lock management.
  */
 
 #include "render_dispatch.h"
 #include "gradient_cache.h"
 #include "../shared.h"
-#include "../cairo/cairo_draw.h"
 #include "../prerender/prerender_farfield.h"
 #include "../rdpattern_ui.h"
 #include "../structure_ui.h"
@@ -49,30 +51,6 @@ render_get_last_rdpat_check(void)
 {
   return &last_rdpat_check;
 }
-
-/* Cairo backend operations vtable for structure window */
-const render_ops_t cairo_struct_ops =
-{
-  .draw_farfield        = NULL,
-  .draw_nearfield       = NULL,
-  .draw_structure       = cairo_draw_structure,
-  .draw_axes            = cairo_draw_axes,
-  .init_empty           = cairo_init_empty,
-  .set_status           = cairo_set_status,
-  .set_gradient         = cairo_set_gradient,
-};
-
-/* Cairo backend operations vtable for radiation pattern window */
-const render_ops_t cairo_rdpat_ops =
-{
-  .draw_farfield        = cairo_draw_farfield,
-  .draw_nearfield       = cairo_draw_nearfield,
-  .draw_structure       = cairo_draw_structure,
-  .draw_axes            = cairo_draw_axes,
-  .init_empty           = cairo_init_empty,
-  .set_status           = cairo_set_status,
-  .set_gradient         = cairo_set_gradient,
-};
 
 /*-----------------------------------------------------------------------*/
 
@@ -465,48 +443,6 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
   }
 
   g_rec_mutex_unlock(&freq_data_lock);
-  return TRUE;
-}
-
-/*-----------------------------------------------------------------------*/
-
-/**
- * render_cairo() - GTK3 draw signal handler for Cairo rendering
- * @widget:    the GtkDrawingArea receiving the draw signal
- * @cr:        Cairo context provided by GTK
- * @user_data: unused
- *
- * Determines the view from the widget identity, builds a
- * cairo_render_ctx_t, and dispatches through render() with the
- * appropriate Cairo backend ops vtable.
- */
-  gboolean
-render_cairo(cairo_t *cr, view_t *v, const render_ops_t *ops)
-{
-  if( isFlagSet(INPUT_PENDING) )
-    return FALSE;
-
-  /* ERROR_CONDX: no rendering but return TRUE to stop GTK signal
-   * propagation (prevents further draw handler invocations). */
-  if( isFlagSet(ERROR_CONDX) )
-    return TRUE;
-
-  if( v == NULL )
-    return FALSE;
-
-  cairo_render_ctx_t ctx =
-  {
-    .cr     = cr,
-    .view   = v,
-  };
-
-  /* Clear drawing surface */
-  cairo_set_source_rgb(cr, BLACK);
-  cairo_rectangle(cr, 0.0, 0.0, (double)v->width, (double)v->height);
-  cairo_fill(cr);
-
-  render((void *)&ctx, ops, v);
-
   return TRUE;
 }
 

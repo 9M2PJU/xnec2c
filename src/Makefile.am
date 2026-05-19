@@ -81,6 +81,7 @@ xnec2c_SOURCES = \
     cairo/cairo_farfield.c \
     cairo/cairo_scenebuffer.c cairo/cairo_scenebuffer_flush.c \
     cairo/cairo_scenebuffer.h \
+    cairo/cairo_frame.c       cairo/cairo_frame.h \
     cairo/cairo_nearfield.c \
     cairo/cairo_structure.c \
     common.h        editors.h

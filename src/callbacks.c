@@ -23,7 +23,7 @@
 #include "measurements.h"
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
-#include "render/render_dispatch.h"
+#include "cairo/cairo_frame.h"
 #include <pthread.h>
 
 #include "opengl/opengl_structure.h"
@@ -32,7 +32,6 @@
 #include "opengl-engine/opengl_view.h"
 #include "opengl/opengl_rdpattern.h"
 #include "opengl/opengl_msaa.h"
-#include "opengl/opengl_settings.h"
 #endif
 
 static void noise_model_menus_populate(void);
@@ -163,6 +162,10 @@ on_main_window_destroy(
     GObject     *object,
     gpointer    user_data)
 {
+  /* Release Cairo scenebuffer allocations before tearing down the
+   * GTK main loop; segment arrays survive until process exit otherwise. */
+  cairo_frame_destroy();
+
   Gtk_Quit();
 }
 
@@ -1267,7 +1270,14 @@ on_structure_drawingarea_draw(
 {
   (void)widget;
   (void)user_data;
-  return render_cairo(cr, structure_view, &cairo_struct_ops);
+
+  cairo_render_ctx_t ctx =
+  {
+    .cr      = cr,
+    .view    = structure_view,
+    .sb      = cairo_frame_get_scenebuffer(VIEW_STRUCTURE),
+  };
+  return render_cairo(&ctx, &cairo_ops);
 }
 
 
@@ -2440,7 +2450,14 @@ on_rdpattern_drawingarea_draw(
 {
   (void)widget;
   (void)user_data;
-  return render_cairo(cr, rdpattern_view, &cairo_rdpat_ops);
+
+  cairo_render_ctx_t ctx =
+  {
+    .cr      = cr,
+    .view    = rdpattern_view,
+    .sb      = cairo_frame_get_scenebuffer(VIEW_RDPATTERN),
+  };
+  return render_cairo(&ctx, &cairo_ops);
 }
 
 

@@ -309,24 +309,7 @@ cairo_draw_structure(void *ctx, float extent,
 /*-----------------------------------------------------------------------*/
 
 /**
- * cairo_init_empty() - Initialize an empty Cairo scene
- * @ctx: cairo_render_ctx_t*
- */
-  void
-cairo_init_empty(void *ctx)
-{
-  cairo_render_ctx_t *cc = (cairo_render_ctx_t *)ctx;
-
-  cairo_set_source_rgb(cc->cr, BLACK);
-  cairo_rectangle(cc->cr, 0.0, 0.0,
-      (double)cc->view->width, (double)cc->view->height);
-  cairo_fill(cc->cr);
-}
-
-/*-----------------------------------------------------------------------*/
-
-/**
- * cairo_set_status() - Display a centered status message
+ * cairo_set_status() - Store status message for deferred rendering
  * @ctx: cairo_render_ctx_t*
  * @msg: UTF-8 status message
  */

@@ -26,14 +26,32 @@
 #include "../prerender/prerender_color.h"
 #include "../render/render_dispatch.h"
 
+#include "cairo_scenebuffer.h"
+
 /*-----------------------------------------------------------------------
  * Cairo rendering context — void *ctx in render_ops_t callbacks
  *----------------------------------------------------------------------*/
 
+/* Deferred axis label for post-flush Pango rendering */
 typedef struct
 {
-  cairo_t *cr;
-  view_t  *view;
+  int         x, y;    /* screen position (axis tip) */
+  const char *text;    /* label string (points into static table) */
+} axis_label_t;
+
+#define AXIS_COUNT 3
+
+typedef struct
+{
+  /* Caller-provided frame resources */
+  cairo_t                *cr;
+  view_t                 *view;
+  cairo_scenebuffer_t    *sb;       /* caller-owned scenebuffer */
+
+  /* Render-internal fields (set during render(), consumed by render_cairo) */
+  axis_label_t     axis_labels[AXIS_COUNT];
+  int              n_axis_labels;
+  const char      *status_message; /* deferred status text; painted after flush */
   cairo_surface_t *gradient;       /* resolved gradient legend; NULL = skip */
 } cairo_render_ctx_t;
 
@@ -74,7 +92,6 @@ gboolean cairo_draw_nearfield(void *ctx,
     const near_field_point_t *origins, int npts,
     const nf_field_set_t *fields, int n_fields,
     double dr, double r_max);
-void     cairo_init_empty(void *ctx);
 void     cairo_set_status(void *ctx, const char *msg);
 void     cairo_set_gradient(void *ctx, cairo_surface_t *surface);
 

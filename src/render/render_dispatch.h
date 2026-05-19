@@ -156,23 +156,4 @@ const render_check_result_t *render_get_last_rdpat_check(void);
  */
 gboolean render(void *ctx, const render_ops_t *ops, view_t *view);
 
-/* Cairo backend vtables; used by the glade draw handlers in callbacks.c
- * to pass the correct ops to render_cairo() without a widget identity check. */
-extern const render_ops_t cairo_struct_ops;
-extern const render_ops_t cairo_rdpat_ops;
-
-/**
- * render_cairo() - Cairo draw path shared by both glade draw handlers
- * @cr:  Cairo context provided by GTK
- * @v:   view resolved by the calling glade handler
- * @ops: Cairo backend vtable resolved by the calling glade handler
- *
- * Builds a cairo_render_ctx_t and dispatches through render().
- * Identity resolution is the caller's responsibility; no widget
- * pointer is accepted here.
- * Returns TRUE when a frame was produced, FALSE for freeze-frame or
- * when @v is NULL.
- */
-gboolean render_cairo(cairo_t *cr, view_t *v, const render_ops_t *ops);
-
 #endif
