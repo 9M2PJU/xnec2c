@@ -24,51 +24,10 @@
 
 /*-----------------------------------------------------------------------*/
 
-/** update_overlay_texture() - Regenerate overlay texture using Cairo
- * @overlay: overlay instance
- */
-  static void
-update_overlay_texture(gradient_overlay_t *overlay)
-{
-  cairo_surface_t *surface;
-  cairo_t *cr;
-  int width, height;
-
-  if( !overlay || !overlay->base )
-    return;
-
-  width = overlay->base->width;
-  height = overlay->base->height;
-
-  if( width <= 0 || height <= 0 )
-    return;
-
-  surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
-  cr = cairo_create(surface);
-
-  cairo_set_source_rgba(cr, 0.0, 0.0, 0.0, 0.0);
-  cairo_paint(cr);
-
-  if( overlay->draw_func )
-    overlay->draw_func(cr);
-
-  cairo_destroy(cr);
-
-  cairo_gl_overlay_upload(overlay->base, surface);
-
-  cairo_surface_destroy(surface);
-
-  overlay->needs_update = FALSE;
-
-} /* update_overlay_texture() */
-
-/*-----------------------------------------------------------------------*/
-
 /** gradient_overlay_new() - Allocate and initialize gradient overlay renderer
- * @draw_func: Cairo drawing function callback
  */
   gradient_overlay_t*
-gradient_overlay_new(gradient_draw_fn draw_func)
+gradient_overlay_new(void)
 {
   gradient_overlay_t *overlay;
 
@@ -81,9 +40,6 @@ gradient_overlay_new(gradient_draw_fn draw_func)
     g_free(overlay);
     return( NULL );
   }
-
-  overlay->draw_func = draw_func;
-  overlay->needs_update = TRUE;
 
   return( overlay );
 
@@ -121,23 +77,39 @@ gradient_overlay_set_viewport(gradient_overlay_t *overlay, int width, int height
   if( overlay->base->width != width || overlay->base->height != height )
   {
     cairo_gl_overlay_set_size(overlay->base, width, height);
-    overlay->needs_update = TRUE;
   }
 
 } /* gradient_overlay_set_viewport() */
 
 /*-----------------------------------------------------------------------*/
 
-/** gradient_overlay_mark_dirty() - Mark overlay texture for regeneration
+/** gradient_overlay_upload_surface() - Upload pre-rendered surface to GL texture
  * @overlay: overlay instance
+ * @surface: ARGB32 surface from gradient_cache
+ *
+ * Compares surface pointer and dimensions against last upload to detect
+ * staleness.  Re-uploads only when the surface identity or size changes.
  */
   void
-gradient_overlay_mark_dirty(gradient_overlay_t *overlay)
+gradient_overlay_upload_surface(gradient_overlay_t *overlay,
+    cairo_surface_t *surface)
 {
-  if( overlay )
-    overlay->needs_update = TRUE;
+  if( !overlay || !overlay->base || surface == NULL )
+    return;
 
-} /* gradient_overlay_mark_dirty() */
+  int w = cairo_image_surface_get_width(surface);
+  int h = cairo_image_surface_get_height(surface);
+
+  if( overlay->last_surface == surface &&
+      overlay->last_width == w && overlay->last_height == h )
+    return;
+
+  cairo_gl_overlay_upload(overlay->base, surface);
+  overlay->last_surface = surface;
+  overlay->last_width = w;
+  overlay->last_height = h;
+
+} /* gradient_overlay_upload_surface() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -149,9 +121,6 @@ gradient_overlay_render(gradient_overlay_t *overlay)
 {
   if( !overlay || !overlay->base )
     return;
-
-  if( overlay->needs_update )
-    update_overlay_texture(overlay);
 
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);

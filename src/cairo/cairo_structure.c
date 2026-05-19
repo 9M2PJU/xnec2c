@@ -340,16 +340,15 @@ cairo_set_status(void *ctx, const char *msg)
 /*-----------------------------------------------------------------------*/
 
 /**
- * cairo_set_gradient() - Enable or disable gradient key display
- * @ctx:  cairo_render_ctx_t*
- * @show: TRUE to draw the gradient color legend
+ * cairo_set_gradient() - Store pre-resolved gradient legend surface
+ * @ctx:     cairo_render_ctx_t*
+ * @surface: ARGB32 gradient surface from gradient_cache
  */
   void
-cairo_set_gradient(void *ctx, gboolean show)
+cairo_set_gradient(void *ctx, cairo_surface_t *surface)
 {
   cairo_render_ctx_t *cc = (cairo_render_ctx_t *)ctx;
-  if( show )
-    Draw_Color_Legend_Overlay(cc->cr);
+  cc->gradient = surface;
 }
 
 /*-----------------------------------------------------------------------*/

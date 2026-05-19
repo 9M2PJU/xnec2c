@@ -26,6 +26,7 @@
  */
 
 #include "render_dispatch.h"
+#include "gradient_cache.h"
 #include "../shared.h"
 #include "../cairo/cairo_draw.h"
 #include "../prerender/prerender_farfield.h"
@@ -152,7 +153,6 @@ render_check_farfield(render_check_result_t *r)
   }
 
   r->mode = RENDER_MODE_FARFIELD;
-  r->show_gradient = rc_config.rdpattern_gradient_key;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -186,7 +186,7 @@ render_check_rdpattern(render_check_result_t *r)
 render_check(view_type_t view_type)
 {
   render_check_result_t r = { .status = RENDER_OK, .mode = RENDER_MODE_NONE,
-    .fstep = -1, .message = NULL, .show_gradient = FALSE, .overlay_active = FALSE };
+    .fstep = -1, .message = NULL, .overlay_active = FALSE };
 
   /* No content available while input file is being parsed */
   if( isFlagSet(INPUT_PENDING) )
@@ -294,7 +294,6 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
     if( ops->draw_axes != NULL )
       ops->draw_axes(ctx, RENDER_EMPTY_AXIS_EXTENT);
     ops->set_status(ctx, r.message);
-    ops->set_gradient(ctx, FALSE);
     g_rec_mutex_unlock(&freq_data_lock);
     return TRUE;
   }
@@ -344,6 +343,18 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
       }
 
       ok = ops->draw_farfield(ctx, r.fstep, &ff);
+
+      /* Resolve gradient legend surface for farfield mode and pass
+       * directly to the backend via set_gradient; backends composite
+       * unconditionally when the surface is non-NULL. */
+      if( ok )
+      {
+        cairo_surface_t *gsfc = gradient_cache_get_overlay(
+            view->width, view->height, NULL);
+        if( gsfc != NULL )
+          ops->set_gradient(ctx, gsfc);
+      }
+
       break;
     }
 
@@ -439,12 +450,9 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
         isFlagSet(FREQ_LOOP_DONE)
         ? STATUS_MSG_NOT_READY
         : STATUS_MSG_START_FREQLOOP);
-    ops->set_gradient(ctx, FALSE);
     g_rec_mutex_unlock(&freq_data_lock);
     return TRUE;
   }
-
-  ops->set_gradient(ctx, r.show_gradient);
 
   /* Post-render UI updates (under lock, main thread) */
   if( view->type == VIEW_STRUCTURE )

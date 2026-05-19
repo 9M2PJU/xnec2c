@@ -95,6 +95,10 @@ typedef struct
   /* Centered text overlay rendered when no data to display; NULL = none */
   const char *status_message;
 
+  /* Pre-resolved gradient legend surface from render(); NULL = skip.
+   * GL upload compares version to avoid redundant texture transfers. */
+  cairo_surface_t *gradient;
+
 } gl_view_content_t;
 
 /* Notice position within the GL viewport */
@@ -352,16 +356,16 @@ gl_view_set_status(void *ctx, const char *msg)
   state->content.status_message = msg;
 }
 
-/** gl_view_set_gradient() - Enable or disable gradient display
- * @ctx:  gl_view_state_t (passed as void* through render_ops_t)
- * @show: TRUE to display gradient key
+/** gl_view_set_gradient() - Store pre-resolved gradient legend surface
+ * @ctx:     gl_view_state_t (passed as void* through render_ops_t)
+ * @surface: ARGB32 gradient surface from gradient_cache; NULL = no legend
  */
 static inline void
-gl_view_set_gradient(void *ctx, gboolean show)
+gl_view_set_gradient(void *ctx, cairo_surface_t *surface)
 {
   gl_view_state_t *state = (gl_view_state_t *)ctx;
 
-  state->content.show_gradient = show;
+  state->content.gradient = surface;
 }
 
 /* Sorting entry for the transparent render pass */

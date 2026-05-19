@@ -128,7 +128,6 @@ gl_view_signal_init_failed(gl_view_state_t *state)
 on_realize(GtkGLArea *area, gpointer user_data)
 {
   gl_view_state_t *state;
-  GtkAllocation alloc;
   gl_renderable_t r;
 
   state = (gl_view_state_t *)user_data;
@@ -271,19 +270,6 @@ on_realize(GtkGLArea *area, gpointer user_data)
     glActiveTexture(GL_TEXTURE0);
   }
 
-  /* Gradient overlay (2D HUD, not a renderable) — optional */
-  if( state->config->has_gradient )
-  {
-    state->overlay = gradient_overlay_new(state->config->gradient_draw);
-    if( !state->overlay )
-      pr_err("Failed to create gradient overlay\n");
-    else
-    {
-      gtk_widget_get_allocation(GTK_WIDGET(area), &alloc);
-      gradient_overlay_set_viewport(state->overlay, alloc.width, alloc.height);
-    }
-  }
-
   /* Compile depth-peel composite shader and create fullscreen triangle */
   {
     gl_shader_t cs = {0};
@@ -374,6 +360,10 @@ on_resize(GtkGLArea *area, int width, int height, gpointer user_data)
 
   state->aspect = aspect;
   state->viewport_height = (float)height;
+
+  /* Propagate dimensions to the view so render paths (gradient cache
+   * in particular) receive valid width/height values. */
+  view_set_viewport(state->view, width, height);
 
   /* Dimensions unchanged — skip FBO resize.
    * Update aspect/viewport in case GTK fires redundantly. */

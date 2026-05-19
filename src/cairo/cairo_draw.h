@@ -34,6 +34,7 @@ typedef struct
 {
   cairo_t *cr;
   view_t  *view;
+  cairo_surface_t *gradient;       /* resolved gradient legend; NULL = skip */
 } cairo_render_ctx_t;
 
 /*-----------------------------------------------------------------------
@@ -75,6 +76,6 @@ gboolean cairo_draw_nearfield(void *ctx,
     double dr, double r_max);
 void     cairo_init_empty(void *ctx);
 void     cairo_set_status(void *ctx, const char *msg);
-void     cairo_set_gradient(void *ctx, gboolean show);
+void     cairo_set_gradient(void *ctx, cairo_surface_t *surface);
 
 #endif

@@ -299,9 +299,13 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
   if( state->scene->post_render )
     state->scene->post_render();
 
-  /* 2D HUD — screen-space, rendered to MSAA FBO */
-  if( state->overlay && state->content.show_gradient )
+  /* 2D HUD — gradient legend overlay (set by render() via set_gradient) */
+  if( state->overlay && state->content.gradient != NULL )
+  {
+    gradient_overlay_upload_surface(state->overlay,
+        state->content.gradient);
     gradient_overlay_render(state->overlay);
+  }
 
   /* Surface dimensions for 2D notice overlay */
   {

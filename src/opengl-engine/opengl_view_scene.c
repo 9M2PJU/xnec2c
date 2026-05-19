@@ -106,9 +106,6 @@ gl_scene_prepare(void *ctx, float r_max)
     }
   }
 
-  if( view->overlay )
-    gradient_overlay_mark_dirty(view->overlay);
-
   view->last_generation = c->generation;
 
 } /* gl_scene_prepare() */

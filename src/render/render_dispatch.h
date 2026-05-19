@@ -87,7 +87,6 @@ typedef struct
   render_mode_t    mode;
   int              fstep;
   const char      *message;      /* STATUS_MSG_* pointer; NULL when RENDER_OK */
-  gboolean         show_gradient;
   gboolean         overlay_active; /* resolved from OVERLAY_STRUCT */
 } render_check_result_t;
 
@@ -114,11 +113,14 @@ typedef struct
   /* Set the status message on the scene */
   void (*set_status)(void *ctx, const char *msg);
 
+  /* Composite a pre-resolved gradient legend surface.
+   * Called by render() when gradient_cache yields a valid surface;
+   * never called otherwise — backends paint unconditionally. */
+  void (*set_gradient)(void *ctx, cairo_surface_t *surface);
+
   /* Draw xyz axes for the primary content extent */
   void (*draw_axes)(void *ctx, float extent);
 
-  /* Enable or disable gradient display */
-  void (*set_gradient)(void *ctx, gboolean show);
 } render_ops_t;
 
 /**
