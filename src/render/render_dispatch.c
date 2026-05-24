@@ -39,15 +39,15 @@
 static render_check_result_t last_rdpat_check;
 
 /**
- * render_get_last_rdpat_check() - Return cached rdpattern precondition result
+ * render_check_rdpat() - Return cached rdpattern precondition result
  *
- * Returns a pointer to the result of the most recent render_check() call made
- * for VIEW_RDPATTERN.  Consumers (overlay provider, shift-scroll handler, axes
- * callback) read overlay_active and mode from this cache instead of re-evaluating
+ * Returns a pointer to the result of the most recent render(VIEW_RDPATTERN)
+ * call.  Consumers (overlay provider, shift-scroll handler, draw handlers)
+ * read mode and overlay_active from this cache instead of re-evaluating
  * content-selection flags.  Valid after the first rdpattern render() call.
  */
 const render_check_result_t *
-render_get_last_rdpat_check(void)
+render_check_rdpat(void)
 {
   return &last_rdpat_check;
 }

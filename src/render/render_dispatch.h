@@ -134,13 +134,14 @@ typedef struct
 render_check_result_t render_check(view_type_t view_type);
 
 /**
- * render_get_last_rdpat_check() - Return cached rdpattern precondition result
+ * render_check_rdpat() - Return cached rdpattern precondition result
  *
- * Returns a pointer to the render_check_result_t from the most recent render()
- * call for VIEW_RDPATTERN.  Consumers read overlay_active and mode instead of
- * re-evaluating content-selection flags.  Valid after the first rdpattern render().
+ * Returns a pointer to the render_check_result_t from the most recent
+ * render() call for VIEW_RDPATTERN.  Consumers read mode and overlay_active
+ * from this cache instead of re-evaluating content-selection flags.  Valid
+ * after the first rdpattern render() call.
  */
-const render_check_result_t *render_get_last_rdpat_check(void);
+const render_check_result_t *render_check_rdpat(void);
 
 /**
  * render() - Unified render entry point for all backends

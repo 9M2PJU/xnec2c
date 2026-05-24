@@ -93,6 +93,12 @@ extern const gl_vertex_attrib_t opengl_chevron_attribs[7];
 
 GtkWidget* opengl_structure_get_widget(void);
 
+/* GL structure leaf renderer; exported for unified gl_ops vtable */
+gboolean gl_draw_structure(void *ctx, float extent, const struct_draw_params_t *params);
+
+/* Unified GL backend vtable (defined in opengl_ops.c) */
+extern const render_ops_t gl_ops;
+
 /* Get/set cylinder radius display scale factor */
 double opengl_structure_get_radius_scale(void);
 void opengl_structure_set_radius_scale(double scale);

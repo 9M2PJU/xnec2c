@@ -42,6 +42,7 @@ xnec2c_SOURCES = \
     settings/render_settings_common.c settings/render_settings_common.h \
     settings/render_settings_dispatch.c \
     opengl/opengl_state.c opengl/opengl_state.h \
+    opengl/opengl_ops.c \
     settings/render_settings_internal.h \
     settings/render_settings_general.c \
     settings/render_settings_opengl.c \

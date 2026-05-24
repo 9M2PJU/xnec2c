@@ -203,7 +203,7 @@ opengl_structure_show_ctrl_notice(GtkWidget *widget)
  *
  * Always returns TRUE; sets status_message when no geometry is loaded.
  */
-  static gboolean
+  gboolean
 gl_draw_structure(void *ctx, float extent, const struct_draw_params_t *params)
 {
   gl_view_state_t *state = (gl_view_state_t *)ctx;
@@ -222,28 +222,12 @@ gl_draw_structure(void *ctx, float extent, const struct_draw_params_t *params)
   out->model_scale = 1.0f;
   out->generation = geom->generation;
 
-  /* Prompt user to open a file when no geometry is loaded */
-  if( geom->batch_count == 0 )
-    out->status_message = STATUS_MSG_OPEN_FILE;
-
   return TRUE;
 }
 
 /*-----------------------------------------------------------------------*/
 
-/* Backend vtable for structure GL scene.
- * draw_farfield and draw_nearfield are NULL: render_check never resolves
- * RENDER_MODE_FARFIELD or RENDER_MODE_NEARFIELD for VIEW_STRUCTURE. */
-static const render_ops_t gl_struct_ops =
-{
-  .draw_farfield  = NULL,
-  .draw_nearfield = NULL,
-  .draw_structure       = gl_draw_structure,
-  .draw_axes      = NULL,
-  .init_empty     = gl_view_init_empty,
-  .set_status     = gl_view_set_status,
-  .set_gradient   = gl_view_set_gradient,
-};
+/* gl_ops defined in opengl_ops.c; declared in opengl_structure.h */
 
 /*-----------------------------------------------------------------------*/
 
@@ -255,9 +239,12 @@ static const render_ops_t gl_struct_ops =
   static gboolean
 structure_scene_generate(gl_view_state_t *state)
 {
+  state->content.status_message = NULL;
+  state->content.gradient = NULL;
+
   opengl_structure_show_ctrl_notice(structure_gl_widget);
 
-  return render((void *)state, &gl_struct_ops, structure_view);
+  return render((void *)state, &gl_ops, structure_view);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -287,8 +274,6 @@ static gl_view_config_t structure_view_config = {
   .attribs = opengl_chevron_attribs,
   .attrib_count = 7,
   .vertex_stride = (int)sizeof(structure_vertex_t),
-  .has_gradient = FALSE,
-  .gradient_draw = NULL,
   .on_gl_init_failed = opengl_gl_init_failed
 };
 

@@ -30,7 +30,15 @@ void opengl_rdpattern_queue_draw(void);
 
 #ifdef HAVE_OPENGL
 #include "../opengl-engine/opengl_renderer.h"
+#include "../render/render_dispatch.h"
 #include "../view/view_core.h"
+
+/* GL rdpattern leaf renderers; exported for unified gl_ops vtable */
+gboolean gl_rdpat_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff);
+gboolean gl_rdpat_draw_nearfield(void *ctx,
+    const near_field_point_t *origins, int npts,
+    const nf_field_set_t *fields, int n_fields,
+    double dr, double r_max);
 
 /* view_t change callback for the rdpattern view.  Bound at view_new()
  * so view_notify_change() fires this directly; no dynamic observer

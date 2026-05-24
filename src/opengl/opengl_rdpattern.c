@@ -29,6 +29,7 @@
 #ifdef HAVE_OPENGL
 
 #include "../opengl-engine/opengl_view.h"
+#include "../opengl-engine/opengl_gradient_overlay.h"
 #include "../opengl-engine/opengl_view_notice.h"
 #include "../render/render_dispatch.h"
 
@@ -72,7 +73,7 @@ static const gl_overlay_config_t rdpattern_overlay_config = {
  *
  * One GL batch per field set. Backend iterates — zero field-type branching.
  */
-  static gboolean
+  gboolean
 gl_rdpat_draw_nearfield(void *ctx,
     const near_field_point_t *origins, int npts,
     const nf_field_set_t *fields, int n_fields,
@@ -119,7 +120,7 @@ gl_rdpat_draw_nearfield(void *ctx,
  *
  * Returns TRUE when batches are populated, FALSE on data dependency failure.
  */
-  static gboolean
+  gboolean
 gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
 {
   static float last_ff_off_len = NAN;
@@ -304,19 +305,7 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
 
 /*-----------------------------------------------------------------------*/
 
-/* Backend vtable for radiation pattern GL scene.
- * draw_structure is NULL: render_check never resolves RENDER_MODE_STRUCTURE
- * for VIEW_RDPATTERN. */
-static const render_ops_t gl_rdpat_ops =
-{
-  .draw_farfield  = gl_rdpat_draw_farfield,
-  .draw_nearfield = gl_rdpat_draw_nearfield,
-  .draw_structure       = NULL,
-  .draw_axes      = NULL,
-  .init_empty     = gl_view_init_empty,
-  .set_status     = gl_view_set_status,
-  .set_gradient   = gl_view_set_gradient,
-};
+/* gl_ops defined in opengl_structure.c; declared in opengl_structure.h */
 
 /*-----------------------------------------------------------------------*/
 
@@ -328,9 +317,21 @@ static const render_ops_t gl_rdpat_ops =
   static gboolean
 rdpattern_scene_generate(gl_view_state_t *state)
 {
+  state->content.status_message = NULL;
+  state->content.gradient = NULL;
+
+  /* Lazy-create gradient overlay on first frame (GL context is active) */
+  if( state->overlay == NULL )
+  {
+    state->overlay = gradient_overlay_new();
+    if( state->overlay )
+      gradient_overlay_set_viewport(state->overlay,
+          state->view->width, state->view->height);
+  }
+
   opengl_structure_show_ctrl_notice(rdpattern_gl_widget);
 
-  return render((void *)state, &gl_rdpat_ops, rdpattern_view);
+  return render((void *)state, &gl_ops, rdpattern_view);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -391,7 +392,7 @@ rdpattern_on_shift_scroll(GtkWidget *_widget, GdkEventScroll *event, gpointer vi
 rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *out)
 {
   const structure_overlay_data_t *geom;
-  const render_check_result_t *rc = render_get_last_rdpat_check();
+  const render_check_result_t *rc = render_check_rdpat();
   static gboolean notice_shown = FALSE;
 
   if( !rc->overlay_active ||
@@ -415,7 +416,6 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
       (size_t)geom->batch_count * sizeof(geom->batches[0]));
   out->batch_count = geom->batch_count;
   out->vertex_stride = geom->vertex_stride;
-  out->show_gradient = FALSE;
 
   /* Far-field: overlay_base_scale from prerender includes the default extent
    * factor (FF_OVERLAY_DEFAULT_EXTENT); gl_overlay_effective_scale applies
@@ -444,17 +444,17 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
 
 /*-----------------------------------------------------------------------*/
 
-/** rdpattern_axes_is_active() - Report whether axes renderable should be drawn
+/** rdpattern_axes_is_active() - Report whether axes renderable is drawn
  * @ctx: unused context pointer
  *
- * Axes are meaningful only when a pattern is rendered — hidden when
- * neither gain nor near-field is selected.
+ * Axes provide spatial orientation regardless of pattern availability;
+ * always active, matching the structure view default.
  */
   static gboolean
 rdpattern_axes_is_active(void *ctx)
 {
   (void)ctx;
-  return( render_get_last_rdpat_check()->mode != RENDER_MODE_NONE );
+  return( TRUE );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -466,9 +466,7 @@ static gl_view_config_t rdpattern_view_config = {
   .attribs = opengl_structure_attribs,
   .attrib_count = 3,
   .vertex_stride = (int)sizeof(lit_color_point_t),
-  .has_gradient = TRUE,
-  .gradient_draw = Draw_Color_Legend_Overlay,
-  .on_gl_init_failed = opengl_gl_init_failed
+  .on_gl_init_failed = opengl_gl_init_failed,
 };
 
 static gl_scene_provider_t rdpattern_scene_provider = {

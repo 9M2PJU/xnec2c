@@ -678,7 +678,7 @@ Queue_Radiation_Redraw(void)
 rdpattern_overlay_shift_scroll(GdkScrollDirection dir,
     int vp_w, int vp_h, double zoom_pct)
 {
-  const render_check_result_t *rc = render_get_last_rdpat_check();
+  const render_check_result_t *rc = render_check_rdpat();
   double scale;
 
   if( !rc->overlay_active || rc->mode != RENDER_MODE_FARFIELD )

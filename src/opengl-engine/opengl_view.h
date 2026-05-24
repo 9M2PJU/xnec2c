@@ -86,7 +86,6 @@ typedef struct
   float r_max;
   float clip_extent;
   float model_scale;
-  gboolean show_gradient;
   unsigned int generation;
 
   /* When TRUE, engine uses model_scale as-is (no overlay scale adjustment) */
@@ -232,9 +231,6 @@ typedef struct
   const gl_vertex_attrib_t *attribs;
   int attrib_count;
   int vertex_stride;
-  gboolean has_gradient;
-  void (*gradient_draw)(cairo_t *cr);
-
   /* Called via g_idle_add_once when GL context creation fails at realize time.
    * Implementations disable the OpenGL renderer and switch to Cairo fallback. */
   GSourceOnceFunc on_gl_init_failed;
