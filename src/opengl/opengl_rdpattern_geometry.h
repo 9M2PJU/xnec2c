@@ -36,6 +36,7 @@ int opengl_rdpattern_generate_nf_field_lines(
     double dr);
 
 /* Tessellate point_3d buffer into colored triangles.
+ * Per-vertex color derived from normalized radius via color_from_value.
  * Returns triangle count, or -1 on invalid input. */
 int opengl_rdpattern_generate_triangles(
     point_3d_t *points, int nth, int nph,
@@ -48,10 +49,12 @@ lit_color_point_t* opengl_rdpattern_get_nf_lines(int *count);
 lit_color_triangle_t* opengl_rdpattern_get_triangles(int *count);
 
 /* Tessellate point_3d buffer into colored line pairs for wireframe.
+ * theta_rgb: precomputed per-edge colors [(nth-1)*nph].
+ * phi_rgb: precomputed per-edge colors [nth*(nph-1)].
  * Returns line count, or -1 on invalid input. */
 int opengl_rdpattern_generate_lines(
     point_3d_t *points, int nth, int nph,
-    double r_min, double r_range);
+    const rgb_f_t *theta_rgb, const rgb_f_t *phi_rgb);
 
 /* Return far-field wireframe line buffer and count */
 lit_color_point_t* opengl_rdpattern_get_lines(int *count);

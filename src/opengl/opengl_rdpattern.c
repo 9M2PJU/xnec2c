@@ -129,7 +129,6 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
   gl_view_state_t *state = (gl_view_state_t *)ctx;
   gl_view_content_t *out = &state->content;
   uint32_t current_gen;
-  double r_min, r_range;
   int nth, nph, npts;
   point_3d_t *verts;
   point_3d_t *points_to_use;
@@ -148,8 +147,6 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
 
   verts = fp->vertices;
   current_gen = fp->generation;
-  r_min = (double)fp->r_min;
-  r_range = (double)(fp->pattern_radius - fp->r_min);
 
   translate_to_excitation = (ff->off_len > 0.001f);
   points_to_use = verts;
@@ -191,6 +188,8 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
 
     if( need_tris )
     {
+      double r_min = (double)fp->r_min;
+      double r_range = (double)(fp->pattern_radius - fp->r_min);
       int tri_count = opengl_rdpattern_generate_triangles(
           points_to_use, nth, nph, r_min, r_range);
 
@@ -201,7 +200,7 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
     if( need_lines )
     {
       int line_count = opengl_rdpattern_generate_lines(
-          points_to_use, nth, nph, r_min, r_range);
+          points_to_use, nth, nph, fp->theta_rgb, fp->phi_rgb);
 
       if( line_count <= 0 )
         return FALSE;

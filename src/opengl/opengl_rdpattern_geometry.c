@@ -21,6 +21,7 @@
 #include "../opengl-engine/opengl_cylinder.h"
 #include "../shared.h"
 #include "../rdpattern_ui.h"
+#include "../prerender/prerender_color.h"
 
 #ifdef HAVE_OPENGL
 
@@ -143,33 +144,25 @@ opengl_rdpattern_generate_nf_field_lines(
  * @vi: starting index in buf
  * @pt0: first endpoint
  * @pt1: second endpoint
- * @r_min: minimum radius for color normalization
- * @r_range: radius range for color normalization
+ * @color: precomputed edge color from ff_pre
  *
- * Color derived from average normalized radius of both endpoints.
  * Returns vi advanced by 2.
  */
   static int
 rdpat_line_edge(
     lit_color_point_t *buf, int vi,
     point_3d_t *pt0, point_3d_t *pt1,
-    double r_min, double r_range)
+    const rgb_f_t *color)
 {
-  double avg_r = ((pt0->r - r_min) + (pt1->r - r_min))
-    / (2.0 * r_range);
-  double red, grn, blu;
-
-  Value_to_Color(&red, &grn, &blu, avg_r, 1.0);
-
   set_lit_vertex(&buf[vi],
       (float)pt0->x, (float)pt0->y, (float)pt0->z,
       0.0f, 0.0f, 1.0f,
-      (float)red, (float)grn, (float)blu, 1.0f);
+      color->r, color->g, color->b, 1.0f);
 
   set_lit_vertex(&buf[vi + 1],
       (float)pt1->x, (float)pt1->y, (float)pt1->z,
       0.0f, 0.0f, 1.0f,
-      (float)red, (float)grn, (float)blu, 1.0f);
+      color->r, color->g, color->b, 1.0f);
 
   return( vi + 2 );
 }
@@ -180,25 +173,25 @@ rdpat_line_edge(
  * @points: array of radiation pattern sample points
  * @nth: number of theta samples
  * @nph: number of phi samples
- * @r_min: minimum radius for color normalization
- * @r_range: radius range for color normalization
+ * @theta_rgb: precomputed per-edge colors [(nth-1)*nph]
+ * @phi_rgb: precomputed per-edge colors [nth*(nph-1)]
  *
  * Produces line pairs matching Cairo wireframe topology:
  *   Theta direction: (nth-1) * nph edges within each phi ring
  *   Phi direction:   nth * (nph-1) edges across adjacent phi rings
- * Color per edge: Value_to_Color on average of endpoint radii.
  * Returns line count, or -1 on invalid input.
  */
   int
 opengl_rdpattern_generate_lines(
     point_3d_t *points, int nth, int nph,
-    double r_min, double r_range)
+    const rgb_f_t *theta_rgb, const rgb_f_t *phi_rgb)
 {
   int nph_idx, nth_idx, vi;
   int theta_edges, phi_edges, total_lines;
+  int edge_idx;
   size_t mreq;
 
-  if( !points || nth < 2 || nph < 1 )
+  if( !points || nth < 2 || nph < 1 || !theta_rgb || !phi_rgb )
     return( -1 );
 
   /* Edge counts matching Cairo wireframe topology */
@@ -210,6 +203,7 @@ opengl_rdpattern_generate_lines(
   mem_realloc((void **)&rdpat_lines, mreq, __LOCATION__);
 
   vi = 0;
+  edge_idx = 0;
 
   /* Theta-direction edges: adjacent theta within each phi ring */
   for( nph_idx = 0; nph_idx < nph; nph_idx++ )
@@ -220,9 +214,12 @@ opengl_rdpattern_generate_lines(
       int p1 = (nth_idx + 1) + nph_idx * nth;
 
       vi = rdpat_line_edge(rdpat_lines, vi,
-          &points[p0], &points[p1], r_min, r_range);
+          &points[p0], &points[p1], &theta_rgb[edge_idx]);
+      edge_idx++;
     }
   }
+
+  edge_idx = 0;
 
   /* Phi-direction edges: same theta across adjacent phi rings */
   for( nth_idx = 0; nth_idx < nth; nth_idx++ )
@@ -233,7 +230,8 @@ opengl_rdpattern_generate_lines(
       int p1 = nth_idx + (nph_idx + 1) * nth;
 
       vi = rdpat_line_edge(rdpat_lines, vi,
-          &points[p0], &points[p1], r_min, r_range);
+          &points[p0], &points[p1], &phi_rgb[edge_idx]);
+      edge_idx++;
     }
   }
 
@@ -265,8 +263,6 @@ opengl_rdpattern_get_lines(int *count)
  * @normal: pre-computed smooth vertex normal
  * @r_min: minimum radius for color normalization
  * @r_range: radius range for color normalization
- *
- * Color is derived from the normalized (r - r_min) / r_range ratio.
  */
   static void
 fill_tri_vertex(
@@ -274,13 +270,12 @@ fill_tri_vertex(
     point_3d_t *pt, point_f_3d_t *normal,
     double r_min, double r_range)
 {
-  double red, grn, blu;
+  rgb_f_t c = color_from_value((pt->r - r_min) / r_range, 1.0);
 
-  Value_to_Color(&red, &grn, &blu, (pt->r - r_min) / r_range, 1.0);
   set_lit_vertex(&tri->cp[vi],
       (float)pt->x, (float)pt->y, (float)pt->z,
       normal->x, normal->y, normal->z,
-      (float)red, (float)grn, (float)blu, 1.0f);
+      c.r, c.g, c.b, 1.0f);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -292,6 +287,7 @@ fill_tri_vertex(
  * @r_min: minimum radius for color normalization
  * @r_range: radius range for color normalization
  *
+ * Per-vertex color derived from normalized radius via color_from_value.
  * Returns triangle count, or -1 on invalid input.
  */
   int
