@@ -1434,9 +1434,11 @@ Draw_Color_Legend_Overlay( cairo_t *cr )
       
       /* Get scaled value at this position */
       double scaled_val = scaled_min + (pos * scaled_range);
-      
-      /* Convert to color */
-      Value_to_Color(&red, &grn, &blu, (scaled_val - scaled_min) / scaled_range, 1.0);
+
+      /* Convert to color; guard zero range from degenerate data */
+      double color_frac = (scaled_range > 0.0)
+          ? (scaled_val - scaled_min) / scaled_range : 0.0;
+      Value_to_Color(&red, &grn, &blu, color_frac, 1.0);
       cairo_set_source_rgb(cr, red, grn, blu);
       cairo_rectangle(cr, x, y + i, width, 1);
       cairo_fill(cr);

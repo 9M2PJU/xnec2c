@@ -244,6 +244,10 @@ static double ant_temp_log_interp(double freq_mhz,
  */
 static double ant_temp_eval(const ant_temp_model_t *m, double freq, int interp)
 {
+	/* Defense-in-depth: log10(freq) is undefined for freq <= 0 */
+	if (freq <= 0.0)
+		return -1.0;
+
 	/* Determine effective method: formula/galactic models override interp;
 	 * table models honor the user's snap/interp choice */
 	ant_temp_method_t method = m->method;
@@ -365,7 +369,9 @@ ant_temp_fill_fstep(int fstep)
   if( noise_temp == NULL || fstep < 0 )
     return;
 
-  freq = save.freq[fstep];
+  /* Child receives frequency via pipe into calc_data.freq_mhz;
+   * save.freq[] is parent-only and uninitialized in the child. */
+  freq = calc_data.freq_mhz;
 
   for( sky = 0; sky < ANT_TEMP_SKY_COUNT; sky++ )
   {

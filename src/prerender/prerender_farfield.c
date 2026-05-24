@@ -201,6 +201,8 @@ ff_presentation_recompute(int fstep)
 
   /* Per-vertex colors for triangle tessellation */
   double r_range = r_max - r_min;
+  if( r_range <= 0.0 )
+    r_range = 1.0;
   for( int i = 0; i < total; i++ )
     fp->vertex_rgb[i] = color_from_value(
         (fp->vertices[i].r - r_min) / r_range, 1.0);
