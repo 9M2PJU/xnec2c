@@ -17,6 +17,7 @@
 
 #include <cairo.h>
 #include <stdint.h>
+#include "../prerender/presentation_cache_key.h"
 
 /*
  * gradient_cache: Self-validating gradient legend surface cache.
@@ -31,14 +32,10 @@
 typedef struct
 {
   cairo_surface_t *surface; /* cached ARGB32 gradient rendering */
-  uint64_t version;    /* monotonic counter; increments on rebuild */
-  int    width;             /* width at render time */
-  int    height;            /* height at render time */
-  double freq_mhz;          /* calc_data.freq_mhz at render time */
-  int    gain_style;        /* rc_config.gain_style at render time */
-  int    pol_type;          /* calc_data.pol_type at render time */
-  double max_gain;          /* rad_pattern[fstep].max_gain[pol] at render time */
-  double min_gain;          /* rad_pattern[fstep].min_gain[pol] at render time */
+  uint64_t version;         /* monotonic counter; increments on rebuild */
+  int    width;             /* viewport width at render time */
+  int    height;            /* viewport height at render time */
+  presentation_cache_key_t cache_key; /* shared gain-scaling inputs */
 } gradient_cache_t;
 
 /*-----------------------------------------------------------------------
@@ -51,7 +48,7 @@ typedef struct
  * @w:      current viewport width
  * @h:      current viewport height
  *
- * Compares stored (freq_mhz, gain_style, pol_type, w, h) against current values.
+ * Compares stored presentation_cache_key and (w, h) against current values.
  * On mismatch: destroys old surface, creates new ARGB32 surface, calls
  * Draw_Color_Legend_Overlay(), stores surface and input snapshot.
  * On match: no-op.
@@ -59,15 +56,28 @@ typedef struct
 void gradient_cache_update(gradient_cache_t *cache, int w, int h);
 
 /**
+ * gradient_result_t - Cohesive gradient legend result
+ * @surface: ARGB32 legend surface; NULL when disabled or invalid
+ * @version: monotonic counter; increments on surface rebuild
+ *
+ * Couples surface with its version so consumers can gate re-upload
+ * without inspecting cache internals or relying on pointer identity.
+ */
+typedef struct
+{
+  cairo_surface_t *surface;
+  uint64_t         version;
+} gradient_result_t;
+
+/**
  * gradient_cache_get_overlay() - Presentation entry point for gradient legend
  * @w:       current viewport width
  * @h:       current viewport height
- * @version: if non-NULL, receives the cache version for staleness detection
  *
- * Checks rc_config.rdpattern_gradient_key; returns NULL when disabled or
- * dimensions are invalid.  Otherwise updates the module-internal singleton
- * cache and returns the rendered ARGB32 surface.
+ * Checks rc_config.rdpattern_gradient_key; returns {NULL, 0} when disabled
+ * or dimensions are invalid.  Otherwise updates the module-internal singleton
+ * cache and returns the rendered surface with its version.
  */
-cairo_surface_t *gradient_cache_get_overlay(int w, int h, uint64_t *version);
+gradient_result_t gradient_cache_get_overlay(int w, int h);
 
 #endif /* GRADIENT_CACHE_H */

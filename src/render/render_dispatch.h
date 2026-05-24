@@ -24,6 +24,7 @@
 #include "../prerender/prerender_color.h"
 #include "../prerender/prerender_state.h"
 #include "render_message.h"
+#include "gradient_cache.h"
 
 /* Axis half-extent used for empty-scene placeholders (no geometry loaded) */
 #define RENDER_EMPTY_AXIS_EXTENT 1.5f
@@ -116,7 +117,7 @@ typedef struct
   /* Composite a pre-resolved gradient legend surface.
    * Called by render() when gradient_cache yields a valid surface;
    * never called otherwise — backends paint unconditionally. */
-  void (*set_gradient)(void *ctx, cairo_surface_t *surface);
+  void (*set_gradient)(void *ctx, const gradient_result_t *result);
 
   /* Draw xyz axes for the primary content extent */
   void (*draw_axes)(void *ctx, float extent);

@@ -25,6 +25,7 @@
 #ifdef HAVE_OPENGL
 #include "opengl_renderer.h"
 #include "opengl_gradient_overlay.h"
+#include "../render/gradient_cache.h"
 
 /* Maximum renderables per view (constrained by guint32 active_mask in render loop) */
 #define MAX_RENDERABLES 32
@@ -94,9 +95,9 @@ typedef struct
   /* Centered text overlay rendered when no data to display; NULL = none */
   const char *status_message;
 
-  /* Pre-resolved gradient legend surface from render(); NULL = skip.
+  /* Pre-resolved gradient legend from render(); surface NULL = skip.
    * GL upload compares version to avoid redundant texture transfers. */
-  cairo_surface_t *gradient;
+  gradient_result_t gradient;
 
 } gl_view_content_t;
 
@@ -352,16 +353,16 @@ gl_view_set_status(void *ctx, const char *msg)
   state->content.status_message = msg;
 }
 
-/** gl_view_set_gradient() - Store pre-resolved gradient legend surface
+/** gl_view_set_gradient() - Store pre-resolved gradient legend result
  * @ctx:     gl_view_state_t (passed as void* through render_ops_t)
- * @surface: ARGB32 gradient surface from gradient_cache; NULL = no legend
+ * @result:  gradient legend result from gradient_cache
  */
 static inline void
-gl_view_set_gradient(void *ctx, cairo_surface_t *surface)
+gl_view_set_gradient(void *ctx, const gradient_result_t *result)
 {
   gl_view_state_t *state = (gl_view_state_t *)ctx;
 
-  state->content.gradient = surface;
+  state->content.gradient = *result;
 }
 
 /* Sorting entry for the transparent render pass */

@@ -322,15 +322,14 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
 
       ok = ops->draw_farfield(ctx, r.fstep, &ff);
 
-      /* Resolve gradient legend surface for farfield mode and pass
-       * directly to the backend via set_gradient; backends composite
-       * unconditionally when the surface is non-NULL. */
+      /* Resolve gradient legend for farfield mode; surface and version
+       * travel as a cohesive result through the vtable to backends. */
       if( ok )
       {
-        cairo_surface_t *gsfc = gradient_cache_get_overlay(
-            view->width, view->height, NULL);
-        if( gsfc != NULL )
-          ops->set_gradient(ctx, gsfc);
+        gradient_result_t gr = gradient_cache_get_overlay(
+            view->width, view->height);
+        if( gr.surface != NULL )
+          ops->set_gradient(ctx, &gr);
       }
 
       break;

@@ -300,10 +300,11 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
     state->scene->post_render();
 
   /* 2D HUD — gradient legend overlay (set by render() via set_gradient) */
-  if( state->overlay && state->content.gradient != NULL )
+  if( state->overlay && state->content.gradient.surface != NULL )
   {
     gradient_overlay_upload_surface(state->overlay,
-        state->content.gradient);
+        state->content.gradient.surface,
+        state->content.gradient.version);
     gradient_overlay_render(state->overlay);
   }
 

@@ -29,16 +29,14 @@
 typedef struct
 {
   cairo_gl_overlay_t  *base;
-  cairo_surface_t     *last_surface; /* pointer at last upload */
-  int                  last_width;   /* surface width at last upload */
-  int                  last_height;  /* surface height at last upload */
+  uint64_t             last_version; /* version at last texture upload */
 } gradient_overlay_t;
 
 gradient_overlay_t* gradient_overlay_new(void);
 void gradient_overlay_free(gradient_overlay_t *overlay);
 void gradient_overlay_set_viewport(gradient_overlay_t *overlay, int width, int height);
 void gradient_overlay_upload_surface(gradient_overlay_t *overlay,
-    cairo_surface_t *surface);
+    cairo_surface_t *surface, uint64_t version);
 void gradient_overlay_render(gradient_overlay_t *overlay);
 
 #endif /* HAVE_OPENGL */

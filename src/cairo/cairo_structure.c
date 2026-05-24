@@ -363,13 +363,13 @@ cairo_set_status(void *ctx, const char *msg)
 /**
  * cairo_set_gradient() - Store pre-resolved gradient legend surface
  * @ctx:     cairo_render_ctx_t*
- * @surface: ARGB32 gradient surface from gradient_cache
+ * @result:  gradient legend result from gradient_cache; version unused by cairo
  */
   void
-cairo_set_gradient(void *ctx, cairo_surface_t *surface)
+cairo_set_gradient(void *ctx, const gradient_result_t *result)
 {
   cairo_render_ctx_t *cc = (cairo_render_ctx_t *)ctx;
-  cc->gradient = surface;
+  cc->gradient = result->surface;
 }
 
 /*-----------------------------------------------------------------------*/

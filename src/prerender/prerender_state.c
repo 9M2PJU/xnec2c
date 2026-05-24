@@ -42,6 +42,7 @@ free_ff_pre_step(ff_pre_t *fp)
   free_ptr((void **)&fp->vertices);
   free_ptr((void **)&fp->theta_rgb);
   free_ptr((void **)&fp->phi_rgb);
+  free_ptr((void **)&fp->vertex_rgb);
 }
 
 /**

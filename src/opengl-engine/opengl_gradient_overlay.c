@@ -86,28 +86,23 @@ gradient_overlay_set_viewport(gradient_overlay_t *overlay, int width, int height
 /** gradient_overlay_upload_surface() - Upload pre-rendered surface to GL texture
  * @overlay: overlay instance
  * @surface: ARGB32 surface from gradient_cache
+ * @version: cache version for staleness detection; skips upload when unchanged
  *
- * Compares surface pointer and dimensions against last upload to detect
- * staleness.  Re-uploads only when the surface identity or size changes.
+ * Compares version against last upload to detect staleness.  Re-uploads
+ * only when the cache version has advanced since the last texture transfer.
  */
   void
 gradient_overlay_upload_surface(gradient_overlay_t *overlay,
-    cairo_surface_t *surface)
+    cairo_surface_t *surface, uint64_t version)
 {
   if( !overlay || !overlay->base || surface == NULL )
     return;
 
-  int w = cairo_image_surface_get_width(surface);
-  int h = cairo_image_surface_get_height(surface);
-
-  if( overlay->last_surface == surface &&
-      overlay->last_width == w && overlay->last_height == h )
+  if( overlay->last_version == version )
     return;
 
   cairo_gl_overlay_upload(overlay->base, surface);
-  overlay->last_surface = surface;
-  overlay->last_width = w;
-  overlay->last_height = h;
+  overlay->last_version = version;
 
 } /* gradient_overlay_upload_surface() */
 

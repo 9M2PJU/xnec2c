@@ -91,6 +91,6 @@ gboolean cairo_draw_nearfield(void *ctx,
     const nf_field_set_t *fields, int n_fields,
     double dr, double r_max);
 void     cairo_set_status(void *ctx, const char *msg);
-void     cairo_set_gradient(void *ctx, cairo_surface_t *surface);
+void     cairo_set_gradient(void *ctx, const gradient_result_t *result);
 
 #endif

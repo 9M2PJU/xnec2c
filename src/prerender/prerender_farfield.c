@@ -77,16 +77,13 @@ ff_presentation_recompute(int fstep)
   if( rad_pattern == NULL || total <= 0 )
     return;
 
-  pol = calc_data.pol_type;
-
   /* Input-snapshot cache gate: skip recomputation when inputs unchanged */
+  presentation_cache_key_t cur_key = presentation_cache_key_build(fstep);
   if( fp->vertices &&
-      fp->snap_gain_style == rc_config.gain_style &&
-      fp->snap_pol_type == pol &&
-      dl_feq(fp->snap_ant_temp_elevation, rc_config.ant_temp_elevation) &&
-      dl_feq(fp->snap_max_gain, rad_pattern[fstep].max_gain[pol]) &&
-      dl_feq(fp->snap_min_gain, rad_pattern[fstep].min_gain[pol]) )
+      presentation_cache_key_match(&fp->cache_key, &cur_key) )
     return;
+
+  pol = cur_key.pol_type;
 
   mreq = (size_t)total * sizeof(point_3d_t);
   mem_realloc((void **)&fp->vertices, mreq, __LOCATION__);
@@ -218,11 +215,7 @@ ff_presentation_recompute(int fstep)
   fp->generation++;
 
   /* Store input snapshot for cache gate */
-  fp->snap_gain_style = rc_config.gain_style;
-  fp->snap_pol_type = pol;
-  fp->snap_ant_temp_elevation = rc_config.ant_temp_elevation;
-  fp->snap_max_gain = rad_pattern[fstep].max_gain[pol];
-  fp->snap_min_gain = rad_pattern[fstep].min_gain[pol];
+  fp->cache_key = cur_key;
 }
 
 /*-----------------------------------------------------------------------*/

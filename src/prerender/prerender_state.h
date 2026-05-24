@@ -22,6 +22,7 @@
 
 #include "../common.h"
 #include "prerender_color.h"
+#include "presentation_cache_key.h"
 
 /*-----------------------------------------------------------------------
  * Shared geometry types
@@ -110,13 +111,8 @@ typedef struct
   rgb_f_t    *phi_rgb;        /* [geom_pre.n_phi_edges] */
   rgb_f_t    *vertex_rgb;     /* [fpat.nth * fpat.nph] per-vertex colors */
 
-  /* Input snapshot for cache gate (gradient_cache pattern).
-   * Early return when all snap fields match current authoritative state. */
-  int         snap_gain_style;
-  int         snap_pol_type;
-  double      snap_ant_temp_elevation;
-  double      snap_max_gain; /* Detects child-process data updates at same fstep */
-  double      snap_min_gain;
+  /* Input snapshot for cache gate (see presentation_cache_key_t) */
+  presentation_cache_key_t cache_key;
 } ff_pre_t;
 
 /* Near-field vector displacement from sample origin.

@@ -240,7 +240,7 @@ gl_draw_structure(void *ctx, float extent, const struct_draw_params_t *params)
 structure_scene_generate(gl_view_state_t *state)
 {
   state->content.status_message = NULL;
-  state->content.gradient = NULL;
+  state->content.gradient = (gradient_result_t){NULL, 0};
 
   opengl_structure_show_ctrl_notice(structure_gl_widget);
 
