@@ -77,6 +77,17 @@ ff_presentation_recompute(int fstep)
   if( rad_pattern == NULL || total <= 0 )
     return;
 
+  pol = calc_data.pol_type;
+
+  /* Input-snapshot cache gate: skip recomputation when inputs unchanged */
+  if( fp->vertices &&
+      fp->snap_gain_style == rc_config.gain_style &&
+      fp->snap_pol_type == pol &&
+      dl_feq(fp->snap_ant_temp_elevation, rc_config.ant_temp_elevation) &&
+      dl_feq(fp->snap_max_gain, rad_pattern[fstep].max_gain[pol]) &&
+      dl_feq(fp->snap_min_gain, rad_pattern[fstep].min_gain[pol]) )
+    return;
+
   mreq = (size_t)total * sizeof(point_3d_t);
   mem_realloc((void **)&fp->vertices, mreq, __LOCATION__);
 
@@ -92,7 +103,8 @@ ff_presentation_recompute(int fstep)
     mem_realloc((void **)&fp->phi_rgb, mreq, __LOCATION__);
   }
 
-  pol = calc_data.pol_type;
+  mreq = (size_t)total * sizeof(rgb_f_t);
+  mem_realloc((void **)&fp->vertex_rgb, mreq, __LOCATION__);
 
   /* Resolve noise temperatures from table */
   double t_sky = 0.0, t_earth = 0.0;
@@ -187,16 +199,28 @@ ff_presentation_recompute(int fstep)
   else
     fp->overlay_base_scale = 1.0f;
 
-  fp->generation++;
+  /* Per-vertex colors for triangle tessellation */
+  double r_range = r_max - r_min;
+  for( int i = 0; i < total; i++ )
+    fp->vertex_rgb[i] = color_from_value(
+        (fp->vertices[i].r - r_min) / r_range, 1.0);
 
   /* Edge colors from averaged vertex radii */
-  double r_range = r_max - r_min;
   if( fp->theta_rgb != NULL )
     color_edges(geom_pre.theta_topo, fp->theta_rgb, geom_pre.n_theta_edges,
         fp->vertices, r_min, r_range);
   if( fp->phi_rgb != NULL )
     color_edges(geom_pre.phi_topo, fp->phi_rgb, geom_pre.n_phi_edges,
         fp->vertices, r_min, r_range);
+
+  fp->generation++;
+
+  /* Store input snapshot for cache gate */
+  fp->snap_gain_style = rc_config.gain_style;
+  fp->snap_pol_type = pol;
+  fp->snap_ant_temp_elevation = rc_config.ant_temp_elevation;
+  fp->snap_max_gain = rad_pattern[fstep].max_gain[pol];
+  fp->snap_min_gain = rad_pattern[fstep].min_gain[pol];
 }
 
 /*-----------------------------------------------------------------------*/

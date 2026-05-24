@@ -36,11 +36,11 @@ int opengl_rdpattern_generate_nf_field_lines(
     double dr);
 
 /* Tessellate point_3d buffer into colored triangles.
- * Per-vertex color derived from normalized radius via color_from_value.
+ * Per-vertex color from precomputed vertex_rgb array.
  * Returns triangle count, or -1 on invalid input. */
 int opengl_rdpattern_generate_triangles(
     point_3d_t *points, int nth, int nph,
-    double r_min, double r_range);
+    const rgb_f_t *vertex_rgb);
 
 /* Return near-field line vertex buffer and count */
 lit_color_point_t* opengl_rdpattern_get_nf_lines(int *count);

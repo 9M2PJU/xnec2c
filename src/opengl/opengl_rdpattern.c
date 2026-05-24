@@ -188,10 +188,8 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
 
     if( need_tris )
     {
-      double r_min = (double)fp->r_min;
-      double r_range = (double)(fp->pattern_radius - fp->r_min);
       int tri_count = opengl_rdpattern_generate_triangles(
-          points_to_use, nth, nph, r_min, r_range);
+          points_to_use, nth, nph, fp->vertex_rgb);
 
       if( tri_count <= 0 )
         return FALSE;

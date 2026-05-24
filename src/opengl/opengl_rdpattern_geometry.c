@@ -261,21 +261,18 @@ opengl_rdpattern_get_lines(int *count)
  * @vi: vertex index within triangle (0, 1, or 2)
  * @pt: source point with position and radius
  * @normal: pre-computed smooth vertex normal
- * @r_min: minimum radius for color normalization
- * @r_range: radius range for color normalization
+ * @color: precomputed vertex color
  */
   static void
 fill_tri_vertex(
     lit_color_triangle_t *tri, int vi,
     point_3d_t *pt, point_f_3d_t *normal,
-    double r_min, double r_range)
+    const rgb_f_t *color)
 {
-  rgb_f_t c = color_from_value((pt->r - r_min) / r_range, 1.0);
-
   set_lit_vertex(&tri->cp[vi],
       (float)pt->x, (float)pt->y, (float)pt->z,
       normal->x, normal->y, normal->z,
-      c.r, c.g, c.b, 1.0f);
+      color->r, color->g, color->b, 1.0f);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -284,8 +281,7 @@ fill_tri_vertex(
  * @points: array of radiation pattern sample points
  * @nth: number of theta samples
  * @nph: number of phi samples
- * @r_min: minimum radius for color normalization
- * @r_range: radius range for color normalization
+ * @vertex_rgb: precomputed per-vertex colors [nth * nph]
  *
  * Per-vertex color derived from normalized radius via color_from_value.
  * Returns triangle count, or -1 on invalid input.
@@ -293,7 +289,7 @@ fill_tri_vertex(
   int
 opengl_rdpattern_generate_triangles(
     point_3d_t *points, int nth, int nph,
-    double r_min, double r_range)
+    const rgb_f_t *vertex_rgb)
 {
   int nph_idx, nth_idx, tri_idx, vi;
   int p0, p1, p2, p3;
@@ -301,7 +297,7 @@ opengl_rdpattern_generate_triangles(
   size_t mreq;
   point_f_3d_t *vertex_normals;
 
-  if( !points || nth < 2 || nph < 1 )
+  if( !points || !vertex_rgb || nth < 2 || nph < 1 )
     return( -1 );
 
   /* Calculate triangle count: 2 per grid cell */
@@ -399,20 +395,20 @@ opengl_rdpattern_generate_triangles(
 
       /* Triangle A: p0 -> p1 -> p2 */
       fill_tri_vertex(&rdpat_triangles[tri_idx], 0,
-          &points[p0], &vertex_normals[p0], r_min, r_range);
+          &points[p0], &vertex_normals[p0], &vertex_rgb[p0]);
       fill_tri_vertex(&rdpat_triangles[tri_idx], 1,
-          &points[p1], &vertex_normals[p1], r_min, r_range);
+          &points[p1], &vertex_normals[p1], &vertex_rgb[p1]);
       fill_tri_vertex(&rdpat_triangles[tri_idx], 2,
-          &points[p2], &vertex_normals[p2], r_min, r_range);
+          &points[p2], &vertex_normals[p2], &vertex_rgb[p2]);
       tri_idx++;
 
       /* Triangle B: p0 -> p2 -> p3 */
       fill_tri_vertex(&rdpat_triangles[tri_idx], 0,
-          &points[p0], &vertex_normals[p0], r_min, r_range);
+          &points[p0], &vertex_normals[p0], &vertex_rgb[p0]);
       fill_tri_vertex(&rdpat_triangles[tri_idx], 1,
-          &points[p2], &vertex_normals[p2], r_min, r_range);
+          &points[p2], &vertex_normals[p2], &vertex_rgb[p2]);
       fill_tri_vertex(&rdpat_triangles[tri_idx], 2,
-          &points[p3], &vertex_normals[p3], r_min, r_range);
+          &points[p3], &vertex_normals[p3], &vertex_rgb[p3]);
       tri_idx++;
 
     } /* for( nth_idx < nth - 1 ) */

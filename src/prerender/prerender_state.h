@@ -108,6 +108,15 @@ typedef struct
   point_3d_t *vertices;       /* [fpat.nth * fpat.nph] */
   rgb_f_t    *theta_rgb;      /* [geom_pre.n_theta_edges] */
   rgb_f_t    *phi_rgb;        /* [geom_pre.n_phi_edges] */
+  rgb_f_t    *vertex_rgb;     /* [fpat.nth * fpat.nph] per-vertex colors */
+
+  /* Input snapshot for cache gate (gradient_cache pattern).
+   * Early return when all snap fields match current authoritative state. */
+  int         snap_gain_style;
+  int         snap_pol_type;
+  double      snap_ant_temp_elevation;
+  double      snap_max_gain; /* Detects child-process data updates at same fstep */
+  double      snap_min_gain;
 } ff_pre_t;
 
 /* Near-field vector displacement from sample origin.
