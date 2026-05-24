@@ -669,6 +669,12 @@ freq_step_update_ui( int new_step, gboolean force )
 
   g_rec_mutex_lock(&freq_data_lock);
 
+  if( save.freq == NULL )
+  {
+    g_rec_mutex_unlock(&freq_data_lock);
+    return;
+  }
+
   calc_data.freq_step = new_step;
   calc_data.freq_mhz  = save.freq[new_step];
   SetFlag( DRAW_NEW_RDPAT );

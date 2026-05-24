@@ -498,19 +498,7 @@ Set_Polarization( int pol )
   Show_Viewer_Gain( main_window_builder, "main_gain_entry", structure_view );
   g_rec_mutex_unlock(&freq_data_lock);
 
-  /* Enable redraw of rad pattern */
-  SetFlag( DRAW_NEW_RDPAT );
-
-  /* Trigger a redraw of drawingareas */
-  if( isFlagSet(DRAW_ENABLED) )
-  {
-    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  }
-
-  if( isFlagSet(PLOT_ENABLED) )
-  {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
-  }
+  freq_step_update_ui(calc_data.freq_step, TRUE);
 
 } /* Set_Polarization() */
 
@@ -613,14 +601,7 @@ Set_Gain_Style( int gs )
 
   Set_Window_Labels();
 
-  /* Trigger a redraw of drawingarea */
-  if( isFlagSet(DRAW_ENABLED) )
-  {
-    /* Enable redraw of rad pattern */
-    SetFlag( DRAW_NEW_RDPAT );
-
-    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  }
+  freq_step_update_ui(calc_data.freq_step, TRUE);
 
 } /* Set_Gain_Style() */
 
