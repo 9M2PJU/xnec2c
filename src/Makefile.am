@@ -38,7 +38,14 @@ xnec2c_SOURCES = \
     somnec.c        somnec.h \
     sy_expr.c       sy_expr.h \
     sy_overrides.c  sy_overrides.h \
-    opengl/opengl_settings.c opengl/opengl_settings.h \
+    settings/render_settings.c settings/render_settings.h \
+    settings/render_settings_common.c settings/render_settings_common.h \
+    settings/render_settings_dispatch.c \
+    opengl/opengl_state.c opengl/opengl_state.h \
+    settings/render_settings_internal.h \
+    settings/render_settings_general.c \
+    settings/render_settings_opengl.c \
+    settings/render_settings_cairo.c \
     expr_edit.c     expr_edit.h \
     opt_ui.c        opt_ui.h \
     opt_ui_internal.h \
@@ -223,8 +230,10 @@ include ./$(XNEC2C_DEPDIR)/xnec2c-resources.Pc
 
 xnec2c_SOURCES += xnec2c-resources.c
 CLEANFILES     += xnec2c-resources.c
-xnec2c-resources.c: $(top_srcdir)/resources/xnec2c.gresource.xml $(top_srcdir)/resources/xnec2c.glade $(top_srcdir)/resources/opengl_settings.glade
-	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/resources --dependency-file=./$(XNEC2C_DEPDIR)/xnec2c-resources.Pc --target=xnec2c-resources.c --generate-source $(top_srcdir)/resources/xnec2c.gresource.xml
+# --generate-phony-targets: emit phony Make targets for each resource file so
+# deleting a resource file triggers a rebuild instead of a stale-dep error.
+xnec2c-resources.c: $(top_srcdir)/resources/xnec2c.gresource.xml $(top_srcdir)/resources/xnec2c.glade $(top_srcdir)/resources/settings/render_settings.glade $(top_srcdir)/resources/settings/opengl_settings.glade $(top_srcdir)/resources/settings/cairo_settings.glade
+	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/resources --dependency-file=./$(XNEC2C_DEPDIR)/xnec2c-resources.Pc --generate-phony-targets --target=xnec2c-resources.c --generate-source $(top_srcdir)/resources/xnec2c.gresource.xml
 
 # Do not dist the generated source file so that building from tarball
 # will use glib-compile-resources together with compatible libraries.

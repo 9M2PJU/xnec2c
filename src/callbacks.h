@@ -36,6 +36,12 @@ void opengl_common_projection_sync(void);
  * SIGNAL_BLOCK/SIGNAL_UNBLOCK in programmatic update sites. */
 void on_freq_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 
+#ifdef HAVE_OPENGL
+/* Ortho toolbar projection sync (defined in callbacks.c) */
+void sync_ortho_toolbar_button(void);
+void on_ortho_toggled(GtkToggleButton *button, gpointer user_data);
+#endif /* HAVE_OPENGL */
+
 /* ISO C forbids casting a function pointer to gpointer (void *) directly.
  * A union reinterpret is defined behavior under C99/C11 and avoids that cast.
  * g_signal_handlers_block_by_func is bypassed in favor of the underlying

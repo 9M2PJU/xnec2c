@@ -1284,16 +1284,18 @@ void opengl_set_renderer(gboolean enable);
 void opengl_set_constrained_rotation(gboolean constrained);
 void on_flow_direction_activate(GtkMenuItem *menuitem, gpointer user_data);
 
-/* rc_config.c — shared OpenGL defaults */
-void opengl_config_set_defaults(void);
+/* rc_config.c — rendering tab defaults for init-time use */
+void render_config_set_defaults(void);
 
-/* opengl_settings.c — OpenGL Settings window */
-void on_opengl_settings_show_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_opengl_settings_changed(GtkWidget *widget, gpointer user_data);
-void on_opengl_settings_close_clicked(GtkButton *button, gpointer user_data);
-void on_opengl_settings_reset_clicked(GtkButton *button, gpointer user_data);
-gboolean on_opengl_settings_window_delete_event(GtkWidget *widget, GdkEvent *event, gpointer user_data);
-void on_opengl_settings_window_destroy(GtkWidget *widget, gpointer user_data);
+/* render_settings.c — Rendering Settings window */
+void on_render_settings_show_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_render_settings_changed(GtkWidget *widget, gpointer user_data);
+void on_render_settings_close_clicked(GtkButton *button, gpointer user_data);
+gboolean on_render_settings_window_delete_event(GtkWidget *widget, GdkEvent *event, gpointer user_data);
+void on_render_settings_window_destroy(GtkWidget *widget, gpointer user_data);
+void on_general_reset_clicked(GtkButton *button, gpointer user_data);
+void on_opengl_tab_reset_clicked(GtkButton *button, gpointer user_data);
+void on_cairo_tab_reset_clicked(GtkButton *button, gpointer user_data);
 
 void on_rdpattern_rotate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 void on_rdpattern_incline_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);

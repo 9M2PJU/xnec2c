@@ -27,7 +27,8 @@
 #include <pthread.h>
 
 #include "opengl/opengl_structure.h"
-#include "opengl/opengl_settings.h"
+#include "opengl/opengl_state.h"
+#include "settings/render_settings.h"
 #ifdef HAVE_OPENGL
 #include "opengl-engine/opengl_view.h"
 #include "opengl/opengl_rdpattern.h"
@@ -708,7 +709,7 @@ on_main_rdpattern_activate(
     opengl_common_projection_sync();
 
     /* Sync ortho toolbar button now that rdpattern window builder is ready */
-    opengl_settings_sync_from_config();
+    render_settings_sync_from_config();
 #endif
 
   } /* if( gtk_check_menu_item_get_active(...) ) */
@@ -5801,4 +5802,78 @@ on_escape_key_press_event(
   }
   else return( FALSE );
 }
+
+/*------------------------------------------------------------------------*/
+
+#ifdef HAVE_OPENGL
+
+/* Ortho toolbar button entries: builder pointer-to-pointer, button id, image id */
+static const struct
+{
+  GtkBuilder **builder;
+  const gchar  *btn_id;
+  const gchar  *img_id;
+} ortho_toolbars[] = {
+  { &main_window_builder,      "main_ortho_button",      "main_ortho_image"      },
+  { &rdpattern_window_builder,  "rdpattern_ortho_button", "rdpattern_ortho_image" },
+};
+
+/*------------------------------------------------------------------------*/
+
+/**
+ * sync_ortho_toolbar_button - Set ortho toggle button state and image in all toolbars
+ *
+ * Reads rc_config.opengl_orthographic and updates the toggle button active
+ * state and icon in both the main window and rdpattern window toolbars.
+ * Blocks on_ortho_toggled during programmatic writes to prevent re-entrancy.
+ */
+void
+sync_ortho_toolbar_button(void)
+{
+  const gchar *icon = rc_config.opengl_orthographic
+      ? "/ortho_cube.svg" : "/persp_cube.svg";
+  int i;
+
+  for( i = 0; i < (int)(sizeof(ortho_toolbars) / sizeof(ortho_toolbars[0])); i++ )
+  {
+    GtkWidget *btn, *img;
+
+    if( *ortho_toolbars[i].builder == NULL )
+      continue;
+
+    btn = GTK_WIDGET(gtk_builder_get_object(*ortho_toolbars[i].builder, ortho_toolbars[i].btn_id));
+    img = GTK_WIDGET(gtk_builder_get_object(*ortho_toolbars[i].builder, ortho_toolbars[i].img_id));
+    if( btn != NULL && img != NULL )
+    {
+      SIGNAL_BLOCK(btn, on_ortho_toggled);
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn),
+          rc_config.opengl_orthographic);
+      SIGNAL_UNBLOCK(btn, on_ortho_toggled);
+      gtk_image_set_from_resource(GTK_IMAGE(img), icon);
+    }
+  }
+}
+
+/*------------------------------------------------------------------------*/
+
+/**
+ * on_ortho_toggled - Toolbar toggle handler for orthographic projection
+ *
+ * Shared by both the main window and rdpattern window toolbar buttons.
+ * Writes rc_config.opengl_orthographic, syncs all toolbar buttons and the
+ * settings dialog checkbox, and queues redraws.
+ */
+void
+on_ortho_toggled(GtkToggleButton *button, gpointer user_data)
+{
+  (void)user_data;
+
+  rc_config.opengl_orthographic = gtk_toggle_button_get_active(button) ? 1 : 0;
+  sync_ortho_toolbar_button();
+  render_settings_sync_from_config();
+  opengl_structure_queue_draw();
+  opengl_rdpattern_queue_draw();
+}
+
+#endif /* HAVE_OPENGL */
 

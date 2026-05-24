@@ -3,7 +3,9 @@
   <gresource prefix="/">
     <file>xnec2c.glade</file>
     <file>sy_overrides.glade</file>
-    <file>opengl_settings.glade</file>
+    <file>settings/render_settings.glade</file>
+    <file>settings/opengl_settings.glade</file>
+    <file>settings/cairo_settings.glade</file>
     <file>sy_overrides.css</file>
     <file>xnec2c.svg</file>
     <file>link.svg</file>

@@ -11209,9 +11209,9 @@ Save NEC2 Editor data first?
                           <object class="GtkMenuItem" id="main_opengl_settings">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">OpenGL _Settings...</property>
+                            <property name="label" translatable="yes">Rendering _Settings...</property>
                             <property name="use-underline">True</property>
-                            <signal name="activate" handler="on_opengl_settings_show_activate" swapped="no"/>
+                            <signal name="activate" handler="on_render_settings_show_activate" swapped="no"/>
                           </object>
                         </child>
                       </object>

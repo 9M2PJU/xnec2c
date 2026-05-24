@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Container window for the rendering settings dialog.
+     Loaded by render_settings_init() in render_settings.c.
+     The GtkNotebook starts empty; general_tab_content (defined below),
+     opengl_tab_content, and cairo_tab_content are appended
+     programmatically after all three glade files are loaded. -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+
+  <!-- General tab content: renderer and view toggles shared by all backends -->
+  <object class="GtkBox" id="general_tab_content">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="orientation">vertical</property>
+    <property name="spacing">6</property>
+    <property name="margin-start">8</property>
+    <property name="margin-end">8</property>
+    <property name="margin-top">8</property>
+    <property name="margin-bottom">8</property>
+
+    <child>
+      <object class="GtkCheckButton" id="chk_opengl_renderer">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="label">Use OpenGL Renderer</property>
+        <property name="tooltip-text">Enable OpenGL hardware rendering; uncheck to use Cairo software rendering</property>
+        <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkCheckButton" id="chk_constrained_rotation">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="label">Constrained Rotation</property>
+        <property name="tooltip-text">Constrain view drag rotation to horizontal and vertical axes</property>
+        <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkCheckButton" id="chk_orthographic">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="label">Orthographic Projection</property>
+        <property name="tooltip-text">Use orthographic projection; disables perspective foreshortening.
+Enable for precise angular measurements or flat pattern inspection.</property>
+        <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+      </object>
+    </child>
+
+    <!-- Per-tab Reset button -->
+    <child>
+      <object class="GtkButtonBox" id="general_tab_buttonbox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="layout-style">end</property>
+        <property name="margin-top">8</property>
+        <child>
+          <object class="GtkButton" id="btn_general_reset">
+            <property name="label" translatable="yes">Reset to _Defaults</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="use-underline">True</property>
+            <property name="tooltip-text">Reset orthographic projection to default</property>
+            <signal name="clicked" handler="on_general_reset_clicked" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+
+  </object>
+
+  <object class="GtkWindow" id="render_settings_window">
+    <property name="visible">False</property>
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Rendering Settings</property>
+    <property name="resizable">True</property>
+    <property name="window-position">center</property>
+    <property name="type-hint">dialog</property>
+    <signal name="delete-event" handler="on_render_settings_window_delete_event" swapped="no"/>
+    <signal name="destroy" handler="on_render_settings_window_destroy" swapped="no"/>
+
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">0</property>
+
+        <child>
+          <object class="GtkNotebook" id="render_settings_notebook">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="show-tabs">True</property>
+            <property name="show-border">True</property>
+            <property name="tab-pos">left</property>
+            <property name="margin-start">8</property>
+            <property name="margin-end">8</property>
+            <property name="margin-top">8</property>
+            <property name="margin-bottom">8</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+
+        <child>
+          <object class="GtkButtonBox" id="footer_buttonbox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="margin-start">8</property>
+            <property name="margin-end">8</property>
+            <property name="margin-bottom">8</property>
+            <property name="spacing">6</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="btn_close">
+                <property name="label" translatable="yes">_Close</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-underline">True</property>
+                <signal name="clicked" handler="on_render_settings_close_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+
+      </object>
+    </child>
+  </object>
+
+</interface>

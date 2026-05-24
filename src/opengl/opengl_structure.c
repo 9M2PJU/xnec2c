@@ -24,7 +24,8 @@
 #ifdef HAVE_OPENGL
 
 #include "opengl_structure_geometry.h"
-#include "opengl_settings.h"
+#include "opengl_state.h"
+#include "../settings/render_settings.h"
 #include "../opengl-engine/opengl_view.h"
 #include "../opengl-engine/opengl_view_notice.h"
 #include "../render/render_dispatch.h"
@@ -152,7 +153,7 @@ opengl_structure_on_ctrl_scroll(
   }
 
   opengl_structure_set_radius_scale(new_scale);
-  opengl_settings_sync_from_config();
+  render_settings_sync_from_config();
 
   /* Queue redraw on the event source widget */
   xnec2_widget_queue_draw(widget, TRUE);

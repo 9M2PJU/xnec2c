@@ -19,6 +19,7 @@
 
 #include <ctype.h>
 #include <sys/stat.h>
+#include <cairo.h>
 #include "shared.h"
 #include "rc_config.h"
 #include "mathlib.h"
@@ -26,7 +27,8 @@
 
 #include "opengl/opengl_structure.h"
 #include "opengl/opengl_msaa.h"
-#include "opengl/opengl_settings.h"
+#include "settings/render_settings.h"
+#include "settings/render_settings_common.h"
 
 
 /* Add configuration options here. To add new variables:
@@ -575,40 +577,17 @@ int Get_Window_Geometry(
  * and save a new file if it is missing using the defaults defined below.
  */
 
-/** opengl_config_set_defaults - Set OpenGL-specific rc_config fields to defaults
+/** render_config_set_defaults - Reset all rendering tab fields via dispatch
  *
- * Single point of truth for all OpenGL brightness, transparency,
- * MSAA, draw style, cylinder scale, and on-click defaults.
- * Called by Create_Default_Config() and opengl_settings_reset_defaults().
+ * Resets GENERAL, OPENGL, and CAIRO tabs to compiled-in defaults.
+ * Called by Create_Default_Config() at init time (no post_apply hooks).
  */
   void
-opengl_config_set_defaults( void )
+render_config_set_defaults( void )
 {
-  /* Per-type brightness defaults (0.0=black, 1.0=full) */
-  rc_config.brightness_segments      = 0.47f;
-  rc_config.brightness_patches       = 0.47f;
-  rc_config.brightness_rdpat_surface = 0.47f;
-  rc_config.brightness_rdpat_wire    = 1.0f;
-  rc_config.brightness_nearfield     = 1.0f;
-  rc_config.brightness_ground_plane  = 1.0f;
-  rc_config.brightness_axes          = 1.0f;
-
-  /* Per-type transparency defaults (0.0=opaque, 1.0=fully transparent) */
-  rc_config.transparency_segments      = 0.5f;
-  rc_config.transparency_patches       = 0.5f;
-  rc_config.transparency_rdpat_surface = 0.5f;
-  rc_config.transparency_rdpat_wire    = 0.5f;
-  rc_config.transparency_nearfield     = 0.0f;
-  rc_config.transparency_ground_plane  = 0.5f;
-  rc_config.transparency_axes          = 0.0f;
-
-  /* Toggle and enum defaults */
-  rc_config.opengl_transparent_on_click = 1;
-  rc_config.opengl_orthographic = 1;
-  rc_config.opengl_cylinder_radius_scale = 1.0;
-  rc_config.rdpattern_overlay_scale_adj = 1.0;
-  rc_config.opengl_msaa_samples = MSAA_4X;
-  rc_config.rdpattern_draw_style = RDPAT_STYLE_BOTH;
+  config_reset_tab(SETTINGS_TAB_GENERAL);
+  config_reset_tab(SETTINGS_TAB_OPENGL);
+  config_reset_tab(SETTINGS_TAB_CAIRO);
 }
 
   gboolean
@@ -683,7 +662,7 @@ Create_Default_Config( void )
 
   rc_config.view_drag_constrained = 1;
   rc_config.current_flow_visualization_mode = FLOW_DIR_REFERENCE_PHASE;
-  opengl_config_set_defaults();
+  render_config_set_defaults();
 
   /* Common projection default on, overlay structure default off */
   rc_config.main_common_projection = 1;
@@ -888,8 +867,8 @@ Restore_GUI_State( void )
     }
   }
 
-  /* Sync OpenGL settings window (guards against NULL builder internally) */
-  opengl_settings_sync_from_config();
+  /* Sync render settings dialog widgets from rc_config */
+  render_settings_sync_from_config();
 #endif
 
   /* Set the "Confirm Quit" menu item */

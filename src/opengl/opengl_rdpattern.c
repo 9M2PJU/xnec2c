@@ -19,7 +19,8 @@
 
 #include "opengl_rdpattern.h"
 #include "opengl_rdpattern_geometry.h"
-#include "opengl_settings.h"
+#include "../settings/render_settings.h"
+#include "opengl_state.h"
 #include "opengl_structure.h"
 #include "opengl_structure_geometry.h"
 #include "../shared.h"
