@@ -2204,7 +2204,6 @@ on_rdpattern_overlay_structure_activate(
     ClearFlag( OVERLAY_STRUCT );
 
   xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
 }
 
 

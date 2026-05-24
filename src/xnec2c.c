@@ -713,7 +713,6 @@ freq_step_update_ui( int new_step, gboolean force )
   if( isFlagSet(DRAW_ENABLED) )
   {
     xnec2_widget_queue_draw( rdpattern_drawingarea, force );
-    xnec2_widget_queue_draw( rdpattern_gl_area, force );
   }
 
   opt_ui_update_values();

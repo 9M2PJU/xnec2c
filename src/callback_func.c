@@ -584,10 +584,7 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
       xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
     if( isFlagSet(OVERLAY_STRUCT) )
-    {
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-      xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
-    }
   }
   else
   {
@@ -605,10 +602,7 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
       Free_Crnt_Buffs();
     }
     if( isFlagSet(OVERLAY_STRUCT) )
-    {
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-      xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
-    }
   }
 
 } /* Main_Currents_Togglebutton_Toggled() */
@@ -640,10 +634,7 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
       xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
     if( isFlagSet(OVERLAY_STRUCT) )
-    {
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-      xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
-    }
   }
   else
   {
@@ -664,10 +655,7 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
     }
 
     if( isFlagSet(OVERLAY_STRUCT) )
-    {
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-      xnec2_widget_queue_draw( rdpattern_gl_area, TRUE );
-    }
   }
 
 } /* Main_Charges_Togglebutton_Toggled() */
