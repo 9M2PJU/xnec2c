@@ -21,99 +21,59 @@
  * cairo_axes: XYZ axis drawing for Cairo rendering.
  */
 #include "cairo_draw.h"
+#include "cairo_scenebuffer.h"
 #include "../shared.h"
 
 /*-----------------------------------------------------------------------*/
 
-/**
- * Project_XYZ_Axes() - Project xyz axes to screen coordinates
- * @cr:      Cairo context (for Pango layout)
- * @v:       view for projection
- * @segment: output array of 3 Segment_t (x, y, z axes)
- */
-  static void
-Project_XYZ_Axes(cairo_t *cr, view_t *v, float extent, Segment_t *segment)
+/* Axis direction vectors and labels */
+static const struct
 {
-  static const struct
-  {
-    double ox, oy, oz;
-    const gchar *label;
-  } axis_table[3] =
-  {
-    { 1.0, 0.0, 0.0, "x"  },
-    { 0.0, 1.0, 0.0, "y"  },
-    { 0.0, 0.0, 1.0, " z" }
-  };
-
-  double scale = view_projection_scale(v, extent, v->zoom);
-  double xc    = view_x_center(v);
-  double yc    = view_y_center(v);
-  double px    = (double)v->pan_offset[0];
-  double py    = (double)v->pan_offset[1];
-  PangoLayout *layout;
-  int idx;
-
-  cairo_set_source_rgb(cr, WHITE);
-
-  /* Use the drawingarea matching the view type for font metrics */
-  GtkWidget *da = (v->type == VIEW_RDPATTERN)
-    ? rdpattern_drawingarea : structure_drawingarea;
-  layout = gtk_widget_create_pango_layout(da, NULL);
-
-  for( idx = 0; idx < 3; idx++ )
-  {
-    Segment_t *segm = &segment[idx];
-    double x, y;
-
-    /* Axis endpoints at content extent distance along each direction */
-    Project_on_Screen(v,
-        axis_table[idx].ox * (double)extent,
-        axis_table[idx].oy * (double)extent,
-        axis_table[idx].oz * (double)extent,
-        &x, &y);
-
-    segm->x1 = (gint)(xc + px);
-    segm->y1 = v->height - (gint)(yc + py);
-    segm->x2 = (gint)(xc + px + x * scale);
-    segm->y2 = v->height - (gint)(yc + py + y * scale);
-
-    pango_layout_set_text(layout, axis_table[idx].label, -1);
-    cairo_move_to(cr, (double)segm->x2, (double)segm->y2);
-    pango_cairo_show_layout(cr, layout);
-  }
-
-  g_object_unref(layout);
-}
-
-/*-----------------------------------------------------------------------*/
-
-/**
- * Draw_XYZ_Axes() - Draw xyz axes to screen
- * @cr: Cairo context
- * @v:  view for projection parameters
- */
-  void
-Draw_XYZ_Axes(cairo_t *cr, view_t *v, float extent)
+  double ox, oy, oz;
+  const char *label;
+} axis_table[3] =
 {
-  static Segment_t seg[3];
-
-  Project_XYZ_Axes(cr, v, extent, seg);
-  Cairo_Draw_Segments(cr, seg, 3);
-}
-
-/*-----------------------------------------------------------------------*/
+  { 1.0, 0.0, 0.0, "x"  },
+  { 0.0, 1.0, 0.0, "y"  },
+  { 0.0, 0.0, 1.0, "z" }
+};
 
 /**
- * cairo_draw_axes() - render_ops_t draw_axes vtable implementation
+ * cairo_draw_axes() - Deposit axis segments and defer label rendering
  * @ctx:    cairo_render_ctx_t cast to void*
  * @extent: half-extent of primary content for axis length
+ *
+ * Projects each axis from origin to tip via Set_Gdk_Segment, deposits
+ * the line into the scenebuffer with real camera-axis depth, and stores
+ * label positions on the render context for post-flush Pango rendering.
  */
   void
 cairo_draw_axes(void *ctx, float extent)
 {
   cairo_render_ctx_t *cc = (cairo_render_ctx_t *)ctx;
+  view_t *v = cc->view;
+  double scale = view_projection_scale(v, extent, v->zoom);
+  Segment_t seg;
+  int idx;
 
-  Draw_XYZ_Axes(cc->cr, cc->view, extent);
+  for( idx = 0; idx < 3; idx++ )
+  {
+    Set_Gdk_Segment(&seg, v, scale,
+        0.0, 0.0, 0.0,
+        axis_table[idx].ox * (double)extent,
+        axis_table[idx].oy * (double)extent,
+        axis_table[idx].oz * (double)extent,
+        &seg.z_mid);
+
+    seg_set_color(&seg, COLOR_WHITE);
+    seg.width = 1.0f;
+    scenebuffer_add(cc->sb, &seg);
+
+    cc->axis_labels[idx].x    = seg.x2;
+    cc->axis_labels[idx].y    = seg.y2;
+    cc->axis_labels[idx].text = axis_table[idx].label;
+  }
+  cc->n_axis_labels = AXIS_COUNT;
 }
 
 /*-----------------------------------------------------------------------*/

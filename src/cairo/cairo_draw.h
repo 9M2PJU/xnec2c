@@ -60,7 +60,6 @@ typedef struct
  *----------------------------------------------------------------------*/
 
 void Cairo_Draw_Polygon(cairo_t *cr, GdkPoint *points, int npoints);
-void Cairo_Draw_Segments(cairo_t *cr, Segment_t *segm, int nseg);
 void Cairo_Draw_Line(cairo_t *cr, int x1, int y1, int x2, int y2);
 void Cairo_Draw_Lines(cairo_t *cr, GdkPoint *points, int npoints);
 
@@ -77,7 +76,6 @@ void Process_Surface_Patches(view_t *v, double scale);
  * Axes (cairo_axes.c)
  *----------------------------------------------------------------------*/
 
-void Draw_XYZ_Axes(cairo_t *cr, view_t *v, float extent);
 void cairo_draw_axes(void *ctx, float extent);
 
 /*-----------------------------------------------------------------------

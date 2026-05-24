@@ -137,6 +137,13 @@ view_set_spin_handlers(view_t *v, GCallback rotate_cb, GCallback incline_cb)
 
 /**
  * Project_on_Screen() - Project (x,y,z) via the current rotation matrix
+ * @v:  view containing the rotation matrix
+ * @x:  world-space X coordinate
+ * @y:  world-space Y coordinate
+ * @z:  world-space Z coordinate
+ * @xs: output screen-space X coordinate
+ * @ys: output screen-space Y coordinate
+ * @zs: non-NULL output; receives camera-axis depth
  *
  * Reads rows 0 and 1 of view_R(v).  The canonical rotation matrix
  * produced by Build_View_Rotation_Matrix() places the screen-horizontal
@@ -146,40 +153,55 @@ view_set_spin_handlers(view_t *v, GCallback rotate_cb, GCallback incline_cb)
   void
 Project_on_Screen(view_t *v,
                   double x, double y, double z,
-                  double *xs, double *ys)
+                  double *xs, double *ys,
+                  float *zs)
 {
   float (*R)[4] = view_R(v);
 
   *xs = x * (double)R[0][0] + y * (double)R[1][0] + z * (double)R[2][0];
   *ys = x * (double)R[0][1] + y * (double)R[1][1] + z * (double)R[2][1];
+  *zs = (float)(x * (double)R[0][2] + y * (double)R[1][2] + z * (double)R[2][2]);
 
 } /* Project_on_Screen() */
 
 /**
  * Set_Gdk_Segment() - Project a line in xyz frame to screen pixel segment
+ * @segm:      output screen-space segment
+ * @v:         view for projection parameters
+ * @scale:     world-to-pixel scale factor
+ * @x1..z1:   first endpoint in world space
+ * @x2..z2:   second endpoint in world space
+ * @z_mid_out: output midpoint camera-axis depth (required)
  *
  * Applies caller-provided scale, view_x_center(), view_y_center() and the
- * pan offset to the two projected endpoints.  Y axis is flipped
- * because Cairo uses top-down coordinates.
+ * pan offset to the two projected endpoints.  Y axis is flipped because
+ * Cairo uses top-down coordinates.  Also computes the camera-axis
+ * (column 2 of R) midpoint depth for depth sorting.
  */
   void
 Set_Gdk_Segment(Segment_t *segm, view_t *v, double scale,
                 double x1, double y1, double z1,
-                double x2, double y2, double z2)
+                double x2, double y2, double z2,
+                float *z_mid_out)
 {
   double x, y;
   double xc    = view_x_center(v);
   double yc    = view_y_center(v);
   double px    = (double)v->pan_offset[0];
   double py    = (double)v->pan_offset[1];
+  float zp1, zp2;
 
-  Project_on_Screen(v, x1, y1, z1, &x, &y);
+  Project_on_Screen(v, x1, y1, z1, &x, &y, &zp1);
   segm->x1 = (gint)(xc + px + x * scale);
   segm->y1 = v->height - (gint)(yc + py + y * scale);
 
-  Project_on_Screen(v, x2, y2, z2, &x, &y);
+  Project_on_Screen(v, x2, y2, z2, &x, &y, &zp2);
   segm->x2 = (gint)(xc + px + x * scale);
   segm->y2 = v->height - (gint)(yc + py + y * scale);
+
+  /* Scale-normalize depth so segments from different coordinate frames
+   * (antenna-meters vs gain-pattern units) sort correctly together. */
+  *z_mid_out = 0.5f * (zp1 + zp2) * (float)scale;
 
 } /* Set_Gdk_Segment() */
 

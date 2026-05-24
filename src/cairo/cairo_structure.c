@@ -25,11 +25,36 @@
  * dispatch decides currents vs charges vs geometry mode.
  */
 #include "cairo_draw.h"
+#include "cairo_scenebuffer.h"
 #include "../shared.h"
 #include "../prerender/prerender_patch_arrow.h"
 #include "../prerender/prerender_state.h"
 #include "../prerender/prerender_color.h"
 #include "../rdpattern_ui.h"
+
+/**
+ * patch_z_mid() - Average z_mid across four patch-corner segments
+ * @segm: segment array
+ * @base: index of first corner segment (stride of 4)
+ */
+static inline float
+patch_z_mid(const Segment_t *segm, int base)
+{
+  return 0.25f * (segm[base].z_mid   + segm[base+1].z_mid
+                + segm[base+2].z_mid + segm[base+3].z_mid);
+}
+
+/**
+ * seg_pair_z_mid() - Midpoint depth of two segments
+ * @segm: segment array
+ * @i1:   first segment index
+ * @i2:   second segment index
+ */
+static inline float
+seg_pair_z_mid(const Segment_t *segm, int i1, int i2)
+{
+  return 0.5f * (segm[i1].z_mid + segm[i2].z_mid);
+}
 
 /* Cairo-local world-space arrow segment (3D endpoints, one edge per arrow line) */
 typedef struct
@@ -37,6 +62,7 @@ typedef struct
   double x1, y1, z1;
   double x2, y2, z2;
 } arrow_seg_3d_t;
+
 
 /** patch_arrow_to_world() - Rotate arrow template and map to world coordinates
  * @idx:   patch index (0-based into data.m)
@@ -88,7 +114,6 @@ patch_arrow_to_world(int idx, const float fd[4], float phase,
 
 /**
  * draw_wire_segments() - Draw all wire segments with dispatch-selected colors
- * @cr:     Cairo context
  * @v:      view for segment coordinates
  * @segm:   projected segment array [nseg]
  * @nseg:   number of segments
@@ -98,18 +123,16 @@ patch_arrow_to_world(int idx, const float fd[4], float phase,
  * seg_rgb encodes type color (blue/yellow/red) in geometry mode.
  */
   static void
-draw_wire_segments(cairo_t *cr, view_t *v, Segment_t *segm, gint nseg,
+draw_wire_segments(cairo_scenebuffer_t *sb, view_t *v, Segment_t *segm, gint nseg,
     const struct_draw_params_t *params)
 {
-  if( !nseg || isFlagSet(INPUT_PENDING) )
+  if( !nseg )
     return;
 
   if( params->wire_widths == NULL )
     BUG("draw_wire_segments: wire_widths is NULL\n");
 
   int idx;
-
-  cairo_set_line_width(cr, 2.0);
 
   /* Draw networks */
   for( idx = 0; idx < netcx.nonet; idx++ )
@@ -121,66 +144,78 @@ draw_wire_segments(cairo_t *cr, view_t *v, Segment_t *segm, gint nseg,
 
     switch( netcx.ntyp[idx] )
     {
-      case 1: /* Two-port network */
+      case 1: /* Two-port network: outline polygon + connecting lines */
         {
-          GdkPoint points[4];
+          int xs[4], ys[4];
+          float zn_mid = seg_pair_z_mid(segm, i1, i2);
 
-          points[0].x = segm[i1].x1 + (segm[i2].x1 - segm[i1].x1) / 3;
-          points[0].y = segm[i1].y1 + (segm[i2].y1 - segm[i1].y1) / 3;
-          points[1].x = segm[i2].x1 + (segm[i1].x1 - segm[i2].x1) / 3;
-          points[1].y = segm[i2].y1 + (segm[i1].y1 - segm[i2].y1) / 3;
-          points[2].x = segm[i2].x2 + (segm[i1].x2 - segm[i2].x2) / 3;
-          points[2].y = segm[i2].y2 + (segm[i1].y2 - segm[i2].y2) / 3;
-          points[3].x = segm[i1].x2 + (segm[i2].x2 - segm[i1].x2) / 3;
-          points[3].y = segm[i1].y2 + (segm[i2].y2 - segm[i1].y2) / 3;
+          xs[0] = segm[i1].x1 + (segm[i2].x1 - segm[i1].x1) / 3;
+          ys[0] = segm[i1].y1 + (segm[i2].y1 - segm[i1].y1) / 3;
+          xs[1] = segm[i2].x1 + (segm[i1].x1 - segm[i2].x1) / 3;
+          ys[1] = segm[i2].y1 + (segm[i1].y1 - segm[i2].y1) / 3;
+          xs[2] = segm[i2].x2 + (segm[i1].x2 - segm[i2].x2) / 3;
+          ys[2] = segm[i2].y2 + (segm[i1].y2 - segm[i2].y2) / 3;
+          xs[3] = segm[i1].x2 + (segm[i2].x2 - segm[i1].x2) / 3;
+          ys[3] = segm[i1].y2 + (segm[i2].y2 - segm[i1].y2) / 3;
 
-          cairo_set_source_rgb(cr, MAGENTA);
-          Cairo_Draw_Polygon(cr, points, 4);
-          cairo_fill(cr);
+          Segment_t net_tmpl;
+          net_tmpl.z_mid = zn_mid;
+          seg_set_color(&net_tmpl, COLOR_MAGENTA);
+          net_tmpl.width = 2.0f;
+          scenebuffer_add_polygon_outline(sb, &net_tmpl, xs, ys);
 
-          Cairo_Draw_Line(cr,
-              segm[i1].x1, segm[i1].y1,
-              segm[i2].x1, segm[i2].y1);
-          Cairo_Draw_Line(cr,
-              segm[i1].x2, segm[i1].y2,
-              segm[i2].x2, segm[i2].y2);
+          net_tmpl.x1 = segm[i1].x1; net_tmpl.y1 = segm[i1].y1;
+          net_tmpl.x2 = segm[i2].x1; net_tmpl.y2 = segm[i2].y1;
+          scenebuffer_add(sb, &net_tmpl);
+          net_tmpl.x1 = segm[i1].x2; net_tmpl.y1 = segm[i1].y2;
+          net_tmpl.x2 = segm[i2].x2; net_tmpl.y2 = segm[i2].y2;
+          scenebuffer_add(sb, &net_tmpl);
         }
         break;
 
       case 2: /* Straight transmission line */
-        cairo_set_source_rgb(cr, CYAN);
-        Cairo_Draw_Line(cr,
-            segm[i1].x1, segm[i1].y1,
-            segm[i2].x1, segm[i2].y1);
-        Cairo_Draw_Line(cr,
-            segm[i1].x2, segm[i1].y2,
-            segm[i2].x2, segm[i2].y2);
+        {
+          Segment_t tl;
+          tl.z_mid = seg_pair_z_mid(segm, i1, i2);
+          seg_set_color(&tl, COLOR_CYAN);
+          tl.width = 2.0f;
+          tl.x1 = segm[i1].x1; tl.y1 = segm[i1].y1;
+          tl.x2 = segm[i2].x1; tl.y2 = segm[i2].y1;
+          scenebuffer_add(sb, &tl);
+          tl.x1 = segm[i1].x2; tl.y1 = segm[i1].y2;
+          tl.x2 = segm[i2].x2; tl.y2 = segm[i2].y2;
+          scenebuffer_add(sb, &tl);
+        }
         break;
 
       case 3: /* Crossed transmission line */
-        cairo_set_source_rgb(cr, CYAN);
-        Cairo_Draw_Line(cr,
-            segm[i1].x1, segm[i1].y1,
-            segm[i2].x2, segm[i2].y2);
-        Cairo_Draw_Line(cr,
-            segm[i1].x2, segm[i1].y2,
-            segm[i2].x1, segm[i2].y1);
+        {
+          Segment_t tl;
+          tl.z_mid = seg_pair_z_mid(segm, i1, i2);
+          seg_set_color(&tl, COLOR_CYAN);
+          tl.width = 2.0f;
+          tl.x1 = segm[i1].x1; tl.y1 = segm[i1].y1;
+          tl.x2 = segm[i2].x2; tl.y2 = segm[i2].y2;
+          scenebuffer_add(sb, &tl);
+          tl.x1 = segm[i1].x2; tl.y1 = segm[i1].y2;
+          tl.x2 = segm[i2].x1; tl.y2 = segm[i2].y1;
+          scenebuffer_add(sb, &tl);
+        }
+        break;
+
+      default:
+        BUG("draw_wire_segments: unknown ntyp=%d\n", netcx.ntyp[idx]);
 
     } /* switch( netcx.ntyp ) */
 
   } /* for( idx = 0; idx < netcx.nonet ) */
 
-  /* Per-segment precomputed colors and widths from dispatch. */
+  /* Per-segment precomputed colors and widths deposited into scenebuffer */
   for( idx = 0; idx < nseg; idx++ )
   {
-    cairo_set_line_width(cr, (double)params->wire_widths[idx]);
-    cairo_set_source_rgb(cr,
-        (double)params->wire_colors[idx].r,
-        (double)params->wire_colors[idx].g,
-        (double)params->wire_colors[idx].b);
-    Cairo_Draw_Line(cr,
-        segm[idx].x1, segm[idx].y1,
-        segm[idx].x2, segm[idx].y2);
+    seg_set_color(&segm[idx], params->wire_colors[idx]);
+    segm[idx].width = (float)params->wire_widths[idx];
+    scenebuffer_add(sb, &segm[idx]);
   }
 
 } /* draw_wire_segments() */
@@ -189,7 +224,6 @@ draw_wire_segments(cairo_t *cr, view_t *v, Segment_t *segm, gint nseg,
 
 /**
  * draw_surface_patches() - Draw patch segments with dispatch-selected colors
- * @cr:     Cairo context
  * @v:      view for segment coordinates
  * @segm:   projected patch segment array [npatch*2]
  * @npatch: number of patches (four rectangle edges each)
@@ -201,7 +235,7 @@ draw_wire_segments(cairo_t *cr, view_t *v, Segment_t *segm, gint nseg,
  * base color from params->patch_colors[0].
  */
   static void
-draw_surface_patches(cairo_t *cr, view_t *v, double scale, Segment_t *segm,
+draw_surface_patches(cairo_scenebuffer_t *sb, view_t *v, double scale, Segment_t *segm,
     gint npatch, const struct_draw_params_t *params)
 {
   if( !npatch )
@@ -209,30 +243,27 @@ draw_surface_patches(cairo_t *cr, view_t *v, double scale, Segment_t *segm,
 
   int idx;
 
-  cairo_set_line_width(cr, 1.0);
-
   /* Current mode: per-patch precomputed colors */
   if( params->cmax > 0.0 )
   {
     for( idx = 0; idx < npatch; idx++ )
     {
-      int j = 4 * idx;
+      int base = 4 * idx;
       int k;
       float fd[4];
       float mag_ratio;
+      float pz = patch_z_mid(segm, base);
 
-      cairo_set_source_rgb(cr,
-          (double)params->patch_colors[idx].r,
-          (double)params->patch_colors[idx].g,
-          (double)params->patch_colors[idx].b);
-
-      /* 4 rectangle edges per patch */
+      /* 4 rectangle edges per patch deposited into scenebuffer */
       for( k = 0; k < 4; k++ )
-        Cairo_Draw_Line(cr,
-            segm[j + k].x1, segm[j + k].y1,
-            segm[j + k].x2, segm[j + k].y2);
+      {
+        segm[base + k].z_mid = pz;
+        seg_set_color(&segm[base + k], params->patch_colors[idx]);
+        segm[base + k].width = 1.0f;
+        scenebuffer_add(sb, &segm[base + k]);
+      }
 
-      /* Draw flow arrow when current data is above threshold */
+      /* Deposit flow arrow segments when current data is above threshold */
       if( params->show_flow )
       {
         int fstep = calc_data.freq_step;
@@ -251,8 +282,11 @@ draw_surface_patches(cairo_t *cr, view_t *v, double scale, Segment_t *segm,
             Segment_t s;
             Set_Gdk_Segment(&s, v, scale,
                 arrow[k].x1, arrow[k].y1, arrow[k].z1,
-                arrow[k].x2, arrow[k].y2, arrow[k].z2);
-            Cairo_Draw_Line(cr, s.x1, s.y1, s.x2, s.y2);
+                arrow[k].x2, arrow[k].y2, arrow[k].z2,
+                &s.z_mid);
+            seg_set_color(&s, params->patch_colors[idx]);
+            s.width = 1.0f;
+            scenebuffer_add(sb, &s);
           }
         }
       }
@@ -260,17 +294,22 @@ draw_surface_patches(cairo_t *cr, view_t *v, double scale, Segment_t *segm,
     return;
   }
 
-  /* Geometry mode: uniform base color */
-  cairo_set_source_rgb(cr,
-      (double)params->patch_colors[0].r,
-      (double)params->patch_colors[0].g,
-      (double)params->patch_colors[0].b);
-  int nsg = 4 * npatch;
-  for( idx = 0; idx < nsg; idx++ )
+  /* Geometry mode: uniform base color for all patch edges */
   {
-    Cairo_Draw_Line(cr,
-        segm[idx].x1, segm[idx].y1,
-        segm[idx].x2, segm[idx].y2);
+    int k;
+    for( idx = 0; idx < npatch; idx++ )
+    {
+      int   base = 4 * idx;
+      float pz   = patch_z_mid(segm, base);
+      for( k = 0; k < 4; k++ )
+      {
+        int e = base + k;
+        segm[e].z_mid = pz;
+        seg_set_color(&segm[e], params->patch_colors[0]);
+        segm[e].width = 1.0f;
+        scenebuffer_add(sb, &segm[e]);
+      }
+    }
   }
 
 } /* draw_surface_patches() */
@@ -291,7 +330,6 @@ cairo_draw_structure(void *ctx, float extent,
     const struct_draw_params_t *params)
 {
   cairo_render_ctx_t *cc = (cairo_render_ctx_t *)ctx;
-  cairo_t *cr = cc->cr;
   view_t *v = cc->view;
   double scale = view_projection_scale(v, extent, v->zoom);
 
@@ -299,9 +337,9 @@ cairo_draw_structure(void *ctx, float extent,
   Process_Wire_Segments(v, scale);
   Process_Surface_Patches(v, scale);
 
-  /* Draw patches below wires */
-  draw_surface_patches(cr, v, scale, structure_segs + data.n, data.m, params);
-  draw_wire_segments(cr, v, structure_segs, data.n, params);
+  /* Deposit patches below wires (painter's order handled by scenebuffer z_mid) */
+  draw_surface_patches(cc->sb, v, scale, structure_segs + data.n, data.m, params);
+  draw_wire_segments(cc->sb, v, structure_segs, data.n, params);
 
   return TRUE;
 }
@@ -311,13 +349,13 @@ cairo_draw_structure(void *ctx, float extent,
 /**
  * cairo_set_status() - Store status message for deferred rendering
  * @ctx: cairo_render_ctx_t*
- * @msg: UTF-8 status message
+ * @msg: UTF-8 status message (painted by render_cairo after flush)
  */
   void
 cairo_set_status(void *ctx, const char *msg)
 {
   cairo_render_ctx_t *cc = (cairo_render_ctx_t *)ctx;
-  Draw_Centered_Message(cc->cr, cc->view->width, cc->view->height, msg);
+  cc->status_message = msg;
 }
 
 /*-----------------------------------------------------------------------*/

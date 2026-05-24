@@ -26,6 +26,7 @@
  * No field math, no Poynting cross product, no Value_to_Color.
  */
 #include "cairo_draw.h"
+#include "cairo_scenebuffer.h"
 #include "../shared.h"
 
 /*-----------------------------------------------------------------------*/
@@ -51,18 +52,15 @@ cairo_draw_nearfield(void *ctx,
     double dr, double r_max)
 {
   cairo_render_ctx_t *cc = (cairo_render_ctx_t *)ctx;
-  cairo_t *cr = cc->cr;
   view_t *v = cc->view;
   Segment_t segm;
   int f, idx;
 
   double scale = view_projection_scale(v, (float)r_max, v->zoom);
 
-  cairo_set_line_width(cr, 2.0);
-
   (void)dr;
 
-  /* Draw each dispatch-assembled field vector set */
+  /* Deposit each dispatch-assembled field vector into the scenebuffer */
   for( f = 0; f < n_fields; f++ )
   {
     const nf_vector_t *vecs = fields[f].vecs;
@@ -80,13 +78,12 @@ cairo_draw_nearfield(void *ctx,
       double fy = py + (double)vecs[idx].dy;
       double fz = pz + (double)vecs[idx].dz;
 
-      Set_Gdk_Segment(&segm, v, scale, px, py, pz, fx, fy, fz);
-
-      cairo_set_source_rgb(cr,
-          (double)vecs[idx].rgb[0],
-          (double)vecs[idx].rgb[1],
-          (double)vecs[idx].rgb[2]);
-      Cairo_Draw_Line(cr, segm.x1, segm.y1, segm.x2, segm.y2);
+      Set_Gdk_Segment(&segm, v, scale, px, py, pz, fx, fy, fz, &segm.z_mid);
+      segm.r     = vecs[idx].rgb[0];
+      segm.g     = vecs[idx].rgb[1];
+      segm.b     = vecs[idx].rgb[2];
+      segm.width = 2.0f;
+      scenebuffer_add(cc->sb, &segm);
     }
   }
 

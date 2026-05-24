@@ -1576,9 +1576,8 @@ void Intrange_Command(int action);
 void Execute_Command(int action);
 void Zo_Command(int action);
 /* draw.c */
-void Set_Gdk_Segment(Segment_t *segm, view_t *v, double scale, double x1, double y1, double z1, double x2, double y2, double z2);
-void Draw_XYZ_Axes(cairo_t *cr, view_t *v, float extent);
-void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, double *ys);
+void Set_Gdk_Segment(Segment_t *segm, view_t *v, double scale, double x1, double y1, double z1, double x2, double y2, double z2, float *z_mid_out);
+void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, double *ys, float *zs);
 /* Availability guards for per-frequency-step data */
 #define CRNT_FSTEP_AVAILABLE(fs) \
     ((fs) >= 0 && (fs) <= calc_data.steps_total \
@@ -1591,11 +1590,6 @@ void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, doub
      && near_field_fstep != NULL && near_field_fstep[(fs)].points != NULL)
 
 void Value_to_Color(double *red, double *grn, double *blu, double val, double max);
-/* cairo/cairo_project.c */
-void Cairo_Draw_Polygon(cairo_t *cr, GdkPoint *points, int npoints);
-void Cairo_Draw_Segments(cairo_t *cr, Segment_t *segm, int nseg);
-void Cairo_Draw_Line(cairo_t *cr, int x1, int y1, int x2, int y2);
-void Cairo_Draw_Lines(cairo_t *cr, GdkPoint *points, int npoints);
 /* rdpattern_ui.c */
 gboolean Validate_Nearfield_Animation(void);
 void compute_near_field_frame(double wt);

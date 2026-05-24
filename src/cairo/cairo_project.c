@@ -45,21 +45,6 @@ Cairo_Draw_Polygon(cairo_t *cr, GdkPoint *points, int npoints)
 /*-----------------------------------------------------------------------*/
 
   void
-Cairo_Draw_Segments(cairo_t *cr, Segment_t *segm, int nseg)
-{
-  int idx;
-
-  for( idx = 0; idx < nseg; idx++ )
-  {
-    cairo_move_to(cr, (double)segm[idx].x1, (double)segm[idx].y1);
-    cairo_line_to(cr, (double)segm[idx].x2, (double)segm[idx].y2);
-  }
-  cairo_stroke(cr);
-}
-
-/*-----------------------------------------------------------------------*/
-
-  void
 Cairo_Draw_Line(cairo_t *cr, int x1, int y1, int x2, int y2)
 {
   cairo_move_to(cr, (double)x1, (double)y1);
@@ -105,7 +90,8 @@ Process_Wire_Segments( view_t *v, double scale )
         (double) data.segments[idx].z1,
         (double) data.segments[idx].x2,
         (double) data.segments[idx].y2,
-        (double) data.segments[idx].z2);
+        (double) data.segments[idx].z2,
+        &structure_segs[idx].z_mid);
 
 } /* Process_Wire_Segments() */
 
@@ -133,22 +119,26 @@ Process_Surface_Patches( view_t *v, double scale )
     /* Edge c0-c1 */
     Set_Gdk_Segment(&structure_segs[base + 0], v, scale,
         pc->c0x, pc->c0y, pc->c0z,
-        pc->c1x, pc->c1y, pc->c1z);
+        pc->c1x, pc->c1y, pc->c1z,
+        &structure_segs[base + 0].z_mid);
 
     /* Edge c1-c2 */
     Set_Gdk_Segment(&structure_segs[base + 1], v, scale,
         pc->c1x, pc->c1y, pc->c1z,
-        pc->c2x, pc->c2y, pc->c2z);
+        pc->c2x, pc->c2y, pc->c2z,
+        &structure_segs[base + 1].z_mid);
 
     /* Edge c2-c3 */
     Set_Gdk_Segment(&structure_segs[base + 2], v, scale,
         pc->c2x, pc->c2y, pc->c2z,
-        pc->c3x, pc->c3y, pc->c3z);
+        pc->c3x, pc->c3y, pc->c3z,
+        &structure_segs[base + 2].z_mid);
 
     /* Edge c3-c0 */
     Set_Gdk_Segment(&structure_segs[base + 3], v, scale,
         pc->c3x, pc->c3y, pc->c3z,
-        pc->c0x, pc->c0y, pc->c0z);
+        pc->c0x, pc->c0y, pc->c0z,
+        &structure_segs[base + 3].z_mid);
   }
 
 } /* Process_Surface_Patches() */

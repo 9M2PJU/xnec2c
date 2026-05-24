@@ -25,9 +25,8 @@
  * No domain math; pure geometric projection and drawing.
  */
 #include "cairo_draw.h"
+#include "cairo_scenebuffer.h"
 #include "../shared.h"
-
-/*-----------------------------------------------------------------------*/
 
 /**
  * cairo_draw_farfield() - Draw far-field gain pattern via Cairo
@@ -43,7 +42,6 @@
 cairo_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
 {
   cairo_render_ctx_t *cc = (cairo_render_ctx_t *)ctx;
-  cairo_t *cr = cc->cr;
   view_t *v = cc->view;
   Segment_t segm;
   int idx;
@@ -58,9 +56,7 @@ cairo_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
 
   double scale = view_projection_scale(v, ff->pattern_radius, v->zoom);
 
-  cairo_set_line_width(cr, 2.0);
-
-  /* Draw theta-direction edges */
+  /* Deposit theta-direction edges into scenebuffer */
   for( idx = 0; idx < geom_pre.n_theta_edges; idx++ )
   {
     const ff_edge_topo_t *topo = &geom_pre.theta_topo[idx];
@@ -69,16 +65,16 @@ cairo_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
 
     Set_Gdk_Segment(&segm, v, scale,
         va->x + (double)ff->x, va->y + (double)ff->y, va->z + (double)ff->z,
-        vb->x + (double)ff->x, vb->y + (double)ff->y, vb->z + (double)ff->z);
-
-    cairo_set_source_rgb(cr,
-        (double)fp->theta_rgb[idx].r,
-        (double)fp->theta_rgb[idx].g,
-        (double)fp->theta_rgb[idx].b);
-    Cairo_Draw_Line(cr, segm.x1, segm.y1, segm.x2, segm.y2);
+        vb->x + (double)ff->x, vb->y + (double)ff->y, vb->z + (double)ff->z,
+        &segm.z_mid);
+    segm.r     = fp->theta_rgb[idx].r;
+    segm.g     = fp->theta_rgb[idx].g;
+    segm.b     = fp->theta_rgb[idx].b;
+    segm.width = 2.0f;
+    scenebuffer_add(cc->sb, &segm);
   }
 
-  /* Draw phi-direction edges */
+  /* Deposit phi-direction edges into scenebuffer */
   for( idx = 0; idx < geom_pre.n_phi_edges; idx++ )
   {
     const ff_edge_topo_t *topo = &geom_pre.phi_topo[idx];
@@ -87,13 +83,13 @@ cairo_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
 
     Set_Gdk_Segment(&segm, v, scale,
         va->x + (double)ff->x, va->y + (double)ff->y, va->z + (double)ff->z,
-        vb->x + (double)ff->x, vb->y + (double)ff->y, vb->z + (double)ff->z);
-
-    cairo_set_source_rgb(cr,
-        (double)fp->phi_rgb[idx].r,
-        (double)fp->phi_rgb[idx].g,
-        (double)fp->phi_rgb[idx].b);
-    Cairo_Draw_Line(cr, segm.x1, segm.y1, segm.x2, segm.y2);
+        vb->x + (double)ff->x, vb->y + (double)ff->y, vb->z + (double)ff->z,
+        &segm.z_mid);
+    segm.r     = fp->phi_rgb[idx].r;
+    segm.g     = fp->phi_rgb[idx].g;
+    segm.b     = fp->phi_rgb[idx].b;
+    segm.width = 2.0f;
+    scenebuffer_add(cc->sb, &segm);
   }
 
   return TRUE;
