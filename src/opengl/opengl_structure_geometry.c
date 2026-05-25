@@ -627,7 +627,7 @@ opengl_structure_geometry_cleanup(void)
   int i;
 
   for( i = 0; i < GL_VIEW_MAX_BATCHES; i++ )
-    free_ptr((void **)&batches[i].vertices);
+    mem_free((void **)&batches[i].vertices);
 
   batch_count = 0;
 }

@@ -277,7 +277,7 @@ void destroy_goal_row(opt_goal_row_t *gr)
 		gtk_widget_destroy(gr->w[col]);
 	}
 
-	free_ptr((void **)&gr);
+	mem_free((void **)&gr);
 }
 
 /*------------------------------------------------------------------------*/

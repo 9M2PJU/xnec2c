@@ -66,7 +66,7 @@ void fr_plots_init(void)
                       sizeof(fr_plot_t) * calc_data.ngraph * calc_data.FR_cards); 
   else
   {
-	  free_ptr((void **)&fr_plots);
+	  mem_free((void **)&fr_plots);
 	  return;
   }
 
@@ -949,7 +949,7 @@ Draw_Graph(
 				NULL, NULL);
   }
 
-  free_ptr( (void **)&points );
+  mem_free((void **)&points);
 
 } /* Draw_Graph() */
 
@@ -1373,7 +1373,7 @@ Plot_Graph_Smith(
 
   /* Draw the graph */
   Cairo_Draw_Lines( cr, points, nc );
-  free_ptr( (void **)&points );
+  mem_free((void **)&points);
 
   /* Draw a vertical line to show current freq if it was
    * changed by a user click on the plots drawingarea */
@@ -1654,8 +1654,8 @@ _Plot_Frequency_Data( cairo_t *cr )
       Plot_Graph(cr, vswr, (rc_config.freqplots_s11 ? s11 : NULL), fplot,
                  num_fsteps, titles, posn++);
 
-    free_ptr( (void **)&vswr );
-    free_ptr( (void **)&s11);
+    mem_free((void **)&vswr);
+    mem_free((void **)&s11);
   } /* if( isFlagSet(PLOT_VSWR) ) */
 
   /* Plot z-real and z-imag */
@@ -1783,10 +1783,10 @@ Plots_Window_Killed( void )
   kill_window = NULL;
 
   if (fr_plots != NULL)
-	  free_ptr((void **)&fr_plots);
+	  mem_free((void **)&fr_plots);
 
   if (prev_click_event != NULL)
-	  free_ptr((void **)&prev_click_event);
+	  mem_free((void **)&prev_click_event);
 
 } /* Plots_Window_Killed() */
 
@@ -1996,7 +1996,7 @@ Set_Frequency_On_Click( GdkEvent *e)
 
   // Free the prev_click_event since it was serviced.
   if (prev_click_event != NULL)
-	  free_ptr((void**)&prev_click_event);
+	  mem_free((void **)&prev_click_event);
 
 } /* Set_Freq_On_Click() */
 

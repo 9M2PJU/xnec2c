@@ -477,8 +477,8 @@ void opt_ui_update_values(void)
 		set_formula_with_score(total_score);
 	}
 
-	free_ptr((void **)&meas_all);
-	free_ptr((void **)&freq_all);
+	mem_free((void **)&meas_all);
+	mem_free((void **)&freq_all);
 
 	g_rec_mutex_unlock(&freq_data_lock);
 }

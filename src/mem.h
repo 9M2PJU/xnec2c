@@ -47,6 +47,6 @@ void _mem_realloc(void **ptr, size_t req, gchar *str);
 
 void mem_backtrace(void *ptr);
 void mem_obj_dump(void *ptr);
-void free_ptr(void **ptr);
+void mem_free(void **ptr);
 
 #endif /* MEM_H */

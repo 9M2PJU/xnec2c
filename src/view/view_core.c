@@ -96,7 +96,7 @@ view_free(view_t **vp)
   if( vp == NULL )
     return;
 
-  free_ptr((void **)vp);
+  mem_free((void **)vp);
 
 } /* view_free() */
 

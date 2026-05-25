@@ -449,7 +449,7 @@ int parse_var(rc_config_vars_t *v, char *line, char *locale)
 
 	setlocale(LC_NUMERIC, orig_numeric_locale);
 
-	free_ptr((void**)&format);
+	mem_free((void **)&format);
 
 	if (check != strlen(line))
 	{

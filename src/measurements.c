@@ -909,7 +909,7 @@ int meas_write_format(measurement_t *m, char *format, FILE *fp)
 
 	meas_format(m, format, s, mreq-1);
 	ret = fputs(s, fp);
-	free_ptr((void**)&s);
+	mem_free((void **)&s);
 	return ret;
 }
 

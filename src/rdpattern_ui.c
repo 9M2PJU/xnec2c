@@ -722,10 +722,10 @@ Free_Nearfield_Fstep_Buffers( void )
   int nfrq = calc_data.steps_total + 1;
   for( int i = 0; i < nfrq; i++ )
   {
-    free_ptr((void **)&near_field_fstep[i].points);
+    mem_free((void **)&near_field_fstep[i].points);
   }
 
-  free_ptr( (void **)&near_field_fstep );
+  mem_free((void **)&near_field_fstep);
 
 } /* Free_Nearfield_Fstep_Buffers() */
 
@@ -1029,16 +1029,16 @@ _Alloc_Rdpattern_Buffers( int nfrq, int nth, int nph )
   /* Free old gain buffers first */
   for( idx = 0; idx < last_nfrq; idx++ )
   {
-    free_ptr( (void **)&rad_pattern[idx].gtot );
-    free_ptr( (void **)&rad_pattern[idx].max_gain );
-    free_ptr( (void **)&rad_pattern[idx].min_gain );
-    free_ptr( (void **)&rad_pattern[idx].max_gain_tht );
-    free_ptr( (void **)&rad_pattern[idx].max_gain_phi );
-    free_ptr( (void **)&rad_pattern[idx].max_gain_idx );
-    free_ptr( (void **)&rad_pattern[idx].min_gain_idx );
-    free_ptr( (void **)&rad_pattern[idx].axrt );
-    free_ptr( (void **)&rad_pattern[idx].tilt );
-    free_ptr( (void **)&rad_pattern[idx].sens );
+    mem_free((void **)&rad_pattern[idx].gtot);
+    mem_free((void **)&rad_pattern[idx].max_gain);
+    mem_free((void **)&rad_pattern[idx].min_gain);
+    mem_free((void **)&rad_pattern[idx].max_gain_tht);
+    mem_free((void **)&rad_pattern[idx].max_gain_phi);
+    mem_free((void **)&rad_pattern[idx].max_gain_idx);
+    mem_free((void **)&rad_pattern[idx].min_gain_idx);
+    mem_free((void **)&rad_pattern[idx].axrt);
+    mem_free((void **)&rad_pattern[idx].tilt);
+    mem_free((void **)&rad_pattern[idx].sens);
   }
   last_nfrq = nfrq;
 

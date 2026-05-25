@@ -518,14 +518,14 @@ netwk( complex double *cmx, int *ip, complex double *einc )
   if( (vsorc.nsant+vsorc.nvqd) == 0)
   {
     /* Free network buffers */
-    free_ptr( (void **)&ipnt );
-    free_ptr( (void **)&nteqa );
-    free_ptr( (void **)&ntsca );
-    free_ptr( (void **)&vsrc );
-    free_ptr( (void **)&rhs );
-    free_ptr( (void **)&cmn );
-    free_ptr( (void **)&rhnt );
-    free_ptr( (void **)&rhnx );
+    mem_free((void **)&ipnt);
+    mem_free((void **)&nteqa);
+    mem_free((void **)&ntsca);
+    mem_free((void **)&vsrc);
+    mem_free((void **)&rhs);
+    mem_free((void **)&cmn);
+    mem_free((void **)&rhnt);
+    mem_free((void **)&rhnx);
     return;
   }
 
@@ -583,14 +583,14 @@ netwk( complex double *cmx, int *ip, complex double *einc )
     } /* for( i = 0; i < vsorc.nvqd; i++ ) */
 
   /* Free network buffers */
-  free_ptr( (void **)&ipnt );
-  free_ptr( (void **)&nteqa );
-  free_ptr( (void **)&ntsca );
-  free_ptr( (void **)&vsrc );
-  free_ptr( (void **)&rhs );
-  free_ptr( (void **)&cmn );
-  free_ptr( (void **)&rhnt );
-  free_ptr( (void **)&rhnx );
+  mem_free((void **)&ipnt);
+  mem_free((void **)&nteqa);
+  mem_free((void **)&ntsca);
+  mem_free((void **)&vsrc);
+  mem_free((void **)&rhs);
+  mem_free((void **)&cmn);
+  mem_free((void **)&rhnt);
+  mem_free((void **)&rhnx);
 
   return;
 }

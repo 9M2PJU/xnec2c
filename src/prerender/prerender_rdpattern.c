@@ -123,11 +123,11 @@ compute_trig_tables(void)
   double dth_rad = (double)fpat.dth * (double)TORAD;
   double dph_rad = (double)fpat.dph * (double)TORAD;
 
-  free_ptr((void **)&geom_pre.sin_theta);
-  free_ptr((void **)&geom_pre.cos_theta);
-  free_ptr((void **)&geom_pre.sin_phi);
-  free_ptr((void **)&geom_pre.cos_phi);
-  free_ptr((void **)&geom_pre.solid_angle);
+  mem_free((void **)&geom_pre.sin_theta);
+  mem_free((void **)&geom_pre.cos_theta);
+  mem_free((void **)&geom_pre.sin_phi);
+  mem_free((void **)&geom_pre.cos_phi);
+  mem_free((void **)&geom_pre.solid_angle);
 
   if( fpat.nth <= 0 || fpat.nph <= 0 )
     return;
@@ -169,8 +169,8 @@ compute_ff_topology(void)
   int nth, nph, col_idx, pts_idx;
   size_t mreq;
 
-  free_ptr((void **)&geom_pre.theta_topo);
-  free_ptr((void **)&geom_pre.phi_topo);
+  mem_free((void **)&geom_pre.theta_topo);
+  mem_free((void **)&geom_pre.phi_topo);
   geom_pre.n_theta_edges = 0;
   geom_pre.n_phi_edges   = 0;
 

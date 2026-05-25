@@ -414,7 +414,7 @@ opengl_rdpattern_generate_triangles(
     } /* for( nth_idx < nth - 1 ) */
   } /* for( nph_idx < nph ) — pass 2 */
 
-  free_ptr((void **)&vertex_normals);
+  mem_free((void **)&vertex_normals);
   rdpat_ff_generation++;
 
   return( rdpat_triangle_count );
@@ -472,13 +472,13 @@ opengl_rdpattern_get_nf_generation(void)
   void
 opengl_rdpattern_geometry_cleanup(void)
 {
-  free_ptr((void **)&rdpat_triangles);
+  mem_free((void **)&rdpat_triangles);
   rdpat_triangle_count = 0;
 
-  free_ptr((void **)&rdpat_lines);
+  mem_free((void **)&rdpat_lines);
   rdpat_line_count = 0;
 
-  free_ptr((void **)&nf_lines);
+  mem_free((void **)&nf_lines);
   nf_line_count = 0;
 
 }

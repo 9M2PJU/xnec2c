@@ -348,7 +348,7 @@ rdpattern_scene_cleanup(void)
 {
   opengl_rdpattern_geometry_cleanup();
 
-  free_ptr((void **)&rdpat_translated_points);
+  mem_free((void **)&rdpat_translated_points);
   rdpat_translated_capacity = 0;
 }
 

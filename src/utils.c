@@ -130,7 +130,7 @@ static void _deferred_notice_cb(gpointer user_data)
 {
 	deferred_notice_t *dn = (deferred_notice_t *)user_data;
 	Notice(dn->buttons, dn->title, "%s", dn->message);
-	free_ptr((void **)&dn);
+	mem_free((void **)&dn);
 }
 
 /**
@@ -729,7 +729,7 @@ int _callback_g_idle_add_once(g_idle_add_data_t *cbdata)
 			free(cbdata->backtrace);
 		}
 
-		free_ptr((void**)&cbdata);
+		mem_free((void **)&cbdata);
 	}
 
 
@@ -777,7 +777,7 @@ guint _g_idle_add_once(GSourceOnceFunc function, gpointer data, int lock)
 		g_mutex_clear(&cbdata->lock);
 		g_cond_clear(&cbdata->cond);
 
-		free_ptr((void**)&cbdata);
+		mem_free((void **)&cbdata);
 	}
 
 	return ret;

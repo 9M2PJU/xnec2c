@@ -587,7 +587,7 @@ main (int argc, char *argv[])
 
   gtk_main ();
 
-  free_ptr((void**)&orig_numeric_locale);
+  mem_free((void **)&orig_numeric_locale);
 
   return 0;
 } // main()
@@ -643,7 +643,7 @@ Open_Input_File( gpointer arg )
 
   calc_data.freq_step = -1;
 
-  free_ptr((void**)&fr_plots);
+  mem_free((void **)&fr_plots);
 
   Open_File( &input_fp, rc_config.input_file, "r");
 

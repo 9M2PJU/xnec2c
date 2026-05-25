@@ -1359,7 +1359,7 @@ freq_loop_start_internal( void )
     int ret = pthread_create( pth_freq_loop, NULL, Frequency_Loop_Thread, floop_state );
     if( ret != 0 )
     {
-      free_ptr((void**)&pth_freq_loop);
+      mem_free((void **)&pth_freq_loop);
       pr_crit("failed to start Frequency_Loop_Thread\n");
       perror( "pthread_create()" );
       exit( -1 );
@@ -1428,12 +1428,12 @@ Stop_Frequency_Loop( void )
 	  if (pth_freq_loop != NULL)
 	  {
 		  pthread_join(*pth_freq_loop, NULL);
-		  free_ptr((void**)&pth_freq_loop);
+		  mem_free((void **)&pth_freq_loop);
 
 		  if( floop_state != NULL )
 		  {
-		    free_ptr((void**)&floop_state->idle_stack);
-		    free_ptr((void**)&floop_state);
+		    mem_free((void **)&floop_state->idle_stack);
+		    mem_free((void **)&floop_state);
 		  }
 	  }
 
@@ -1453,8 +1453,8 @@ Stop_Frequency_Loop( void )
 	/* Both paths free state here; g_idle source was removed above */
 	if( floop_state != NULL )
 	{
-	  free_ptr((void**)&floop_state->idle_stack);
-	  free_ptr((void**)&floop_state);
+	  mem_free((void **)&floop_state->idle_stack);
+	  mem_free((void **)&floop_state);
 	}
   }
 } /* Stop_Frequency_Loop() */

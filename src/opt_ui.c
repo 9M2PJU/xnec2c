@@ -279,8 +279,8 @@ void opt_ui_cleanup(void)
 
 	formula_base_markup = NULL;
 
-	free_ptr((void **)&timer_meas);
-	free_ptr((void **)&timer_freq);
+	mem_free((void **)&timer_meas);
+	mem_free((void **)&timer_freq);
 }
 
 /*------------------------------------------------------------------------*/

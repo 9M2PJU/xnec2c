@@ -106,7 +106,7 @@ void _mem_realloc( void **ptr, size_t req, gchar *str )
 /*------------------------------------------------------------------------*/
 
   void
-free_ptr( void **ptr )
+mem_free( void **ptr )
 {
   if( *ptr != NULL )
   {
@@ -116,4 +116,4 @@ free_ptr( void **ptr )
   }
   *ptr = NULL;
 
-} /* End of free_ptr() */
+} /* End of mem_free() */

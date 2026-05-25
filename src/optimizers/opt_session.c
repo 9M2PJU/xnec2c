@@ -166,10 +166,10 @@ int opt_start(simple_var_t *vars, int num_vars,
 		fitness_config_free(&active_session->fitness_cfg);
 		if (active_session->simple_cfg.algorithm == OPT_SIMPLEX)
 		{
-			free_ptr((void **)&active_session->simple_cfg.opts.simplex.ssize);
+			mem_free((void **)&active_session->simple_cfg.opts.simplex.ssize);
 		}
 		g_mutex_clear(&active_session->best_lock);
-		free_ptr((void **)&active_session);
+		mem_free((void **)&active_session);
 		active_session = NULL;
 	}
 
@@ -244,9 +244,9 @@ cleanup:
 	session->running = FALSE;
 	if (algo == OPT_SIMPLEX)
 	{
-		free_ptr((void **)&session->simple_cfg.opts.simplex.ssize);
+		mem_free((void **)&session->simple_cfg.opts.simplex.ssize);
 	}
-	free_ptr((void **)&session);
+	mem_free((void **)&session);
 	return -1;
 }
 

@@ -39,10 +39,10 @@ static int allocated_steps = 0;
 static void
 free_ff_pre_step(ff_pre_t *fp)
 {
-  free_ptr((void **)&fp->vertices);
-  free_ptr((void **)&fp->theta_rgb);
-  free_ptr((void **)&fp->phi_rgb);
-  free_ptr((void **)&fp->vertex_rgb);
+  mem_free((void **)&fp->vertices);
+  mem_free((void **)&fp->theta_rgb);
+  mem_free((void **)&fp->phi_rgb);
+  mem_free((void **)&fp->vertex_rgb);
 }
 
 /**
@@ -52,10 +52,10 @@ free_ff_pre_step(ff_pre_t *fp)
 static void
 free_nf_pre_step(nf_pre_t *np)
 {
-  free_ptr((void **)&np->e_vecs);
-  free_ptr((void **)&np->h_vecs);
-  free_ptr((void **)&np->pov_vecs);
-  free_ptr((void **)&np->pr_buf);
+  mem_free((void **)&np->e_vecs);
+  mem_free((void **)&np->h_vecs);
+  mem_free((void **)&np->pov_vecs);
+  mem_free((void **)&np->pr_buf);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -112,23 +112,23 @@ prerender_state_free(void)
   {
     for( i = 0; i < allocated_steps; i++ )
       free_ff_pre_step(&ff_pre[i]);
-    free_ptr((void **)&ff_pre);
+    mem_free((void **)&ff_pre);
   }
 
   if( nf_pre != NULL )
   {
     for( i = 0; i < allocated_steps; i++ )
       free_nf_pre_step(&nf_pre[i]);
-    free_ptr((void **)&nf_pre);
+    mem_free((void **)&nf_pre);
   }
 
-  free_ptr((void **)&geom_pre.sin_theta);
-  free_ptr((void **)&geom_pre.cos_theta);
-  free_ptr((void **)&geom_pre.sin_phi);
-  free_ptr((void **)&geom_pre.cos_phi);
-  free_ptr((void **)&geom_pre.solid_angle);
-  free_ptr((void **)&geom_pre.theta_topo);
-  free_ptr((void **)&geom_pre.phi_topo);
+  mem_free((void **)&geom_pre.sin_theta);
+  mem_free((void **)&geom_pre.cos_theta);
+  mem_free((void **)&geom_pre.sin_phi);
+  mem_free((void **)&geom_pre.cos_phi);
+  mem_free((void **)&geom_pre.solid_angle);
+  mem_free((void **)&geom_pre.theta_topo);
+  mem_free((void **)&geom_pre.phi_topo);
   geom_pre.n_theta_edges = 0;
   geom_pre.n_phi_edges   = 0;
 

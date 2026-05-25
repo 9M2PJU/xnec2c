@@ -268,17 +268,17 @@ free_struct_colors(void)
     nfrq = allocated_steps;
     for( i = 0; i < nfrq; i++ )
     {
-      free_ptr( (void **)&struct_colors[i].wire_crnt_rgb );
-      free_ptr( (void **)&struct_colors[i].wire_chrg_rgb );
-      free_ptr( (void **)&struct_colors[i].patch_crnt_rgb );
-      free_ptr( (void **)&struct_colors[i].patch_flow_data );
+      mem_free((void **)&struct_colors[i].wire_crnt_rgb);
+      mem_free((void **)&struct_colors[i].wire_chrg_rgb);
+      mem_free((void **)&struct_colors[i].patch_crnt_rgb);
+      mem_free((void **)&struct_colors[i].patch_flow_data);
     }
-    free_ptr( (void **)&struct_colors );
+    mem_free((void **)&struct_colors);
   }
 
-  free_ptr( (void **)&seg_rgb );
-  free_ptr( (void **)&seg_width );
-  free_ptr( (void **)&patch_rgb );
+  mem_free((void **)&seg_rgb);
+  mem_free((void **)&seg_width);
+  mem_free((void **)&patch_rgb);
 }
 
 /*-----------------------------------------------------------------------*/

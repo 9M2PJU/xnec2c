@@ -273,7 +273,7 @@ void close_mathlib(mathlib_t *lib)
 	if (lib == NULL)
 		return;
 
-	free_ptr((void **) &lib->functions);
+	mem_free((void **)&lib->functions);
 
 	if (lib->handle != NULL)
 	{
@@ -326,7 +326,7 @@ int open_mathlib(mathlib_t *lib)
 			break;
 		}
 	}
-	free_ptr((void**)&libfn0);
+	mem_free((void **)&libfn0);
 
 	if (lib->handle == NULL)
 	{

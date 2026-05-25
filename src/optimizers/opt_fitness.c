@@ -423,7 +423,7 @@ void fitness_config_copy(fitness_config_t *dst, const fitness_config_t *src)
  */
 void fitness_config_free(fitness_config_t *cfg)
 {
-	free_ptr((void **)&cfg->obj);
+	mem_free((void **)&cfg->obj);
 	memset(cfg, 0, sizeof(*cfg));
 }
 
