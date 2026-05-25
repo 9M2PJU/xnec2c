@@ -200,3 +200,64 @@ void mem_backtrace(void *ptr)
 		_print_backtrace(m->backtrace);
 }
 
+/**
+ * mem_clone() - duplicate a managed memory buffer
+ * @ptr: user-facing pointer to an existing managed allocation
+ *
+ * Allocates a new managed buffer of the same used size and copies
+ * the contents of the source buffer into it.
+ *
+ * Return: user-facing pointer to the new allocation
+ */
+void *mem_clone(void *ptr)
+{
+	mem_obj_t *src = mem_obj_from_ptr(ptr);
+	mem_obj_t *dst;
+
+	dst = mem_obj_alloc(NULL, src->used, 0);
+	if (unlikely(dst == NULL))
+	{
+		pr_crit("mem_clone: allocation failed for %lu bytes\n",
+			(unsigned long)src->used);
+		return NULL;
+	}
+
+	memcpy(dst->ptr, src->ptr, src->used);
+	return dst->ptr;
+}
+
+/**
+ * mem_bcmp() - compare contents of two managed buffers
+ * @p1: user-facing pointer to first managed allocation
+ * @p2: user-facing pointer to second managed allocation
+ *
+ * Compares the used regions of two managed buffers. Buffers with
+ * different used sizes are considered unequal.
+ *
+ * Return: 0 if equal, non-zero otherwise (memcmp semantics)
+ */
+int mem_bcmp(void *p1, void *p2)
+{
+	mem_obj_t *m1 = mem_obj_from_ptr(p1);
+	mem_obj_t *m2 = mem_obj_from_ptr(p2);
+
+	if (m1->used != m2->used)
+		return (m1->used > m2->used) ? 1 : -1;
+
+	return memcmp(m1->ptr, m2->ptr, m1->used);
+}
+
+/**
+ * mem_set() - fill a managed buffer with a byte value
+ * @ptr: user-facing pointer to a managed allocation
+ * @c: byte value to fill with
+ *
+ * Sets every byte in the used region of the managed buffer to c.
+ */
+void mem_set(void *ptr, int c)
+{
+	mem_obj_t *m = mem_obj_from_ptr(ptr);
+
+	memset(m->ptr, c, m->used);
+}
+

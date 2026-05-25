@@ -90,5 +90,8 @@ static inline void *_mem_realloc_fast(void **ptr, size_t req, char *str)
 void mem_backtrace(void *ptr);
 void mem_obj_dump(void *ptr);
 void mem_free(void **ptr);
+void *mem_clone(void *ptr);
+int mem_bcmp(void *p1, void *p2);
+void mem_set(void *ptr, int c);
 
 #endif /* MEM_H */
