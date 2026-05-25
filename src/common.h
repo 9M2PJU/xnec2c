@@ -45,6 +45,15 @@
 #endif
 
 #include "measurements.h"
+
+/* Branch-prediction hints for hot paths */
+#ifndef likely
+#define likely(x)   __builtin_expect(!!(x), 1)
+#endif
+#ifndef unlikely
+#define unlikely(x) __builtin_expect(!!(x), 0)
+#endif
+
 #include "mem.h"
 #include "i18n.h"
 #include "view/view_core.h"

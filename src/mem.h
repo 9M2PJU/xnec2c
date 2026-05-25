@@ -2,34 +2,29 @@
 #define MEM_H
 
 #include <stddef.h>
-#include <glib/gtypes.h>
+#include <string.h>
 
-/* xnec2c uses mem_realloc() very often to resize buffers in the code.
- * There are cases where uninitialized memory buffers can lead to incorrect behavior
- * but unfortunately the libc realloc() call doesn't initialize the reallocated memory.
+/* Alignment for cache-line and AVX-512 friendliness */
+#define MEM_ALIGNMENT  64
+#define MEM_HEADER_SIZE 64
+
+/* mem_obj_t occupies the first cache line of each allocation.
+ * User data begins at base + MEM_HEADER_SIZE, also 64-byte aligned.
  *
- * Since there is not a portable way to discover the amount of memory allocated by the
- * previous realloc/malloc() call we cannot call memset() on the extended portion.
+ * Layout:
+ *   |<-- MEM_HEADER_SIZE (64B) -->|<-- req bytes user data -->|
+ *   [ mem_obj_t (32B) | pad 32B  ][ user ptr (64-byte aligned)]
+ *   ^                              ^
+ *   base (64-aligned)              m->ptr = base + MEM_HEADER_SIZE
  *
- * To solve this mem_obj_t stores a couple sizes and a pointer:
- *    1. size: the total allocated size requested by the caller
- *             Note that the actual allocated size is greater by sizeof(mem_obj_t)
- *    2. used: The amount actually used by the caller
- *         a. If mem_realloc() is called with a smaller amount of memory requested
- *            then it will shrink the `used` size without reallocating.
- *
- *         b. If mem_realloc() is called requesting more than `used` but less than `size`
- *            then it is grown without reallocating.
- *
- *         c. If mem_realloc() is called requesting more than `size` then realloc() is
- *            called and both `size` and `used` are updated.
- *
- *    3. ptr: a pointer to the memory used by the caller
- *
- * A mem_obj_t object is allocated in excess of the structure size by the amount
- * of memory requested by the caller.  When ptr_free or mem_realloc are called
- * we use decrement by sizeof(mem_obj_t) to access the original
- * structure pointer.
+ * Fields:
+ *   size: total allocated user-data capacity
+ *   used: amount currently in use by caller
+ *     - shrink: req <= used, no realloc
+ *     - grow within capacity: used < req <= size, no realloc
+ *     - grow beyond capacity: req > size, new posix_memalign
+ *   backtrace: optional debug allocation trace
+ *   ptr: pointer to user data region
  */
 typedef struct mem_obj_t
 {
@@ -40,7 +35,7 @@ typedef struct mem_obj_t
 	void *ptr;
 } mem_obj_t;
 
-void _mem_realloc(void **ptr, size_t req, gchar *str);
+void *_mem_realloc(void **ptr, size_t req, char *str);
 
 #define mem_alloc(ptr, size)   _mem_realloc(ptr, size, __LOCATION__)
 #define mem_realloc(ptr, size) _mem_realloc(ptr, size, __LOCATION__)
