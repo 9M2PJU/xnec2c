@@ -6,26 +6,21 @@ _Static_assert(sizeof(mem_obj_t) <= MEM_HEADER_SIZE,
 	"mem_obj_t exceeds MEM_HEADER_SIZE");
 
 /**
- * get_mem_obj() - recover mem_obj_t header from a user pointer
- * @ptr: user-facing pointer returned by _mem_realloc
+ * _mem_validate_fail() - report corrupted mem_obj_t header via BUG
+ * @ptr: user-facing pointer that failed validation
+ * @base: computed base address of the mem_obj_t
  *
  * The header lives at (ptr - MEM_HEADER_SIZE).  Validates that
  * the stored ptr field matches the caller's pointer.
  *
- * Return: pointer to the mem_obj_t, or NULL on validation failure
  */
-static inline mem_obj_t *get_mem_obj(void *ptr)
+void _mem_validate_fail(void *ptr, void *base)
 {
-	mem_obj_t *m = (mem_obj_t *)((char *)ptr - MEM_HEADER_SIZE);
+	mem_obj_t *m = (mem_obj_t *)base;
 
-	if (unlikely(m->ptr != ptr))
-	{
-		pr_err("get_mem_obj: ptr %p does not match m->ptr %p\n",
-			ptr, m->ptr);
-		return NULL;
-	}
-
-	return m;
+	BUG("mem_obj_from_ptr: ptr %p does not match m->ptr %p (base %p)\n",
+		ptr, m->ptr, base);
+	abort();
 }
 
 /**
@@ -101,9 +96,7 @@ void *_mem_realloc(void **ptr, size_t req, char *str)
 		return m->ptr;
 	}
 
-	m = get_mem_obj(*ptr);
-	if (unlikely(m == NULL))
-		goto alloc_fail;
+	m = mem_obj_from_ptr(*ptr);
 
 	if (m->backtrace != NULL)
 	{
@@ -158,16 +151,13 @@ void mem_free(void **ptr)
 {
 	if (*ptr != NULL)
 	{
-		mem_obj_t *m = get_mem_obj(*ptr);
+		mem_obj_t *m = mem_obj_from_ptr(*ptr);
 
-		if (likely(m != NULL))
-		{
-			if (m->backtrace != NULL)
-				free(m->backtrace);
+		if (m->backtrace != NULL)
+			free(m->backtrace);
 
-			/* Free from base of aligned allocation */
-			free(m);
-		}
+		/* Free from base of aligned allocation */
+		free(m);
 	}
 
 	*ptr = NULL;
@@ -179,10 +169,7 @@ void mem_free(void **ptr)
  */
 void mem_obj_dump(void *ptr)
 {
-	mem_obj_t *m = get_mem_obj(ptr);
-
-	if (unlikely(m == NULL))
-		return;
+	mem_obj_t *m = mem_obj_from_ptr(ptr);
 
 	pr_debug("mem_obj_t at %p: size=%lu used=%lu addr=%p\n",
 		(void *)m, (unsigned long)m->size,
@@ -203,9 +190,7 @@ void mem_backtrace(void *ptr)
 		return;
 	}
 
-	m = get_mem_obj(ptr);
-	if (unlikely(m == NULL))
-		return;
+	m = mem_obj_from_ptr(ptr);
 
 	pr_debug("mem_backtrace(%p):\n", ptr);
 
