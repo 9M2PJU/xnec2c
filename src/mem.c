@@ -24,8 +24,9 @@ void _mem_validate_fail(void *ptr, void *base)
 }
 
 /**
- * mem_obj_alloc() - allocate or reallocate aligned memory
- * @old_m: previous mem_obj_t or NULL for fresh allocation
+ * mem_obj_alloc() - allocate aligned memory, optionally copying from a source
+ * @old_m: read-only source for data copy, or NULL for fresh allocation.
+ *         Always allocates a new block; never modifies or frees old_m.
  * @req: requested user-data size in bytes
  * @prev_used: bytes of old data to preserve (0 for fresh allocation)
  *
@@ -34,12 +35,16 @@ void _mem_validate_fail(void *ptr, void *base)
  *
  * Return: pointer to new mem_obj_t, or NULL on failure
  */
-static inline mem_obj_t *mem_obj_alloc(mem_obj_t *old_m, size_t req,
+static inline mem_obj_t *mem_obj_alloc(const mem_obj_t *old_m, size_t req,
 	size_t prev_used)
 {
 	void *base = NULL;
 	mem_obj_t *m;
 	int rc;
+
+	/* Minimum 1-byte user region so m->ptr stays within the allocation */
+	if (req == 0)
+		req = 1;
 
 	rc = posix_memalign(&base, MEM_ALIGNMENT, MEM_HEADER_SIZE + req);
 	if (unlikely(rc != 0 || base == NULL))
@@ -106,7 +111,9 @@ void *_mem_realloc(void **ptr, size_t req, char *str)
 
 	prev_used = m->used;
 
-	/* Shrink or grow within existing capacity */
+	/* Shrink or grow within existing capacity.
+	 * On shrink (req < prev_used) the abandoned tail is not zeroed;
+	 * grow-within-capacity re-zeroes the exposed region below. */
 	if (req <= m->size)
 	{
 		m->used = req;
@@ -214,15 +221,15 @@ void *mem_clone(void *ptr)
 	mem_obj_t *src = mem_obj_from_ptr(ptr);
 	mem_obj_t *dst;
 
-	dst = mem_obj_alloc(NULL, src->used, 0);
+	/* mem_obj_alloc always creates a new block; src is read-only copy source */
+	dst = mem_obj_alloc(src, src->used, src->used);
 	if (unlikely(dst == NULL))
 	{
 		pr_crit("mem_clone: allocation failed for %lu bytes\n",
 			(unsigned long)src->used);
-		return NULL;
+		abort();
 	}
 
-	memcpy(dst->ptr, src->ptr, src->used);
 	return dst->ptr;
 }
 
