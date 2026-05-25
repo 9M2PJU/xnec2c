@@ -149,32 +149,6 @@ Alloc_Crnt_Fstep_Buffers( int nfrq )
 
 /*-----------------------------------------------------------------------*/
 
-/**
- * Free_Crnt_Fstep_Buffers() - Free per-frequency-step crnt storage
- */
-  void
-Free_Crnt_Fstep_Buffers( void )
-{
-  if( crnt_fstep == NULL )
-    return;
-
-  int nfrq = calc_data.steps_total + 1;
-  for( int i = 0; i < nfrq; i++ )
-  {
-    free_ptr( (void **)&crnt_fstep[i].air );
-    free_ptr( (void **)&crnt_fstep[i].aii );
-    free_ptr( (void **)&crnt_fstep[i].bir );
-    free_ptr( (void **)&crnt_fstep[i].bii );
-    free_ptr( (void **)&crnt_fstep[i].cir );
-    free_ptr( (void **)&crnt_fstep[i].cii );
-    free_ptr( (void **)&crnt_fstep[i].cur );
-  }
-
-  free_ptr( (void **)&crnt_fstep );
-  free_struct_colors();
-
-} /* Free_Crnt_Fstep_Buffers() */
-
 /*-----------------------------------------------------------------------*/
 
 /**

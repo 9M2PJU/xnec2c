@@ -1414,7 +1414,6 @@ Read_Commands( void )
         {
           SetFlag( ENABLE_NEAREH );
           SetFlag( ALLOC_NEAREH_BUFF );
-          SetFlag( ALLOC_PNTING_BUFF );
         }
 
         /* Because of the interactive GUI, program

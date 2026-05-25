@@ -20,6 +20,8 @@
 #include "callback_func.h"
 #include "cairo/cairo_draw.h"
 #include "shared.h"
+#include "prerender/prerender_state.h"
+#include "prerender/prerender_color.h"
 
 #include "opengl/opengl_structure.h"
 
@@ -954,6 +956,10 @@ Gtk_Quit( void )
       num_child_procs--;
       kill( child_procs[num_child_procs]->pid, SIGKILL );
     }
+
+  /* Release prerender allocations */
+  prerender_state_free();
+  free_struct_colors();
 
   /* Kill possibly nested loops */
   k = (int)gtk_main_level();

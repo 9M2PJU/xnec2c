@@ -267,7 +267,6 @@ static inline int dl_feq_eps(double a, double b, double eps) { return fabs(a - b
 /* Allocation control flags */
 #define ALLOC_NEAREH_BUFF   0x0000800000000000ll
 #define ALLOC_RDPAT_BUFF    0x0001000000000000ll
-#define ALLOC_PNTING_BUFF   0x0002000000000000ll
 
 /* Force editors to quit */
 #define EDITOR_QUIT         0x0004000000000000ll
@@ -1577,7 +1576,7 @@ void Kernel_Command(int action);
 void Intrange_Command(int action);
 void Execute_Command(int action);
 void Zo_Command(int action);
-/* draw.c */
+/* cairo/cairo_project.c */
 void Set_Gdk_Segment(Segment_t *segm, view_t *v, double scale, double x1, double y1, double z1, double x2, double y2, double z2, float *z_mid_out);
 void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, double *ys, float *zs);
 /* Availability guards for per-frequency-step data */
