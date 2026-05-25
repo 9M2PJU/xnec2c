@@ -70,25 +70,25 @@ netwk( complex double *cmx, int *ip, complex double *einc )
   if( netcx.nonet > 0 )
   {
     mreq = (size_t)data.np3m * sizeof(complex double);
-    mem_alloc( (void **)&rhs, mreq, "in network.c");
+    mem_alloc((void **)&rhs, mreq);
 
     mreq = (size_t)j * sizeof(complex double);
-    mem_alloc( (void **)&rhnt, mreq, "in network.c");
-    mem_alloc( (void **)&rhnx, mreq, "in network.c");
-    mem_alloc( (void **)&cmn,  mreq * (size_t)j, "in network.c");
+    mem_alloc((void **)&rhnt, mreq);
+    mem_alloc((void **)&rhnx, mreq);
+    mem_alloc((void **)&cmn, mreq * (size_t)j);
 
     mreq = (size_t)j * sizeof(int);
-    mem_alloc( (void **)&ntsca, mreq, "in network.c");
-    mem_alloc( (void **)&nteqa, mreq, "in network.c");
-    mem_alloc( (void **)&ipnt,  mreq, "in network.c");
+    mem_alloc((void **)&ntsca, mreq);
+    mem_alloc((void **)&nteqa, mreq);
+    mem_alloc((void **)&ipnt, mreq);
 
     mreq = (size_t)vsorc.nsant * sizeof(complex double);
-    mem_alloc( (void **)&vsrc, mreq, "in network.c");
+    mem_alloc((void **)&vsrc, mreq);
   }
   else if( netcx.masym != 0)
   {
     mreq = (size_t)j * sizeof(int);
-    mem_alloc( (void **)&ipnt,  mreq, "in network.c");
+    mem_alloc((void **)&ipnt, mreq);
   }
 
 

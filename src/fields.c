@@ -274,7 +274,7 @@ efld( double xi, double yi,
   static complex double *egnd = NULL;
 
   size_t mreq = 9 * sizeof(complex double);
-  mem_alloc( (void **)&egnd, mreq, "in fields.c");
+  mem_alloc((void **)&egnd, mreq);
 
   xij= xi- dataj.xj;
   yij= yi- dataj.yj;

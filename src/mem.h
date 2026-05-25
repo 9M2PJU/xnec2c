@@ -40,8 +40,11 @@ typedef struct mem_obj_t
 	void *ptr;
 } mem_obj_t;
 
-void mem_alloc(void **ptr, size_t req, gchar *str);
-void mem_realloc(void **ptr, size_t req, gchar *str);
+void _mem_realloc(void **ptr, size_t req, gchar *str);
+
+#define mem_alloc(ptr, size)   _mem_realloc(ptr, size, __LOCATION__)
+#define mem_realloc(ptr, size) _mem_realloc(ptr, size, __LOCATION__)
+
 void mem_backtrace(void *ptr);
 void mem_obj_dump(void *ptr);
 void free_ptr(void **ptr);

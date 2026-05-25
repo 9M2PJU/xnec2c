@@ -375,7 +375,7 @@ on_struct_save_currents_activate(
   char newfn[PATH_MAX];
   /* Open file chooser to save frequency plots */
 
-  mem_alloc((void**)&filechooser_callback, sizeof(filechooser_t), __LOCATION__);
+  mem_alloc((void **)&filechooser_callback, sizeof(filechooser_t));
   filechooser_callback->callback = Save_Currents_CSV;
   filechooser_callback->extension = ".csv";
   file_chooser = Open_Filechooser( GTK_FILE_CHOOSER_ACTION_SAVE,
@@ -1400,7 +1400,7 @@ on_freqplots_save_as_s1p_activate(
   char newfn[PATH_MAX];
   /* Open file chooser to save frequency plots */
 
-  mem_alloc((void**)&filechooser_callback, sizeof(filechooser_t), __LOCATION__);
+  mem_alloc((void **)&filechooser_callback, sizeof(filechooser_t));
   filechooser_callback->callback = Save_FreqPlots_S1P;
   filechooser_callback->extension = ".s1p";
   file_chooser = Open_Filechooser( GTK_FILE_CHOOSER_ACTION_SAVE,
@@ -1416,7 +1416,7 @@ on_freqplots_save_as_s2p_max_gain_activate(
   char newfn[PATH_MAX];
   /* Open file chooser to save frequency plots */
 
-  mem_alloc((void**)&filechooser_callback, sizeof(filechooser_t), __LOCATION__);
+  mem_alloc((void **)&filechooser_callback, sizeof(filechooser_t));
   filechooser_callback->callback = Save_FreqPlots_S2P_Max_Gain;
   filechooser_callback->extension = ".s2p";
   file_chooser = Open_Filechooser( GTK_FILE_CHOOSER_ACTION_SAVE,
@@ -1432,7 +1432,7 @@ on_freqplots_save_as_s2p_viewer_gain_activate(
   char newfn[PATH_MAX];
   /* Open file chooser to save frequency plots */
 
-  mem_alloc((void**)&filechooser_callback, sizeof(filechooser_t), __LOCATION__);
+  mem_alloc((void **)&filechooser_callback, sizeof(filechooser_t));
   filechooser_callback->callback = Save_FreqPlots_S2P_Viewer_Gain;
   filechooser_callback->extension = ".s2p";
   file_chooser = Open_Filechooser( GTK_FILE_CHOOSER_ACTION_SAVE,
@@ -1448,7 +1448,7 @@ on_freqplots_save_as_csv_activate(
   char newfn[PATH_MAX];
   /* Open file chooser to save frequency plots */
 
-  mem_alloc((void**)&filechooser_callback, sizeof(filechooser_t), __LOCATION__);
+  mem_alloc((void **)&filechooser_callback, sizeof(filechooser_t));
   filechooser_callback->callback = Save_FreqPlots_CSV;
   filechooser_callback->extension = ".csv";
   file_chooser = Open_Filechooser( GTK_FILE_CHOOSER_ACTION_SAVE,
@@ -1725,7 +1725,7 @@ on_rdpattern_save_as_csv_activate(
   char newfn[PATH_MAX];
   /* Open file chooser to save frequency plots */
 
-  mem_alloc((void**)&filechooser_callback, sizeof(filechooser_t), __LOCATION__);
+  mem_alloc((void **)&filechooser_callback, sizeof(filechooser_t));
   filechooser_callback->callback = Save_RadPattern_CSV;
   filechooser_callback->extension = ".csv";
   file_chooser = Open_Filechooser( GTK_FILE_CHOOSER_ACTION_SAVE,

@@ -62,9 +62,8 @@ void fr_plots_init(void)
 
   /* 2d array of plot rectangles popluated by the Plot_Graph function */
   if (calc_data.ngraph > 0 && calc_data.FR_cards > 0)
-	  mem_realloc((void**)&fr_plots,
-		sizeof(fr_plot_t) * calc_data.ngraph * calc_data.FR_cards,
-		__LOCATION__); 
+	  mem_realloc((void **)&fr_plots,
+                      sizeof(fr_plot_t) * calc_data.ngraph * calc_data.FR_cards); 
   else
   {
 	  free_ptr((void **)&fr_plots);
@@ -879,8 +878,7 @@ Draw_Graph(
   circle_padding = CIRCLE_PADDING_PX;
 
   /* Calculate points to plot */
-  mem_alloc( (void **) &points, (size_t)nval * sizeof(GdkPoint),
-      "in Draw_Graph()" );
+  mem_alloc((void **)&points, (size_t)nval * sizeof(GdkPoint));
   if( points == NULL )
   {
     pr_err("memory allocation for points failed\n");
@@ -1348,8 +1346,7 @@ Plot_Graph_Smith(
   cairo_set_source_rgb( cr, MAGENTA );
 
   /* Calculate points to plot */
-  mem_alloc( (void **)&points, (size_t)nc * sizeof(GdkPoint),
-      "in Draw_Graph()" );
+  mem_alloc((void **)&points, (size_t)nc * sizeof(GdkPoint));
 
   if( points == NULL )
   {
@@ -1450,8 +1447,8 @@ _Plot_Frequency_Data( cairo_t *cr )
   static double *fplot       = NULL;
   size_t vstep_mreq = (size_t)calc_data.steps_total * sizeof(int);
   size_t fplot_mreq = (size_t)calc_data.steps_total * sizeof(double);
-  mem_realloc( (void **)&valid_steps_map, vstep_mreq, "in plot_freqdata.c" );
-  mem_realloc( (void **)&fplot,       fplot_mreq, "in plot_freqdata.c" );
+  mem_realloc((void **)&valid_steps_map, vstep_mreq);
+  mem_realloc((void **)&fplot, fplot_mreq);
 
   num_fsteps = 0;
   for( idx = 0; idx < calc_data.steps_total; idx++ )
@@ -1493,12 +1490,12 @@ _Plot_Frequency_Data( cairo_t *cr )
 
     /* Allocate max gmax and directions */
     size_t mreq = (size_t) num_fsteps * sizeof(double);
-    mem_realloc( (void **)&gmax,     mreq, "in plot_freqdata.c" );
-    mem_realloc( (void **)&gdir_tht, mreq, "in plot_freqdata.c" );
-    mem_realloc( (void **)&gdir_phi, mreq, "in plot_freqdata.c" );
-    mem_realloc( (void **)&fbratio,  mreq, "in plot_freqdata.c" );
+    mem_realloc((void **)&gmax, mreq);
+    mem_realloc((void **)&gdir_tht, mreq);
+    mem_realloc((void **)&gdir_phi, mreq);
+    mem_realloc((void **)&fbratio, mreq);
     if( isFlagSet(PLOT_NETGAIN) )
-      mem_realloc( (void **)&netgain, mreq, "in plot_freqdata.c" );
+      mem_realloc((void **)&netgain, mreq);
 
     /* Find max gain and direction, F/B ratio */
     no_fbr = FALSE;
@@ -1575,7 +1572,7 @@ _Plot_Frequency_Data( cairo_t *cr )
 
     /* Allocate viewer gain buffer */
     size_t mreq = (size_t) num_fsteps * sizeof(double);
-    mem_realloc( (void **)&vgain, mreq, "in plot_freqdata.c" );
+    mem_realloc((void **)&vgain, mreq);
 
     /* Calcs are done for all freq steps */
     for( idx = 0; idx < num_fsteps; idx++ )
@@ -1585,7 +1582,7 @@ _Plot_Frequency_Data( cairo_t *cr )
     if( isFlagSet(PLOT_NETGAIN) )
     {
       mreq = (size_t) num_fsteps * sizeof(double);
-      mem_realloc( (void **)&netgain, mreq, "in plot_freqdata.c" );
+      mem_realloc((void **)&netgain, mreq);
 
       for( idx = 0; idx < num_fsteps; idx++ )
       {
@@ -1626,11 +1623,11 @@ _Plot_Frequency_Data( cairo_t *cr )
 
 
     /* Calculate VSWR */
-    mem_alloc( (void **) &vswr, (size_t)(calc_data.steps_total+1) * sizeof(double),
-        "in Plot_Frequency_Data()" );
+    mem_alloc((void **)&vswr,
+              (size_t)(calc_data.steps_total + 1) * sizeof(double));
 
-    mem_alloc( (void **) &s11, (size_t)(calc_data.steps_total+1) * sizeof(double),
-        "in Plot_Frequency_Data()" );
+    mem_alloc((void **)&s11,
+              (size_t)(calc_data.steps_total + 1) * sizeof(double));
 
     if( vswr == NULL || s11 == NULL)
     {
@@ -1667,10 +1664,10 @@ _Plot_Frequency_Data( cairo_t *cr )
     static double *zreal_c = NULL, *zimag_c = NULL;
     static double *zmagn_c = NULL, *zphase_c = NULL;
     size_t zmreq = (size_t)num_fsteps * sizeof(double);
-    mem_realloc( (void **)&zreal_c,  zmreq, "in plot_freqdata.c" );
-    mem_realloc( (void **)&zimag_c,  zmreq, "in plot_freqdata.c" );
-    mem_realloc( (void **)&zmagn_c,  zmreq, "in plot_freqdata.c" );
-    mem_realloc( (void **)&zphase_c, zmreq, "in plot_freqdata.c" );
+    mem_realloc((void **)&zreal_c, zmreq);
+    mem_realloc((void **)&zimag_c, zmreq);
+    mem_realloc((void **)&zmagn_c, zmreq);
+    mem_realloc((void **)&zphase_c, zmreq);
     for( idx = 0; idx < num_fsteps; idx++ )
     {
       int s = valid_steps_map[idx];
@@ -1712,8 +1709,8 @@ _Plot_Frequency_Data( cairo_t *cr )
     static double *temp_buf = NULL;
 
     size_t mreq = (size_t)num_fsteps * sizeof(double);
-    mem_realloc( (void **)&gt_buf, mreq, "in plot_freqdata.c" );
-    mem_realloc( (void **)&temp_buf, mreq, "in plot_freqdata.c" );
+    mem_realloc((void **)&gt_buf, mreq);
+    mem_realloc((void **)&temp_buf, mreq);
 
     for( idx = 0; idx < num_fsteps; idx++ )
     {
@@ -1798,7 +1795,7 @@ Plots_Window_Killed( void )
 void save_click_event(GdkEvent *e)
 {
 	if (prev_click_event == NULL)
-		mem_alloc((void**)&prev_click_event, sizeof(GdkEvent), __LOCATION__);
+		mem_alloc((void **)&prev_click_event, sizeof(GdkEvent));
 
 	memcpy(prev_click_event, e, sizeof(GdkEvent));
 }

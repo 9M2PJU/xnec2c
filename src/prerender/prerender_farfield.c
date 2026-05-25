@@ -86,22 +86,22 @@ ff_presentation_recompute(int fstep)
   pol = cur_key.pol_type;
 
   mreq = (size_t)total * sizeof(point_3d_t);
-  mem_realloc((void **)&fp->vertices, mreq, __LOCATION__);
+  mem_realloc((void **)&fp->vertices, mreq);
 
   if( geom_pre.n_theta_edges > 0 )
   {
     mreq = (size_t)geom_pre.n_theta_edges * sizeof(rgb_f_t);
-    mem_realloc((void **)&fp->theta_rgb, mreq, __LOCATION__);
+    mem_realloc((void **)&fp->theta_rgb, mreq);
   }
 
   if( geom_pre.n_phi_edges > 0 )
   {
     mreq = (size_t)geom_pre.n_phi_edges * sizeof(rgb_f_t);
-    mem_realloc((void **)&fp->phi_rgb, mreq, __LOCATION__);
+    mem_realloc((void **)&fp->phi_rgb, mreq);
   }
 
   mreq = (size_t)total * sizeof(rgb_f_t);
-  mem_realloc((void **)&fp->vertex_rgb, mreq, __LOCATION__);
+  mem_realloc((void **)&fp->vertex_rgb, mreq);
 
   /* Resolve noise temperatures from table */
   double t_sky = 0.0, t_earth = 0.0;

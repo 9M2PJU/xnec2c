@@ -106,7 +106,7 @@ arc( int itg, int ns, double rada,
 
     /* Reallocate wire segments */
     mreq = (size_t)(data.n + data.m) * sizeof(wire_segment_t);
-    mem_realloc((void **)&data.segments, mreq, "in geometry.c");
+    mem_realloc((void **)&data.segments, mreq);
 
     ang= ang1* TORAD;
     dang=( ang2- ang1)* TORAD/ ns;
@@ -158,7 +158,7 @@ subph( int nx, int ny )
   else data.m += 4;
 
   mreq = (size_t)data.m * sizeof(surface_patch_t);
-  mem_realloc((void **)&data.patches, mreq, "in geometry.c");
+  mem_realloc((void **)&data.patches, mreq);
   /* Shift patches to make room for new ones */
   if( (ny == 0) && (nx != data.m) )
   {
@@ -291,7 +291,7 @@ conect( int ignd )
   {
     /* Allocate wire segments for connectivity */
     mreq = (size_t)(data.n + data.m) * sizeof(wire_segment_t);
-    mem_realloc((void **)&data.segments, mreq, "in geometry.c");
+    mem_realloc((void **)&data.segments, mreq);
 
     for( i = 0; i < data.n; i++ )
     {
@@ -471,7 +471,7 @@ conect( int ignd )
 
   /* Allocate to connection buffers */
   mreq = (size_t)segj.maxcon * sizeof(int);
-  mem_realloc( (void **)&segj.jco, mreq, "in geometry.c" );
+  mem_realloc((void **)&segj.jco, mreq);
 
   /* Adjust connected segment ends to exactly coincide.
    * Also find old seg. connecting to new segment */
@@ -525,7 +525,7 @@ conect( int ignd )
             }
 
             mreq = (size_t)segj.maxcon * sizeof(int);
-            mem_realloc( (void **)&segj.jco, mreq, "in geometry.c" );
+            mem_realloc((void **)&segj.jco, mreq);
           }
           segj.jco[ic-1]= ix* jend;
 
@@ -607,9 +607,9 @@ conect( int ignd )
   } /* for( j = 0; j < data.n; j++ ) */
 
   mreq = (size_t)segj.maxcon * sizeof(double);
-  mem_realloc( (void **)&segj.ax, mreq, "in geometry.c" );
-  mem_realloc( (void **)&segj.bx, mreq, "in geometry.c" );
-  mem_realloc( (void **)&segj.cx, mreq, "in geometry.c" );
+  mem_realloc((void **)&segj.ax, mreq);
+  mem_realloc((void **)&segj.bx, mreq);
+  mem_realloc((void **)&segj.cx, mreq);
 
   return( TRUE );
 }
@@ -646,7 +646,7 @@ helix(
 
   /* Reallocate wire segments */
   mreq = (size_t)data.n * sizeof(wire_segment_t);
-  mem_realloc((void **)&data.segments, mreq, "in geometry.c");
+  mem_realloc((void **)&data.segments, mreq);
 
   /* For a proper helix */
   if( (hl != 0.0) && (tsp != 0.0) )
@@ -830,7 +830,7 @@ move( double rox, double roy,
       k= data.n;
       /* Reallocate wire segments */
       mreq = (size_t)(data.n + data.m + (data.n + 1 - i1) * nrpt) * sizeof(wire_segment_t);
-      mem_realloc((void **)&data.segments, mreq, "in geometry.c");
+      mem_realloc((void **)&data.segments, mreq);
     }
 
     for( ir = 0; ir < nrp; ir++ )
@@ -874,7 +874,7 @@ move( double rox, double roy,
 
     /* Reallocate patch buffers */
     mreq = (size_t)(data.m * (nrpt + 1)) * sizeof(surface_patch_t);
-    mem_realloc((void **)&data.patches, mreq, "in geometry.c");
+    mem_realloc((void **)&data.patches, mreq);
 
     for( ii = 0; ii < nrp; ii++ )
     {
@@ -949,7 +949,7 @@ patch(
 
   /* Reallocate patch buffers */
   mreq = (size_t)data.m * sizeof(surface_patch_t);
-  mem_realloc((void **)&data.patches, mreq, "in geometry.c");
+  mem_realloc((void **)&data.patches, mreq);
 
   if( nx > 0) ntp=2;
   else ntp= ny;
@@ -1076,7 +1076,7 @@ patch(
     data.m += nx*ny-1;
     /* Reallocate patch buffers */
     mreq = (size_t)data.m * sizeof(surface_patch_t);
-    mem_realloc((void **)&data.patches, mreq, "in geometry.c");
+    mem_realloc((void **)&data.patches, mreq);
 
     xn2= data.patches[mi].px - s1x- s2x;
     yn2= data.patches[mi].py - s1y- s2y;
@@ -1152,7 +1152,7 @@ reflc( int ix, int iy, int iz, int iti, int nop )
       {
         /* Reallocate wire segments */
         mreq = (size_t)(2 * data.n + data.m) * sizeof(wire_segment_t);
-        mem_realloc((void **)&data.segments, mreq, "in geometry.c");
+        mem_realloc((void **)&data.segments, mreq);
 
         for( i = 0; i < data.n; i++ )
         {
@@ -1194,7 +1194,7 @@ reflc( int ix, int iy, int iz, int iti, int nop )
       {
         /* Reallocate patch buffers */
         mreq = (size_t)(2 * data.m) * sizeof(surface_patch_t);
-        mem_realloc((void **)&data.patches, mreq, "in geometry.c");
+        mem_realloc((void **)&data.patches, mreq);
 
         for( i = 0; i < data.m; i++ )
         {
@@ -1233,7 +1233,7 @@ reflc( int ix, int iy, int iz, int iti, int nop )
       {
         /* Reallocate wire segments */
         mreq = (size_t)(2 * data.n) * sizeof(wire_segment_t);
-        mem_realloc((void **)&data.segments, mreq, "in geometry.c");
+        mem_realloc((void **)&data.segments, mreq);
 
         for( i = 0; i < data.n; i++ )
         {
@@ -1275,7 +1275,7 @@ reflc( int ix, int iy, int iz, int iti, int nop )
       {
         /* Reallocate patch buffers */
         mreq = (size_t)(2 * data.m) * sizeof(surface_patch_t);
-        mem_realloc((void **)&data.patches, mreq, "in geometry.c");
+        mem_realloc((void **)&data.patches, mreq);
 
         for( i = 0; i < data.m; i++ )
         {
@@ -1315,7 +1315,7 @@ reflc( int ix, int iy, int iz, int iti, int nop )
     {
       /* Reallocate wire segments */
       mreq = (size_t)(2 * data.n) * sizeof(wire_segment_t);
-      mem_realloc((void **)&data.segments, mreq, "in geometry.c");
+      mem_realloc((void **)&data.segments, mreq);
 
       for( i = 0; i < data.n; i++ )
       {
@@ -1355,7 +1355,7 @@ reflc( int ix, int iy, int iz, int iti, int nop )
 
     /* Reallocate patch buffers */
     mreq = (size_t)(2 * data.m) * sizeof(surface_patch_t);
-    mem_realloc((void **)&data.patches, mreq, "in geometry.c");
+    mem_realloc((void **)&data.patches, mreq);
 
     for( i = 0; i < data.m; i++ )
     {
@@ -1400,7 +1400,7 @@ reflc( int ix, int iy, int iz, int iti, int nop )
 
     /* Reallocate wire segments */
     mreq = (size_t)data.n * sizeof(wire_segment_t);
-    mem_realloc((void **)&data.segments, mreq, "in geometry.c");
+    mem_realloc((void **)&data.segments, mreq);
 
     for( i = nx; i < data.n; i++ )
     {
@@ -1433,7 +1433,7 @@ reflc( int ix, int iy, int iz, int iti, int nop )
 
   /* Reallocate patch buffers */
   mreq = (size_t)data.m * sizeof(surface_patch_t);
-  mem_realloc((void **)&data.patches, mreq, "in geometry.c");
+  mem_realloc((void **)&data.patches, mreq);
 
   for( i = nx; i < data.m; i++ )
   {
@@ -1867,7 +1867,7 @@ wire( double xw1, double yw1, double zw1,
 
   /* Reallocate wire segments */
   mreq = (size_t)data.n * sizeof(wire_segment_t);
-  mem_realloc((void **)&data.segments, mreq, "in geometry.c");
+  mem_realloc((void **)&data.segments, mreq);
 
   xd= xw2- xw1;
   yd= yw2- yw1;

@@ -696,15 +696,14 @@ Alloc_Nearfield_Fstep_Buffers( int nfrq )
 
   /* Outer array — zero so realloc of sub-fields receives NULL, not garbage */
   mreq = (size_t)nfrq * sizeof(near_field_t);
-  mem_realloc( (void **)&near_field_fstep, mreq, "in draw_radiation.c" );
+  mem_realloc((void **)&near_field_fstep, mreq);
   memset( near_field_fstep, 0, mreq );
 
   size_t npts = (size_t)fpat.nrx * fpat.nry * fpat.nrz * sizeof(near_field_point_t);
 
   for( int i = 0; i < nfrq; i++ )
   {
-    mem_realloc((void **)&near_field_fstep[i].points, npts,
-                "in draw_radiation.c");
+    mem_realloc((void **)&near_field_fstep[i].points, npts);
   }
 
 } /* Alloc_Nearfield_Fstep_Buffers() */
@@ -1045,42 +1044,42 @@ _Alloc_Rdpattern_Buffers( int nfrq, int nth, int nph )
 
   /* Allocate rad pattern buffers */
   mreq = (size_t)nfrq * sizeof(rad_pattern_t);
-  mem_realloc( (void **)&rad_pattern, mreq, "in draw_radiation.c" );
+  mem_realloc((void **)&rad_pattern, mreq);
   for( idx = 0; idx < nfrq; idx++ )
   {
     /* Memory request for allocs */
     mreq = (size_t)(nph * nth) * sizeof(double);
     rad_pattern[idx].gtot = NULL;
-    mem_alloc( (void **)&(rad_pattern[idx].gtot), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].gtot), mreq);
     rad_pattern[idx].axrt = NULL;
-    mem_alloc( (void **)&(rad_pattern[idx].axrt), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].axrt), mreq);
     rad_pattern[idx].tilt = NULL;
-    mem_alloc( (void **)&(rad_pattern[idx].tilt), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].tilt), mreq);
 
     mreq = NUM_POL * sizeof(double);
     rad_pattern[idx].max_gain = NULL;
-    mem_alloc( (void **)&(rad_pattern[idx].max_gain), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].max_gain), mreq);
     rad_pattern[idx].min_gain = NULL;
-    mem_alloc( (void **)&(rad_pattern[idx].min_gain), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].min_gain), mreq);
     rad_pattern[idx].max_gain_tht = NULL;
-    mem_alloc( (void **)&(rad_pattern[idx].max_gain_tht), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].max_gain_tht), mreq);
     rad_pattern[idx].max_gain_phi = NULL;
-    mem_alloc( (void **)&(rad_pattern[idx].max_gain_phi), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].max_gain_phi), mreq);
 
     mreq = NUM_POL * sizeof(int);
     rad_pattern[idx].max_gain_idx = NULL;
-    mem_alloc( (void **)&(rad_pattern[idx].max_gain_idx), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].max_gain_idx), mreq);
     rad_pattern[idx].min_gain_idx = NULL;
-    mem_alloc( (void **)&(rad_pattern[idx].min_gain_idx), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].min_gain_idx), mreq);
 
     rad_pattern[idx].sens = NULL;
     mreq = (size_t)(nph * nth) * sizeof(int);
-    mem_alloc( (void **)&(rad_pattern[idx].sens), mreq, "in draw_radiation.c" );
+    mem_alloc((void **)&(rad_pattern[idx].sens), mreq);
   }
 
   /* Per-fstep noise temperature table (Tier 2) */
   mreq = (size_t)nfrq * sizeof(noise_temp_t);
-  mem_realloc( (void **)&noise_temp, mreq, "in draw_radiation.c" );
+  mem_realloc((void **)&noise_temp, mreq);
   memset( noise_temp, 0, mreq );
 
 } /* Alloc_Rdpattern_Buffers() */
@@ -1108,7 +1107,7 @@ Alloc_Nearfield_Buffers( int n1, int n2, int n3 )
 
   /* Allocate near field points array */
   mreq = (size_t)(n1 * n2 * n3) * sizeof(near_field_point_t);
-  mem_realloc((void **)&near_field.points, mreq, "in draw_radiation.c");
+  mem_realloc((void **)&near_field.points, mreq);
 
 } /* Alloc_Nearfield_Buffers() */
 

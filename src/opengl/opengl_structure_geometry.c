@@ -499,11 +499,11 @@ opengl_structure_generate_geometry(
 
   /* Allocate each batch independently */
   mem_realloc((void **)&batches[0].vertices,
-      (size_t)seg_verts * sizeof(structure_vertex_t), __LOCATION__);
+              (size_t)seg_verts * sizeof(structure_vertex_t));
 
   if( data.m > 0 )
     mem_realloc((void **)&batches[1].vertices,
-        (size_t)patch_verts * sizeof(structure_vertex_t), __LOCATION__);
+                (size_t)patch_verts * sizeof(structure_vertex_t));
 
   /* Generate segment batch */
   if( seg_line_mode )

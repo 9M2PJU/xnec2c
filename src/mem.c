@@ -34,14 +34,7 @@ void mem_backtrace(void *ptr)
 
 }
 
-inline void mem_alloc( void **ptr, size_t req, gchar *str )
-{
-	mem_realloc(ptr, req, str);
-} /* End of mem_alloc() */
-
-/*------------------------------------------------------------------------*/
-
-void mem_realloc( void **ptr, size_t req, gchar *str )
+void _mem_realloc( void **ptr, size_t req, gchar *str )
 {
   gchar mesg[MESG_SIZE];
   size_t prev_used;
@@ -108,7 +101,7 @@ void mem_realloc( void **ptr, size_t req, gchar *str )
   if (m->used > prev_used)
 	  memset(((uint8_t*)*ptr)+prev_used, 0x00, m->used - prev_used);
 
-} /* End of mem_realloc() */
+} /* End of _mem_realloc() */
 
 /*------------------------------------------------------------------------*/
 

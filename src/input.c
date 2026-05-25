@@ -124,10 +124,10 @@ Read_Comments( void )
     if( strcmp(ain, "CM") == 0 )
     {
       mreq = (size_t)(comments.num + 1) * sizeof(char *);
-      mem_realloc( (void **)&comments.lines, mreq, "in input.c" );
+      mem_realloc((void **)&comments.lines, mreq);
 
       line_len = strlen(&line_buf[3]) + 1;
-      mem_alloc( (void **)&comments.lines[comments.num], line_len, "in input.c" );
+      mem_alloc((void **)&comments.lines[comments.num], line_len);
       Strlcpy( comments.lines[comments.num], &line_buf[3], line_len );
 
       comments.num++;
@@ -874,34 +874,34 @@ Read_Geometry( void )
 
   /* Memory allocation for temporary buffers */
   mreq = (size_t)data.npm * sizeof(double);
-  mem_realloc( (void **)&save.xtemp,  mreq, "in input.c" );
-  mem_realloc( (void **)&save.ytemp,  mreq, "in input.c" );
-  mem_realloc( (void **)&save.ztemp,  mreq, "in input.c" );
-  mem_realloc( (void **)&save.bitemp, mreq, "in input.c" );
+  mem_realloc((void **)&save.xtemp, mreq);
+  mem_realloc((void **)&save.ytemp, mreq);
+  mem_realloc((void **)&save.ztemp, mreq);
+  mem_realloc((void **)&save.bitemp, mreq);
   if( data.n > 0 )
   {
     mreq = (size_t)data.n * sizeof(double);
-    mem_realloc( (void **)&save.sitemp, mreq, "in input.c" );
+    mem_realloc((void **)&save.sitemp, mreq);
   }
 
   /* Memory allocation for primary interacton matrix. */
   mreq = (size_t)(data.np2m * (data.np + 2 * data.mp)) * sizeof(complex double);
-  mem_realloc( (void **)&cm, mreq, "in input.c" );
+  mem_realloc((void **)&cm, mreq);
 
   /* Memory allocation for current buffers */
   mreq = (size_t)data.npm * sizeof( double);
-  mem_realloc( (void **)&crnt.air, mreq, "in input.c" );
-  mem_realloc( (void **)&crnt.aii, mreq, "in input.c" );
-  mem_realloc( (void **)&crnt.bir, mreq, "in input.c" );
-  mem_realloc( (void **)&crnt.bii, mreq, "in input.c" );
-  mem_realloc( (void **)&crnt.cir, mreq, "in input.c" );
-  mem_realloc( (void **)&crnt.cii, mreq, "in input.c" );
+  mem_realloc((void **)&crnt.air, mreq);
+  mem_realloc((void **)&crnt.aii, mreq);
+  mem_realloc((void **)&crnt.bir, mreq);
+  mem_realloc((void **)&crnt.bii, mreq);
+  mem_realloc((void **)&crnt.cir, mreq);
+  mem_realloc((void **)&crnt.cii, mreq);
   mreq = (size_t)data.np3m * sizeof( complex double);
-  mem_realloc( (void **)&crnt.cur, mreq, "in input.c" );
+  mem_realloc((void **)&crnt.cur, mreq);
 
   /* Memory allocation for loading buffers */
   mreq = (size_t)data.npm * sizeof(complex double);
-  mem_realloc( (void **)&zload.zarray, mreq, "in input.c" );
+  mem_realloc((void **)&zload.zarray, mreq);
 
   /* Save segment and patch data for freq scaling */
   if( data.n > 0 )
@@ -1001,12 +1001,12 @@ Read_Commands( void )
 
   /* Allocate some buffers */
   mreq = (size_t)data.np2m * sizeof(int);
-  mem_realloc( (void **)&save.ip, mreq, "in input.c" );
+  mem_realloc((void **)&save.ip, mreq);
 
   /* Memory allocation for symmetry array */
   smat.nop = netcx.neq/netcx.npeq;
   mreq = (size_t)(smat.nop * smat.nop) * sizeof( complex double);
-  mem_realloc( (void **)&smat.ssx, mreq, "in input.c" );
+  mem_realloc((void **)&smat.ssx, mreq);
 
   /* main input section, exits at various points */
   /* depending on error conditions or end of job */
@@ -1063,11 +1063,11 @@ Read_Commands( void )
           {
             vsorc.nvqd++;
             mreq = (size_t)vsorc.nvqd * sizeof(int);
-            mem_realloc( (void **)&vsorc.ivqd, mreq, "in input.c" );
-            mem_realloc( (void **)&vsorc.iqds, mreq, "in input.c" );
+            mem_realloc((void **)&vsorc.ivqd, mreq);
+            mem_realloc((void **)&vsorc.iqds, mreq);
             mreq = (size_t)vsorc.nvqd * sizeof(complex double);
-            mem_realloc( (void **)&vsorc.vqd, mreq, "in input.c" );
-            mem_realloc( (void **)&vsorc.vqds, mreq, "in input.c" );
+            mem_realloc((void **)&vsorc.vqd, mreq);
+            mem_realloc((void **)&vsorc.vqds, mreq);
             {
               int indx = vsorc.nvqd-1;
 
@@ -1087,9 +1087,9 @@ Read_Commands( void )
             /* Else, applied E field */
             vsorc.nsant++;
             mreq = (size_t)vsorc.nsant * sizeof(int);
-            mem_realloc( (void **)&vsorc.isant, mreq, "in input.c" );
+            mem_realloc((void **)&vsorc.isant, mreq);
             mreq = (size_t)vsorc.nsant * sizeof(complex double);
-            mem_realloc( (void **)&vsorc.vsant, mreq, "in input.c" );
+            mem_realloc((void **)&vsorc.vsant, mreq);
             {
               int indx = vsorc.nsant-1;
 
@@ -1134,7 +1134,7 @@ Read_Commands( void )
 
         /* Allocate the frequency data structure pointer FIXME */
         mreq = (size_t)calc_data.FR_cards * sizeof(freq_loop_data_t);
-        mem_realloc( (void **) &(calc_data.freq_loop_data), mreq, "in input.c" );
+        mem_realloc((void **)&(calc_data.freq_loop_data), mreq);
 
         /* Short cuts */
         freq_loop_data_t *fld = calc_data.freq_loop_data;
@@ -1157,14 +1157,14 @@ Read_Commands( void )
         {
           calc_data.steps_total += fld[card].freq_steps;
           mreq = (size_t)(calc_data.steps_total+1) * sizeof(double);
-          mem_realloc( (void **) &(impedance_data.zreal),  mreq, "in input.c" );
-          mem_realloc( (void **) &(impedance_data.zimag),  mreq, "in input.c" );
-          mem_realloc( (void **) &(impedance_data.zmagn),  mreq, "in input.c" );
-          mem_realloc( (void **) &(impedance_data.zphase), mreq, "in input.c" );
-          mem_realloc( (void **) &(save.freq), mreq, "in input.c" );
+          mem_realloc((void **)&(impedance_data.zreal), mreq);
+          mem_realloc((void **)&(impedance_data.zimag), mreq);
+          mem_realloc((void **)&(impedance_data.zmagn), mreq);
+          mem_realloc((void **)&(impedance_data.zphase), mreq);
+          mem_realloc((void **)&(save.freq), mreq);
 
           mreq = (size_t)(calc_data.steps_total+1) * sizeof(char);
-          mem_realloc( (void **) &(save.fstep), mreq, "in input.c" );
+          mem_realloc((void **)&(save.fstep), mreq);
         }
 
         if( CHILD ) continue;
@@ -1294,15 +1294,15 @@ Read_Commands( void )
           /* Reallocate loading buffers */
           zload.nload++;
           mreq = (size_t)zload.nload * sizeof(int);
-          mem_realloc( (void **)&calc_data.ldtyp,  mreq, "in input.c" );
-          mem_realloc( (void **)&calc_data.ldtag,  mreq, "in input.c" );
-          mem_realloc( (void **)&calc_data.ldtagf, mreq, "in input.c" );
-          mem_realloc( (void **)&calc_data.ldtagt, mreq, "in input.c" );
+          mem_realloc((void **)&calc_data.ldtyp, mreq);
+          mem_realloc((void **)&calc_data.ldtag, mreq);
+          mem_realloc((void **)&calc_data.ldtagf, mreq);
+          mem_realloc((void **)&calc_data.ldtagt, mreq);
 
           mreq = (size_t)zload.nload * sizeof(double);
-          mem_realloc( (void **)&calc_data.zlr, mreq, "in input.c" );
-          mem_realloc( (void **)&calc_data.zli, mreq, "in input.c" );
-          mem_realloc( (void **)&calc_data.zlc, mreq, "in input.c" );
+          mem_realloc((void **)&calc_data.zlr, mreq);
+          mem_realloc((void **)&calc_data.zli, mreq);
+          mem_realloc((void **)&calc_data.zlc, mreq);
 
           idx = zload.nload-1;
           calc_data.ldtyp[idx]= itmp1;
@@ -1334,8 +1334,8 @@ Read_Commands( void )
             {
               nseg = data.n;
               mreq = (size_t)(nseg + zload.nldseg) * sizeof(int);
-              mem_realloc( (void **)&zload.ldsegn, mreq, "in input.c" );
-              mem_realloc( (void **)&zload.ldtype, mreq, "in input.c" );
+              mem_realloc((void **)&zload.ldsegn, mreq);
+              mem_realloc((void **)&zload.ldtype, mreq);
               for( idx = 0; idx < nseg; idx++ )
               {
                 zload.ldtype[zload.nldseg]   = itmp1;
@@ -1347,8 +1347,8 @@ Read_Commands( void )
               nseg = itmp4 - itmp3 + 1;
               if( nseg <= 0 ) nseg = 1;
               mreq = (size_t)(nseg + zload.nldseg) * sizeof(int);
-              mem_realloc( (void **)&zload.ldsegn, mreq, "in input.c" );
-              mem_realloc( (void **)&zload.ldtype, mreq, "in input.c" );
+              mem_realloc((void **)&zload.ldsegn, mreq);
+              mem_realloc((void **)&zload.ldtype, mreq);
               for( idx = 0; idx < nseg; idx++ )
               {
                 zload.ldtype[zload.nldseg]   = itmp1;
@@ -1365,8 +1365,8 @@ Read_Commands( void )
                 if(data.segments[idx].itag == itmp2 )
                 {
                   mreq = (size_t)(zload.nldseg + 1) * sizeof(int);
-                  mem_realloc( (void **)&zload.ldsegn, mreq, "in input.c" );
-                  mem_realloc( (void **)&zload.ldtype, mreq, "in input.c" );
+                  mem_realloc((void **)&zload.ldsegn, mreq);
+                  mem_realloc((void **)&zload.ldtype, mreq);
                   zload.ldtype[zload.nldseg]   = itmp1;
                   zload.ldsegn[zload.nldseg++] = idx+1;
                 }
@@ -1376,8 +1376,8 @@ Read_Commands( void )
               nseg = itmp4 - itmp3 + 1;
               if( nseg <= 0 ) nseg = 1; /* Just one seg of tag (=itmp3) */
               mreq = (size_t)(zload.nldseg + nseg) * sizeof(int);
-              mem_realloc( (void **)&zload.ldsegn, mreq, "in input.c" );
-              mem_realloc( (void **)&zload.ldtype, mreq, "in input.c" );
+              mem_realloc((void **)&zload.ldsegn, mreq);
+              mem_realloc((void **)&zload.ldtype, mreq);
               for( idx = 0; idx < nseg; idx++ )
               {
                 zload.ldtype[zload.nldseg] = itmp1;
@@ -1427,17 +1427,17 @@ Read_Commands( void )
           /* Re-allocate network buffers */
           netcx.nonet++;
           mreq = (size_t)netcx.nonet * sizeof(int);
-          mem_realloc( (void **)&netcx.ntyp,  mreq, "in input.c" );
-          mem_realloc( (void **)&netcx.iseg1, mreq, "in input.c" );
-          mem_realloc( (void **)&netcx.iseg2, mreq, "in input.c" );
+          mem_realloc((void **)&netcx.ntyp, mreq);
+          mem_realloc((void **)&netcx.iseg1, mreq);
+          mem_realloc((void **)&netcx.iseg2, mreq);
 
           mreq = (size_t)netcx.nonet * sizeof(double);
-          mem_realloc( (void **)&netcx.x11r, mreq, "in input.c" );
-          mem_realloc( (void **)&netcx.x11i, mreq, "in input.c" );
-          mem_realloc( (void **)&netcx.x12r, mreq, "in input.c" );
-          mem_realloc( (void **)&netcx.x12i, mreq, "in input.c" );
-          mem_realloc( (void **)&netcx.x22r, mreq, "in input.c" );
-          mem_realloc( (void **)&netcx.x22i, mreq, "in input.c" );
+          mem_realloc((void **)&netcx.x11r, mreq);
+          mem_realloc((void **)&netcx.x11i, mreq);
+          mem_realloc((void **)&netcx.x12r, mreq);
+          mem_realloc((void **)&netcx.x12i, mreq);
+          mem_realloc((void **)&netcx.x22r, mreq);
+          mem_realloc((void **)&netcx.x22i, mreq);
 
           idx = netcx.nonet-1;
           if( ain_num == NT )
@@ -1737,7 +1737,7 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
     cmnd_fexprs[i][0] = '\0';
 
   /* read a line from input file */
-  mem_alloc((void **)&line_buf, LINE_LEN, "in readmn()");
+  mem_alloc((void **)&line_buf, LINE_LEN);
   if( line_buf == NULL ) return( FALSE );
   startptr = line_buf;
   eof = Load_Line( line_buf, input_fp );
@@ -1943,7 +1943,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
     geom_fexprs[i][0] = '\0';
 
   /* read a line from input file */
-  mem_alloc((void **)&line_buf, LINE_LEN, "in readgm()");
+  mem_alloc((void **)&line_buf, LINE_LEN);
   if( line_buf == NULL ) return( FALSE );
   startptr = line_buf;
    eof = Load_Line( line_buf, input_fp );

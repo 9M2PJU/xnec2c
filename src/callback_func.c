@@ -533,15 +533,15 @@ Alloc_Crnt_Buffs( void )
   if( data.m > 0 )
   {
     size_t mreq = (size_t)data.m * sizeof( double );
-    mem_realloc( (void **)&ct1m, mreq, "in callback_func.c" );
-    mem_realloc( (void **)&ct2m, mreq, "in callback_func.c" );
+    mem_realloc((void **)&ct1m, mreq);
+    mem_realloc((void **)&ct2m, mreq);
   }
 
   /* Segment currents buffer */
   if( data.n > 0 )
   {
     size_t mreq = (size_t)data.n * sizeof( double );
-    mem_realloc( (void **)&cmag, mreq, "in callback_func.c" );
+    mem_realloc((void **)&cmag, mreq);
   }
 
 } /* Alloc_Crnt_Buffs() */

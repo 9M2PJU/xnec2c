@@ -83,10 +83,10 @@ New_Patch_Data(void)
     return 0.0;
 
   mreq = (size_t)data.m * sizeof(patch_corners_t);
-  mem_realloc((void **)&geom_pre.patch_corners, mreq, __LOCATION__);
+  mem_realloc((void **)&geom_pre.patch_corners, mreq);
 
   mreq = (size_t)data.m * sizeof(patch_tangent_frame_t);
-  mem_realloc((void **)&geom_pre.patch_tangent_frame, mreq, __LOCATION__);
+  mem_realloc((void **)&geom_pre.patch_tangent_frame, mreq);
 
   for( idx = 0; idx < data.m; idx++ )
   {

@@ -905,7 +905,7 @@ int meas_write_format(measurement_t *m, char *format, FILE *fp)
 	// mreq length is 20*count of formatted strings to get all the floating point digits
 	// plus the total number of chars in `format` should be more than enough.
 	mreq = 20*count+len;
-	mem_alloc((void**)&s, 20*count+len, __LOCATION__);
+	mem_alloc((void **)&s, 20 * count + len);
 
 	meas_format(m, format, s, mreq-1);
 	ret = fputs(s, fp);

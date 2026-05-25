@@ -37,7 +37,7 @@
   void
 scenebuffer_init(cairo_scenebuffer_t *sb, size_t initial_capacity)
 {
-  mem_alloc((void **)&sb->segs, initial_capacity * sizeof(Segment_t), "scenebuffer");
+  mem_alloc((void **)&sb->segs, initial_capacity * sizeof(Segment_t));
   sb->count    = 0;
   sb->capacity = (int)initial_capacity;
 }
@@ -90,7 +90,7 @@ scenebuffer_add(cairo_scenebuffer_t *sb, const Segment_t *seg)
   {
     int new_cap = sb->capacity * 2;
     Segment_t *grown = NULL;
-    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Segment_t), "scenebuffer grow");
+    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Segment_t));
     memcpy(grown, sb->segs, (size_t)sb->count * sizeof(Segment_t));
     free_ptr((void **)&sb->segs);
     sb->segs     = grown;

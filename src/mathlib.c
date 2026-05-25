@@ -309,7 +309,7 @@ int open_mathlib(mathlib_t *lib)
 	dlerror();
 
 	// Open the .so library, split on a comma (,):
-	mem_alloc((void**)&libfn0, strlen(lib->lib)+1, __LOCATION__);
+	mem_alloc((void **)&libfn0, strlen(lib->lib) + 1);
 	strcpy(libfn0, lib->lib);
 	libfn = libfn0;
 	while ((token = strtok_r(libfn, ",", &libfn)) != NULL)
@@ -338,7 +338,7 @@ int open_mathlib(mathlib_t *lib)
 	if (lib->init != NULL)
 		lib->init(lib);
 
-	mem_alloc((void **) &lib->functions, sizeof(void *) * num_mathfuncs, __LOCATION__);
+	mem_alloc((void **)&lib->functions, sizeof(void *) * num_mathfuncs);
 	for (fidx = 0; fidx < num_mathfuncs; fidx++)
 	{
 		// Clear any error state

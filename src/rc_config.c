@@ -422,7 +422,7 @@ int parse_var(rc_config_vars_t *v, char *line, char *locale)
 		return 0;
 
 	mreq = strlen(v->format)+4;
-	mem_alloc((void**)&format, mreq, __LOCATION__);
+	mem_alloc((void **)&format, mreq);
 	snprintf(format, mreq-1, "%s%%n", v->format);
 
 	setlocale(LC_NUMERIC, locale);

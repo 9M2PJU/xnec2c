@@ -228,7 +228,7 @@ alloc_struct_colors(int nfrq)
     return;
 
   mreq = (size_t)nfrq * sizeof(struct_colors_t);
-  mem_realloc( (void **)&struct_colors, mreq, "in prerender_color.c" );
+  mem_realloc((void **)&struct_colors, mreq);
   memset( struct_colors, 0, mreq );
   allocated_steps = nfrq;
 
@@ -237,17 +237,17 @@ alloc_struct_colors(int nfrq)
     if( data.n > 0 )
     {
       mreq = (size_t)data.n * sizeof(rgb_f_t);
-      mem_alloc( (void **)&struct_colors[i].wire_crnt_rgb, mreq, "in prerender_color.c" );
-      mem_alloc( (void **)&struct_colors[i].wire_chrg_rgb, mreq, "in prerender_color.c" );
+      mem_alloc((void **)&struct_colors[i].wire_crnt_rgb, mreq);
+      mem_alloc((void **)&struct_colors[i].wire_chrg_rgb, mreq);
     }
 
     if( data.m > 0 )
     {
       mreq = (size_t)data.m * sizeof(rgb_f_t);
-      mem_alloc( (void **)&struct_colors[i].patch_crnt_rgb, mreq, "in prerender_color.c" );
+      mem_alloc((void **)&struct_colors[i].patch_crnt_rgb, mreq);
 
       mreq = (size_t)data.m * 4 * sizeof(float);
-      mem_alloc( (void **)&struct_colors[i].patch_flow_data, mreq, "in prerender_color.c" );
+      mem_alloc((void **)&struct_colors[i].patch_flow_data, mreq);
     }
   }
 }
@@ -297,10 +297,10 @@ init_geometry_colors(void)
   if( data.n > 0 )
   {
     mreq = (size_t)data.n * sizeof(rgb_f_t);
-    mem_realloc( (void **)&seg_rgb, mreq, "in prerender_color.c" );
+    mem_realloc((void **)&seg_rgb, mreq);
 
     mreq = (size_t)data.n * sizeof(float);
-    mem_realloc( (void **)&seg_width, mreq, "in prerender_color.c" );
+    mem_realloc((void **)&seg_width, mreq);
 
     for( i = 0; i < data.n; i++ )
     {
@@ -316,7 +316,7 @@ init_geometry_colors(void)
   if( data.m > 0 )
   {
     mreq = (size_t)data.m * sizeof(rgb_f_t);
-    mem_realloc( (void **)&patch_rgb, mreq, "in prerender_color.c" );
+    mem_realloc((void **)&patch_rgb, mreq);
 
     /* Patches use SEG_COLOR_NORMAL blue constant */
     segment_type_to_rgb(SEG_COLOR_NORMAL, &r, &g, &b);

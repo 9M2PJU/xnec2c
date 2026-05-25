@@ -52,7 +52,7 @@ view_new(view_type_t type,
 {
   view_t *v = NULL;
 
-  mem_alloc((void **)&v, sizeof(view_t), __LOCATION__);
+  mem_alloc((void **)&v, sizeof(view_t));
 
   glm_mat4_identity(v->R);
   v->rotation_master   = NULL;

@@ -320,7 +320,7 @@ void fitness_config_init(fitness_config_t *cfg)
 
 	memset(cfg, 0, sizeof(*cfg));
 	mem_alloc((void **)&cfg->obj,
-		FITNESS_OBJ_INIT_CAP * sizeof(fitness_objective_t), __LOCATION__);
+		  FITNESS_OBJ_INIT_CAP * sizeof(fitness_objective_t));
 	cfg->capacity = FITNESS_OBJ_INIT_CAP;
 	cfg->num_obj = 0;
 
@@ -355,7 +355,7 @@ fitness_objective_t *fitness_config_add(fitness_config_t *cfg, int meas_index)
 
 		new_cap = (cfg->capacity > 0) ? cfg->capacity * 2 : FITNESS_OBJ_INIT_CAP;
 		mem_realloc((void **)&cfg->obj,
-			new_cap * sizeof(fitness_objective_t), __LOCATION__);
+			    new_cap * sizeof(fitness_objective_t));
 		cfg->capacity = new_cap;
 	}
 
@@ -410,7 +410,7 @@ void fitness_config_copy(fitness_config_t *dst, const fitness_config_t *src)
 	if (src->num_obj > 0)
 	{
 		mem_alloc((void **)&dst->obj,
-			src->num_obj * sizeof(fitness_objective_t), __LOCATION__);
+			  src->num_obj * sizeof(fitness_objective_t));
 		memcpy(dst->obj, src->obj,
 			src->num_obj * sizeof(fitness_objective_t));
 	}

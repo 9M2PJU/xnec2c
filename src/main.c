@@ -163,7 +163,7 @@ main (int argc, char *argv[])
   // so make a copy of it for later:
   setlocale(LC_ALL, "");
   char *l = setlocale(LC_NUMERIC, NULL);
-  mem_alloc((void**)&orig_numeric_locale, strlen(l)+1, __LOCATION__);
+  mem_alloc((void **)&orig_numeric_locale, strlen(l) + 1);
   strcpy(orig_numeric_locale, l);
 
   // Initialize gettext for internationalization
@@ -412,12 +412,12 @@ main (int argc, char *argv[])
   if( calc_data.num_jobs >= 1 && enable_forking )
   {
     size_t mreq = (size_t)calc_data.num_jobs * sizeof(child_proc_t *);
-    mem_alloc( (void **)&child_procs, mreq, "in main.c" );
+    mem_alloc((void **)&child_procs, mreq);
     for( idx = 0; idx < calc_data.num_jobs; idx++ )
     {
       child_procs[idx] = NULL;
       mreq = sizeof(child_proc_t);
-      mem_alloc( (void **)&child_procs[idx], mreq, "in main.c" );
+      mem_alloc((void **)&child_procs[idx], mreq);
     }
 
     pr_info("Forking %d jobs.\n", calc_data.num_jobs);
@@ -472,10 +472,10 @@ main (int argc, char *argv[])
     /* Allocate a virtual child for non-forked mode so the
      * frequency loop state machine operates identically. */
     size_t mreq = sizeof(child_proc_t *);
-    mem_alloc( (void **)&child_procs, mreq, "in main.c" );
+    mem_alloc((void **)&child_procs, mreq);
     child_procs[0] = NULL;
     mreq = sizeof(child_proc_t);
-    mem_alloc( (void **)&child_procs[0], mreq, "in main.c" );
+    mem_alloc((void **)&child_procs[0], mreq);
     child_procs[0]->idx           = 0;
     child_procs[0]->pid           = 0;
     child_procs[0]->to_child[0]   = -1;

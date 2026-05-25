@@ -173,7 +173,7 @@ int opt_start(simple_var_t *vars, int num_vars,
 		active_session = NULL;
 	}
 
-	mem_alloc((void **)&session, sizeof(opt_session_t), __LOCATION__);
+	mem_alloc((void **)&session, sizeof(opt_session_t));
 	g_mutex_init(&session->best_lock);
 	fitness_config_copy(&session->fitness_cfg, fitness_cfg);
 	session->running = TRUE;
@@ -205,8 +205,7 @@ int opt_start(simple_var_t *vars, int num_vars,
 			double *ssize_copy = NULL;
 
 			mem_alloc((void **)&ssize_copy,
-				algo_params->simplex.num_ssize * sizeof(double),
-				__LOCATION__);
+				  algo_params->simplex.num_ssize * sizeof(double));
 			memcpy(ssize_copy, algo_params->simplex.ssize,
 				algo_params->simplex.num_ssize * sizeof(double));
 			session->simple_cfg.opts.simplex.ssize = ssize_copy;

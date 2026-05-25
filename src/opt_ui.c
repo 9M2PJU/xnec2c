@@ -236,9 +236,8 @@ void opt_ui_init(GtkBuilder *builder)
 
 	/* Pre-allocate buffers for timer-driven best-measurement display */
 	mem_alloc((void **)&timer_meas,
-		OPT_MAX_FREQ_STEPS * sizeof(measurement_t), __LOCATION__);
-	mem_alloc((void **)&timer_freq,
-		OPT_MAX_FREQ_STEPS * sizeof(double), __LOCATION__);
+		  OPT_MAX_FREQ_STEPS * sizeof(measurement_t));
+	mem_alloc((void **)&timer_freq, OPT_MAX_FREQ_STEPS * sizeof(double));
 
 	/* Load saved configuration, then initialize formula display */
 	opt_file_load();

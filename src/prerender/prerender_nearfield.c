@@ -99,7 +99,7 @@ Prerender_Near_Field(int fstep)
   if( fpat.nfeh & NEAR_EFIELD )
   {
     mreq = (size_t)npts * sizeof(nf_vector_t);
-    mem_realloc((void **)&np->e_vecs, mreq, __LOCATION__);
+    mem_realloc((void **)&np->e_vecs, mreq);
     prerender_field_vectors(np->e_vecs, nf, npts, dr, TRUE);
   }
 
@@ -107,7 +107,7 @@ Prerender_Near_Field(int fstep)
   if( fpat.nfeh & NEAR_HFIELD )
   {
     mreq = (size_t)npts * sizeof(nf_vector_t);
-    mem_realloc((void **)&np->h_vecs, mreq, __LOCATION__);
+    mem_realloc((void **)&np->h_vecs, mreq);
     prerender_field_vectors(np->h_vecs, nf, npts, dr, FALSE);
   }
 
@@ -117,10 +117,10 @@ Prerender_Near_Field(int fstep)
   if( (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
   {
     mreq = (size_t)npts * sizeof(nf_vector_t);
-    mem_realloc((void **)&np->pov_vecs, mreq, __LOCATION__);
+    mem_realloc((void **)&np->pov_vecs, mreq);
 
     mreq = (size_t)npts * sizeof(float);
-    mem_realloc((void **)&np->pr_buf, mreq, __LOCATION__);
+    mem_realloc((void **)&np->pr_buf, mreq);
 
     np->pov_max = 0.0f;
 

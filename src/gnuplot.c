@@ -297,10 +297,10 @@ Save_RadPattern_Gnuplot_Data( char *filename )
       if( !mreq || (mreq != (size_t)npts * sizeof(double)) )
       {
         mreq = (size_t)npts * sizeof( double );
-        mem_realloc( (void **)&pov_x, mreq, "in draw_radiation.c" );
-        mem_realloc( (void **)&pov_y, mreq, "in draw_radiation.c" );
-        mem_realloc( (void **)&pov_z, mreq, "in draw_radiation.c" );
-        mem_realloc( (void **)&pov_r, mreq, "in draw_radiation.c" );
+        mem_realloc((void **)&pov_x, mreq);
+        mem_realloc((void **)&pov_y, mreq);
+        mem_realloc((void **)&pov_z, mreq);
+        mem_realloc((void **)&pov_r, mreq);
       }
 
       /* Calculate Poynting vector and its max and min */

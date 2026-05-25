@@ -72,11 +72,11 @@ prerender_state_alloc(int steps_total)
   size_t mreq;
 
   mreq = (size_t)steps_total * sizeof(ff_pre_t);
-  mem_alloc((void **)&ff_pre, mreq, __LOCATION__);
+  mem_alloc((void **)&ff_pre, mreq);
   memset(ff_pre, 0, mreq);
 
   mreq = (size_t)steps_total * sizeof(nf_pre_t);
-  mem_alloc((void **)&nf_pre, mreq, __LOCATION__);
+  mem_alloc((void **)&nf_pre, mreq);
   memset(nf_pre, 0, mreq);
 
   /* Pre-allocate near-field inner arrays as pipe-read destinations.
@@ -90,11 +90,11 @@ prerender_state_alloc(int steps_total)
     {
       mreq = (size_t)npts * sizeof(nf_vector_t);
       if( fpat.nfeh & NEAR_EFIELD )
-        mem_alloc((void **)&nf_pre[i].e_vecs,   mreq, __LOCATION__);
+        mem_alloc((void **)&nf_pre[i].e_vecs, mreq);
       if( fpat.nfeh & NEAR_HFIELD )
-        mem_alloc((void **)&nf_pre[i].h_vecs,   mreq, __LOCATION__);
+        mem_alloc((void **)&nf_pre[i].h_vecs, mreq);
       if( (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-        mem_alloc((void **)&nf_pre[i].pov_vecs, mreq, __LOCATION__);
+        mem_alloc((void **)&nf_pre[i].pov_vecs, mreq);
     }
   }
 

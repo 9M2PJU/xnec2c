@@ -123,23 +123,23 @@ Alloc_Crnt_Fstep_Buffers( int nfrq )
 
   /* Outer array — zero so realloc of sub-fields receives NULL, not garbage */
   mreq = (size_t)nfrq * sizeof(crnt_t);
-  mem_realloc( (void **)&crnt_fstep, mreq, "in structure_ui.c" );
+  mem_realloc((void **)&crnt_fstep, mreq);
   memset( crnt_fstep, 0, mreq );
 
   for( int i = 0; i < nfrq; i++ )
   {
     /* Basis function coefficients: npm elements each */
     mreq = (size_t)data.npm * sizeof(double);
-    mem_realloc( (void **)&crnt_fstep[i].air, mreq, "in structure_ui.c" );
-    mem_realloc( (void **)&crnt_fstep[i].aii, mreq, "in structure_ui.c" );
-    mem_realloc( (void **)&crnt_fstep[i].bir, mreq, "in structure_ui.c" );
-    mem_realloc( (void **)&crnt_fstep[i].bii, mreq, "in structure_ui.c" );
-    mem_realloc( (void **)&crnt_fstep[i].cir, mreq, "in structure_ui.c" );
-    mem_realloc( (void **)&crnt_fstep[i].cii, mreq, "in structure_ui.c" );
+    mem_realloc((void **)&crnt_fstep[i].air, mreq);
+    mem_realloc((void **)&crnt_fstep[i].aii, mreq);
+    mem_realloc((void **)&crnt_fstep[i].bir, mreq);
+    mem_realloc((void **)&crnt_fstep[i].bii, mreq);
+    mem_realloc((void **)&crnt_fstep[i].cir, mreq);
+    mem_realloc((void **)&crnt_fstep[i].cii, mreq);
 
     /* Solved current amplitudes: np3m elements */
     mreq = (size_t)data.np3m * sizeof(complex double);
-    mem_realloc( (void **)&crnt_fstep[i].cur, mreq, "in structure_ui.c" );
+    mem_realloc((void **)&crnt_fstep[i].cur, mreq);
 
   }
 
@@ -268,7 +268,7 @@ Init_Struct_Drawing( void )
 {
   /* We need n segs for wires + 4 edges per patch */
   size_t mreq = (size_t)(data.n + 4*data.m) * sizeof(Segment_t);
-  mem_realloc( (void **)&structure_segs, mreq, "in structure_ui.c" );
+  mem_realloc((void **)&structure_segs, mreq);
   Prerender_Aggregate();
 
   /* Viewport only exists in the UI process; children skip this harmlessly.

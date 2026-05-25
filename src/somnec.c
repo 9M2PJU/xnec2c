@@ -79,9 +79,9 @@ bessel( complex double z,
     int i;
 
     size_t mreq = 101 * sizeof(double);
-    mem_alloc( (void **)&m, mreq, "in somnec.c");
-    mem_alloc( (void **)&a1, mreq, "in somnec.c");
-    mem_alloc( (void **)&a2, mreq, "in somnec.c");
+    mem_alloc((void **)&m, mreq);
+    mem_alloc((void **)&a1, mreq);
+    mem_alloc((void **)&a2, mreq);
 
     for( k = 1; k <= 25; k++ )
     {
@@ -191,12 +191,12 @@ hankel( complex double z,
   {
     first_call = FALSE;
     size_t mreq = 101 * sizeof(int);
-    mem_alloc( (void **)&m, mreq, "in somnec.c");
+    mem_alloc((void **)&m, mreq);
     mreq = 25 * sizeof(double);
-    mem_alloc( (void **)&a1, mreq, "in somnec.c");
-    mem_alloc( (void **)&a2, mreq, "in somnec.c");
-    mem_alloc( (void **)&a3, mreq, "in somnec.c");
-    mem_alloc( (void **)&a4, mreq, "in somnec.c");
+    mem_alloc((void **)&a1, mreq);
+    mem_alloc((void **)&a2, mreq);
+    mem_alloc((void **)&a3, mreq);
+    mem_alloc((void **)&a4, mreq);
   }
 
   /* initialization of constants */
@@ -418,14 +418,14 @@ rom1( int n, complex double *sum, int nx )
   {
     first_call = FALSE;
     size_t mreq = 6 * sizeof(complex double);
-    mem_alloc( (void **)&g1, mreq, "in somnec.c");
-    mem_alloc( (void **)&g2, mreq, "in somnec.c");
-    mem_alloc( (void **)&g3, mreq, "in somnec.c");
-    mem_alloc( (void **)&g4, mreq, "in somnec.c");
-    mem_alloc( (void **)&g5, mreq, "in somnec.c");
-    mem_alloc( (void **)&t01, mreq, "in somnec.c");
-    mem_alloc( (void **)&t10, mreq, "in somnec.c");
-    mem_alloc( (void **)&t20, mreq, "in somnec.c");
+    mem_alloc((void **)&g1, mreq);
+    mem_alloc((void **)&g2, mreq);
+    mem_alloc((void **)&g3, mreq);
+    mem_alloc((void **)&g4, mreq);
+    mem_alloc((void **)&g5, mreq);
+    mem_alloc((void **)&t01, mreq);
+    mem_alloc((void **)&t10, mreq);
+    mem_alloc((void **)&t20, mreq);
   }
 
   lstep=0;
@@ -597,11 +597,11 @@ gshank( complex double start, complex double dela,
   {
     first_call = FALSE;
     size_t mreq = 6 * 20 * sizeof(complex double);
-    mem_alloc( (void **)&q1, mreq, "in somnec.c");
-    mem_alloc( (void **)&q2, mreq, "in somnec.c");
+    mem_alloc((void **)&q1, mreq);
+    mem_alloc((void **)&q2, mreq);
     mreq = 6 * sizeof(complex double);
-    mem_alloc( (void **)&ans1, mreq, "in somnec.c");
-    mem_alloc( (void **)&ans2, mreq, "in somnec.c");
+    mem_alloc((void **)&ans1, mreq);
+    mem_alloc((void **)&ans2, mreq);
   }
 
   rbk=creal(bk);
@@ -768,8 +768,8 @@ evlua( complex double *erv, complex double *ezv,
   {
     first_call = FALSE;
     size_t mreq = 6 * sizeof(complex double);
-    mem_alloc( (void **)&sum, mreq, "in somnec.c");
-    mem_alloc( (void **)&ans, mreq, "in somnec.c");
+    mem_alloc((void **)&sum, mreq);
+    mem_alloc((void **)&ans, mreq);
   }
 
   del=zph;
@@ -918,21 +918,21 @@ somnec( double epr, double sig, double fmhz )
 
     /* Allocate some buffers */
     size_t mreq = sizeof(complex double) * 11 * 10 * 4;
-    mem_alloc( (void **)&ggrid.ar1, mreq, "in somnec.c");
+    mem_alloc((void **)&ggrid.ar1, mreq);
     mreq = sizeof(complex double) * 17 * 5 * 4;
-    mem_alloc( (void **)&ggrid.ar2, mreq, "in somnec.c");
+    mem_alloc((void **)&ggrid.ar2, mreq);
     mreq = sizeof(complex double) * 9 * 8 * 4;
-    mem_alloc( (void **)&ggrid.ar3, mreq, "in somnec.c");
+    mem_alloc((void **)&ggrid.ar3, mreq);
 
     mreq = sizeof(int) * 3;
-    mem_alloc( (void **)&ggrid.nxa, mreq, "in somnec.c");
-    mem_alloc( (void **)&ggrid.nya, mreq, "in somnec.c");
+    mem_alloc((void **)&ggrid.nxa, mreq);
+    mem_alloc((void **)&ggrid.nya, mreq);
 
     mreq = sizeof(double) * 3;
-    mem_alloc( (void **)&ggrid.dxa, mreq, "in somnec.c");
-    mem_alloc( (void **)&ggrid.dya, mreq, "in somnec.c");
-    mem_alloc( (void **)&ggrid.xsa, mreq, "in somnec.c");
-    mem_alloc( (void **)&ggrid.ysa, mreq, "in somnec.c");
+    mem_alloc((void **)&ggrid.dxa, mreq);
+    mem_alloc((void **)&ggrid.dya, mreq);
+    mem_alloc((void **)&ggrid.xsa, mreq);
+    mem_alloc((void **)&ggrid.ysa, mreq);
 
     /* Initialize ground grid parameters for somnec */
     ggrid.nxa[0] = 11;

@@ -100,7 +100,7 @@ opengl_rdpattern_generate_nf_field_lines(
   total_lines = n_fields * npts;
 
   mreq = (size_t)total_lines * 2 * sizeof(lit_color_point_t);
-  mem_realloc((void **)&nf_lines, mreq, __LOCATION__);
+  mem_realloc((void **)&nf_lines, mreq);
 
   line_idx = 0;
 
@@ -200,7 +200,7 @@ opengl_rdpattern_generate_lines(
   total_lines = theta_edges + phi_edges;
 
   mreq = (size_t)total_lines * 2 * sizeof(lit_color_point_t);
-  mem_realloc((void **)&rdpat_lines, mreq, __LOCATION__);
+  mem_realloc((void **)&rdpat_lines, mreq);
 
   vi = 0;
   edge_idx = 0;
@@ -304,13 +304,13 @@ opengl_rdpattern_generate_triangles(
   rdpat_triangle_count = 2 * nph * (nth - 1);
 
   mreq = (size_t)rdpat_triangle_count * sizeof(lit_color_triangle_t);
-  mem_realloc((void **)&rdpat_triangles, mreq, __LOCATION__);
+  mem_realloc((void **)&rdpat_triangles, mreq);
 
   /* Allocate and zero temporary per-vertex normal accumulator */
   npts = nth * nph;
   mreq = (size_t)npts * sizeof(point_f_3d_t);
   vertex_normals = NULL;
-  mem_realloc((void **)&vertex_normals, mreq, __LOCATION__);
+  mem_realloc((void **)&vertex_normals, mreq);
   memset(vertex_normals, 0, mreq);
 
   /* Pass 1: accumulate face normals into each corner vertex */

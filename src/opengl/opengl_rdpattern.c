@@ -158,7 +158,7 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
     if( npts > rdpat_translated_capacity )
     {
       size_t mreq = (size_t)npts * sizeof(point_3d_t);
-      mem_realloc((void **)&rdpat_translated_points, mreq, __LOCATION__);
+      mem_realloc((void **)&rdpat_translated_points, mreq);
       rdpat_translated_capacity = npts;
     }
 
