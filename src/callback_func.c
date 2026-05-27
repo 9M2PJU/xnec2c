@@ -439,17 +439,6 @@ Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
       return;
     }
 
-    /* Swap to OpenGL renderer if enabled */
-#ifdef HAVE_OPENGL
-    if( rc_config.use_opengl_renderer &&
-        rdpattern_gl_area && rdpattern_cairo_da )
-    {
-      gtk_widget_hide(rdpattern_cairo_da);
-      gtk_widget_show(rdpattern_gl_area);
-      rdpattern_drawingarea = rdpattern_gl_area;
-    }
-#endif
-
     /* Enable gain (radiation) pattern plotting */
     rdpattern_trigger_redraw();
   }
@@ -486,17 +475,6 @@ Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
       return;
     }
-
-    /* Swap to Cairo renderer if OpenGL disabled */
-#ifdef HAVE_OPENGL
-    if( !rc_config.use_opengl_renderer &&
-        rdpattern_cairo_da && rdpattern_gl_area )
-    {
-      gtk_widget_hide(rdpattern_gl_area);
-      gtk_widget_show(rdpattern_cairo_da);
-      rdpattern_drawingarea = rdpattern_cairo_da;
-    }
-#endif
 
     /* Delegate near field calculations to child
      * processes if forked and near field data valid */

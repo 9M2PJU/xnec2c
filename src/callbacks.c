@@ -577,19 +577,7 @@ on_main_rdpattern_activate(
       rdpattern_gl_area = opengl_rdpattern_create_widget();
       gtk_box_pack_start(GTK_BOX(box), rdpattern_gl_area, TRUE, TRUE, 0);
 
-      /* Select renderer based on config preference */
-      if( rc_config.use_opengl_renderer )
-      {
-        gtk_widget_hide( rdpattern_cairo_da );
-        gtk_widget_show( rdpattern_gl_area );
-        rdpattern_drawingarea = rdpattern_gl_area;
-      }
-      else
-      {
-        gtk_widget_hide( rdpattern_gl_area );
-        gtk_widget_show( rdpattern_cairo_da );
-        rdpattern_drawingarea = rdpattern_cairo_da;
-      }
+      opengl_set_renderer(rc_config.use_opengl_renderer);
     }
 #else
     rdpattern_drawingarea = Builder_Get_Object(

@@ -553,18 +553,7 @@ main (int argc, char *argv[])
     structure_gl_area = opengl_structure_create_widget();
     gtk_box_pack_start(GTK_BOX(box), structure_gl_area, TRUE, TRUE, 0);
 
-    if( rc_config.use_opengl_renderer )
-    {
-      gtk_widget_hide(structure_cairo_da);
-      gtk_widget_show(structure_gl_area);
-      structure_drawingarea = structure_gl_area;
-    }
-    else
-    {
-      gtk_widget_hide(structure_gl_area);
-      gtk_widget_show(structure_cairo_da);
-      structure_drawingarea = structure_cairo_da;
-    }
+    opengl_set_renderer(rc_config.use_opengl_renderer);
   }
 #else
   structure_drawingarea = structure_cairo_da;
@@ -741,17 +730,6 @@ Open_Input_File( gpointer arg )
   gtk_widget_show( Builder_Get_Object(main_window_builder, "main_hbox2") );
   gtk_widget_show( Builder_Get_Object(main_window_builder, "main_grid1") );
   gtk_widget_show( Builder_Get_Object(main_window_builder, "structure_frame") );
-
-#ifdef HAVE_OPENGL
-  /* Hide inactive structure renderer after parent visible */
-  if( structure_gl_area != NULL && structure_cairo_da != NULL )
-  {
-    if( rc_config.use_opengl_renderer )
-      gtk_widget_hide(structure_cairo_da);
-    else
-      gtk_widget_hide(structure_gl_area);
-  }
-#endif
 
   gtk_widget_show( Builder_Get_Object(main_window_builder, "main_view_menuitem") );
   gtk_widget_show( structure_drawingarea );
