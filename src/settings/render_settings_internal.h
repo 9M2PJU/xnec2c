@@ -33,7 +33,7 @@ extern const config_tab_defaults_t general_tab_defaults;
 extern const config_tab_defaults_t opengl_tab_defaults;
 extern const config_tab_defaults_t cairo_tab_defaults;
 
-/* General tab sync: applies GL-availability sensitivity to widgets */
+/* General tab: sync widgets from rc_config and apply GL-availability sensitivity */
 void general_tab_sync(void);
 
 /* Available in both HAVE_OPENGL and non-OpenGL builds */

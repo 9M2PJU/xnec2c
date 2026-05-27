@@ -26,6 +26,10 @@
 #include "../structure_ui.h"
 #include "../rdpattern_ui.h"
 
+#ifdef HAVE_OPENGL
+#include "../opengl/opengl_state.h"
+#endif
+
 
 /*------------------------------------------------------------------------*/
 
@@ -52,6 +56,58 @@ on_render_settings_changed(GtkWidget *widget, gpointer user_data)
    * changes are detected by their own staleness checks. */
   Queue_Structure_Redraw();
   Queue_Radiation_Redraw();
+}
+
+/*------------------------------------------------------------------------*/
+
+/** general_tab_apply_gl_sensitivity - Disable renderer toggle when GL unavailable
+ *
+ * Called by general_tab_sync() after config_sync_tab(SETTINGS_TAB_GENERAL) to
+ * apply hardware-availability constraints to the OpenGL renderer checkbox.
+ */
+static void
+general_tab_apply_gl_sensitivity(void)
+{
+  GtkWidget *w;
+
+  w = Builder_Get_Object(render_settings_builder, "chk_opengl_renderer");
+  if( w != NULL )
+  {
+#ifdef HAVE_OPENGL
+    if( opengl_gl_context_failed() )
+    {
+      gtk_widget_set_sensitive(w, FALSE);
+      gtk_widget_set_tooltip_text(w,
+          "OpenGL is not available on this display.\n"
+          "Cairo rendering is active.");
+    }
+    else
+    {
+      gtk_widget_set_sensitive(w, TRUE);
+      gtk_widget_set_tooltip_text(w, NULL);
+    }
+#else
+    gtk_widget_set_sensitive(w, FALSE);
+    gtk_widget_set_tooltip_text(w,
+        "Built without OpenGL support.\n"
+        "Cairo rendering is active.");
+#endif
+  }
+}
+
+/*------------------------------------------------------------------------*/
+
+/** general_tab_sync - Sync General tab widgets and apply GL-availability constraints
+ *
+ * Single entry point for General tab synchronisation.  Populates widgets
+ * from rc_config via config_sync_tab then applies hardware-availability
+ * sensitivity to the renderer toggle.
+ */
+void
+general_tab_sync(void)
+{
+  config_sync_tab(SETTINGS_TAB_GENERAL);
+  general_tab_apply_gl_sensitivity();
 }
 
 /*------------------------------------------------------------------------*/

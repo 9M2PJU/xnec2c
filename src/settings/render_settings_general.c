@@ -26,9 +26,6 @@
 #include "../structure_ui.h"
 #include "../rdpattern_ui.h"
 
-#ifdef HAVE_OPENGL
-#include "../opengl/opengl_state.h"
-#endif
 
 /*------------------------------------------------------------------------*/
 
@@ -79,45 +76,6 @@ const config_tab_defaults_t general_tab_defaults = {
 
 /*------------------------------------------------------------------------*/
 
-/** general_tab_sync - Populate General tab widgets from rc_config
- *
- * Uses generic dispatch for field values, then disables the renderer
- * toggle when OpenGL is unavailable (build-time or runtime).
- */
-void
-general_tab_sync(void)
-{
-  GtkWidget *w;
-
-  config_sync_tab(SETTINGS_TAB_GENERAL);
-
-  /* Disable renderer toggle when OpenGL is unavailable */
-  w = Builder_Get_Object(render_settings_builder, "chk_opengl_renderer");
-  if( w != NULL )
-  {
-#ifdef HAVE_OPENGL
-    if( opengl_gl_context_failed() )
-    {
-      gtk_widget_set_sensitive(w, FALSE);
-      gtk_widget_set_tooltip_text(w,
-          "OpenGL is not available on this display.\n"
-          "Cairo rendering is active.");
-    }
-    else
-    {
-      gtk_widget_set_sensitive(w, TRUE);
-      gtk_widget_set_tooltip_text(w, NULL);
-    }
-#else
-    gtk_widget_set_sensitive(w, FALSE);
-    gtk_widget_set_tooltip_text(w,
-        "Built without OpenGL support.\n"
-        "Cairo rendering is active.");
-#endif
-  }
-}
-
-/*------------------------------------------------------------------------*/
 
 /** on_general_reset_clicked - Per-tab Reset button handler for General tab
  *
