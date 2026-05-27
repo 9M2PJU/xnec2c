@@ -7,8 +7,9 @@ for l in "$@"; do
 	echo
 	echo
 	echo ================================== $l ===============================
-	scripts/trans-validate-1.sh "$l"
-	stty echo cooked
-	reset
-	sleep 3
+	if scripts/trans-validate-1.sh "$l"; then 
+		stty echo cooked
+		reset
+		sleep 3
+	fi
 done

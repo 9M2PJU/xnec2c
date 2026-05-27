@@ -30,7 +30,7 @@ count_f=$(msgattrib --only-fuzzy "$l" | grep -c '^msgid ".')
 if [ "$count_u" -eq 0 ] && [ "$count_f" -eq 0 ]; then
 	echo "$l: fully translated"
 	rm -f "$scope"
-	exit 0
+	exit 1
 fi
 
 echo "$l: $count_u untranslated, $count_f fuzzy"
@@ -147,3 +147,5 @@ msgmerge --update --backup=none "$l" po/xnec2c.pot
 msgattrib --no-obsolete -o "$l" "$l"
 
 rm -f "$scope"
+
+exit 0
