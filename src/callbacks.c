@@ -1639,10 +1639,6 @@ on_rdpattern_window_delete_event(
     GdkEvent        *event,
     gpointer         user_data)
 {
-  /* Disable auto setting of Gain and EH toggle buttons */
-  rc_config.rdpattern_gain_togglebutton = 0;
-  rc_config.rdpattern_eh_togglebutton   = 0;
-
   /* Close rdpattern window without confirmation dialog */
   if( !rc_config.confirm_quit )
   {
