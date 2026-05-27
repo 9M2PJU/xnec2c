@@ -419,7 +419,7 @@ rdpattern_overlay_generate(const gl_view_content_t *primary, gl_view_content_t *
    * the interactive scale_adj on top.
    * Near-field: structure and field vectors share the same space (scale 1.0). */
   float structure_extent = (float)geom_pre.scene_radius;
-  int fstep = calc_data.freq_step;
+  int fstep = rc->fstep;
   if( rc->mode == RENDER_MODE_FARFIELD && structure_extent > 0.0f
       && ff_pre != NULL && fstep >= 0 )
   {

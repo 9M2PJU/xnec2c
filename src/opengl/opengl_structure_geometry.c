@@ -258,7 +258,7 @@ generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *p
       {
         float mag_ratio;
 
-        get_precomputed_flow_data(calc_data.freq_step, idx, fd);
+        get_precomputed_flow_data(params->fstep, idx, fd);
         mag_ratio = (float)sqrt(
             fd[0] * fd[0] + fd[1] * fd[1] +
             fd[2] * fd[2] + fd[3] * fd[3]);
@@ -417,7 +417,7 @@ generate_patches_triangles(gl_draw_batch_t *batch, const struct_draw_params_t *p
     p_r = params->patch_colors[idx].r;
     p_g = params->patch_colors[idx].g;
     p_b = params->patch_colors[idx].b;
-    get_precomputed_flow_data(calc_data.freq_step, idx, fd);
+    get_precomputed_flow_data(params->fstep, idx, fd);
 
     /* Triangle 1: c0(1,1), c1(0,1), c2(0,0) */
     verts[vidx++] = (structure_vertex_t){
@@ -571,8 +571,8 @@ opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *
     /* Prevent redundant regeneration on subsequent expose events */
     if( params->cmax > 0.0 )
     {
-      last_fstep = calc_data.freq_step;
-      last_freq_mhz = calc_data.freq_mhz;
+      last_fstep = params->fstep;
+      last_freq_mhz = params->freq_mhz;
     }
 
     /* Update shared overlay data after regeneration */

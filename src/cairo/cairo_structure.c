@@ -266,7 +266,7 @@ draw_surface_patches(cairo_scenebuffer_t *sb, view_t *v, double scale, Segment_t
       /* Deposit flow arrow segments when current data is above threshold */
       if( params->show_flow )
       {
-        int fstep = calc_data.freq_step;
+        int fstep = params->fstep;
         get_precomputed_flow_data(fstep, idx, fd);
         mag_ratio = (float)sqrt(
             fd[0] * fd[0] + fd[1] * fd[1] +
