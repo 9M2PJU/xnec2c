@@ -1625,9 +1625,9 @@ on_rdpattern_window_destroy(
    * references the rdpattern view that is about to be freed. */
   if( rdpattern_view != NULL && rdpattern_view->rotation_master != NULL )
     view_unshare_master( rdpattern_view );
+#endif
 
   view_free( &rdpattern_view );
-#endif
 
   Rdpattern_Window_Killed();
 }
