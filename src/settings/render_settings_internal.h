@@ -33,14 +33,10 @@ extern const config_tab_defaults_t general_tab_defaults;
 extern const config_tab_defaults_t opengl_tab_defaults;
 extern const config_tab_defaults_t cairo_tab_defaults;
 
-#ifdef HAVE_OPENGL
-
-/* General tab sync retains GL-availability sensitivity logic */
+/* General tab sync: applies GL-availability sensitivity to widgets */
 void general_tab_sync(void);
 
-#endif /* HAVE_OPENGL */
-
-/* Available in both HAVE_OPENGL and stub builds */
+/* Available in both HAVE_OPENGL and non-OpenGL builds */
 void render_settings_sync_from_config(void);
 
 #endif /* RENDER_SETTINGS_INTERNAL_H */

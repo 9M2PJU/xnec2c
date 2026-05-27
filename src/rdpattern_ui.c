@@ -644,6 +644,28 @@ Queue_Radiation_Redraw(void)
 
 /*-----------------------------------------------------------------------*/
 
+/** rdpattern_view_changed_cb() - view_t change callback for rdpattern view
+ * @v:           view that changed
+ * @_user_data:  unused
+ *
+ * Invoked by view_notify_change() whenever rotation, pan, zoom, or extent
+ * changes.  Refreshes the WR/WI spin display and queues a radiation pattern
+ * redraw.  Bound as changed_cb at view_new() in callbacks.c; when sharing is
+ * active the master (structure_view) reaches this callback via its
+ * rotation_follower link inside view_notify_change().
+ */
+  void
+rdpattern_view_changed_cb(view_t *v, gpointer _user_data)
+{
+  (void)_user_data;
+
+  view_update_spin_display( v );
+  Queue_Radiation_Redraw();
+
+} /* rdpattern_view_changed_cb() */
+
+/*-----------------------------------------------------------------------*/
+
 /**
  * rdpattern_overlay_shift_scroll() - Adjust overlay structure scale from scroll input
  * @dir:      GDK_SCROLL_UP or GDK_SCROLL_DOWN

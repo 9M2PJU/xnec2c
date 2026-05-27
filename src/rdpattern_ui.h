@@ -41,6 +41,8 @@ double Scale_Gain(double gain, int fstep, int idx);
  * Mutates rc_config.rdpattern_overlay_scale_adj and queues a rdpattern redraw.
  * Returns TRUE when the event was consumed, FALSE otherwise.
  */
+void rdpattern_view_changed_cb(view_t *v, gpointer user_data);
+
 gboolean rdpattern_overlay_shift_scroll(GdkScrollDirection dir,
     int vp_w, int vp_h, double zoom_pct);
 

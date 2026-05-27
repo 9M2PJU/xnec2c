@@ -49,7 +49,6 @@ typedef struct
 GtkWidget* opengl_structure_create_widget(void);
 void opengl_structure_cleanup(void);
 void opengl_structure_invalidate(void);
-void opengl_structure_queue_draw(void);
 
 /* Scale below which segments render as lines instead of cylinders with 0.001 epsilon for slider */
 #define CYLINDER_SCALE_LINE_THRESHOLD 0.101
@@ -57,11 +56,6 @@ void opengl_structure_queue_draw(void);
 #ifdef HAVE_OPENGL
 #include "../opengl-engine/opengl_renderer.h"
 #include "../view/view_core.h"
-
-/* view_t change callback for the structure view.  Bound at view_new()
- * so view_notify_change() fires this directly; no dynamic observer
- * registration exists. */
-void structure_view_changed_cb(view_t *v, gpointer user_data);
 
 /* Extended vertex with UV and flow data for chevron shader.
  * First 48 bytes are layout-identical to lit_color_point_t. */

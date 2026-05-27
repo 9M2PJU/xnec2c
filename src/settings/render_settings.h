@@ -22,8 +22,6 @@
 
 #include "../common.h"
 
-#ifdef HAVE_OPENGL
-
 /** render_settings_init - Create builder and window from glade resource */
 gboolean render_settings_init(void);
 
@@ -35,6 +33,4 @@ void render_settings_hide(void);
 
 /** render_settings_sync_from_config - Update all widgets from rc_config */
 void render_settings_sync_from_config(void);
-
-#endif /* HAVE_OPENGL */
 #endif /* RENDER_SETTINGS_H */

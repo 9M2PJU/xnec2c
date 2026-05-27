@@ -19,13 +19,14 @@
 
 #include "../shared.h"
 
-#ifdef HAVE_OPENGL
+#include "../callbacks.h"
 #include "render_settings.h"
 #include "render_settings_common.h"
 #include "render_settings_internal.h"
 #include "../opengl/opengl_structure.h"
-#include "../opengl/opengl_rdpattern.h"
 #include "../opengl/opengl_msaa.h"
+#include "../structure_ui.h"
+#include "../rdpattern_ui.h"
 
 /*------------------------------------------------------------------------*/
 
@@ -48,9 +49,16 @@ CFG_FLT_ASSERT(transparency_rdpat_wire);
 CFG_FLT_ASSERT(transparency_nearfield);
 CFG_FLT_ASSERT(transparency_ground_plane);
 CFG_FLT_ASSERT(transparency_axes);
+CFG_INT_ASSERT(opengl_orthographic);
 CFG_DBL_ASSERT(opengl_cylinder_radius_scale);
 
 /* Post-apply wrappers: read value from rc_config after generic write */
+
+static void post_apply_sync_ortho(void)
+{
+  sync_ortho_toolbar_button();
+}
+
 
 static void post_apply_set_msaa(void)
 {
@@ -67,6 +75,10 @@ static void post_apply_set_radius_scale(void)
 /* OpenGL tab dispatch table: brightness, transparency, toggles, radios.
  * Radio groups: first entry carries the reset default value. */
 static const config_default_t opengl_defaults[] = {
+  /* Orthographic projection toggle (widget in OpenGL tab glade;
+   * config entry here since it only affects the OpenGL renderer) */
+  CFG_INT(opengl_orthographic, "chk_orthographic", post_apply_sync_ortho, 1),
+
   /* Per-type brightness sliders (0.0=black, 1.0=full) */
   CFG_FLT(brightness_segments,      "scale_bright_segments",      NULL, 0.47f),
   CFG_FLT(brightness_patches,       "scale_bright_patches",       NULL, 0.47f),
@@ -116,8 +128,9 @@ const config_tab_defaults_t opengl_tab_defaults = {
 
 /** on_opengl_tab_reset_clicked - Per-tab Reset button handler for OpenGL tab
  *
- * Restores brightness, transparency, cylinder scale, MSAA, and draw style
- * to compiled-in defaults. Syncs widgets and redraws OpenGL views.
+ * Restores orthographic projection, brightness, transparency, cylinder scale,
+ * MSAA, and draw style to compiled-in defaults. Syncs widgets and redraws
+ * OpenGL views.
  */
 void
 on_opengl_tab_reset_clicked(GtkButton *button, gpointer user_data)
@@ -128,8 +141,6 @@ on_opengl_tab_reset_clicked(GtkButton *button, gpointer user_data)
   config_reset_tab_user(SETTINGS_TAB_OPENGL);
   config_sync_tab(SETTINGS_TAB_OPENGL);
   opengl_structure_invalidate();
-  opengl_structure_queue_draw();
-  opengl_rdpattern_queue_draw();
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
 }
-
-#endif /* HAVE_OPENGL */

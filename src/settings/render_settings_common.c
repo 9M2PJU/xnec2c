@@ -127,6 +127,7 @@ render_settings_load_glade(void)
     return FALSE;
   }
 
+#ifdef HAVE_OPENGL
   if( !gtk_builder_add_from_resource(render_settings_builder,
         "/settings/opengl_settings.glade", &gerror) )
   {
@@ -135,6 +136,7 @@ render_settings_load_glade(void)
     g_error_free(gerror);
     return FALSE;
   }
+#endif
 
   if( !gtk_builder_add_from_resource(render_settings_builder,
         "/settings/cairo_settings.glade", &gerror) )

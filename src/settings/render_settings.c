@@ -18,15 +18,13 @@
  */
 
 #include "../shared.h"
-
-#ifdef HAVE_OPENGL
 #include "../callbacks.h"
 #include "render_settings.h"
 #include "render_settings_internal.h"
 #include "render_settings_common.h"
-#include "../opengl/opengl_structure.h"
-#include "../opengl/opengl_rdpattern.h"
-#include "../opengl/opengl_msaa.h"
+
+#include "../structure_ui.h"
+#include "../rdpattern_ui.h"
 
 
 /*------------------------------------------------------------------------*/
@@ -49,34 +47,11 @@ on_render_settings_changed(GtkWidget *widget, gpointer user_data)
 
   config_apply_tab(tab);
 
-  /* Redraw only the views affected by the owning tab.  No invalidate needed
-   * for brightness/transparency since visual params are read from rc_config
-   * each frame.  Cylinder scale and draw style changes are detected by their
-   * own staleness checks. */
-  switch( tab )
-  {
-    case SETTINGS_TAB_GENERAL:
-      /* Renderer switch and ortho/rotation changes affect all views */
-      opengl_structure_queue_draw();
-      opengl_rdpattern_queue_draw();
-      xnec2_widget_queue_draw(structure_drawingarea, TRUE);
-      xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
-      break;
-
-    case SETTINGS_TAB_OPENGL:
-      opengl_structure_queue_draw();
-      opengl_rdpattern_queue_draw();
-      break;
-
-    case SETTINGS_TAB_CAIRO:
-      xnec2_widget_queue_draw(structure_drawingarea, TRUE);
-      xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
-      break;
-
-    default:
-      BUG("on_render_settings_changed: unknown tab %d\n", (int)tab);
-      break;
-  }
+  /* No invalidate needed for brightness/transparency since visual params
+   * are read from rc_config each frame.  Cylinder scale and draw style
+   * changes are detected by their own staleness checks. */
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
 }
 
 /*------------------------------------------------------------------------*/
@@ -89,7 +64,6 @@ on_render_settings_changed(GtkWidget *widget, gpointer user_data)
 void
 render_settings_sync_from_config(void)
 {
-  /* Toolbar buttons live in main/rdpattern builders; sync them unconditionally */
   sync_ortho_toolbar_button();
 
   if( render_settings_builder == NULL )
@@ -124,8 +98,10 @@ render_settings_init(void)
           render_settings_builder, "render_settings_notebook"));
     GtkWidget *general_content = GTK_WIDGET(gtk_builder_get_object(
           render_settings_builder, "general_tab_content"));
+#ifdef HAVE_OPENGL
     GtkWidget *gl_content = GTK_WIDGET(gtk_builder_get_object(
           render_settings_builder, "opengl_tab_content"));
+#endif
     GtkWidget *cairo_content = GTK_WIDGET(gtk_builder_get_object(
           render_settings_builder, "cairo_tab_content"));
 
@@ -133,9 +109,11 @@ render_settings_init(void)
       gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
           general_content, gtk_label_new("General"));
 
+#ifdef HAVE_OPENGL
     if( notebook != NULL && gl_content != NULL )
       gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
           gl_content, gtk_label_new("OpenGL"));
+#endif
 
     if( notebook != NULL && cairo_content != NULL )
       gtk_notebook_append_page(GTK_NOTEBOOK(notebook),
@@ -232,5 +210,3 @@ on_render_settings_window_destroy(GtkWidget *widget, gpointer user_data)
 
   render_settings_window = NULL;
 }
-
-#endif /* HAVE_OPENGL */

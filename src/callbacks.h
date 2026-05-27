@@ -36,11 +36,16 @@ void opengl_common_projection_sync(void);
  * SIGNAL_BLOCK/SIGNAL_UNBLOCK in programmatic update sites. */
 void on_freq_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 
-#ifdef HAVE_OPENGL
+/* Ortho toolbar toggle handler; stub in non-OpenGL builds */
+void on_ortho_toggled(GtkToggleButton *button, gpointer user_data);
+
 /* Ortho toolbar projection sync (defined in callbacks.c) */
 void sync_ortho_toolbar_button(void);
-void on_ortho_toggled(GtkToggleButton *button, gpointer user_data);
-#endif /* HAVE_OPENGL */
+
+#ifndef HAVE_OPENGL
+/* Hide a widget by builder id; removes OpenGL-only toolbar buttons */
+void hide_widget_by_id(GtkBuilder *builder, const char *widget_id);
+#endif /* !HAVE_OPENGL */
 
 /* ISO C forbids casting a function pointer to gpointer (void *) directly.
  * A union reinterpret is defined behavior under C99/C11 and avoids that cast.

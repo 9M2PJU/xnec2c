@@ -26,8 +26,6 @@
 GtkWidget* opengl_rdpattern_create_widget(void);
 void opengl_rdpattern_cleanup(void);
 GtkWidget* opengl_rdpattern_get_widget(void);
-void opengl_rdpattern_queue_draw(void);
-
 #ifdef HAVE_OPENGL
 #include "../opengl-engine/opengl_renderer.h"
 #include "../render/render_dispatch.h"
@@ -39,11 +37,6 @@ gboolean gl_rdpat_draw_nearfield(void *ctx,
     const near_field_point_t *origins, int npts,
     const nf_field_set_t *fields, int n_fields,
     double dr, double r_max);
-
-/* view_t change callback for the rdpattern view.  Bound at view_new()
- * so view_notify_change() fires this directly; no dynamic observer
- * registration exists. */
-void rdpattern_view_changed_cb(view_t *v, gpointer user_data);
 
 #endif /* HAVE_OPENGL */
 #endif /* OPENGL_RDPATTERN_H */

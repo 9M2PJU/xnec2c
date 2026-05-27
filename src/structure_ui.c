@@ -209,6 +209,28 @@ Queue_Structure_Redraw(void)
 
 /*-----------------------------------------------------------------------*/
 
+/** structure_view_changed_cb() - view_t change callback for structure view
+ * @v:           view that changed
+ * @_user_data:  unused
+ *
+ * Invoked by view_notify_change() whenever rotation, pan, zoom, or extent
+ * changes.  Refreshes the WR/WI spin display and queues a structure redraw.
+ * Propagation to the rdpattern view under common-projection sharing is
+ * handled internally by view_t via the rotation_follower link established
+ * by view_share_master().  Bound as changed_cb at view_new() in main.c.
+ */
+  void
+structure_view_changed_cb(view_t *v, gpointer _user_data)
+{
+  (void)_user_data;
+
+  view_update_spin_display( v );
+  Queue_Structure_Redraw();
+
+} /* structure_view_changed_cb() */
+
+/*-----------------------------------------------------------------------*/
+
 /** Animate_Phase() - Unified animation tick callback
  * @_udata: unused
  *

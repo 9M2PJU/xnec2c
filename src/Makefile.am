@@ -42,11 +42,8 @@ xnec2c_SOURCES = \
     settings/render_settings.c settings/render_settings.h \
     settings/render_settings_common.c settings/render_settings_common.h \
     settings/render_settings_dispatch.c \
-    opengl/opengl_state.c opengl/opengl_state.h \
-    opengl/opengl_ops.c \
     settings/render_settings_internal.h \
     settings/render_settings_general.c \
-    settings/render_settings_opengl.c \
     settings/render_settings_cairo.c \
     expr_edit.c     expr_edit.h \
     opt_ui.c        opt_ui.h \
@@ -141,6 +138,9 @@ xnec2c_CPPFLAGS += $(GSL_CFLAGS)
 xnec2c_LDADD    += $(GSL_LIBS)
 if HAVE_OPENGL
 xnec2c_SOURCES += \
+  opengl/opengl_state.c opengl/opengl_state.h \
+  opengl/opengl_ops.c \
+  settings/render_settings_opengl.c \
   opengl-engine/opengl_renderer.c opengl-engine/opengl_renderer.h \
   opengl-engine/opengl_view.c opengl-engine/opengl_view.h \
   opengl-engine/opengl_view_render.c opengl-engine/opengl_view_render.h \
@@ -164,6 +164,9 @@ xnec2c_SOURCES += \
 xnec2c_CPPFLAGS += $(EPOXY_CFLAGS)
 xnec2c_LDADD    += $(EPOXY_LIBS)
 xnec2c_LDADD    += $(GL_LIBS)
+else
+xnec2c_SOURCES += \
+  settings/render_settings_stubs.c
 endif
 
 

@@ -306,32 +306,6 @@ static gl_scene_provider_t structure_scene_provider = {
 
 /*-----------------------------------------------------------------------*/
 
-/** structure_view_changed_cb() - view_t change callback for structure view
- * @v:           view that changed (structure_view)
- * @_user_data:  unused
- *
- * Invoked by view_notify_change() whenever rotation, pan, zoom or
- * extent changes.  Queues redraws on the Cairo path (Queue_Structure_Redraw)
- * and the GL widget, and refreshes the WR/WI spin display.  Propagation
- * to the rdpattern view under common-projection sharing is handled
- * internally by view_t via the rotation_follower link established by
- * view_share_master().  Bound as changed_cb at view_new() in main.c.
- */
-  void
-structure_view_changed_cb(view_t *v, gpointer _user_data)
-{
-  (void)_user_data;
-
-  view_update_spin_display( v );
-  Queue_Structure_Redraw();
-
-  if( structure_gl_widget )
-    xnec2_widget_queue_draw( structure_gl_widget, TRUE );
-
-} /* structure_view_changed_cb() */
-
-/*-----------------------------------------------------------------------*/
-
 /** opengl_structure_create_widget_impl() - Create the OpenGL structure widget using the generic view engine
  *
  * Returns existing widget if already created.
@@ -422,14 +396,3 @@ opengl_structure_invalidate(void)
 }
 
 /*-----------------------------------------------------------------------*/
-
-/** opengl_structure_queue_draw() - Public API: queue redraw of OpenGL structure widget
- */
-  void
-opengl_structure_queue_draw(void)
-{
-#ifdef HAVE_OPENGL
-  if( structure_gl_widget != NULL )
-    xnec2_widget_queue_draw( structure_gl_widget, TRUE );
-#endif
-}

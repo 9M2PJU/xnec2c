@@ -18,25 +18,27 @@
  */
 
 #include "../shared.h"
-
-#ifdef HAVE_OPENGL
 #include "../callbacks.h"
 #include "render_settings.h"
 #include "render_settings_common.h"
 #include "render_settings_internal.h"
-#include "../opengl/opengl_structure.h"
-#include "../opengl/opengl_rdpattern.h"
+
+#include "../structure_ui.h"
+#include "../rdpattern_ui.h"
+
+#ifdef HAVE_OPENGL
 #include "../opengl/opengl_state.h"
+#endif
 
 /*------------------------------------------------------------------------*/
 
 /* Compile-time width checks for int-typed config fields */
-CFG_INT_ASSERT(use_opengl_renderer);
 CFG_INT_ASSERT(view_drag_constrained);
-CFG_INT_ASSERT(opengl_orthographic);
 CFG_DBL_ASSERT(rdpattern_overlay_scale_adj);
 
 /* Post-apply wrappers: read new value from rc_config after generic write */
+
+CFG_INT_ASSERT(use_opengl_renderer);
 
 static void post_apply_set_renderer(void)
 {
@@ -48,18 +50,23 @@ static void post_apply_set_constrained(void)
   opengl_set_constrained_rotation(rc_config.view_drag_constrained);
 }
 
-static void post_apply_sync_ortho(void)
-{
-  sync_ortho_toolbar_button();
-}
-
 /*------------------------------------------------------------------------*/
 
-/* General tab defaults: widget-bound fields and widget-less rendering defaults */
+/* Reset default: enable OpenGL renderer only when built with OpenGL support */
+#ifdef HAVE_OPENGL
+# define RENDERER_RESET_DEFAULT 1
+#else
+# define RENDERER_RESET_DEFAULT 0
+#endif
+
+/* General tab defaults: renderer toggle, constrained rotation, and
+ * overlay scale (renderer-agnostic; used by both Cairo and OpenGL paths).
+ * Orthographic projection lives in the OpenGL tab (OpenGL-only). */
 static const config_default_t general_defaults[] = {
-  CFG_INT(use_opengl_renderer, "chk_opengl_renderer", post_apply_set_renderer, 1),
+  CFG_INT(use_opengl_renderer, "chk_opengl_renderer", post_apply_set_renderer, RENDERER_RESET_DEFAULT),
   CFG_INT(view_drag_constrained, "chk_constrained_rotation", post_apply_set_constrained, 1),
-  CFG_INT(opengl_orthographic, "chk_orthographic", post_apply_sync_ortho, 1),
+
+  /* Overlay scale (no widget; programmatic session state via shift+scroll) */
   CFG_DBL(rdpattern_overlay_scale_adj, NULL, NULL, 1.0),
 };
 
@@ -74,8 +81,8 @@ const config_tab_defaults_t general_tab_defaults = {
 
 /** general_tab_sync - Populate General tab widgets from rc_config
  *
- * Uses generic dispatch for field values, then applies GL-availability
- * sensitivity logic to the renderer toggle widget.
+ * Uses generic dispatch for field values, then disables the renderer
+ * toggle when OpenGL is unavailable (build-time or runtime).
  */
 void
 general_tab_sync(void)
@@ -84,10 +91,11 @@ general_tab_sync(void)
 
   config_sync_tab(SETTINGS_TAB_GENERAL);
 
-  /* Disable renderer toggle when OpenGL is unavailable on this display */
+  /* Disable renderer toggle when OpenGL is unavailable */
   w = Builder_Get_Object(render_settings_builder, "chk_opengl_renderer");
   if( w != NULL )
   {
+#ifdef HAVE_OPENGL
     if( opengl_gl_context_failed() )
     {
       gtk_widget_set_sensitive(w, FALSE);
@@ -100,6 +108,12 @@ general_tab_sync(void)
       gtk_widget_set_sensitive(w, TRUE);
       gtk_widget_set_tooltip_text(w, NULL);
     }
+#else
+    gtk_widget_set_sensitive(w, FALSE);
+    gtk_widget_set_tooltip_text(w,
+        "Built without OpenGL support.\n"
+        "Cairo rendering is active.");
+#endif
   }
 }
 
@@ -107,9 +121,9 @@ general_tab_sync(void)
 
 /** on_general_reset_clicked - Per-tab Reset button handler for General tab
  *
- * Resets OpenGL renderer, constrained rotation, and orthographic projection
- * to defaults via config_reset_tab_user (which invokes post_apply hooks for
- * changed fields), then syncs widgets and redraws.
+ * Resets constrained rotation, renderer toggle, and overlay scale to
+ * defaults, syncs widgets, and redraws.  The renderer toggle is disabled
+ * when OpenGL is unavailable (build-time or runtime context failure).
  */
 void
 on_general_reset_clicked(GtkButton *button, gpointer user_data)
@@ -120,8 +134,6 @@ on_general_reset_clicked(GtkButton *button, gpointer user_data)
   config_reset_tab_user(SETTINGS_TAB_GENERAL);
 
   general_tab_sync();
-  opengl_structure_queue_draw();
-  opengl_rdpattern_queue_draw();
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
 }
-
-#endif /* HAVE_OPENGL */

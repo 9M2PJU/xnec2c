@@ -20,7 +20,9 @@
 #include "main.h"
 #include "shared.h"
 #include "mathlib.h"
+#include "structure_ui.h"
 #include "opengl/opengl_structure.h"
+#include "cairo/cairo_draw.h"
 
 /* Forward declaration — full sy_overrides.h conflicts with openblas via gsl */
 extern void sy_overrides_close_if_empty(void);
@@ -531,11 +533,7 @@ main (int argc, char *argv[])
    * subsequent viewport/angle assignments. */
   structure_view = view_new( VIEW_STRUCTURE,
       rotate_structure, incline_structure, structure_zoom,
-#ifdef HAVE_OPENGL
       structure_view_changed_cb, NULL );
-#else
-      NULL, NULL );
-#endif
   view_set_spin_handlers( structure_view,
       G_CALLBACK(on_main_rotate_spinbutton_value_changed),
       G_CALLBACK(on_main_incline_spinbutton_value_changed) );
@@ -570,6 +568,8 @@ main (int argc, char *argv[])
   }
 #else
   structure_drawingarea = structure_cairo_da;
+
+  hide_widget_by_id(main_window_builder, "main_ortho_button");
 #endif
 
   /* Signal start of xnec2c */
@@ -870,9 +870,8 @@ Open_Input_File( gpointer arg )
   {
 #ifdef HAVE_OPENGL
     opengl_structure_invalidate();
-    opengl_structure_queue_draw();
 #endif
-    xnec2_widget_queue_draw( structure_drawingarea, TRUE );
+    Queue_Structure_Redraw();
   }
 
   /* Close symbol overrides window if no symbols defined */

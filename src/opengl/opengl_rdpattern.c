@@ -480,31 +480,6 @@ static gl_scene_provider_t rdpattern_scene_provider = {
 
 /*-----------------------------------------------------------------------*/
 
-/** rdpattern_view_changed_cb() - view_t change callback for rdpattern view
- * @v:           view that changed (rdpattern_view)
- * @_user_data:  unused
- *
- * Queues a redraw on the rdpattern GL widget and Cairo path and
- * refreshes the rdpattern WR/WI spin display.  Bound as changed_cb at
- * view_new() in callbacks.c; when sharing is active the master
- * (structure_view) reaches this callback via its rotation_follower
- * link inside view_notify_change().
- */
-  void
-rdpattern_view_changed_cb(view_t *v, gpointer _user_data)
-{
-  (void)_user_data;
-
-  view_update_spin_display( v );
-  Queue_Radiation_Redraw();
-
-  if( rdpattern_gl_widget )
-    xnec2_widget_queue_draw( rdpattern_gl_widget, TRUE );
-
-} /* rdpattern_view_changed_cb() */
-
-/*-----------------------------------------------------------------------*/
-
 /** opengl_rdpattern_create_widget_impl() - Create the OpenGL radiation pattern widget using the generic view engine
  */
   static GtkWidget*
@@ -579,14 +554,3 @@ opengl_rdpattern_get_widget(void)
 }
 
 /*-----------------------------------------------------------------------*/
-
-/** opengl_rdpattern_queue_draw() - Public API: queue redraw of OpenGL radiation pattern widget
- */
-  void
-opengl_rdpattern_queue_draw(void)
-{
-#ifdef HAVE_OPENGL
-  if( rdpattern_gl_widget != NULL )
-    xnec2_widget_queue_draw( rdpattern_gl_widget, TRUE );
-#endif
-}

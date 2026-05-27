@@ -475,17 +475,8 @@
               <packing><property name="left-attach">2</property><property name="top-attach">2</property></packing>
             </child>
             <child>
-              <object class="GtkCheckButton" id="chk_only_on_click">
-                <property name="visible">True</property><property name="can-focus">True</property>
-                <property name="label">Transparency Only on Click</property><property name="active">True</property><property name="margin-top">4</property>
-                <property name="tooltip-text">Apply per-type transparency only while dragging; otherwise always active</property>
-                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
-              </object>
-              <packing><property name="left-attach">0</property><property name="top-attach">3</property><property name="width">3</property></packing>
-            </child>
-            <child>
               <object class="GtkLabel"><property name="visible">True</property><property name="can-focus">False</property><property name="label">Cylinder Scale</property><property name="xalign">0</property><property name="margin-top">4</property></object>
-              <packing><property name="left-attach">0</property><property name="top-attach">4</property></packing>
+              <packing><property name="left-attach">0</property><property name="top-attach">3</property></packing>
             </child>
             <child>
               <object class="GtkScale" id="scale_cylinder_scale">
@@ -494,7 +485,7 @@
                 <property name="tooltip-text">Visual thickness of wire segments (does not affect NEC2 model calculations)</property>
                 <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
               </object>
-              <packing><property name="left-attach">1</property><property name="top-attach">4</property><property name="width">2</property></packing>
+              <packing><property name="left-attach">1</property><property name="top-attach">3</property><property name="width">2</property></packing>
             </child>
             <child>
               <object class="GtkLabel">
@@ -503,7 +494,26 @@
                 <property name="xalign">0</property><property name="margin-start">4</property>
                 <attributes><attribute name="style" value="italic"/><attribute name="scale" value="0.85"/></attributes>
               </object>
+              <packing><property name="left-attach">0</property><property name="top-attach">4</property><property name="width">3</property></packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="chk_only_on_click">
+                <property name="visible">True</property><property name="can-focus">True</property>
+                <property name="label">Transparency Only on Click</property><property name="active">True</property><property name="margin-top">4</property>
+                <property name="tooltip-text">Apply per-type transparency only while dragging; otherwise always active</property>
+                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+              </object>
               <packing><property name="left-attach">0</property><property name="top-attach">5</property><property name="width">3</property></packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="chk_orthographic">
+                <property name="visible">True</property><property name="can-focus">True</property>
+                <property name="label">Orthographic Projection</property><property name="margin-top">4</property>
+                <property name="tooltip-text">Use orthographic projection; disables perspective foreshortening.
+Enable for precise angular measurements or flat pattern inspection.</property>
+                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+              </object>
+              <packing><property name="left-attach">0</property><property name="top-attach">6</property><property name="width">3</property></packing>
             </child>
           </object>
         </child>
@@ -525,7 +535,7 @@
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="use-underline">True</property>
-            <property name="tooltip-text">Reset OpenGL brightness, transparency, MSAA, draw style, and cylinder scale to defaults</property>
+            <property name="tooltip-text">Reset orthographic projection, brightness, transparency, MSAA, draw style, and cylinder scale to defaults</property>
             <signal name="clicked" handler="on_opengl_tab_reset_clicked" swapped="no"/>
           </object>
           <packing>

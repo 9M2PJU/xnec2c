@@ -23,6 +23,7 @@
 #include "measurements.h"
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
+#include "cairo/cairo_draw.h"
 #include "cairo/cairo_frame.h"
 #include <pthread.h>
 
@@ -34,6 +35,20 @@
 #include "opengl/opengl_rdpattern.h"
 #include "opengl/opengl_msaa.h"
 #endif
+
+#ifndef HAVE_OPENGL
+
+/* Hide a widget by builder id; used to remove OpenGL-only toolbar
+ * buttons (eg orthographic projection) in Cairo-only builds. */
+void
+hide_widget_by_id(GtkBuilder *builder, const char *widget_id)
+{
+  GtkWidget *w = GTK_WIDGET(gtk_builder_get_object(builder, widget_id));
+  if( w != NULL )
+    gtk_widget_hide(w);
+}
+
+#endif /* !HAVE_OPENGL */
 
 static void noise_model_menus_populate(void);
 static void noise_interp_menu_set_active(int method);
@@ -541,11 +556,7 @@ on_main_rdpattern_activate(
     {
       rdpattern_view = view_new( VIEW_RDPATTERN,
           rotate_rdpattern, incline_rdpattern, rdpattern_zoom,
-#ifdef HAVE_OPENGL
           rdpattern_view_changed_cb, NULL );
-#else
-          NULL, NULL );
-#endif
       view_set_spin_handlers( rdpattern_view,
           G_CALLBACK(on_rdpattern_rotate_spinbutton_value_changed),
           G_CALLBACK(on_rdpattern_incline_spinbutton_value_changed) );
@@ -585,6 +596,8 @@ on_main_rdpattern_activate(
     rdpattern_cairo_da = NULL;
     rdpattern_gl_area = NULL;
     rc_config.use_opengl_renderer = 0;
+
+    hide_widget_by_id(rdpattern_window_builder, "rdpattern_ortho_button");
 #endif
     gtk_widget_get_allocation( rdpattern_drawingarea, &alloc );
     rdpattern_width  = alloc.width;
@@ -2316,7 +2329,6 @@ opengl_set_renderer(gboolean enable)
   void
 opengl_set_constrained_rotation(gboolean constrained)
 {
-#ifdef HAVE_OPENGL
   drag_mode_t mode;
 
   rc_config.view_drag_constrained = constrained ? 1 : 0;
@@ -2327,7 +2339,6 @@ opengl_set_constrained_rotation(gboolean constrained)
 
   if( rdpattern_view != NULL )
     view_set_drag_mode( rdpattern_view, mode );
-#endif
 
 } /* opengl_set_constrained_rotation() */
 
@@ -2840,9 +2851,9 @@ on_flow_direction_activate(
       rc_config.current_flow_visualization_mode = items[i].mode;
 #ifdef HAVE_OPENGL
       opengl_structure_invalidate();
-      opengl_structure_queue_draw();
-      opengl_rdpattern_queue_draw();
 #endif
+      Queue_Structure_Redraw();
+      Queue_Radiation_Redraw();
 
       /* Animation produces no visible change for phase-invariant modes.
        * Grey out Animate menu item for Polarization Tilt and Peak Magnitude. */
@@ -2900,10 +2911,7 @@ on_rdpattern_draw_style_activate(
     {
       rc_config.rdpattern_draw_style = items[i].style;
 
-      /* Force geometry regeneration by resetting staleness tracker */
-#ifdef HAVE_OPENGL
-      opengl_rdpattern_queue_draw();
-#endif
+      Queue_Radiation_Redraw();
       return;
     }
   }
@@ -5804,8 +5812,6 @@ on_escape_key_press_event(
 
 /*------------------------------------------------------------------------*/
 
-#ifdef HAVE_OPENGL
-
 /* Ortho toolbar button entries: builder pointer-to-pointer, button id, image id */
 static const struct
 {
@@ -5855,6 +5861,8 @@ sync_ortho_toolbar_button(void)
 
 /*------------------------------------------------------------------------*/
 
+#ifdef HAVE_OPENGL
+
 /**
  * on_ortho_toggled - Toolbar toggle handler for orthographic projection
  *
@@ -5870,8 +5878,20 @@ on_ortho_toggled(GtkToggleButton *button, gpointer user_data)
   rc_config.opengl_orthographic = gtk_toggle_button_get_active(button) ? 1 : 0;
   sync_ortho_toolbar_button();
   render_settings_sync_from_config();
-  opengl_structure_queue_draw();
-  opengl_rdpattern_queue_draw();
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
+}
+
+#else /* !HAVE_OPENGL */
+
+/* Stub: glade binds on_ortho_toggled on toolbar buttons that are hidden
+ * in non-OpenGL builds; provide the symbol so gtk_builder_connect_signals
+ * resolves without warning. */
+void
+on_ortho_toggled(GtkToggleButton *button, gpointer user_data)
+{
+  (void)button;
+  (void)user_data;
 }
 
 #endif /* HAVE_OPENGL */
