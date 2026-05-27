@@ -652,15 +652,6 @@ Create_Default_Config( void )
   rc_config.rdpattern_poynting_vector = 0;
   rc_config.rdpattern_gradient_key = 1;
   rc_config.rdpattern_zoom_spinbutton = 100;
-#ifdef HAVE_OPENGL
-  rc_config.use_opengl_renderer = 1;
-  rc_config.opengl_msaa_samples = MSAA_4X;
-#else
-  rc_config.use_opengl_renderer = 0;
-  rc_config.opengl_msaa_samples = MSAA_OFF;
-#endif
-
-  rc_config.view_drag_constrained = 1;
   rc_config.current_flow_visualization_mode = FLOW_DIR_REFERENCE_PHASE;
   render_config_set_defaults();
 

@@ -34,7 +34,7 @@
  * @sb:               scenebuffer to initialize
  * @initial_capacity: number of segments to pre-allocate
  */
-  void
+  static void
 scenebuffer_init(cairo_scenebuffer_t *sb, size_t initial_capacity)
 {
   mem_alloc((void **)&sb->segs, initial_capacity * sizeof(Segment_t));

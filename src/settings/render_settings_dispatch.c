@@ -277,6 +277,10 @@ config_apply_tab(settings_tab_t tab)
 void
 config_sync_tab(settings_tab_t tab)
 {
+  /* Settings dialog not yet built; no widgets to sync */
+  if( render_settings_builder == NULL )
+    return;
+
   const config_tab_defaults_t *td = render_tab_defaults[tab];
 
   config_sync_entries(td->entries, td->count);

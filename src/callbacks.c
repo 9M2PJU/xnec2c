@@ -30,6 +30,7 @@
 #include "opengl/opengl_structure.h"
 #include "opengl/opengl_state.h"
 #include "settings/render_settings.h"
+#include "settings/render_settings_common.h"
 #ifdef HAVE_OPENGL
 #include "opengl-engine/opengl_view.h"
 #include "opengl/opengl_rdpattern.h"
@@ -2238,6 +2239,8 @@ on_rdpattern_gradient_key_toggled(
 opengl_set_renderer(gboolean enable)
 {
 #ifdef HAVE_OPENGL
+  rc_config.use_opengl_renderer = enable ? 1 : 0;
+
   /* Refuse to enable OpenGL when context creation already failed */
   if( enable && opengl_gl_context_failed() )
   {
@@ -2258,8 +2261,6 @@ opengl_set_renderer(gboolean enable)
   if( rdpattern_view != NULL )
     view_end_drag( rdpattern_view );
   ClearFlag( BLOCK_MOTION_EV );
-
-  rc_config.use_opengl_renderer = enable ? 1 : 0;
 
   /* Swap renderer if radiation pattern window is open */
   if( rdpattern_window != NULL &&
@@ -2910,6 +2911,7 @@ on_rdpattern_draw_style_activate(
     if( GTK_WIDGET(menuitem) == w )
     {
       rc_config.rdpattern_draw_style = items[i].style;
+      config_sync_tab(SETTINGS_TAB_OPENGL);
 
       Queue_Radiation_Redraw();
       return;

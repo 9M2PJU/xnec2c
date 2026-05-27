@@ -41,7 +41,6 @@ typedef struct cairo_scenebuffer
  * Lifecycle
  *----------------------------------------------------------------------*/
 
-void scenebuffer_init(cairo_scenebuffer_t *sb, size_t initial_capacity);
 void scenebuffer_destroy(cairo_scenebuffer_t *sb);
 
 /*-----------------------------------------------------------------------
