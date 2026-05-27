@@ -23,12 +23,11 @@
 #include "common.h"
 #include "prerender/prerender_state.h"
 
-void Draw_Color_Legend_Overlay(cairo_t *cr);
-
 void ant_temp_entry_set_kelvin(GtkWidget *entry, double kelvin);
 void ant_temp_entry_set_unresolved(GtkWidget *entry);
 
 double Scale_Gain(double gain, int fstep, int idx);
+double Inverse_Scale_Gain(double scaled_val);
 
 /**
  * rdpattern_overlay_shift_scroll() - Adjust overlay structure scale from scroll input

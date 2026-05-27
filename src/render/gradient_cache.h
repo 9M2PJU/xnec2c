@@ -43,19 +43,6 @@ typedef struct
  *----------------------------------------------------------------------*/
 
 /**
- * gradient_cache_update() - Reconcile cache with current authoritative state
- * @cache:  cache instance
- * @w:      current viewport width
- * @h:      current viewport height
- *
- * Compares stored presentation_cache_key and (w, h) against current values.
- * On mismatch: destroys old surface, creates new ARGB32 surface, calls
- * Draw_Color_Legend_Overlay(), stores surface and input snapshot.
- * On match: no-op.
- */
-void gradient_cache_update(gradient_cache_t *cache, int w, int h);
-
-/**
  * gradient_result_t - Cohesive gradient legend result
  * @surface: ARGB32 legend surface; NULL when disabled or invalid
  * @version: monotonic counter; increments on surface rebuild
