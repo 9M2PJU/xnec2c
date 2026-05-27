@@ -234,6 +234,7 @@ build_struct_draw_params(int fstep)
   }
 
   params.fstep = fs;
+  params.freq_mhz = calc_data.freq_mhz;
   return params;
 }
 

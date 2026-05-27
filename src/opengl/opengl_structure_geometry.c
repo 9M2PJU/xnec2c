@@ -555,15 +555,15 @@ opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *
   cylinder_radius_scale = opengl_structure_get_radius_scale();
 
   gboolean extra_slot_changed =
-    (calc_data.freq_step == calc_data.steps_total &&
-     calc_data.freq_mhz != last_freq_mhz);
+    (params->fstep == calc_data.steps_total &&
+     !FREQ_EQ(params->freq_mhz, last_freq_mhz));
 
   /* Regenerate on color pointer change (mode/fstep change), empty buffer, new data, or scale change */
   if( params->wire_colors != last_wire_colors ||
       batch_count == 0 ||
       cylinder_radius_scale != structure_last_radius_scale ||
-      (params->cmax > 0.0 && CRNT_FSTEP_AVAILABLE(calc_data.freq_step) &&
-       (calc_data.freq_step != last_fstep || extra_slot_changed)) )
+      (params->cmax > 0.0 && CRNT_FSTEP_AVAILABLE(params->fstep) &&
+       (params->fstep != last_fstep || extra_slot_changed)) )
   {
     last_wire_colors = params->wire_colors;
     opengl_structure_generate_geometry(params, cylinder_radius_scale);

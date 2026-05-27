@@ -58,6 +58,7 @@ typedef struct
   const float   *wire_widths;   /* seg_width [data.n] per-segment line widths */
   const rgb_f_t *patch_colors;  /* patch_rgb | patch_crnt_rgb */
   double         cmax;          /* fmax(wire_crnt_cmax, patch_crnt_cmax) or 0.0 */
+  double         freq_mhz;      /* frequency for staleness detection */
   gboolean       show_flow;     /* TRUE only for DRAW_CURRENTS */
   int            fstep;         /* for crnt_fstep[] access */
 } struct_draw_params_t;
