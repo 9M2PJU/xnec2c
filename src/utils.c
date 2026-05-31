@@ -71,7 +71,8 @@ usage(void)
 		"  --write-rdpat           <filename>  - write CSV of the radiation pattern\n"
 		"  --write-currents        <filename>  - write CSV of currents and charges\n"
 		"  --write-gnuplot-structure <filename> - write gnuplot structure file\n"
-		"  --write-patch-currents  <filename>  - write CSV of patch surface currents\n"));
+		"  --write-patch-currents  <filename>  - write CSV of patch surface currents\n"
+		"  --write-validation-dir <directory> - write full validation data tree\n"));
 
 } /* end of usage() */
 

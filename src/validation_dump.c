@@ -1,0 +1,582 @@
+#include <errno.h>
+#include <locale.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
+#include "mathlib.h"
+#include "measurements.h"
+#include "prerender/prerender_state.h"
+#include "prerender/prerender_color.h"
+#include "shared.h"
+#include "validation_dump.h"
+
+/* Directory set by validation_dump_set_dir(); NULL disables all output. */
+static char *validation_dir = NULL;
+
+void validation_dump_set_dir(char *dir)
+{
+	validation_dir = dir;
+}
+
+void validation_dump_force_config(void)
+{
+	mathlib_t *lib;
+
+	if (validation_dir == NULL)
+		return;
+
+	/* Force the NEC2 built-in solver for cross-machine reproducibility.  Runs
+	 * after Read_Config() so it overrides the rc-file "Selected Mathlib", which
+	 * mathlib_config_init() applies during config load. */
+	lib = get_mathlib_by_id("nec2-builtin");
+	if (lib == NULL)
+		pr_warn("validation: nec2-builtin mathlib not available; "
+			"numeric results may differ from reference\n");
+	else
+	{
+		current_mathlib = lib;
+		pr_notice("validation: forced mathlib to nec2-builtin for reproducibility\n");
+	}
+
+	/* Any rc-configurable setting that changes dumped output must be forced to a
+	 * single canonical value here: validation data is a fixed cross-machine
+	 * reference, so it cannot depend on the host's saved configuration.  Future
+	 * configurable settings that affect output belong in this block, each given
+	 * one unified value for the purpose of the validation data. */
+
+	/* Pin the antenna-temperature inputs: ant_temp/ant_temp_tot/gt integrate a
+	 * gain-weighted sky/earth brightness (measurements.c), selecting the sky and
+	 * earth noise models and the table interpolation method, and classifying each
+	 * pattern cell as sky or earth by the elevation-rotated horizon.  An rc
+	 * override of any of these would make those columns host-dependent, so force
+	 * the canonical models and a zero elevation. */
+	rc_config.ant_temp_sky       = ANT_TEMP_SKY_SYNTH_AVG;
+	rc_config.ant_temp_earth     = ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL;
+	rc_config.ant_temp_interp    = ANT_TEMP_INTERP;
+	rc_config.ant_temp_elevation = 0.0;
+	pr_notice("validation: forced antenna-temp models and elevation for reproducibility\n");
+
+	/* Pin the polarization selection: _meas_calc() reads calc_data.pol_type to
+	 * pick the single polarization whose max-gain bearing and gain-weighted
+	 * integration produce the compared measurement columns gain_dev_px..nz,
+	 * ant_temp, ant_temp_tot, and gt.  Restore_GUI_State() sets pol_type from
+	 * the host's saved polarization toggles before this runs, so an unpinned
+	 * value would make those columns host-dependent.  POL_TOTAL is the rc
+	 * default and the committed baseline's value. */
+	calc_data.pol_type = POL_TOTAL;
+	pr_notice("validation: forced polarization to total for reproducibility\n");
+}
+
+/*
+ * dump_each - open a file under validation_dir, call dumper, close
+ */
+static void dump_each(const char *name, void (*dumper)(FILE *))
+{
+	char path[4096];
+	FILE *fp = NULL;
+
+	snprintf(path, sizeof(path), "%s/%s", validation_dir, name);
+	if (!Open_File(&fp, path, "w"))
+		return;
+	dumper(fp);
+	fclose(fp);
+}
+
+/* measurements.csv
+ * meas_write_header/meas_write_data already iterate all fsteps */
+static void dump_measurements(FILE *fp)
+{
+	meas_write_header(fp, ",");
+	meas_write_data(fp, ",");
+}
+
+/* rdpat.csv
+ * mhz, fstep, phi_idx, theta_idx, phi, theta,
+ * gtot, tilt, axrt, gain_horiz, gain_vert, gain_rhcp, gain_lhcp, sens */
+static void dump_rdpat(FILE *fp)
+{
+	fprintf(fp, "mhz,fstep,phi_idx,theta_idx,phi,theta,"
+		"gtot,tilt,axrt,gain_horiz,gain_vert,gain_rhcp,gain_lhcp,sens,"
+		"polarization_factor_total\n");
+
+	if (!isFlagSet(ENABLE_RDPAT) || calc_data.freq_step < 0)
+		return;
+
+	double dth = (double)fpat.dth * (double)TORAD;
+	double dph = (double)fpat.dph * (double)TORAD;
+
+	for (int fs = 0; fs < calc_data.steps_total; fs++)
+	{
+		if (!save.fstep[fs])
+			continue;
+
+		int idx = 0;
+		double phi = (double)fpat.phis * (double)TORAD;
+
+		for (int nph = 0; nph < fpat.nph; nph++)
+		{
+			double theta = (double)fpat.thets * (double)TORAD;
+
+			for (int nth = 0; nth < fpat.nth; nth++)
+			{
+				double gtot = rad_pattern[fs].gtot[idx];
+
+				fprintf(fp, "%.6f,%d,%d,%d,%.17g,%.17g,"
+					"%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,%d,%.17g\n",
+					save.freq[fs], fs, nph, nth,
+					phi * TODEG, theta * TODEG,
+					gtot,
+					rad_pattern[fs].tilt[idx],
+					rad_pattern[fs].axrt[idx],
+					gtot + Polarization_Factor(POL_HORIZ, fs, idx),
+					gtot + Polarization_Factor(POL_VERT,  fs, idx),
+					gtot + Polarization_Factor(POL_RHCP,  fs, idx),
+					gtot + Polarization_Factor(POL_LHCP,  fs, idx),
+					rad_pattern[fs].sens[idx],
+					Polarization_Factor(POL_TOTAL, fs, idx));
+
+				theta += dth;
+				idx++;
+			}
+
+			phi += dph;
+		}
+	}
+}
+
+/* currents.csv
+ * Per-fstep wire currents from crnt_fstep[]; geometry from data.segments[].
+ * mhz, fstep, seg, tag, air, aii, bir, bii, cir, cii, cur_real, cur_imag,
+ * x1, y1, z1, x2, y2, z2 */
+static void dump_currents(FILE *fp)
+{
+	fprintf(fp, "mhz,fstep,seg,tag,"
+		"air,aii,bir,bii,cir,cii,"
+		"cur_real,cur_imag,"
+		"x1,y1,z1,x2,y2,z2\n");
+
+	if (data.n <= 0)
+		return;
+
+	for (int fs = 0; fs < calc_data.steps_total; fs++)
+	{
+		if (!save.fstep[fs] || !CRNT_FSTEP_AVAILABLE(fs))
+			continue;
+
+		crnt_t *c = &crnt_fstep[fs];
+
+		for (int idx = 0; idx < data.n; idx++)
+		{
+			wire_segment_t *seg = &data.segments[idx];
+
+			fprintf(fp, "%.6f,%d,%d,%d,"
+				"%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,"
+				"%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n",
+				save.freq[fs], fs, idx + 1, seg->itag,
+				c->air[idx], c->aii[idx],
+				c->bir[idx], c->bii[idx],
+				c->cir[idx], c->cii[idx],
+				creal(c->cur[idx]), cimag(c->cur[idx]),
+				seg->x1, seg->y1, seg->z1,
+				seg->x2, seg->y2, seg->z2);
+		}
+	}
+}
+
+/* patch_currents.csv
+ * Per-fstep patch currents from crnt_fstep[].  Patch center (px,py,pz) and
+ * area come from the unscaled template save.{x,y,z,bi}temp[], one entry per
+ * patch at n+i; tangents (t1,t2) are frequency-independent in data.patches[].
+ * crnt.cur stores each patch as three rectangular (x,y,z) complex current
+ * components at n+3*i, the layout the far-field integrator reads (fflds in
+ * radiation.c, the patch loop in fields.c); the tangential surface currents
+ * are the projections of that vector onto t1 and t2.
+ * mhz, fstep, patch, area,
+ * px, py, pz, t1x, t1y, t1z, t2x, t2y, t2z,
+ * cur_xr, cur_xi, cur_yr, cur_yi, cur_zr, cur_zi */
+static void dump_patch_currents(FILE *fp)
+{
+	fprintf(fp, "mhz,fstep,patch,area,"
+		"px,py,pz,"
+		"t1x,t1y,t1z,t2x,t2y,t2z,"
+		"cur_xr,cur_xi,cur_yr,cur_yi,cur_zr,cur_zi\n");
+
+	if (data.m <= 0)
+		return;
+
+	for (int fs = 0; fs < calc_data.steps_total; fs++)
+	{
+		if (!save.fstep[fs] || !CRNT_FSTEP_AVAILABLE(fs))
+			continue;
+
+		crnt_t *c = &crnt_fstep[fs];
+
+		for (int i = 0; i < data.m; i++)
+		{
+			surface_patch_t *p = &data.patches[i];
+			int gi = data.n + i;
+			int cc = data.n + 3*i;
+
+			fprintf(fp, "%.6f,%d,%d,%.17g,"
+				"%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n",
+				save.freq[fs], fs, i,
+				save.bitemp[gi],
+				save.xtemp[gi], save.ytemp[gi], save.ztemp[gi],
+				p->t1x, p->t1y, p->t1z,
+				p->t2x, p->t2y, p->t2z,
+				creal(c->cur[cc]),   cimag(c->cur[cc]),
+				creal(c->cur[cc+1]), cimag(c->cur[cc+1]),
+				creal(c->cur[cc+2]), cimag(c->cur[cc+2]));
+		}
+	}
+}
+
+/* nearfield_points.csv
+ * Per-fstep near field from near_field_fstep[].points (AoS layout).
+ * mhz, fstep, point, px, py, pz,
+ * er, erx, ery, erz, hr, hrx, hry, hrz, max_er, max_hr, r_max */
+static void dump_nearfield_points(FILE *fp)
+{
+	fprintf(fp, "mhz,fstep,point,"
+		"px,py,pz,"
+		"er,erx,ery,erz,"
+		"hr,hrx,hry,hrz,"
+		"max_er,max_hr,r_max\n");
+
+	int npts = fpat.nrx * fpat.nry * fpat.nrz;
+
+	for (int fs = 0; fs < calc_data.steps_total; fs++)
+	{
+		if (!save.fstep[fs] || !NF_FSTEP_AVAILABLE(fs))
+			continue;
+
+		near_field_t *nf = &near_field_fstep[fs];
+
+		for (int i = 0; i < npts; i++)
+		{
+			near_field_point_t *pt = &nf->points[i];
+
+			fprintf(fp, "%.6f,%d,%d,"
+				"%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g\n",
+				save.freq[fs], fs, i,
+				pt->px, pt->py, pt->pz,
+				pt->er, pt->erx, pt->ery, pt->erz,
+				pt->hr, pt->hrx, pt->hry, pt->hrz,
+				nf->max_er, nf->max_hr, nf->r_max);
+		}
+	}
+}
+
+
+/* impedance.csv
+ * mhz, fstep, zreal, zimag, zmagn, zphase, netcx_zped_real, netcx_zped_imag */
+static void dump_impedance(FILE *fp)
+{
+	fprintf(fp, "mhz,fstep,zreal,zimag,zmagn,zphase,"
+		"netcx_zped_real,netcx_zped_imag\n");
+
+	for (int fs = 0; fs < calc_data.steps_total; fs++)
+	{
+		if (!save.fstep[fs])
+			continue;
+
+		/* netcx.zped is a single global holding the last-computed value. */
+		double zped_r = (fs == calc_data.steps_total - 1)
+			? creal(netcx.zped) : 0.0;
+		double zped_i = (fs == calc_data.steps_total - 1)
+			? cimag(netcx.zped) : 0.0;
+
+		fprintf(fp, "%.6f,%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n",
+			save.freq[fs], fs,
+			impedance_data.zreal[fs],
+			impedance_data.zimag[fs],
+			impedance_data.zmagn[fs],
+			impedance_data.zphase[fs],
+			zped_r, zped_i);
+	}
+}
+
+
+/* nf_pre.csv
+ * Per-fstep near-field prerender vectors from nf_pre[].  Each of E, H, and
+ * Poynting carries a displacement (dx,dy,dz) and a baked RGB triple; a NULL
+ * vector array (field absent for this run) emits the canonical zero row so
+ * the column schema stays fixed across antennas.
+ * mhz, fstep, point,
+ * e_dx, e_dy, e_dz, e_r, e_g, e_b,
+ * h_dx, h_dy, h_dz, h_r, h_g, h_b,
+ * pov_dx, pov_dy, pov_dz, pov_r, pov_g, pov_b, pov_max */
+static void dump_nf_pre(FILE *fp)
+{
+	fprintf(fp, "mhz,fstep,point,"
+		"e_dx,e_dy,e_dz,e_r,e_g,e_b,"
+		"h_dx,h_dy,h_dz,h_r,h_g,h_b,"
+		"pov_dx,pov_dy,pov_dz,pov_r,pov_g,pov_b,"
+		"pov_max\n");
+
+	if (nf_pre == NULL)
+		return;
+
+	int npts = fpat.nrx * fpat.nry * fpat.nrz;
+
+	for (int fs = 0; fs < calc_data.steps_total; fs++)
+	{
+		if (!save.fstep[fs] || !NF_FSTEP_AVAILABLE(fs))
+			continue;
+
+		nf_pre_t *np = &nf_pre[fs];
+
+		for (int i = 0; i < npts; i++)
+		{
+			nf_vector_t e = np->e_vecs   ? np->e_vecs[i]   : (nf_vector_t){0};
+			nf_vector_t h = np->h_vecs   ? np->h_vecs[i]   : (nf_vector_t){0};
+			nf_vector_t p = np->pov_vecs ? np->pov_vecs[i] : (nf_vector_t){0};
+
+			fprintf(fp, "%.6f,%d,%d,"
+				"%g,%g,%g,%g,%g,%g,"
+				"%g,%g,%g,%g,%g,%g,"
+				"%g,%g,%g,%g,%g,%g,"
+				"%g\n",
+				save.freq[fs], fs, i,
+				e.dx, e.dy, e.dz, e.rgb[0], e.rgb[1], e.rgb[2],
+				h.dx, h.dy, h.dz, h.rgb[0], h.rgb[1], h.rgb[2],
+				p.dx, p.dy, p.dz, p.rgb[0], p.rgb[1], p.rgb[2],
+				np->pov_max);
+		}
+	}
+}
+
+/* struct_colors.csv
+ * Per-fstep wire/patch display colors from struct_colors[].  One row per
+ * entity in three blocks (wire current, wire charge, patch current); the
+ * patch_flow phasor projection columns are nonzero only for patch_crnt rows.
+ * The cmin/cmax range scalars repeat on every row of an fstep.
+ * mhz, fstep, entity_kind, entity_idx, r, g, b,
+ * flow0, flow1, flow2, flow3,
+ * wire_crnt_cmin, wire_crnt_cmax, wire_chrg_cmin, wire_chrg_cmax,
+ * patch_crnt_cmin, patch_crnt_cmax */
+static void dump_struct_colors(FILE *fp)
+{
+	fprintf(fp, "mhz,fstep,entity_kind,entity_idx,"
+		"r,g,b,"
+		"flow0,flow1,flow2,flow3,"
+		"wire_crnt_cmin,wire_crnt_cmax,"
+		"wire_chrg_cmin,wire_chrg_cmax,"
+		"patch_crnt_cmin,patch_crnt_cmax\n");
+
+	if (struct_colors == NULL)
+		return;
+
+	for (int fs = 0; fs < calc_data.steps_total; fs++)
+	{
+		if (!save.fstep[fs])
+			continue;
+
+		struct_colors_t *sc = &struct_colors[fs];
+
+		if (sc->wire_crnt_rgb != NULL)
+			for (int i = 0; i < data.n; i++)
+			{
+				rgb_f_t c = sc->wire_crnt_rgb[i];
+				fprintf(fp, "%.6f,%d,wire_crnt,%d,"
+					"%g,%g,%g,0,0,0,0,"
+					"%g,%g,%g,%g,%g,%g\n",
+					save.freq[fs], fs, i, c.r, c.g, c.b,
+					sc->wire_crnt_cmin, sc->wire_crnt_cmax,
+					sc->wire_chrg_cmin, sc->wire_chrg_cmax,
+					sc->patch_crnt_cmin, sc->patch_crnt_cmax);
+			}
+
+		if (sc->wire_chrg_rgb != NULL)
+			for (int i = 0; i < data.n; i++)
+			{
+				rgb_f_t c = sc->wire_chrg_rgb[i];
+				fprintf(fp, "%.6f,%d,wire_chrg,%d,"
+					"%g,%g,%g,0,0,0,0,"
+					"%g,%g,%g,%g,%g,%g\n",
+					save.freq[fs], fs, i, c.r, c.g, c.b,
+					sc->wire_crnt_cmin, sc->wire_crnt_cmax,
+					sc->wire_chrg_cmin, sc->wire_chrg_cmax,
+					sc->patch_crnt_cmin, sc->patch_crnt_cmax);
+			}
+
+		if (sc->patch_crnt_rgb != NULL)
+			for (int i = 0; i < data.m; i++)
+			{
+				rgb_f_t c = sc->patch_crnt_rgb[i];
+				float *fl = sc->patch_flow_data[i];
+				fprintf(fp, "%.6f,%d,patch_crnt,%d,"
+					"%g,%g,%g,%g,%g,%g,%g,"
+					"%g,%g,%g,%g,%g,%g\n",
+					save.freq[fs], fs, i, c.r, c.g, c.b,
+					fl[0], fl[1], fl[2], fl[3],
+					sc->wire_crnt_cmin, sc->wire_crnt_cmax,
+					sc->wire_chrg_cmin, sc->wire_chrg_cmax,
+					sc->patch_crnt_cmin, sc->patch_crnt_cmax);
+			}
+	}
+}
+
+/* noise_temp.csv
+ * Per-fstep sky/earth noise temperature tensor from noise_temp[].  The full
+ * sky x earth x method cross product is emitted; t_sky depends on (sky,method),
+ * t_earth on (earth,method).
+ * mhz, fstep, sky_model, earth_model, method, t_sky, t_earth */
+static void dump_noise_temp(FILE *fp)
+{
+	fprintf(fp, "mhz,fstep,sky_model,earth_model,method,t_sky,t_earth\n");
+
+	if (noise_temp == NULL)
+		return;
+
+	for (int fs = 0; fs < calc_data.steps_total; fs++)
+	{
+		if (!save.fstep[fs])
+			continue;
+
+		noise_temp_t *nt = &noise_temp[fs];
+
+		for (int sky = 0; sky < ANT_TEMP_SKY_COUNT; sky++)
+			for (int earth = 0; earth < ANT_TEMP_EARTH_COUNT; earth++)
+				for (int method = 0; method < ANT_TEMP_METHOD_COUNT; method++)
+					fprintf(fp, "%.6f,%d,%d,%d,%d,%.17g,%.17g\n",
+						save.freq[fs], fs, sky, earth, method,
+						nt->t_sky[sky][method],
+						nt->t_earth[earth][method]);
+	}
+}
+
+/* geom_aggregate.csv
+ * Frequency-independent geometry scalars and per-patch corner/tangent frames
+ * from geom_pre.  Heterogeneous rows share a 12-wide value space discriminated
+ * by the kind column so a single PDL frame holds all geometry-tier data.
+ * kind, idx, v0..v11 */
+static void dump_geom_aggregate(FILE *fp)
+{
+	fprintf(fp, "kind,idx,v0,v1,v2,v3,v4,v5,v6,v7,v8,v9,v10,v11\n");
+
+	fprintf(fp, "scalar,0,"
+		"%.17g,%.17g,%.17g,%.17g,%.17g,"
+		"0,0,0,0,0,0,0\n",
+		geom_pre.scene_radius,
+		geom_pre.excitation_cx, geom_pre.excitation_cy, geom_pre.excitation_cz,
+		geom_pre.nf_dr_norm);
+
+	if (geom_pre.patch_corners != NULL)
+		for (int i = 0; i < data.m; i++)
+		{
+			patch_corners_t *pc = &geom_pre.patch_corners[i];
+			fprintf(fp, "patch_corners,%d,"
+				"%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n",
+				i,
+				pc->c0x, pc->c0y, pc->c0z,
+				pc->c1x, pc->c1y, pc->c1z,
+				pc->c2x, pc->c2y, pc->c2z,
+				pc->c3x, pc->c3y, pc->c3z);
+		}
+
+	if (geom_pre.patch_tangent_frame != NULL)
+		for (int i = 0; i < data.m; i++)
+		{
+			patch_tangent_frame_t *pt = &geom_pre.patch_tangent_frame[i];
+			fprintf(fp, "patch_tangent,%d,"
+				"%.17g,%.17g,%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g,0,0,0\n",
+				i,
+				pt->cx, pt->cy, pt->cz,
+				pt->st1x, pt->st1y, pt->st1z,
+				pt->st2x, pt->st2y, pt->st2z);
+		}
+}
+
+/* geom_trig.csv
+ * Radiation-pattern grid trig tables from geom_pre.  theta rows carry the
+ * solid-angle weight; phi rows have no solid angle (0.0).
+ * axis, idx, sin_val, cos_val, solid_angle */
+static void dump_geom_trig(FILE *fp)
+{
+	fprintf(fp, "axis,idx,sin_val,cos_val,solid_angle\n");
+
+	if (geom_pre.sin_theta != NULL)
+		for (int i = 0; i < fpat.nth; i++)
+			fprintf(fp, "theta,%d,%.17g,%.17g,%.17g\n",
+				i, geom_pre.sin_theta[i], geom_pre.cos_theta[i],
+				geom_pre.solid_angle[i]);
+
+	if (geom_pre.sin_phi != NULL)
+		for (int i = 0; i < fpat.nph; i++)
+			fprintf(fp, "phi,%d,%.17g,%.17g,0\n",
+				i, geom_pre.sin_phi[i], geom_pre.cos_phi[i]);
+}
+
+/* geom_topology.csv
+ * Far-field grid edge connectivity from geom_pre; integer vertex indices.
+ * axis, edge_idx, va, vb */
+static void dump_geom_topology(FILE *fp)
+{
+	fprintf(fp, "axis,edge_idx,va,vb\n");
+
+	for (int i = 0; i < geom_pre.n_theta_edges; i++)
+		fprintf(fp, "theta,%d,%u,%u\n",
+			i, geom_pre.theta_topo[i].va, geom_pre.theta_topo[i].vb);
+
+	for (int i = 0; i < geom_pre.n_phi_edges; i++)
+		fprintf(fp, "phi,%d,%u,%u\n",
+			i, geom_pre.phi_topo[i].va, geom_pre.phi_topo[i].vb);
+}
+
+
+void Save_Validation_Tree(void)
+{
+	if (validation_dir == NULL)
+		return;
+
+	if (isFlagClear(FREQ_LOOP_DONE))
+	{
+		Notice(GTK_BUTTONS_OK, _("Validation Tree"), "Cannot save: frequency loop not done");
+		return;
+	}
+
+	if (mkdir(validation_dir, 0755) < 0 && errno != EEXIST)
+	{
+		Notice(GTK_BUTTONS_OK, _("Validation Tree"), "Cannot create output directory");
+		return;
+	}
+
+	/* The frequency loop populates near_field_fstep[] per step: New_Frequency()
+	 * runs the full single-frequency solve for every step in the non-forked
+	 * path and calls Near_Field_Pattern() (gated only on ENABLE_NEAREH) plus
+	 * Save_Nearfield_Data() (xnec2c.c). No batch recompute is needed; a
+	 * re-solve here would overwrite the global netcx.zped at stale post-loop
+	 * frequency state and corrupt the impedance dump. */
+
+	char *orig = setlocale(LC_NUMERIC, "C");
+
+	g_rec_mutex_lock(&freq_data_lock);
+
+	dump_each("measurements.csv",     dump_measurements);
+	dump_each("rdpat.csv",            dump_rdpat);
+	dump_each("currents.csv",         dump_currents);
+	dump_each("patch_currents.csv",   dump_patch_currents);
+	dump_each("nearfield_points.csv", dump_nearfield_points);
+	dump_each("nf_pre.csv",           dump_nf_pre);
+	dump_each("struct_colors.csv",    dump_struct_colors);
+	dump_each("noise_temp.csv",       dump_noise_temp);
+	dump_each("impedance.csv",        dump_impedance);
+	dump_each("geom_aggregate.csv",   dump_geom_aggregate);
+	dump_each("geom_trig.csv",        dump_geom_trig);
+	dump_each("geom_topology.csv",    dump_geom_topology);
+
+	g_rec_mutex_unlock(&freq_data_lock);
+
+	setlocale(LC_NUMERIC, orig);
+
+	pr_notice("validation tree written to: %s\n", validation_dir);
+}

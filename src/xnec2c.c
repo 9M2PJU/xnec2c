@@ -26,6 +26,7 @@
 #include "prerender/prerender_color.h"
 #include "prerender/prerender_farfield.h"
 #include "prerender/prerender_nearfield.h"
+#include "validation_dump.h"
 #include "mathlib.h"
 #include "opt_ui.h"
 #include "plot_freqdata.h"
@@ -1207,6 +1208,10 @@ freq_loop_finalize( freq_loop_state_t *state )
   struct timespec end;
 
   SetFlag( FREQ_LOOP_DONE );
+
+  /* Dump the validation data tree when --write-validation-dir is set;
+   * no-op otherwise.  All per-fstep arrays are populated at this point. */
+  Save_Validation_Tree();
 
   clock_gettime(CLOCK_MONOTONIC, &end);
   pr_notice("Frequency loop elapsed time: %f seconds. (%s)\n",

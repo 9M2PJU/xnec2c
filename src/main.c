@@ -18,6 +18,7 @@
  */
 
 #include "main.h"
+#include "validation_dump.h"
 #include "shared.h"
 #include "gdk_scroll.h"
 #include "mathlib.h"
@@ -59,6 +60,7 @@ enum XNEC2C_OPTS {
 	OPT_SKIP_VERIFY,
 	OPT_FORCE_VERIFY,
 	OPT_MEM_REPORT,
+	OPT_WRITE_VALIDATION_DIR,
 
 	OPT_MAX_OPTS
 };
@@ -93,6 +95,7 @@ static struct option long_options[] = {
 		{  "skip-verify",            no_argument,         NULL,  OPT_SKIP_VERIFY            },
 		{  "force-verify",           no_argument,         NULL,  OPT_FORCE_VERIFY           },
 		{  "mem-report",             no_argument,         NULL,  OPT_MEM_REPORT             },
+		{  "write-validation-dir",   required_argument,   NULL,  OPT_WRITE_VALIDATION_DIR   },
 
 		{  NULL,                     0,                   NULL,  0                          }
 	};
@@ -382,6 +385,9 @@ main (int argc, char *argv[])
         pr_notice("forcing overlap check on large models\n");
         rc_config.force_verify_segments = 1;
         break;
+      case OPT_WRITE_VALIDATION_DIR:
+        validation_dump_set_dir(optarg);
+        break;
 
       case OPT_MEM_REPORT:
         pr_notice("managed allocator leak report enabled\n");
@@ -542,6 +548,10 @@ main (int argc, char *argv[])
 
   /* Read GUI state config file and reset geometry */
   Read_Config();
+
+  /* Force deterministic mathlib and elevation for reproducible validation dumps;
+   * after Read_Config() so it overrides rc-file mathlib and elevation. */
+  validation_dump_force_config();
 
   if (rc_config.batch_mode)
 	  rc_config.main_loop_start = 1;

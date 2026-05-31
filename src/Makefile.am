@@ -34,6 +34,7 @@ xnec2c_SOURCES = \
     input.c         input.h \
     matrix.c        matrix.h \
     utils.c         utils.h \
+    validation_dump.c validation_dump.h \
     nec2_model.c    nec2_model.h \
     network.c       network.h \
     optimize.c      optimize.h \
