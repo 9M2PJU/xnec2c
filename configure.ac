@@ -193,7 +193,7 @@ AC_ARG_ENABLE(debug-timings,
 
 AC_ARG_ENABLE(optimizations,
 	[AS_HELP_STRING([--disable-optimizations],
-		[Disable compiler optimizations. Use this if you plan to set your own -Ox option])]
+		[Disable compiler optimizations and force reproducible IEEE floating-point. Use this for deterministic, build-portable numerical output, or when setting your own -Ox option])]
 	)
 
 # Optimized compiler flags:
@@ -259,8 +259,15 @@ if test "x$OPENMP_CFLAGS" != x; then
 fi
 
 
-## Enable fortran math optimizations
-
+## Floating-point policy.
+#
+# Optimized builds relax IEEE rules for speed; reproducible builds
+# (--disable-optimizations) force deterministic IEEE evaluation so numerical
+# output is bit-stable across branches and architectures. Contraction off
+# defeats target-dependent FMA fusion on x86 and ARM alike; standard excess
+# precision rounds intermediates at their declared width. Both sets route
+# through AX_CHECK_COMPILE_FLAG so a compiler lacking a flag drops it.
+#
 # Note that -ffinite-math-only is known to break xnec2c radiation patterns,
 # so please do not add it to the list.  Interestingly, clang seems to work fine
 # with -fno-honor-infinities and -fno-honor-nans which are the same as GCC's
@@ -272,19 +279,27 @@ fi
 
 m4_pattern_forbid([AX_CHECK_COMPILE_FLAG])dnl
 
-# GCC
-AX_CHECK_COMPILE_FLAG([-fcx-fortran-rules],
-                      [CFLAGS="$CFLAGS -fcx-fortran-rules"])
+# Result-affecting relaxations apply only to optimized builds; the reproducible
+# build forces deterministic IEEE evaluation instead.
+if test "$enable_optimizations" != no; then
+	# GCC
+	AX_CHECK_COMPILE_FLAG([-fcx-fortran-rules],
+	                      [CFLAGS="$CFLAGS -fcx-fortran-rules"])
+	# clang
+	AX_CHECK_COMPILE_FLAG([-fno-honor-nans],
+	                      [CFLAGS="$CFLAGS -fno-honor-nans"])
+	AX_CHECK_COMPILE_FLAG([-fno-signed-zeros],
+	                      [CFLAGS="$CFLAGS -fno-signed-zeros"])
+else
+	AX_CHECK_COMPILE_FLAG([-ffp-contract=off],
+	                      [CFLAGS="$CFLAGS -ffp-contract=off"])
+	AX_CHECK_COMPILE_FLAG([-fexcess-precision=standard],
+	                      [CFLAGS="$CFLAGS -fexcess-precision=standard"])
+fi
+
+# FP-result-neutral, applied to every build.
 AX_CHECK_COMPILE_FLAG([-fstack-protector-strong],
                       [CFLAGS="$CFLAGS -fstack-protector-strong"])
-
-# clang
-AX_CHECK_COMPILE_FLAG([-fno-honor-nans],
-                      [CFLAGS="$CFLAGS -fno-honor-nans"])
-AX_CHECK_COMPILE_FLAG([-fno-signed-zeros],
-                      [CFLAGS="$CFLAGS -fno-signed-zeros"])
-
-# gcc/clang shared
 AX_CHECK_COMPILE_FLAG([-fno-math-errno],
                       [CFLAGS="$CFLAGS -fno-math-errno"])
 
