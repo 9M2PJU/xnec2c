@@ -395,7 +395,7 @@ generate_patches_triangles(gl_draw_batch_t *batch, const struct_draw_params_t *p
   {
     float nx, ny, nz;
     float p_r, p_g, p_b;
-    float fd[4];
+    float fd[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
     float c0x, c0y, c0z, c1x, c1y, c1z, c2x, c2y, c2z, c3x, c3y, c3z;
 
     get_patch_normal(idx, &nx, &ny, &nz);
@@ -417,7 +417,13 @@ generate_patches_triangles(gl_draw_batch_t *batch, const struct_draw_params_t *p
     p_r = params->patch_colors[idx].r;
     p_g = params->patch_colors[idx].g;
     p_b = params->patch_colors[idx].b;
-    get_precomputed_flow_data(params->fstep, idx, fd);
+
+    /* Flow phasors require valid current data; show_flow gates the
+     * struct_colors[fstep] read because fstep is -1 until a frequency
+     * step is computed.  fd stays zeroed otherwise, matching
+     * generate_patches_wireframe(). */
+    if( params->show_flow )
+      get_precomputed_flow_data(params->fstep, idx, fd);
 
     /* Triangle 1: c0(1,1), c1(0,1), c2(0,0) */
     verts[vidx++] = (structure_vertex_t){

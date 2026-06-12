@@ -785,12 +785,6 @@ Restore_GUI_State( void )
 {
   GtkWidget *widget;
 
-  /* Restore main (structure) window geometry */
-  Set_Window_Geometry( main_window,
-      rc_config.main_x, rc_config.main_y,
-      rc_config.main_width, rc_config.main_height );
-  gtk_widget_show( main_window );
-
   /* Restore main (structure) window widgets state */
   if( rc_config.main_currents_togglebutton )
   {
@@ -868,6 +862,13 @@ Restore_GUI_State( void )
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
   else
     gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
+
+  /* Restore main (structure) window geometry after all widget state
+   * restorations so layout-affecting changes precede sizing */
+  Set_Window_Geometry( main_window,
+      rc_config.main_x, rc_config.main_y,
+      rc_config.main_width, rc_config.main_height );
+  gtk_widget_show( main_window );
 
   g_idle_add( Restore_Windows, NULL );
 
@@ -1025,12 +1026,13 @@ Read_Config( void )
 
 /*------------------------------------------------------------------------*/
 
-/* Get_GUI_State()
+/* get_main_window_state()
  *
- * Gets the GUI state and stores it in the rc_config buffer
+ * Captures main (structure) window geometry and widget state
+ * into the rc_config buffer
  */
   void
-Get_GUI_State( void )
+get_main_window_state( void )
 {
   GtkWidget *widget;
 
@@ -1080,6 +1082,19 @@ Get_GUI_State( void )
   gtk_spin_button_update( GTK_SPIN_BUTTON(widget) );
   rc_config.main_zoom_spinbutton =
     gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(widget) );
+}
+
+/*------------------------------------------------------------------------*/
+
+/* get_rdpattern_window_state()
+ *
+ * Captures radiation pattern window geometry and widget state
+ * into the rc_config buffer
+ */
+  void
+get_rdpattern_window_state( void )
+{
+  GtkWidget *widget;
 
   /* Get geometry of radiation patterns window */
   rc_config.rdpattern_is_open = Get_Window_Geometry( rdpattern_window,
@@ -1136,6 +1151,19 @@ Get_GUI_State( void )
      * no widget query needed here since rc_config fields are
      * updated directly by on_rdpattern_noise_{sky,earth,interp}_activate */
   }
+}
+
+/*------------------------------------------------------------------------*/
+
+/* get_freqplots_window_state()
+ *
+ * Captures frequency plots window geometry and widget state
+ * into the rc_config buffer
+ */
+  void
+get_freqplots_window_state( void )
+{
+  GtkWidget *widget;
 
   /* Get geometry of frequency plots window */
   rc_config.freqplots_is_open = Get_Window_Geometry( freqplots_window,
@@ -1224,17 +1252,53 @@ Get_GUI_State( void )
     if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
       rc_config.freqplots_ant_temp_togglebutton = 1;
   }
+}
 
+/*------------------------------------------------------------------------*/
+
+/* get_nec2_edit_window_state()
+ *
+ * Captures NEC2 editor window geometry into the rc_config buffer
+ */
+  void
+get_nec2_edit_window_state( void )
+{
   /* Get geometry of NEC2 editor window */
   Get_Window_Geometry( nec2_edit_window,
       &(rc_config.nec2_edit_x), &(rc_config.nec2_edit_y),
       &(rc_config.nec2_edit_width), &(rc_config.nec2_edit_height) );
+}
 
+/*------------------------------------------------------------------------*/
+
+/* get_sy_overrides_window_state()
+ *
+ * Captures Symbol Overrides window geometry into the rc_config buffer
+ */
+  void
+get_sy_overrides_window_state( void )
+{
   /* Get geometry of Symbol Overrides window */
   rc_config.sy_overrides_is_open = Get_Window_Geometry( sy_overrides_window,
       &(rc_config.sy_overrides_x), &(rc_config.sy_overrides_y),
       &(rc_config.sy_overrides_width), &(rc_config.sy_overrides_height) );
+}
 
+/*------------------------------------------------------------------------*/
+
+/* Get_GUI_State()
+ *
+ * Captures all window geometry and widget state into the rc_config
+ * buffer by dispatching to each window's own capture function
+ */
+  void
+Get_GUI_State( void )
+{
+  get_main_window_state();
+  get_rdpattern_window_state();
+  get_freqplots_window_state();
+  get_nec2_edit_window_state();
+  get_sy_overrides_window_state();
 } /* Get_GUI_State */
 
 /*------------------------------------------------------------------------*/

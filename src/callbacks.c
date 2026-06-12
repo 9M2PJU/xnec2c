@@ -530,11 +530,6 @@ on_main_rdpattern_activate(
     }
 
     rdpattern_window = create_rdpattern_window( &rdpattern_window_builder );
-    Set_Window_Geometry( rdpattern_window,
-        rc_config.rdpattern_x, rc_config.rdpattern_y,
-        rc_config.rdpattern_width, rc_config.rdpattern_height );
-    gtk_widget_show( rdpattern_window );
-    Update_Window_Titles();
 
     /* Spin widgets must be resolved before creating the GL widget:
      * opengl_rdpattern_create_widget() dereferences rdpattern_view,
@@ -690,6 +685,14 @@ on_main_rdpattern_activate(
     else
       gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
 
+    /* Request geometry and show after all structural mutations and
+     * widget state restorations so sizing is the last layout operation */
+    Set_Window_Geometry( rdpattern_window,
+        rc_config.rdpattern_x, rc_config.rdpattern_y,
+        rc_config.rdpattern_width, rc_config.rdpattern_height );
+    gtk_widget_show( rdpattern_window );
+    Update_Window_Titles();
+
     Main_Rdpattern_Activate( TRUE );
 
     /* Restore gain style */
@@ -741,11 +744,6 @@ on_main_freqplots_activate(
       }
 
       freqplots_window = create_freqplots_window( &freqplots_window_builder );
-      Set_Window_Geometry( freqplots_window,
-          rc_config.freqplots_x, rc_config.freqplots_y,
-          rc_config.freqplots_width, rc_config.freqplots_height );
-      gtk_widget_show( freqplots_window );
-      Update_Window_Titles();
       freqplots_drawingarea = Builder_Get_Object(
           freqplots_window_builder, "freqplots_drawingarea" );
       Set_Window_Labels();
@@ -859,6 +857,14 @@ on_main_freqplots_activate(
             freqplots_window_builder, "freqplots_round_x_axis" );
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
       }
+
+      /* Request geometry and show after all widget state restorations
+       * so sizing is the last layout operation */
+      Set_Window_Geometry( freqplots_window,
+          rc_config.freqplots_x, rc_config.freqplots_y,
+          rc_config.freqplots_width, rc_config.freqplots_height );
+      gtk_widget_show( freqplots_window );
+      Update_Window_Titles();
 
       if( (rc_config.main_loop_start || isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS)) && isFlagClear(FREQ_LOOP_DONE))
         Start_Frequency_Loop();
@@ -1312,6 +1318,9 @@ on_freqplots_window_delete_event(
     GdkEvent        *event,
     gpointer         user_data)
 {
+  /* Capture window state before destroy */
+  get_freqplots_window_state();
+
   /* Close freq plots window without confirmation dialog */
   if( !rc_config.confirm_quit )
   {
@@ -1578,8 +1587,6 @@ on_freqplots_drawingarea_configure_event(
   freqplots_width  = event->width;
   freqplots_height = event->height;
 
-  Get_GUI_State();
-
   return( TRUE );
 }
 
@@ -1639,6 +1646,9 @@ on_rdpattern_window_delete_event(
     GdkEvent        *event,
     gpointer         user_data)
 {
+  /* Capture window state before destroy */
+  get_rdpattern_window_state();
+
   /* Close rdpattern window without confirmation dialog */
   if( !rc_config.confirm_quit )
   {
