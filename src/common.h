@@ -133,25 +133,16 @@ typedef struct { float r, g, b; } rgb_f_t;
 
 /* Named color constants for rendering */
 extern const rgb_f_t COLOR_WHITE;
-extern const rgb_f_t COLOR_RED;
 extern const rgb_f_t COLOR_YELLOW;
 extern const rgb_f_t COLOR_GREEN;
 extern const rgb_f_t COLOR_DARK_GREEN;
 extern const rgb_f_t COLOR_CYAN;
-extern const rgb_f_t COLOR_BLUE;
 extern const rgb_f_t COLOR_MAGENTA;
 extern const rgb_f_t COLOR_GREY;
 extern const rgb_f_t COLOR_BLACK;
 
 /* Comma-separated expansion for legacy cairo_set_source_rgb(cr, COLOR) calls */
 #define WHITE      (double)(COLOR_WHITE.r),      (double)(COLOR_WHITE.g),      (double)(COLOR_WHITE.b)
-#define RED        (double)(COLOR_RED.r),        (double)(COLOR_RED.g),        (double)(COLOR_RED.b)
-#define YELLOW     (double)(COLOR_YELLOW.r),     (double)(COLOR_YELLOW.g),     (double)(COLOR_YELLOW.b)
-#define GREEN      (double)(COLOR_GREEN.r),      (double)(COLOR_GREEN.g),      (double)(COLOR_GREEN.b)
-#define DARK_GREEN (double)(COLOR_DARK_GREEN.r), (double)(COLOR_DARK_GREEN.g), (double)(COLOR_DARK_GREEN.b)
-#define CYAN       (double)(COLOR_CYAN.r),       (double)(COLOR_CYAN.g),       (double)(COLOR_CYAN.b)
-#define BLUE       (double)(COLOR_BLUE.r),       (double)(COLOR_BLUE.g),       (double)(COLOR_BLUE.b)
-#define MAGENTA    (double)(COLOR_MAGENTA.r),    (double)(COLOR_MAGENTA.g),    (double)(COLOR_MAGENTA.b)
 #define GREY       (double)(COLOR_GREY.r),       (double)(COLOR_GREY.g),       (double)(COLOR_GREY.b)
 #define BLACK      (double)(COLOR_BLACK.r),      (double)(COLOR_BLACK.g),      (double)(COLOR_BLACK.b)
 
@@ -1742,11 +1733,10 @@ void load(int *ldtyp, int *ldtag, int *ldtagf, int *ldtagt, double *zlr, double 
 void Write_Optimizer_Data(void);
 void *Optimizer_Output(void *arg);
 int opt_have_files_to_save(void);
-/* plot_freqdata.c */
+/* freqplots */
 void Plot_Frequency_Data(cairo_t *cr);
 void Plots_Window_Killed(void);
 void Set_Frequency_On_Click(GdkEvent *event);
-int freqplots_click_pending(void);
 /* radiation.c */
 void rdpat(void);
 /* rc_config.c */

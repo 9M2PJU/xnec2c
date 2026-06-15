@@ -32,7 +32,20 @@ xnec2c_SOURCES = \
     nec2_model.c    nec2_model.h \
     network.c       network.h \
     optimize.c      optimize.h \
-    plot_freqdata.c plot_freqdata.h \
+    plot_freqdata.h \
+    freqplots/freqplots_internal.h \
+    freqplots/freqplots_render.c   freqplots/freqplots_render.h \
+    freqplots/freqplots_scale.c \
+    freqplots/freqplots_graph.c \
+    freqplots/freqplots_xy.c \
+    freqplots/graphs/smith_graph.c \
+    freqplots/graphs/gain_graph.c \
+    freqplots/graphs/viewer_graph.c \
+    freqplots/graphs/vswr_graph.c \
+    freqplots/graphs/impedance_graph.c \
+    freqplots/graphs/anttemp_graph.c \
+    freqplots/freqplots_core.c \
+    freqplots/freqplots_input.c \
     radiation.c     radiation.h \
     rc_config.c     rc_config.h \
     shared.c        shared.h \
