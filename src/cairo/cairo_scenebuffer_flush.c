@@ -64,6 +64,26 @@ cmp_z_color(const void *a, const void *b)
 
 /*-----------------------------------------------------------------------*/
 
+/* qsort comparator: ascending quantized z_mid, then deposit order so
+ * overlapping equal-depth markers paint in the sequence they were added.
+ * Bitwise == on quantized depth: same rationale as cmp_z_color. */
+static int
+cmp_marker_z(const void *a, const void *b)
+{
+  const Marker_t *ma = (const Marker_t *)a;
+  const Marker_t *mb = (const Marker_t *)b;
+
+  if( ma->z_mid != mb->z_mid )
+    return (ma->z_mid < mb->z_mid) ? -1 : 1;
+
+  if( ma->seq != mb->seq )
+    return (ma->seq < mb->seq) ? -1 : 1;
+
+  return 0;
+}
+
+/*-----------------------------------------------------------------------*/
+
 /**
  * scenebuffer_quantize_colors() - Round RGB values to discrete levels
  * @sb:          scenebuffer with deposited segments
@@ -90,25 +110,36 @@ scenebuffer_quantize_colors(cairo_scenebuffer_t *sb, int color_quant)
 
 /**
  * scenebuffer_quantize_depth() - Bin z_mid values for painter's algorithm
- * @sb:         scenebuffer with deposited segments
+ * @sb:         scenebuffer with deposited segments and markers
  * @depth_bins: number of z bins (>=1)
  *
- * Segments within the same bin sort by (r,g,b,width) to maximise batch
- * run length while preserving painter's-algorithm depth order between bins.
- * When all z_mid values are equal (zero range), the early return preserves
- * natural depth order and the subsequent sort groups by color only.
+ * Folds both the segment and marker depths into one extent so the two
+ * arrays share a single quantization lattice and stay depth-comparable
+ * during the flush merge.  When all depths are equal (zero range) the
+ * early return preserves natural order.
  */
 static void
 scenebuffer_quantize_depth(cairo_scenebuffer_t *sb, int depth_bins)
 {
-  float z_min = sb->segs[0].z_mid;
-  float z_max = sb->segs[0].z_mid;
+  float z_min, z_max;
   int   n;
 
-  for( n = 1; n < sb->count; n++ )
+  /* Seed the extent from whichever array holds geometry; the flush guard
+   * guarantees at least one segment or marker is present. */
+  if( sb->count > 0 )
+    z_min = z_max = sb->segs[0].z_mid;
+  else
+    z_min = z_max = sb->marks[0].z_mid;
+
+  for( n = 0; n < sb->count; n++ )
   {
     if( fl_flt(sb->segs[n].z_mid, z_min) ) z_min = sb->segs[n].z_mid;
     if( fl_fgt(sb->segs[n].z_mid, z_max) ) z_max = sb->segs[n].z_mid;
+  }
+  for( n = 0; n < sb->mark_count; n++ )
+  {
+    if( fl_flt(sb->marks[n].z_mid, z_min) ) z_min = sb->marks[n].z_mid;
+    if( fl_fgt(sb->marks[n].z_mid, z_max) ) z_max = sb->marks[n].z_mid;
   }
 
   float z_range = z_max - z_min;
@@ -123,6 +154,55 @@ scenebuffer_quantize_depth(cairo_scenebuffer_t *sb, int depth_bins)
     float norm = (sb->segs[n].z_mid - z_min) * inv_range;
     sb->segs[n].z_mid = z_min + floorf(norm * bins_f) / bins_f * z_range;
   }
+  for( n = 0; n < sb->mark_count; n++ )
+  {
+    float norm = (sb->marks[n].z_mid - z_min) * inv_range;
+    sb->marks[n].z_mid = z_min + floorf(norm * bins_f) / bins_f * z_range;
+  }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * scenebuffer_emit_marker() - Fill one opaque marker into the context
+ * @cr: Cairo context to draw into
+ * @m:  marker describing centre, color, size, and shape
+ */
+static void
+scenebuffer_emit_marker(cairo_t *cr, const Marker_t *m)
+{
+  cairo_set_source_rgb(cr, (double)m->r, (double)m->g, (double)m->b);
+  cairo_new_path(cr);
+
+  switch( m->shape )
+  {
+    case SCENEBUFFER_MARK_CIRCLE:
+      cairo_arc(cr, (double)m->x, (double)m->y, (double)m->size, 0.0, M_2PI);
+      break;
+
+    case SCENEBUFFER_MARK_SQUARE:
+      cairo_rectangle(cr,
+          (double)(m->x - m->size / 2), (double)(m->y - m->size / 2),
+          (double)m->size, (double)m->size);
+      break;
+
+    case SCENEBUFFER_MARK_DIAMOND:
+    {
+      int half = m->size / 2;
+      cairo_move_to(cr, (double)(m->x - half), (double)m->y);
+      cairo_line_to(cr, (double)m->x,          (double)(m->y + half + 1));
+      cairo_line_to(cr, (double)(m->x + half), (double)m->y);
+      cairo_line_to(cr, (double)m->x,          (double)(m->y - half - 1));
+      cairo_close_path(cr);
+      break;
+    }
+
+    default:
+      BUG("scenebuffer_emit_marker: shape=%d\n", m->shape);
+      return;
+  }
+
+  cairo_fill(cr);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -160,7 +240,7 @@ scenebuffer_flush(cairo_scenebuffer_t *sb, cairo_t *cr,
     stats->capacity     = sb->capacity;
   }
 
-  if( sb->count == 0 )
+  if( sb->count == 0 && sb->mark_count == 0 )
     return;
 
   scenebuffer_quantize_colors(sb, color_quant);
@@ -171,6 +251,8 @@ scenebuffer_flush(cairo_scenebuffer_t *sb, cairo_t *cr,
     t_sort_start = g_get_monotonic_time();
 
   qsort(sb->segs, (size_t)sb->count, sizeof(Segment_t), cmp_z_color);
+  if( sb->mark_count > 0 )
+    qsort(sb->marks, (size_t)sb->mark_count, sizeof(Marker_t), cmp_marker_z);
 
   gint64 t_stroke_start = 0;
   if( stats != NULL )
@@ -180,9 +262,15 @@ scenebuffer_flush(cairo_scenebuffer_t *sb, cairo_t *cr,
   }
   int    groups = 0;
   int i = 0;
+  int mi = 0;
   while( i < sb->count )
   {
     Segment_t *head = &sb->segs[i];
+
+    /* Paint markers strictly below this run's depth; equal-depth markers
+     * defer so they overlay the same-depth segment runs. */
+    while( mi < sb->mark_count && sb->marks[mi].z_mid < head->z_mid )
+      scenebuffer_emit_marker(cr, &sb->marks[mi++]);
 
     /* Find the run end where (r,g,b,width) changes */
     int j = i + 1;
@@ -211,6 +299,11 @@ scenebuffer_flush(cairo_scenebuffer_t *sb, cairo_t *cr,
     groups++;
     i = j;
   }
+
+  /* Remaining markers sit at or above the deepest segment depth; paint
+   * them last so they overlay all equal-or-shallower geometry. */
+  while( mi < sb->mark_count )
+    scenebuffer_emit_marker(cr, &sb->marks[mi++]);
 
   if( stats != NULL )
   {

@@ -40,6 +40,9 @@ scenebuffer_init(cairo_scenebuffer_t *sb, size_t initial_capacity)
   mem_alloc((void **)&sb->segs, initial_capacity * sizeof(Segment_t));
   sb->count    = 0;
   sb->capacity = (int)initial_capacity;
+  sb->marks         = NULL;
+  sb->mark_count    = 0;
+  sb->mark_capacity = 0;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -54,6 +57,9 @@ scenebuffer_destroy(cairo_scenebuffer_t *sb)
   mem_free((void **)&sb->segs);
   sb->count    = 0;
   sb->capacity = 0;
+  mem_free((void **)&sb->marks);
+  sb->mark_count    = 0;
+  sb->mark_capacity = 0;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -71,7 +77,8 @@ scenebuffer_reset(cairo_scenebuffer_t *sb)
   if( sb->capacity == 0 )
     scenebuffer_init(sb, SCENEBUFFER_INITIAL_CAP);
 
-  sb->count = 0;
+  sb->count      = 0;
+  sb->mark_count = 0;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -124,6 +131,35 @@ scenebuffer_add_polygon_outline(cairo_scenebuffer_t *sb,
     edge.y2 = ys[next];
     scenebuffer_add(sb, &edge);
   }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * scenebuffer_add_marker() - Append one opaque filled marker
+ * @sb: target scenebuffer
+ * @m:  marker to copy into the buffer; its seq is assigned here
+ *
+ * Doubles capacity via mem_alloc when the array is full.
+ */
+  void
+scenebuffer_add_marker(cairo_scenebuffer_t *sb, const Marker_t *m)
+{
+  if( sb->mark_count >= sb->mark_capacity )
+  {
+    int new_cap = sb->mark_capacity ? sb->mark_capacity * 2 : 256;
+    Marker_t *grown = NULL;
+    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Marker_t));
+    if( sb->mark_count )
+      memcpy(grown, sb->marks, (size_t)sb->mark_count * sizeof(Marker_t));
+    mem_free((void **)&sb->marks);
+    sb->marks         = grown;
+    sb->mark_capacity = new_cap;
+  }
+
+  sb->marks[sb->mark_count]     = *m;
+  sb->marks[sb->mark_count].seq = sb->mark_count;
+  sb->mark_count++;
 }
 
 /*-----------------------------------------------------------------------*/

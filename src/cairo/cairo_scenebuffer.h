@@ -29,12 +29,36 @@
 /* Default capacity for lazy-init in scenebuffer_reset */
 #define SCENEBUFFER_INITIAL_CAP 4096
 
+/* Filled marker shapes painted opaque on top of same-depth segments. */
+typedef enum
+{
+  SCENEBUFFER_MARK_SQUARE  = 0, /* axis-aligned filled square */
+  SCENEBUFFER_MARK_CIRCLE  = 1, /* filled disc */
+  SCENEBUFFER_MARK_DIAMOND = 2  /* filled diamond (45-degree square) */
+} scenebuffer_mark_shape_t;
+
+/* One opaque filled marker.  Painted during scenebuffer_flush after every
+ * segment sharing its quantized depth so it overlays equal-depth lines. */
+typedef struct
+{
+  gint  x, y;    /* marker centre, screen space */
+  float z_mid;   /* painter's-algorithm depth, same scale as Segment_t */
+  float r, g, b; /* RGB color [0.0, 1.0] */
+  int   size;    /* square/diamond: full extent; circle: radius, pixels */
+  scenebuffer_mark_shape_t shape;
+  int   seq;     /* deposit order; set by scenebuffer_add_marker for stable
+                  * equal-depth paint order */
+} Marker_t;
+
 /* Dynamic array accumulating all segments for the current frame */
 typedef struct cairo_scenebuffer
 {
   Segment_t *segs; /* heap-allocated segment array */
   int        count;
   int        capacity;
+  Marker_t  *marks; /* heap-allocated filled-marker array */
+  int        mark_count;
+  int        mark_capacity;
 } cairo_scenebuffer_t;
 
 /*-----------------------------------------------------------------------
@@ -58,6 +82,10 @@ void scenebuffer_add(cairo_scenebuffer_t *sb, const Segment_t *seg);
 void scenebuffer_add_polygon_outline(cairo_scenebuffer_t *sb,
     const Segment_t *template_seg,
     int xs[4], int ys[4]);
+
+/* Append one opaque filled marker; grows allocation as needed.  The seq
+ * field is assigned here so equal-depth markers paint in deposit order. */
+void scenebuffer_add_marker(cairo_scenebuffer_t *sb, const Marker_t *m);
 
 /* Set to 1 to collect per-frame flush metrics; 0 passes NULL to
  * scenebuffer_flush, skipping all timing and metric overhead. */
