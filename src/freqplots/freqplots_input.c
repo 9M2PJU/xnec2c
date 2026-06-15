@@ -122,13 +122,25 @@ Set_Frequency_On_Click( GdkEvent *e)
 
   }
 
-  if (fr_plot == NULL || !FR_PLOT_T_IS_VALID(fr_plot))
+  // Decode the button, scroll direction, or button-drag state.
+  button = 0;
+
+  if (e->type == GDK_BUTTON_PRESS)
+	  button = button_event->button;
+  else if (e->type == GDK_SCROLL && scroll_event->direction == GDK_SCROLL_UP)
+	  button = 4;
+  else if (e->type == GDK_SCROLL && scroll_event->direction == GDK_SCROLL_DOWN)
+	  button = 5;
+  else if (e->type == GDK_MOTION_NOTIFY)
   {
-	  // no plot_rect selected for frequency line
-	save_click_event(e);
-	  return;
+  // Support holding the button down to drag the green line:
+  if (motion_event->state & GDK_BUTTON1_MASK) button = 1;
+	  else if (motion_event->state & GDK_BUTTON2_MASK) button = 2;
+	  else if (motion_event->state & GDK_BUTTON3_MASK) button = 3;
   }
 
+  if (fr_plot != NULL && FR_PLOT_T_IS_VALID(fr_plot))
+  {
   // local shorthand variables
   double min_fscale = fr_plot->min_fscale;
   double max_fscale = fr_plot->max_fscale;
@@ -145,22 +157,6 @@ Set_Frequency_On_Click( GdkEvent *e)
    * used for button 1 and 3: */
   fmhz = max_fscale - min_fscale;
   fmhz = min_fscale + fmhz * x / w;
-
-  button = 0;
-
-  if (e->type == GDK_BUTTON_PRESS)
-	  button = button_event->button;
-  else if (e->type == GDK_SCROLL && scroll_event->direction == GDK_SCROLL_UP)
-	  button = 4;
-  else if (e->type == GDK_SCROLL && scroll_event->direction == GDK_SCROLL_DOWN)
-	  button = 5;
-  else if (e->type == GDK_MOTION_NOTIFY)
-  {
-  // Support holding the button down to drag the green line:
-  if (motion_event->state & GDK_BUTTON1_MASK) button = 1;
-	  else if (motion_event->state & GDK_BUTTON2_MASK) button = 2;
-	  else if (motion_event->state & GDK_BUTTON3_MASK) button = 3;
-  }
 
   // event types: https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gdk/gdkevents.h#L309
   // Enable this for mouse debugging:
@@ -249,6 +245,33 @@ Set_Frequency_On_Click( GdkEvent *e)
 			return;
 
   } /* switch( button_event->button ) */
+  }
+  else if (isFlagSet(PLOT_SMITH)
+      && (button == 1 || button == 2 || button == 3)
+      && fp_smith_freq_at_pixel(button_event->x, button_event->y,
+          button == 3, &fmhz))
+  {
+    /* Smith chart is not an x-axis panel; the click maps onto the locus.
+     * Primary interpolates the locus position; secondary snaps to a step. */
+    if (button == 2)
+    {
+      calc_data.fmhz_save = 0.0;
+      draw_freqplot = 1;
+    }
+    else
+    {
+      draw_freqplot = 1;
+      set_fmhz = 1;
+      if (button == 1)
+        xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    }
+  }
+  else
+  {
+	  // no plot_rect selected for frequency line
+	save_click_event(e);
+	  return;
+  }
 
   if (set_fmhz)
   {

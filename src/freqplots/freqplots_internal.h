@@ -57,6 +57,11 @@ void Plot_Graph(fp_render_t *fp,
 void Plot_Graph_Smith(fp_render_t *fp,
     double *fa, double *fb, double *fc, int nc, int posn);
 
+/* Resolve a Smith-chart click to a locus frequency; FALSE when the chart is
+ * not displayed or the click is outside it (graphs/smith_graph.c). */
+gboolean fp_smith_freq_at_pixel(double px, double py,
+    gboolean snap_to_step, double *fmhz);
+
 /* Per-frame data shared with every dispatched plot renderer.  posn advances
  * as each renderer claims drawing-area panels. */
 typedef struct
