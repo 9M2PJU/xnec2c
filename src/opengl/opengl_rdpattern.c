@@ -146,6 +146,7 @@ gl_rdpat_draw_nearfield(void *ctx,
     out->batches[0].vertices = nf_buf;
     out->batches[0].vertex_count = nf_count * 2;
     out->batches[0].draw_mode = GL_LINES;
+    out->batches[0].line_width = 1.0f;
     out->batches[0].color_dim = rc_config.brightness_nearfield;
     out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_nearfield);
     out->batch_count = 1;
@@ -275,6 +276,7 @@ gl_rdpat_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
       out->batches[0].vertex_count = tri_count * 3;
       out->batches[0].draw_mode = GL_TRIANGLES;
       out->batches[0].polygon_offset = FALSE;
+      out->batches[0].line_width = 1.0f;
       out->batches[0].color_dim = rc_config.brightness_rdpat_surface;
       out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
       out->batch_count = 1;
@@ -294,6 +296,7 @@ gl_rdpat_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
       out->batches[0].vertex_count = line_count * 2;
       out->batches[0].draw_mode = GL_LINES;
       out->batches[0].polygon_offset = FALSE;
+      out->batches[0].line_width = 1.0f;
       out->batches[0].color_dim = rc_config.brightness_rdpat_wire;
       out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
       out->batch_count = 1;
@@ -316,6 +319,7 @@ gl_rdpat_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
       out->batches[0].vertex_count = tri_count * 3;
       out->batches[0].draw_mode = GL_TRIANGLES;
       out->batches[0].polygon_offset = TRUE;
+      out->batches[0].line_width = 1.0f;
       out->batches[0].color_dim =
           rc_config.brightness_rdpat_surface * RDPAT_BOTH_SURFACE_DIM_RATIO;
       out->batches[0].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_surface);
@@ -324,6 +328,7 @@ gl_rdpat_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
       out->batches[1].vertex_count = line_count * 2;
       out->batches[1].draw_mode = GL_LINES;
       out->batches[1].polygon_offset = FALSE;
+      out->batches[1].line_width = 1.0f;
       out->batches[1].color_dim = rc_config.brightness_rdpat_wire;
       out->batches[1].alpha = TRANSPARENCY_TO_ALPHA(rc_config.transparency_rdpat_wire);
       out->batch_count = 2;

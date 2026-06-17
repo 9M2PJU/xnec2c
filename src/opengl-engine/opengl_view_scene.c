@@ -182,6 +182,13 @@ gl_scene_render(void *ctx, const gl_render_params_t *params)
         glUniform1f(sc->u_color_dim_location,
             view->content.batches[i].color_dim);
 
+        /* Apply per-batch line width unconditionally so it never inherits
+         * leftover global GL state from a prior batch or renderable.
+         * Triangle batches pin to their own width, keeping line width a
+         * per-batch single source of truth. */
+        glLineWidth(view->content.batches[i].line_width > 0.0f
+            ? view->content.batches[i].line_width : 1.0f);
+
         glDrawArrays(view->content.batches[i].draw_mode, 0,
             view->content.batches[i].vertex_count);
       }

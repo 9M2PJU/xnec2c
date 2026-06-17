@@ -383,6 +383,9 @@ opengl_axes_render(void *ctx, const gl_render_params_t *params)
       TRANSPARENCY_TO_ALPHA(rc_config.transparency_axes));
   glUniform1f(axes->line_u_color_dim_loc, rc_config.brightness_axes);
 
+  /* Axis lines own their width explicitly so it never inherits leftover
+   * global GL state from a previously rendered batch. */
+  glLineWidth(1.0f);
   glBindVertexArray(axes->lines_vao);
   glDrawArrays(GL_LINES, 0, NUM_AXES * 2);
   glBindVertexArray(0);
