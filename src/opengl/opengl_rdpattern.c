@@ -17,6 +17,8 @@
  *    https://www.xnec2c.org/
  */
 
+#include <string.h>
+
 #include "opengl_rdpattern.h"
 #include "opengl_rdpattern_geometry.h"
 #include "../settings/render_settings.h"
@@ -58,6 +60,53 @@ static const gl_overlay_config_t rdpattern_overlay_config = {
   .attribs = opengl_chevron_attribs,
   .attrib_count = 7
 };
+
+
+/* Validity snapshot for the cached far-field mesh tessellation.
+ * Bundles the producer data-version with the GL presentation parameters
+ * that shape the mesh; a mismatch against current state forces
+ * re-tessellation.  fp->generation is per-slot and not globally unique,
+ * so fstep is part of the snapshot to disambiguate slots whose
+ * generations coincide. */
+typedef struct
+{
+  int      fstep;       /* slot the mesh was tessellated from */
+  uint32_t generation;  /* fp->generation captured at tessellation */
+  int      draw_style;  /* rc_config.rdpattern_draw_style */
+  float    off_len;     /* excitation translation magnitude */
+} rdpat_mesh_cache_t;
+
+
+/* rdpat_mesh_cache_capture() - Snapshot current mesh-validity inputs
+ * @fstep:      active far-field slot index
+ * @generation: fp->generation for that slot
+ * @off_len:    excitation translation magnitude from dispatch
+ *
+ * draw_style is read from the engine-specific render config. */
+  static rdpat_mesh_cache_t
+rdpat_mesh_cache_capture(int fstep, uint32_t generation, float off_len)
+{
+  rdpat_mesh_cache_t snap = {0};
+  snap.fstep      = fstep;
+  snap.generation = generation;
+  snap.draw_style = rc_config.rdpattern_draw_style;
+  snap.off_len    = off_len;
+  return snap;
+}
+
+/* rdpat_mesh_cache_match() - Single comparison point for mesh-validity
+ * @a: stored snapshot
+ * @b: freshly captured snapshot
+ *
+ * Bytewise equality; the struct has no internal padding (four 4-byte
+ * members) and both operands originate from = {0} capture, so memcmp
+ * is well-defined. */
+  static inline int
+rdpat_mesh_cache_match(const rdpat_mesh_cache_t *a,
+    const rdpat_mesh_cache_t *b)
+{
+  return memcmp(a, b, sizeof(*a)) == 0;
+}
 
 
 /*-----------------------------------------------------------------------*/
@@ -114,18 +163,17 @@ gl_rdpat_draw_nearfield(void *ctx,
 /*-----------------------------------------------------------------------*/
 
 /** gl_rdpat_draw_farfield() - Far-field leaf: tessellate gain pattern and populate batches
- * @ctx:    gl_view_state_s (passed as void* through render_ops_t)
- * @_fstep: current frequency step, indexes ff_pre[] for vertex data
- * @ff:     dispatch-resolved far-field draw parameters
+ * @ctx:   gl_view_state_s (passed as void* through render_ops_t)
+ * @fstep: current frequency step, indexes ff_pre[] for vertex data
+ * @ff:    dispatch-resolved far-field draw parameters
  *
  * Returns TRUE when batches are populated, FALSE on data dependency failure.
  */
   gboolean
-gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
+gl_rdpat_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
 {
-  static float last_ff_off_len = NAN;
-  static uint32_t last_ff_gen = 0;
-  static int last_draw_style = -1;
+  static rdpat_mesh_cache_t mesh_cache = {
+    .fstep = -1, .generation = 0, .draw_style = -1, .off_len = NAN };
   gl_view_state_t *state = (gl_view_state_t *)ctx;
   gl_view_content_t *out = &state->content;
   uint32_t current_gen;
@@ -134,10 +182,10 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
   point_3d_t *points_to_use;
   gboolean translate_to_excitation;
 
-  if( ff_pre == NULL || _fstep < 0 )
+  if( ff_pre == NULL || fstep < 0 )
     return FALSE;
 
-  ff_pre_t *fp = &ff_pre[_fstep];
+  ff_pre_t *fp = &ff_pre[fstep];
   nth = fpat.nth;
   nph = fpat.nph;
   npts = nth * nph;
@@ -174,10 +222,14 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
     points_to_use = rdpat_translated_points;
   }
 
-  /* Regenerate geometry on data change, translation change, or draw style change */
-  if( current_gen != last_ff_gen ||
-      rc_config.rdpattern_draw_style != last_draw_style ||
-      ff->off_len != last_ff_off_len )
+  rdpat_mesh_cache_t cur =
+      rdpat_mesh_cache_capture(fstep, current_gen, ff->off_len);
+
+  /* Regenerate geometry on data change, translation change, draw style change,
+   * or frequency step change.  fp->generation is a per-slot counter and is not
+   * globally unique, so switching to a slot whose generation coincides with the
+   * last rendered slot must still force a rebuild. */
+  if( !rdpat_mesh_cache_match(&mesh_cache, &cur) )
   {
     gboolean need_tris =
       (rc_config.rdpattern_draw_style == RDPAT_STYLE_SURFACE ||
@@ -204,9 +256,7 @@ gl_rdpat_draw_farfield(void *ctx, int _fstep, const ff_draw_params_t *ff)
         return FALSE;
     }
 
-    last_ff_gen = current_gen;
-    last_draw_style = rc_config.rdpattern_draw_style;
-    last_ff_off_len = ff->off_len;
+    mesh_cache = cur;
   }
 
   /* Populate batches per draw style */
