@@ -20,64 +20,58 @@
 
 /* Painter's-algorithm depth layers for the frequency plots.  Ascending
  * z_mid is drawn back-to-front by scenebuffer_flush(), so a larger value
- * paints on top.  Grid sits furthest back, the right (cyan) trace next,
- * the left (magenta) trace above it, and the current-frequency line on
- * top of all segment geometry.  Deferred text paints after the flush and
- * therefore overlays every layer. */
+ * paints on top.  Measurement data rides above plot infrastructure: the grid
+ * sits furthest back, then text labels, then the right (cyan) and left
+ * (magenta) traces, with the current-frequency marker on top so the selected
+ * measurement is never hidden by a label or a grid line.  Depths 1.0 - 3.0
+ * are reserved for graph-specific grid sublayers (see smith_graph.c). */
 #define FP_Z_GRID   0.0f
-#define FP_Z_RIGHT  1.0f
-#define FP_Z_LEFT   2.0f
-#define FP_Z_GREEN  3.0f
+#define FP_Z_TEXT   4.0f
+#define FP_Z_RIGHT  5.0f
+#define FP_Z_LEFT   6.0f
+#define FP_Z_GREEN  7.0f
 
 /* Every freq-plot stroke uses the GTK draw context default line width. */
 #define FP_LINE_WIDTH  2.0f
 
-/* Maximum deferred-text length (titles, scale values, min/max labels). */
-#define FP_TEXT_LEN  64
+/* Cohesive stroke style passed to the line/arc deposit helpers; one object
+ * instead of three loose colour, width, and depth scalars. */
+typedef struct
+{
+  rgb_f_t color;
+  float   width;
+  float   z_mid;
+} fp_stroke_t;
 
-/* Text justification, calculated against the supplied x (horizontal) and
- * y (vertical) anchor coordinates. */
-enum {
-  JUSTIFY_LEFT   = 0,
-  JUSTIFY_CENTER = 1,
-  JUSTIFY_RIGHT  = 2,
-  JUSTIFY_HMASK  = 0x03,
-
-  JUSTIFY_BELOW  = 0,
-  JUSTIFY_MIDDLE = 1 << 2,
-  JUSTIFY_ABOVE  = 2 << 2,
-  JUSTIFY_VMASK  = 0x0c
-};
-
-/* Per-frame render handle carrying the active Cairo context.  Segment and
- * deferred-text storage are owned by freqplots_render.c. */
+/* Per-frame render handle carrying the active Cairo context.  All primitive
+ * storage is owned by the shared cairo_scenebuffer in freqplots_render.c. */
 typedef struct
 {
   cairo_t *cr;
 } fp_render_t;
 
-/* Lifecycle: reset clears the scenebuffer and deferred-text list for a new
- * frame; flush depth-sorts and strokes all segments then paints deferred
- * text on top; destroy releases the backing allocations. */
+/* Lifecycle: reset binds the frame context and clears the scenebuffer; flush
+ * depth-sorts and emits every primitive; destroy releases the backing
+ * allocations and the shared text layout. */
 void fp_render_reset(fp_render_t *fp, cairo_t *cr);
 void fp_render_flush(fp_render_t *fp);
 void fp_render_destroy(void);
 
-/* Segment deposit helpers.  Colour and depth are resolved by the caller;
- * each helper appends line geometry to the per-frame scenebuffer. */
+/* Stroked geometry deposit helpers.  The stroke style carries colour, width,
+ * and depth; each helper appends line or arc geometry to the scenebuffer. */
 void fp_add_line(fp_render_t *fp, int x1, int y1, int x2, int y2,
-    float z, rgb_f_t c);
+    fp_stroke_t s);
 void fp_add_polyline(fp_render_t *fp, const GdkPoint *pts, int n,
-    float z, rgb_f_t c);
+    fp_stroke_t s);
 void fp_add_rect(fp_render_t *fp, int x, int y, int w, int h,
-    float z, rgb_f_t c);
+    fp_stroke_t s);
 void fp_add_quad(fp_render_t *fp, const GdkPoint pts[4],
-    float z, rgb_f_t c);
+    fp_stroke_t s);
 void fp_add_arc(fp_render_t *fp, double cx, double cy, double r,
-    double a0, double a1, float z, rgb_f_t c);
+    double a0, double a1, fp_stroke_t s);
 
-/* Opaque filled point markers.  Each deposits one marker that paints on
- * top of segments sharing its depth layer.  size is the full square or
+/* Opaque filled point markers.  Squares and diamonds deposit a filled
+ * polygon; circles deposit a filled disc.  size is the full square or
  * diamond extent; radius is the circle radius, in pixels. */
 void fp_add_filled_square(fp_render_t *fp, int cx, int cy, int size,
     float z, rgb_f_t c);
@@ -86,9 +80,10 @@ void fp_add_filled_diamond(fp_render_t *fp, int cx, int cy, int size,
 void fp_add_filled_circle(fp_render_t *fp, int cx, int cy, int radius,
     float z, rgb_f_t c);
 
-/* Defer one text run; painted during fp_render_flush after all segments. */
-void fp_defer_text(fp_render_t *fp, int x, int y, const char *text,
-    int justify, rgb_f_t c);
+/* Deposit one text run; scale multiplies the base font glyph size for this
+ * run.  Painted during flush in depth order, overlaying same-depth geometry. */
+void fp_add_text(fp_render_t *fp, int x, int y, float scale,
+    const char *text, int justify, rgb_f_t c);
 
 /* Pixel size of a string laid out in the freqplots drawing area font. */
 void pango_text_size(GtkWidget *widget, int *width, int *height, char *s);

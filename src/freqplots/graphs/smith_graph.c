@@ -173,11 +173,14 @@ Plot_Graph_Smith(
        int div = 2 << idx;
        double angle[] = { 1.0, 1.2, 1.35 };
        fp_add_arc( fp, x0 + scale / 2 - scale / div, y0, scale / div,
-           0, M_2PI, FP_Z_GRID, COLOR_GREY );
+           0, M_2PI,
+           (fp_stroke_t){ .color = COLOR_GREY, .width = FP_LINE_WIDTH, .z_mid = FP_Z_GRID } );
        fp_add_arc( fp, x0 + scale / 2, y0 - scale / div, scale / div,
-           M_PI / 2.0, M_PI * angle[idx], FP_Z_GRID, COLOR_GREY );
+           M_PI / 2.0, M_PI * angle[idx],
+           (fp_stroke_t){ .color = COLOR_GREY, .width = FP_LINE_WIDTH, .z_mid = FP_Z_GRID } );
        fp_add_arc( fp, x0 + scale / 2, y0 + scale / div, scale / div,
-           M_PI * 1.5, ( 2.0 - angle[idx]) * M_PI, FP_Z_GRID, COLOR_GREY );
+           ( 2.0 - angle[idx]) * M_PI, M_PI * 1.5,
+           (fp_stroke_t){ .color = COLOR_GREY, .width = FP_LINE_WIDTH, .z_mid = FP_Z_GRID } );
   }
 
   /* Calculate points to plot */
@@ -205,7 +208,8 @@ Plot_Graph_Smith(
   }
 
   /* Draw the graph */
-  fp_add_polyline( fp, points, nc, FP_Z_LEFT, COLOR_MAGENTA );
+  fp_add_polyline( fp, points, nc,
+      (fp_stroke_t){ .color = COLOR_MAGENTA, .width = FP_LINE_WIDTH, .z_mid = FP_Z_LEFT } );
 
   /* Capture the locus geometry so a chart click resolves to a frequency */
   smith_locus_valid = FALSE;

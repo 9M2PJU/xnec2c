@@ -13,36 +13,25 @@
  */
 
 /*
- * freqplots_render: Depth-buffered segment and deferred-text accumulator
- * for the frequency-plots Cairo drawing area.
+ * freqplots_render: Primitive accumulator for the frequency-plots Cairo
+ * drawing area.
  *
- * Leaf plot renderers deposit line geometry via the fp_add_* helpers and
- * text via fp_defer_text during a frame.  fp_render_flush() strokes the
- * accumulated segments back-to-front through the shared cairo_scenebuffer
- * painter's pipeline, then paints the deferred text so labels overlay all
- * geometry.
+ * Leaf plot renderers deposit line, arc, polygon, and text primitives via the
+ * fp_add_* helpers during a frame.  fp_render_flush() hands the shared
+ * cairo_scenebuffer to the depth-sorted painter's pipeline, which emits every
+ * primitive back-to-front; text deposits at FP_Z_TEXT, above the grid but
+ * below the data traces, so labels never hide the measurement geometry.
  */
 
 #include "freqplots_render.h"
 #include "../shared.h"
 
 #include <math.h>
-#include <string.h>
 
-/* One deferred text run, painted after all segments are flushed. */
-typedef struct
-{
-  int     x, y;
-  int     justify;
-  rgb_f_t c;
-  char    text[FP_TEXT_LEN];
-} fp_text_t;
-
-/* Per-frame accumulators, reused across frames. */
+/* Per-frame accumulator, reused across frames, and the base Pango layout that
+ * supplies the font for every text run; both persist until destroy. */
 static cairo_scenebuffer_t fp_sb;
-static fp_text_t          *fp_texts     = NULL;
-static int                 fp_text_count = 0;
-static int                 fp_text_cap   = 0;
+static PangoLayout        *fp_text_layout = NULL;
 
 /*-----------------------------------------------------------------------*/
 
@@ -50,83 +39,91 @@ static int                 fp_text_cap   = 0;
  * fp_render_reset() - Begin a new frame
  * @fp: render handle to bind to @cr
  * @cr: active Cairo context for this frame
+ *
+ * Creates the shared text layout on first use and binds it to the
+ * scenebuffer so text primitives have a base font.
  */
   void
 fp_render_reset(fp_render_t *fp, cairo_t *cr)
 {
   fp->cr = cr;
+
+  if( fp_text_layout == NULL )
+    fp_text_layout = gtk_widget_create_pango_layout(freqplots_drawingarea, NULL);
+
   scenebuffer_reset(&fp_sb);
-  fp_text_count = 0;
+  scenebuffer_set_text_layout(&fp_sb, fp_text_layout);
 }
 
 /*-----------------------------------------------------------------------*/
 
 /**
- * fp_render_destroy() - Release the segment and text allocations
+ * fp_render_destroy() - Release the scenebuffer and text layout
  */
   void
 fp_render_destroy(void)
 {
   scenebuffer_destroy(&fp_sb);
-  mem_free((void **)&fp_texts);
-  fp_text_count = 0;
-  fp_text_cap   = 0;
+
+  if( fp_text_layout != NULL )
+  {
+    g_object_unref(fp_text_layout);
+    fp_text_layout = NULL;
+  }
 }
 
 /*-----------------------------------------------------------------------*/
 
-/* Append one line segment to the per-frame scenebuffer. */
+/* Append one line segment carrying the stroke style to the scenebuffer. */
   static void
-fp_add_seg(float z, rgb_f_t c, int x1, int y1, int x2, int y2)
+fp_add_seg(fp_stroke_t s, int x1, int y1, int x2, int y2)
 {
-  Segment_t s;
+  Segment_t seg;
 
-  s.x1 = x1;
-  s.y1 = y1;
-  s.x2 = x2;
-  s.y2 = y2;
-  s.z_mid = z;
-  s.width = FP_LINE_WIDTH;
-  seg_set_color(&s, c);
+  seg.x1 = x1;
+  seg.y1 = y1;
+  seg.x2 = x2;
+  seg.y2 = y2;
+  seg.z_mid = s.z_mid;
+  seg.width = s.width;
+  seg_set_color(&seg, s.color);
 
-  scenebuffer_add(&fp_sb, &s);
+  scenebuffer_add(&fp_sb, &seg);
 }
 
 /*-----------------------------------------------------------------------*/
 
   void
-fp_add_line(fp_render_t *fp, int x1, int y1, int x2, int y2,
-    float z, rgb_f_t c)
+fp_add_line(fp_render_t *fp, int x1, int y1, int x2, int y2, fp_stroke_t s)
 {
   (void)fp;
-  fp_add_seg(z, c, x1, y1, x2, y2);
+  fp_add_seg(s, x1, y1, x2, y2);
 }
 
 /*-----------------------------------------------------------------------*/
 
   void
-fp_add_polyline(fp_render_t *fp, const GdkPoint *pts, int n,
-    float z, rgb_f_t c)
+fp_add_polyline(fp_render_t *fp, const GdkPoint *pts, int n, fp_stroke_t s)
 {
   int i;
 
   (void)fp;
   for( i = 1; i < n; i++ )
-    fp_add_seg(z, c, pts[i-1].x, pts[i-1].y, pts[i].x, pts[i].y);
+    fp_add_seg(s, pts[i-1].x, pts[i-1].y, pts[i].x, pts[i].y);
 }
 
 /*-----------------------------------------------------------------------*/
 
   void
-fp_add_quad(fp_render_t *fp, const GdkPoint pts[4], float z, rgb_f_t c)
+fp_add_quad(fp_render_t *fp, const GdkPoint pts[4], fp_stroke_t s)
 {
   Segment_t tmpl;
   int xs[4], ys[4], k;
 
   (void)fp;
-  tmpl.z_mid = z;
-  tmpl.width = FP_LINE_WIDTH;
-  seg_set_color(&tmpl, c);
+  tmpl.z_mid = s.z_mid;
+  tmpl.width = s.width;
+  seg_set_color(&tmpl, s.color);
 
   for( k = 0; k < 4; k++ )
   {
@@ -140,7 +137,7 @@ fp_add_quad(fp_render_t *fp, const GdkPoint pts[4], float z, rgb_f_t c)
 /*-----------------------------------------------------------------------*/
 
   void
-fp_add_rect(fp_render_t *fp, int x, int y, int w, int h, float z, rgb_f_t c)
+fp_add_rect(fp_render_t *fp, int x, int y, int w, int h, fp_stroke_t s)
 {
   GdkPoint p[4];
 
@@ -149,68 +146,58 @@ fp_add_rect(fp_render_t *fp, int x, int y, int w, int h, float z, rgb_f_t c)
   p[2].x = x + w; p[2].y = y + h;
   p[3].x = x;     p[3].y = y + h;
 
-  fp_add_quad(fp, p, z, c);
+  fp_add_quad(fp, p, s);
 }
 
 /*-----------------------------------------------------------------------*/
 
 /**
- * fp_add_arc() - Sample a circular arc into line segments
+ * fp_add_arc() - Deposit one stroked circular arc
  * @cx, @cy: arc centre
  * @r:       arc radius
- * @a0, @a1: start and end angle in radians; sampled linearly from a0 to a1
- *           so a decreasing range yields a negative sweep
- *
- * Stroked arcs cannot enter the segment scenebuffer directly, so the arc
- * is approximated by a polyline whose segment count scales with its angular
- * span to preserve smoothness while keeping the painter's-algorithm layer.
+ * @a0, @a1: start and end angle in radians
+ * @s:       stroke style
  */
   void
 fp_add_arc(fp_render_t *fp, double cx, double cy, double r,
-    double a0, double a1, float z, rgb_f_t c)
+    double a0, double a1, fp_stroke_t s)
 {
-  int nseg, i;
-  double px, py;
+  Arc_t a;
 
   (void)fp;
-  nseg = (int)( fabs(a1 - a0) / M_2PI * 64.0 + 0.5 );
-  if( nseg < 2 ) nseg = 2;
+  a.cx     = cx;
+  a.cy     = cy;
+  a.radius = r;
+  a.a0     = a0;
+  a.a1     = a1;
+  a.z_mid  = s.z_mid;
+  a.r      = s.color.r;
+  a.g      = s.color.g;
+  a.b      = s.color.b;
+  a.width  = s.width;
+  a.mode   = SCENE_STROKE;
 
-  px = cx + r * cos(a0);
-  py = cy + r * sin(a0);
-  for( i = 1; i <= nseg; i++ )
-  {
-    double t = (double)i / (double)nseg;
-    double a = a0 + t * (a1 - a0);
-    double nx = cx + r * cos(a);
-    double ny = cy + r * sin(a);
-    fp_add_seg(z, c, (int)(px + 0.5), (int)(py + 0.5),
-        (int)(nx + 0.5), (int)(ny + 0.5));
-    px = nx;
-    py = ny;
-  }
+  scenebuffer_add_arc(&fp_sb, &a);
 }
 
 /*-----------------------------------------------------------------------*/
 
-/* Deposit one opaque filled marker of the given shape onto the per-frame
- * scenebuffer; size carries the square/diamond extent or circle radius. */
+/* Deposit one filled convex polygon from four screen-space vertices. */
   static void
-fp_add_marker(float z, rgb_f_t c, int cx, int cy, int size,
-    scenebuffer_mark_shape_t shape)
+fp_add_filled_poly(float z, rgb_f_t c, const GdkPoint pts[4])
 {
-  Marker_t m;
+  Polygon_t p;
+  int k;
 
-  m.x     = cx;
-  m.y     = cy;
-  m.z_mid = z;
-  m.r     = c.r;
-  m.g     = c.g;
-  m.b     = c.b;
-  m.size  = size;
-  m.shape = shape;
+  for( k = 0; k < 4; k++ )
+    p.pts[k] = pts[k];
+  p.n     = 4;
+  p.z_mid = z;
+  p.r     = c.r;
+  p.g     = c.g;
+  p.b     = c.b;
 
-  scenebuffer_add_marker(&fp_sb, &m);
+  scenebuffer_add_polygon(&fp_sb, &p);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -219,8 +206,17 @@ fp_add_marker(float z, rgb_f_t c, int cx, int cy, int size,
 fp_add_filled_square(fp_render_t *fp, int cx, int cy, int size,
     float z, rgb_f_t c)
 {
+  int x0 = cx - size / 2;
+  int y0 = cy - size / 2;
+  GdkPoint pts[4] = {
+    { x0,        y0        },
+    { x0 + size, y0        },
+    { x0 + size, y0 + size },
+    { x0,        y0 + size }
+  };
+
   (void)fp;
-  fp_add_marker(z, c, cx, cy, size, SCENEBUFFER_MARK_SQUARE);
+  fp_add_filled_poly(z, c, pts);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -229,8 +225,18 @@ fp_add_filled_square(fp_render_t *fp, int cx, int cy, int size,
 fp_add_filled_diamond(fp_render_t *fp, int cx, int cy, int size,
     float z, rgb_f_t c)
 {
+  int half = size / 2;
+  /* The one-pixel vertical extension keeps the diamond visually balanced
+   * against the integer-rounded square. */
+  GdkPoint pts[4] = {
+    { cx - half, cy            },
+    { cx,        cy + half + 1 },
+    { cx + half, cy            },
+    { cx,        cy - half - 1 }
+  };
+
   (void)fp;
-  fp_add_marker(z, c, cx, cy, size, SCENEBUFFER_MARK_DIAMOND);
+  fp_add_filled_poly(z, c, pts);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -239,91 +245,56 @@ fp_add_filled_diamond(fp_render_t *fp, int cx, int cy, int size,
 fp_add_filled_circle(fp_render_t *fp, int cx, int cy, int radius,
     float z, rgb_f_t c)
 {
+  Arc_t a;
+
   (void)fp;
-  fp_add_marker(z, c, cx, cy, radius, SCENEBUFFER_MARK_CIRCLE);
+  a.cx     = (double)cx;
+  a.cy     = (double)cy;
+  a.radius = (double)radius;
+  a.a0     = 0.0;
+  a.a1     = M_2PI;
+  a.z_mid  = z;
+  a.r      = c.r;
+  a.g      = c.g;
+  a.b      = c.b;
+  a.width  = 0.0f;
+  a.mode   = SCENE_FILL;
+
+  scenebuffer_add_arc(&fp_sb, &a);
 }
 
 /*-----------------------------------------------------------------------*/
 
   void
-fp_defer_text(fp_render_t *fp, int x, int y, const char *text,
-    int justify, rgb_f_t c)
+fp_add_text(fp_render_t *fp, int x, int y, float scale,
+    const char *text, int justify, rgb_f_t c)
 {
-  fp_text_t *t;
+  Text_t t;
 
   (void)fp;
-  if( fp_text_count >= fp_text_cap )
-  {
-    int new_cap = fp_text_cap ? fp_text_cap * 2 : 64;
-    fp_text_t *grown = NULL;
-    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(fp_text_t));
-    if( fp_text_count )
-      memcpy(grown, fp_texts, (size_t)fp_text_count * sizeof(fp_text_t));
-    mem_free((void **)&fp_texts);
-    fp_texts    = grown;
-    fp_text_cap = new_cap;
-  }
+  t.x       = x;
+  t.y       = y;
+  t.z_mid   = FP_Z_TEXT;
+  t.r       = c.r;
+  t.g       = c.g;
+  t.b       = c.b;
+  t.scale   = scale;
+  t.justify = justify;
+  g_strlcpy(t.text, text, SCENE_TEXT_LEN);
 
-  t = &fp_texts[fp_text_count++];
-  t->x       = x;
-  t->y       = y;
-  t->justify = justify;
-  t->c       = c;
-  g_strlcpy(t->text, text, FP_TEXT_LEN);
+  scenebuffer_add_text(&fp_sb, &t);
 }
 
 /*-----------------------------------------------------------------------*/
 
 /**
- * fp_render_flush() - Stroke all segments, then paint deferred text on top
+ * fp_render_flush() - Emit every accumulated primitive depth-sorted
  * @fp: render handle bound to the active Cairo context
- *
- * Segments flush through the shared depth-sorted painter's pipeline.  Each
- * deferred text run is then justified against its anchor exactly as the
- * legacy draw_text() did and painted over the flushed geometry.
  */
   void
 fp_render_flush(fp_render_t *fp)
 {
-  cairo_t *cr = fp->cr;
-  PangoLayout *layout;
-  int i, w, h;
-
-  scenebuffer_flush(&fp_sb, cr, NULL);
-
-  if( fp_text_count == 0 )
-    return;
-
-  layout = gtk_widget_create_pango_layout(freqplots_drawingarea, NULL);
-  for( i = 0; i < fp_text_count; i++ )
-  {
-    fp_text_t *t = &fp_texts[i];
-    int x = t->x, y = t->y;
-
-    cairo_set_source_rgb(cr, (double)t->c.r, (double)t->c.g, (double)t->c.b);
-    pango_layout_set_text(layout, t->text, -1);
-    pango_layout_get_pixel_size(layout, &w, &h);
-
-    switch( t->justify & JUSTIFY_HMASK )
-    {
-      case JUSTIFY_RIGHT:  x -= w;     break;
-      case JUSTIFY_CENTER: x -= w / 2; break;
-      case JUSTIFY_LEFT:
-      default:                         break;
-    }
-
-    switch( t->justify & JUSTIFY_VMASK )
-    {
-      case JUSTIFY_ABOVE:  y -= h;     break;
-      case JUSTIFY_MIDDLE: y -= h / 2; break;
-      case JUSTIFY_BELOW:
-      default:                         break;
-    }
-
-    cairo_move_to(cr, x, y);
-    pango_cairo_show_layout(cr, layout);
-  }
-  g_object_unref(layout);
+  scenebuffer_flush(&fp_sb, fp->cr, NULL);
 }
 
 /*-----------------------------------------------------------------------*/

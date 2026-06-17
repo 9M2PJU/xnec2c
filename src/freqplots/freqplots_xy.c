@@ -130,20 +130,15 @@ Plot_Graph(
 	/* Draw titles */
 	plot_rect_y = (freqplots_height * posn) / calc_data.ngraph;
 
-	fp_defer_text(fp,
-		pad_x_scale_text+pad_x_px_after_scale,
-		plot_rect_y,
-		titles[0], JUSTIFY_LEFT, COLOR_MAGENTA);
+	fp_add_text(fp, pad_x_scale_text + pad_x_px_after_scale, plot_rect_y,
+		    1.0f, titles[0], JUSTIFY_LEFT, COLOR_MAGENTA);
 
-	fp_defer_text(fp,
-		freqplots_width/2,
-		plot_rect_y,
-		titles[1], JUSTIFY_CENTER, COLOR_YELLOW);
+	fp_add_text(fp, freqplots_width / 2, plot_rect_y, 1.0f, titles[1],
+		    JUSTIFY_CENTER, COLOR_YELLOW);
 
-	fp_defer_text(fp,
-		freqplots_width - (pad_x_scale_text+pad_x_px_after_scale),
-		plot_rect_y,
-		titles[2], JUSTIFY_RIGHT, COLOR_CYAN);
+	fp_add_text(fp,
+		    freqplots_width - (pad_x_scale_text + pad_x_px_after_scale),
+		    plot_rect_y, 1.0f, titles[2], JUSTIFY_RIGHT, COLOR_CYAN);
 
 	// Increase the y position to account for the title text height above:
 	plot_rect_y += pad_y_title_text;
@@ -326,7 +321,7 @@ Plot_Graph(
 			fp_add_line(fp,
 				(int)(plot_rect->x + freq_x), plot_rect->y,
 				(int)(plot_rect->x + freq_x), plot_rect->y+plot_rect->height,
-				FP_Z_GREEN, green_c);
+				(fp_stroke_t){ .color = green_c, .width = FP_LINE_WIDTH, .z_mid = FP_Z_GREEN });
 		}
 
 		// Next FR card index:

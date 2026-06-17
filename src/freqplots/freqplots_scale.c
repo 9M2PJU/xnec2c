@@ -354,10 +354,8 @@ Plot_Horizontal_Scale(
 		if (idx == nval-1) justify = JUSTIFY_RIGHT;
 
 		snprintf( value, sizeof(value), (const char *)format, min );
-		fp_defer_text(fp,
-			x + (idx * width) / (nval-1),
-			y,
-			value, justify, c);
+		fp_add_text(fp, x + (idx * width) / (nval - 1), y, 1.0f,
+                            value, justify, c);
 
     min += hstep;
   }
@@ -422,9 +420,8 @@ Plot_Vertical_Scale(
 
 	// Algin the first value to the top to keep from overlapping the title
 	// but otherwise center on the scale line.
-	fp_defer_text(fp,
-		x, yps,
-		value, JUSTIFY_RIGHT | JUSTIFY_MIDDLE, c);
+	fp_add_text(fp, x, yps, 1.0f, value, JUSTIFY_RIGHT | JUSTIFY_MIDDLE,
+                    c);
     max -= vstep;
   }
 

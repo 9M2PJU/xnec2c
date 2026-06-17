@@ -20,45 +20,97 @@
 #include "../common.h"
 
 /*
- * cairo_scenebuffer: Depth-sorted segment accumulator for Cairo rendering.
+ * cairo_scenebuffer: Depth-sorted accumulator for every Cairo drawing
+ * primitive a view emits.
  *
- * Each frame: reset -> leaf renderers deposit segments -> flush draws all
- * segments depth-sorted via painter's algorithm with minimal cairo_stroke calls.
+ * Each frame: reset -> leaf renderers deposit primitives -> flush draws
+ * them depth-sorted via painter's algorithm.  Four primitive lanes share
+ * one depth scale: straight lines and stroked outlines as Segment_t, arcs
+ * (stroked or filled discs) as Arc_t, filled convex polygons as Polygon_t,
+ * and text runs as Text_t.  Depth dominates overlay; kind breaks equal-depth
+ * ties in the order segment, arc, polygon, text.
  */
 
 /* Default capacity for lazy-init in scenebuffer_reset */
 #define SCENEBUFFER_INITIAL_CAP 4096
 
-/* Filled marker shapes painted opaque on top of same-depth segments. */
-typedef enum
-{
-  SCENEBUFFER_MARK_SQUARE  = 0, /* axis-aligned filled square */
-  SCENEBUFFER_MARK_CIRCLE  = 1, /* filled disc */
-  SCENEBUFFER_MARK_DIAMOND = 2  /* filled diamond (45-degree square) */
-} scenebuffer_mark_shape_t;
+/* Vertex headroom for any filled polygon: square, diamond, quad, rect (4). */
+#define SCENE_POLY_MAX 8
 
-/* One opaque filled marker.  Painted during scenebuffer_flush after every
- * segment sharing its quantized depth so it overlays equal-depth lines. */
+/* Maximum stored length of one text run (titles, scale values, labels). */
+#define SCENE_TEXT_LEN 64
+
+/* Text justification, calculated against the supplied x (horizontal) and
+ * y (vertical) anchor coordinates.  JUSTIFY_BOLD selects the bold weight. */
+enum {
+  JUSTIFY_LEFT   = 0,
+  JUSTIFY_CENTER = 1,
+  JUSTIFY_RIGHT  = 2,
+  JUSTIFY_HMASK  = 0x03,
+
+  JUSTIFY_BELOW  = 0,
+  JUSTIFY_MIDDLE = 1 << 2,
+  JUSTIFY_ABOVE  = 2 << 2,
+  JUSTIFY_VMASK  = 0x0c,
+
+  JUSTIFY_BOLD   = 1 << 4
+};
+
+/* Paint operation for an arc: stroked outline or filled disc. */
+typedef enum { SCENE_STROKE, SCENE_FILL } scene_paint_t;
+
+/* Circular arc: stroked outline, or filled disc when mode is SCENE_FILL.
+ * Common fields follow the Segment_t order (geometry, z_mid, r,g,b, width)
+ * with mode trailing. */
 typedef struct
 {
-  gint  x, y;    /* marker centre, screen space */
-  float z_mid;   /* painter's-algorithm depth, same scale as Segment_t */
-  float r, g, b; /* RGB color [0.0, 1.0] */
-  int   size;    /* square/diamond: full extent; circle: radius, pixels */
-  scenebuffer_mark_shape_t shape;
-  int   seq;     /* deposit order; set by scenebuffer_add_marker for stable
-                  * equal-depth paint order */
-} Marker_t;
+  double        cx, cy, radius, a0, a1; /* centre, radius, start/end angle */
+  float         z_mid;                  /* painter's-algorithm depth */
+  float         r, g, b;                /* RGB color [0.0, 1.0] */
+  float         width;                  /* stroke width; unused when filled */
+  scene_paint_t mode;
+} Arc_t;
 
-/* Dynamic array accumulating all segments for the current frame */
+/* Filled convex polygon: square, diamond, and any future fill.  Vertices are
+ * stored AoS in screen space; common fields follow the Segment_t order. */
+typedef struct
+{
+  GdkPoint pts[SCENE_POLY_MAX]; /* vertices, screen space */
+  int      n;                   /* vertex count, <= SCENE_POLY_MAX */
+  float    z_mid;               /* painter's-algorithm depth */
+  float    r, g, b;             /* RGB color [0.0, 1.0] */
+} Polygon_t;
+
+/* One deferred text run.  scale multiplies the base layout glyph size; the
+ * justify bits select anchor alignment and bold weight. */
+typedef struct
+{
+  int   x, y;                 /* anchor, screen space */
+  float z_mid;                /* painter's-algorithm depth */
+  float r, g, b;              /* RGB color [0.0, 1.0] */
+  float scale;                /* glyph-size multiplier, per run */
+  int   justify;              /* JUSTIFY_* bits incl. JUSTIFY_BOLD */
+  char  text[SCENE_TEXT_LEN];
+} Text_t;
+
+/* Per-frame accumulator.  Each kind owns a packed lazily-grown array sized to
+ * its own element so the segment hot path keeps optimal cache density.  The
+ * text layout is a non-owning base font set by the text-using consumer. */
 typedef struct cairo_scenebuffer
 {
-  Segment_t *segs; /* heap-allocated segment array */
-  int        count;
-  int        capacity;
-  Marker_t  *marks; /* heap-allocated filled-marker array */
-  int        mark_count;
-  int        mark_capacity;
+  Segment_t   *segs; /* straight lines and stroked outlines */
+  int          count;
+  int          capacity;
+  Arc_t       *arcs;
+  int          arc_count;
+  int          arc_capacity;
+  Polygon_t   *polys;
+  int          poly_count;
+  int          poly_capacity;
+  Text_t      *texts;
+  int          text_count;
+  int          text_capacity;
+  PangoLayout *text_layout; /* non-owning base font for every text run */
 } cairo_scenebuffer_t;
 
 /*-----------------------------------------------------------------------
@@ -71,7 +123,7 @@ void scenebuffer_destroy(cairo_scenebuffer_t *sb);
  * Per-frame operations
  *----------------------------------------------------------------------*/
 
-/* Reset count to 0; retains allocation for reuse */
+/* Reset all lane counts to 0; retains allocations for reuse */
 void scenebuffer_reset(cairo_scenebuffer_t *sb);
 
 /* Append one segment; grows allocation as needed */
@@ -83,9 +135,19 @@ void scenebuffer_add_polygon_outline(cairo_scenebuffer_t *sb,
     const Segment_t *template_seg,
     int xs[4], int ys[4]);
 
-/* Append one opaque filled marker; grows allocation as needed.  The seq
- * field is assigned here so equal-depth markers paint in deposit order. */
-void scenebuffer_add_marker(cairo_scenebuffer_t *sb, const Marker_t *m);
+/* Append one arc (stroked or filled disc); grows allocation as needed */
+void scenebuffer_add_arc(cairo_scenebuffer_t *sb, const Arc_t *a);
+
+/* Append one filled convex polygon; grows allocation as needed */
+void scenebuffer_add_polygon(cairo_scenebuffer_t *sb, const Polygon_t *p);
+
+/* Append one text run; grows allocation as needed */
+void scenebuffer_add_text(cairo_scenebuffer_t *sb, const Text_t *t);
+
+/* Set the base layout used to render every text primitive in this buffer.
+ * Caller retains ownership and lifetime; NULL means this buffer emits no
+ * text and any text deposit is a BUG. */
+void scenebuffer_set_text_layout(cairo_scenebuffer_t *sb, PangoLayout *layout);
 
 /* Set to 1 to collect per-frame flush metrics; 0 passes NULL to
  * scenebuffer_flush, skipping all timing and metric overhead. */
@@ -103,8 +165,9 @@ typedef struct
   int    capacity;     /* allocator capacity at flush time */
 } cairo_flush_stats_t;
 
-/* Sort by z_mid ascending (back-to-front), batch by (color, width),
- * flush with minimal cairo_stroke calls.
+/* Sort each lane by quantized z_mid ascending (back-to-front), then sweep a
+ * z-frontier emitting at each depth in kind order (segment, arc, polygon,
+ * text) with minimal cairo_stroke/cairo_fill calls.
  * Reads rc_config.cairo_depth_bins and rc_config.cairo_color_quant directly.
  * When stats is non-NULL, the populated metrics describe this flush. */
 void scenebuffer_flush(cairo_scenebuffer_t *sb, cairo_t *cr,

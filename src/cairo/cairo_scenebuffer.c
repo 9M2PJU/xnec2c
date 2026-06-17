@@ -13,12 +13,12 @@
  */
 
 /*
- * cairo_scenebuffer: Depth-sorted segment accumulator for Cairo rendering.
+ * cairo_scenebuffer: Depth-sorted primitive accumulator for Cairo rendering.
  *
- * Leaf renderers deposit segments each frame via scenebuffer_add().
- * scenebuffer_flush() sorts by z_mid (painter's algorithm, back-to-front),
- * groups consecutive segments sharing identical (r,g,b,width) into batched
- * cairo_move_to/cairo_line_to paths, and strokes each group once.
+ * Leaf renderers deposit primitives each frame into four packed lanes
+ * (segments, arcs, polygons, text).  scenebuffer_flush() sorts each lane by
+ * z_mid (painter's algorithm, back-to-front) and emits them depth-first with
+ * batched cairo_stroke/cairo_fill calls.
  */
 #include "cairo_scenebuffer.h"
 #include "../common.h"
@@ -30,9 +30,12 @@
 /*-----------------------------------------------------------------------*/
 
 /**
- * scenebuffer_init() - Allocate segment array for a scenebuffer instance
+ * scenebuffer_init() - Allocate the segment lane for a scenebuffer instance
  * @sb:               scenebuffer to initialize
  * @initial_capacity: number of segments to pre-allocate
+ *
+ * The arc, polygon, and text lanes are left empty and grown lazily on first
+ * deposit so a segment-only frame never allocates them.
  */
   static void
 scenebuffer_init(cairo_scenebuffer_t *sb, size_t initial_capacity)
@@ -40,16 +43,29 @@ scenebuffer_init(cairo_scenebuffer_t *sb, size_t initial_capacity)
   mem_alloc((void **)&sb->segs, initial_capacity * sizeof(Segment_t));
   sb->count    = 0;
   sb->capacity = (int)initial_capacity;
-  sb->marks         = NULL;
-  sb->mark_count    = 0;
-  sb->mark_capacity = 0;
+
+  sb->arcs         = NULL;
+  sb->arc_count    = 0;
+  sb->arc_capacity = 0;
+
+  sb->polys         = NULL;
+  sb->poly_count    = 0;
+  sb->poly_capacity = 0;
+
+  sb->texts         = NULL;
+  sb->text_count    = 0;
+  sb->text_capacity = 0;
+
+  sb->text_layout = NULL;
 }
 
 /*-----------------------------------------------------------------------*/
 
 /**
- * scenebuffer_destroy() - Release the segment array
+ * scenebuffer_destroy() - Release every lane allocation
  * @sb: scenebuffer to destroy
+ *
+ * The text layout is non-owning and is not released here.
  */
   void
 scenebuffer_destroy(cairo_scenebuffer_t *sb)
@@ -57,19 +73,31 @@ scenebuffer_destroy(cairo_scenebuffer_t *sb)
   mem_free((void **)&sb->segs);
   sb->count    = 0;
   sb->capacity = 0;
-  mem_free((void **)&sb->marks);
-  sb->mark_count    = 0;
-  sb->mark_capacity = 0;
+
+  mem_free((void **)&sb->arcs);
+  sb->arc_count    = 0;
+  sb->arc_capacity = 0;
+
+  mem_free((void **)&sb->polys);
+  sb->poly_count    = 0;
+  sb->poly_capacity = 0;
+
+  mem_free((void **)&sb->texts);
+  sb->text_count    = 0;
+  sb->text_capacity = 0;
+
+  sb->text_layout = NULL;
 }
 
 /*-----------------------------------------------------------------------*/
 
 /**
- * scenebuffer_reset() - Clear segment count without releasing memory
+ * scenebuffer_reset() - Clear all lane counts without releasing memory
  * @sb: scenebuffer to reset
  *
- * Lazy-initializes with a default capacity on the first call.
- * Called at the start of each Cairo frame before leaf renderers deposit segments.
+ * Lazy-initializes the segment lane with a default capacity on the first
+ * call.  Called at the start of each Cairo frame before leaf renderers
+ * deposit primitives.  The text layout persists across resets.
  */
   void
 scenebuffer_reset(cairo_scenebuffer_t *sb)
@@ -78,7 +106,22 @@ scenebuffer_reset(cairo_scenebuffer_t *sb)
     scenebuffer_init(sb, SCENEBUFFER_INITIAL_CAP);
 
   sb->count      = 0;
-  sb->mark_count = 0;
+  sb->arc_count  = 0;
+  sb->poly_count = 0;
+  sb->text_count = 0;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * scenebuffer_set_text_layout() - Bind the base font for text primitives
+ * @sb:     target scenebuffer
+ * @layout: caller-owned Pango layout, or NULL to emit no text
+ */
+  void
+scenebuffer_set_text_layout(cairo_scenebuffer_t *sb, PangoLayout *layout)
+{
+  sb->text_layout = layout;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -88,7 +131,7 @@ scenebuffer_reset(cairo_scenebuffer_t *sb)
  * @sb:  target scenebuffer
  * @seg: segment to copy into the buffer
  *
- * Doubles capacity via mem_alloc when the array is full.
+ * Doubles capacity via mem_alloc when the lane is full.
  */
   void
 scenebuffer_add(cairo_scenebuffer_t *sb, const Segment_t *seg)
@@ -136,30 +179,98 @@ scenebuffer_add_polygon_outline(cairo_scenebuffer_t *sb,
 /*-----------------------------------------------------------------------*/
 
 /**
- * scenebuffer_add_marker() - Append one opaque filled marker
+ * scenebuffer_add_arc() - Append one arc (stroked outline or filled disc)
  * @sb: target scenebuffer
- * @m:  marker to copy into the buffer; its seq is assigned here
+ * @a:  arc to copy into the buffer
  *
- * Doubles capacity via mem_alloc when the array is full.
+ * Doubles capacity via mem_alloc when the lane is full; the lane is grown
+ * from empty on first deposit.
  */
   void
-scenebuffer_add_marker(cairo_scenebuffer_t *sb, const Marker_t *m)
+scenebuffer_add_arc(cairo_scenebuffer_t *sb, const Arc_t *a)
 {
-  if( sb->mark_count >= sb->mark_capacity )
+  if( sb->arc_count >= sb->arc_capacity )
   {
-    int new_cap = sb->mark_capacity ? sb->mark_capacity * 2 : 256;
-    Marker_t *grown = NULL;
-    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Marker_t));
-    if( sb->mark_count )
-      memcpy(grown, sb->marks, (size_t)sb->mark_count * sizeof(Marker_t));
-    mem_free((void **)&sb->marks);
-    sb->marks         = grown;
-    sb->mark_capacity = new_cap;
+    int new_cap = sb->arc_capacity ? sb->arc_capacity * 2 : 256;
+    Arc_t *grown = NULL;
+    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Arc_t));
+    if( sb->arc_count )
+      memcpy(grown, sb->arcs, (size_t)sb->arc_count * sizeof(Arc_t));
+    mem_free((void **)&sb->arcs);
+    sb->arcs         = grown;
+    sb->arc_capacity = new_cap;
   }
 
-  sb->marks[sb->mark_count]     = *m;
-  sb->marks[sb->mark_count].seq = sb->mark_count;
-  sb->mark_count++;
+  sb->arcs[sb->arc_count++] = *a;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * scenebuffer_add_polygon() - Append one filled convex polygon
+ * @sb: target scenebuffer
+ * @p:  polygon to copy into the buffer
+ *
+ * Doubles capacity via mem_alloc when the lane is full; the lane is grown
+ * from empty on first deposit.
+ */
+  void
+scenebuffer_add_polygon(cairo_scenebuffer_t *sb, const Polygon_t *p)
+{
+  if( p->n > SCENE_POLY_MAX )
+  {
+    BUG("scenebuffer_add_polygon: n=%d > SCENE_POLY_MAX\n", p->n);
+    return;
+  }
+
+  if( sb->poly_count >= sb->poly_capacity )
+  {
+    int new_cap = sb->poly_capacity ? sb->poly_capacity * 2 : 256;
+    Polygon_t *grown = NULL;
+    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Polygon_t));
+    if( sb->poly_count )
+      memcpy(grown, sb->polys, (size_t)sb->poly_count * sizeof(Polygon_t));
+    mem_free((void **)&sb->polys);
+    sb->polys         = grown;
+    sb->poly_capacity = new_cap;
+  }
+
+  sb->polys[sb->poly_count++] = *p;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * scenebuffer_add_text() - Append one text run
+ * @sb: target scenebuffer
+ * @t:  text run to copy into the buffer
+ *
+ * Doubles capacity via mem_alloc when the lane is full; the lane is grown
+ * from empty on first deposit.  Depositing text without a base layout is a
+ * BUG since flush has no font to render it with.
+ */
+  void
+scenebuffer_add_text(cairo_scenebuffer_t *sb, const Text_t *t)
+{
+  if( sb->text_layout == NULL )
+  {
+    BUG("scenebuffer_add_text: no base layout set\n");
+    return;
+  }
+
+  if( sb->text_count >= sb->text_capacity )
+  {
+    int new_cap = sb->text_capacity ? sb->text_capacity * 2 : 64;
+    Text_t *grown = NULL;
+    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Text_t));
+    if( sb->text_count )
+      memcpy(grown, sb->texts, (size_t)sb->text_count * sizeof(Text_t));
+    mem_free((void **)&sb->texts);
+    sb->texts         = grown;
+    sb->text_capacity = new_cap;
+  }
+
+  sb->texts[sb->text_count++] = *t;
 }
 
 /*-----------------------------------------------------------------------*/

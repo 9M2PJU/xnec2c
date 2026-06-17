@@ -37,6 +37,7 @@ Draw_Plotting_Frame(
     int nhor, int nvert )
 {
   int idx, xpw, xps, yph, yps;
+  fp_stroke_t grid = { .color = COLOR_GREY, .width = FP_LINE_WIDTH, .z_mid = FP_Z_GRID };
 
   /* title is unused; the frame draws only grid lines and the bounding box */
   (void)title;
@@ -50,7 +51,7 @@ Draw_Plotting_Frame(
   for( idx = 1; idx <= nvert; idx++ )
   {
     xps = rect->x + (idx * rect->width) / nvert;
-    fp_add_line( fp, xps, rect->y, xps, yph, FP_Z_GRID, COLOR_GREY );
+    fp_add_line( fp, xps, rect->y, xps, yph, grid );
   }
 
   /* Draw horizontal divisions */
@@ -58,12 +59,11 @@ Draw_Plotting_Frame(
   for( idx = 1; idx <= nhor; idx++ )
   {
     yps = rect->y + (idx * rect->height) / nhor;
-    fp_add_line( fp, rect->x, yps, xpw, yps, FP_Z_GRID, COLOR_GREY );
+    fp_add_line( fp, rect->x, yps, xpw, yps, grid );
   }
 
   /* Draw outer box */
-  fp_add_rect( fp, rect->x, rect->y, rect->width, rect->height,
-      FP_Z_GRID, COLOR_GREY );
+  fp_add_rect( fp, rect->x, rect->y, rect->width, rect->height, grid );
 
 } /* Draw_Plotting_Frame() */
 
@@ -149,7 +149,8 @@ Draw_Graph(
   }
 
   /* Draw the graph */
-  fp_add_polyline( fp, points, nval, z, trace_c );
+  fp_add_polyline( fp, points, nval,
+      (fp_stroke_t){ .color = trace_c, .width = FP_LINE_WIDTH, .z_mid = z } );
 
   /* Plot a small rectangle (left scale) or polygon (right scale) at point */
   for( idx = 0; idx < nval; idx++ )
@@ -176,15 +177,11 @@ Draw_Graph(
 	  snprintf(s, sizeof(s)-1, "min:%.2f\nmax:%.2f", a[min_idx], a[max_idx]);
 
 	  if (side == LEFT)
-		  fp_defer_text(fp,
-				rect->x + 5,
-				rect->y + 5,
-				s, JUSTIFY_LEFT, trace_c);
+		  fp_add_text(fp, rect->x + 5, rect->y + 5, 1.0f, s,
+                              JUSTIFY_LEFT, trace_c);
 	  else
-		  fp_defer_text(fp,
-				rect->x + rect->width - 5,
-				rect->y + 5,
-				s, JUSTIFY_RIGHT, trace_c);
+		  fp_add_text(fp, rect->x + rect->width - 5, rect->y + 5,
+                              1.0f, s, JUSTIFY_RIGHT, trace_c);
   }
 
   mem_free((void **)&points);
