@@ -26,6 +26,7 @@
  */
 #include "structure_ui.h"
 #include "shared.h"
+#include "callbacks.h"
 #include "cairo/cairo_draw.h"
 #include "prerender/prerender_aggregate.h"
 #include "prerender/prerender_color.h"
@@ -252,6 +253,24 @@ Animate_Phase(gpointer _udata)
   if( flow_phase >= (float)M_2PI )
     flow_phase -= (float)M_2PI;
 
+  apply_animation_phase();
+
+  return( G_SOURCE_CONTINUE );
+
+} /* Animate_Phase() */
+
+/*-----------------------------------------------------------------------*/
+
+/** apply_animation_phase() - Render structure and pattern at the current phase
+ *
+ * Shared by the timer tick and the manual phase slider.  Reads flow_phase
+ * without modifying it: computes the near-field frame when EH field
+ * visualization is active, queues the structure drawing area, and queues the
+ * radiation-pattern drawing area for near-field or patch-arrow overlay.
+ */
+  void
+apply_animation_phase(void)
+{
   /* Near-field computation only runs when EH field visualization is active */
   if( isFlagSet(DRAW_EHFIELD) )
     compute_near_field_frame((double)flow_phase);
@@ -263,9 +282,20 @@ Animate_Phase(gpointer _udata)
       (isFlagSet(OVERLAY_STRUCT) && data.m > 0) )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 
-  return( G_SOURCE_CONTINUE );
+  /* Update the phase readout from flow_phase without moving the slider, whose
+   * position stays static while the timer animation runs.  The readout is
+   * decoupled from the slider thumb.  Slider reads degrees; flow_phase stores
+   * radians. */
+  if( animate_dialog != NULL )
+  {
+    GtkLabel *readout = GTK_LABEL( Builder_Get_Object(
+          animate_dialog_builder, "animate_phase_value") );
+    gchar *text = g_strdup_printf( "φ %.0f°", (gdouble)flow_phase * TODEG );
+    gtk_label_set_text( readout, text );
+    g_free( text );
+  }
 
-} /* Animate_Phase() */
+} /* apply_animation_phase() */
 
 /*-----------------------------------------------------------------------*/
 

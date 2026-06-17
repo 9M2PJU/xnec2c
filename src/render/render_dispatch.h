@@ -46,6 +46,7 @@ typedef enum
   RENDER_NO_RP_CARD,
   RENDER_NO_NF_CARD,
   RENDER_NF_NOT_READY,
+  RENDER_NO_NF_FIELD,   /* DRAW_EHFIELD set but no E/H/Poynting component selected */
   RENDER_NO_DATA,
   RENDER_NO_GEOMETRY,   /* VIEW_STRUCTURE with no geometry loaded (data.n == data.m == 0) */
   RENDER_NO_MODE

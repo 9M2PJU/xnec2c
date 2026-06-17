@@ -82,6 +82,16 @@ render_rdpattern_mode_message(void)
   static void
 render_check_nearfield(render_check_result_t *r)
 {
+  /* Near-field view needs at least one field component selected; with none
+   * selected the draw yields nothing, so direct the user to enable one. */
+  if( isFlagClear(DRAW_EFIELD) && isFlagClear(DRAW_HFIELD) &&
+      isFlagClear(DRAW_POYNTING) )
+  {
+    r->status = RENDER_NO_NF_FIELD;
+    r->message = STATUS_MSG_SELECT_NF_FIELD;
+    return;
+  }
+
   if( isFlagSet(ENABLE_NEAREH) && NF_FSTEP_AVAILABLE(r->fstep) )
   {
     r->mode = RENDER_MODE_NEARFIELD;

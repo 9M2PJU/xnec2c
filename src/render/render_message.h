@@ -31,6 +31,7 @@
 #define STATUS_MSG_SELECT_NEARFIELD "Select Near Field (no RP card for gain pattern)"
 #define STATUS_MSG_SELECT_GAINPAT   "Select Gain Pattern (no NE/NH cards for near field)"
 #define STATUS_MSG_SELECT_MODE      "Select Gain Pattern or Near Field"
+#define STATUS_MSG_SELECT_NF_FIELD  "Enable E field, H field, or Poynting vector"
 #define STATUS_MSG_START_FREQLOOP   "Press ▶ to start the frequency loop"
 #define STATUS_MSG_NOT_READY        "Radiation pattern data not ready"
 #define STATUS_MSG_NO_RDPAT_DATA    "Waiting for frequency data"

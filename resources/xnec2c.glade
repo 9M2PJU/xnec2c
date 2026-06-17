@@ -62,12 +62,18 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
+  <object class="GtkAdjustment" id="animate_phase_adjustment">
+    <property name="upper">720</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">15</property>
+  </object>
   <object class="GtkDialog" id="animate_dialog">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="border-width">2</property>
+    <property name="width-request">460</property>
     <property name="title" translatable="yes">Near Field Animation</property>
-    <property name="resizable">False</property>
+    <property name="resizable">True</property>
     <property name="window-position">mouse</property>
     <property name="icon">xnec2c.svg</property>
     <property name="type-hint">dialog</property>
@@ -77,8 +83,8 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <property name="homogeneous">True</property>
+        <property name="spacing">6</property>
+        <property name="homogeneous">False</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox">
             <property name="visible">True</property>
@@ -135,6 +141,68 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
             <property name="fill">True</property>
             <property name="pack-type">end</property>
             <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkFrame">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label-xalign">0</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="orientation">vertical</property>
+                <property name="border-width">4</property>
+                <property name="spacing">2</property>
+                <child>
+                  <object class="GtkScale" id="animate_phase_slider">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="hexpand">True</property>
+                    <property name="adjustment">animate_phase_adjustment</property>
+                    <property name="round-digits">0</property>
+                    <property name="digits">0</property>
+                    <property name="draw-value">False</property>
+                    <property name="tooltip-text" translatable="yes">Scrub the animation phase manually.&#10;Disabled while the animation is running.</property>
+                    <marks>
+                      <mark value="0" position="top">0</mark>
+                      <mark value="720" position="top">720°</mark>
+                    </marks>
+                    <signal name="change-value" handler="on_animate_phase_slider_change_value" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="animate_phase_value">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">φ 0°</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+            <child type="label">
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Phase</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
           </packing>
         </child>
         <child>
@@ -215,7 +283,171 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">0</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="spacing">6</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <object class="GtkFrame" id="anim_structure_frame">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label-xalign">0</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="border-width">4</property>
+                    <property name="spacing">4</property>
+                    <child>
+                      <object class="GtkCheckButton" id="anim_currents">
+                        <property name="label" translatable="yes">Show currents</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="tooltip-text" translatable="yes">Animate current magnitude and direction along the wires.&#10;Mirrors the Currents button in the main window.</property>
+                        <property name="draw-indicator">True</property>
+                        <signal name="toggled" handler="on_anim_mirror_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Flow direction:</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="anim_flow_dir">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="tooltip-text" translatable="yes">Select how the animated current flow is rendered.&#10;Mirrors the Flow direction setting in the main window.</property>
+                        <items>
+                          <item translatable="yes">Reference phase</item>
+                          <item translatable="yes">LIC</item>
+                          <item translatable="yes">Wireframe</item>
+                        </items>
+                        <signal name="changed" handler="on_anim_flow_dir_changed" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+                <child type="label">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Structure</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkFrame">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label-xalign">0</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="border-width">4</property>
+                    <property name="spacing">4</property>
+                    <child>
+                      <object class="GtkCheckButton" id="anim_efield">
+                        <property name="label" translatable="yes">Near E field</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="tooltip-text" translatable="yes">Show the near electric field vectors while animating.&#10;Enable by opening the radiation pattern window.</property>
+                        <property name="draw-indicator">True</property>
+                        <signal name="toggled" handler="on_anim_mirror_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="anim_hfield">
+                        <property name="label" translatable="yes">Near H field</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="tooltip-text" translatable="yes">Show the near magnetic field vectors while animating.&#10;Enable by opening the radiation pattern window.</property>
+                        <property name="draw-indicator">True</property>
+                        <signal name="toggled" handler="on_anim_mirror_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="anim_poynting">
+                        <property name="label" translatable="yes">Poynting vector</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="tooltip-text" translatable="yes">Show the Poynting power-flow vectors while animating.&#10;Enable by opening the radiation pattern window.</property>
+                        <property name="draw-indicator">True</property>
+                        <signal name="toggled" handler="on_anim_mirror_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+                <child type="label">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Near Field</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>

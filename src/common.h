@@ -582,10 +582,15 @@ typedef struct
   /* Per-batch transparency (0.0=invisible, 1.0=opaque) */
   float alpha;
 
+  /* GL_LINES draw width in pixels; <=0 falls back to 1.0 */
+  float line_width;
+
 } gl_draw_batch_t;
 
-/* Maximum independent draw batches per view content */
-#define GL_VIEW_MAX_BATCHES 2
+/* Maximum independent draw batches per view content
+ * (structure: segments, patches, network/transmission-line outlines,
+ * two-port network polygon fills) */
+#define GL_VIEW_MAX_BATCHES 4
 
 /* OpenGL types */
 #ifdef HAVE_OPENGL
@@ -1325,6 +1330,9 @@ void on_near_snapshot_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_structure_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_draw_style_activate(GtkMenuItem *menuitem, gpointer user_data);
+gboolean on_animate_phase_slider_change_value(GtkRange *range, GtkScrollType scroll, gdouble value, gpointer user_data);
+void on_anim_mirror_toggled(GtkToggleButton *togglebutton, gpointer user_data);
+void on_anim_flow_dir_changed(GtkComboBox *combo, gpointer user_data);
 void on_animate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 gboolean on_animate_spinbutton_focus_out_event(GtkWidget *widget, GdkEventFocus *event, gpointer user_data);
 void on_animation_applybutton_clicked(GtkButton *button, gpointer user_data);

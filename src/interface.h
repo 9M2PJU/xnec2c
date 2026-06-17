@@ -32,6 +32,15 @@ NULL
 "animate_dialog", \
 "animate_steps_spinbutton", \
 "animate_freq_spinbutton", \
+"animate_phase_adjustment", \
+"animate_phase_slider", \
+"animate_phase_value", \
+"anim_currents", \
+"anim_efield", \
+"anim_hfield", \
+"anim_poynting", \
+"anim_flow_dir", \
+"anim_structure_frame", \
 NULL
 
 #define ARC_EDITOR_IDS \

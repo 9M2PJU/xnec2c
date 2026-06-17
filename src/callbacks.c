@@ -2649,6 +2649,340 @@ on_near_snapshot_activate(
 }
 
 
+/* Animation control panel mirror bindings.  Each row binds one panel control
+ * in animate_dialog_builder to the canonical visualization widget that owns
+ * the flag and redraw.  Builders are stored by address so a NULL window
+ * builder (closed window) resolves at runtime, greying the control. */
+typedef struct
+{
+  const char  *panel_id;      /* GtkCheckButton in animate_dialog_builder */
+  GtkBuilder **canon_builder; /* &main_window_builder or &rdpattern_window_builder */
+  const char  *canon_on_id;   /* canonical widget set active from the panel control */
+} anim_mirror_t;
+
+static const anim_mirror_t anim_mirror_table[] =
+{
+  { "anim_currents", &main_window_builder,      "main_currents_togglebutton" },
+  { "anim_efield",   &rdpattern_window_builder, "rdpattern_e_field"          },
+  { "anim_hfield",   &rdpattern_window_builder, "rdpattern_h_field"          },
+  { "anim_poynting", &rdpattern_window_builder, "rdpattern_poynting_vector"  },
+};
+
+/* Flow-direction combo rows in GtkComboBoxText model order; this order must
+ * match the anim_flow_dir items in xnec2c.glade.  Polarization tilt and peak
+ * magnitude are excluded: they are phase invariant and do not animate from the
+ * flow direction. */
+static const char * const anim_flow_dir_ids[] =
+{
+  "main_flow_dir_ref_phase",
+  "main_flow_dir_lic",
+  "main_flow_dir_wireframe",
+};
+
+/* Panel mirror canonical widgets are either toolbar toggle buttons or check
+ * menu items; this closed set is resolved by widget type. */
+  static gboolean
+widget_get_active(GtkWidget *w)
+{
+  if( GTK_IS_TOGGLE_BUTTON(w) )
+    return( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)) );
+  else if( GTK_IS_CHECK_MENU_ITEM(w) )
+    return( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w)) );
+  else
+  {
+    BUG( "unexpected canonical widget type" );
+    return( FALSE );
+  }
+}
+
+  static void
+widget_set_active(GtkWidget *w, gboolean active)
+{
+  if( GTK_IS_TOGGLE_BUTTON(w) )
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(w), active );
+  else if( GTK_IS_CHECK_MENU_ITEM(w) )
+    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(w), active );
+  else
+    BUG( "unexpected canonical widget type" );
+}
+
+  static const anim_mirror_t *
+anim_mirror_row_for_panel(GtkWidget *panel)
+{
+  size_t i;
+
+  for( i = 0; i < G_N_ELEMENTS(anim_mirror_table); i++ )
+    if( Builder_Get_Object(animate_dialog_builder, anim_mirror_table[i].panel_id) == panel )
+      return( &anim_mirror_table[i] );
+
+  return( NULL );
+}
+
+/** on_anim_mirror_toggled() - Forward a panel checkbox to its canonical widget
+ * @togglebutton: emitting panel GtkCheckButton
+ * @user_data: unused
+ *
+ * Writing the canonical widget fires its existing handler, which performs the
+ * real flag change and redraw.  A NULL canonical builder means the owning
+ * window is closed and the control is insensitive, so nothing is forwarded.
+ */
+  void
+on_anim_mirror_toggled(GtkToggleButton *togglebutton, gpointer user_data)
+{
+  const anim_mirror_t *row;
+  GtkBuilder *b;
+  gboolean on;
+
+  (void)user_data;
+
+  row = anim_mirror_row_for_panel( GTK_WIDGET(togglebutton) );
+  if( row == NULL )
+    return;
+
+  b = *row->canon_builder;
+  if( b == NULL )
+    return;
+
+  on = gtk_toggle_button_get_active( togglebutton );
+  widget_set_active( Builder_Get_Object(b, row->canon_on_id), on );
+}
+
+/** on_anim_flow_dir_changed() - Forward the panel flow-direction combo
+ * @combo: emitting GtkComboBox
+ * @user_data: unused
+ *
+ * Sets the canonical flow-direction radio menu item active for the selected
+ * index; its activate handler applies the mode and redraws.
+ */
+  void
+on_anim_flow_dir_changed(GtkComboBox *combo, gpointer user_data)
+{
+  int idx;
+  GtkWidget *radio;
+
+  (void)user_data;
+
+  if( main_window_builder == NULL )
+    return;
+
+  idx = gtk_combo_box_get_active( combo );
+  if( idx < 0 || idx >= (int)G_N_ELEMENTS(anim_flow_dir_ids) )
+    return;
+
+  radio = Builder_Get_Object( main_window_builder, anim_flow_dir_ids[idx] );
+  gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(radio), TRUE );
+}
+
+  static void
+anim_flow_dir_sync(void)
+{
+  GtkComboBox *combo =
+    GTK_COMBO_BOX( Builder_Get_Object(animate_dialog_builder, "anim_flow_dir") );
+  size_t i;
+  int active = -1;
+
+  if( main_window_builder == NULL )
+  {
+    gtk_widget_set_sensitive( GTK_WIDGET(combo), FALSE );
+    return;
+  }
+
+  gtk_widget_set_sensitive( GTK_WIDGET(combo), TRUE );
+
+  for( i = 0; i < G_N_ELEMENTS(anim_flow_dir_ids); i++ )
+  {
+    GtkWidget *radio = Builder_Get_Object( main_window_builder, anim_flow_dir_ids[i] );
+    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(radio)) )
+      active = (int)i;
+  }
+
+  SIGNAL_BLOCK( combo, on_anim_flow_dir_changed );
+  gtk_combo_box_set_active( combo, active );
+  SIGNAL_UNBLOCK( combo, on_anim_flow_dir_changed );
+}
+
+/** anim_mirror_sync() - Reflect canonical visualization state into the panel
+ *
+ * For each mirror row, greys the panel control when its owning window is
+ * closed, otherwise sets its sensitivity and active state from the canonical
+ * widget with the forward handler signal-blocked to avoid a feedback loop.
+ */
+  static void
+anim_mirror_sync(void)
+{
+  size_t i;
+
+  if( animate_dialog == NULL )
+    return;
+
+  for( i = 0; i < G_N_ELEMENTS(anim_mirror_table); i++ )
+  {
+    const anim_mirror_t *row = &anim_mirror_table[i];
+    GtkWidget *panel = Builder_Get_Object( animate_dialog_builder, row->panel_id );
+    GtkBuilder *b = *row->canon_builder;
+
+    if( b == NULL )
+    {
+      gtk_widget_set_sensitive( panel, FALSE );
+      continue;
+    }
+
+    gtk_widget_set_sensitive( panel, TRUE );
+    SIGNAL_BLOCK( panel, on_anim_mirror_toggled );
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(panel),
+        widget_get_active(Builder_Get_Object(b, row->canon_on_id)) );
+    SIGNAL_UNBLOCK( panel, on_anim_mirror_toggled );
+  }
+
+  /* Grey out Structure section when model has no surface patches */
+  {
+    GtkWidget *frame = Builder_Get_Object(
+        animate_dialog_builder, "anim_structure_frame");
+    gboolean has_patches = (data.m > 0);
+
+    gtk_widget_set_sensitive(frame, has_patches);
+    gtk_widget_set_tooltip_text(frame,
+        has_patches ? NULL
+        : _("Current flow animation requires surface patches"
+            " (SP/SM cards) in the model."));
+  }
+
+  anim_flow_dir_sync();
+}
+
+/* Wrap value into the half-open phase span [lower, lower+span). */
+  static gdouble
+phase_wrap(gdouble value, gdouble lower, gdouble span)
+{
+  value = fmod( value - lower, span );
+  if( value < 0.0 )
+    value += span;
+  return( value + lower );
+}
+
+/** on_animate_phase_slider_change_value() - Keyboard wrap-aware phase scrub
+ * @range: emitting GtkScale
+ * @scroll: scroll action type (arrow key, page, etc.)
+ * @value: proposed new value before GTK clamps to adjustment bounds
+ * @user_data: unused
+ *
+ * Handles keyboard-driven phase changes (arrow keys, page up/down) with
+ * fmod wrapping.  Mouse drag (GTK_SCROLL_JUMP) is handled by
+ * on_phase_slider_motion_notify instead, because GTK3 clamps the proposed
+ * value at the lower bound for leftward drag but not at the upper bound
+ * for rightward drag.
+ */
+  gboolean
+on_animate_phase_slider_change_value(GtkRange *range, GtkScrollType scroll,
+                                     gdouble value, gpointer user_data)
+{
+  (void)user_data;
+
+  /* Mouse drag handled by motion-notify for symmetric wrap */
+  if( scroll == GTK_SCROLL_JUMP )
+    return( TRUE );
+
+  GtkAdjustment *adj = gtk_range_get_adjustment( range );
+  gdouble lower = gtk_adjustment_get_lower( adj );
+  gdouble upper = gtk_adjustment_get_upper( adj );
+  gdouble span = upper - lower;
+
+  if( span <= 0.0 )
+    return( TRUE );
+
+  value = phase_wrap( value, lower, span );
+  gtk_range_set_value( range, value );
+
+  flow_phase = (float)( value * TORAD );
+  apply_animation_phase();
+
+  return( TRUE );
+}
+
+/** on_phase_slider_motion_notify() - Pixel-delta drag with symmetric wrap
+ * @widget: the phase GtkScale
+ * @event: motion event with raw pixel coordinates
+ * @user_data: unused
+ *
+ * Tracks consecutive mouse positions during button-1 drag and converts
+ * pixel deltas to degree deltas, applying fmod wrapping.  Operates
+ * identically in both directions because it reads raw event coordinates
+ * rather than GTK's clamped proposed values.
+ */
+  static gboolean
+on_phase_slider_motion_notify(GtkWidget *widget, GdkEventMotion *event,
+                              gpointer user_data)
+{
+  static gdouble prev_x = NAN;
+
+  (void)user_data;
+
+  if( !(event->state & GDK_BUTTON1_MASK) )
+  {
+    prev_x = NAN;
+    return( FALSE );
+  }
+
+  GtkRange *range = GTK_RANGE(widget);
+  GtkAdjustment *adj = gtk_range_get_adjustment( range );
+  gdouble lower = gtk_adjustment_get_lower( adj );
+  gdouble upper = gtk_adjustment_get_upper( adj );
+  gdouble span = upper - lower;
+
+  GdkRectangle rect;
+  gtk_range_get_range_rect( range, &rect );
+
+  if( rect.width <= 0 || span <= 0.0 )
+    return( FALSE );
+
+  /* First motion of a new drag: record baseline, no movement */
+  if( isnan(prev_x) )
+  {
+    prev_x = event->x;
+    return( FALSE );
+  }
+
+  gdouble delta_px = event->x - prev_x;
+  prev_x = event->x;
+
+  gdouble degrees_per_px = span / (gdouble)rect.width;
+  gdouble delta_deg = delta_px * degrees_per_px;
+
+  gdouble current = gtk_range_get_value( range );
+  gdouble new_val = current + delta_deg;
+
+  new_val = phase_wrap( new_val, lower, span );
+
+  SIGNAL_BLOCK( range, on_animate_phase_slider_change_value );
+  gtk_range_set_value( range, new_val );
+  SIGNAL_UNBLOCK( range, on_animate_phase_slider_change_value );
+
+  flow_phase = (float)( new_val * TORAD );
+  apply_animation_phase();
+
+  return( FALSE );
+}
+
+/* Create the animation dialog on first use, wire the phase slider drag
+ * handler, then show it and reflect the mirrored visualization state. */
+  static void
+show_animate_dialog(void)
+{
+  if( animate_dialog == NULL )
+  {
+    animate_dialog = create_animate_dialog( &animate_dialog_builder );
+
+    /* Connect motion-notify for symmetric wrap-around mouse drag;
+     * change-value handles keyboard only (GTK3 clamps leftward drag). */
+    g_signal_connect( Builder_Get_Object(animate_dialog_builder,
+          "animate_phase_slider"), "motion-notify-event",
+        G_CALLBACK(on_phase_slider_motion_notify), NULL );
+  }
+  gtk_widget_show( animate_dialog );
+  anim_mirror_sync();
+}
+
+
   void
 on_rdpattern_animate_activate(
     GtkMenuItem     *menuitem,
@@ -2667,11 +3001,7 @@ on_rdpattern_animate_activate(
       TRUE );
   }
 
-  if( animate_dialog == NULL )
-  {
-    animate_dialog = create_animate_dialog( &animate_dialog_builder );
-  }
-  gtk_widget_show( animate_dialog );
+  show_animate_dialog();
 }
 
 
@@ -2680,11 +3010,7 @@ on_structure_animate_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
 {
-  if( animate_dialog == NULL )
-  {
-    animate_dialog = create_animate_dialog( &animate_dialog_builder );
-  }
-  gtk_widget_show( animate_dialog );
+  show_animate_dialog();
 }
 
 
@@ -2759,6 +3085,23 @@ on_animate_spinbutton_focus_out_event(
   return( FALSE );
 }
 
+/** anim_phase_slider_sync_sensitivity() - Project ANIMATE onto the slider
+ *
+ * The manual phase slider is interactive only while the timer animation is
+ * stopped; during animation it is greyed and frozen, and the live phase is
+ * shown by the decoupled readout label instead.
+ */
+  static void
+anim_phase_slider_sync_sensitivity(void)
+{
+  if( animate_dialog == NULL )
+    return;
+
+  gtk_widget_set_sensitive(
+      Builder_Get_Object(animate_dialog_builder, "animate_phase_slider"),
+      isFlagClear(ANIMATE) );
+}
+
   void
 on_animation_applybutton_clicked(
     GtkButton       *button,
@@ -2778,6 +3121,7 @@ on_animation_applybutton_clicked(
     return;
 
   SetFlag( ANIMATE );
+  anim_phase_slider_sync_sensitivity();
   update_animation_parameters();
 }
 
@@ -2793,6 +3137,19 @@ on_animation_cancelbutton_clicked(
   if( anim_tag )
     g_source_remove( anim_tag );
   anim_tag = 0;
+
+  /* Re-enable manual scrubbing and return the slider and readout to the reset
+   * phase. */
+  if( animate_dialog != NULL )
+  {
+    GtkRange *slider = GTK_RANGE(
+        Builder_Get_Object(animate_dialog_builder, "animate_phase_slider") );
+    SIGNAL_BLOCK( slider, on_animate_phase_slider_change_value );
+    gtk_range_set_value( slider, 0.0 );
+    SIGNAL_UNBLOCK( slider, on_animate_phase_slider_change_value );
+  }
+  anim_phase_slider_sync_sensitivity();
+  apply_animation_phase();
 }
 
 
