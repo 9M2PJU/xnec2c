@@ -139,6 +139,15 @@ Set_Frequency_On_Click( GdkEvent *e)
 	  else if (motion_event->state & GDK_BUTTON3_MASK) button = 3;
   }
 
+  /* Swap primary and secondary click actions when configured so a left
+   * click snaps to a calculated frequency and a right click selects an
+   * arbitrary frequency. */
+  if (rc_config.freqplots_swap_click)
+  {
+    if (button == 1) button = 3;
+    else if (button == 3) button = 1;
+  }
+
   if (fr_plot != NULL && FR_PLOT_T_IS_VALID(fr_plot))
   {
   // local shorthand variables

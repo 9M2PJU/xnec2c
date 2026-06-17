@@ -858,6 +858,13 @@ on_main_freqplots_activate(
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
       }
 
+      if( rc_config.freqplots_swap_click )
+      {
+        widget = Builder_Get_Object(
+            freqplots_window_builder, "freqplots_swap_click" );
+        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
+      }
+
       /* Request geometry and show after all widget state restorations
        * so sizing is the last layout operation */
       Set_Window_Geometry( freqplots_window,
@@ -5933,6 +5940,19 @@ on_freqplots_round_x_axis_activate(
   {
     xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
   }
+}
+
+  void
+on_freqplots_swap_click_activate(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+  /* Swap left and right click frequency selection; affects only the
+   * interpretation of future clicks, so no redraw is required. */
+  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    rc_config.freqplots_swap_click = 1;
+  else
+    rc_config.freqplots_swap_click = 0;
 }
 
   void

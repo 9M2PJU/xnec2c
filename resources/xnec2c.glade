@@ -10116,6 +10116,15 @@ Save NEC2 Editor data first?
                             <signal name="activate" handler="on_freqplots_round_x_axis_activate" swapped="no"/>
                           </object>
                         </child>
+                        <child>
+                          <object class="GtkCheckMenuItem" id="freqplots_swap_click">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">S_wap Left/Right Click Frequency Selection</property>
+                            <property name="use-underline">True</property>
+                            <signal name="activate" handler="on_freqplots_swap_click_activate" swapped="no"/>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

@@ -286,6 +286,9 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Round X Axis", .format = "%d",
 		.vars = { &rc_config.freqplots_round_x_axis } },
 
+	{ .desc = "Frequency Plots Swap Click", .format = "%d",
+		.vars = { &rc_config.freqplots_swap_click } },
+
 	{ .desc = "Optimizer Write CSV", .format = "%d", .batch_mode_skip = TRUE,
 		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_csv",
 		.vars = { &rc_config.opt_write_csv } },
@@ -690,6 +693,7 @@ Create_Default_Config( void )
 
   rc_config.freqplots_clamp_vswr = 1;
   rc_config.freqplots_round_x_axis = 0;
+  rc_config.freqplots_swap_click = 1;
 
   /* Antenna temperature defaults (Synth Practical Avg sky + DG7YBN Residential earth) */
   rc_config.ant_temp_sky = ANT_TEMP_SKY_SYNTH_AVG;
@@ -1186,6 +1190,7 @@ get_freqplots_window_state( void )
     rc_config.freqplots_show_ant_temp = 0;
     rc_config.freqplots_min_max = 0;
     rc_config.freqplots_round_x_axis = 0;
+    rc_config.freqplots_swap_click = 0;
 
     widget = Builder_Get_Object(
         freqplots_window_builder, "freqplots_gmax_togglebutton" );
@@ -1236,6 +1241,11 @@ get_freqplots_window_state( void )
         freqplots_window_builder, "freqplots_round_x_axis" );
     if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
       rc_config.freqplots_round_x_axis = 1;
+
+    widget = Builder_Get_Object(
+        freqplots_window_builder, "freqplots_swap_click" );
+    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
+      rc_config.freqplots_swap_click = 1;
 
     widget = Builder_Get_Object(
         freqplots_window_builder, "freqplots_show_ant_temp" );

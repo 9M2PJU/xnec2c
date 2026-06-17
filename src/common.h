@@ -379,7 +379,8 @@ typedef struct
     freqplots_min_max,
     freqplots_s11,
     freqplots_clamp_vswr,
-    freqplots_net_gain;
+    freqplots_net_gain,
+    freqplots_swap_click;
 
   /* NEC2 editor window position and size */
   int
@@ -1563,6 +1564,7 @@ void on_aboutdialog_close(GtkDialog *dialog, gpointer user_data);
 void on_aboutdialog_destroy(GObject *object, gpointer user_data);
 void on_aboutdialog_response(GtkDialog *dialog, gint response_id, gpointer user_data);
 void on_freqplots_net_gain_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_freqplots_swap_click_activate(GtkMenuItem *menuitem, gpointer user_data);
 gboolean on_structure_drawingarea_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 void on_main_zoom_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 gboolean on_rdpattern_drawingarea_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
