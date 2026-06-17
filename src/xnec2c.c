@@ -628,11 +628,34 @@ typedef struct
 /* Per-sweep state; allocated by Start_Frequency_Loop(), freed by thread/Stop */
 static freq_loop_state_t *floop_state = NULL;
 
+/*
+ * green_line_alias_step - sweep step whose frequency matches the green line
+ *
+ * Returns the index of the sweep step whose frequency equals fmhz_save within
+ * FREQ_EPSILON_MHZ, or -1 when the green line is inactive or matches no step.
+ * save.freq[0..steps_total-1] must be populated by freq_populate_steps.
+ */
+static int
+green_line_alias_step( void )
+{
+  int match = -1;
+
+  if( calc_data.fmhz_save <= 0.0 )
+    return -1;
+
+  for( int i = 0; match < 0 && i < calc_data.steps_total; i++ )
+    if( FREQ_EQ(calc_data.fmhz_save, save.freq[i]) )
+      match = i;
+
+  return match;
+}
+
 /**
- * freq_loop_display_step - determine highest valid step to show in the UI
+ * freq_loop_display_step - determine the step to show in the UI
  *
  * Scans save.fstep[] for the highest completed sweep entry.  When the green-
- * line slot is active and computed, it takes priority over sweep steps.
+ * line slot is active and computed it takes priority; when the green line
+ * aliases a computed sweep step it routes to that matching step.
  * Returns the step index, or -1 if no data is available yet.
  */
 static int
@@ -646,9 +669,19 @@ freq_loop_display_step( void )
     if( save.fstep[idx] )
       step = idx;
 
-  /* Green-line slot takes priority when active and computed */
-  if( calc_data.fmhz_save > 0.0 && save.fstep[calc_data.steps_total] )
-    step = calc_data.steps_total;
+  /* Green-line slot takes priority when computed; when it aliases a sweep
+   * step the slot is invalidated, so route to that matching step. */
+  if( calc_data.fmhz_save > 0.0 )
+  {
+    if( save.fstep[calc_data.steps_total] )
+      step = calc_data.steps_total;
+    else
+    {
+      int alias = green_line_alias_step();
+      if( alias >= 0 && save.fstep[alias] )
+        step = alias;
+    }
+  }
 
   g_rec_mutex_unlock(&freq_data_lock);
   return step;
@@ -777,6 +810,16 @@ freq_populate_steps( void )
    * loop treats it identically to sweep slots. */
   if( calc_data.fmhz_save > 0.0 )
   {
+    /* When the green-line frequency coincides with a sweep step within
+     * FREQ_EPSILON_MHZ, invalidate the extra slot and exclude it from the
+     * scan range so it is not recomputed; freq_loop_display_step routes the
+     * green-line selection to the matching sweep step. */
+    if( green_line_alias_step() >= 0 )
+    {
+      save.fstep[calc_data.steps_total] = 0;
+      return calc_data.steps_total - 1;
+    }
+
     save.freq[calc_data.steps_total] = calc_data.fmhz_save;
     return calc_data.steps_total;
   }
