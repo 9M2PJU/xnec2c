@@ -629,25 +629,68 @@ typedef struct
 static freq_loop_state_t *floop_state = NULL;
 
 /*
- * green_line_alias_step - sweep step whose frequency matches the green line
+ * green_line_class_t - disposition of the green-line frequency relative to the
+ * sweep steps and the populated display extent.  Closed enum: every consumer
+ * dispatches on it exhaustively.
+ */
+typedef enum
+{
+  GREEN_LINE_INACTIVE,  /* fmhz_save <= 0, NaN, or no FR cards */
+  GREEN_LINE_ALIAS,     /* coincides with a sweep step within FREQ_EPSILON */
+  GREEN_LINE_EXTRA,     /* in FR data range or display extent; compute extra slot */
+  GREEN_LINE_STALE      /* outside every FR data range and the display extent */
+} green_line_class_t;
+
+/* Classification result; alias_step is meaningful only for GREEN_LINE_ALIAS. */
+typedef struct
+{
+  green_line_class_t cls;
+  int                alias_step;
+} green_line_eval_t;
+
+/*
+ * green_line_eval - classify the green-line frequency against sweep and display
  *
- * Returns the index of the sweep step whose frequency equals fmhz_save within
- * FREQ_EPSILON_MHZ, or -1 when the green line is inactive or matches no step.
+ * Single authority for every judgment of calc_data.fmhz_save relative to the
+ * sweep steps, the FR card data ranges, and the populated display extent.
+ * Membership is the union of the geometry-free FR data range and the display
+ * extent populated by freqplots_update_fscale_extents.  ALIAS precedes the
+ * range tests so a sweep-step coincidence deduplicates the extra slot.
  * save.freq[0..steps_total-1] must be populated by freq_populate_steps.
  */
-static int
-green_line_alias_step( void )
+static green_line_eval_t
+green_line_eval( void )
 {
-  int match = -1;
+  green_line_eval_t result = { GREEN_LINE_INACTIVE, -1 };
+  double fmhz = calc_data.fmhz_save;
 
-  if( calc_data.fmhz_save <= 0.0 )
-    return -1;
+  if( fmhz <= 0.0 || isnan(fmhz) || calc_data.FR_cards < 1 )
+    return result;
 
-  for( int i = 0; match < 0 && i < calc_data.steps_total; i++ )
-    if( FREQ_EQ(calc_data.fmhz_save, save.freq[i]) )
-      match = i;
+  for( int i = 0; i < calc_data.steps_total; i++ )
+    if( FREQ_EQ(fmhz, save.freq[i]) )
+    {
+      result.cls        = GREEN_LINE_ALIAS;
+      result.alias_step = i;
+      return result;
+    }
 
-  return match;
+  for( int fr = 0; fr < calc_data.FR_cards; fr++ )
+  {
+    freq_loop_data_t *fld = &calc_data.freq_loop_data[fr];
+    if( fmhz >= fld->min_freq - FREQ_EPSILON_MHZ && fmhz <= fld->max_freq + FREQ_EPSILON_MHZ )
+    {
+      result.cls = GREEN_LINE_EXTRA;
+      return result;
+    }
+  }
+
+  if( fmhz_within_display_range(fmhz) )
+    result.cls = GREEN_LINE_EXTRA;
+  else
+    result.cls = GREEN_LINE_STALE;
+
+  return result;
 }
 
 /**
@@ -669,18 +712,26 @@ freq_loop_display_step( void )
     if( save.fstep[idx] )
       step = idx;
 
-  /* Green-line slot takes priority when computed; when it aliases a sweep
-   * step the slot is invalidated, so route to that matching step. */
-  if( calc_data.fmhz_save > 0.0 )
+  /* Dispatch the green-line selection on its classification: the extra slot
+   * wins when computed, an alias routes to its matching sweep step, and a
+   * stale or inactive green line keeps the highest completed sweep step. */
+  green_line_eval_t gl = green_line_eval();
+  switch( gl.cls )
   {
-    if( save.fstep[calc_data.steps_total] )
-      step = calc_data.steps_total;
-    else
-    {
-      int alias = green_line_alias_step();
-      if( alias >= 0 && save.fstep[alias] )
-        step = alias;
-    }
+    case GREEN_LINE_EXTRA:
+      if( save.fstep[calc_data.steps_total] )
+        step = calc_data.steps_total;
+      break;
+
+    case GREEN_LINE_ALIAS:
+      if( save.fstep[gl.alias_step] )
+        step = gl.alias_step;
+      break;
+
+    case GREEN_LINE_STALE:
+    case GREEN_LINE_INACTIVE:
+      /* Keep the highest completed sweep step found above. */
+      break;
   }
 
   g_rec_mutex_unlock(&freq_data_lock);
@@ -805,25 +856,24 @@ freq_populate_steps( void )
     }
   }
 
-  /* Include the extra green-line slot in the scan range when the user
-   * has selected a green-line frequency.  Assign it here so the dispatch
-   * loop treats it identically to sweep slots. */
-  if( calc_data.fmhz_save > 0.0 )
+  /* Admit the extra green-line slot only when its frequency is in range or
+   * visible; alias, stale, and inactive green lines exclude the slot from the
+   * scan range so an out-of-range frequency is never dispatched. */
+  green_line_eval_t gl = green_line_eval();
+  switch( gl.cls )
   {
-    /* When the green-line frequency coincides with a sweep step within
-     * FREQ_EPSILON_MHZ, invalidate the extra slot and exclude it from the
-     * scan range so it is not recomputed; freq_loop_display_step routes the
-     * green-line selection to the matching sweep step. */
-    if( green_line_alias_step() >= 0 )
-    {
+    case GREEN_LINE_EXTRA:
+      save.freq[calc_data.steps_total] = calc_data.fmhz_save;
+      return calc_data.steps_total;
+
+    case GREEN_LINE_ALIAS:
+    case GREEN_LINE_STALE:
+    case GREEN_LINE_INACTIVE:
       save.fstep[calc_data.steps_total] = 0;
       return calc_data.steps_total - 1;
-    }
-
-    save.freq[calc_data.steps_total] = calc_data.fmhz_save;
-    return calc_data.steps_total;
   }
 
+  BUG("green_line_eval returned unknown class %d\n", gl.cls);
   return calc_data.steps_total - 1;
 }
 
@@ -1103,21 +1153,10 @@ fmhz_save_apply_idle(gpointer data)
 static gboolean
 fmhz_save_reset_if_stale(void)
 {
-  if (calc_data.fmhz_save <= 0.0 || isnan(calc_data.fmhz_save) || calc_data.FR_cards < 1)
-    return FALSE;
-
-  /* Check whether fmhz_save falls within any FR card range */
-  for (int fr = 0; fr < calc_data.FR_cards; fr++)
-  {
-    freq_loop_data_t *fld = &calc_data.freq_loop_data[fr];
-    if (calc_data.fmhz_save >= fld->min_freq - 1e-6
-        && calc_data.fmhz_save <= fld->max_freq + 1e-6)
-      return FALSE;
-  }
-
-  /* fmhz_save is visible in a plot panel whose display range exceeds the FR
-   * card data range (e.g. single-frequency card expanded by Fit_to_Scale) */
-  if (fmhz_within_display_range(calc_data.fmhz_save))
+  /* Repair only a green line that classifies stale: outside every FR card
+   * range and the populated display extent.  The classifier is the single
+   * authority shared with the seeding and display-routing sites. */
+  if (green_line_eval().cls != GREEN_LINE_STALE)
     return FALSE;
 
   /* fmhz_save is outside all FR card ranges; find lowest-VSWR step */
@@ -1389,6 +1428,11 @@ freq_loop_start_internal( void )
   floop_state->idle_top = -1;
   mem_alloc((void **)&floop_state->idle_stack,
             (size_t)calc_data.num_jobs * sizeof(child_proc_t *));
+
+  /* Populate the display extent on the GTK thread before the sweep worker
+   * runs freq_populate_steps; green-line classification reads the extent via
+   * fmhz_within_display_range and the worker must only read these fields. */
+  freqplots_update_fscale_extents();
 
   SetFlag( FREQ_LOOP_INIT );
   SetFlag( FREQ_LOOP_RUNNING );

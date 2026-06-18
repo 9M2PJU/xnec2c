@@ -27,6 +27,7 @@
 #define RIGHT   2
 
 gboolean fmhz_within_display_range( double fmhz );
+void freqplots_update_fscale_extents( void );
 
 #endif
 

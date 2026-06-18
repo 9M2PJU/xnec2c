@@ -447,6 +447,40 @@ fmhz_within_display_range( double fmhz )
   return FALSE;
 }
 
+/*
+ * freqplots_update_fscale_extents - populate main-view panel display extents
+ *
+ * Stores each valid panel's display extent into fr_plot->min_fscale/max_fscale
+ * via the single extent derivation.  Geometry-free: passes nval = 0 so
+ * Fit_to_Scale applies only the degenerate single-point expansion, yielding a
+ * baseline independent of rendered plot width; a later paint refines each
+ * extent with real geometry.  Runs on the GTK thread before a sweep starts so
+ * green-line classification reads a populated extent while the sweep worker
+ * only reads these fields.
+ */
+void
+freqplots_update_fscale_extents( void )
+{
+  freqplots_view_t *v = freqplots_main_view();
+  int i, n;
+
+  if (v->fr_plots == NULL || v->ngraph < 1 || calc_data.FR_cards < 1)
+    return;
+
+  n = v->ngraph * calc_data.FR_cards;
+  for (i = 0; i < n; i++)
+  {
+    int nval = 0;
+
+    if (!FR_PLOT_T_IS_VALID(&v->fr_plots[i]))
+      continue;
+
+    fscale_extent_fit( v->fr_plots[i].freq_loop_data,
+        rc_config.freqplots_round_x_axis,
+        &v->fr_plots[i].min_fscale, &v->fr_plots[i].max_fscale, &nval );
+  }
+}
+
 /*-----------------------------------------------------------------------*/
 
 /* Step index the green frequency line marks: calc_data.freq_step, clamped to

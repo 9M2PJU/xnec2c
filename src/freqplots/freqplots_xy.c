@@ -251,12 +251,9 @@ Plot_Graph(
 		/* Draw plotting frame */
 
 		// Scale the X-axis frequency values to nice round numbers:
-		fr_plot->min_fscale = fr_plot->freq_loop_data->min_freq;
-		fr_plot->max_fscale = fr_plot->freq_loop_data->max_freq;
-
-		if (rc_config.freqplots_round_x_axis ||
-		    fabs(fr_plot->min_fscale - fr_plot->max_fscale) < 1e-6)
-			Fit_to_Scale( &fr_plot->max_fscale, &fr_plot->min_fscale, &n_vert_scale );
+		fscale_extent_fit( fr_plot->freq_loop_data,
+			rc_config.freqplots_round_x_axis,
+			&fr_plot->min_fscale, &fr_plot->max_fscale, &n_vert_scale );
 
 		// local shorthand variables
 		double min_fscale = fr_plot->min_fscale;

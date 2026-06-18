@@ -111,6 +111,28 @@ double Fit_to_Scale( double *max, double *min, int *nval )
   return subdiv_order;
 } /* Fit_to_Scale() */
 
+/* fscale_extent_fit()
+ *
+ * Derive a panel's display extent from its FR card data range.  Seeds
+ * *min/*max from the card's frequency limits, then rounds outward via
+ * Fit_to_Scale when the X-axis is rounded or the range is degenerate
+ * (single-frequency card).  *nval carries the subdivision count in and
+ * out: callers with rendered geometry pass the width-derived count;
+ * geometry-free callers pass 0 so Fit_to_Scale applies only the
+ * single-point expansion.  This is the lone derivation of the extent
+ * stored in fr_plot->min_fscale/max_fscale.
+ */
+void
+fscale_extent_fit( freq_loop_data_t *fld, int round_x_axis,
+    double *min, double *max, int *nval )
+{
+  *min = fld->min_freq;
+  *max = fld->max_freq;
+
+  if( round_x_axis || FREQ_EQ(*min, *max) )
+    Fit_to_Scale( max, min, nval );
+}
+
 /* Fit_to_Scale2()
  *
  * Adjust the max and min value of data to be plotted,
