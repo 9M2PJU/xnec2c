@@ -38,6 +38,7 @@
  */
 
 #include "freqplots_internal.h"
+#include "freqplots_locus.h"
 #include "../shared.h"
 #include "../opt_ui.h"
 
@@ -926,6 +927,10 @@ _Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
   ctx.num_fsteps      = num_fsteps;
   ctx.posn            = 0;
 
+  /* Reset the click-resolution registry before producers deposit their
+   * rendered loci for this frame. */
+  fp_locus_frame_begin( v );
+
   if( !fp_run_dispatch( &ctx ) )
     return;
 
@@ -1025,8 +1030,7 @@ void freqplots_close_panel(fp_panel_t panel)
 
 	fpv_popups[panel] = NULL;
 	mem_free((void **)&v->fr_plots);
-	mem_free((void **)&v->smith_locus_pts);
-	mem_free((void **)&v->smith_locus_freq);
+	fp_locus_free(v);
 	mem_free((void **)&v->prev_click_event);
 	if (v->text_layout != NULL)
 		g_object_unref(v->text_layout);

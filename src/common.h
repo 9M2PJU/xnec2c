@@ -1041,6 +1041,9 @@ typedef enum {
 	FP_PANEL_COUNT
 } fp_panel_t;
 
+/* Per-view click-resolution registry record; defined in freqplots_locus.h. */
+typedef struct fp_locus_s fp_locus_t;
+
 /*
  * fr_plot_t structure and related defines used in plot_freqdata.c
  */
@@ -1106,13 +1109,13 @@ typedef struct {
 	// draw path against this view's own geometry.
 	GdkEvent  *prev_click_event;
 
-	// Smith-chart locus geometry captured at draw, read on click; per-view so
-	// each window resolves chart clicks against its own geometry.
-	GdkRectangle smith_locus_rect;
-	GdkPoint    *smith_locus_pts;
-	double      *smith_locus_freq;
-	int          smith_locus_n;
-	gboolean     smith_locus_valid;
+	// Per-frame click-resolution registry, rebuilt each draw by every plot
+	// producer and consulted on click; per-view so each window resolves
+	// clicks against its own geometry.  Buffers persist at high-water
+	// capacity across frames.
+	fp_locus_t *loci;
+	int         loci_n;
+	int         loci_cap;
 
 	// Popup selected-frequency readout bar: one cell box and its value label
 	// per displayed field, refreshed each draw.  readout_n is 0 for the

@@ -21,6 +21,7 @@
  */
 
 #include "freqplots_internal.h"
+#include "freqplots_locus.h"
 #include "../shared.h"
 
 #include <math.h>
@@ -58,6 +59,9 @@ Plot_Graph(
 		n_vert_scale,      n_horiz_scale;
 
 	int i;
+
+	// Reused per-card pixel rail deposited into the click-resolution registry.
+	GdkPoint *rail = NULL;
 
 	if (calc_data.freq_step < 0)
 		return;
@@ -317,10 +321,47 @@ Plot_Graph(
 				(fp_stroke_t){ .color = green_c, .width = FP_LINE_WIDTH, .z_mid = FP_Z_GREEN });
 		}
 
+		/* Deposit this card's click-resolution geometry.  A primary click
+		 * lerps an arbitrary frequency across the full rendered x-axis, so the
+		 * continuum spans the panel edges (min_fscale at the left, max_fscale
+		 * at the right) at a constant y the resolver reduces to pure x.  A
+		 * secondary click snaps to the rendered samples, the extra slot among
+		 * them; rail and trace share fp_axis_pixel_x, so snap and trace
+		 * stay aligned. */
+		if (maxidx > 0)
+		{
+			int rail_y = plot_rect->y + plot_rect->height / 2;
+			int s;
+			GdkPoint edges[2];
+			double   edge_freq[2];
+
+			mem_realloc((void **)&rail, (size_t)maxidx * sizeof(GdkPoint));
+			for (s = 0; s < maxidx; s++)
+			{
+				rail[s].x = fp_axis_pixel_x(plot_rect, x[offset + s],
+					min_fscale, max_fscale);
+				rail[s].y = rail_y;
+			}
+
+			edges[0].x = plot_rect->x;
+			edges[0].y = rail_y;
+			edge_freq[0] = min_fscale;
+			edges[1].x = plot_rect->x + plot_rect->width;
+			edges[1].y = rail_y;
+			edge_freq[1] = max_fscale;
+
+			fp_locus_add(v, &(fp_locus_input_t){
+				.panel = panel, .rect = *plot_rect,
+				.cont_pts = edges, .cont_freq = edge_freq, .cont_n = 2,
+				.snap_pts = rail, .snap_freq = x + offset, .snap_n = maxidx });
+		}
+
 		// Next FR card index:
 		x_offset += plot_rect->width + pad_x_between_graphs;
 		offset += card_nfsteps[fr];
 	}
+
+	mem_free((void **)&rail);
 
 	v->prev_width_available = width_available;
 	v->prev_ngraphs = v->ngraph;

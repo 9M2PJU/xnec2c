@@ -21,10 +21,10 @@
  */
 
 #include "../freqplots_internal.h"
+#include "../freqplots_locus.h"
 #include "../../shared.h"
 
 #include <math.h>
-#include <string.h>
 
 /* Adjacent locus step indices spanning a frequency, with the
  * interpolation fraction between them. */
@@ -554,18 +554,13 @@ Plot_Graph_Smith(
     coff += cn;
   }
 
-  /* Capture the locus geometry so a chart click resolves to a frequency */
-  v->smith_locus_valid = FALSE;
-  if( nc > 0 )
-  {
-    mem_realloc((void **)&v->smith_locus_pts,  (size_t)nc * sizeof(GdkPoint));
-    mem_realloc((void **)&v->smith_locus_freq, (size_t)nc * sizeof(double));
-    memcpy( v->smith_locus_pts,  points, (size_t)nc * sizeof(GdkPoint) );
-    memcpy( v->smith_locus_freq, fc,     (size_t)nc * sizeof(double) );
-    v->smith_locus_rect  = plot_rect;
-    v->smith_locus_n     = nc;
-    v->smith_locus_valid = TRUE;
-  }
+  /* Deposit the impedance curve so a chart click resolves to a frequency; the
+   * curve serves both primary projection and secondary snapping, so it fills
+   * the continuum and snap roles with the same arrays. */
+  fp_locus_add( v, &(fp_locus_input_t){
+      .panel = FP_PANEL_SMITH, .rect = plot_rect,
+      .cont_pts = points, .cont_freq = fc, .cont_n = nc,
+      .snap_pts = points, .snap_freq = fc, .snap_n = nc } );
 
   mem_free((void **)&points);
 
@@ -593,115 +588,3 @@ Plot_Graph_Smith(
   }
 
 } /* Plot_Graph_Smith() */
-
-/*-----------------------------------------------------------------------*/
-
-/* fp_smith_hit()
- *
- * True when the Smith chart was drawn and (px,py) lies within its bounding
- * rectangle.  Sole owner of the chart hit-test, shared by the frequency
- * resolver and the double-click popout query.
- */
-  gboolean
-fp_smith_hit( freqplots_view_t *v, double px, double py )
-{
-  if( !v->smith_locus_valid || v->smith_locus_n <= 0 )
-    return FALSE;
-
-  return px >= v->smith_locus_rect.x
-      && px <= v->smith_locus_rect.x + v->smith_locus_rect.width
-      && py >= v->smith_locus_rect.y
-      && py <= v->smith_locus_rect.y + v->smith_locus_rect.height;
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* fp_smith_freq_at_pixel()
- *
- * Resolves a click on the Smith chart to a frequency on the impedance locus
- * captured during the last render.  Returns FALSE when the chart was not
- * drawn or the click lies outside its bounding rectangle.  snap_to_step
- * picks the nearest sweep-step vertex; otherwise the click is projected onto
- * the nearest locus segment and the bracketing step frequencies are
- * interpolated by the projection fraction.
- */
-  gboolean
-fp_smith_freq_at_pixel( freqplots_view_t *v, double px, double py, gboolean snap_to_step, double *fmhz )
-{
-  int idx;
-
-  if( !fp_smith_hit(v, px, py) )
-    return FALSE;
-
-  /* Secondary click: nearest sweep-step vertex by pixel distance */
-  if( snap_to_step )
-  {
-    int    best = 0;
-    double dx = px - v->smith_locus_pts[0].x;
-    double dy = py - v->smith_locus_pts[0].y;
-    double best_d2 = dx * dx + dy * dy;
-
-    for( idx = 1; idx < v->smith_locus_n; idx++ )
-    {
-      dx = px - v->smith_locus_pts[idx].x;
-      dy = py - v->smith_locus_pts[idx].y;
-      double d2 = dx * dx + dy * dy;
-      if( dl_flt(d2, best_d2) )
-      {
-        best_d2 = d2;
-        best = idx;
-      }
-    }
-
-    *fmhz = v->smith_locus_freq[best];
-    return TRUE;
-  }
-
-  /* Single point: no segment to project onto */
-  if( v->smith_locus_n == 1 )
-  {
-    *fmhz = v->smith_locus_freq[0];
-    return TRUE;
-  }
-
-  /* Primary click: project onto the nearest locus segment and interpolate
-   * the bracketing step frequencies by the clamped projection fraction */
-  int    best_i = 0;
-  double best_t = 0.0;
-  double best_d2 = 0.0;
-
-  for( idx = 0; idx < v->smith_locus_n - 1; idx++ )
-  {
-    double ax = v->smith_locus_pts[idx].x;
-    double ay = v->smith_locus_pts[idx].y;
-    double vx = v->smith_locus_pts[idx + 1].x - ax;
-    double vy = v->smith_locus_pts[idx + 1].y - ay;
-    double len2 = vx * vx + vy * vy;
-    double t = 0.0;
-
-    if( dl_fgt(len2, 0.0) )
-        t = ( (px - ax) * vx + (py - ay) * vy ) / len2;
-
-    if( t < 0.0 ) t = 0.0;
-    else if( t > 1.0 ) t = 1.0;
-
-    double cx = ax + t * vx;
-    double cy = ay + t * vy;
-    double dx = px - cx;
-    double dy = py - cy;
-    double d2 = dx * dx + dy * dy;
-
-    if( idx == 0 || dl_flt(d2, best_d2) )
-    {
-      best_d2 = d2;
-      best_i  = idx;
-      best_t  = t;
-    }
-  }
-
-  *fmhz = v->smith_locus_freq[best_i]
-      + best_t * ( v->smith_locus_freq[best_i + 1] - v->smith_locus_freq[best_i] );
-
-  return TRUE;
-
-} /* fp_smith_freq_at_pixel() */

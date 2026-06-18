@@ -100,7 +100,7 @@ Draw_Graph(
     double bmax, double bmin,
     int nval, int nval_max, int side )
 {
-  double ra, rb;
+  double ra;
   int idx;
   GdkPoint *points = NULL;
   char s[23];
@@ -118,7 +118,6 @@ Draw_Graph(
 
   /* Range of values to plot */
   ra = amax - amin;
-  rb = bmax - bmin;
 
   marker_size = (nval < 3) ? MARKER_SIZE_SINGLE_POINT : MARKER_SIZE_MULTI_POINT;
   circle_padding = CIRCLE_PADDING_PX;
@@ -136,7 +135,7 @@ Draw_Graph(
   int min_idx = 0, max_idx = 0;
   for( idx = 0; idx < nval; idx++ )
   {
-    points[idx].x = rect->x + (int)((double)rect->width * (b[idx]-bmin)/rb + 0.5);
+    points[idx].x = fp_axis_pixel_x(rect, b[idx], bmin, bmax);
     points[idx].y = rect->y + (int)( (double)rect->height *
         (amax-a[idx]) / ra + 0.5 );
 

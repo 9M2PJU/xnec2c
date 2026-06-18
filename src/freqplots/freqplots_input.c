@@ -21,6 +21,7 @@
  */
 
 #include "freqplots_internal.h"
+#include "freqplots_locus.h"
 #include "../shared.h"
 
 #include <string.h>
@@ -53,8 +54,7 @@ Plots_Window_Killed( void )
   // Release heap tables, then zero the whole view so the resize caches
   // (prev_*) restart and width_available rescales on the next open.
   mem_free((void **)&v->fr_plots);
-  mem_free((void **)&v->smith_locus_pts);
-  mem_free((void **)&v->smith_locus_freq);
+  fp_locus_free(v);
   mem_free((void **)&v->prev_click_event);
   if (v->text_layout != NULL)
     g_object_unref(v->text_layout);
@@ -89,8 +89,7 @@ Set_Frequency_On_Click( freqplots_view_t *v, GdkEvent *e)
 {
   double fmhz = 0.0;
   int set_fmhz = 0, draw_freqplot = 0;
-  double x, w;
-  int button, i;
+  int button;
 
   GdkEventButton *button_event = (GdkEventButton *)e;
   GdkEventScroll *scroll_event = (GdkEventScroll *)e;
@@ -140,121 +139,73 @@ Set_Frequency_On_Click( freqplots_view_t *v, GdkEvent *e)
     else if (button == 3) button = 1;
   }
 
-  if (fr_plot != NULL && FR_PLOT_T_IS_VALID(fr_plot))
+  // Mouse-wheel scroll over an FR-card panel resizes panel widths.  This is
+  // panel geometry, not frequency resolution, so it stays on the fr_plot
+  // layout table rather than the locus registry.
+  if (button == 4 || button == 5)
   {
-  // local shorthand variables
-  double min_fscale = fr_plot->min_fscale;
-  double max_fscale = fr_plot->max_fscale;
+    if (fr_plot == NULL || !FR_PLOT_T_IS_VALID(fr_plot))
+    {
+      save_click_event(v, e);
+      return;
+    }
 
-  /* Width of plot bounding rectangle */
-  w = fr_plot->plot_rect.width;
+    // If its the last plot than shrink/grow the previous:
+    if (fr_plot->fr == calc_data.FR_cards-1)
+      fr_adj = get_fr_plot(v, fr_plot->posn, fr_plot->fr-1);
 
-  /* 'x' posn of click referred to plot bounding rectangle's 'x' */
-  x = button_event->x - fr_plot->plot_rect.x;
-  if( x < 0.0 ) x = 0.0;
-  else if( x > w ) x = w;
+    // Otherwise shink/grow the next:
+    else
+      fr_adj = get_fr_plot(v, fr_plot->posn, fr_plot->fr+1);
 
-  /* Calculate frequency corresponding to x position of click,
-   * used for button 1 and 3: */
-  fmhz = max_fscale - min_fscale;
-  fmhz = min_fscale + fmhz * x / w;
+    // Abort if there is only one plot:
+    if (fr_adj == NULL)
+      return;
 
-  // event types: https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gdk/gdkevents.h#L309
-  // Enable this for mouse debugging:
-  /*
-  pr_debug("mouse click[type=%d pos=%4.1f,%4.1f button=%d(%d)]\n",
-	  e->type,
-	  button_event->x, button_event->y,
-	  button, button_event->button);
-  print_fr_plot(fr_plot);
-  */
+    // the amount to adjust on scale:
+    int px_adjust = 20;
 
-  /* Set freq corresponding to click 'x', to freq spinbuttons FIXME */
-  switch( button )
-  {
-    case 1: /* Enable drawing of frequency line */
+    // scroll up
+    if (button == 4)
+    {
+      if (fr_adj->plot_rect.width < 100)
+        return;
 
-	  draw_freqplot = 1;
-	  set_fmhz = 1;
-      freqplots_redraw_all(TRUE);
-      break;
+      fr_adj->plot_rect.width -= px_adjust;
+      fr_plot->plot_rect.width += px_adjust;
+    }
+    // scroll down
+    else
+    {
+      if (fr_plot->plot_rect.width < 100)
+        return;
 
-    case 2: /* Disable drawing of freq line */
-      calc_data.fmhz_save = 0.0;
+      fr_adj->plot_rect.width += px_adjust;
+      fr_plot->plot_rect.width -= px_adjust;
+    }
 
-	  draw_freqplot = 1;
+    // Sync widths for all positions based on fr_plot:
+    fr_plot_sync_widths(v, fr_plot);
 
-      break;
-
-    case 3: /* Calculate nearest frequency corresponding to mouse position in plot */
-      i = (fmhz - fr_plot->freq_loop_data->min_freq) / fr_plot->freq_loop_data->delta_freq + 0.5;
-
-      fmhz = fr_plot->freq_loop_data->min_freq + i * fr_plot->freq_loop_data->delta_freq;
-
-      /* Enable drawing of frequency line */
-
-	  draw_freqplot = 1;
-	  set_fmhz = 1;
-      break;
-
-
-    case 4:  // scroll up
-    case 5:  // scroll down
-		// If its the last plot than shrink/grow the previous:
-		if (fr_plot->fr == calc_data.FR_cards-1)
-			fr_adj = get_fr_plot(v, fr_plot->posn, fr_plot->fr-1);
-
-		// Otherwise shink/grow the next:
-		else
-			fr_adj = get_fr_plot(v, fr_plot->posn, fr_plot->fr+1);
-
-		// Abort if there is only one plot:
-		if (fr_adj == NULL)
-			return;
-
-		// the amount to adjust on scale:
-		int px_adjust = 20;
-
-		// scroll up
-		if (button == 4)
-		{
-			if (fr_adj->plot_rect.width < 100)
-			return;
-
-			fr_adj->plot_rect.width -= px_adjust;
-			fr_plot->plot_rect.width += px_adjust;
-		}
-		// scroll down
-		else if (button == 5)
-		{
-			if (fr_plot->plot_rect.width < 100)
-				return;
-
-			fr_adj->plot_rect.width += px_adjust;
-			fr_plot->plot_rect.width -= px_adjust;
-		}
-
-		// Sync widths for all positions based on fr_plot:
-		fr_plot_sync_widths(v, fr_plot);
-
-		draw_freqplot = 1;
-
-		break;
-
-		default:
-			pr_debug("mouse button: unknown button %d\n", button);
-			return;
-
-  } /* switch( button_event->button ) */
+    draw_freqplot = 1;
   }
-  else if ((button == 1 || button == 2 || button == 3)
-      && fp_smith_freq_at_pixel(v, button_event->x, button_event->y,
-          button == 3, &fmhz))
+  // Primary, secondary, and drag clicks resolve to a frequency through the
+  // shared locus registry, which serves every plot family uniformly: a
+  // primary click lerps between bracketing samples; a secondary click snaps
+  // to the nearest sample, including the green-line extra slot once present.
+  else if (button == 1 || button == 2 || button == 3)
   {
-    /* Smith chart is not an x-axis panel; the click maps onto the locus.
-     * Primary interpolates the locus position; secondary snaps to a step. */
+    if (!fp_locus_freq_at_pixel(v, button_event->x, button_event->y,
+            button == 3, &fmhz))
+    {
+      // No panel under the click; defer until this view has geometry.
+      save_click_event(v, e);
+      return;
+    }
+
     if (button == 2)
     {
+      // Disable drawing of the freq line.
       calc_data.fmhz_save = 0.0;
       draw_freqplot = 1;
     }
@@ -268,9 +219,8 @@ Set_Frequency_On_Click( freqplots_view_t *v, GdkEvent *e)
   }
   else
   {
-	  // no plot_rect selected for frequency line
-	save_click_event(v, e);
-	  return;
+    // No actionable button under the pointer, e.g. a bare hover.
+    return;
   }
 
   if (set_fmhz)
@@ -305,8 +255,5 @@ freqplots_panel_at( freqplots_view_t *v, double px, double py )
   if( p != NULL )
     return p->panel_type;
 
-  if( fp_smith_hit(v, px, py) )
-    return FP_PANEL_SMITH;
-
-  return FP_PANEL_ALL;
+  return fp_locus_panel_at( v, px, py );
 }

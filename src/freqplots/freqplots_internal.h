@@ -20,6 +20,15 @@
 #include "../measurements.h"
 #include "freqplots_render.h"
 
+/* Map an axis value to its pixel x within rect, rounding to the nearest pixel.
+ * Single source for x-axis sample placement, shared by the trace renderer and
+ * the click-resolution rail so snap points land on the drawn trace. */
+static inline int
+fp_axis_pixel_x(const GdkRectangle *rect, double val, double vmin, double vmax)
+{
+  return rect->x + (int)((double)rect->width * (val - vmin) / (vmax - vmin) + 0.5);
+}
+
 /* Per-view plot-table init, rectangle accessors, and width sync
  * (freqplots_core.c) */
 void          fr_plots_init(freqplots_view_t *v);
@@ -61,15 +70,6 @@ void Plot_Graph(freqplots_view_t *v, fp_render_t *fp,
     int *card_nfsteps, char *titles[], int posn, fp_panel_t panel);
 void Plot_Graph_Smith(freqplots_view_t *v, fp_render_t *fp,
     double *fa, double *fb, double *fc, int nc, int *card_nfsteps, int posn);
-
-/* Resolve a Smith-chart click to a locus frequency; FALSE when the chart is
- * not displayed or the click is outside it (graphs/smith_graph.c). */
-gboolean fp_smith_freq_at_pixel(freqplots_view_t *v, double px, double py,
-    gboolean snap_to_step, double *fmhz);
-
-/* True when the Smith chart is drawn and the pixel lies within its bounding
- * rectangle (graphs/smith_graph.c). */
-gboolean fp_smith_hit(freqplots_view_t *v, double px, double py);
 
 /* Per-frame data shared with every dispatched plot renderer.  posn advances
  * as each renderer claims drawing-area panels. */

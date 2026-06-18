@@ -34,6 +34,7 @@ xnec2c_SOURCES = \
     optimize.c      optimize.h \
     plot_freqdata.h \
     freqplots/freqplots_internal.h \
+    freqplots/freqplots_locus.c    freqplots/freqplots_locus.h \
     freqplots/freqplots_render.c   freqplots/freqplots_render.h \
     freqplots/freqplots_scale.c \
     freqplots/freqplots_graph.c \
