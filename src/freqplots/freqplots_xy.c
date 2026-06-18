@@ -35,7 +35,7 @@
 Plot_Graph(
     freqplots_view_t *v, fp_render_t *fp,
     double *y_left, double *y_right, double *x, int nx,
-    char *titles[], int posn, fp_panel_t panel)
+    int *card_nfsteps, char *titles[], int posn, fp_panel_t panel)
 {
 	// Pointer to the FR card's plot_rect
 	GdkRectangle *plot_rect = NULL;
@@ -245,8 +245,8 @@ Plot_Graph(
 		// Clamp the number of index to be plotted if there
 		// are some available to plot in the next FR card which
 		// will be done in the next iteration of this loop:
-		if (maxidx > fr_plot->freq_loop_data->freq_steps)
-			maxidx = fr_plot->freq_loop_data->freq_steps;
+		if (maxidx > card_nfsteps[fr])
+			maxidx = card_nfsteps[fr];
 
 		/* Draw plotting frame */
 
@@ -279,7 +279,7 @@ Plot_Graph(
 				y_left+offset, x+offset,
 				max_y_left, min_y_left,
 				max_fscale, min_fscale,
-				maxidx, fr_plot->freq_loop_data->freq_steps,
+				maxidx, card_nfsteps[fr],
 				LEFT );
 		}
 
@@ -292,7 +292,7 @@ Plot_Graph(
 				y_right+offset, x+offset,
 				max_y_right, min_y_right,
 				max_fscale, min_fscale,
-				maxidx, fr_plot->freq_loop_data->freq_steps,
+				maxidx, card_nfsteps[fr],
 				RIGHT);
 		}
 
@@ -319,7 +319,7 @@ Plot_Graph(
 
 		// Next FR card index:
 		x_offset += plot_rect->width + pad_x_between_graphs;
-		offset += fr_plot->freq_loop_data->freq_steps;
+		offset += card_nfsteps[fr];
 	}
 
 	v->prev_width_available = width_available;

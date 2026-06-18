@@ -703,7 +703,7 @@ fp_plot_panel(fp_plot_ctx_t *ctx, double *left, double *right, char *titles[3],
     return;
 
   Plot_Graph(ctx->view, ctx->fp, left, right, ctx->fplot, ctx->num_fsteps,
-      titles, ctx->posn++, panel);
+      ctx->card_nfsteps, titles, ctx->posn++, panel);
 }
 
 /* Emit the Smith-chart panel through the shared renderer under the same view
@@ -715,7 +715,8 @@ fp_plot_smith_panel(fp_plot_ctx_t *ctx, double *fa, double *fb, double *fc,
   if( !fp_panel_active(ctx->view, panel) )
     return;
 
-  Plot_Graph_Smith(ctx->view, ctx->fp, fa, fb, fc, nc, ctx->posn++);
+  Plot_Graph_Smith(ctx->view, ctx->fp, fa, fb, fc, nc,
+      ctx->card_nfsteps, ctx->posn++);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -746,6 +747,46 @@ fp_run_dispatch(fp_plot_ctx_t *ctx)
 }
 
 /*-----------------------------------------------------------------------*/
+
+/* freqloop_card_of_fmhz()
+ *
+ * Resolve the FR card that owns a frequency: the card whose data range contains
+ * it, or failing that the card whose display extent contains it.  Single
+ * authority for that judgment; green_line_eval marks the green line
+ * GREEN_LINE_EXTRA exactly when this returns a card.  The display-extent
+ * fallback reads the main view, the single authority for panel extents (see
+ * fmhz_within_display_range), so every view resolves a frequency to the same
+ * card regardless of whether its own panels have painted.
+ * Returns -1 when no card covers the frequency.
+ */
+int
+freqloop_card_of_fmhz( double fmhz )
+{
+  fr_plot_t *fr_plots = freqplots_main_view()->fr_plots;
+  int fr;
+
+  for( fr = 0; fr < calc_data.FR_cards; fr++ )
+  {
+    freq_loop_data_t *fld = &calc_data.freq_loop_data[fr];
+    if( fmhz >= fld->min_freq - FREQ_EPSILON_MHZ &&
+        fmhz <= fld->max_freq + FREQ_EPSILON_MHZ )
+      return fr;
+  }
+
+  if( fr_plots == NULL )
+    return -1;
+
+  for( fr = 0; fr < calc_data.FR_cards; fr++ )
+  {
+    fr_plot_t *p = &fr_plots[fr];
+    if( FR_PLOT_T_IS_VALID(p) &&
+        fmhz >= p->min_fscale - FREQ_EPSILON_MHZ &&
+        fmhz <= p->max_fscale + FREQ_EPSILON_MHZ )
+      return fr;
+  }
+
+  return -1;
+}
 
 /* Plot_Frequency_Data()
  *
@@ -793,22 +834,61 @@ _Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
     v->text_layout = gtk_widget_create_pango_layout(v->drawingarea, NULL);
   fp_render_reset( &fp, cr, v->text_layout );
 
-  /* Build compact index list; out-of-order arrivals appear immediately */
+  /* Build compact index list; out-of-order arrivals appear immediately.
+   * Capacity holds every sweep step plus the green-line extra slot. */
   static int    *valid_steps_map = NULL;
-  static double *fplot       = NULL;
-  size_t vstep_mreq = (size_t)calc_data.steps_total * sizeof(int);
-  size_t fplot_mreq = (size_t)calc_data.steps_total * sizeof(double);
+  static double *fplot           = NULL;
+  static int    *card_nfsteps    = NULL;
+  size_t vstep_mreq = (size_t)(calc_data.steps_total + 1) * sizeof(int);
+  size_t fplot_mreq = (size_t)(calc_data.steps_total + 1) * sizeof(double);
+  size_t card_mreq  = (size_t)calc_data.FR_cards * sizeof(int);
   mem_realloc((void **)&valid_steps_map, vstep_mreq);
   mem_realloc((void **)&fplot, fplot_mreq);
+  mem_realloc((void **)&card_nfsteps, card_mreq);
 
+  /* The extra slot at steps_total holds a computed green-line measurement when
+   * save.fstep marks it valid; render it inside its home card at the sorted
+   * frequency position so the trace stays monotonic in frequency. */
+  int extra_idx  = calc_data.steps_total;
+  int extra_card = save.fstep[extra_idx]
+      ? freqloop_card_of_fmhz( save.freq[extra_idx] ) : -1;
+
+  /* Walk each FR card's contiguous step block in turn, recording the actual
+   * valid-point count per card so the renderer partitions the flat arrays by
+   * real counts rather than the static sweep stride. */
   num_fsteps = 0;
-  for( idx = 0; idx < calc_data.steps_total; idx++ )
+  int card_start = 0;
+  for( int fr = 0; fr < calc_data.FR_cards; fr++ )
   {
-    if( !save.fstep[idx] )
-      continue;
-    valid_steps_map[num_fsteps] = idx;
-    fplot[num_fsteps]       = save.freq[idx];
-    num_fsteps++;
+    int block_start = num_fsteps;
+    int card_steps  = calc_data.freq_loop_data[fr].freq_steps;
+
+    for( idx = card_start;
+         idx < card_start + card_steps && idx < calc_data.steps_total; idx++ )
+    {
+      if( !save.fstep[idx] )
+        continue;
+      valid_steps_map[num_fsteps] = idx;
+      fplot[num_fsteps]           = save.freq[idx];
+      num_fsteps++;
+    }
+
+    if( fr == extra_card )
+    {
+      int pos = block_start;
+      while( pos < num_fsteps && fplot[pos] < save.freq[extra_idx] )
+        pos++;
+      memmove( &valid_steps_map[pos+1], &valid_steps_map[pos],
+          (size_t)(num_fsteps - pos) * sizeof(int) );
+      memmove( &fplot[pos+1], &fplot[pos],
+          (size_t)(num_fsteps - pos) * sizeof(double) );
+      valid_steps_map[pos] = extra_idx;
+      fplot[pos]           = save.freq[extra_idx];
+      num_fsteps++;
+    }
+
+    card_nfsteps[fr] = num_fsteps - block_start;
+    card_start      += card_steps;
   }
 
   /* Abort if plotting is not possible FIXME */
@@ -841,6 +921,7 @@ _Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
   ctx.fp              = &fp;
   ctx.valid_steps_map = valid_steps_map;
   ctx.fplot           = fplot;
+  ctx.card_nfsteps    = card_nfsteps;
   ctx.meas_rows       = meas_rows;
   ctx.num_fsteps      = num_fsteps;
   ctx.posn            = 0;

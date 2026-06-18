@@ -441,7 +441,7 @@ smith_draw_legend( fp_render_t *fp, int x, int y_bottom, int line_h, float scale
 Plot_Graph_Smith(
 	freqplots_view_t *v, fp_render_t *fp,
 	double *fa, double *fb, double *fc,
-	int nc, int posn )
+	int nc, int *card_nfsteps, int posn )
 {
   int plot_height, plot_y_position;
   int idx;
@@ -539,10 +539,20 @@ Plot_Graph_Smith(
         FP_Z_LEFT, COLOR_MAGENTA );
   }
 
-  /* Draw the graph */
-  fp_add_polyline( fp, points, nc,
-      (fp_stroke_t){ .color = COLOR_MAGENTA, .width = SMITH_W_LOCUS * density.stroke,
-                     .z_mid = FP_Z_LEFT } );
+  /* Draw one locus per FR card so the trace does not jump between the
+   * disjoint frequency ranges of adjacent cards.  card_nfsteps partitions the
+   * flat point array into the same contiguous per-card blocks the XY plots
+   * use, summing to nc. */
+  int card, coff = 0;
+  for( card = 0; card < calc_data.FR_cards; card++ )
+  {
+    int cn = card_nfsteps[card];
+    if( cn > 0 )
+      fp_add_polyline( fp, points + coff, cn,
+          (fp_stroke_t){ .color = COLOR_MAGENTA, .width = SMITH_W_LOCUS * density.stroke,
+                         .z_mid = FP_Z_LEFT } );
+    coff += cn;
+  }
 
   /* Capture the locus geometry so a chart click resolves to a frequency */
   v->smith_locus_valid = FALSE;

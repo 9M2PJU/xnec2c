@@ -58,9 +58,9 @@ void Draw_Graph(fp_render_t *fp,
 /* Plot types (freqplots_xy.c, graphs/smith_graph.c) */
 void Plot_Graph(freqplots_view_t *v, fp_render_t *fp,
     double *y_left, double *y_right, double *x, int nx,
-    char *titles[], int posn, fp_panel_t panel);
+    int *card_nfsteps, char *titles[], int posn, fp_panel_t panel);
 void Plot_Graph_Smith(freqplots_view_t *v, fp_render_t *fp,
-    double *fa, double *fb, double *fc, int nc, int posn);
+    double *fa, double *fb, double *fc, int nc, int *card_nfsteps, int posn);
 
 /* Resolve a Smith-chart click to a locus frequency; FALSE when the chart is
  * not displayed or the click is outside it (graphs/smith_graph.c). */
@@ -79,6 +79,7 @@ typedef struct
   fp_render_t   *fp;              /* per-frame depth-buffer render handle */
   int           *valid_steps_map; /* compact step indices into save.* arrays */
   double        *fplot;           /* x-axis frequencies, one per valid step */
+  int           *card_nfsteps;    /* valid rendered point count per FR card */
   measurement_t *meas_rows;       /* one full measurement per valid step,
                                    * computed once per frame and shared by
                                    * every plot type */

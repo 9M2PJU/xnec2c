@@ -675,17 +675,7 @@ green_line_eval( void )
       return result;
     }
 
-  for( int fr = 0; fr < calc_data.FR_cards; fr++ )
-  {
-    freq_loop_data_t *fld = &calc_data.freq_loop_data[fr];
-    if( fmhz >= fld->min_freq - FREQ_EPSILON_MHZ && fmhz <= fld->max_freq + FREQ_EPSILON_MHZ )
-    {
-      result.cls = GREEN_LINE_EXTRA;
-      return result;
-    }
-  }
-
-  if( fmhz_within_display_range(fmhz) )
+  if( freqloop_card_of_fmhz(fmhz) >= 0 )
     result.cls = GREEN_LINE_EXTRA;
   else
     result.cls = GREEN_LINE_STALE;
