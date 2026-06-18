@@ -80,6 +80,146 @@ static const fp_panel_desc_t fp_panel_desc[FP_PANEL_COUNT] = {
   [FP_PANEL_ANT_TEMP] = { PLOT_ANT_TEMP,    ENABLE_RDPAT },
 };
 
+/* Setting that gates one selected-frequency readout column.  Each value names
+ * the same condition the matching graph renderer evaluates, so the popup bar
+ * shows exactly the traces the graph draws. */
+typedef enum {
+  FP_FIELD_ALWAYS,
+  FP_FIELD_IF_NETGAIN,
+  FP_FIELD_IF_NO_NETGAIN,
+  FP_FIELD_IF_S11,
+  FP_FIELD_IF_ANT_TEMP_VIEW,
+  FP_FIELD_IF_NO_ANT_TEMP_VIEW,
+} fp_field_cond_t;
+
+/* One readout column: a measurement field, its display gate, its numeric
+ * format, and a trailing unit.  A value below invalid_min renders as an em
+ * dash so sentinel results (-1, -999) read as unavailable, not as numbers. */
+typedef struct {
+  int             meas_idx;
+  fp_field_cond_t cond;
+  const char     *fmt;
+  const char     *unit;
+  double          invalid_min;
+} fp_readout_field_t;
+
+/* Leading column shared by every popup bar: the selected frequency. */
+static const fp_readout_field_t fp_readout_freq =
+  { MEAS_MHZ, FP_FIELD_ALWAYS, "%.3f", "", -1e30 };
+
+static const fp_readout_field_t fp_rf_gain[] = {
+  { MEAS_GAIN_MAX, FP_FIELD_ALWAYS,        "%.2f", " dBi", -1e30 },
+  { MEAS_GAIN_NET, FP_FIELD_IF_NETGAIN,    "%.2f", " dBi", -1e30 },
+  { MEAS_FB_RATIO, FP_FIELD_IF_NO_NETGAIN, "%.2f", " dB",  0.0   },
+  { -1, FP_FIELD_ALWAYS, NULL, NULL, 0.0 },
+};
+
+static const fp_readout_field_t fp_rf_gain_dir[] = {
+  { MEAS_GAIN_THETA, FP_FIELD_ALWAYS, "%.1f", "°", -1e30 },
+  { MEAS_GAIN_PHI,   FP_FIELD_ALWAYS, "%.1f", "°", -1e30 },
+  { -1, FP_FIELD_ALWAYS, NULL, NULL, 0.0 },
+};
+
+static const fp_readout_field_t fp_rf_viewer[] = {
+  { MEAS_GAIN_VIEWER,     FP_FIELD_ALWAYS,     "%.2f", " dBi", -1e30 },
+  { MEAS_GAIN_VIEWER_NET, FP_FIELD_IF_NETGAIN, "%.2f", " dBi", -1e30 },
+  { -1, FP_FIELD_ALWAYS, NULL, NULL, 0.0 },
+};
+
+static const fp_readout_field_t fp_rf_vswr[] = {
+  { MEAS_VSWR, FP_FIELD_ALWAYS, "%.2f", "",    -1e30 },
+  { MEAS_S11,  FP_FIELD_IF_S11, "%.2f", " dB", -1e30 },
+  { -1, FP_FIELD_ALWAYS, NULL, NULL, 0.0 },
+};
+
+static const fp_readout_field_t fp_rf_zrlzim[] = {
+  { MEAS_ZREAL, FP_FIELD_ALWAYS, "%.1f", " Ω", -1e30 },
+  { MEAS_ZIMAG, FP_FIELD_ALWAYS, "%.1f", " Ω", -1e30 },
+  { -1, FP_FIELD_ALWAYS, NULL, NULL, 0.0 },
+};
+
+static const fp_readout_field_t fp_rf_zmgzph[] = {
+  { MEAS_ZMAG,   FP_FIELD_ALWAYS, "%.1f", " Ω", -1e30 },
+  { MEAS_ZPHASE, FP_FIELD_ALWAYS, "%.1f", "°",  -1e30 },
+  { -1, FP_FIELD_ALWAYS, NULL, NULL, 0.0 },
+};
+
+static const fp_readout_field_t fp_rf_smith[] = {
+  { MEAS_ZREAL, FP_FIELD_ALWAYS, "%.1f", " Ω", -1e30 },
+  { MEAS_ZIMAG, FP_FIELD_ALWAYS, "%.1f", " Ω", -1e30 },
+  { MEAS_VSWR,  FP_FIELD_ALWAYS, "%.2f", "",    -1e30 },
+  { -1, FP_FIELD_ALWAYS, NULL, NULL, 0.0 },
+};
+
+static const fp_readout_field_t fp_rf_ant_temp[] = {
+  { MEAS_GT,           FP_FIELD_ALWAYS,               "%.1f", " dB", -998.0 },
+  { MEAS_ANT_TEMP,     FP_FIELD_IF_ANT_TEMP_VIEW,     "%.0f", " K",  0.0    },
+  { MEAS_ANT_TEMP_TOT, FP_FIELD_IF_NO_ANT_TEMP_VIEW,  "%.0f", " K",  0.0    },
+  { -1, FP_FIELD_ALWAYS, NULL, NULL, 0.0 },
+};
+
+/* Per-graph readout field set, indexed by fp_panel_t.  This is the one place
+ * naming which measurement values each popup graph displays. */
+static const fp_readout_field_t *const fp_panel_readout[FP_PANEL_COUNT] = {
+  [FP_PANEL_GAIN]     = fp_rf_gain,
+  [FP_PANEL_GAIN_DIR] = fp_rf_gain_dir,
+  [FP_PANEL_VIEWER]   = fp_rf_viewer,
+  [FP_PANEL_VSWR]     = fp_rf_vswr,
+  [FP_PANEL_ZRLZIM]   = fp_rf_zrlzim,
+  [FP_PANEL_ZMGZPH]   = fp_rf_zmgzph,
+  [FP_PANEL_SMITH]    = fp_rf_smith,
+  [FP_PANEL_ANT_TEMP] = fp_rf_ant_temp,
+};
+
+/* True when the setting gating @cond currently selects its column.  Each arm
+ * mirrors the condition its graph renderer reads so bar and graph agree. */
+  static gboolean
+fp_field_cond_active(fp_field_cond_t cond)
+{
+  switch( cond )
+  {
+    case FP_FIELD_ALWAYS:              return TRUE;
+    case FP_FIELD_IF_NETGAIN:          return isFlagSet(PLOT_NETGAIN);
+    case FP_FIELD_IF_NO_NETGAIN:       return isFlagClear(PLOT_NETGAIN);
+    case FP_FIELD_IF_S11:              return rc_config.freqplots_s11 != 0;
+    case FP_FIELD_IF_ANT_TEMP_VIEW:    return rc_config.freqplots_show_ant_temp != 0;
+    case FP_FIELD_IF_NO_ANT_TEMP_VIEW: return rc_config.freqplots_show_ant_temp == 0;
+  }
+
+  BUG("fp_field_cond_active: unhandled cond %d\n", cond);
+  return FALSE;
+}
+
+/* Number of readout columns a popup of @filter shows: a leading frequency
+ * column plus its per-graph field set, clamped to the widget array bound. */
+  static int
+fp_readout_field_count(fp_panel_t filter)
+{
+  const fp_readout_field_t *f = fp_panel_readout[filter];
+  int n = 1;
+
+  while( f != NULL && f->meas_idx >= 0 ) { n++; f++; }
+
+  if( n > FP_READOUT_MAX )
+  {
+    BUG("fp_readout_field_count: field set exceeds FP_READOUT_MAX\n");
+    n = FP_READOUT_MAX;
+  }
+
+  return n;
+}
+
+/* Resolve combined readout column @i for a popup of @filter: column 0 is the
+ * frequency, the rest follow the per-graph field set. */
+  static const fp_readout_field_t *
+fp_readout_field_at(fp_panel_t filter, int i)
+{
+  if( i == 0 )
+    return &fp_readout_freq;
+
+  return &fp_panel_readout[filter][i - 1];
+}
+
 /* True when @panel should emit for @v: its data precondition holds and either
  * the view pins this single graph (popup) or the main-window toggle selects it
  * (primary).  A popup thus renders its graph even when the matching toggle is
@@ -309,6 +449,23 @@ fmhz_within_display_range( double fmhz )
 
 /*-----------------------------------------------------------------------*/
 
+/* Step index the green frequency line marks: calc_data.freq_step, clamped to
+ * the extra custom-frequency slot at steps_total (xnec2.c user_set_frequency).
+ * Returns -1 when no step is selected, so callers skip their readout. */
+  static int
+fp_selected_fstep( void )
+{
+  int fstep = calc_data.freq_step;
+
+  if( fstep < 0 )
+    return -1;
+
+  if( fstep >= calc_data.steps_total )
+    fstep = calc_data.steps_total;
+
+  return fstep;
+}
+
 /* Display_Frequency_Data()
  *
  * Displays freq dependent data (gain, impedance etc)
@@ -325,14 +482,10 @@ Display_Frequency_Data( void )
 
   if( isFlagClear(PLOT_ENABLED) ) return;
 
-  /* Limit freq stepping to freq_steps FIXME */
-  fstep = calc_data.freq_step;
+  fstep = fp_selected_fstep();
 
-  if (fstep < 0)
-	  return;
-
-  if( fstep >= calc_data.steps_total )
-    fstep = calc_data.steps_total;
+  if( fstep < 0 )
+    return;
 
   meas_calc(&meas, fstep);
 
@@ -397,6 +550,110 @@ Display_Frequency_Data( void )
           freqplots_window_builder, "freqplots_gt_entry")), txt );
 
 } /* Display_Frequency_Data() */
+
+/*-----------------------------------------------------------------------*/
+
+/* Format readout column @f from measurement @m into @out.  A value below the
+ * field's invalid_min renders as an em dash with the unit so sentinel results
+ * read as unavailable. */
+  static void
+fp_readout_format(const fp_readout_field_t *f, measurement_t *m,
+    char *out, int outlen)
+{
+  double val = m->a[f->meas_idx];
+
+  if( val < f->invalid_min )
+  {
+    snprintf( out, outlen, "—%s", f->unit );
+    return;
+  }
+
+  char num[32];
+  snprintf( num, sizeof(num), f->fmt, val );
+  snprintf( out, outlen, "%s%s", num, f->unit );
+}
+
+/* freqplots_readout_bar_new()
+ *
+ * Build a popup's selected-frequency readout bar: one cell per displayed
+ * column, each a bold name label from meas_display_names paired with a value
+ * label refreshed by freqplots_update_readout.  Stores cell and value widgets
+ * in the view so the per-draw update can set text and toggle visibility.
+ */
+  GtkWidget *
+freqplots_readout_bar_new(freqplots_view_t *v)
+{
+  GtkWidget *bar = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 12 );
+  int i, n;
+
+  gtk_container_set_border_width( GTK_CONTAINER(bar), 4 );
+
+  n = fp_readout_field_count( v->filter );
+
+  for( i = 0; i < n; i++ )
+  {
+    const fp_readout_field_t *f = fp_readout_field_at( v->filter, i );
+    GtkWidget *cell = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 4 );
+    GtkWidget *name = gtk_label_new( NULL );
+    GtkWidget *val  = gtk_label_new( "—" );
+    char markup[96];
+
+    snprintf( markup, sizeof(markup), "<b>%s:</b>",
+        _(meas_display_names[f->meas_idx]) );
+    gtk_label_set_markup( GTK_LABEL(name), markup );
+
+    gtk_box_pack_start( GTK_BOX(cell), name, FALSE, FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX(cell), val,  FALSE, FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX(bar),  cell, FALSE, FALSE, 0 );
+
+    v->readout_field[i] = cell;
+    v->readout_value[i] = val;
+  }
+
+  v->readout_n = n;
+
+  return bar;
+}
+
+/* freqplots_update_readout()
+ *
+ * Refresh a popup's readout bar from the selected-frequency measurement.
+ * Each column is shown only when its gating setting is active, so toggling a
+ * graph option (net gain, S11, antenna-temperature view) adds or drops the
+ * matching value in step with the graph.  The selected step is calc_data.
+ * freq_step, identical to the value the green frequency line marks.
+ */
+  static void
+freqplots_update_readout(freqplots_view_t *v)
+{
+  measurement_t meas;
+  int fstep, i;
+
+  if( v->readout_n <= 0 )
+    return;
+
+  fstep = fp_selected_fstep();
+
+  if( fstep < 0 )
+    return;
+
+  meas_calc( &meas, fstep );
+
+  for( i = 0; i < v->readout_n; i++ )
+  {
+    const fp_readout_field_t *f = fp_readout_field_at( v->filter, i );
+    gboolean active = fp_field_cond_active( f->cond );
+    char txt[48];
+
+    gtk_widget_set_visible( v->readout_field[i], active );
+
+    if( !active )
+      continue;
+
+    fp_readout_format( f, &meas, txt, sizeof(txt) );
+    gtk_label_set_text( GTK_LABEL(v->readout_value[i]), txt );
+  }
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -560,8 +817,12 @@ _Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
   /* Flush all deposited segments depth-sorted, then paint deferred text */
   fp_render_flush( &fp );
 
-  /* Display freq data in entry widgets */
-  Display_Frequency_Data();
+  /* Refresh the selected-frequency readouts: the primary window's builder
+   * entry grid, or a popup's per-graph label bar. */
+  if( v->filter == FP_PANEL_ALL )
+    Display_Frequency_Data();
+  else
+    freqplots_update_readout( v );
 
 
 } /* Plot_Frequency_Data() */

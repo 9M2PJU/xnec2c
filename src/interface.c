@@ -266,8 +266,15 @@ create_freqplots_popup_window( freqplots_view_t *view, const char *graph_name )
   snprintf( title, sizeof(title), _("xnec2c %s: %s"), graph_name, subject );
   gtk_window_set_title( GTK_WINDOW(win), title );
 
+  /* Stack the selected-frequency readout bar above the drawing area so the
+   * popup shows its graph's metric values by name. */
+  GtkWidget *vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
+  gtk_container_add( GTK_CONTAINER(win), vbox );
+  gtk_box_pack_start( GTK_BOX(vbox),
+      freqplots_readout_bar_new( view ), FALSE, FALSE, 0 );
+
   da = gtk_drawing_area_new();
-  gtk_container_add( GTK_CONTAINER(win), da );
+  gtk_box_pack_start( GTK_BOX(vbox), da, TRUE, TRUE, 0 );
   gtk_widget_add_events( da,
       GDK_BUTTON_PRESS_MASK | GDK_SCROLL_MASK |
       GDK_BUTTON_MOTION_MASK );
@@ -288,6 +295,8 @@ create_freqplots_popup_window( freqplots_view_t *view, const char *graph_name )
       G_CALLBACK(on_freqplots_drawingarea_motion_notify_event), NULL );
   g_signal_connect( win, "destroy",
       G_CALLBACK(on_freqplots_popup_destroy), view );
+  g_signal_connect( win, "key-press-event",
+      G_CALLBACK(on_freqplots_popup_key_press_event), NULL );
 
   return( win );
 }

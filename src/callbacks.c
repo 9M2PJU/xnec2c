@@ -1737,6 +1737,24 @@ on_freqplots_popup_destroy(
   freqplots_close_panel( v->filter );
 }
 
+/* Ctrl+W closes a frequency-plots popup window; the window's destroy handler
+ * then releases its view. */
+  gboolean
+on_freqplots_popup_key_press_event(
+    GtkWidget       *widget,
+    GdkEventKey     *event,
+    gpointer         user_data)
+{
+  if( (event->keyval == GDK_KEY_w) &&
+      (event->state & GDK_CONTROL_MASK) )
+  {
+    gtk_widget_destroy( widget );
+    return( TRUE );
+  }
+
+  return( FALSE );
+}
+
   void
 on_rdpattern_window_destroy(
     GObject       *object,

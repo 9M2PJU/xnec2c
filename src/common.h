@@ -1069,6 +1069,10 @@ typedef struct {
 	uint64_t valid;
 } fr_plot_t;
 
+/* Upper bound on selected-frequency readout columns per popup: a leading
+ * frequency column plus the largest per-graph field set. */
+#define FP_READOUT_MAX 6
+
 /* Per-window render and input context for the frequency plots.  The primary
  * window is the sole persistent instance; popups are heap instances holding a
  * single filtered graph.  Only genuinely per-window divergent state lives
@@ -1109,6 +1113,13 @@ typedef struct {
 	double      *smith_locus_freq;
 	int          smith_locus_n;
 	gboolean     smith_locus_valid;
+
+	// Popup selected-frequency readout bar: one cell box and its value label
+	// per displayed field, refreshed each draw.  readout_n is 0 for the
+	// primary view, which uses the builder entry grid instead.
+	GtkWidget   *readout_field[FP_READOUT_MAX];
+	GtkWidget   *readout_value[FP_READOUT_MAX];
+	int          readout_n;
 } freqplots_view_t;
 
 /* My addition, struct to hold data needed
@@ -1743,6 +1754,7 @@ GtkWidget *create_main_window(GtkBuilder **builder);
 GtkWidget *create_filechooserdialog(GtkBuilder **builder);
 GtkWidget *create_freqplots_window(GtkBuilder **builder);
 GtkWidget *create_freqplots_popup_window(freqplots_view_t *view, const char *graph_name);
+GtkWidget *freqplots_readout_bar_new(freqplots_view_t *view);
 GtkWidget *create_rdpattern_window(GtkBuilder **builder);
 GtkWidget *create_quit_dialog(GtkBuilder **builder);
 GtkWidget *create_error_dialog(GtkBuilder **builder);
@@ -1811,6 +1823,7 @@ void freqplots_close_panel(fp_panel_t panel);
 void freqplots_destroy_all_popups(void);
 gboolean freqplots_popup_open(fp_panel_t panel);
 void on_freqplots_popup_destroy(GtkWidget *widget, gpointer user_data);
+gboolean on_freqplots_popup_key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 /* radiation.c */
 void rdpat(void);
 /* rc_config.c */
