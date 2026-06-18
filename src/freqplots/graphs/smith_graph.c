@@ -34,16 +34,6 @@ typedef struct {
   double frac;
 } fp_locus_bracket_t;
 
-/* Impedance locus geometry captured on each render so a click on the chart
- * can resolve to a frequency.  The rectangle hit-tests the click; the per-step
- * pixel points and their frequencies map a pixel onto the nearest locus
- * position. */
-static GdkRectangle smith_locus_rect;
-static GdkPoint    *smith_locus_pts = NULL;
-static double      *smith_locus_freq = NULL;
-static int          smith_locus_n = 0;
-static gboolean     smith_locus_valid = FALSE;
-
   static void
 Calculate_Smith( double zr, double zi, double z0, double *re, double *im )
 {
@@ -367,7 +357,7 @@ smith_draw_perimeter( fp_render_t *fp, int x0, int y0, double half, double rh,
  * matched-point marker at the chart centre.
  */
   static void
-smith_draw_grid( fp_render_t *fp, int x0, int y0, int scale, fp_density_t density )
+smith_draw_grid( fp_render_t *fp, GtkWidget *area, int x0, int y0, int scale, fp_density_t density )
 {
   double  half   = scale / 2.0;
   rgb_f_t axis_c = SMITH_C_AXIS;
@@ -376,7 +366,7 @@ smith_draw_grid( fp_render_t *fp, int x0, int y0, int scale, fp_density_t densit
   double  dw;
   size_t  i;
 
-  pango_text_size( freqplots_drawingarea, &dw_px, &dh_px, "0" );
+  pango_text_size( area, &dw_px, &dh_px, "0" );
   dw = (double)dw_px;
 
   fp_add_line( fp, x0 - (int)half, y0, x0 + (int)half, y0,
@@ -449,7 +439,7 @@ smith_draw_legend( fp_render_t *fp, int x, int y_bottom, int line_h, float scale
  */
   void
 Plot_Graph_Smith(
-	fp_render_t *fp,
+	freqplots_view_t *v, fp_render_t *fp,
 	double *fa, double *fb, double *fc,
 	int nc, int posn )
 {
@@ -466,25 +456,25 @@ Plot_Graph_Smith(
   /* Pango layout size */
   static int layout_width, layout_height, width1, height;
 
-  pango_text_size(freqplots_drawingarea, &layout_width, &layout_height, "000000");
+  pango_text_size(v->drawingarea, &layout_width, &layout_height, "000000");
 
   /* Horizontal margin sized to the real-axis endpoint label plus a small gap
    * so the chart fills the width while ∞ Ω and 0 Ω stay off the window edge */
-  pango_text_size(freqplots_drawingarea, &ohm_w, &ohm_h, _("∞ Ω"));
+  pango_text_size(v->drawingarea, &ohm_w, &ohm_h, _("∞ Ω"));
 
   /* Available height for each graph.
    * (np=number of graphs to be plotted) */
-  plot_height = freqplots_height / calc_data.ngraph;
-  plot_y_position   = ( freqplots_height * posn) / calc_data.ngraph;
+  plot_height = v->height / v->ngraph;
+  plot_y_position   = ( v->height * posn) / v->ngraph;
 
   /* Plot box rectangle */
   plot_rect.x = ohm_w + 2;
   plot_rect.y = plot_y_position + 2;
-  plot_rect.width = freqplots_width - 2 * ( ohm_w + 2 );
+  plot_rect.width = v->width - 2 * ( ohm_w + 2 );
   plot_rect.height = plot_height - 8 - 2 * layout_height;
 
   /* Reserve vertical space for the chart title row */
-  pango_text_size(freqplots_drawingarea, &width1, &height, _("Smith Chart") );
+  pango_text_size(v->drawingarea, &width1, &height, _("Smith Chart") );
   plot_rect.y += height;
 
   x0 = plot_rect.x + plot_rect.width  / 2;
@@ -498,10 +488,10 @@ Plot_Graph_Smith(
 
   /* Per-graph density resolved once: stroke widths halve and label sizes
    * shrink 1/n so stacked charts stay legible and proportional. */
-  fp_density_t density = fp_density_for( calc_data.ngraph );
+  fp_density_t density = fp_density_for( v->ngraph );
 
   /* Draw smith background grid */
-  smith_draw_grid( fp, x0, y0, scale, density );
+  smith_draw_grid( fp, v->drawingarea, x0, y0, scale, density );
 
   /* Corner overlays annotate the plot frame rather than the chart geometry,
    * so they hold base size regardless of how many graphs share the window;
@@ -555,16 +545,16 @@ Plot_Graph_Smith(
                      .z_mid = FP_Z_LEFT } );
 
   /* Capture the locus geometry so a chart click resolves to a frequency */
-  smith_locus_valid = FALSE;
+  v->smith_locus_valid = FALSE;
   if( nc > 0 )
   {
-    mem_realloc((void **)&smith_locus_pts,  (size_t)nc * sizeof(GdkPoint));
-    mem_realloc((void **)&smith_locus_freq, (size_t)nc * sizeof(double));
-    memcpy( smith_locus_pts,  points, (size_t)nc * sizeof(GdkPoint) );
-    memcpy( smith_locus_freq, fc,     (size_t)nc * sizeof(double) );
-    smith_locus_rect  = plot_rect;
-    smith_locus_n     = nc;
-    smith_locus_valid = TRUE;
+    mem_realloc((void **)&v->smith_locus_pts,  (size_t)nc * sizeof(GdkPoint));
+    mem_realloc((void **)&v->smith_locus_freq, (size_t)nc * sizeof(double));
+    memcpy( v->smith_locus_pts,  points, (size_t)nc * sizeof(GdkPoint) );
+    memcpy( v->smith_locus_freq, fc,     (size_t)nc * sizeof(double) );
+    v->smith_locus_rect  = plot_rect;
+    v->smith_locus_n     = nc;
+    v->smith_locus_valid = TRUE;
   }
 
   mem_free((void **)&points);
@@ -596,6 +586,26 @@ Plot_Graph_Smith(
 
 /*-----------------------------------------------------------------------*/
 
+/* fp_smith_hit()
+ *
+ * True when the Smith chart was drawn and (px,py) lies within its bounding
+ * rectangle.  Sole owner of the chart hit-test, shared by the frequency
+ * resolver and the double-click popout query.
+ */
+  gboolean
+fp_smith_hit( freqplots_view_t *v, double px, double py )
+{
+  if( !v->smith_locus_valid || v->smith_locus_n <= 0 )
+    return FALSE;
+
+  return px >= v->smith_locus_rect.x
+      && px <= v->smith_locus_rect.x + v->smith_locus_rect.width
+      && py >= v->smith_locus_rect.y
+      && py <= v->smith_locus_rect.y + v->smith_locus_rect.height;
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* fp_smith_freq_at_pixel()
  *
  * Resolves a click on the Smith chart to a frequency on the impedance locus
@@ -606,31 +616,25 @@ Plot_Graph_Smith(
  * interpolated by the projection fraction.
  */
   gboolean
-fp_smith_freq_at_pixel( double px, double py, gboolean snap_to_step, double *fmhz )
+fp_smith_freq_at_pixel( freqplots_view_t *v, double px, double py, gboolean snap_to_step, double *fmhz )
 {
   int idx;
 
-  if( !smith_locus_valid || smith_locus_n <= 0 )
-    return FALSE;
-
-  if(    px < smith_locus_rect.x
-      || px > smith_locus_rect.x + smith_locus_rect.width
-      || py < smith_locus_rect.y
-      || py > smith_locus_rect.y + smith_locus_rect.height )
+  if( !fp_smith_hit(v, px, py) )
     return FALSE;
 
   /* Secondary click: nearest sweep-step vertex by pixel distance */
   if( snap_to_step )
   {
     int    best = 0;
-    double dx = px - smith_locus_pts[0].x;
-    double dy = py - smith_locus_pts[0].y;
+    double dx = px - v->smith_locus_pts[0].x;
+    double dy = py - v->smith_locus_pts[0].y;
     double best_d2 = dx * dx + dy * dy;
 
-    for( idx = 1; idx < smith_locus_n; idx++ )
+    for( idx = 1; idx < v->smith_locus_n; idx++ )
     {
-      dx = px - smith_locus_pts[idx].x;
-      dy = py - smith_locus_pts[idx].y;
+      dx = px - v->smith_locus_pts[idx].x;
+      dy = py - v->smith_locus_pts[idx].y;
       double d2 = dx * dx + dy * dy;
       if( dl_flt(d2, best_d2) )
       {
@@ -639,14 +643,14 @@ fp_smith_freq_at_pixel( double px, double py, gboolean snap_to_step, double *fmh
       }
     }
 
-    *fmhz = smith_locus_freq[best];
+    *fmhz = v->smith_locus_freq[best];
     return TRUE;
   }
 
   /* Single point: no segment to project onto */
-  if( smith_locus_n == 1 )
+  if( v->smith_locus_n == 1 )
   {
-    *fmhz = smith_locus_freq[0];
+    *fmhz = v->smith_locus_freq[0];
     return TRUE;
   }
 
@@ -656,12 +660,12 @@ fp_smith_freq_at_pixel( double px, double py, gboolean snap_to_step, double *fmh
   double best_t = 0.0;
   double best_d2 = 0.0;
 
-  for( idx = 0; idx < smith_locus_n - 1; idx++ )
+  for( idx = 0; idx < v->smith_locus_n - 1; idx++ )
   {
-    double ax = smith_locus_pts[idx].x;
-    double ay = smith_locus_pts[idx].y;
-    double vx = smith_locus_pts[idx + 1].x - ax;
-    double vy = smith_locus_pts[idx + 1].y - ay;
+    double ax = v->smith_locus_pts[idx].x;
+    double ay = v->smith_locus_pts[idx].y;
+    double vx = v->smith_locus_pts[idx + 1].x - ax;
+    double vy = v->smith_locus_pts[idx + 1].y - ay;
     double len2 = vx * vx + vy * vy;
     double t = 0.0;
 
@@ -685,8 +689,8 @@ fp_smith_freq_at_pixel( double px, double py, gboolean snap_to_step, double *fmh
     }
   }
 
-  *fmhz = smith_locus_freq[best_i]
-      + best_t * ( smith_locus_freq[best_i + 1] - smith_locus_freq[best_i] );
+  *fmhz = v->smith_locus_freq[best_i]
+      + best_t * ( v->smith_locus_freq[best_i + 1] - v->smith_locus_freq[best_i] );
 
   return TRUE;
 

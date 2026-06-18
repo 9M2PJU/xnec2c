@@ -28,10 +28,8 @@
 
 #include <math.h>
 
-/* Per-frame accumulator, reused across frames, and the base Pango layout that
- * supplies the font for every text run; both persist until destroy. */
+/* Per-frame accumulator, reused across frames; persists until destroy. */
 static cairo_scenebuffer_t fp_sb;
-static PangoLayout        *fp_text_layout = NULL;
 
 /*-----------------------------------------------------------------------*/
 
@@ -39,37 +37,29 @@ static PangoLayout        *fp_text_layout = NULL;
  * fp_render_reset() - Begin a new frame
  * @fp: render handle to bind to @cr
  * @cr: active Cairo context for this frame
+ * @layout: caller-owned base font layout for this frame's text
  *
- * Creates the shared text layout on first use and binds it to the
- * scenebuffer so text primitives have a base font.
+ * Binds @layout to the scenebuffer so text primitives have a base font; the
+ * view owns the layout's lifetime, so this neither creates nor frees it.
  */
   void
-fp_render_reset(fp_render_t *fp, cairo_t *cr)
+fp_render_reset(fp_render_t *fp, cairo_t *cr, PangoLayout *layout)
 {
   fp->cr = cr;
 
-  if( fp_text_layout == NULL )
-    fp_text_layout = gtk_widget_create_pango_layout(freqplots_drawingarea, NULL);
-
   scenebuffer_reset(&fp_sb);
-  scenebuffer_set_text_layout(&fp_sb, fp_text_layout);
+  scenebuffer_set_text_layout(&fp_sb, layout);
 }
 
 /*-----------------------------------------------------------------------*/
 
 /**
- * fp_render_destroy() - Release the scenebuffer and text layout
+ * fp_render_destroy() - Release the scenebuffer
  */
   void
 fp_render_destroy(void)
 {
   scenebuffer_destroy(&fp_sb);
-
-  if( fp_text_layout != NULL )
-  {
-    g_object_unref(fp_text_layout);
-    fp_text_layout = NULL;
-  }
 }
 
 /*-----------------------------------------------------------------------*/
@@ -300,17 +290,15 @@ fp_render_flush(fp_render_t *fp)
 /*-----------------------------------------------------------------------*/
 
 /**
- * pango_text_size() - Measure a string in the freqplots drawing-area font
- * @widget: unused; the layout is always created against freqplots_drawingarea
- *          so all plot text shares one font metric source
+ * pango_text_size() - Measure a string in the rendering widget's font
+ * @widget: drawing area whose font supplies the text metric source
  */
   void
 pango_text_size(GtkWidget *widget, int *width, int *height, char *s)
 {
   PangoLayout *layout;
 
-  (void)widget;
-  layout = gtk_widget_create_pango_layout(freqplots_drawingarea, s);
+  layout = gtk_widget_create_pango_layout(widget, s);
   pango_layout_get_pixel_size(layout, width, height);
   g_object_unref(layout);
 }

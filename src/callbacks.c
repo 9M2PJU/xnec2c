@@ -723,6 +723,61 @@ on_main_rdpattern_activate(
 }
 
 
+/* One plot-select button bound to the graph type its detached popup shows. */
+typedef struct {
+  const char *id;     /* glade widget id of the plot-select toggle button */
+  fp_panel_t  panel;  /* graph type opened when the button is right-clicked */
+} freqplots_panel_button_t;
+
+/* Plot-select buttons paired with their popup graph types; the table is the
+ * single source mapping a main-window button to the graph its popup renders. */
+static const freqplots_panel_button_t freqplots_panel_buttons[] = {
+  { "freqplots_gmax_togglebutton",     FP_PANEL_GAIN     },
+  { "freqplots_gdir_togglebutton",     FP_PANEL_GAIN_DIR },
+  { "freqplots_gviewer_togglebutton",  FP_PANEL_VIEWER   },
+  { "freqplots_vswr_togglebutton",     FP_PANEL_VSWR     },
+  { "freqplots_zrlzim_togglebutton",   FP_PANEL_ZRLZIM   },
+  { "freqplots_zmgzph_togglebutton",   FP_PANEL_ZMGZPH   },
+  { "freqplots_smith_togglebutton",    FP_PANEL_SMITH    },
+  { "freqplots_ant_temp_togglebutton", FP_PANEL_ANT_TEMP },
+};
+
+/* Right-click a plot-select button to open that graph's detached popup; the
+ * panel travels as the connection's user data so one handler serves every
+ * button.  A GtkButton toggles only on the primary button, so the button's
+ * main-window selection state is left unchanged.  Other buttons fall through
+ * to the default toggle handler. */
+  static gboolean
+freqplots_panel_button_press_cb( GtkWidget *widget, GdkEventButton *event,
+    gpointer user_data )
+{
+  (void)widget;
+
+  if( event->button != 3 )
+    return FALSE;
+
+  freqplots_open_panel( (fp_panel_t)GPOINTER_TO_INT(user_data) );
+  return TRUE;
+}
+
+/* Wire each plot-select button's right-click to its popup opener. */
+  static void
+freqplots_connect_panel_buttons( GtkBuilder *builder )
+{
+  size_t i;
+
+  for( i = 0; i < G_N_ELEMENTS(freqplots_panel_buttons); i++ )
+  {
+    GtkWidget *btn = Builder_Get_Object( builder,
+        freqplots_panel_buttons[i].id );
+
+    g_signal_connect( btn, "button-press-event",
+        G_CALLBACK(freqplots_panel_button_press_cb),
+        GINT_TO_POINTER(freqplots_panel_buttons[i].panel) );
+  }
+}
+
+
   void
 on_main_freqplots_activate(
     GtkMenuItem     *menuitem,
@@ -744,8 +799,13 @@ on_main_freqplots_activate(
       }
 
       freqplots_window = create_freqplots_window( &freqplots_window_builder );
-      freqplots_drawingarea = Builder_Get_Object(
+      GtkWidget *fp_da = Builder_Get_Object(
           freqplots_window_builder, "freqplots_drawingarea" );
+      freqplots_main_view()->window      = freqplots_window;
+      freqplots_main_view()->drawingarea = fp_da;
+      freqplots_main_view()->filter      = FP_PANEL_ALL;
+      g_object_set_data( G_OBJECT(fp_da), "fp_view", freqplots_main_view() );
+      freqplots_connect_panel_buttons( freqplots_window_builder );
       Set_Window_Labels();
       calc_data.ngraph = 0;
 
@@ -755,9 +815,9 @@ on_main_freqplots_activate(
       gtk_spin_button_set_value( GTK_SPIN_BUTTON(spin), (gdouble)calc_data.zo );
 
       GtkAllocation alloc;
-      gtk_widget_get_allocation( freqplots_drawingarea, &alloc );
-      freqplots_width  = alloc.width;
-      freqplots_height = alloc.height;
+      gtk_widget_get_allocation( fp_da, &alloc );
+      freqplots_main_view()->width  = alloc.width;
+      freqplots_main_view()->height = alloc.height;
 
       /* Restore frequency plots window widgets state */
       if( rc_config.freqplots_gmax_togglebutton )
@@ -1363,9 +1423,9 @@ on_freqplots_save_activate(
       isFlagClear(PLOT_SELECT) )
     return;
 
-  saveas_drawingarea = freqplots_drawingarea;
-  saveas_width  = freqplots_width;
-  saveas_height = freqplots_height;
+  saveas_drawingarea = freqplots_main_view()->drawingarea;
+  saveas_width  = freqplots_main_view()->width;
+  saveas_height = freqplots_main_view()->height;
 
   /* Make file name from input file name,
    * to save frequency plots drawing */
@@ -1385,9 +1445,9 @@ on_freqplots_save_as_activate(
     gpointer         user_data)
 {
   char newfn[PATH_MAX];
-  saveas_drawingarea = freqplots_drawingarea;
-  saveas_width  = freqplots_width;
-  saveas_height = freqplots_height;
+  saveas_drawingarea = freqplots_main_view()->drawingarea;
+  saveas_width  = freqplots_main_view()->width;
+  saveas_height = freqplots_main_view()->height;
 
   /* Open file chooser to save frequency plots */
   SetFlag( IMAGE_SAVE );
@@ -1523,7 +1583,7 @@ on_freqplots_zo_spinbutton_value_changed(
   calc_data.zo = gtk_spin_button_get_value(spinbutton);
   if( isFlagSet(PLOT_ENABLED) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 
   gtk_spin_button_update( spinbutton );
@@ -1575,12 +1635,17 @@ on_freqplots_drawingarea_draw(
     cairo_t         *cr,
     gpointer         user_data)
 {
+  freqplots_view_t *view = g_object_get_data( G_OBJECT(widget), "fp_view" );
+
+  if( view == NULL )
+    return( FALSE );
+
   /* No redraws if new input pending */
   if( isFlagSet(INPUT_PENDING) )
     return( FALSE );
 
   /* Draw the frequency dependent data plots */
-  Plot_Frequency_Data( cr );
+  Plot_Frequency_Data( view, cr );
   return( TRUE );
 }
 
@@ -1591,8 +1656,13 @@ on_freqplots_drawingarea_configure_event(
     GdkEventConfigure *event,
     gpointer         user_data)
 {
-  freqplots_width  = event->width;
-  freqplots_height = event->height;
+  freqplots_view_t *view = g_object_get_data( G_OBJECT(widget), "fp_view" );
+
+  if( view == NULL )
+    return( FALSE );
+
+  view->width  = event->width;
+  view->height = event->height;
 
   return( TRUE );
 }
@@ -1604,7 +1674,24 @@ on_freqplots_drawingarea_button_press_event(
     GdkEventButton  *event,
     gpointer         user_data)
 {
-  Set_Frequency_On_Click( (GdkEvent*)event );
+  freqplots_view_t *view = g_object_get_data( G_OBJECT(widget), "fp_view" );
+
+  if( view == NULL )
+    return( FALSE );
+
+  /* Double-click detaches the clicked graph into its own popup window. */
+  if( event->type == GDK_2BUTTON_PRESS )
+  {
+    fp_panel_t panel = freqplots_panel_at( view, event->x, event->y );
+
+    if( panel != FP_PANEL_ALL )
+    {
+      freqplots_open_panel( panel );
+      return( TRUE );
+    }
+  }
+
+  Set_Frequency_On_Click( view, (GdkEvent*)event );
   return( TRUE );
 }
 
@@ -1614,8 +1701,12 @@ on_freqplots_drawingarea_scroll_event(
     GdkEvent        *event,
     gpointer         user_data)
 {
+  freqplots_view_t *view = g_object_get_data( G_OBJECT(widget), "fp_view" );
 
-  Set_Frequency_On_Click( event );
+  if( view == NULL )
+    return( FALSE );
+
+  Set_Frequency_On_Click( view, event );
   return TRUE;
 }
 
@@ -1625,8 +1716,25 @@ on_freqplots_drawingarea_motion_notify_event(
     GdkEventMotion  *event,
     gpointer         user_data)
 {
-  Set_Frequency_On_Click( (GdkEvent*)event );
+  freqplots_view_t *view = g_object_get_data( G_OBJECT(widget), "fp_view" );
+
+  if( view == NULL )
+    return( FALSE );
+
+  Set_Frequency_On_Click( view, (GdkEvent*)event );
   return( TRUE );
+}
+
+/* Popup teardown: release the heap view for this graph type.  GTK is already
+ * destroying the window, so only the registry slot and view are freed. */
+  void
+on_freqplots_popup_destroy(
+    GtkWidget       *widget,
+    gpointer         user_data)
+{
+  freqplots_view_t *v = user_data;
+
+  freqplots_close_panel( v->filter );
 }
 
   void
@@ -5865,7 +5973,7 @@ on_freqplots_min_max_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 }
 
@@ -5884,7 +5992,7 @@ on_freqplots_s11_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 }
 
@@ -5903,7 +6011,7 @@ on_freqplots_clamp_vswr_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 }
 
@@ -5919,7 +6027,7 @@ on_freqplots_show_ant_temp_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 }
 
@@ -5938,7 +6046,7 @@ on_freqplots_round_x_axis_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 }
 
@@ -5968,7 +6076,7 @@ on_freqplots_net_gain_activate(
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 }
 

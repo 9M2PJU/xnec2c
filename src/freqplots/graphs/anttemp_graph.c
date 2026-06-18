@@ -59,7 +59,7 @@ fp_ant_temp_render(fp_plot_ctx_t *ctx)
   else
     titles[2] = _("TA (K)");
 
-  fp_plot_panel(ctx, gt_buf, temp_buf, titles);
+  fp_plot_panel(ctx, gt_buf, temp_buf, titles, FP_PANEL_ANT_TEMP);
 
   return TRUE;
 }

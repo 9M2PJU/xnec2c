@@ -136,7 +136,6 @@ extern GtkWidget
 
 /* Frequency plots and save-as */
 extern GtkWidget
-  *freqplots_drawingarea,
   *saveas_drawingarea;
 
 extern GtkBuilder
@@ -174,7 +173,6 @@ extern GtkBuilder
 
 /* Drawing area widgets */
 extern GtkWidget
-  *freqplots_drawingarea,
   *rdpattern_drawingarea,
   *rdpattern_gl_area,
   *rdpattern_cairo_da;
@@ -185,13 +183,8 @@ extern GtkWidget *saveas_drawingarea;
 extern int
   structure_width,
   structure_height,
-  freqplots_width,
-  freqplots_height,
   rdpattern_width,
   rdpattern_height;
-
-/* memory for fr_plot_t data (defined in plot_freqdata.c) */
-extern fr_plot_t *fr_plots;
 
 /* Motion event handler id */
 extern gulong rdpattern_motion_handler;

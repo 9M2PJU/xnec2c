@@ -25,11 +25,6 @@
 
 #include <math.h>
 
-/* Layout-cache for window-resize detection across frames; reset to zero by
- * Plots_Window_Killed() in freqplots_input.c. */
-int fr_prev_width_available = 0;
-int fr_prev_ngraphs = 0;
-
 /* Plot_Graph()
  *
  * Plots graphs of two functions against a common variable
@@ -38,9 +33,9 @@ int fr_prev_ngraphs = 0;
  */
   void
 Plot_Graph(
-    fp_render_t *fp,
+    freqplots_view_t *v, fp_render_t *fp,
     double *y_left, double *y_right, double *x, int nx,
-    char *titles[], int posn)
+    char *titles[], int posn, fp_panel_t panel)
 {
 	// Pointer to the FR card's plot_rect
 	GdkRectangle *plot_rect = NULL;
@@ -68,7 +63,7 @@ Plot_Graph(
 		return;
 
 	// Get the pixel size of the scale text on left and right of the graph.
-	pango_text_size(freqplots_drawingarea,
+	pango_text_size(v->drawingarea,
 		&pad_x_scale_text,
 		&pad_y_bottom_scale_text, "1234.5");
 
@@ -99,7 +94,7 @@ Plot_Graph(
 	/* Available height for each graph.
 	* (calc_data.ngraph is the number of graphs to be plotted) */
 	plot_rect_height =
-		freqplots_height / calc_data.ngraph - (
+		v->height / v->ngraph - (
 			pad_y_title_text +
 			pad_y_px_above_scale +
 			pad_y_bottom_scale_text
@@ -116,7 +111,7 @@ Plot_Graph(
 
 	// Calculate the entire available width for plotting:
 	width_available =
-		(freqplots_width - (
+		(v->width - (
 			// 2x, one for each side, left and right:
 			2*pad_x_scale_text +
 			2*pad_x_px_after_scale +
@@ -128,16 +123,16 @@ Plot_Graph(
 
 
 	/* Draw titles */
-	plot_rect_y = (freqplots_height * posn) / calc_data.ngraph;
+	plot_rect_y = (v->height * posn) / v->ngraph;
 
 	fp_add_text(fp, pad_x_scale_text + pad_x_px_after_scale, plot_rect_y,
 		    1.0f, titles[0], JUSTIFY_LEFT, COLOR_MAGENTA);
 
-	fp_add_text(fp, freqplots_width / 2, plot_rect_y, 1.0f, titles[1],
+	fp_add_text(fp, v->width / 2, plot_rect_y, 1.0f, titles[1],
 		    JUSTIFY_CENTER, COLOR_YELLOW);
 
 	fp_add_text(fp,
-		    freqplots_width - (pad_x_scale_text + pad_x_px_after_scale),
+		    v->width - (pad_x_scale_text + pad_x_px_after_scale),
 		    plot_rect_y, 1.0f, titles[2], JUSTIFY_RIGHT, COLOR_CYAN);
 
 	// Increase the y position to account for the title text height above:
@@ -196,7 +191,7 @@ Plot_Graph(
 		Plot_Vertical_Scale(
 			fp,
 			COLOR_CYAN,
-			freqplots_width-pad_x_px_after_scale,
+			v->width-pad_x_px_after_scale,
 			plot_rect_y,
 			plot_rect_height,
 			max_y_right, min_y_right, n_horiz_scale);
@@ -208,7 +203,8 @@ Plot_Graph(
 	x_offset = pad_x_scale_text	+ pad_x_px_after_scale;
 	for (fr = 0; fr < calc_data.FR_cards; fr++)
 	{
-		fr_plot_t *fr_plot = get_fr_plot(posn, fr);
+		fr_plot_t *fr_plot = get_fr_plot(v, posn, fr);
+		fr_plot->panel_type = panel;
 		plot_rect = &fr_plot->plot_rect;
 
 		// Set the y/height values from above:
@@ -224,14 +220,14 @@ Plot_Graph(
 			plot_rect->width = width_available / calc_data.FR_cards;
 
 		// Resize and sync plots if the window size or number of plots have changed.
-		if (fr_prev_width_available != width_available ||
+		if (v->prev_width_available != width_available ||
 			plot_rect->width > width_available ||
 			plot_rect->width < 0) {
 				plot_rect->width = width_available / calc_data.FR_cards;
-				fr_plot_sync_widths(fr_plot);
+				fr_plot_sync_widths(v, fr_plot);
 		}
-		else if (fr_prev_ngraphs != calc_data.ngraph) {
-			fr_plot_sync_widths(fr_plot);
+		else if (v->prev_ngraphs != v->ngraph) {
+			fr_plot_sync_widths(v, fr_plot);
 		}
 
 		// Adjust the vertical scale based on the width (assigned above).
@@ -329,6 +325,6 @@ Plot_Graph(
 		offset += fr_plot->freq_loop_data->freq_steps;
 	}
 
-	fr_prev_width_available = width_available;
-	fr_prev_ngraphs = calc_data.ngraph;
+	v->prev_width_available = width_available;
+	v->prev_ngraphs = v->ngraph;
 }

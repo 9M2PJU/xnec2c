@@ -97,7 +97,7 @@ Plot_Select( GtkToggleButton *togglebutton, unsigned long long int flag )
   /* Trigger a redraw of frequency plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 
 } /* Plot_Select() */

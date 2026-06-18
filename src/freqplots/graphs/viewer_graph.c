@@ -55,12 +55,12 @@ fp_viewer_render(fp_plot_ctx_t *ctx)
     fp_fill_meas_columns( ctx, &col, 1 );
 
     titles[2] = _("Net gain dBi");
-    fp_plot_panel(ctx, vgain, netgain, titles);
+    fp_plot_panel(ctx, vgain, netgain, titles, FP_PANEL_VIEWER);
   }
   else
   {
     titles[2] = "        ";
-    fp_plot_panel(ctx, vgain, NULL, titles);
+    fp_plot_panel(ctx, vgain, NULL, titles, FP_PANEL_VIEWER);
   }
 
   return TRUE;

@@ -632,7 +632,7 @@ Open_Input_File( gpointer arg )
 
   calc_data.freq_step = -1;
 
-  mem_free((void **)&fr_plots);
+  mem_free((void **)&freqplots_main_view()->fr_plots);
 
   Open_File( &input_fp, rc_config.input_file, "r");
 

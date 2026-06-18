@@ -1031,7 +1031,17 @@ typedef struct
 
 } freq_loop_data_t;
 
-/* 
+/* Graph-type identity keying each frequency-plot panel.  The numbered members
+ * follow dispatch-emission order; FP_PANEL_ALL is the primary window's
+ * all-panels sentinel and FP_PANEL_COUNT bounds the per-type popup registry. */
+typedef enum {
+	FP_PANEL_ALL = -1,
+	FP_PANEL_GAIN = 0, FP_PANEL_GAIN_DIR, FP_PANEL_VIEWER, FP_PANEL_VSWR,
+	FP_PANEL_ZRLZIM, FP_PANEL_ZMGZPH, FP_PANEL_SMITH, FP_PANEL_ANT_TEMP,
+	FP_PANEL_COUNT
+} fp_panel_t;
+
+/*
  * fr_plot_t structure and related defines used in plot_freqdata.c
  */
 #define FR_PLOT_T_MAGIC 				0xc2bca3083893e65eULL
@@ -1042,6 +1052,9 @@ typedef struct {
 	int posn;			// Position in the frequency plots
 	int fr;				// index into calc_data.freq_loop_data[fr]
 
+	// Which graph type this panel renders, written during draw
+	fp_panel_t panel_type;
+
 	// Pointer to &calc_data.freq_loop_data[fr]
 	freq_loop_data_t *freq_loop_data;
 
@@ -1050,11 +1063,53 @@ typedef struct {
 	double min_fscale, max_fscale;
 
 	// Because we are using realloc it is hard to know if the structure has
-	// been initialized or if it needs to be set to sane values.  The 
+	// been initialized or if it needs to be set to sane values.  The
 	// value will equal 0xc2bca3083893e65e (just a 64-bit random number) if
 	// it is valid.
-	uint64_t valid; 
+	uint64_t valid;
 } fr_plot_t;
+
+/* Per-window render and input context for the frequency plots.  The primary
+ * window is the sole persistent instance; popups are heap instances holding a
+ * single filtered graph.  Only genuinely per-window divergent state lives
+ * here; measurement and frequency state stay global and shared. */
+typedef struct {
+	// focus and destroy target
+	GtkWidget *window;
+
+	// render target, hit-test, font source
+	GtkWidget *drawingarea;
+
+	// base font source for text runs, 1:1 with drawingarea
+	PangoLayout *text_layout;
+
+	// this area's pixel size
+	int        width, height;
+
+	// this window's layout and hit-test table
+	fr_plot_t *fr_plots;
+
+	// resize caches
+	int        prev_width_available, prev_ngraphs;
+
+	// primary: calc_data.ngraph; popup: 1
+	int        ngraph;
+
+	// fp_panel_t shown, or FP_PANEL_ALL
+	fp_panel_t filter;
+
+	// Click deferred until this view has a layout table; replayed from the
+	// draw path against this view's own geometry.
+	GdkEvent  *prev_click_event;
+
+	// Smith-chart locus geometry captured at draw, read on click; per-view so
+	// each window resolves chart clicks against its own geometry.
+	GdkRectangle smith_locus_rect;
+	GdkPoint    *smith_locus_pts;
+	double      *smith_locus_freq;
+	int          smith_locus_n;
+	gboolean     smith_locus_valid;
+} freqplots_view_t;
 
 /* My addition, struct to hold data needed
  * to execute various calculations requested
@@ -1687,6 +1742,7 @@ GtkWidget *Builder_Get_Object(GtkBuilder *builder, const gchar *name);
 GtkWidget *create_main_window(GtkBuilder **builder);
 GtkWidget *create_filechooserdialog(GtkBuilder **builder);
 GtkWidget *create_freqplots_window(GtkBuilder **builder);
+GtkWidget *create_freqplots_popup_window(freqplots_view_t *view, const char *graph_name);
 GtkWidget *create_rdpattern_window(GtkBuilder **builder);
 GtkWidget *create_quit_dialog(GtkBuilder **builder);
 GtkWidget *create_error_dialog(GtkBuilder **builder);
@@ -1744,9 +1800,17 @@ void Write_Optimizer_Data(void);
 void *Optimizer_Output(void *arg);
 int opt_have_files_to_save(void);
 /* freqplots */
-void Plot_Frequency_Data(cairo_t *cr);
+void Plot_Frequency_Data(freqplots_view_t *view, cairo_t *cr);
 void Plots_Window_Killed(void);
-void Set_Frequency_On_Click(GdkEvent *event);
+void Set_Frequency_On_Click(freqplots_view_t *view, GdkEvent *event);
+fp_panel_t freqplots_panel_at(freqplots_view_t *view, double px, double py);
+freqplots_view_t *freqplots_main_view(void);
+void freqplots_redraw_all(gboolean force);
+void freqplots_open_panel(fp_panel_t panel);
+void freqplots_close_panel(fp_panel_t panel);
+void freqplots_destroy_all_popups(void);
+gboolean freqplots_popup_open(fp_panel_t panel);
+void on_freqplots_popup_destroy(GtkWidget *widget, gpointer user_data);
 /* radiation.c */
 void rdpat(void);
 /* rc_config.c */
@@ -1794,6 +1858,7 @@ guint g_idle_add_once(GSourceOnceFunc function, gpointer data);
 #endif
 guint g_idle_add_once_sync(GSourceOnceFunc function, gpointer data);
 void print_backtrace(char *msg);
+void Window_Title_Subject(char *buf, size_t len);
 void Update_Window_Titles(void);
 
 /* xnec2c.c */

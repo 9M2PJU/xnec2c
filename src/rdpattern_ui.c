@@ -632,10 +632,12 @@ Queue_Radiation_Redraw(void)
   /* Trigger a redraw of plots drawingarea if doing "viewer" gain
    * or antenna temperature (noise env / elevation changes affect Ta) */
   if( isFlagSet(PLOT_ENABLED) &&
-      (isFlagSet(PLOT_GVIEWER) || isFlagSet(PLOT_ANT_TEMP)) &&
+      (isFlagSet(PLOT_GVIEWER) || isFlagSet(PLOT_ANT_TEMP) ||
+       freqplots_popup_open(FP_PANEL_VIEWER) ||
+       freqplots_popup_open(FP_PANEL_ANT_TEMP)) &&
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 
 } /* Queue_Radiation_Redraw() */

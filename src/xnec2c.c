@@ -732,7 +732,7 @@ freq_step_update_ui( int new_step, gboolean force )
     gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(
         freqplots_window_builder, "freqplots_fmhz_entry")), txt );
 
-    xnec2_widget_queue_draw( freqplots_drawingarea, force );
+    freqplots_redraw_all(force);
   }
 
   /* Vertex colors are baked per freq_step; invalidate so the next render

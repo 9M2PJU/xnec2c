@@ -20,10 +20,13 @@
 #include "../measurements.h"
 #include "freqplots_render.h"
 
-/* Plot-rectangle accessors and width sync (freqplots_core.c) */
-fr_plot_t    *get_fr_plot(int posn, int fr);
-GdkRectangle *get_plot_rect(int posn, int fr);
-void          fr_plot_sync_widths(fr_plot_t *fr_plot);
+/* Per-view plot-table init, rectangle accessors, and width sync
+ * (freqplots_core.c) */
+void          fr_plots_init(freqplots_view_t *v);
+fr_plot_t    *get_fr_plot(freqplots_view_t *v, int posn, int fr);
+GdkRectangle *get_plot_rect(freqplots_view_t *v, int posn, int fr);
+void          fr_plot_sync_widths(freqplots_view_t *v, fr_plot_t *fr_plot);
+fr_plot_t    *fr_plot_at(freqplots_view_t *v, double px, double py);
 void          print_fr_plot(fr_plot_t *p);
 
 /* Scale fitting and scale labels (freqplots_scale.c) */
@@ -51,21 +54,26 @@ void Draw_Graph(fp_render_t *fp,
     int nval, int nval_max, int side);
 
 /* Plot types (freqplots_xy.c, graphs/smith_graph.c) */
-void Plot_Graph(fp_render_t *fp,
+void Plot_Graph(freqplots_view_t *v, fp_render_t *fp,
     double *y_left, double *y_right, double *x, int nx,
-    char *titles[], int posn);
-void Plot_Graph_Smith(fp_render_t *fp,
+    char *titles[], int posn, fp_panel_t panel);
+void Plot_Graph_Smith(freqplots_view_t *v, fp_render_t *fp,
     double *fa, double *fb, double *fc, int nc, int posn);
 
 /* Resolve a Smith-chart click to a locus frequency; FALSE when the chart is
  * not displayed or the click is outside it (graphs/smith_graph.c). */
-gboolean fp_smith_freq_at_pixel(double px, double py,
+gboolean fp_smith_freq_at_pixel(freqplots_view_t *v, double px, double py,
     gboolean snap_to_step, double *fmhz);
+
+/* True when the Smith chart is drawn and the pixel lies within its bounding
+ * rectangle (graphs/smith_graph.c). */
+gboolean fp_smith_hit(freqplots_view_t *v, double px, double py);
 
 /* Per-frame data shared with every dispatched plot renderer.  posn advances
  * as each renderer claims drawing-area panels. */
 typedef struct
 {
+  freqplots_view_t *view;         /* active render target for this frame */
   fp_render_t   *fp;              /* per-frame depth-buffer render handle */
   int           *valid_steps_map; /* compact step indices into save.* arrays */
   double        *fplot;           /* x-axis frequencies, one per valid step */
@@ -87,7 +95,9 @@ typedef struct
 void fp_fill_meas_columns(fp_plot_ctx_t *ctx,
     const fp_meas_column_t *cols, int ncols);
 void fp_plot_panel(fp_plot_ctx_t *ctx,
-    double *left, double *right, char *titles[3]);
+    double *left, double *right, char *titles[3], fp_panel_t panel);
+void fp_plot_smith_panel(fp_plot_ctx_t *ctx,
+    double *fa, double *fb, double *fc, int nc, fp_panel_t panel);
 
 /* Per-type plot renderers; the enabled predicate gates the accumulating
  * render pass.  Defined one type per file (freqplots_<type>.c). */
@@ -104,12 +114,7 @@ gboolean fp_ant_temp_render(fp_plot_ctx_t *ctx);
 
 /* Click-event state shared between the data and input modules
  * (freqplots_input.c) */
-void      save_click_event(GdkEvent *e);
-GdkEvent *freqplots_pending_click(void);
-
-/* Layout-cache for window-resize detection in Plot_Graph; owned by
- * freqplots_xy.c, reset by Plots_Window_Killed() in freqplots_input.c. */
-extern int fr_prev_width_available;
-extern int fr_prev_ngraphs;
+void      save_click_event(freqplots_view_t *v, GdkEvent *e);
+GdkEvent *freqplots_pending_click(freqplots_view_t *v);
 
 #endif /* FREQPLOTS_INTERNAL_H */

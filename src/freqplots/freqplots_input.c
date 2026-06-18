@@ -25,8 +25,6 @@
 
 #include <string.h>
 
-static GdkEvent *prev_click_event = NULL;
-
 /* Plots_Window_Killed()
  *
  * Cleans up after the plots window is closed
@@ -34,14 +32,15 @@ static GdkEvent *prev_click_event = NULL;
   void
 Plots_Window_Killed( void )
 {
-  // Reset this for next time otherwise width_available rescales in Plot_Graph will not work.
-  fr_prev_width_available = 0;
-  fr_prev_ngraphs = 0;
+  freqplots_view_t *v = freqplots_main_view();
+
+  // Close every popup before tearing down the primary view so no popup
+  // references freed primary state.
+  freqplots_destroy_all_popups();
 
   if( isFlagSet(PLOT_ENABLED) )
   {
     ClearFlag( PLOT_ENABLED );
-    freqplots_drawingarea = NULL;
     g_object_unref( freqplots_window_builder );
     freqplots_window_builder = NULL;
 
@@ -51,11 +50,15 @@ Plots_Window_Killed( void )
   freqplots_window = NULL;
   kill_window = NULL;
 
-  if (fr_plots != NULL)
-	  mem_free((void **)&fr_plots);
-
-  if (prev_click_event != NULL)
-	  mem_free((void **)&prev_click_event);
+  // Release heap tables, then zero the whole view so the resize caches
+  // (prev_*) restart and width_available rescales on the next open.
+  mem_free((void **)&v->fr_plots);
+  mem_free((void **)&v->smith_locus_pts);
+  mem_free((void **)&v->smith_locus_freq);
+  mem_free((void **)&v->prev_click_event);
+  if (v->text_layout != NULL)
+    g_object_unref(v->text_layout);
+  memset(v, 0, sizeof(*v));
 
   fp_render_destroy();
 
@@ -63,17 +66,17 @@ Plots_Window_Killed( void )
 
 /*-----------------------------------------------------------------------*/
 
-void save_click_event(GdkEvent *e)
+void save_click_event(freqplots_view_t *v, GdkEvent *e)
 {
-	if (prev_click_event == NULL)
-		mem_alloc((void **)&prev_click_event, sizeof(GdkEvent));
+	if (v->prev_click_event == NULL)
+		mem_alloc((void **)&v->prev_click_event, sizeof(GdkEvent));
 
-	memcpy(prev_click_event, e, sizeof(GdkEvent));
+	memcpy(v->prev_click_event, e, sizeof(GdkEvent));
 }
 
-GdkEvent *freqplots_pending_click(void)
+GdkEvent *freqplots_pending_click(freqplots_view_t *v)
 {
-	return prev_click_event;
+	return v->prev_click_event;
 }
 
 
@@ -82,7 +85,7 @@ GdkEvent *freqplots_pending_click(void)
  * Sets the current freq after click by user on plots drawingarea
  */
   void
-Set_Frequency_On_Click( GdkEvent *e)
+Set_Frequency_On_Click( freqplots_view_t *v, GdkEvent *e)
 {
   double fmhz = 0.0;
   int set_fmhz = 0, draw_freqplot = 0;
@@ -102,25 +105,14 @@ Set_Frequency_On_Click( GdkEvent *e)
   if (isFlagSet(SY_OPTIMIZER_ACTIVE))
 	  return;
 
-  if (fr_plots == NULL)
+  if (v->fr_plots == NULL)
   {
-	save_click_event(e);
+	save_click_event(v, e);
 	return;
   }
 
   // find the fr_plot structure that the mouse is within:
-  for (i = 0; i < calc_data.ngraph * calc_data.FR_cards; i++)
-  {
-	if (   button_event->x >= fr_plots[i].plot_rect.x
-		&& button_event->x <= fr_plots[i].plot_rect.x + fr_plots[i].plot_rect.width
-		&& button_event->y >= fr_plots[i].plot_rect.y
-		&& button_event->y <= fr_plots[i].plot_rect.y + fr_plots[i].plot_rect.height)
-	{
-		fr_plot = &fr_plots[i];
-		break;
-	}
-
-  }
+  fr_plot = fr_plot_at(v, button_event->x, button_event->y);
 
   // Decode the button, scroll direction, or button-drag state.
   button = 0;
@@ -184,7 +176,7 @@ Set_Frequency_On_Click( GdkEvent *e)
 
 	  draw_freqplot = 1;
 	  set_fmhz = 1;
-      xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+      freqplots_redraw_all(TRUE);
       break;
 
     case 2: /* Disable drawing of freq line */
@@ -210,11 +202,11 @@ Set_Frequency_On_Click( GdkEvent *e)
     case 5:  // scroll down
 		// If its the last plot than shrink/grow the previous:
 		if (fr_plot->fr == calc_data.FR_cards-1)
-			fr_adj = get_fr_plot(fr_plot->posn, fr_plot->fr-1);
+			fr_adj = get_fr_plot(v, fr_plot->posn, fr_plot->fr-1);
 
 		// Otherwise shink/grow the next:
 		else
-			fr_adj = get_fr_plot(fr_plot->posn, fr_plot->fr+1);
+			fr_adj = get_fr_plot(v, fr_plot->posn, fr_plot->fr+1);
 
 		// Abort if there is only one plot:
 		if (fr_adj == NULL)
@@ -243,7 +235,7 @@ Set_Frequency_On_Click( GdkEvent *e)
 		}
 
 		// Sync widths for all positions based on fr_plot:
-		fr_plot_sync_widths(fr_plot);
+		fr_plot_sync_widths(v, fr_plot);
 
 		draw_freqplot = 1;
 
@@ -255,9 +247,8 @@ Set_Frequency_On_Click( GdkEvent *e)
 
   } /* switch( button_event->button ) */
   }
-  else if (isFlagSet(PLOT_SMITH)
-      && (button == 1 || button == 2 || button == 3)
-      && fp_smith_freq_at_pixel(button_event->x, button_event->y,
+  else if ((button == 1 || button == 2 || button == 3)
+      && fp_smith_freq_at_pixel(v, button_event->x, button_event->y,
           button == 3, &fmhz))
   {
     /* Smith chart is not an x-axis panel; the click maps onto the locus.
@@ -272,13 +263,13 @@ Set_Frequency_On_Click( GdkEvent *e)
       draw_freqplot = 1;
       set_fmhz = 1;
       if (button == 1)
-        xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+        freqplots_redraw_all(TRUE);
     }
   }
   else
   {
 	  // no plot_rect selected for frequency line
-	save_click_event(e);
+	save_click_event(v, e);
 	  return;
   }
 
@@ -294,11 +285,28 @@ Set_Frequency_On_Click( GdkEvent *e)
   // If prev_click_event is set then we are being called from Plot_Frequency_Data()
   // to update fmhz so don't redraw because Plot_Frequency_Data() is going to draw
   // after we return.
-  if (draw_freqplot && prev_click_event == NULL)
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+  if (draw_freqplot && v->prev_click_event == NULL)
+    freqplots_redraw_all(TRUE);
 
-  // Free the prev_click_event since it was serviced.
-  if (prev_click_event != NULL)
-	  mem_free((void **)&prev_click_event);
+  // Free the pending click since it was serviced.
+  if (v->prev_click_event != NULL)
+	  mem_free((void **)&v->prev_click_event);
 
 } /* Set_Freq_On_Click() */
+
+/* Resolve a pixel to the graph type beneath it for double-click popout.
+ * Returns the panel type, or FP_PANEL_ALL when no graph is hit.  The Smith
+ * chart registers no plot rows, so it is matched through its locus rect. */
+  fp_panel_t
+freqplots_panel_at( freqplots_view_t *v, double px, double py )
+{
+  fr_plot_t *p = fr_plot_at( v, px, py );
+
+  if( p != NULL )
+    return p->panel_type;
+
+  if( fp_smith_hit(v, px, py) )
+    return FP_PANEL_SMITH;
+
+  return FP_PANEL_ALL;
+}

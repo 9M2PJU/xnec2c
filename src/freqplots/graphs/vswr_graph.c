@@ -67,7 +67,7 @@ fp_vswr_render(fp_plot_ctx_t *ctx)
       if( vswr[idx] > 10.0 )
         vswr[idx] = 10.0;
 
-  fp_plot_panel(ctx, vswr, (rc_config.freqplots_s11 ? s11 : NULL), titles);
+  fp_plot_panel(ctx, vswr, (rc_config.freqplots_s11 ? s11 : NULL), titles, FP_PANEL_VSWR);
 
   return TRUE;
 }

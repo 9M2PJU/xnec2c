@@ -200,10 +200,10 @@ Queue_Structure_Redraw(void)
 
   /* Trigger a redraw of plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) &&
-      isFlagSet(PLOT_GVIEWER) &&
+      (isFlagSet(PLOT_GVIEWER) || freqplots_popup_open(FP_PANEL_VIEWER)) &&
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
-    xnec2_widget_queue_draw( freqplots_drawingarea, TRUE );
+    freqplots_redraw_all(TRUE);
   }
 
 } /* Queue_Structure_Redraw() */

@@ -58,20 +58,17 @@ is_auto_generated_comment( const char *line )
 
 /*------------------------------------------------------------------*/
 
-/* Update_Window_Titles()
+/* Window_Title_Subject()
  *
- * Updates main and editor window titles with CM card or filename
+ * Fills @buf with the active title subject: the first human-authored CM
+ * comment, else the input filename, else the package string, truncated to
+ * fit the window-title field.
  */
   void
-Update_Window_Titles( void )
+Window_Title_Subject( char *buf, size_t len )
 {
-  char title[256];
-  char display_text[128];
   int fname_idx, i;
   const char *valid_comment;
-
-  if( CHILD )
-    return;
 
   valid_comment = NULL;
   if( comments.num > 0 && comments.lines != NULL )
@@ -91,25 +88,44 @@ Update_Window_Titles( void )
 
   if( valid_comment != NULL )
   {
-    Strlcpy( display_text, valid_comment, sizeof(display_text) );
+    Strlcpy( buf, valid_comment, len );
   }
   else if( strlen(rc_config.input_file) > 0 )
   {
     Get_Dirname( rc_config.input_file, NULL, &fname_idx );
-    Strlcpy( display_text, &rc_config.input_file[fname_idx], sizeof(display_text) );
+    Strlcpy( buf, &rc_config.input_file[fname_idx], len );
   }
   else
   {
-    Strlcpy( display_text, PACKAGE_STRING, sizeof(display_text) );
+    Strlcpy( buf, PACKAGE_STRING, len );
   }
 
-  if( strlen(display_text) > 60 )
+  if( strlen(buf) > 60 )
   {
-    display_text[57] = '.';
-    display_text[58] = '.';
-    display_text[59] = '.';
-    display_text[60] = '\0';
+    buf[57] = '.';
+    buf[58] = '.';
+    buf[59] = '.';
+    buf[60] = '\0';
   }
+
+} /* Window_Title_Subject() */
+
+/*------------------------------------------------------------------*/
+
+/* Update_Window_Titles()
+ *
+ * Updates main and editor window titles with CM card or filename
+ */
+  void
+Update_Window_Titles( void )
+{
+  char title[256];
+  char display_text[128];
+
+  if( CHILD )
+    return;
+
+  Window_Title_Subject( display_text, sizeof(display_text) );
 
   if( main_window != NULL )
   {
@@ -228,6 +244,52 @@ create_freqplots_window( GtkBuilder **builder )
   Gtk_Builder( builder, object_ids );
   ret = Builder_Get_Object( *builder, "freqplots_window" );
   return( ret );
+}
+
+/* Build a detached popup window holding one frequency-plot graph.  Hand-built
+ * rather than loaded from glade so it carries only the Cairo drawing area,
+ * without the main window's toolbars, menus, or metric entries.  The drawing
+ * area binds the freqplots input handlers and stores its view so each handler
+ * resolves its target uniformly. */
+  GtkWidget *
+create_freqplots_popup_window( freqplots_view_t *view, const char *graph_name )
+{
+  GtkWidget *win, *da;
+  char title[256], subject[128];
+
+  win = gtk_window_new( GTK_WINDOW_TOPLEVEL );
+  gtk_window_set_default_size( GTK_WINDOW(win), 640, 480 );
+
+  /* Title once at creation: a popup renders one fixed graph type, so the
+   * title needs no later refresh. */
+  Window_Title_Subject( subject, sizeof(subject) );
+  snprintf( title, sizeof(title), _("xnec2c %s: %s"), graph_name, subject );
+  gtk_window_set_title( GTK_WINDOW(win), title );
+
+  da = gtk_drawing_area_new();
+  gtk_container_add( GTK_CONTAINER(win), da );
+  gtk_widget_add_events( da,
+      GDK_BUTTON_PRESS_MASK | GDK_SCROLL_MASK |
+      GDK_BUTTON_MOTION_MASK );
+
+  view->window      = win;
+  view->drawingarea = da;
+  g_object_set_data( G_OBJECT(da), "fp_view", view );
+
+  g_signal_connect( da, "draw",
+      G_CALLBACK(on_freqplots_drawingarea_draw), NULL );
+  g_signal_connect( da, "configure-event",
+      G_CALLBACK(on_freqplots_drawingarea_configure_event), NULL );
+  g_signal_connect( da, "button-press-event",
+      G_CALLBACK(on_freqplots_drawingarea_button_press_event), NULL );
+  g_signal_connect( da, "scroll-event",
+      G_CALLBACK(on_freqplots_drawingarea_scroll_event), NULL );
+  g_signal_connect( da, "motion-notify-event",
+      G_CALLBACK(on_freqplots_drawingarea_motion_notify_event), NULL );
+  g_signal_connect( win, "destroy",
+      G_CALLBACK(on_freqplots_popup_destroy), view );
+
+  return( win );
 }
 
   GtkWidget *

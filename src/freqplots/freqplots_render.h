@@ -50,10 +50,10 @@ typedef struct
   cairo_t *cr;
 } fp_render_t;
 
-/* Lifecycle: reset binds the frame context and clears the scenebuffer; flush
- * depth-sorts and emits every primitive; destroy releases the backing
- * allocations and the shared text layout. */
-void fp_render_reset(fp_render_t *fp, cairo_t *cr);
+/* Lifecycle: reset binds the frame context, the caller-owned text layout, and
+ * clears the scenebuffer; flush depth-sorts and emits every primitive; destroy
+ * releases the backing allocations. */
+void fp_render_reset(fp_render_t *fp, cairo_t *cr, PangoLayout *layout);
 void fp_render_flush(fp_render_t *fp);
 void fp_render_destroy(void);
 

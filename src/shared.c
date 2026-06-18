@@ -113,18 +113,12 @@ GtkWidget
   *rdpattern_gl_area     = NULL,
   *rdpattern_cairo_da    = NULL;
 
-/* Frequency plots drawing widget */
-GtkWidget
-  *freqplots_drawingarea = NULL;
-
 GtkWidget *saveas_drawingarea = NULL;
 
 /* Sizes of above */
 int
   structure_width,
   structure_height,
-  freqplots_width,
-  freqplots_height,
   rdpattern_width,
   rdpattern_height;
 

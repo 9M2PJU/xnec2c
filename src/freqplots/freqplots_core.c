@@ -43,7 +43,77 @@
 
 #include <string.h>
 
-fr_plot_t *fr_plots = NULL;
+/* The primary frequency-plots window is the sole persistent view; popups are
+ * heap views registered one per graph type and cleared to NULL when closed. */
+static freqplots_view_t  fpv_main;
+static freqplots_view_t *fpv_popups[FP_PANEL_COUNT];
+
+/* Window-title text per popup graph type, indexed by fp_panel_t. */
+static const char *fp_panel_names[FP_PANEL_COUNT] = {
+  [FP_PANEL_GAIN]     = N_("Gain"),
+  [FP_PANEL_GAIN_DIR] = N_("Gain Direction"),
+  [FP_PANEL_VIEWER]   = N_("Viewer Gain"),
+  [FP_PANEL_VSWR]     = N_("VSWR"),
+  [FP_PANEL_ZRLZIM]   = N_("Impedance (real/imag)"),
+  [FP_PANEL_ZMGZPH]   = N_("Impedance (mag/phase)"),
+  [FP_PANEL_SMITH]    = N_("Smith Chart"),
+  [FP_PANEL_ANT_TEMP] = N_("Antenna Temperature"),
+};
+
+/* Per-panel selection and data-availability descriptor.  select_flag is the
+ * main-window PLOT_* toggle that chooses the panel; require_flag is a data
+ * precondition that must hold for the panel to carry meaningful values, or 0
+ * when the panel has none. */
+typedef struct {
+  unsigned long long select_flag;
+  unsigned long long require_flag;
+} fp_panel_desc_t;
+
+static const fp_panel_desc_t fp_panel_desc[FP_PANEL_COUNT] = {
+  [FP_PANEL_GAIN]     = { PLOT_GMAX,        ENABLE_RDPAT },
+  [FP_PANEL_GAIN_DIR] = { PLOT_GAIN_DIR,    ENABLE_RDPAT },
+  [FP_PANEL_VIEWER]   = { PLOT_GVIEWER,     ENABLE_RDPAT },
+  [FP_PANEL_VSWR]     = { PLOT_VSWR,        0 },
+  [FP_PANEL_ZRLZIM]   = { PLOT_ZREAL_ZIMAG, 0 },
+  [FP_PANEL_ZMGZPH]   = { PLOT_ZMAG_ZPHASE, 0 },
+  [FP_PANEL_SMITH]    = { PLOT_SMITH,       0 },
+  [FP_PANEL_ANT_TEMP] = { PLOT_ANT_TEMP,    ENABLE_RDPAT },
+};
+
+/* True when @panel should emit for @v: its data precondition holds and either
+ * the view pins this single graph (popup) or the main-window toggle selects it
+ * (primary).  A popup thus renders its graph even when the matching toggle is
+ * off in the main window, while data preconditions still gate both views. */
+  static gboolean
+fp_panel_active(freqplots_view_t *v, fp_panel_t panel)
+{
+  const fp_panel_desc_t *d = &fp_panel_desc[panel];
+
+  if( d->require_flag && isFlagClear(d->require_flag) )
+    return FALSE;
+
+  if( v->filter != FP_PANEL_ALL )
+    return v->filter == panel;
+
+  return isFlagSet(d->select_flag) ? TRUE : FALSE;
+}
+
+/* True when @v has at least one panel its user wants drawn: any panel for a
+ * popup, or any selected toggle for the primary all-panels view. */
+  static gboolean
+fp_view_any_selected(freqplots_view_t *v)
+{
+  int p;
+
+  if( v->filter != FP_PANEL_ALL )
+    return TRUE;
+
+  for( p = 0; p < FP_PANEL_COUNT; p++ )
+    if( isFlagSet(fp_panel_desc[p].select_flag) )
+      return TRUE;
+
+  return FALSE;
+}
 
 static void Display_Frequency_Data( void );
 
@@ -80,51 +150,51 @@ fp_fill_meas_columns(fp_plot_ctx_t *ctx,
       cols[c].dst[i] = ctx->meas_rows[i].a[cols[c].meas_idx];
 }
 
-void fr_plots_init(void)
+void fr_plots_init(freqplots_view_t *v)
 {
   int idx;
 
   /* 2d array of plot rectangles popluated by the Plot_Graph function */
-  if (calc_data.ngraph > 0 && calc_data.FR_cards > 0)
-	  mem_realloc((void **)&fr_plots,
-                      sizeof(fr_plot_t) * calc_data.ngraph * calc_data.FR_cards);
+  if (v->ngraph > 0 && calc_data.FR_cards > 0)
+	  mem_realloc((void **)&v->fr_plots,
+                      sizeof(fr_plot_t) * v->ngraph * calc_data.FR_cards);
   else
   {
-	  mem_free((void **)&fr_plots);
+	  mem_free((void **)&v->fr_plots);
 	  return;
   }
 
-  for (idx = 0; idx < calc_data.ngraph * calc_data.FR_cards; idx++)
+  for (idx = 0; idx < v->ngraph * calc_data.FR_cards; idx++)
   {
-	  if (FR_PLOT_T_IS_VALID(&fr_plots[idx]))
+	  if (FR_PLOT_T_IS_VALID(&v->fr_plots[idx]))
 		  continue;
 
 	  // Set the plot position
-	  fr_plots[idx].posn = idx / calc_data.FR_cards;
+	  v->fr_plots[idx].posn = idx / calc_data.FR_cards;
 
 	  // Point to the freq loop data
-	  fr_plots[idx].fr = idx % calc_data.FR_cards;
-	  fr_plots[idx].freq_loop_data = &calc_data.freq_loop_data[fr_plots[idx].fr];
+	  v->fr_plots[idx].fr = idx % calc_data.FR_cards;
+	  v->fr_plots[idx].freq_loop_data = &calc_data.freq_loop_data[v->fr_plots[idx].fr];
 
 	  // zero the plot_rect, Plot_Graph() will fill it in.
-	  memset(&fr_plots[idx].plot_rect, 0, sizeof(GdkRectangle));
+	  memset(&v->fr_plots[idx].plot_rect, 0, sizeof(GdkRectangle));
 
 	  // Set it as valid:
-	  fr_plots[idx].valid = FR_PLOT_T_MAGIC;
+	  v->fr_plots[idx].valid = FR_PLOT_T_MAGIC;
   }
 }
 
-fr_plot_t *get_fr_plot(int posn, int fr)
+fr_plot_t *get_fr_plot(freqplots_view_t *v, int posn, int fr)
 {
-	if (posn < 0 || posn >= calc_data.ngraph ||	fr < 0 || fr >= calc_data.FR_cards)
+	if (posn < 0 || posn >= v->ngraph || fr < 0 || fr >= calc_data.FR_cards)
 		return NULL;
 
-	return &fr_plots[posn*calc_data.FR_cards + fr];
+	return &v->fr_plots[posn*calc_data.FR_cards + fr];
 }
 
-GdkRectangle *get_plot_rect(int posn, int fr)
+GdkRectangle *get_plot_rect(freqplots_view_t *v, int posn, int fr)
 {
-	fr_plot_t *p = get_fr_plot(posn, fr);
+	fr_plot_t *p = get_fr_plot(v, posn, fr);
 
 	if (p == NULL)
 		return NULL;
@@ -132,16 +202,44 @@ GdkRectangle *get_plot_rect(int posn, int fr)
 	return &p->plot_rect;
 }
 
-void fr_plot_sync_widths(fr_plot_t *fr_plot)
+/* Hit-test: return the valid plot row whose rectangle contains (px,py), or
+ * NULL when the pixel falls in no panel.  Shared by the click-to-frequency
+ * and double-click-to-popout input paths. */
+fr_plot_t *fr_plot_at(freqplots_view_t *v, double px, double py)
+{
+	int i, n;
+
+	if (v->fr_plots == NULL)
+		return NULL;
+
+	n = v->ngraph * calc_data.FR_cards;
+	for (i = 0; i < n; i++)
+	{
+		fr_plot_t *p = &v->fr_plots[i];
+
+		if (!FR_PLOT_T_IS_VALID(p))
+			continue;
+
+		if (   px >= p->plot_rect.x
+			&& px <= p->plot_rect.x + p->plot_rect.width
+			&& py >= p->plot_rect.y
+			&& py <= p->plot_rect.y + p->plot_rect.height)
+			return p;
+	}
+
+	return NULL;
+}
+
+void fr_plot_sync_widths(freqplots_view_t *v, fr_plot_t *fr_plot)
 {
 	GdkRectangle *current, *r;
 	int posn, fr;
 
-	if (fr_plot == NULL || fr_plots == NULL)
+	if (fr_plot == NULL || v->fr_plots == NULL)
 		return;
 
 	// Update all plot widths so they re the same as fr_plot's width.
-	for (posn = 0; posn < calc_data.ngraph; posn++)
+	for (posn = 0; posn < v->ngraph; posn++)
 	{
 		// Skip the current one the mouse adjusted:
 		if (posn == fr_plot->posn)
@@ -149,16 +247,16 @@ void fr_plot_sync_widths(fr_plot_t *fr_plot)
 
 		for (fr = 0; fr < calc_data.FR_cards; fr++)
 		{
-			current = get_plot_rect(fr_plot->posn, fr);
+			current = get_plot_rect(v, fr_plot->posn, fr);
 			if (current == NULL)
 			{
-				BUG("fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d calc_data.ngraph=%d fr=%d posn=%d valid=%d\n",
-					calc_data.FR_cards, calc_data.ngraph,
+				BUG("fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr=%d posn=%d valid=%d\n",
+					calc_data.FR_cards, v->ngraph,
 					fr, fr_plot->posn,
 					FR_PLOT_T_IS_VALID(fr_plot));
 				return;
 			}
-			r = get_plot_rect(posn, fr);
+			r = get_plot_rect(v, posn, fr);
 
 			r->width = current->width;
 		}
@@ -190,6 +288,7 @@ gboolean
 fmhz_within_display_range( double fmhz )
 {
   int i, n;
+  fr_plot_t *fr_plots = freqplots_main_view()->fr_plots;
 
   if (fr_plots == NULL || calc_data.ngraph < 1 || calc_data.FR_cards < 1)
     return FALSE;
@@ -306,10 +405,26 @@ Display_Frequency_Data( void )
  * XY plot type so individual renderers carry only their data preparation.
  * The orchestrator guarantees num_fsteps > 0 before any renderer runs. */
   void
-fp_plot_panel(fp_plot_ctx_t *ctx, double *left, double *right, char *titles[3])
+fp_plot_panel(fp_plot_ctx_t *ctx, double *left, double *right, char *titles[3],
+    fp_panel_t panel)
 {
-  Plot_Graph(ctx->fp, left, right, ctx->fplot, ctx->num_fsteps, titles,
-      ctx->posn++);
+  if( !fp_panel_active(ctx->view, panel) )
+    return;
+
+  Plot_Graph(ctx->view, ctx->fp, left, right, ctx->fplot, ctx->num_fsteps,
+      titles, ctx->posn++, panel);
+}
+
+/* Emit the Smith-chart panel through the shared renderer under the same view
+ * filter gate as fp_plot_panel; posn advances only on emission. */
+  void
+fp_plot_smith_panel(fp_plot_ctx_t *ctx, double *fa, double *fb, double *fc,
+    int nc, fp_panel_t panel)
+{
+  if( !fp_panel_active(ctx->view, panel) )
+    return;
+
+  Plot_Graph_Smith(ctx->view, ctx->fp, fa, fb, fc, nc, ctx->posn++);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -321,9 +436,15 @@ fp_run_dispatch(fp_plot_ctx_t *ctx)
 {
   size_t i;
 
+  /* The primary all-panels view skips groups whose enabled() predicate is
+   * false for efficiency.  A popup runs every group and lets the per-panel
+   * filter emit only its one graph, so a graph unselected in the main window
+   * still draws in its popup. */
+  gboolean gate_by_enabled = (ctx->view->filter == FP_PANEL_ALL);
+
   for( i = 0; i < G_N_ELEMENTS(fp_plot_dispatch); i++ )
   {
-    if( !fp_plot_dispatch[i].enabled() )
+    if( gate_by_enabled && !fp_plot_dispatch[i].enabled() )
       continue;
 
     if( !fp_plot_dispatch[i].render(ctx) )
@@ -341,7 +462,7 @@ fp_run_dispatch(fp_plot_ctx_t *ctx)
  * (gain, vswr, imoedance etc) against frequency
  */
   void
-_Plot_Frequency_Data( cairo_t *cr )
+_Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
 {
   /* Abort plotting if main window is to be closed
    * or when plots drawing area not available */
@@ -357,9 +478,12 @@ _Plot_Frequency_Data( cairo_t *cr )
   /* Shared per-frame data handed to the dispatched plot renderers */
   fp_plot_ctx_t ctx;
 
-  fr_plots_init();
+  /* Primary shows every panel; a popup pins ngraph to its single graph. */
+  v->ngraph = (v->filter == FP_PANEL_ALL) ? calc_data.ngraph : 1;
 
-  if (fr_plots == NULL)
+  fr_plots_init(v);
+
+  if (v->fr_plots == NULL)
 	  return; // nothing to do here...
 
   /* Clear drawingarea */
@@ -367,13 +491,16 @@ _Plot_Frequency_Data( cairo_t *cr )
       (double)COLOR_BLACK.g, (double)COLOR_BLACK.b );
   cairo_rectangle(
       cr, 0.0, 0.0,
-      (double)freqplots_width,
-      (double)freqplots_height );
+      (double)v->width,
+      (double)v->height );
   cairo_fill( cr );
 
   /* Begin a new depth-buffered frame; plot types deposit segments and
    * deferred text, flushed together after all panels are drawn. */
-  fp_render_reset( &fp, cr );
+  /* Bind this view's own base font; created once, freed at view teardown. */
+  if( v->text_layout == NULL )
+    v->text_layout = gtk_widget_create_pango_layout(v->drawingarea, NULL);
+  fp_render_reset( &fp, cr, v->text_layout );
 
   /* Build compact index list; out-of-order arrivals appear immediately */
   static int    *valid_steps_map = NULL;
@@ -396,23 +523,16 @@ _Plot_Frequency_Data( cairo_t *cr )
   /* Abort if plotting is not possible FIXME */
   if( (num_fsteps <= 0) || isFlagClear(FREQ_LOOP_READY) ||
       (isFlagClear(FREQ_LOOP_RUNNING) && isFlagClear(FREQ_LOOP_DONE)) ||
-
-      (isFlagClear(PLOT_GMAX)         &&
-       isFlagClear(PLOT_GVIEWER)      &&
-       isFlagClear(PLOT_VSWR)         &&
-       isFlagClear(PLOT_ZREAL_ZIMAG)  &&
-       isFlagClear(PLOT_ZMAG_ZPHASE)  &&
-       isFlagClear(PLOT_SMITH)        &&
-       isFlagClear(PLOT_ANT_TEMP)) )
+      !fp_view_any_selected(v) )
   {
     return;
   }
 
   // Call the underscore version because freq_data_lock is already held.
   // This makes the plot choppy during optimize, so skip that then.
-  GdkEvent *pending_click = freqplots_pending_click();
-  if (pending_click != NULL)
-	  Set_Frequency_On_Click(pending_click);
+  GdkEvent *prev_click_event = freqplots_pending_click(v);
+  if (prev_click_event != NULL)
+	  Set_Frequency_On_Click(v, prev_click_event);
 
   /* Compute every per-frequency measurement once per frame; meas_calc is
    * costly (antenna-temperature spherical integration) and was previously
@@ -426,6 +546,7 @@ _Plot_Frequency_Data( cairo_t *cr )
   /* Resolve every enabled plot panel through the dispatch table; each
    * renderer deposits segments and defers its text.  posn advances across
    * renderers so panels lay out top to bottom. */
+  ctx.view            = v;
   ctx.fp              = &fp;
   ctx.valid_steps_map = valid_steps_map;
   ctx.fplot           = fplot;
@@ -445,13 +566,106 @@ _Plot_Frequency_Data( cairo_t *cr )
 
 } /* Plot_Frequency_Data() */
 
-void Plot_Frequency_Data( cairo_t *cr )
+void Plot_Frequency_Data( freqplots_view_t *view, cairo_t *cr )
 {
 	if (isFlagSet(ERROR_CONDX))
 		return;
 	g_rec_mutex_lock(&freq_data_lock);
-	_Plot_Frequency_Data( cr );
+	_Plot_Frequency_Data( view, cr );
 	g_rec_mutex_unlock(&freq_data_lock);
+}
+
+/*-----------------------------------------------------------------------*/
+
+freqplots_view_t *freqplots_main_view(void)
+{
+	return &fpv_main;
+}
+
+/* True when a detached popup for graph type @panel is currently open.  Lets
+ * rotation observers refresh a popped-out graph even when the main window's
+ * corresponding PLOT_* flag is clear. */
+gboolean freqplots_popup_open(fp_panel_t panel)
+{
+	if (panel < 0 || panel >= FP_PANEL_COUNT)
+		return FALSE;
+
+	return fpv_popups[panel] != NULL;
+}
+
+/* Queue a redraw for the primary window and every open popup so one data or
+ * parameter mutation refreshes all frequency-plot views.  Routed through
+ * xnec2_widget_queue_draw to keep the main-thread g_idle guarantee. */
+void freqplots_redraw_all(gboolean force)
+{
+	int p;
+
+	if (fpv_main.drawingarea != NULL)
+		xnec2_widget_queue_draw(fpv_main.drawingarea, force);
+
+	for (p = 0; p < FP_PANEL_COUNT; p++)
+		if (fpv_popups[p] != NULL && fpv_popups[p]->drawingarea != NULL)
+			xnec2_widget_queue_draw(fpv_popups[p]->drawingarea, force);
+}
+
+/* Open the popup for graph type @panel, or raise it if already open.  A new
+ * popup gets a heap view filtered to the one graph with ngraph fixed at 1. */
+void freqplots_open_panel(fp_panel_t panel)
+{
+	freqplots_view_t *v = NULL;
+
+	if (panel < 0 || panel >= FP_PANEL_COUNT)
+		return;
+
+	if (fpv_popups[panel] != NULL)
+	{
+		gtk_window_present(GTK_WINDOW(fpv_popups[panel]->window));
+		return;
+	}
+
+	mem_alloc((void **)&v, sizeof(freqplots_view_t));
+
+	v->filter = panel;
+	v->ngraph = 1;
+
+	create_freqplots_popup_window(v, _(fp_panel_names[panel]));
+	fpv_popups[panel] = v;
+	gtk_widget_show_all(v->window);
+}
+
+/* Close the popup for graph type @panel: drop it from the registry and free
+ * its view and plot table.  The window is destroyed by the caller's destroy
+ * path, so this only releases heap state. */
+void freqplots_close_panel(fp_panel_t panel)
+{
+	freqplots_view_t *v;
+
+	if (panel < 0 || panel >= FP_PANEL_COUNT)
+		return;
+
+	v = fpv_popups[panel];
+	if (v == NULL)
+		return;
+
+	fpv_popups[panel] = NULL;
+	mem_free((void **)&v->fr_plots);
+	mem_free((void **)&v->smith_locus_pts);
+	mem_free((void **)&v->smith_locus_freq);
+	mem_free((void **)&v->prev_click_event);
+	if (v->text_layout != NULL)
+		g_object_unref(v->text_layout);
+	mem_free((void **)&v);
+}
+
+/* Destroy every open popup window; each window's destroy handler frees its
+ * view through freqplots_close_panel.  Called during primary-window teardown. */
+void freqplots_destroy_all_popups(void)
+{
+	int p;
+
+	for (p = 0; p < FP_PANEL_COUNT; p++)
+		if (fpv_popups[p] != NULL)
+			gtk_widget_destroy(fpv_popups[p]->window);
 }
 
 /*-----------------------------------------------------------------------*/

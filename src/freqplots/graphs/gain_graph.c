@@ -71,30 +71,28 @@ fp_gain_render(fp_plot_ctx_t *ctx)
     {
       titles[1] = _("Max Gain & Net Gain vs Frequency");
       titles[2] = _("Net Gain dBi");
-      fp_plot_panel(ctx, gmax, netgain, titles);
+      fp_plot_panel(ctx, gmax, netgain, titles, FP_PANEL_GAIN);
     }
     else
     {
       titles[1] = _("Max Gain & F/B Ratio vs Frequency");
       titles[2] = "        ";
-      fp_plot_panel(ctx, gmax, NULL, titles);
+      fp_plot_panel(ctx, gmax, NULL, titles, FP_PANEL_GAIN);
     }
   }
   else
   {
     titles[1] = _("Max Gain & F/B Ratio vs Frequency");
     titles[2] = _("F/B Ratio dB");
-    fp_plot_panel(ctx, gmax, fbratio, titles);
+    fp_plot_panel(ctx, gmax, fbratio, titles, FP_PANEL_GAIN);
   }
 
-  /* Plot max gain direction if enabled */
-  if( isFlagSet(PLOT_GAIN_DIR) )
-  {
-    titles[0] = _("Rad Angle - deg");
-    titles[1] = _("Max Gain Direction vs Frequency");
-    titles[2] = _("Phi - deg");
-    fp_plot_panel(ctx, gdir_tht, gdir_phi, titles);
-  }
+  /* Deposit max gain direction unconditionally; the dispatch gate emits it
+   * only when selected (primary) or pinned (popup). */
+  titles[0] = _("Rad Angle - deg");
+  titles[1] = _("Max Gain Direction vs Frequency");
+  titles[2] = _("Phi - deg");
+  fp_plot_panel(ctx, gdir_tht, gdir_phi, titles, FP_PANEL_GAIN_DIR);
 
   return TRUE;
 }

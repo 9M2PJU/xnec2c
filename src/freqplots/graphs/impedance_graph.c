@@ -52,25 +52,20 @@ fp_impedance_render(fp_plot_ctx_t *ctx)
   };
   fp_fill_meas_columns( ctx, cols, 4 );
 
-  if( isFlagSet(PLOT_ZREAL_ZIMAG) )
-  {
-    titles[0] = _("Z-real");
-    titles[1] = _("Impedance vs Frequency");
-    titles[2] = _("Z-imag");
-    fp_plot_panel(ctx, zreal_c, zimag_c, titles);
-  }
+  /* Deposit every impedance panel unconditionally; the dispatch gate emits
+   * each only when selected (primary) or pinned (popup). */
+  titles[0] = _("Z-real");
+  titles[1] = _("Impedance vs Frequency");
+  titles[2] = _("Z-imag");
+  fp_plot_panel(ctx, zreal_c, zimag_c, titles, FP_PANEL_ZRLZIM);
 
-  if( isFlagSet(PLOT_ZMAG_ZPHASE) )
-  {
-    titles[0] = _("Z-magn");
-    titles[1] = _("Impedance vs Frequency");
-    titles[2] = _("Z-phase");
-    fp_plot_panel(ctx, zmagn_c, zphase_c, titles);
-  }
+  titles[0] = _("Z-magn");
+  titles[1] = _("Impedance vs Frequency");
+  titles[2] = _("Z-phase");
+  fp_plot_panel(ctx, zmagn_c, zphase_c, titles, FP_PANEL_ZMGZPH);
 
-  if( isFlagSet(PLOT_SMITH) )
-    Plot_Graph_Smith(ctx->fp, zreal_c, zimag_c, ctx->fplot,
-        ctx->num_fsteps, ctx->posn++);
+  fp_plot_smith_panel(ctx, zreal_c, zimag_c, ctx->fplot,
+      ctx->num_fsteps, FP_PANEL_SMITH);
 
   return TRUE;
 }
