@@ -48,7 +48,7 @@ typedef struct
 /* Integer field getters */
 static int exp_i1(const fixture_expectation_t *e) { return e->i1; }
 static int exp_i2(const fixture_expectation_t *e) { return e->i2; }
-static int act_i1(void) { return data.itag[0]; }
+static int act_i1(void) { return data.segments[0].itag; }
 static int act_i2(void) { return data.n; }
 
 /* Double field getters - expected */
@@ -61,13 +61,13 @@ static double exp_f6(const fixture_expectation_t *e) { return e->f6; }
 static double exp_f7(const fixture_expectation_t *e) { return e->f7; }
 
 /* Double field getters - actual */
-static double act_f1(void) { return data.x1[0]; }
-static double act_f2(void) { return data.y1[0]; }
-static double act_f3(void) { return data.z1[0]; }
-static double act_f4(void) { return data.x2[data.n - 1]; }
-static double act_f5(void) { return data.y2[data.n - 1]; }
-static double act_f6(void) { return data.z2[data.n - 1]; }
-static double act_f7(void) { return data.bi[0]; }
+static double act_f1(void) { return data.segments[0].x1; }
+static double act_f2(void) { return data.segments[0].y1; }
+static double act_f3(void) { return data.segments[0].z1; }
+static double act_f4(void) { return data.segments[data.n - 1].x2; }
+static double act_f5(void) { return data.segments[data.n - 1].y2; }
+static double act_f6(void) { return data.segments[data.n - 1].z2; }
+static double act_f7(void) { return data.segments[0].bi; }
 
 /* Integer field checks table */
 static const int_check_t int_checks[] =

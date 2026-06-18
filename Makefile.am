@@ -252,6 +252,10 @@ nobase_dist_pkgdata_DATA += examples/data/2m_extended_Xpol_yagi.csv
 nobase_dist_pkgdata_DATA += examples/2m_extended_yagi-optimized.nec
 nobase_dist_pkgdata_DATA += examples/data/2m_extended_yagi-optimized.csv
 
+nobase_dist_pkgdata_DATA += examples/20m_dipole_NT_50ohm.nec
+
+nobase_dist_pkgdata_DATA += examples/2m-5el-rhcp-ARISS-KJ7NLL.nec
+
 nobase_dist_pkgdata_DATA += examples/2m_extended_yagi.nec
 nobase_dist_pkgdata_DATA += examples/data/2m_extended_yagi.csv
 
@@ -291,6 +295,9 @@ nobase_dist_pkgdata_DATA += examples/data/40-80m_Inv_L.csv
 nobase_dist_pkgdata_DATA += examples/40m-moxon.nec
 nobase_dist_pkgdata_DATA += examples/data/40m-moxon.csv
 
+nobase_dist_pkgdata_DATA += examples/5el_yagi_SY_parametric.nec
+nobase_dist_pkgdata_DATA += examples/5el_yagi_SY_parametric.opt
+
 nobase_dist_pkgdata_DATA += examples/6-17m_bipyramid.nec
 nobase_dist_pkgdata_DATA += examples/data/6-17m_bipyramid.csv
 
@@ -314,6 +321,8 @@ nobase_dist_pkgdata_DATA += examples/data/6m_bigwheel-stack.csv
 
 nobase_dist_pkgdata_DATA += examples/6m_horizomni.nec
 nobase_dist_pkgdata_DATA += examples/data/6m_horizomni.csv
+
+nobase_dist_pkgdata_DATA += examples/70cm-5el-rhcp-KJ7NLL.nec
 
 nobase_dist_pkgdata_DATA += examples/70cm_collinear.nec
 nobase_dist_pkgdata_DATA += examples/data/70cm_collinear.csv
@@ -347,12 +356,15 @@ nobase_dist_pkgdata_DATA += examples/data/satellite.csv
 
 # Ensure that the above nobase_dist_pkgdata_DATA list is consistent
 # with the files existing in the $(srcdir)/examples directory tree.
+# Root-level examples/*.csv are program-generated outputs (see .gitignore
+# rule /examples/*.csv) and are excluded, as are *.sy/*.SY source cards;
+# committed reference data under examples/data/*.csv stays in the list.
 CLEANFILES += examples-automake.lst
 CLEANFILES += examples-srcdir.lst
 check-local: check-examples-file-list
 check-examples-file-list:
 	@for f in $(nobase_dist_pkgdata_DATA); do echo "$$f"; done | sort > examples-automake.lst
-	@(cd $(srcdir) && find examples -type f -not -name '*.sy' -not -name '*.SY') | sort > examples-srcdir.lst
+	@(cd $(srcdir) && find examples -type f -not -name '*.sy' -not -name '*.SY' -not \( -path 'examples/*.csv' ! -path 'examples/*/*.csv' \)) | sort > examples-srcdir.lst
 	@if cmp examples-automake.lst examples-srcdir.lst > /dev/null; then :; else \
 	  echo "Error: Makefile.am nobase_dist_pkgdata_DATA and examples/ dir are inconsistent:"; \
 	  diff examples-automake.lst examples-srcdir.lst | grep -v '^[0-9]'; \

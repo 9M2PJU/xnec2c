@@ -24,27 +24,10 @@ Stop(int err, const char *format, ...)
 	return 0;
 }
 
-/* Simplified memory stubs for test isolation.
- * The real implementation in utils.c prepends a tracking header;
- * tests use plain allocators since no tracking is needed. */
-
+/* Backtrace symbol required by the linked src/mem.c; the allocator
+ * itself comes from mem.c for parity with production. */
 void
-mem_alloc(void **ptr, size_t req, gchar *str)
+_print_backtrace(char **strings)
 {
-	(void)str;
-	*ptr = calloc(1, req);
-}
-
-void
-mem_realloc(void **ptr, size_t req, gchar *str)
-{
-	(void)str;
-	*ptr = realloc(*ptr, req);
-}
-
-void
-free_ptr(void **ptr)
-{
-	free(*ptr);
-	*ptr = NULL;
+	(void)strings;
 }

@@ -54,6 +54,39 @@ New_Patch_Data(void)
 {
 }
 
+/* Stubs for prerender derivations triggered at end of command parsing;
+ * the parsing test asserts raw geometry only, not prerender outputs. */
+void
+prerender_state_alloc(int steps_total)
+{
+  (void)steps_total;
+}
+
+void
+compute_nf_dr_norm(void)
+{
+}
+
+void
+compute_excitation_center(void)
+{
+}
+
+void
+init_geometry_colors(void)
+{
+}
+
+void
+compute_trig_tables(void)
+{
+}
+
+void
+compute_ff_topology(void)
+{
+}
+
 /* Stub for polarization factor calculation */
 double
 Polarization_Factor(int pol_type, int fstep, int idx)
@@ -173,29 +206,12 @@ Notice(GtkButtonsType buttons, const char *title, const char *msg_fmt, ...)
   return 0;
 }
 
-/* Stub for memory allocation */
+/* Backtrace symbol required by the linked src/mem.c; the allocator
+ * itself comes from mem.c for parity with production. */
 void
-mem_alloc(void **ptr, size_t req, gchar *str)
+_print_backtrace(char **strings)
 {
-  *ptr = malloc(req);
-}
-
-/* Stub for memory reallocation */
-void
-mem_realloc(void **ptr, size_t req, gchar *str)
-{
-  *ptr = realloc(*ptr, req);
-}
-
-/* Stub for pointer freeing */
-void
-free_ptr(void **ptr)
-{
-  if( ptr && *ptr )
-  {
-    free(*ptr);
-    *ptr = NULL;
-  }
+  (void)strings;
 }
 
 /* Stub for flag operations */
