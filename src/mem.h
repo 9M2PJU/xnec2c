@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "branch_hints.h"
+
 /* Alignment for cache-line and AVX-512 friendliness */
 #define MEM_ALIGNMENT  64
 #define MEM_HEADER_SIZE 64
