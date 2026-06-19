@@ -92,6 +92,58 @@ static inline void *_mem_realloc_fast(void **ptr, size_t req, char *str)
 void mem_backtrace(void *ptr);
 void mem_obj_dump(void *ptr);
 void mem_free(void **ptr);
+
+/**
+ * mem_array_count() - elements currently allocated in a managed array
+ * @ptr: managed pointer, or NULL
+ * @elem_size: size of one element
+ *
+ * Reads the live element count from the allocator header, the single
+ * source of truth; callers keep no separate count.
+ *
+ * Return: used bytes / elem_size, or 0 when ptr is NULL
+ */
+static inline int mem_array_count(void *ptr, size_t elem_size)
+{
+	if (ptr == NULL)
+		return 0;
+
+	return (int)(mem_obj_from_ptr(ptr)->used / elem_size);
+}
+
+/**
+ * mem_array_capacity() - elements a managed array holds before it must grow
+ * @ptr: managed pointer, or NULL
+ * @elem_size: size of one element
+ *
+ * Return: capacity bytes / elem_size, or 0 when ptr is NULL
+ */
+static inline int mem_array_capacity(void *ptr, size_t elem_size)
+{
+	if (ptr == NULL)
+		return 0;
+
+	return (int)(mem_obj_from_ptr(ptr)->size / elem_size);
+}
+
+/**
+ * mem_elem_free_fn - per-element teardown callback for mem_array_resize
+ * @elem: pointer to one array element to release sub-buffers from
+ */
+typedef void (*mem_elem_free_fn)(void *elem);
+
+void mem_array_resize(void **arr, size_t elem_size, int new_count,
+		      mem_elem_free_fn free_elem);
+
+/**
+ * mem_array_reserve - grow a managed array to hold at least @needed elements
+ * @arr: address of the caller's array pointer
+ * @elem_size: size of one element
+ * @needed: minimum element count the array must hold
+ * @initial_cap: capacity allocated when the array is empty
+ */
+void mem_array_reserve(void **arr, size_t elem_size, int needed,
+		       int initial_cap);
 void *mem_clone(void *ptr);
 int mem_bcmp(void *p1, void *p2);
 void mem_set(void *ptr, int c);

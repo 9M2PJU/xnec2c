@@ -268,3 +268,52 @@ void mem_set(void *ptr, int c)
 	memset(m->ptr, c, m->used);
 }
 
+/**
+ * mem_array_resize() - resize an array of structs, freeing dropped elements
+ * @arr: address of the caller's array pointer
+ * @elem_size: size of one array element
+ * @new_count: new element count (caller guarantees >= 1)
+ * @free_elem: per-element teardown for the shrink tail
+ *
+ * Reads the prior element count from the allocator header, releases
+ * sub-buffers of the dropped tail [new_count, old_count), then reallocates
+ * the outer array in place. Surviving entries [0, new_count) keep their
+ * pointers for reuse; any grown region is zeroed by the allocator.
+ */
+void mem_array_resize(void **arr, size_t elem_size, int new_count,
+		      mem_elem_free_fn free_elem)
+{
+	int old_count = mem_array_count(*arr, elem_size);
+
+	for (int i = new_count; i < old_count; i++)
+		free_elem((char *)*arr + (size_t)i * elem_size);
+
+	mem_realloc(arr, (size_t)new_count * elem_size);
+}
+
+/**
+ * mem_array_reserve() - grow a managed array to hold at least @needed elements
+ * @arr: address of the caller's array pointer
+ * @elem_size: size of one element
+ * @needed: minimum element count the array must hold
+ * @initial_cap: capacity allocated when the array is empty
+ *
+ * Doubles the current capacity until it covers @needed, reusing the block
+ * in place; an array already large enough is left untouched. The caller
+ * tracks its own fill count.
+ */
+void mem_array_reserve(void **arr, size_t elem_size, int needed,
+		       int initial_cap)
+{
+	int cap = mem_array_capacity(*arr, elem_size);
+
+	if (cap >= needed)
+		return;
+
+	int new_cap = cap ? cap : initial_cap;
+	while (new_cap < needed)
+		new_cap *= 2;
+
+	mem_realloc(arr, (size_t)new_cap * elem_size);
+}
+
