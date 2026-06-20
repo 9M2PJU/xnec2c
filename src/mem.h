@@ -15,7 +15,7 @@
  *
  * Layout:
  *   |<-- MEM_HEADER_SIZE (64B) -->|<-- req bytes user data -->|
- *   [ mem_obj_t (32B) | pad 32B  ][ user ptr (64-byte aligned)]
+ *   [ mem_obj_t (40B) | pad 24B  ][ user ptr (64-byte aligned)]
  *   ^                              ^
  *   base (64-aligned)              m->ptr = base + MEM_HEADER_SIZE
  *
@@ -26,6 +26,7 @@
  *     - grow within capacity: used < req <= size, no realloc
  *     - grow beyond capacity: req > size, new posix_memalign
  *   backtrace: optional debug allocation trace
+ *   site: __LOCATION__ of the allocating call, for leak accounting
  *   ptr: pointer to user data region
  */
 typedef struct mem_obj_t
@@ -33,6 +34,7 @@ typedef struct mem_obj_t
 	size_t size;
 	size_t used;
 	char **backtrace;
+	const char *site;
 
 	void *ptr;
 } mem_obj_t;

@@ -409,6 +409,10 @@ typedef struct
   /* verbose and debug levels, see console.h */
   int verbose, debug;
 
+  /* Report managed-allocator live bytes per call site at instrumented
+   * checkpoints (--mem-report); global allocator diagnostics */
+  int mem_report_enabled;
+
   /* true if ~/.xnec2c/xnec2c.conf does not exist, false otherwise */
   int first_run;
 

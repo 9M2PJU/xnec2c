@@ -57,6 +57,7 @@ usage(void)
 		"\n"
 		"  --optimize:        Activate the optimizer immediately.\n"
 		"  --skip-verify:     skip geometry verification checks\n"
+		"  --mem-report:      report managed allocator live bytes per call site\n"
 		"\n"
 		"The following arguments write to an output file after the frequency loop\n"
 		"completes.  These are useful to combine with --batch; If you wish to specify\n"

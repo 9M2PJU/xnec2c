@@ -22,6 +22,7 @@
 #include "shared.h"
 #include "prerender/prerender_state.h"
 #include "prerender/prerender_color.h"
+#include "mem_track.h"
 
 #include "opengl/opengl_structure.h"
 
@@ -938,6 +939,10 @@ Gtk_Quit( void )
   /* Release prerender allocations */
   prerender_state_free();
   free_struct_colors();
+
+  /* Program-wide managed-allocator snapshot at teardown */
+  if( rc_config.mem_report_enabled )
+    mem_report("Gtk_Quit");
 
   /* Kill possibly nested loops */
   k = (int)gtk_main_level();

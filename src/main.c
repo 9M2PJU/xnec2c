@@ -54,6 +54,7 @@ enum XNEC2C_OPTS {
 	OPT_WRITE_PATCH_CURRENTS,
 	OPT_SKIP_VERIFY,
 	OPT_FORCE_VERIFY,
+	OPT_MEM_REPORT,
 
 	OPT_MAX_OPTS
 };
@@ -87,6 +88,7 @@ static struct option long_options[] = {
 		{  "write-patch-currents",   required_argument,   NULL,  OPT_WRITE_PATCH_CURRENTS   },
 		{  "skip-verify",            no_argument,         NULL,  OPT_SKIP_VERIFY            },
 		{  "force-verify",           no_argument,         NULL,  OPT_FORCE_VERIFY           },
+		{  "mem-report",             no_argument,         NULL,  OPT_MEM_REPORT             },
 
 		{  NULL,                     0,                   NULL,  0                          }
 	};
@@ -353,6 +355,11 @@ main (int argc, char *argv[])
       case OPT_FORCE_VERIFY:
         pr_notice("forcing overlap check on large models\n");
         rc_config.force_verify_segments = 1;
+        break;
+
+      case OPT_MEM_REPORT:
+        pr_notice("managed allocator leak report enabled\n");
+        rc_config.mem_report_enabled = 1;
         break;
 
       default:

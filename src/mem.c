@@ -1,6 +1,7 @@
 #include "common.h"
 #include "console.h"
 #include "utils.h"
+#include "mem_track.h"
 
 _Static_assert(sizeof(mem_obj_t) <= MEM_HEADER_SIZE,
 	"mem_obj_t exceeds MEM_HEADER_SIZE");
@@ -36,7 +37,7 @@ void _mem_validate_fail(void *ptr, void *base)
  * Return: pointer to new mem_obj_t, or NULL on failure
  */
 static inline mem_obj_t *mem_obj_alloc(const mem_obj_t *old_m, size_t req,
-	size_t prev_used)
+	size_t prev_used, const char *site)
 {
 	void *base = NULL;
 	mem_obj_t *m;
@@ -54,6 +55,11 @@ static inline mem_obj_t *mem_obj_alloc(const mem_obj_t *old_m, size_t req,
 	m->size = req;
 	m->used = req;
 	m->backtrace = NULL;
+	/* Tag for leak accounting only while reporting is enabled.  An
+	 * untracked block carries a NULL site so its release skips the
+	 * accounting path, keeping add and drop balanced across the
+	 * monotonic flag edge without a mutex on the disabled fast path. */
+	m->site = rc_config.mem_report_enabled ? site : NULL;
 	m->ptr = (char *)base + MEM_HEADER_SIZE;
 
 	/* Preserve old data when reallocating */
@@ -68,7 +74,28 @@ static inline mem_obj_t *mem_obj_alloc(const mem_obj_t *old_m, size_t req,
 	if (req > prev_used)
 		memset((char *)m->ptr + prev_used, 0, req - prev_used);
 
+	if (m->site != NULL)
+		mem_track_add(m->site, m->size);
+
 	return m;
+}
+
+/**
+ * mem_obj_free() - release a managed block and its backtrace
+ * @m: header to release
+ *
+ * Single release point: drops the per-site live total for tracked
+ * blocks, then frees the optional backtrace and the aligned base block.
+ */
+static inline void mem_obj_free(mem_obj_t *m)
+{
+	if (m->site != NULL)
+		mem_track_drop(m->site, m->size);
+
+	if (m->backtrace != NULL)
+		free(m->backtrace);
+
+	free(m);
 }
 
 /**
@@ -93,7 +120,7 @@ void *_mem_realloc(void **ptr, size_t req, char *str)
 	if (likely(*ptr == NULL))
 	{
 		/* Fresh allocation */
-		m = mem_obj_alloc(NULL, req, 0);
+		m = mem_obj_alloc(NULL, req, 0, str);
 		if (unlikely(m == NULL))
 			goto alloc_fail;
 
@@ -130,12 +157,12 @@ void *_mem_realloc(void **ptr, size_t req, char *str)
 	{
 		mem_obj_t *old_m = m;
 
-		m = mem_obj_alloc(old_m, req, prev_used);
+		m = mem_obj_alloc(old_m, req, prev_used, str);
 		if (unlikely(m == NULL))
 			goto alloc_fail;
 
 		/* Free the old block */
-		free(old_m);
+		mem_obj_free(old_m);
 	}
 
 	/* Debug only if you need it, this is very slow: */
@@ -160,11 +187,7 @@ void mem_free(void **ptr)
 	{
 		mem_obj_t *m = mem_obj_from_ptr(*ptr);
 
-		if (m->backtrace != NULL)
-			free(m->backtrace);
-
-		/* Free from base of aligned allocation */
-		free(m);
+		mem_obj_free(m);
 	}
 
 	*ptr = NULL;
@@ -222,7 +245,7 @@ void *mem_clone(void *ptr)
 	mem_obj_t *dst;
 
 	/* mem_obj_alloc always creates a new block; src is read-only copy source */
-	dst = mem_obj_alloc(src, src->used, src->used);
+	dst = mem_obj_alloc(src, src->used, src->used, __LOCATION__);
 	if (unlikely(dst == NULL))
 	{
 		pr_crit("mem_clone: allocation failed for %lu bytes\n",

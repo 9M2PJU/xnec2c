@@ -10,6 +10,7 @@ xnec2c_SOURCES = \
     main.c          main.h \
     branch_hints.h \
     mem.c           mem.h \
+    mem_track.c     mem_track.h \
     mathlib.c       mathlib.h \
     measurements.c  measurements.h \
     interface.c     interface.h \
