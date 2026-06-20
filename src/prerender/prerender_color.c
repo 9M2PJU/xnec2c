@@ -31,8 +31,6 @@ rgb_f_t *patch_rgb = NULL;
 
 struct_colors_t *struct_colors = NULL;
 
-static int allocated_steps = 0;
-
 /*-----------------------------------------------------------------------*/
 
 /**
@@ -215,6 +213,22 @@ Value_to_Color(double *red, double *grn, double *blu, double val, double max)
 /*-----------------------------------------------------------------------*/
 
 /**
+ * free_struct_colors_step() - Release one fstep's color sub-buffers
+ * @elem: pointer to one struct_colors_t element
+ */
+static void
+free_struct_colors_step(void *elem)
+{
+  struct_colors_t *c = elem;
+  mem_free((void **)&c->wire_crnt_rgb);
+  mem_free((void **)&c->wire_chrg_rgb);
+  mem_free((void **)&c->patch_crnt_rgb);
+  mem_free((void **)&c->patch_flow_data);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
  * alloc_struct_colors() - Allocate per-fstep struct_colors array
  * @nfrq: total frequency steps
  */
@@ -227,10 +241,10 @@ alloc_struct_colors(int nfrq)
   if( nfrq <= 0 )
     return;
 
-  mreq = (size_t)nfrq * sizeof(struct_colors_t);
-  mem_realloc((void **)&struct_colors, mreq);
-  memset( struct_colors, 0, mreq );
-  allocated_steps = nfrq;
+  /* Resize the outer array, freeing only the shrink tail; surviving
+   * entries keep their sub-buffers for reuse by the inner alloc loop. */
+  mem_array_resize((void **)&struct_colors, sizeof(struct_colors_t),
+      nfrq, free_struct_colors_step);
 
   for( i = 0; i < nfrq; i++ )
   {
@@ -265,14 +279,9 @@ free_struct_colors(void)
 
   if( struct_colors != NULL )
   {
-    nfrq = allocated_steps;
+    nfrq = mem_array_count(struct_colors, sizeof(struct_colors_t));
     for( i = 0; i < nfrq; i++ )
-    {
-      mem_free((void **)&struct_colors[i].wire_crnt_rgb);
-      mem_free((void **)&struct_colors[i].wire_chrg_rgb);
-      mem_free((void **)&struct_colors[i].patch_crnt_rgb);
-      mem_free((void **)&struct_colors[i].patch_flow_data);
-    }
+      free_struct_colors_step(&struct_colors[i]);
     mem_free((void **)&struct_colors);
   }
 

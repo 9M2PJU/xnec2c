@@ -704,6 +704,19 @@ rdpattern_overlay_shift_scroll(GdkScrollDirection dir,
 /*-----------------------------------------------------------------------*/
 
 /**
+ * free_near_step() - Release one fstep's near-field point buffer
+ * @elem: pointer to one near_field_t element
+ */
+static void
+free_near_step(void *elem)
+{
+  near_field_t *nf = elem;
+  mem_free((void **)&nf->points);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
  * Alloc_Nearfield_Fstep_Buffers() - Allocate per-frequency-step near field storage
  *
  * @nfrq: Number of frequency steps (steps_total + 1)
@@ -714,12 +727,10 @@ rdpattern_overlay_shift_scroll(GdkScrollDirection dir,
   void
 Alloc_Nearfield_Fstep_Buffers( int nfrq )
 {
-  size_t mreq;
-
-  /* Outer array — zero so realloc of sub-fields receives NULL, not garbage */
-  mreq = (size_t)nfrq * sizeof(near_field_t);
-  mem_realloc((void **)&near_field_fstep, mreq);
-  memset( near_field_fstep, 0, mreq );
+  /* Resize the outer array, freeing only the shrink tail; surviving
+   * entries keep their point buffers for reuse by the inner alloc loop. */
+  mem_array_resize((void **)&near_field_fstep, sizeof(near_field_t),
+      nfrq, free_near_step);
 
   size_t npts = (size_t)fpat.nrx * fpat.nry * fpat.nrz * sizeof(near_field_point_t);
 
@@ -741,11 +752,9 @@ Free_Nearfield_Fstep_Buffers( void )
   if( near_field_fstep == NULL )
     return;
 
-  int nfrq = calc_data.steps_total + 1;
+  int nfrq = mem_array_count(near_field_fstep, sizeof(near_field_t));
   for( int i = 0; i < nfrq; i++ )
-  {
-    mem_free((void **)&near_field_fstep[i].points);
-  }
+    free_near_step(&near_field_fstep[i]);
 
   mem_free((void **)&near_field_fstep);
 
@@ -1037,6 +1046,28 @@ Set_Window_Labels( void )
 
 /*-----------------------------------------------------------------------*/
 
+/**
+ * free_rad_pattern_step() - Release one fstep's radiation-pattern sub-buffers
+ * @elem: pointer to one rad_pattern_t element
+ */
+static void
+free_rad_pattern_step(void *elem)
+{
+  rad_pattern_t *rp = elem;
+  mem_free((void **)&rp->gtot);
+  mem_free((void **)&rp->max_gain);
+  mem_free((void **)&rp->min_gain);
+  mem_free((void **)&rp->max_gain_tht);
+  mem_free((void **)&rp->max_gain_phi);
+  mem_free((void **)&rp->max_gain_idx);
+  mem_free((void **)&rp->min_gain_idx);
+  mem_free((void **)&rp->axrt);
+  mem_free((void **)&rp->tilt);
+  mem_free((void **)&rp->sens);
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* Alloc_Rdpattern_Buffers
  *
  * Allocates memory to the radiation pattern buffers
@@ -1046,55 +1077,30 @@ _Alloc_Rdpattern_Buffers( int nfrq, int nth, int nph )
 {
   int idx;
   size_t mreq;
-  static int last_nfrq = 0;
 
-  /* Free old gain buffers first */
-  for( idx = 0; idx < last_nfrq; idx++ )
-  {
-    mem_free((void **)&rad_pattern[idx].gtot);
-    mem_free((void **)&rad_pattern[idx].max_gain);
-    mem_free((void **)&rad_pattern[idx].min_gain);
-    mem_free((void **)&rad_pattern[idx].max_gain_tht);
-    mem_free((void **)&rad_pattern[idx].max_gain_phi);
-    mem_free((void **)&rad_pattern[idx].max_gain_idx);
-    mem_free((void **)&rad_pattern[idx].min_gain_idx);
-    mem_free((void **)&rad_pattern[idx].axrt);
-    mem_free((void **)&rad_pattern[idx].tilt);
-    mem_free((void **)&rad_pattern[idx].sens);
-  }
-  last_nfrq = nfrq;
+  /* Resize the outer array, freeing only the shrink tail; surviving
+   * entries keep their sub-buffers for reuse by the inner alloc loop. */
+  mem_array_resize((void **)&rad_pattern, sizeof(rad_pattern_t),
+      nfrq, free_rad_pattern_step);
 
-  /* Allocate rad pattern buffers */
-  mreq = (size_t)nfrq * sizeof(rad_pattern_t);
-  mem_realloc((void **)&rad_pattern, mreq);
   for( idx = 0; idx < nfrq; idx++ )
   {
     /* Memory request for allocs */
     mreq = (size_t)(nph * nth) * sizeof(double);
-    rad_pattern[idx].gtot = NULL;
     mem_alloc((void **)&(rad_pattern[idx].gtot), mreq);
-    rad_pattern[idx].axrt = NULL;
     mem_alloc((void **)&(rad_pattern[idx].axrt), mreq);
-    rad_pattern[idx].tilt = NULL;
     mem_alloc((void **)&(rad_pattern[idx].tilt), mreq);
 
     mreq = NUM_POL * sizeof(double);
-    rad_pattern[idx].max_gain = NULL;
     mem_alloc((void **)&(rad_pattern[idx].max_gain), mreq);
-    rad_pattern[idx].min_gain = NULL;
     mem_alloc((void **)&(rad_pattern[idx].min_gain), mreq);
-    rad_pattern[idx].max_gain_tht = NULL;
     mem_alloc((void **)&(rad_pattern[idx].max_gain_tht), mreq);
-    rad_pattern[idx].max_gain_phi = NULL;
     mem_alloc((void **)&(rad_pattern[idx].max_gain_phi), mreq);
 
     mreq = NUM_POL * sizeof(int);
-    rad_pattern[idx].max_gain_idx = NULL;
     mem_alloc((void **)&(rad_pattern[idx].max_gain_idx), mreq);
-    rad_pattern[idx].min_gain_idx = NULL;
     mem_alloc((void **)&(rad_pattern[idx].min_gain_idx), mreq);
 
-    rad_pattern[idx].sens = NULL;
     mreq = (size_t)(nph * nth) * sizeof(int);
     mem_alloc((void **)&(rad_pattern[idx].sens), mreq);
   }

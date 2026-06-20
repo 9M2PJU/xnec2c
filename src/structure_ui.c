@@ -110,6 +110,25 @@ Show_Viewer_Gain(
 /*-----------------------------------------------------------------------*/
 
 /**
+ * free_crnt_step() - Release one fstep's crnt sub-buffers
+ * @elem: pointer to one crnt_t element
+ */
+static void
+free_crnt_step(void *elem)
+{
+  crnt_t *c = elem;
+  mem_free((void **)&c->air);
+  mem_free((void **)&c->aii);
+  mem_free((void **)&c->bir);
+  mem_free((void **)&c->bii);
+  mem_free((void **)&c->cir);
+  mem_free((void **)&c->cii);
+  mem_free((void **)&c->cur);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/**
  * Alloc_Crnt_Fstep_Buffers() - Allocate per-frequency-step crnt storage
  *
  * @nfrq: Number of frequency steps (steps_total + 1)
@@ -122,10 +141,10 @@ Alloc_Crnt_Fstep_Buffers( int nfrq )
 {
   size_t mreq;
 
-  /* Outer array — zero so realloc of sub-fields receives NULL, not garbage */
-  mreq = (size_t)nfrq * sizeof(crnt_t);
-  mem_realloc((void **)&crnt_fstep, mreq);
-  memset( crnt_fstep, 0, mreq );
+  /* Resize the outer array, freeing only the shrink tail; surviving
+   * entries keep their sub-buffers for reuse by the inner alloc loop. */
+  mem_array_resize((void **)&crnt_fstep, sizeof(crnt_t),
+      nfrq, free_crnt_step);
 
   for( int i = 0; i < nfrq; i++ )
   {

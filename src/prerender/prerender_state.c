@@ -27,18 +27,16 @@ geom_pre_t    geom_pre;
 ff_pre_t     *ff_pre     = NULL;
 nf_pre_t     *nf_pre     = NULL;
 
-/* Tracked allocation count for deallocation */
-static int allocated_steps = 0;
-
 /*-----------------------------------------------------------------------*/
 
 /**
  * free_ff_pre_step() - Release one ff_pre_t entry
- * @fp: pointer to the entry
+ * @elem: pointer to one ff_pre_t element
  */
 static void
-free_ff_pre_step(ff_pre_t *fp)
+free_ff_pre_step(void *elem)
 {
+  ff_pre_t *fp = elem;
   mem_free((void **)&fp->vertices);
   mem_free((void **)&fp->theta_rgb);
   mem_free((void **)&fp->phi_rgb);
@@ -47,11 +45,12 @@ free_ff_pre_step(ff_pre_t *fp)
 
 /**
  * free_nf_pre_step() - Release one nf_pre_t entry
- * @np: pointer to the entry
+ * @elem: pointer to one nf_pre_t element
  */
 static void
-free_nf_pre_step(nf_pre_t *np)
+free_nf_pre_step(void *elem)
 {
+  nf_pre_t *np = elem;
   mem_free((void **)&np->e_vecs);
   mem_free((void **)&np->h_vecs);
   mem_free((void **)&np->pov_vecs);
@@ -63,21 +62,17 @@ free_nf_pre_step(nf_pre_t *np)
   void
 prerender_state_alloc(int steps_total)
 {
-  /* Release any prior allocation */
-  prerender_state_free();
-
   if( steps_total <= 0 )
     return;
 
   size_t mreq;
 
-  mreq = (size_t)steps_total * sizeof(ff_pre_t);
-  mem_alloc((void **)&ff_pre, mreq);
-  memset(ff_pre, 0, mreq);
-
-  mreq = (size_t)steps_total * sizeof(nf_pre_t);
-  mem_alloc((void **)&nf_pre, mreq);
-  memset(nf_pre, 0, mreq);
+  /* Resize each array, freeing only the shrink tail; surviving entries
+   * keep their sub-buffers for reuse by the inner alloc loop. */
+  mem_array_resize((void **)&ff_pre, sizeof(ff_pre_t),
+      steps_total, free_ff_pre_step);
+  mem_array_resize((void **)&nf_pre, sizeof(nf_pre_t),
+      steps_total, free_nf_pre_step);
 
   /* Pre-allocate near-field inner arrays as pipe-read destinations.
    * PRead_Pipe writes directly into these pointers; they must be
@@ -97,8 +92,6 @@ prerender_state_alloc(int steps_total)
         mem_alloc((void **)&nf_pre[i].pov_vecs, mreq);
     }
   }
-
-  allocated_steps = steps_total;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -110,14 +103,16 @@ prerender_state_free(void)
 
   if( ff_pre != NULL )
   {
-    for( i = 0; i < allocated_steps; i++ )
+    int n = mem_array_count(ff_pre, sizeof(ff_pre_t));
+    for( i = 0; i < n; i++ )
       free_ff_pre_step(&ff_pre[i]);
     mem_free((void **)&ff_pre);
   }
 
   if( nf_pre != NULL )
   {
-    for( i = 0; i < allocated_steps; i++ )
+    int n = mem_array_count(nf_pre, sizeof(nf_pre_t));
+    for( i = 0; i < n; i++ )
       free_nf_pre_step(&nf_pre[i]);
     mem_free((void **)&nf_pre);
   }
@@ -135,8 +130,6 @@ prerender_state_free(void)
   /* patch_corners holds geometry computed at GE-card time. It is only
    * freed and reallocated by New_Patch_Data() on file reload; unlike the
    * RP/EX-card fields above, it must survive frequency-sweep restarts. */
-
-  allocated_steps = 0;
 }
 
 /*-----------------------------------------------------------------------*/
