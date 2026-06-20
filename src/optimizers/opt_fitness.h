@@ -136,7 +136,6 @@ typedef struct
 {
 	fitness_objective_t *obj;
 	int                  num_obj;
-	int                  capacity;
 } fitness_config_t;
 
 /**

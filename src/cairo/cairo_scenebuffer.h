@@ -100,16 +100,12 @@ typedef struct cairo_scenebuffer
 {
   Segment_t   *segs; /* straight lines and stroked outlines */
   int          count;
-  int          capacity;
   Arc_t       *arcs;
   int          arc_count;
-  int          arc_capacity;
   Polygon_t   *polys;
   int          poly_count;
-  int          poly_capacity;
   Text_t      *texts;
   int          text_count;
-  int          text_capacity;
   PangoLayout *text_layout; /* non-owning base font for every text run */
 } cairo_scenebuffer_t;
 

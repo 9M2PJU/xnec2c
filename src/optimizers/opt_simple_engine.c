@@ -10,6 +10,7 @@
  */
 
 #include "opt_simple_internal.h"
+#include "../mem.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -57,15 +58,11 @@ void simple_cache_clear(simple_cache_t *cache)
 {
 	for (int i = 0; i < cache->count; i++)
 	{
-		free(cache->keys[i]);
+		free(cache->entries[i].key);
 	}
 
-	free(cache->keys);
-	free(cache->values);
-	cache->keys = NULL;
-	cache->values = NULL;
+	mem_free((void **)&cache->entries);
 	cache->count = 0;
-	cache->capacity = 0;
 }
 
 /**
@@ -90,12 +87,12 @@ double simple_cache_lookup(simple_t *s, const gsl_vector *vec, int *found)
 
 	for (int i = 0; i < s->cache.count; i++)
 	{
-		if (strcmp(s->cache.keys[i], key) == 0)
+		if (strcmp(s->cache.entries[i].key, key) == 0)
 		{
 			free(key);
 			s->cache_hits++;
 			*found = 1;
-			return s->cache.values[i];
+			return s->cache.entries[i].value;
 		}
 	}
 
@@ -117,18 +114,11 @@ void simple_cache_store(simple_t *s, const gsl_vector *vec, double value)
 		return;
 	}
 
-	/* Grow arrays if needed */
-	if (s->cache.count >= s->cache.capacity)
-	{
-		int new_cap = (s->cache.capacity == 0) ? 64 : s->cache.capacity * 2;
-		s->cache.keys   = realloc(s->cache.keys,   new_cap * sizeof(char *));
-		s->cache.values = realloc(s->cache.values, new_cap * sizeof(double));
-		s->cache.capacity = new_cap;
-	}
+	mem_array_reserve((void **)&s->cache.entries, sizeof(simple_cache_entry_t),
+			  s->cache.count + 1, 64);
 
-	char *key = _cache_build_key(vec);
-	s->cache.keys[s->cache.count]   = key;
-	s->cache.values[s->cache.count] = value;
+	s->cache.entries[s->cache.count].key   = _cache_build_key(vec);
+	s->cache.entries[s->cache.count].value = value;
 	s->cache.count++;
 }
 

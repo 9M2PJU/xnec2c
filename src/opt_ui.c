@@ -295,7 +295,6 @@ void opt_ui_get_fitness_config(fitness_config_t *cfg)
 	memset(cfg, 0, sizeof(*cfg));
 	cfg->obj = NULL;
 	cfg->num_obj = 0;
-	cfg->capacity = 0;
 
 	for (iter = goal_row_list; iter != NULL; iter = iter->next)
 	{

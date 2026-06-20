@@ -42,19 +42,15 @@ scenebuffer_init(cairo_scenebuffer_t *sb, size_t initial_capacity)
 {
   mem_alloc((void **)&sb->segs, initial_capacity * sizeof(Segment_t));
   sb->count    = 0;
-  sb->capacity = (int)initial_capacity;
 
   sb->arcs         = NULL;
   sb->arc_count    = 0;
-  sb->arc_capacity = 0;
 
   sb->polys         = NULL;
   sb->poly_count    = 0;
-  sb->poly_capacity = 0;
 
   sb->texts         = NULL;
   sb->text_count    = 0;
-  sb->text_capacity = 0;
 
   sb->text_layout = NULL;
 }
@@ -72,19 +68,15 @@ scenebuffer_destroy(cairo_scenebuffer_t *sb)
 {
   mem_free((void **)&sb->segs);
   sb->count    = 0;
-  sb->capacity = 0;
 
   mem_free((void **)&sb->arcs);
   sb->arc_count    = 0;
-  sb->arc_capacity = 0;
 
   mem_free((void **)&sb->polys);
   sb->poly_count    = 0;
-  sb->poly_capacity = 0;
 
   mem_free((void **)&sb->texts);
   sb->text_count    = 0;
-  sb->text_capacity = 0;
 
   sb->text_layout = NULL;
 }
@@ -102,7 +94,7 @@ scenebuffer_destroy(cairo_scenebuffer_t *sb)
   void
 scenebuffer_reset(cairo_scenebuffer_t *sb)
 {
-  if( sb->capacity == 0 )
+  if( sb->segs == NULL )
     scenebuffer_init(sb, SCENEBUFFER_INITIAL_CAP);
 
   sb->count      = 0;
@@ -136,16 +128,8 @@ scenebuffer_set_text_layout(cairo_scenebuffer_t *sb, PangoLayout *layout)
   void
 scenebuffer_add(cairo_scenebuffer_t *sb, const Segment_t *seg)
 {
-  if( sb->count >= sb->capacity )
-  {
-    int new_cap = sb->capacity * 2;
-    Segment_t *grown = NULL;
-    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Segment_t));
-    memcpy(grown, sb->segs, (size_t)sb->count * sizeof(Segment_t));
-    mem_free((void **)&sb->segs);
-    sb->segs     = grown;
-    sb->capacity = new_cap;
-  }
+  mem_array_reserve((void **)&sb->segs, sizeof(Segment_t),
+      sb->count + 1, SCENEBUFFER_INITIAL_CAP);
 
   sb->segs[sb->count++] = *seg;
 }
@@ -189,17 +173,7 @@ scenebuffer_add_polygon_outline(cairo_scenebuffer_t *sb,
   void
 scenebuffer_add_arc(cairo_scenebuffer_t *sb, const Arc_t *a)
 {
-  if( sb->arc_count >= sb->arc_capacity )
-  {
-    int new_cap = sb->arc_capacity ? sb->arc_capacity * 2 : 256;
-    Arc_t *grown = NULL;
-    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Arc_t));
-    if( sb->arc_count )
-      memcpy(grown, sb->arcs, (size_t)sb->arc_count * sizeof(Arc_t));
-    mem_free((void **)&sb->arcs);
-    sb->arcs         = grown;
-    sb->arc_capacity = new_cap;
-  }
+  mem_array_reserve((void **)&sb->arcs, sizeof(Arc_t), sb->arc_count + 1, 256);
 
   sb->arcs[sb->arc_count++] = *a;
 }
@@ -223,17 +197,8 @@ scenebuffer_add_polygon(cairo_scenebuffer_t *sb, const Polygon_t *p)
     return;
   }
 
-  if( sb->poly_count >= sb->poly_capacity )
-  {
-    int new_cap = sb->poly_capacity ? sb->poly_capacity * 2 : 256;
-    Polygon_t *grown = NULL;
-    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Polygon_t));
-    if( sb->poly_count )
-      memcpy(grown, sb->polys, (size_t)sb->poly_count * sizeof(Polygon_t));
-    mem_free((void **)&sb->polys);
-    sb->polys         = grown;
-    sb->poly_capacity = new_cap;
-  }
+  mem_array_reserve((void **)&sb->polys, sizeof(Polygon_t),
+      sb->poly_count + 1, 256);
 
   sb->polys[sb->poly_count++] = *p;
 }
@@ -258,17 +223,8 @@ scenebuffer_add_text(cairo_scenebuffer_t *sb, const Text_t *t)
     return;
   }
 
-  if( sb->text_count >= sb->text_capacity )
-  {
-    int new_cap = sb->text_capacity ? sb->text_capacity * 2 : 64;
-    Text_t *grown = NULL;
-    mem_alloc((void **)&grown, (size_t)new_cap * sizeof(Text_t));
-    if( sb->text_count )
-      memcpy(grown, sb->texts, (size_t)sb->text_count * sizeof(Text_t));
-    mem_free((void **)&sb->texts);
-    sb->texts         = grown;
-    sb->text_capacity = new_cap;
-  }
+  mem_array_reserve((void **)&sb->texts, sizeof(Text_t),
+      sb->text_count + 1, 64);
 
   sb->texts[sb->text_count++] = *t;
 }

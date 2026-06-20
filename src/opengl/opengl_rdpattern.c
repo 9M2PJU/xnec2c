@@ -47,7 +47,6 @@
 
 /* Translated far-field points buffer for excitation center offset */
 static point_3d_t *rdpat_translated_points = NULL;
-static int rdpat_translated_capacity = 0;
 
 /* Widget pointer for external access */
 static GtkWidget *rdpattern_gl_widget = NULL;
@@ -204,11 +203,10 @@ gl_rdpat_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
   {
     int i;
 
-    if( npts > rdpat_translated_capacity )
+    if( npts > mem_array_capacity(rdpat_translated_points, sizeof(point_3d_t)))
     {
       size_t mreq = (size_t)npts * sizeof(point_3d_t);
       mem_realloc((void **)&rdpat_translated_points, mreq);
-      rdpat_translated_capacity = npts;
     }
 
     /* ff->x/y/z already pre-scaled to pattern space by dispatch */
@@ -404,7 +402,6 @@ rdpattern_scene_cleanup(void)
   opengl_rdpattern_geometry_cleanup();
 
   mem_free((void **)&rdpat_translated_points);
-  rdpat_translated_capacity = 0;
 }
 
 /*-----------------------------------------------------------------------*/

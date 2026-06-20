@@ -170,16 +170,10 @@ fp_locus_add( freqplots_view_t *v, const fp_locus_input_t *in )
   if( in->cont_n == 0 )
     return;
 
-  /* Grow the registry, zeroing new slots so their owned buffers start NULL
-   * for mem_realloc reuse on this and later frames. */
-  if( v->loci_n >= v->loci_cap )
-  {
-    int new_cap = v->loci_cap ? v->loci_cap * 2 : 4;
-    mem_realloc( (void **)&v->loci, (size_t)new_cap * sizeof(fp_locus_t) );
-    memset( &v->loci[v->loci_cap], 0,
-        (size_t)(new_cap - v->loci_cap) * sizeof(fp_locus_t) );
-    v->loci_cap = new_cap;
-  }
+  /* Grow the registry through the shared resize helper; surviving slots keep
+   * their owned buffers and the allocator zeroes newly exposed slots so their
+   * buffers start NULL for mem_realloc reuse on this and later frames. */
+  mem_array_reserve( (void **)&v->loci, sizeof(fp_locus_t), v->loci_n + 1, 4 );
 
   l = &v->loci[v->loci_n];
 
@@ -233,7 +227,7 @@ fp_locus_free( freqplots_view_t *v )
 {
   int i;
 
-  for( i = 0; i < v->loci_cap; i++ )
+  for( i = 0; i < mem_array_count(v->loci, sizeof(fp_locus_t)); i++ )
   {
     mem_free( (void **)&v->loci[i].pts );
     mem_free( (void **)&v->loci[i].freq );
@@ -242,6 +236,5 @@ fp_locus_free( freqplots_view_t *v )
   }
 
   mem_free( (void **)&v->loci );
-  v->loci_n   = 0;
-  v->loci_cap = 0;
+  v->loci_n = 0;
 }

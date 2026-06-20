@@ -17,13 +17,18 @@
 
 #include "opt_simple.h"
 
-/** Result cache: dynamic array of (key, value) pairs */
+/** One cached trial: parameter-vector key and the fitness it scored */
 typedef struct
 {
-	char   **keys;
-	double  *values;
-	int      count;
-	int      capacity;
+	char   *key;
+	double  value;
+} simple_cache_entry_t;
+
+/** Result cache: managed array of (key, value) entries */
+typedef struct
+{
+	simple_cache_entry_t *entries;
+	int                   count;
 } simple_cache_t;
 
 /** Full session state, opaque to public API callers */

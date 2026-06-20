@@ -1113,7 +1113,6 @@ typedef struct {
 	// capacity across frames.
 	fp_locus_t *loci;
 	int         loci_n;
-	int         loci_cap;
 
 	// Popup selected-frequency readout bar: one cell box and its value label
 	// per displayed field, refreshed each draw.  readout_n is 0 for the

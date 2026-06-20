@@ -547,7 +547,7 @@ scenebuffer_flush(cairo_scenebuffer_t *sb, cairo_t *cr,
     stats->batch_groups = 0;
     stats->sort_us      = 0;
     stats->stroke_us    = 0;
-    stats->capacity     = sb->capacity;
+    stats->capacity     = mem_array_capacity(sb->segs, sizeof(Segment_t));
   }
 
   if( sb->count == 0 && sb->arc_count == 0 &&
