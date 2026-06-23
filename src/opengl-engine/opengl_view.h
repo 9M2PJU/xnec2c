@@ -297,6 +297,8 @@ typedef struct gl_view_state_s
   int msaa_samples;
   int msaa_width;
   int msaa_height;
+  GLuint resolve_fbo;        /* single-sample color-only resolve target */
+  GLuint resolve_color_tex;  /* GL_RGBA8 texture sampled by the final copy */
 
   /* Depth-peel transparency state */
   GLuint peel_fbo[2];          /* ping-pong FBOs for depth peeling (single-sample resolve targets) */

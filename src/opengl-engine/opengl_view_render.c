@@ -19,6 +19,7 @@
 
 #include "opengl_view_render.h"
 #include "opengl_view_peel.h"
+#include "opengl_view_msaa.h"
 #include "opengl_view_notice.h"
 #include "opengl_gradient_overlay.h"
 #include "../shared.h"
@@ -323,16 +324,11 @@ on_render(GtkGLArea *area, GdkGLContext *context, gpointer user_data)
       gl_view_render_notice(state, surf_width, surf_height);
   }
 
-  /* Blit MSAA to default FBO */
+  /* Resolve MSAA into the default FBO through a single-sample texture copy.
+   * A direct multisample blit into GTK's framebuffer is rejected under
+   * Wayland/EGL, so the resolve and the default-FBO write are split. */
   if( state->msaa_fbo )
-  {
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, state->msaa_fbo);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, default_fbo);
-    glBlitFramebuffer(0, 0, state->msaa_width, state->msaa_height,
-                      0, 0, state->msaa_width, state->msaa_height,
-                      GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, default_fbo);
-  }
+    gl_view_msaa_resolve(state, default_fbo);
 
   return( TRUE );
 

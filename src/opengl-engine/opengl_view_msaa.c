@@ -51,6 +51,18 @@ gl_view_msaa_free(gl_view_state_t *state)
     state->msaa_depth_rbo = 0;
   }
 
+  if( state->resolve_fbo )
+  {
+    glDeleteFramebuffers(1, &state->resolve_fbo);
+    state->resolve_fbo = 0;
+  }
+
+  if( state->resolve_color_tex )
+  {
+    glDeleteTextures(1, &state->resolve_color_tex);
+    state->resolve_color_tex = 0;
+  }
+
   state->msaa_samples = 0;
 
 } /* gl_view_msaa_free() */
@@ -138,9 +150,88 @@ gl_view_recreate_msaa(gl_view_state_t *state, int requested_samples)
     gl_view_msaa_free(state);
   }
 
+  /* Create and size the single-sample resolve target.  Guarded by
+   * msaa_fbo: a failed completeness check above already freed it, and
+   * allocating here would orphan the resolve resources. */
+  if( state->msaa_fbo )
+  {
+    if( !state->resolve_color_tex )
+    {
+      glGenTextures(1, &state->resolve_color_tex);
+      glBindTexture(GL_TEXTURE_2D, state->resolve_color_tex);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+
+    if( !state->resolve_fbo )
+      glGenFramebuffers(1, &state->resolve_fbo);
+
+    glBindTexture(GL_TEXTURE_2D, state->resolve_color_tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0,
+        GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, state->resolve_fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+        GL_TEXTURE_2D, state->resolve_color_tex, 0);
+
+    if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+    {
+      pr_err("MSAA resolve framebuffer incomplete\n");
+      gl_view_msaa_free(state);
+    }
+  }
+
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 } /* gl_view_recreate_msaa() */
+
+/*-----------------------------------------------------------------------*/
+
+/** gl_view_msaa_resolve() - Resolve MSAA color to a texture, then draw it into default_fbo
+ * @state: view state holding the MSAA and resolve resources
+ * @default_fbo: GTK-provided framebuffer that receives the resolved image
+ *
+ * A direct multisample blit into GTK's framebuffer is rejected under
+ * Wayland/EGL, so the multisample resolve targets a single-sample texture
+ * and a fullscreen textured draw writes that texture into default_fbo.
+ */
+  void
+gl_view_msaa_resolve(gl_view_state_t *state, GLint default_fbo)
+{
+  int w = state->msaa_width;
+  int h = state->msaa_height;
+
+  /* Hardware resolve: multisample color → single-sample texture */
+  glBindFramebuffer(GL_READ_FRAMEBUFFER, state->msaa_fbo);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, state->resolve_fbo);
+  glBlitFramebuffer(0, 0, w, h, 0, 0, w, h,
+      GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+  /* Fullscreen textured copy of the resolved color into default_fbo */
+  glBindFramebuffer(GL_FRAMEBUFFER, default_fbo);
+  glViewport(0, 0, w, h);
+  glDisable(GL_DEPTH_TEST);
+  glDepthMask(GL_FALSE);
+  glDisable(GL_BLEND);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, state->resolve_color_tex);
+
+  glUseProgram(state->composite_program);
+  glUniform1i(state->composite_u_layer, 0);
+
+  glBindVertexArray(state->composite_vao);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+  glBindVertexArray(0);
+
+  /* Restore the frame-entry depth contract: on_render() clears the depth
+   * buffer next frame gated by the depth mask and never re-asserts it. */
+  glEnable(GL_DEPTH_TEST);
+  glDepthMask(GL_TRUE);
+
+} /* gl_view_msaa_resolve() */
 
 /*-----------------------------------------------------------------------*/
 
