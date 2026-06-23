@@ -31,3 +31,9 @@ _print_backtrace(char **strings)
 {
 	(void)strings;
 }
+
+gboolean
+isChild(void)
+{
+	return FALSE;
+}
