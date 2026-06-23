@@ -127,9 +127,6 @@ typedef struct { float r, g, b; } rgb_f_t;
 
 /* Named color constants for rendering */
 extern const rgb_f_t COLOR_WHITE;
-extern const rgb_f_t COLOR_YELLOW;
-extern const rgb_f_t COLOR_GREEN;
-extern const rgb_f_t COLOR_DARK_GREEN;
 extern const rgb_f_t COLOR_CYAN;
 extern const rgb_f_t COLOR_MAGENTA;
 extern const rgb_f_t COLOR_GREY;
@@ -375,6 +372,11 @@ typedef struct
     freqplots_clamp_vswr,
     freqplots_net_gain,
     freqplots_swap_click;
+
+  /* Frequency plots color theme base name and inversion toggle; the composed
+   * lookup key is derived at access time, never stored. */
+  char freqplots_theme[64];
+  int  freqplots_theme_invert;
 
   /* NEC2 editor window position and size */
   int
@@ -1631,6 +1633,12 @@ void on_aboutdialog_destroy(GObject *object, gpointer user_data);
 void on_aboutdialog_response(GtkDialog *dialog, gint response_id, gpointer user_data);
 void on_freqplots_net_gain_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_swap_click_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_freqplots_theme_activate(GtkMenuItem *menuitem, gpointer user_data);
+void on_freqplots_theme_invert_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
+void freqplots_invert_item_sync(GtkWidget *invert, const char *base);
+void freqplots_theme_menu_build(GtkBuilder *builder);
+void on_freqplots_theme_select(GtkMenuItem *menuitem, gpointer user_data);
+void on_freqplots_theme_menu_hide(GtkWidget *menu, gpointer user_data);
 gboolean on_structure_drawingarea_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 void on_main_zoom_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 gboolean on_rdpattern_drawingarea_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer user_data);

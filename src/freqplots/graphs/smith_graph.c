@@ -118,17 +118,9 @@ fp_locus_bracket( const double *freq, int nc, double fmhz )
  * each constant-reactance value a mirrored arc pair; the geometry derives
  * from the value so positions stay exact rather than approximated. */
 
-static const rgb_f_t SMITH_C_R     = { 0.40f, 0.52f, 0.72f };
-static const rgb_f_t SMITH_C_X     = { 0.72f, 0.52f, 0.40f };
-static const rgb_f_t SMITH_C_UNITY = { 0.88f, 0.84f, 0.45f };
-static const rgb_f_t SMITH_C_AXIS  = { 0.62f, 0.62f, 0.62f };
-static const rgb_f_t SMITH_C_PERIM = { 0.55f, 0.55f, 0.62f };
-static const rgb_f_t SMITH_C_WTG   = { 0.50f, 0.62f, 0.55f };
-
-#define SMITH_W_MINOR  1.0f
-#define SMITH_W_MAJOR  1.6f
-#define SMITH_W_AXIS   2.0f
-#define SMITH_W_LOCUS  1.0f
+/* Grid colors come from the active theme and widths from the width config;
+ * each grid row binds a theme color role and a width purpose by enum key,
+ * resolved per row at draw time. */
 
 /* Smith-chart paint order (ascending z paints later, hence on top):
  *   constant-X arcs < constant-R circles < unity/major grid and real axis <
@@ -143,40 +135,29 @@ static const rgb_f_t SMITH_C_WTG   = { 0.50f, 0.62f, 0.55f };
 #define SMITH_LABEL_GAP  10.0
 
 typedef struct {
-  double          value;   /* normalised resistance or |reactance| */
-  const rgb_f_t  *color;
-  float           width;
-  float           depth;   /* painter's-algorithm layer; see paint order above */
-  gboolean        label;
+  double       value;  /* normalised resistance or |reactance| */
+  theme_role_e color;  /* theme color role */
+  fp_width_e   width;  /* width purpose */
+  float        depth;  /* painter's-algorithm layer; see paint order above */
+  gboolean     label;
 } smith_grid_t;
 
 static const smith_grid_t smith_r_grid[] = {
-  { 0.0, &SMITH_C_AXIS,  SMITH_W_AXIS,  SMITH_Z_MAJOR, FALSE },
-  { 0.2, &SMITH_C_R,     SMITH_W_MINOR, SMITH_Z_R,     TRUE  },
-  { 0.5, &SMITH_C_R,     SMITH_W_MINOR, SMITH_Z_R,     TRUE  },
-  { 1.0, &SMITH_C_UNITY, SMITH_W_MAJOR, SMITH_Z_MAJOR, FALSE },
-  { 2.0, &SMITH_C_R,     SMITH_W_MINOR, SMITH_Z_R,     TRUE  },
-  { 5.0, &SMITH_C_R,     SMITH_W_MINOR, SMITH_Z_R,     TRUE  },
+  { 0.0, THEME_ROLE_AXIS,          FP_W_AXIS,          SMITH_Z_MAJOR, FALSE },
+  { 0.2, THEME_ROLE_GRID_PRIMARY,  FP_W_GRID,          SMITH_Z_R,     TRUE  },
+  { 0.5, THEME_ROLE_GRID_PRIMARY,  FP_W_GRID,          SMITH_Z_R,     TRUE  },
+  { 1.0, THEME_ROLE_GRID_EMPHASIS, FP_W_GRID_EMPHASIS, SMITH_Z_MAJOR, FALSE },
+  { 2.0, THEME_ROLE_GRID_PRIMARY,  FP_W_GRID,          SMITH_Z_R,     TRUE  },
+  { 5.0, THEME_ROLE_GRID_PRIMARY,  FP_W_GRID,          SMITH_Z_R,     TRUE  },
 };
 
 static const smith_grid_t smith_x_grid[] = {
-  { 0.2, &SMITH_C_X,     SMITH_W_MINOR, SMITH_Z_X,     FALSE },
-  { 0.5, &SMITH_C_X,     SMITH_W_MINOR, SMITH_Z_X,     TRUE  },
-  { 1.0, &SMITH_C_UNITY, SMITH_W_MAJOR, SMITH_Z_MAJOR, TRUE  },
-  { 2.0, &SMITH_C_X,     SMITH_W_MINOR, SMITH_Z_X,     TRUE  },
-  { 5.0, &SMITH_C_X,     SMITH_W_MINOR, SMITH_Z_X,     TRUE  },
+  { 0.2, THEME_ROLE_GRID_SECONDARY, FP_W_GRID,          SMITH_Z_X,     FALSE },
+  { 0.5, THEME_ROLE_GRID_SECONDARY, FP_W_GRID,          SMITH_Z_X,     TRUE  },
+  { 1.0, THEME_ROLE_GRID_EMPHASIS,  FP_W_GRID_EMPHASIS, SMITH_Z_MAJOR, TRUE  },
+  { 2.0, THEME_ROLE_GRID_SECONDARY, FP_W_GRID,          SMITH_Z_X,     TRUE  },
+  { 5.0, THEME_ROLE_GRID_SECONDARY, FP_W_GRID,          SMITH_Z_X,     TRUE  },
 };
-
-/* Per-graph density resolved once at graph entry: stroke widths halve when
- * panels share vertical space; text shrinks 1/n so stacked charts keep
- * proportional labels. */
-typedef struct { float stroke; float text; } fp_density_t;
-
-  static fp_density_t
-fp_density_for( int ngraph )
-{
-  return (fp_density_t){ ngraph > 1 ? 0.5f : 1.0f, 1.0f / (float)ngraph };
-}
 
 /* smith_polar()
  *
@@ -206,13 +187,18 @@ smith_polar( double cx, double cy, double radius, double deg, int *px, int *py )
  */
   static void
 smith_draw_resistance( fp_render_t *fp, int x0, int y0, double half,
-    double dw, const smith_grid_t *g, fp_density_t density )
+    double dw, const fp_style_t *style, const smith_grid_t *g )
 {
+  const theme_t    *th = style->theme;
+  const fp_width_t *w  = style->width;
+  fp_density_t      density = style->density;
+  rgb_f_t color = th->colors[g->color];
+  float   width = w->widths[g->width];
   double cx  = x0 + ( g->value / (g->value + 1.0) ) * half;
   double rad = half / (g->value + 1.0);
 
   fp_add_arc( fp, cx, y0, rad, 0.0, M_2PI,
-      (fp_stroke_t){ .color = *g->color, .width = g->width * density.stroke,
+      (fp_stroke_t){ .color = color, .width = width * density.stroke,
                      .z_mid = g->depth } );
 
   if( g->label )
@@ -229,7 +215,7 @@ smith_draw_resistance( fp_render_t *fp, int x0, int y0, double half,
 
     g_snprintf( buf, sizeof(buf), "%g", g->value );
     fp_add_text(fp, lx, ly, density.text, buf,
-                JUSTIFY_CENTER | JUSTIFY_MIDDLE | JUSTIFY_BOLD, *g->color);
+                JUSTIFY_CENTER | JUSTIFY_MIDDLE | JUSTIFY_BOLD, color);
   }
 
 } /* smith_draw_resistance() */
@@ -243,14 +229,19 @@ smith_draw_resistance( fp_render_t *fp, int x0, int y0, double half,
  */
   static void
 smith_draw_reactance( fp_render_t *fp, int x0, int y0, double half,
-    double dw, const smith_grid_t *g, fp_density_t density )
+    double dw, const fp_style_t *style, const smith_grid_t *g )
 {
+  const theme_t    *th = style->theme;
+  const fp_width_t *w  = style->width;
+  fp_density_t      density = style->density;
+  rgb_f_t color = th->colors[g->color];
+  float   width = w->widths[g->width];
   double x   = g->value;
   double rad = half / x;
   double cx  = x0 + half;
   double end = M_PI + atan2( (x*x - 1.0) / (x * (x*x + 1.0)),
                              2.0 / (x*x + 1.0) );
-  fp_stroke_t s = { .color = *g->color, .width = g->width * density.stroke,
+  fp_stroke_t s = { .color = color, .width = width * density.stroke,
                     .z_mid = g->depth };
 
   fp_add_arc( fp, cx, y0 - rad, rad, M_PI / 2.0, end, s );
@@ -275,10 +266,10 @@ smith_draw_reactance( fp_render_t *fp, int x0, int y0, double half,
 
     g_snprintf( buf, sizeof(buf), "j%g", x );
     fp_add_text(fp, ux, uy, density.text, buf,
-                JUSTIFY_CENTER | JUSTIFY_MIDDLE, *g->color);
+                JUSTIFY_CENTER | JUSTIFY_MIDDLE, color);
     g_snprintf( buf, sizeof(buf), "-j%g", x );
     fp_add_text(fp, lx - (int)(0.5 * dw), ly, density.text, buf,
-                JUSTIFY_CENTER | JUSTIFY_MIDDLE, *g->color);
+                JUSTIFY_CENTER | JUSTIFY_MIDDLE, color);
   }
 
 } /* smith_draw_reactance() */
@@ -292,10 +283,13 @@ smith_draw_reactance( fp_render_t *fp, int x0, int y0, double half,
  */
   static void
 smith_draw_perimeter( fp_render_t *fp, int x0, int y0, double half, double rh,
-    fp_density_t density )
+    const fp_style_t *style )
 {
-  rgb_f_t  perim_c = SMITH_C_PERIM;
-  rgb_f_t  wtg_c   = SMITH_C_WTG;
+  const theme_t    *th = style->theme;
+  const fp_width_t *w  = style->width;
+  fp_density_t      density = style->density;
+  rgb_f_t  perim_c = th->colors[THEME_ROLE_GRID_PERIMETER];
+  rgb_f_t  wtg_c   = th->colors[THEME_ROLE_GRID_SCALE];
   int      deg;
   int      k;
 
@@ -312,7 +306,7 @@ smith_draw_perimeter( fp_render_t *fp, int x0, int y0, double half, double rh,
     int      y2    = y0 - (int)( s * t1 );
 
     fp_add_line( fp, x1, y1, x2, y2,
-        (fp_stroke_t){ .color = perim_c, .width = FP_LINE_WIDTH, .z_mid = SMITH_Z_MAJOR } );
+        (fp_stroke_t){ .color = perim_c, .width = w->widths[FP_W_GRID] * density.stroke, .z_mid = SMITH_Z_MAJOR } );
 
     /* The 0 Ω and ∞ Ω endpoints own the horizontal axis terminals */
     if( major && deg != 0 && deg != 180 )
@@ -332,8 +326,8 @@ smith_draw_perimeter( fp_render_t *fp, int x0, int y0, double half, double rh,
 
   for( k = 0; k < 10; k++ )
   {
-    double w   = k * 0.05;
-    double phi = 180.0 - w * 720.0;
+    double wl  = k * 0.05;
+    double phi = 180.0 - wl * 720.0;
     int    lx, ly;
     char   buf[16];
 
@@ -343,7 +337,7 @@ smith_draw_perimeter( fp_render_t *fp, int x0, int y0, double half, double rh,
 
     smith_polar( x0, y0, half + SMITH_LABEL_GAP + 0.75 * rh, phi, &lx, &ly );
 
-    g_snprintf( buf, sizeof(buf), "%.2f", w );
+    g_snprintf( buf, sizeof(buf), "%.2f", wl );
     fp_add_text(fp, lx, ly, density.text, buf,
                 JUSTIFY_CENTER | JUSTIFY_MIDDLE, wtg_c);
   }
@@ -357,10 +351,14 @@ smith_draw_perimeter( fp_render_t *fp, int x0, int y0, double half, double rh,
  * matched-point marker at the chart centre.
  */
   static void
-smith_draw_grid( fp_render_t *fp, GtkWidget *area, int x0, int y0, int scale, fp_density_t density )
+smith_draw_grid( fp_render_t *fp, GtkWidget *area, int x0, int y0, int scale,
+    const fp_style_t *style )
 {
+  const theme_t    *th = style->theme;
+  const fp_width_t *w  = style->width;
+  fp_density_t      density = style->density;
   double  half   = scale / 2.0;
-  rgb_f_t axis_c = SMITH_C_AXIS;
+  rgb_f_t axis_c = th->colors[THEME_ROLE_AXIS];
   int     dw_px, dh_px;
   int     ex, ey;
   double  dw;
@@ -370,16 +368,16 @@ smith_draw_grid( fp_render_t *fp, GtkWidget *area, int x0, int y0, int scale, fp
   dw = (double)dw_px;
 
   fp_add_line( fp, x0 - (int)half, y0, x0 + (int)half, y0,
-      (fp_stroke_t){ .color = axis_c, .width = FP_LINE_WIDTH, .z_mid = SMITH_Z_MAJOR } );
+      (fp_stroke_t){ .color = axis_c, .width = w->widths[FP_W_AXIS] * density.stroke, .z_mid = SMITH_Z_MAJOR } );
 
   for( i = 0; i < G_N_ELEMENTS(smith_r_grid); i++ )
-    smith_draw_resistance( fp, x0, y0, half, dw, &smith_r_grid[i], density );
+    smith_draw_resistance( fp, x0, y0, half, dw, style, &smith_r_grid[i] );
 
   for( i = 0; i < G_N_ELEMENTS(smith_x_grid); i++ )
-    smith_draw_reactance( fp, x0, y0, half, dw, &smith_x_grid[i], density );
+    smith_draw_reactance( fp, x0, y0, half, dw, style, &smith_x_grid[i] );
 
   /* Bright matched-point dot at the chart centre */
-  fp_add_filled_circle( fp, x0, y0, 3, SMITH_Z_MAJOR, COLOR_WHITE );
+  fp_add_filled_circle( fp, x0, y0, 3, SMITH_Z_MAJOR, th->colors[THEME_ROLE_MARKER_EXTREME] );
 
   /* Real-axis endpoints: left is a short (0 Ω), right an open (∞ Ω) */
   smith_polar( x0, y0, half + SMITH_LABEL_GAP, 180.0, &ex, &ey );
@@ -389,7 +387,7 @@ smith_draw_grid( fp_render_t *fp, GtkWidget *area, int x0, int y0, int scale, fp
   fp_add_text(fp, ex, ey, density.text, _("∞ Ω"),
               JUSTIFY_LEFT | JUSTIFY_MIDDLE, axis_c);
 
-  smith_draw_perimeter( fp, x0, y0, half, (double)dh_px, density );
+  smith_draw_perimeter( fp, x0, y0, half, (double)dh_px, style );
 
 } /* smith_draw_grid() */
 
@@ -402,17 +400,18 @@ smith_draw_grid( fp_render_t *fp, GtkWidget *area, int x0, int y0, int scale, fp
  * the swatches and the text align in two columns.
  */
   static void
-smith_draw_legend( fp_render_t *fp, int x, int y_bottom, int line_h, float scale )
+smith_draw_legend( fp_render_t *fp, int x, int y_bottom, int line_h, float scale,
+    const theme_t *th )
 {
-  struct { rgb_f_t color; const char *text; } key[] = {
-    { SMITH_C_R,     _("constant R") },
-    { SMITH_C_X,     _("constant X") },
-    { SMITH_C_UNITY, _("unity R, X") },
-    { COLOR_WHITE,   _("match (z = 1)") },
-    { COLOR_MAGENTA, _("impedance vs freq") },
-    { COLOR_GREEN,   _("selected frequency") },
-    { SMITH_C_PERIM, _("reflection angle (°)") },
-    { SMITH_C_WTG,   _("wavelengths → gen") },
+  struct { const char *text; rgb_f_t color; } key[] = {
+    { _("constant R"),           th->colors[THEME_ROLE_GRID_PRIMARY]   },
+    { _("constant X"),           th->colors[THEME_ROLE_GRID_SECONDARY] },
+    { _("unity R, X"),           th->colors[THEME_ROLE_GRID_EMPHASIS]  },
+    { _("match (z = 1)"),        th->colors[THEME_ROLE_MARKER_EXTREME] },
+    { _("impedance vs freq"),    th->colors[THEME_ROLE_SERIES_PRIMARY] },
+    { _("selected frequency"),   th->colors[THEME_ROLE_CURSOR]         },
+    { _("reflection angle (°)"), th->colors[THEME_ROLE_GRID_PERIMETER] },
+    { _("wavelengths → gen"),    th->colors[THEME_ROLE_GRID_SCALE]     },
   };
   size_t n  = G_N_ELEMENTS(key);
   int    sw = line_h / 2;            /* swatch half-extent */
@@ -490,8 +489,14 @@ Plot_Graph_Smith(
    * shrink 1/n so stacked charts stay legible and proportional. */
   fp_density_t density = fp_density_for( v->ngraph );
 
+  /* Active color theme and per-purpose widths resolved once at plot entry and
+   * passed down to the leaf drawing helpers. */
+  const theme_t    *th = theme_active();
+  const fp_width_t *w  = fp_width_active();
+  fp_style_t        style = { .theme = th, .width = w, .density = density };
+
   /* Draw smith background grid */
-  smith_draw_grid( fp, v->drawingarea, x0, y0, scale, density );
+  smith_draw_grid( fp, v->drawingarea, x0, y0, scale, &style );
 
   /* Corner overlays annotate the plot frame rather than the chart geometry,
    * so they hold base size regardless of how many graphs share the window;
@@ -501,19 +506,20 @@ Plot_Graph_Smith(
   /* Normalising-impedance annotation */
   g_snprintf( z0buf, sizeof(z0buf), _("Z0 = %g Ω"), calc_data.zo );
   fp_add_text(fp, plot_rect.x, plot_rect.y, annot_text, z0buf,
-              JUSTIFY_LEFT | JUSTIFY_BELOW, COLOR_WHITE);
+              JUSTIFY_LEFT | JUSTIFY_BELOW, th->colors[THEME_ROLE_MARKER_EXTREME]);
 
-  /* Reactance-sign reminders in the clear plot corners */
+  /* Reactance-sign reminders in the clear plot corners; cyan to match the
+   * right-hand series so right-side colors read consistently */
   fp_add_text(fp, plot_rect.x + plot_rect.width, plot_rect.y, annot_text,
-              _("INDUCTIVE (+jX)"), JUSTIFY_RIGHT | JUSTIFY_BELOW, SMITH_C_X);
+              _("INDUCTIVE (+jX)"), JUSTIFY_RIGHT | JUSTIFY_BELOW, th->colors[THEME_ROLE_SERIES_SECONDARY]);
   fp_add_text(fp, plot_rect.x + plot_rect.width,
               plot_rect.y + plot_rect.height, annot_text,
-              _("CAPACITIVE (-jX)"), JUSTIFY_RIGHT | JUSTIFY_ABOVE, SMITH_C_X);
+              _("CAPACITIVE (-jX)"), JUSTIFY_RIGHT | JUSTIFY_ABOVE, th->colors[THEME_ROLE_SERIES_SECONDARY]);
 
   /* Colour key in the lower-left corner; swatch and row spacing track the
    * base label height */
   smith_draw_legend( fp, plot_rect.x,
-      plot_rect.y + plot_rect.height, layout_height, annot_text );
+      plot_rect.y + plot_rect.height, layout_height, annot_text, th );
 
   /* Calculate points to plot */
   mem_alloc((void **)&points, (size_t)nc * sizeof(GdkPoint));
@@ -536,7 +542,7 @@ Plot_Graph_Smith(
     points[idx].x = x0 + (gint)( re * scale / 2 );
     points[idx].y = y0 + (gint)( im * scale / 2 );
     fp_add_filled_square( fp, points[idx].x, points[idx].y, SMITH_MARK_STEP,
-        FP_Z_LEFT, COLOR_MAGENTA );
+        FP_Z_LEFT, th->colors[THEME_ROLE_SERIES_PRIMARY] );
   }
 
   /* Draw one locus per FR card so the trace does not jump between the
@@ -549,7 +555,7 @@ Plot_Graph_Smith(
     int cn = card_nfsteps[card];
     if( cn > 0 )
       fp_add_polyline( fp, points + coff, cn,
-          (fp_stroke_t){ .color = COLOR_MAGENTA, .width = SMITH_W_LOCUS * density.stroke,
+          (fp_stroke_t){ .color = th->colors[THEME_ROLE_SERIES_PRIMARY], .width = w->widths[FP_W_TRACE] * density.stroke,
                          .z_mid = FP_Z_LEFT } );
     coff += cn;
   }
@@ -568,8 +574,7 @@ Plot_Graph_Smith(
    * changed by a user click on the plots drawingarea */
   if( calc_data.fmhz_save > 0.0 )
   {
-    rgb_f_t green_c = isFlagSet(SY_OPTIMIZER_ACTIVE)
-        ? COLOR_DARK_GREEN : COLOR_GREEN;
+    rgb_f_t cursor_c = fp_cursor_color(th);
 
     /* Interpolate the completed sweep locus at the click frequency so the
      * marker tracks the click without waiting on a pending solve */
@@ -584,7 +589,7 @@ Plot_Graph_Smith(
 
     x = x0 + (gint)( re * scale / 2 );
     y = y0 + (gint)( im * scale / 2 );
-    fp_add_filled_square( fp, x, y, 8, FP_Z_GREEN, green_c );
+    fp_add_filled_square( fp, x, y, 8, FP_Z_GREEN, cursor_c );
   }
 
 } /* Plot_Graph_Smith() */

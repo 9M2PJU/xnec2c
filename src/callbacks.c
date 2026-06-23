@@ -21,6 +21,7 @@
 #include "shared.h"
 #include "opt_ui.h"
 #include "measurements.h"
+#include "themes/theme.h"
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
 #include "cairo/cairo_draw.h"
@@ -6096,6 +6097,94 @@ on_freqplots_net_gain_activate(
   {
     freqplots_redraw_all(TRUE);
   }
+}
+
+
+/* on_freqplots_theme_activate()
+ *
+ * Base color-theme radio selection.  Sets the active base theme name and
+ * updates the Inverted item's sensitivity to match whether the chosen theme
+ * carries an inverted variant, then repaints through the single orchestration
+ * path. */
+  void
+on_freqplots_theme_activate(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+  const char *base;
+  GtkWidget  *invert;
+
+  if( !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
+    return;
+
+  base = g_object_get_data( G_OBJECT(menuitem), THEME_DATA_BASE );
+  if( base == NULL )
+    return;
+
+  Strlcpy( rc_config.freqplots_theme, base, sizeof(rc_config.freqplots_theme) );
+
+  /* A committed selection supersedes any hover preview so theme_active reads
+   * the persisted rc_config value rather than the transient override. */
+  theme_preview_clear();
+
+  invert = g_object_get_data( G_OBJECT(menuitem), THEME_DATA_INVERT_ITEM );
+  if( invert != NULL )
+    freqplots_invert_item_sync( invert, base );
+
+  freq_step_update_ui( calc_data.freq_step, TRUE );
+}
+
+/* on_freqplots_theme_invert_toggled()
+ *
+ * Inverted-variant toggle, the orthogonal axis to the base theme; repaints
+ * through the single orchestration path. */
+  void
+on_freqplots_theme_invert_toggled(
+    GtkCheckMenuItem *menuitem,
+    gpointer          user_data)
+{
+  rc_config.freqplots_theme_invert =
+      gtk_check_menu_item_get_active(menuitem) ? 1 : 0;
+
+  freq_step_update_ui( calc_data.freq_step, TRUE );
+}
+
+/* on_freqplots_theme_select()
+ *
+ * Menu-hover preview.  Highlighting a base-theme item paints that theme at
+ * once without committing it, so the user previews before choosing.  An
+ * uncommitted preview is reverted by on_freqplots_theme_menu_hide when the
+ * theme list collapses. */
+  void
+on_freqplots_theme_select(
+    GtkMenuItem     *menuitem,
+    gpointer         user_data)
+{
+  const char *base = g_object_get_data( G_OBJECT(menuitem), THEME_DATA_BASE );
+
+  if( base == NULL )
+    return;
+
+  theme_preview_set( base );
+  freq_step_update_ui( calc_data.freq_step, TRUE );
+}
+
+/* on_freqplots_theme_menu_hide()
+ *
+ * Color Theme submenu collapse.  A click commits through
+ * on_freqplots_theme_activate, which clears the preview before the menu hides;
+ * a preview still active here means the list collapsed on a mere hover, so the
+ * committed selection is restored. */
+  void
+on_freqplots_theme_menu_hide(
+    GtkWidget       *menu,
+    gpointer         user_data)
+{
+  if( !theme_preview_active() )
+    return;
+
+  theme_preview_clear();
+  freq_step_update_ui( calc_data.freq_step, TRUE );
 }
 
 

@@ -114,7 +114,7 @@ double Fit_to_Scale( double *max, double *min, int *nval )
 /* fscale_extent_fit()
  *
  * Derive a panel's display extent from its FR card data range.  Seeds
- * *min/*max from the card's frequency limits, then rounds outward via
+ * *min / *max from the card's frequency limits, then rounds outward via
  * Fit_to_Scale when the X-axis is rounded or the range is degenerate
  * (single-frequency card).  *nval carries the subdivision count in and
  * out: callers with rendered geometry pass the width-derived count;

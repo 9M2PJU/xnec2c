@@ -66,6 +66,13 @@ Plot_Graph(
 	if (calc_data.freq_step < 0)
 		return;
 
+	// Active color theme, per-purpose widths, and per-panel density resolved
+	// once at plot entry and passed down to the leaf drawing helpers.
+	const theme_t    *th = theme_active();
+	const fp_width_t *w  = fp_width_active();
+	fp_density_t      density = fp_density_for(v->ngraph);
+	fp_style_t        style = { .theme = th, .width = w, .density = density };
+
 	// Get the pixel size of the scale text on left and right of the graph.
 	pango_text_size(v->drawingarea,
 		&pad_x_scale_text,
@@ -130,14 +137,14 @@ Plot_Graph(
 	plot_rect_y = (v->height * posn) / v->ngraph;
 
 	fp_add_text(fp, pad_x_scale_text + pad_x_px_after_scale, plot_rect_y,
-		    1.0f, titles[0], JUSTIFY_LEFT, COLOR_MAGENTA);
+		    1.0f, titles[0], JUSTIFY_LEFT, th->colors[THEME_ROLE_LABEL_PRIMARY]);
 
 	fp_add_text(fp, v->width / 2, plot_rect_y, 1.0f, titles[1],
-		    JUSTIFY_CENTER, COLOR_YELLOW);
+		    JUSTIFY_CENTER, th->colors[THEME_ROLE_LABEL_AXIS]);
 
 	fp_add_text(fp,
 		    v->width - (pad_x_scale_text + pad_x_px_after_scale),
-		    plot_rect_y, 1.0f, titles[2], JUSTIFY_RIGHT, COLOR_CYAN);
+		    plot_rect_y, 1.0f, titles[2], JUSTIFY_RIGHT, th->colors[THEME_ROLE_LABEL_SECONDARY]);
 
 	// Increase the y position to account for the title text height above:
 	plot_rect_y += pad_y_title_text;
@@ -186,7 +193,7 @@ Plot_Graph(
 	if (y_left != NULL)
 		Plot_Vertical_Scale(
 			fp,
-			COLOR_MAGENTA,
+			th->colors[THEME_ROLE_LABEL_PRIMARY],
 			pad_x_scale_text, plot_rect_y,
 			plot_rect_height,
 			max_y_left, min_y_left, n_horiz_scale);
@@ -194,7 +201,7 @@ Plot_Graph(
 	if (y_right != NULL)
 		Plot_Vertical_Scale(
 			fp,
-			COLOR_CYAN,
+			th->colors[THEME_ROLE_LABEL_SECONDARY],
 			v->width-pad_x_px_after_scale,
 			plot_rect_y,
 			plot_rect_height,
@@ -263,12 +270,12 @@ Plot_Graph(
 		double min_fscale = fr_plot->min_fscale;
 		double max_fscale = fr_plot->max_fscale;
 
-		Draw_Plotting_Frame( fp, titles,
+		Draw_Plotting_Frame( fp, &style, titles,
 			plot_rect, n_horiz_scale, n_vert_scale);
 
 		Plot_Horizontal_Scale(
 			fp,
-			COLOR_YELLOW,
+			th->colors[THEME_ROLE_LABEL_AXIS],
 			plot_rect->x,
 			plot_rect->y + plot_rect->height,
 			plot_rect->width,
@@ -278,7 +285,8 @@ Plot_Graph(
 		{
 			Draw_Graph(
 				fp,
-				COLOR_MAGENTA,
+				&style,
+				th->colors[THEME_ROLE_SERIES_PRIMARY],
 				plot_rect,
 				y_left+offset, x+offset,
 				max_y_left, min_y_left,
@@ -291,7 +299,8 @@ Plot_Graph(
 		{
 			Draw_Graph(
 				fp,
-				COLOR_CYAN,
+				&style,
+				th->colors[THEME_ROLE_SERIES_SECONDARY],
 				plot_rect,
 				y_right+offset, x+offset,
 				max_y_right, min_y_right,
@@ -309,16 +318,19 @@ Plot_Graph(
 			&& calc_data.fmhz_save <= max_fscale + 1e-6)
 		{
 			double freq_x;
-			rgb_f_t green_c = isFlagSet(SY_OPTIMIZER_ACTIVE)
-				? COLOR_DARK_GREEN : COLOR_GREEN;
+			rgb_f_t cursor_c = fp_cursor_color(th);
 
 			freq_x = (calc_data.fmhz_save - min_fscale) / (max_fscale - min_fscale);
 			freq_x *= plot_rect->width;
 
+			/* The cursor is a UI marker, not panel data; it keeps the full
+			 * w_cursor width unscaled by panel density so a stacked-panel
+			 * sub-pixel line never anti-aliases the marker to a dim hue,
+			 * matching the unscaled Smith cursor and legacy stroke. */
 			fp_add_line(fp,
 				(int)(plot_rect->x + freq_x), plot_rect->y,
 				(int)(plot_rect->x + freq_x), plot_rect->y+plot_rect->height,
-				(fp_stroke_t){ .color = green_c, .width = FP_LINE_WIDTH, .z_mid = FP_Z_GREEN });
+				(fp_stroke_t){ .color = cursor_c, .width = w->widths[FP_W_CURSOR], .z_mid = FP_Z_GREEN });
 		}
 
 		/* Deposit this card's click-resolution geometry.  A primary click

@@ -20,7 +20,9 @@
 #include <ctype.h>
 #include "interface.h"
 #include "shared.h"
+#include "callbacks.h"
 #include "i18n.h"
+#include "themes/theme.h"
 
 /*------------------------------------------------------------------*/
 
@@ -243,6 +245,13 @@ create_freqplots_window( GtkBuilder **builder )
   gchar *object_ids[] = { FREQPLOTS_WINDOW_IDS };
   Gtk_Builder( builder, object_ids );
   ret = Builder_Get_Object( *builder, "freqplots_window" );
+
+  /* The color-theme registry and the per-purpose widths load once with the
+   * window; the Color Theme submenu is generated from the registry. */
+  theme_registry_init();
+  fp_width_init();
+  freqplots_theme_menu_build( *builder );
+
   return( ret );
 }
 

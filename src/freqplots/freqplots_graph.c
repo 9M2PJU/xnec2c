@@ -32,12 +32,17 @@
   void
 Draw_Plotting_Frame(
     fp_render_t *fp,
+    const fp_style_t *style,
     gchar **title,
     GdkRectangle *rect,
     int nhor, int nvert )
 {
+  const theme_t    *th = style->theme;
+  const fp_width_t *w  = style->width;
+  fp_density_t      density = style->density;
   int idx, xpw, xps, yph, yps;
-  fp_stroke_t grid = { .color = COLOR_GREY, .width = FP_LINE_WIDTH, .z_mid = FP_Z_GRID };
+  fp_stroke_t grid = { .color = th->colors[THEME_ROLE_GRID], .width = w->widths[FP_W_GRID] * density.stroke, .z_mid = FP_Z_GRID };
+  fp_stroke_t box  = { .color = th->colors[THEME_ROLE_GRID], .width = w->widths[FP_W_AXIS] * density.stroke, .z_mid = FP_Z_GRID };
 
   /* title is unused; the frame draws only grid lines and the bounding box */
   (void)title;
@@ -63,7 +68,7 @@ Draw_Plotting_Frame(
   }
 
   /* Draw outer box */
-  fp_add_rect( fp, rect->x, rect->y, rect->width, rect->height, grid );
+  fp_add_rect( fp, rect->x, rect->y, rect->width, rect->height, box );
 
 } /* Draw_Plotting_Frame() */
 
@@ -93,6 +98,7 @@ draw_poly(
   void
 Draw_Graph(
     fp_render_t *fp,
+    const fp_style_t *style,
     rgb_f_t trace_c,
     GdkRectangle *rect,
     double *a, double *b,
@@ -100,6 +106,9 @@ Draw_Graph(
     double bmax, double bmin,
     int nval, int nval_max, int side )
 {
+  const theme_t    *th = style->theme;
+  const fp_width_t *w  = style->width;
+  fp_density_t      density = style->density;
   double ra;
   int idx;
   GdkPoint *points = NULL;
@@ -110,9 +119,8 @@ Draw_Graph(
   const int MARKER_SIZE_MULTI_POINT = 6;
   const int CIRCLE_PADDING_PX = 3;
 
-  /* Depth layer and resolved colours for this axis side */
+  /* Depth layer for this axis side; the side circle reads the trace color. */
   float   z       = (side == LEFT) ? FP_Z_LEFT : FP_Z_RIGHT;
-  rgb_f_t side_c  = (side == LEFT) ? COLOR_MAGENTA : COLOR_CYAN;
 
   (void)nval_max;
 
@@ -149,7 +157,7 @@ Draw_Graph(
 
   /* Draw the graph */
   fp_add_polyline( fp, points, nval,
-      (fp_stroke_t){ .color = trace_c, .width = FP_LINE_WIDTH, .z_mid = z } );
+      (fp_stroke_t){ .color = trace_c, .width = w->widths[FP_W_TRACE] * density.stroke, .z_mid = z } );
 
   /* Plot a small rectangle (left scale) or polygon (right scale) at point */
   for( idx = 0; idx < nval; idx++ )
@@ -158,12 +166,12 @@ Draw_Graph(
 	if (marker_size == MARKER_SIZE_SINGLE_POINT)
 	{
 		fp_add_filled_circle( fp, points[idx].x, points[idx].y,
-			marker_size/2 + circle_padding, z, side_c );
+			marker_size/2 + circle_padding, z, trace_c );
 	}
 
 	rgb_f_t marker_c;
 	if (idx == min_idx || idx == max_idx)
-		marker_c = COLOR_WHITE;
+		marker_c = th->colors[THEME_ROLE_MARKER_EXTREME];
     else
 		marker_c = trace_c;
 

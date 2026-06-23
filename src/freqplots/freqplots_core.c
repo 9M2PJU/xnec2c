@@ -819,9 +819,12 @@ _Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
   if (v->fr_plots == NULL)
 	  return; // nothing to do here...
 
-  /* Clear drawingarea */
-  cairo_set_source_rgb( cr, (double)COLOR_BLACK.r,
-      (double)COLOR_BLACK.g, (double)COLOR_BLACK.b );
+  /* Clear drawingarea to the active theme's background surface; foreground
+   * roles are contrast-solved against this same surface. */
+  const theme_t *th = theme_active();
+  cairo_set_source_rgb( cr, (double)th->colors[THEME_ROLE_BACKGROUND].r,
+      (double)th->colors[THEME_ROLE_BACKGROUND].g,
+      (double)th->colors[THEME_ROLE_BACKGROUND].b );
   cairo_rectangle(
       cr, 0.0, 0.0,
       (double)v->width,

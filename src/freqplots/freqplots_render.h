@@ -31,9 +31,6 @@
 #define FP_Z_LEFT   6.0f
 #define FP_Z_GREEN  7.0f
 
-/* Every freq-plot stroke uses the GTK draw context default line width. */
-#define FP_LINE_WIDTH  2.0f
-
 /* Cohesive stroke style passed to the line/arc deposit helpers; one object
  * instead of three loose colour, width, and depth scalars. */
 typedef struct

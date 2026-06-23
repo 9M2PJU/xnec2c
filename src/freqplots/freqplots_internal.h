@@ -19,6 +19,7 @@
 #include "../plot_freqdata.h"
 #include "../measurements.h"
 #include "freqplots_render.h"
+#include "../themes/theme.h"
 
 /* Map an axis value to its pixel x within rect, rounding to the nearest pixel.
  * Single source for x-axis sample placement, shared by the trace renderer and
@@ -27,6 +28,48 @@ static inline int
 fp_axis_pixel_x(const GdkRectangle *rect, double val, double vmin, double vmax)
 {
   return rect->x + (int)((double)rect->width * (val - vmin) / (vmax - vmin) + 0.5);
+}
+
+/* Per-panel density resolved once at plot entry: stroke widths halve when
+ * panels share vertical space; text shrinks 1/n so stacked charts keep
+ * proportional labels.  Shared by every plot type so stacked panels stay
+ * legible. */
+typedef struct { float stroke; float text; } fp_density_t;
+
+static inline fp_density_t
+fp_density_for(int ngraph)
+{
+  return (fp_density_t){ ngraph > 1 ? 0.5f : 1.0f, 1.0f / (float)ngraph };
+}
+
+/* Per-plot style bundle: the active color theme, the per-purpose line widths,
+ * and the per-panel density, resolved once at plot entry and threaded as one
+ * argument to every leaf drawing helper so the trio never drifts apart. */
+typedef struct
+{
+  const theme_t    *theme;
+  const fp_width_t *width;
+  fp_density_t      density;
+} fp_style_t;
+
+/* The optimizing pass scales the cursor to half intensity. */
+#define FP_CURSOR_OPTIMIZE_DIM  0.5f
+
+/* fp_cursor_color()
+ *
+ * Single source for the selected-frequency marker color across every plot
+ * type: the rectangular cursor line and the Smith selected-frequency dot both
+ * resolve it here from the one cursor role, so the two never diverge.  The
+ * optimizing pass keeps the cursor hue and scales it to half intensity rather
+ * than reading a second role, so the dimmed color is derived, never stored. */
+static inline rgb_f_t
+fp_cursor_color(const theme_t *th)
+{
+  float k = isFlagSet(SY_OPTIMIZER_ACTIVE) ? FP_CURSOR_OPTIMIZE_DIM : 1.0f;
+
+  return (rgb_f_t){ th->colors[THEME_ROLE_CURSOR].r * k,
+                    th->colors[THEME_ROLE_CURSOR].g * k,
+                    th->colors[THEME_ROLE_CURSOR].b * k };
 }
 
 /* Per-view plot-table init, rectangle accessors, and width sync
@@ -54,9 +97,12 @@ void   Plot_Vertical_Scale(fp_render_t *fp,
     double max, double min, int nval);
 
 /* Shared XY drawing primitives (freqplots_graph.c) */
-void Draw_Plotting_Frame(fp_render_t *fp, gchar **title,
+void Draw_Plotting_Frame(fp_render_t *fp,
+    const fp_style_t *style,
+    gchar **title,
     GdkRectangle *rect, int nhor, int nvert);
 void Draw_Graph(fp_render_t *fp,
+    const fp_style_t *style,
     rgb_f_t trace_c,
     GdkRectangle *rect,
     double *a, double *b,

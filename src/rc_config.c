@@ -354,6 +354,12 @@ rc_config_vars_t rc_config_vars[] = {
 	{ .desc = "Antenna Temp Custom Earth (K)", .format = "%lf",
 		.vars = { &rc_config.ant_temp_custom_t_earth } },
 
+	{ .desc = "Frequency Plots Color Theme", .format = "%s",
+		.vars = { rc_config.freqplots_theme }, .size = sizeof(rc_config.freqplots_theme) },
+
+	{ .desc = "Frequency Plots Theme Inverted", .format = "%d",
+		.vars = { &rc_config.freqplots_theme_invert } },
+
 };
 
 
@@ -694,6 +700,8 @@ Create_Default_Config( void )
   rc_config.freqplots_clamp_vswr = 1;
   rc_config.freqplots_round_x_axis = 0;
   rc_config.freqplots_swap_click = 1;
+  Strlcpy( rc_config.freqplots_theme, "legacy", sizeof(rc_config.freqplots_theme) );
+  rc_config.freqplots_theme_invert = 0;
 
   /* Antenna temperature defaults (Synth Practical Avg sky + DG7YBN Residential earth) */
   rc_config.ant_temp_sky = ANT_TEMP_SKY_SYNTH_AVG;
