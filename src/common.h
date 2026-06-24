@@ -67,11 +67,10 @@ typedef void (* GSourceOnceFunc) (gpointer user_data);
 #define PATH_MAX 4096
 #endif
 
-// Use __LOCATION__ anywhere you want the file and line number:
-// (Move this to be used in all calls to mem_realloc)
-#define __S1(x) #x
-#define STRINGIFY(x) __S1(x)
-#define  __LOCATION__ __FILE__ ":"  STRINGIFY(__LINE__)
+// __LOCATION__ and STRINGIFY are defined in location.h, already pulled in
+// above through mem.h, so headers can use __LOCATION__ without depending on
+// common.h include order:
+#include "location.h"
 
 typedef struct Segment
 {

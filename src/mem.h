@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "branch_hints.h"
+#include "location.h"
 
 /* Alignment for cache-line and AVX-512 friendliness */
 #define MEM_ALIGNMENT  64
@@ -15,7 +16,7 @@
  *
  * Layout:
  *   |<-- MEM_HEADER_SIZE (64B) -->|<-- req bytes user data -->|
- *   [ mem_obj_t (40B) | pad 24B  ][ user ptr (64-byte aligned)]
+ *   [ mem_obj_t (48B) | pad 16B  ][ user ptr (64-byte aligned)]
  *   ^                              ^
  *   base (64-aligned)              m->ptr = base + MEM_HEADER_SIZE
  *
@@ -25,6 +26,9 @@
  *     - shrink: req <= used, no realloc
  *     - grow within capacity: used < req <= size, no realloc
  *     - grow beyond capacity: req > size, new posix_memalign
+ *   array_elem_size: element size for a managed array; 0 marks a scalar or
+ *     byte block. The array layer is its single writer; element count and
+ *     capacity derive from used/size divided by this size.
  *   backtrace: optional debug allocation trace
  *   site: __LOCATION__ of the allocating call, for leak accounting
  *   ptr: pointer to user data region
@@ -33,6 +37,7 @@ typedef struct mem_obj_t
 {
 	size_t size;
 	size_t used;
+	size_t array_elem_size;
 	char **backtrace;
 	const char *site;
 
@@ -88,12 +93,38 @@ static inline void *_mem_realloc_fast(void **ptr, size_t req, char *str)
 	return _mem_realloc(ptr, req, str);
 }
 
-#define mem_alloc(ptr, size)   _mem_realloc_fast(ptr, size, __LOCATION__)
-#define mem_realloc(ptr, size) _mem_realloc_fast(ptr, size, __LOCATION__)
+#define mem_alloc(ptr, size)   _mem_realloc_fast((void **)(ptr), (size), __LOCATION__)
+#define mem_realloc(ptr, size) _mem_realloc_fast((void **)(ptr), (size), __LOCATION__)
 
 void mem_backtrace(void *ptr);
 void mem_obj_dump(void *ptr);
-void mem_free(void **ptr);
+void _mem_free(void **ptr);
+#define mem_free(ptr) _mem_free((void **)(ptr))
+
+/* Typed array verbs: derive the element size from the pointer so callers
+ * pass only a pointer and a quantity. The inner _mem_array_* helpers take
+ * the folded size, stamp it into the allocator header, and guard array
+ * verbs against non-array or mismatched-element blocks. */
+void *_mem_array_alloc(void **pp, size_t elem_size, int n, char *site);
+void *_mem_array_realloc(void **pp, size_t elem_size, int n, char *site);
+void _mem_array_free(void **pp, size_t elem_size);
+
+/* MEM_ARRAY_TYPED rejects a void element type at compile time, independent
+ * of -Wpointer-arith, so the silent sizeof(void)==1 trap cannot size an
+ * array verb at one byte. Arrays of void * pointers pass: their element
+ * type is void *, not void. */
+#define MEM_ARRAY_TYPED(pp) _Static_assert( \
+	!__builtin_types_compatible_p(__typeof__(**(pp)), void), \
+	"mem_array_*: void element type; use mem_alloc for byte buffers")
+
+#define mem_array_alloc(pp, n) \
+	({ MEM_ARRAY_TYPED(pp); _mem_array_alloc((void **)(pp), sizeof(**(pp)), (n), __LOCATION__); })
+#define mem_array_realloc(pp, n) \
+	({ MEM_ARRAY_TYPED(pp); _mem_array_realloc((void **)(pp), sizeof(**(pp)), (n), __LOCATION__); })
+#define mem_array_free(pp) \
+	({ MEM_ARRAY_TYPED(pp); _mem_array_free((void **)(pp), sizeof(**(pp))); })
+#define mem_new(pp) \
+	({ MEM_ARRAY_TYPED(pp); mem_alloc((pp), sizeof(**(pp))); })
 
 /**
  * mem_array_count() - elements currently allocated in a managed array
@@ -134,8 +165,14 @@ static inline int mem_array_capacity(void *ptr, size_t elem_size)
  */
 typedef void (*mem_elem_free_fn)(void *elem);
 
-void mem_array_resize(void **arr, size_t elem_size, int new_count,
-		      mem_elem_free_fn free_elem);
+void _mem_array_resize(void **arr, size_t elem_size, int new_count,
+		      mem_elem_free_fn free_elem, char *site);
+
+/* Thread the caller __LOCATION__ to _mem_realloc_fast so a grow is
+ * attributed to its caller, not to this header. The four-argument list is
+ * unchanged; the macro appends the site. */
+#define mem_array_resize(arr, elem_size, new_count, free_elem) \
+	_mem_array_resize((arr), (elem_size), (new_count), (free_elem), __LOCATION__)
 
 /**
  * mem_array_reserve - grow a managed array to hold at least @needed elements
@@ -144,8 +181,11 @@ void mem_array_resize(void **arr, size_t elem_size, int new_count,
  * @needed: minimum element count the array must hold
  * @initial_cap: capacity allocated when the array is empty
  */
-void mem_array_reserve(void **arr, size_t elem_size, int needed,
-		       int initial_cap);
+void _mem_array_reserve(void **arr, size_t elem_size, int needed,
+		       int initial_cap, char *site);
+
+#define mem_array_reserve(arr, elem_size, needed, initial_cap) \
+	_mem_array_reserve((arr), (elem_size), (needed), (initial_cap), __LOCATION__)
 void *mem_clone(void *ptr);
 int mem_bcmp(void *p1, void *p2);
 void mem_set(void *ptr, int c);

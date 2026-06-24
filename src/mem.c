@@ -54,6 +54,12 @@ static inline mem_obj_t *mem_obj_alloc(const mem_obj_t *old_m, size_t req,
 	m = (mem_obj_t *)base;
 	m->size = req;
 	m->used = req;
+	/* Single relocation-persistence point: a grow-beyond reallocation
+	 * returns a fresh block, so every header field that must outlive the
+	 * predecessor is carried from it here. A fresh allocation has no
+	 * predecessor and starts at the scalar/byte default; the array layer
+	 * stamps the element size at birth. */
+	m->array_elem_size = (old_m != NULL) ? old_m->array_elem_size : 0;
 	m->backtrace = NULL;
 	/* Tag for leak accounting only while reporting is enabled.  An
 	 * untracked block carries a NULL site so its release skips the
@@ -178,10 +184,12 @@ alloc_fail:
 }
 
 /**
- * mem_free() - release a managed memory buffer
+ * _mem_free() - release a managed memory buffer
  * @ptr: pointer to caller's void* (set to NULL on return)
+ *
+ * The public mem_free macro strips the pointer cast before calling here.
  */
-void mem_free(void **ptr)
+void _mem_free(void **ptr)
 {
 	if (*ptr != NULL)
 	{
@@ -292,41 +300,137 @@ void mem_set(void *ptr, int c)
 }
 
 /**
- * mem_array_resize() - resize an array of structs, freeing dropped elements
+ * mem_array_guard() - reject an array verb on a non-array or mismatched block
+ * @m: header recovered from an existing managed block
+ * @elem_size: element size derived from the caller's typed pointer
+ *
+ * A live array block carries a non-zero array_elem_size equal to its
+ * element size. A zero marker (scalar or byte block) or a size mismatch is
+ * a programmer error, surfaced like the header-corruption path rather than
+ * tolerated.
+ */
+static void mem_array_guard(const mem_obj_t *m, size_t elem_size)
+{
+	if (unlikely(m->array_elem_size == 0 || m->array_elem_size != elem_size))
+	{
+		BUG("mem_array verb: element size %lu does not match header %lu\n",
+			(unsigned long)elem_size, (unsigned long)m->array_elem_size);
+		abort();
+	}
+}
+
+/**
+ * _mem_array_alloc() - allocate a managed typed array
+ * @pp: address of the caller's array pointer
+ * @elem_size: element size folded from the typed pointer at the macro
+ * @n: element count
+ * @site: caller location from __LOCATION__
+ *
+ * Sizes the request at n * elem_size and stamps the element size into the
+ * header so later array verbs can validate and derive count and capacity.
+ *
+ * Return: the user-data pointer (also stored in *pp)
+ */
+void *_mem_array_alloc(void **pp, size_t elem_size, int n, char *site)
+{
+	if (unlikely(*pp != NULL))
+		mem_array_guard(mem_obj_from_ptr(*pp), elem_size);
+
+	void *p = _mem_realloc_fast(pp, (size_t)n * elem_size, site);
+
+	mem_obj_from_ptr(p)->array_elem_size = elem_size;
+
+	return p;
+}
+
+/**
+ * _mem_array_realloc() - resize a managed typed array
+ * @pp: address of the caller's array pointer
+ * @elem_size: element size folded from the typed pointer at the macro
+ * @n: new element count
+ * @site: caller location from __LOCATION__
+ *
+ * Validates an existing block against the array type guard, then resizes
+ * to n * elem_size and stamps the element size, establishing it when the
+ * array is born from a NULL pointer; persistence across a grow-beyond
+ * relocation is handled by the allocator's carry-forward point.
+ *
+ * Return: the user-data pointer (also stored in *pp)
+ */
+void *_mem_array_realloc(void **pp, size_t elem_size, int n, char *site)
+{
+	if (likely(*pp != NULL))
+		mem_array_guard(mem_obj_from_ptr(*pp), elem_size);
+
+	void *p = _mem_realloc_fast(pp, (size_t)n * elem_size, site);
+
+	mem_obj_from_ptr(p)->array_elem_size = elem_size;
+
+	return p;
+}
+
+/**
+ * _mem_array_free() - release a managed typed array
+ * @pp: address of the caller's array pointer (set to NULL on return)
+ * @elem_size: element size folded from the typed pointer at the macro
+ *
+ * Validates the block against the array type guard before release; the
+ * drop accounting reads the site stored at allocation, so no site is
+ * passed here.
+ */
+void _mem_array_free(void **pp, size_t elem_size)
+{
+	if (*pp != NULL)
+	{
+		mem_obj_t *m = mem_obj_from_ptr(*pp);
+
+		mem_array_guard(m, elem_size);
+		mem_obj_free(m);
+	}
+
+	*pp = NULL;
+}
+
+/**
+ * _mem_array_resize() - resize an array of structs, freeing dropped elements
  * @arr: address of the caller's array pointer
  * @elem_size: size of one array element
  * @new_count: new element count (caller guarantees >= 1)
  * @free_elem: per-element teardown for the shrink tail
+ * @site: caller location from __LOCATION__, forwarded to the allocator
  *
  * Reads the prior element count from the allocator header, releases
  * sub-buffers of the dropped tail [new_count, old_count), then reallocates
  * the outer array in place. Surviving entries [0, new_count) keep their
  * pointers for reuse; any grown region is zeroed by the allocator.
  */
-void mem_array_resize(void **arr, size_t elem_size, int new_count,
-		      mem_elem_free_fn free_elem)
+void _mem_array_resize(void **arr, size_t elem_size, int new_count,
+		      mem_elem_free_fn free_elem, char *site)
 {
 	int old_count = mem_array_count(*arr, elem_size);
 
 	for (int i = new_count; i < old_count; i++)
 		free_elem((char *)*arr + (size_t)i * elem_size);
 
-	mem_realloc(arr, (size_t)new_count * elem_size);
+	/* Reuse the typed realloc primitive so the element-size stamp and the
+	 * type guard apply here exactly as on any other typed growth. */
+	_mem_array_realloc(arr, elem_size, new_count, site);
 }
 
 /**
- * mem_array_reserve() - grow a managed array to hold at least @needed elements
+ * _mem_array_reserve() - grow a managed array to hold at least @needed elements
  * @arr: address of the caller's array pointer
  * @elem_size: size of one element
  * @needed: minimum element count the array must hold
  * @initial_cap: capacity allocated when the array is empty
+ * @site: caller location from __LOCATION__, forwarded to the allocator
  *
  * Doubles the current capacity until it covers @needed, reusing the block
  * in place; an array already large enough is left untouched. The caller
  * tracks its own fill count.
  */
-void mem_array_reserve(void **arr, size_t elem_size, int needed,
-		       int initial_cap)
+void _mem_array_reserve(void **arr, size_t elem_size, int needed,
+		       int initial_cap, char *site)
 {
 	int cap = mem_array_capacity(*arr, elem_size);
 
@@ -337,6 +441,8 @@ void mem_array_reserve(void **arr, size_t elem_size, int needed,
 	while (new_cap < needed)
 		new_cap *= 2;
 
-	mem_realloc(arr, (size_t)new_cap * elem_size);
+	/* Reuse the typed realloc primitive so the element-size stamp and the
+	 * type guard apply here exactly as on any other typed growth. */
+	_mem_array_realloc(arr, elem_size, new_cap, site);
 }
 

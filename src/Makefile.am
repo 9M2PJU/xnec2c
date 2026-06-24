@@ -9,6 +9,7 @@ bin_PROGRAMS = xnec2c
 xnec2c_SOURCES = \
     main.c          main.h \
     branch_hints.h \
+    location.h \
     mem.c           mem.h \
     mem_track.c     mem_track.h \
     mathlib.c       mathlib.h \
