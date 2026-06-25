@@ -236,32 +236,27 @@ free_struct_colors_step(void *elem)
 alloc_struct_colors(int nfrq)
 {
   int i;
-  size_t mreq;
 
   if( nfrq <= 0 )
     return;
 
   /* Resize the outer array, freeing only the shrink tail; surviving
    * entries keep their sub-buffers for reuse by the inner alloc loop. */
-  mem_array_resize((void **)&struct_colors, sizeof(struct_colors_t),
-      nfrq, free_struct_colors_step);
+  mem_array_resize(&struct_colors, nfrq, free_struct_colors_step);
 
   for( i = 0; i < nfrq; i++ )
   {
     if( data.n > 0 )
     {
-      mreq = (size_t)data.n * sizeof(rgb_f_t);
-      mem_alloc((void **)&struct_colors[i].wire_crnt_rgb, mreq);
-      mem_alloc((void **)&struct_colors[i].wire_chrg_rgb, mreq);
+      mem_array_alloc(&struct_colors[i].wire_crnt_rgb, data.n);
+      mem_array_alloc(&struct_colors[i].wire_chrg_rgb, data.n);
     }
 
     if( data.m > 0 )
     {
-      mreq = (size_t)data.m * sizeof(rgb_f_t);
-      mem_alloc((void **)&struct_colors[i].patch_crnt_rgb, mreq);
+      mem_array_alloc(&struct_colors[i].patch_crnt_rgb, data.m);
 
-      mreq = (size_t)data.m * 4 * sizeof(float);
-      mem_alloc((void **)&struct_colors[i].patch_flow_data, mreq);
+      mem_array_alloc(&struct_colors[i].patch_flow_data, data.m);
     }
   }
 }
@@ -279,7 +274,7 @@ free_struct_colors(void)
 
   if( struct_colors != NULL )
   {
-    nfrq = mem_array_count(struct_colors, sizeof(struct_colors_t));
+    nfrq = mem_array_count(struct_colors);
     for( i = 0; i < nfrq; i++ )
       free_struct_colors_step(&struct_colors[i]);
     mem_free((void **)&struct_colors);
@@ -299,17 +294,13 @@ free_struct_colors(void)
 init_geometry_colors(void)
 {
   int i;
-  size_t mreq;
   float r, g, b;
   segment_color_type_t ctype;
 
   if( data.n > 0 )
   {
-    mreq = (size_t)data.n * sizeof(rgb_f_t);
-    mem_realloc((void **)&seg_rgb, mreq);
-
-    mreq = (size_t)data.n * sizeof(float);
-    mem_realloc((void **)&seg_width, mreq);
+    mem_array_realloc(&seg_rgb, data.n);
+    mem_array_realloc(&seg_width, data.n);
 
     for( i = 0; i < data.n; i++ )
     {
@@ -324,8 +315,7 @@ init_geometry_colors(void)
 
   if( data.m > 0 )
   {
-    mreq = (size_t)data.m * sizeof(rgb_f_t);
-    mem_realloc((void **)&patch_rgb, mreq);
+    mem_array_realloc(&patch_rgb, data.m);
 
     /* Patches use SEG_COLOR_NORMAL blue constant */
     segment_type_to_rgb(SEG_COLOR_NORMAL, &r, &g, &b);
@@ -462,8 +452,7 @@ struct_colors_fill_fstep(int fstep)
     }
     else
     {
-      memset(struct_colors[fstep].patch_flow_data, 0,
-             (size_t)data.m * 4 * sizeof(float));
+      mem_array_zero(struct_colors[fstep].patch_flow_data);
     }
   }
 }

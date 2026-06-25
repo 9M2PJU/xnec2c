@@ -586,10 +586,7 @@ cmset( int nrow, complex double *cmx, double rkhx, int iexkx )
 
   if( matpar.icase == 1)
     return;
-
-  /* Allocate to scratch memory */
-  size_t mreq = (size_t)data.np2m * sizeof(complex double);
-  mem_alloc((void **)&scm, mreq);
+  mem_array_alloc(&scm, data.np2m);
 
   /* combine elements for symmetry modes */
   for( i = 0; i < it; i++ )
@@ -640,9 +637,7 @@ cmsw( int j1, int j2, int i1, int i2, complex double *cmx,
 {
   int jsnox; /* -1 offset to "jsno" for array indexing */
   static complex double *emel = NULL;
-
-  size_t mreq = 9 * sizeof(complex double);
-  mem_alloc((void **)&emel, mreq);
+  mem_array_alloc(&emel, 9);
 
   jsnox = segj.jsno-1;
 
@@ -1131,10 +1126,7 @@ int factr_gauss_elim( int n, complex double *a, int *ip, int ndim)
   int r, rm1, rp1, pj, pr, iflg, k, j, jp1, i;
   double dmax, elmag;
   complex double arj, *scm = NULL;
-
-  /* Allocate to scratch memory */
-  size_t mreq = (size_t)data.np2m * sizeof(complex double);
-  mem_alloc((void **)&scm, mreq);
+  mem_array_alloc(&scm, data.np2m);
 
   // Notice: Un-transposition of the matrix for Gauss elimination 
   // was previously performed in this function from the original NEC2
@@ -1363,10 +1355,7 @@ int solve_gauss_elim( int n, complex double *a, int *ip,
 {
   int i, ip1, j, k, pia;
   complex double sum, *scm = NULL;
-
-  /* Allocate to scratch memory */
-  size_t mreq = (size_t)data.np2m * sizeof(complex double);
-  mem_alloc((void **)&scm, mreq);
+  mem_array_alloc(&scm, data.np2m);
 
   /* forward substitution */
   for( i = 0; i < n; i++ )
@@ -1437,10 +1426,7 @@ solves( complex double *a, int *ip,
   fnop= smat.nop;
   fnorm=1.0/ fnop;
   nrow= neq;
-
-  /* Allocate to scratch memory */
-  size_t mreq = (size_t)data.np2m * sizeof(complex double);
-  mem_alloc((void **)&scm, mreq);
+  mem_array_alloc(&scm, data.np2m);
 
   if( smat.nop != 1)
   {

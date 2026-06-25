@@ -309,8 +309,7 @@ Set_Interaction_Matrix( void )
 {
   /* Memory allocation for symmetry array */
   smat.nop = netcx.neq/netcx.npeq;
-  size_t mreq = (size_t)(smat.nop * smat.nop) * sizeof( complex double);
-  mem_realloc((void **)&smat.ssx, mreq);
+  mem_array_realloc(&smat.ssx, (smat.nop * smat.nop));
 
   /* irngf is not used (NGF function not implemented) */
   int iresrv = data.np2m * (data.np + 2 * data.mp);
@@ -1414,10 +1413,9 @@ freq_loop_start_internal( void )
   if( isFlagSet(FREQ_LOOP_RUNNING) )
     return FALSE;
 
-  mem_alloc((void **)&floop_state, sizeof(freq_loop_state_t));
+  mem_new(&floop_state);
   floop_state->idle_top = -1;
-  mem_alloc((void **)&floop_state->idle_stack,
-            (size_t)calc_data.num_jobs * sizeof(child_proc_t *));
+  mem_array_alloc(&floop_state->idle_stack, calc_data.num_jobs);
 
   /* Populate the display extent on the GTK thread before the sweep worker
    * runs freq_populate_steps; green-line classification reads the extent via
@@ -1432,7 +1430,7 @@ freq_loop_start_internal( void )
 
   if( !rc_config.disable_pthread_freqloop )
   {
-    mem_alloc((void **)&pth_freq_loop, sizeof(pthread_t));
+    mem_new(&pth_freq_loop);
     int ret = pthread_create( pth_freq_loop, NULL, Frequency_Loop_Thread, floop_state );
     if( ret != 0 )
     {

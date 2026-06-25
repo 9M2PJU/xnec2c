@@ -37,15 +37,14 @@ fp_gain_render(fp_plot_ctx_t *ctx)
   char *titles[3];
   gboolean no_fbr;
   int idx;
-  size_t mreq = (size_t)ctx->num_fsteps * sizeof(double);
 
   /* Allocate max gmax and directions */
-  mem_realloc((void **)&gmax, mreq);
-  mem_realloc((void **)&gdir_tht, mreq);
-  mem_realloc((void **)&gdir_phi, mreq);
-  mem_realloc((void **)&fbratio, mreq);
+  mem_array_realloc(&gmax, ctx->num_fsteps);
+  mem_array_realloc(&gdir_tht, ctx->num_fsteps);
+  mem_array_realloc(&gdir_phi, ctx->num_fsteps);
+  mem_array_realloc(&fbratio, ctx->num_fsteps);
   if( isFlagSet(PLOT_NETGAIN) )
-    mem_realloc((void **)&netgain, mreq);
+    mem_array_realloc(&netgain, ctx->num_fsteps);
 
   /* Gather max gain, direction, and F/B ratio in one measurement pass */
   fp_meas_column_t cols[5];

@@ -85,7 +85,6 @@ prerender_field_vectors(nf_vector_t *vecs, near_field_t *nf,
 Prerender_Near_Field(int fstep)
 {
   int idx, npts;
-  size_t mreq;
   nf_pre_t *np = &nf_pre[fstep];
 
   if( near_field_fstep == NULL || near_field_fstep[fstep].points == NULL )
@@ -98,16 +97,14 @@ Prerender_Near_Field(int fstep)
   /* E-field vectors */
   if( fpat.nfeh & NEAR_EFIELD )
   {
-    mreq = (size_t)npts * sizeof(nf_vector_t);
-    mem_realloc((void **)&np->e_vecs, mreq);
+    mem_array_realloc(&np->e_vecs, npts);
     prerender_field_vectors(np->e_vecs, nf, npts, dr, TRUE);
   }
 
   /* H-field vectors */
   if( fpat.nfeh & NEAR_HFIELD )
   {
-    mreq = (size_t)npts * sizeof(nf_vector_t);
-    mem_realloc((void **)&np->h_vecs, mreq);
+    mem_array_realloc(&np->h_vecs, npts);
     prerender_field_vectors(np->h_vecs, nf, npts, dr, FALSE);
   }
 
@@ -116,11 +113,8 @@ Prerender_Near_Field(int fstep)
    * Pass 2: bake colors from magnitude buffer. */
   if( (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
   {
-    mreq = (size_t)npts * sizeof(nf_vector_t);
-    mem_realloc((void **)&np->pov_vecs, mreq);
-
-    mreq = (size_t)npts * sizeof(float);
-    mem_realloc((void **)&np->pr_buf, mreq);
+    mem_array_realloc(&np->pov_vecs, npts);
+    mem_array_realloc(&np->pr_buf, npts);
 
     np->pov_max = 0.0f;
 

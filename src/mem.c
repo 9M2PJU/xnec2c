@@ -331,12 +331,12 @@ static void mem_array_guard(const mem_obj_t *m, size_t elem_size)
  *
  * Return: the user-data pointer (also stored in *pp)
  */
-void *_mem_array_alloc(void **pp, size_t elem_size, int n, char *site)
+void *_mem_array_alloc(void **pp, size_t elem_size, size_t n, char *site)
 {
 	if (unlikely(*pp != NULL))
 		mem_array_guard(mem_obj_from_ptr(*pp), elem_size);
 
-	void *p = _mem_realloc_fast(pp, (size_t)n * elem_size, site);
+	void *p = _mem_realloc_fast(pp, n * elem_size, site);
 
 	mem_obj_from_ptr(p)->array_elem_size = elem_size;
 
@@ -357,12 +357,12 @@ void *_mem_array_alloc(void **pp, size_t elem_size, int n, char *site)
  *
  * Return: the user-data pointer (also stored in *pp)
  */
-void *_mem_array_realloc(void **pp, size_t elem_size, int n, char *site)
+void *_mem_array_realloc(void **pp, size_t elem_size, size_t n, char *site)
 {
 	if (likely(*pp != NULL))
 		mem_array_guard(mem_obj_from_ptr(*pp), elem_size);
 
-	void *p = _mem_realloc_fast(pp, (size_t)n * elem_size, site);
+	void *p = _mem_realloc_fast(pp, n * elem_size, site);
 
 	mem_obj_from_ptr(p)->array_elem_size = elem_size;
 
@@ -392,6 +392,44 @@ void _mem_array_free(void **pp, size_t elem_size)
 }
 
 /**
+ * _mem_zero() - zero a non-array managed buffer, rejecting array blocks
+ * @ptr: managed scalar or byte-buffer pointer
+ *
+ * A non-array block carries a zero array_elem_size; a stamped array is a
+ * programmer error, surfaced rather than tolerated. BUG does not unwind, so
+ * the wrongly typed block is left untouched.
+ */
+void _mem_zero(void *ptr)
+{
+	mem_obj_t *m = mem_obj_from_ptr(ptr);
+
+	if (unlikely(m->array_elem_size != 0))
+	{
+		BUG("mem_zero: array block element size %lu; use mem_array_zero\n",
+			(unsigned long)m->array_elem_size);
+		return;
+	}
+
+	mem_set(ptr, 0);
+}
+
+/**
+ * _mem_array_zero() - zero a managed array, rejecting non-array blocks
+ * @ptr: managed array pointer
+ * @elem_size: element size folded from the typed pointer at the macro
+ *
+ * Validates the block against the array type guard before clearing the
+ * whole live region.
+ */
+void _mem_array_zero(void *ptr, size_t elem_size)
+{
+	mem_obj_t *m = mem_obj_from_ptr(ptr);
+
+	mem_array_guard(m, elem_size);
+	mem_set(ptr, 0);
+}
+
+/**
  * _mem_array_resize() - resize an array of structs, freeing dropped elements
  * @arr: address of the caller's array pointer
  * @elem_size: size of one array element
@@ -407,7 +445,7 @@ void _mem_array_free(void **pp, size_t elem_size)
 void _mem_array_resize(void **arr, size_t elem_size, int new_count,
 		      mem_elem_free_fn free_elem, char *site)
 {
-	int old_count = mem_array_count(*arr, elem_size);
+	int old_count = mem_array_count(*arr);
 
 	for (int i = new_count; i < old_count; i++)
 		free_elem((char *)*arr + (size_t)i * elem_size);
@@ -432,7 +470,7 @@ void _mem_array_resize(void **arr, size_t elem_size, int new_count,
 void _mem_array_reserve(void **arr, size_t elem_size, int needed,
 		       int initial_cap, char *site)
 {
-	int cap = mem_array_capacity(*arr, elem_size);
+	int cap = mem_array_capacity(*arr);
 
 	if (cap >= needed)
 		return;

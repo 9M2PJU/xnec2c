@@ -283,7 +283,6 @@ Save_RadPattern_Gnuplot_Data( char *filename )
         (fpat.nfeh & NEAR_HFIELD) )
     {
       int ipv;
-      static size_t mreq = 0;
 
       /* Co-ordinates of Poynting vectors */
       static double *pov_x = NULL, *pov_y = NULL;
@@ -293,14 +292,14 @@ Save_RadPattern_Gnuplot_Data( char *filename )
        * its max and min and log of max/min */
       static double pov_max = 0;
 
-      /* Allocate on new near field matrix size */
-      if( !mreq || (mreq != (size_t)npts * sizeof(double)) )
+      /* Grow the Poynting buffers when the point count exceeds the live
+       * capacity; the allocator header is the single capacity record. */
+      if( npts > mem_array_capacity(pov_x) )
       {
-        mreq = (size_t)npts * sizeof( double );
-        mem_realloc((void **)&pov_x, mreq);
-        mem_realloc((void **)&pov_y, mreq);
-        mem_realloc((void **)&pov_z, mreq);
-        mem_realloc((void **)&pov_r, mreq);
+        mem_array_realloc(&pov_x, npts);
+        mem_array_realloc(&pov_y, npts);
+        mem_array_realloc(&pov_z, npts);
+        mem_array_realloc(&pov_r, npts);
       }
 
       /* Calculate Poynting vector and its max and min */

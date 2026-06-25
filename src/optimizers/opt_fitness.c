@@ -319,8 +319,7 @@ void fitness_config_init(fitness_config_t *cfg)
 	fitness_objective_t *obj;
 
 	memset(cfg, 0, sizeof(*cfg));
-	mem_alloc((void **)&cfg->obj,
-		  FITNESS_OBJ_INIT_CAP * sizeof(fitness_objective_t));
+	mem_array_alloc(&cfg->obj, FITNESS_OBJ_INIT_CAP);
 	cfg->num_obj = 0;
 
 	/* Default goals: VSWR, Max Gain */
@@ -347,8 +346,7 @@ fitness_objective_t *fitness_config_add(fitness_config_t *cfg, int meas_index)
 		abort();
 	}
 
-	mem_array_reserve((void **)&cfg->obj, sizeof(fitness_objective_t),
-			  cfg->num_obj + 1, FITNESS_OBJ_INIT_CAP);
+	mem_array_reserve(&cfg->obj, cfg->num_obj + 1, FITNESS_OBJ_INIT_CAP);
 
 	def = &meas_fitness_defaults[meas_index];
 	obj = &cfg->obj[cfg->num_obj];
@@ -399,8 +397,7 @@ void fitness_config_copy(fitness_config_t *dst, const fitness_config_t *src)
 	dst->obj = NULL;
 	if (src->num_obj > 0)
 	{
-		mem_alloc((void **)&dst->obj,
-			  src->num_obj * sizeof(fitness_objective_t));
+		mem_array_alloc(&dst->obj, src->num_obj);
 		memcpy(dst->obj, src->obj,
 			src->num_obj * sizeof(fitness_objective_t));
 	}

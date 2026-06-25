@@ -114,8 +114,7 @@ void simple_cache_store(simple_t *s, const gsl_vector *vec, double value)
 		return;
 	}
 
-	mem_array_reserve((void **)&s->cache.entries, sizeof(simple_cache_entry_t),
-			  s->cache.count + 1, 64);
+	mem_array_reserve(&s->cache.entries, s->cache.count + 1, 64);
 
 	s->cache.entries[s->cache.count].key   = _cache_build_key(vec);
 	s->cache.entries[s->cache.count].value = value;

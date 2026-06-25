@@ -147,7 +147,7 @@ void Notice_Deferred(GtkButtonsType buttons, const char *title,
 	const char *msg_fmt, ...)
 {
 	deferred_notice_t *dn = NULL;
-	mem_alloc((void **)&dn, sizeof(*dn));
+	mem_new(&dn);
 
 	dn->buttons = buttons;
 	snprintf(dn->title, sizeof(dn->title), "%s", title);
@@ -742,7 +742,7 @@ guint _g_idle_add_once(GSourceOnceFunc function, gpointer data, int lock)
 	guint ret;
 	g_idle_add_data_t *cbdata = NULL;
 
-	mem_alloc((void **)&cbdata, sizeof(g_idle_add_data_t));
+	mem_new(&cbdata);
 
 	// Don't do a locked sync if -P is specified because GTK
 	// is already running synchronously.

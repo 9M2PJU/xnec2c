@@ -599,9 +599,9 @@ void intrp( double x, double y, complex double *f1,
   if( first_call )
   {
     first_call = FALSE;
-    size_t mreq = 3*sizeof(int);
-    mem_alloc((void **)&nda, mreq);
-    mem_alloc((void **)&ndpa, mreq);
+    int nrec = 3;
+    mem_array_alloc(&nda, nrec);
+    mem_array_alloc(&ndpa, nrec);
     nda[0] = 11; nda[1] = 17; nda[2] = 9;
     ndpa[0] = 110; ndpa[1] = 85; ndpa[2] = 72;
   }
@@ -1223,12 +1223,10 @@ trio( int j )
       if( segj.jsno >= segj.maxcon )
       {
         segj.maxcon = segj.jsno +1;
-        size_t mreq = (size_t)segj.maxcon * sizeof(int);
-        mem_realloc((void **)&segj.jco, mreq);
-        mreq = (size_t)segj.maxcon * sizeof(double);
-        mem_realloc((void **)&segj.ax, mreq);
-        mem_realloc((void **)&segj.bx, mreq);
-        mem_realloc((void **)&segj.cx, mreq);
+        mem_array_realloc(&segj.jco, segj.maxcon);
+        mem_array_realloc(&segj.ax, segj.maxcon);
+        mem_array_realloc(&segj.bx, segj.maxcon);
+        mem_array_realloc(&segj.cx, segj.maxcon);
       }
 
       sbf( j, j, &segj.ax[jsnox], &segj.bx[jsnox], &segj.cx[jsnox]);
@@ -1255,12 +1253,10 @@ trio( int j )
       if( segj.jsno >= segj.maxcon )
       {
         segj.maxcon = segj.jsno +1;
-        size_t mreq = (size_t)segj.maxcon * sizeof(int);
-        mem_realloc((void **)&segj.jco, mreq);
-        mreq = (size_t)segj.maxcon * sizeof(double);
-        mem_realloc((void **)&segj.ax, mreq);
-        mem_realloc((void **)&segj.bx, mreq);
-        mem_realloc((void **)&segj.cx, mreq);
+        mem_array_realloc(&segj.jco, segj.maxcon);
+        mem_array_realloc(&segj.ax, segj.maxcon);
+        mem_array_realloc(&segj.bx, segj.maxcon);
+        mem_array_realloc(&segj.cx, segj.maxcon);
       }
 
       sbf( jcox, j, &segj.ax[jsnox], &segj.bx[jsnox], &segj.cx[jsnox]);
@@ -1301,12 +1297,10 @@ trio( int j )
   if( segj.jsno >= segj.maxcon )
   {
     segj.maxcon = segj.jsno +1;
-    size_t mreq = (size_t)segj.maxcon * sizeof(int);
-    mem_realloc((void **)&segj.jco, mreq);
-    mreq = (size_t)segj.maxcon * sizeof(double);
-    mem_realloc((void **)&segj.ax, mreq);
-    mem_realloc((void **)&segj.bx, mreq);
-    mem_realloc((void **)&segj.cx, mreq);
+    mem_array_realloc(&segj.jco, segj.maxcon);
+    mem_array_realloc(&segj.ax, segj.maxcon);
+    mem_array_realloc(&segj.bx, segj.maxcon);
+    mem_array_realloc(&segj.cx, segj.maxcon);
   }
 
   sbf( j, j, &segj.ax[jsnox], &segj.bx[jsnox], &segj.cx[jsnox]);

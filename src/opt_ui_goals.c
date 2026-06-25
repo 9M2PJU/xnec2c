@@ -115,7 +115,7 @@ static opt_goal_row_t *create_goal_row(int meas_index, int enabled)
 	gchar buf[32];
 	int i;
 
-	mem_alloc((void **)&gr, sizeof(opt_goal_row_t));
+	mem_new(&gr);
 	def = &meas_fitness_defaults[meas_index];
 
 	/* Enabled checkbox */

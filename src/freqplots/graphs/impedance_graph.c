@@ -37,12 +37,11 @@ fp_impedance_render(fp_plot_ctx_t *ctx)
   static double *zreal_c = NULL, *zimag_c = NULL;
   static double *zmagn_c = NULL, *zphase_c = NULL;
   char *titles[3];
-  size_t zmreq = (size_t)ctx->num_fsteps * sizeof(double);
 
-  mem_realloc((void **)&zreal_c, zmreq);
-  mem_realloc((void **)&zimag_c, zmreq);
-  mem_realloc((void **)&zmagn_c, zmreq);
-  mem_realloc((void **)&zphase_c, zmreq);
+  mem_array_realloc(&zreal_c, ctx->num_fsteps);
+  mem_array_realloc(&zimag_c, ctx->num_fsteps);
+  mem_array_realloc(&zmagn_c, ctx->num_fsteps);
+  mem_array_realloc(&zphase_c, ctx->num_fsteps);
 
   fp_meas_column_t cols[] = {
     { zreal_c,  MEAS_ZREAL  },

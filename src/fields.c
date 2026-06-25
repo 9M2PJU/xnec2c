@@ -272,9 +272,7 @@ efld( double xi, double yi,
   complex double epx, epy, refs, refps, zrsin, zratx = 0.0, zscrn = 0.0;
   complex double tezs, ters, tezc = 0.0, terc = 0.0, tezk = 0.0, terk = 0.0;
   static complex double *egnd = NULL;
-
-  size_t mreq = 9 * sizeof(complex double);
-  mem_alloc((void **)&egnd, mreq);
+  mem_array_alloc(&egnd, 9);
 
   xij= xi- dataj.xj;
   yij= yi- dataj.yj;

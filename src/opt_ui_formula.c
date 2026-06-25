@@ -461,8 +461,8 @@ void opt_ui_update_values(void)
 	steps = calc_data.steps_total;
 
 	/* Build measurement array for all steps */
-	mem_alloc((void **)&meas_all, steps * sizeof(measurement_t));
-	mem_alloc((void **)&freq_all, steps * sizeof(double));
+	mem_array_alloc(&meas_all, steps);
+	mem_array_alloc(&freq_all, steps);
 
 	for (idx = 0; idx < steps; idx++)
 	{

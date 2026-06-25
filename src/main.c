@@ -420,13 +420,11 @@ main (int argc, char *argv[])
   /* Allocate buffers for fork data */
   if( calc_data.num_jobs >= 1 && enable_forking )
   {
-    size_t mreq = (size_t)calc_data.num_jobs * sizeof(child_proc_t *);
-    mem_alloc((void **)&child_procs, mreq);
+    mem_array_alloc(&child_procs, calc_data.num_jobs);
     for( idx = 0; idx < calc_data.num_jobs; idx++ )
     {
       child_procs[idx] = NULL;
-      mreq = sizeof(child_proc_t);
-      mem_alloc((void **)&child_procs[idx], mreq);
+      mem_new(&child_procs[idx]);
     }
 
     pr_info("Forking %d jobs.\n", calc_data.num_jobs);
@@ -478,13 +476,9 @@ main (int argc, char *argv[])
   } /* if( calc_data.num_jobs > 1 ) */
   else
   {
-    /* Allocate a virtual child for non-forked mode so the
-     * frequency loop state machine operates identically. */
-    size_t mreq = sizeof(child_proc_t *);
-    mem_alloc((void **)&child_procs, mreq);
+    mem_array_alloc(&child_procs, 1);
     child_procs[0] = NULL;
-    mreq = sizeof(child_proc_t);
-    mem_alloc((void **)&child_procs[0], mreq);
+    mem_new(&child_procs[0]);
     child_procs[0]->idx           = 0;
     child_procs[0]->pid           = 0;
     child_procs[0]->to_child[0]   = -1;

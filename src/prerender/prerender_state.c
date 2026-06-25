@@ -65,14 +65,10 @@ prerender_state_alloc(int steps_total)
   if( steps_total <= 0 )
     return;
 
-  size_t mreq;
-
   /* Resize each array, freeing only the shrink tail; surviving entries
    * keep their sub-buffers for reuse by the inner alloc loop. */
-  mem_array_resize((void **)&ff_pre, sizeof(ff_pre_t),
-      steps_total, free_ff_pre_step);
-  mem_array_resize((void **)&nf_pre, sizeof(nf_pre_t),
-      steps_total, free_nf_pre_step);
+  mem_array_resize(&ff_pre, steps_total, free_ff_pre_step);
+  mem_array_resize(&nf_pre, steps_total, free_nf_pre_step);
 
   /* Pre-allocate near-field inner arrays as pipe-read destinations.
    * PRead_Pipe writes directly into these pointers; they must be
@@ -83,13 +79,12 @@ prerender_state_alloc(int steps_total)
   {
     if( npts > 0 )
     {
-      mreq = (size_t)npts * sizeof(nf_vector_t);
       if( fpat.nfeh & NEAR_EFIELD )
-        mem_alloc((void **)&nf_pre[i].e_vecs, mreq);
+        mem_array_alloc(&nf_pre[i].e_vecs, npts);
       if( fpat.nfeh & NEAR_HFIELD )
-        mem_alloc((void **)&nf_pre[i].h_vecs, mreq);
+        mem_array_alloc(&nf_pre[i].h_vecs, npts);
       if( (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-        mem_alloc((void **)&nf_pre[i].pov_vecs, mreq);
+        mem_array_alloc(&nf_pre[i].pov_vecs, npts);
     }
   }
 }
@@ -103,7 +98,7 @@ prerender_state_free(void)
 
   if( ff_pre != NULL )
   {
-    int n = mem_array_count(ff_pre, sizeof(ff_pre_t));
+    int n = mem_array_count(ff_pre);
     for( i = 0; i < n; i++ )
       free_ff_pre_step(&ff_pre[i]);
     mem_free((void **)&ff_pre);
@@ -111,7 +106,7 @@ prerender_state_free(void)
 
   if( nf_pre != NULL )
   {
-    int n = mem_array_count(nf_pre, sizeof(nf_pre_t));
+    int n = mem_array_count(nf_pre);
     for( i = 0; i < n; i++ )
       free_nf_pre_step(&nf_pre[i]);
     mem_free((void **)&nf_pre);

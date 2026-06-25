@@ -92,15 +92,12 @@ opengl_rdpattern_generate_nf_field_lines(
 {
   int fi, idx, line_idx;
   int total_lines;
-  size_t mreq;
 
   if( n_fields <= 0 || npts <= 0 )
     return( -1 );
 
   total_lines = n_fields * npts;
-
-  mreq = (size_t)total_lines * 2 * sizeof(lit_color_point_t);
-  mem_realloc((void **)&nf_lines, mreq);
+  mem_array_realloc(&nf_lines, (size_t)total_lines * 2);
 
   line_idx = 0;
 
@@ -189,7 +186,6 @@ opengl_rdpattern_generate_lines(
   int nph_idx, nth_idx, vi;
   int theta_edges, phi_edges, total_lines;
   int edge_idx;
-  size_t mreq;
 
   if( !points || nth < 2 || nph < 1 || !theta_rgb || !phi_rgb )
     return( -1 );
@@ -198,9 +194,7 @@ opengl_rdpattern_generate_lines(
   theta_edges = (nth - 1) * nph;
   phi_edges = nth * (nph - 1);
   total_lines = theta_edges + phi_edges;
-
-  mreq = (size_t)total_lines * 2 * sizeof(lit_color_point_t);
-  mem_realloc((void **)&rdpat_lines, mreq);
+  mem_array_realloc(&rdpat_lines, (size_t)total_lines * 2);
 
   vi = 0;
   edge_idx = 0;
@@ -294,7 +288,6 @@ opengl_rdpattern_generate_triangles(
   int nph_idx, nth_idx, tri_idx, vi;
   int p0, p1, p2, p3;
   int npts;
-  size_t mreq;
   point_f_3d_t *vertex_normals;
 
   if( !points || !vertex_rgb || nth < 2 || nph < 1 )
@@ -302,16 +295,13 @@ opengl_rdpattern_generate_triangles(
 
   /* Calculate triangle count: 2 per grid cell */
   rdpat_triangle_count = 2 * nph * (nth - 1);
-
-  mreq = (size_t)rdpat_triangle_count * sizeof(lit_color_triangle_t);
-  mem_realloc((void **)&rdpat_triangles, mreq);
+  mem_array_realloc(&rdpat_triangles, rdpat_triangle_count);
 
   /* Allocate and zero temporary per-vertex normal accumulator */
   npts = nth * nph;
-  mreq = (size_t)npts * sizeof(point_f_3d_t);
   vertex_normals = NULL;
-  mem_realloc((void **)&vertex_normals, mreq);
-  memset(vertex_normals, 0, mreq);
+  mem_array_realloc(&vertex_normals, npts);
+  mem_array_zero(vertex_normals);
 
   /* Pass 1: accumulate face normals into each corner vertex */
   for( nph_idx = 0; nph_idx < nph; nph_idx++ )

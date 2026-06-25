@@ -511,16 +511,14 @@ Alloc_Crnt_Buffs( void )
   /* Patch currents buffer */
   if( data.m > 0 )
   {
-    size_t mreq = (size_t)data.m * sizeof( double );
-    mem_realloc((void **)&ct1m, mreq);
-    mem_realloc((void **)&ct2m, mreq);
+    mem_array_realloc(&ct1m, data.m);
+    mem_array_realloc(&ct2m, data.m);
   }
 
   /* Segment currents buffer */
   if( data.n > 0 )
   {
-    size_t mreq = (size_t)data.n * sizeof( double );
-    mem_realloc((void **)&cmag, mreq);
+    mem_array_realloc(&cmag, data.n);
   }
 
 } /* Alloc_Crnt_Buffs() */

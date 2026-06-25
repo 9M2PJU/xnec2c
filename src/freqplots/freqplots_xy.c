@@ -347,7 +347,7 @@ Plot_Graph(
 			GdkPoint edges[2];
 			double   edge_freq[2];
 
-			mem_realloc((void **)&rail, (size_t)maxidx * sizeof(GdkPoint));
+			mem_array_realloc(&rail, maxidx);
 			for (s = 0; s < maxidx; s++)
 			{
 				rail[s].x = fp_axis_pixel_x(plot_rect, x[offset + s],

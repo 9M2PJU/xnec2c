@@ -133,11 +133,11 @@ compute_trig_tables(void)
     return;
   }
 
-  mem_alloc((void **)&geom_pre.sin_theta, (size_t)fpat.nth * sizeof(double));
-  mem_alloc((void **)&geom_pre.cos_theta, (size_t)fpat.nth * sizeof(double));
-  mem_alloc((void **)&geom_pre.solid_angle, (size_t)fpat.nth * sizeof(double));
-  mem_alloc((void **)&geom_pre.sin_phi, (size_t)fpat.nph * sizeof(double));
-  mem_alloc((void **)&geom_pre.cos_phi, (size_t)fpat.nph * sizeof(double));
+  mem_array_alloc(&geom_pre.sin_theta, fpat.nth);
+  mem_array_alloc(&geom_pre.cos_theta, fpat.nth);
+  mem_array_alloc(&geom_pre.solid_angle, fpat.nth);
+  mem_array_alloc(&geom_pre.sin_phi, fpat.nph);
+  mem_array_alloc(&geom_pre.cos_phi, fpat.nph);
 
   for( i = 0; i < fpat.nth; i++ )
   {
@@ -168,7 +168,6 @@ compute_trig_tables(void)
 compute_ff_topology(void)
 {
   int nth, nph, col_idx, pts_idx;
-  size_t mreq;
 
   if( fpat.nth < 2 || fpat.nph < 2 )
   {
@@ -180,8 +179,7 @@ compute_ff_topology(void)
   }
 
   geom_pre.n_theta_edges = (fpat.nth - 1) * fpat.nph;
-  mreq = (size_t)geom_pre.n_theta_edges * sizeof(ff_edge_topo_t);
-  mem_alloc((void **)&geom_pre.theta_topo, mreq);
+  mem_array_alloc(&geom_pre.theta_topo, geom_pre.n_theta_edges);
 
   col_idx = 0;
   pts_idx = 0;
@@ -198,8 +196,7 @@ compute_ff_topology(void)
   }
 
   geom_pre.n_phi_edges = fpat.nth * (fpat.nph - 1);
-  mreq = (size_t)geom_pre.n_phi_edges * sizeof(ff_edge_topo_t);
-  mem_alloc((void **)&geom_pre.phi_topo, mreq);
+  mem_array_alloc(&geom_pre.phi_topo, geom_pre.n_phi_edges);
 
   col_idx = 0;
   for( nth = 0; nth < fpat.nth; nth++ )

@@ -843,12 +843,9 @@ _Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
   static int    *valid_steps_map = NULL;
   static double *fplot           = NULL;
   static int    *card_nfsteps    = NULL;
-  size_t vstep_mreq = (size_t)(calc_data.steps_total + 1) * sizeof(int);
-  size_t fplot_mreq = (size_t)(calc_data.steps_total + 1) * sizeof(double);
-  size_t card_mreq  = (size_t)calc_data.FR_cards * sizeof(int);
-  mem_realloc((void **)&valid_steps_map, vstep_mreq);
-  mem_realloc((void **)&fplot, fplot_mreq);
-  mem_realloc((void **)&card_nfsteps, card_mreq);
+  mem_array_realloc(&valid_steps_map, (calc_data.steps_total + 1));
+  mem_array_realloc(&fplot, (calc_data.steps_total + 1));
+  mem_array_realloc(&card_nfsteps, calc_data.FR_cards);
 
   /* The extra slot at steps_total holds a computed green-line measurement when
    * save.fstep marks it valid; render it inside its home card at the sorted
@@ -913,8 +910,7 @@ _Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
    * costly (antenna-temperature spherical integration) and was previously
    * repeated by each plot type.  All plot types now read these rows. */
   static measurement_t *meas_rows = NULL;
-  mem_realloc((void **)&meas_rows,
-      (size_t)num_fsteps * sizeof(measurement_t));
+  mem_array_realloc(&meas_rows, num_fsteps);
   for( idx = 0; idx < num_fsteps; idx++ )
     meas_calc( &meas_rows[idx], valid_steps_map[idx] );
 
@@ -1007,7 +1003,7 @@ void freqplots_open_panel(fp_panel_t panel)
 		return;
 	}
 
-	mem_alloc((void **)&v, sizeof(freqplots_view_t));
+	mem_new(&v);
 
 	v->filter = panel;
 	v->ngraph = 1;

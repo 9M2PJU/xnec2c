@@ -729,14 +729,13 @@ Alloc_Nearfield_Fstep_Buffers( int nfrq )
 {
   /* Resize the outer array, freeing only the shrink tail; surviving
    * entries keep their point buffers for reuse by the inner alloc loop. */
-  mem_array_resize((void **)&near_field_fstep, sizeof(near_field_t),
-      nfrq, free_near_step);
+  mem_array_resize(&near_field_fstep, nfrq, free_near_step);
 
-  size_t npts = (size_t)fpat.nrx * fpat.nry * fpat.nrz * sizeof(near_field_point_t);
+  size_t npts = (size_t)fpat.nrx * fpat.nry * fpat.nrz;
 
   for( int i = 0; i < nfrq; i++ )
   {
-    mem_realloc((void **)&near_field_fstep[i].points, npts);
+    mem_array_realloc(&near_field_fstep[i].points, npts);
   }
 
 } /* Alloc_Nearfield_Fstep_Buffers() */
@@ -752,7 +751,7 @@ Free_Nearfield_Fstep_Buffers( void )
   if( near_field_fstep == NULL )
     return;
 
-  int nfrq = mem_array_count(near_field_fstep, sizeof(near_field_t));
+  int nfrq = mem_array_count(near_field_fstep);
   for( int i = 0; i < nfrq; i++ )
     free_near_step(&near_field_fstep[i]);
 
@@ -1076,39 +1075,28 @@ free_rad_pattern_step(void *elem)
 _Alloc_Rdpattern_Buffers( int nfrq, int nth, int nph )
 {
   int idx;
-  size_t mreq;
 
   /* Resize the outer array, freeing only the shrink tail; surviving
    * entries keep their sub-buffers for reuse by the inner alloc loop. */
-  mem_array_resize((void **)&rad_pattern, sizeof(rad_pattern_t),
-      nfrq, free_rad_pattern_step);
+  mem_array_resize(&rad_pattern, nfrq, free_rad_pattern_step);
 
   for( idx = 0; idx < nfrq; idx++ )
   {
     /* Memory request for allocs */
-    mreq = (size_t)(nph * nth) * sizeof(double);
-    mem_alloc((void **)&(rad_pattern[idx].gtot), mreq);
-    mem_alloc((void **)&(rad_pattern[idx].axrt), mreq);
-    mem_alloc((void **)&(rad_pattern[idx].tilt), mreq);
-
-    mreq = NUM_POL * sizeof(double);
-    mem_alloc((void **)&(rad_pattern[idx].max_gain), mreq);
-    mem_alloc((void **)&(rad_pattern[idx].min_gain), mreq);
-    mem_alloc((void **)&(rad_pattern[idx].max_gain_tht), mreq);
-    mem_alloc((void **)&(rad_pattern[idx].max_gain_phi), mreq);
-
-    mreq = NUM_POL * sizeof(int);
-    mem_alloc((void **)&(rad_pattern[idx].max_gain_idx), mreq);
-    mem_alloc((void **)&(rad_pattern[idx].min_gain_idx), mreq);
-
-    mreq = (size_t)(nph * nth) * sizeof(int);
-    mem_alloc((void **)&(rad_pattern[idx].sens), mreq);
+    int nrec = (nph * nth);
+    mem_array_alloc(&rad_pattern[idx].gtot, nrec);
+    mem_array_alloc(&rad_pattern[idx].axrt, nrec);
+    mem_array_alloc(&rad_pattern[idx].tilt, nrec);
+    mem_array_alloc(&rad_pattern[idx].max_gain, NUM_POL);
+    mem_array_alloc(&rad_pattern[idx].min_gain, NUM_POL);
+    mem_array_alloc(&rad_pattern[idx].max_gain_tht, NUM_POL);
+    mem_array_alloc(&rad_pattern[idx].max_gain_phi, NUM_POL);
+    mem_array_alloc(&rad_pattern[idx].max_gain_idx, NUM_POL);
+    mem_array_alloc(&rad_pattern[idx].min_gain_idx, NUM_POL);
+    mem_array_alloc(&rad_pattern[idx].sens, (nph * nth));
   }
-
-  /* Per-fstep noise temperature table (Tier 2) */
-  mreq = (size_t)nfrq * sizeof(noise_temp_t);
-  mem_realloc((void **)&noise_temp, mreq);
-  memset( noise_temp, 0, mreq );
+  mem_array_realloc(&noise_temp, nfrq);
+  mem_array_zero(noise_temp);
 
 } /* Alloc_Rdpattern_Buffers() */
 
@@ -1128,14 +1116,9 @@ void Alloc_Rdpattern_Buffers( int nfrq, int nth, int nph )
   void
 Alloc_Nearfield_Buffers( int n1, int n2, int n3 )
 {
-  size_t mreq;
-
   if( isFlagClear(ALLOC_NEAREH_BUFF) ) return;
   ClearFlag( ALLOC_NEAREH_BUFF );
-
-  /* Allocate near field points array */
-  mreq = (size_t)(n1 * n2 * n3) * sizeof(near_field_point_t);
-  mem_realloc((void **)&near_field.points, mreq);
+  mem_array_realloc(&near_field.points, (n1 * n2 * n3));
 
 } /* Alloc_Nearfield_Buffers() */
 

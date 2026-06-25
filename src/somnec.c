@@ -78,10 +78,10 @@ bessel( complex double z,
   {
     int i;
 
-    size_t mreq = 101 * sizeof(double);
-    mem_alloc((void **)&m, mreq);
-    mem_alloc((void **)&a1, mreq);
-    mem_alloc((void **)&a2, mreq);
+    int nrec = 101;
+    mem_array_alloc(&m, nrec);
+    mem_array_alloc(&a1, nrec);
+    mem_array_alloc(&a2, nrec);
 
     for( k = 1; k <= 25; k++ )
     {
@@ -190,13 +190,12 @@ hankel( complex double z,
   if( first_call )
   {
     first_call = FALSE;
-    size_t mreq = 101 * sizeof(int);
-    mem_alloc((void **)&m, mreq);
-    mreq = 25 * sizeof(double);
-    mem_alloc((void **)&a1, mreq);
-    mem_alloc((void **)&a2, mreq);
-    mem_alloc((void **)&a3, mreq);
-    mem_alloc((void **)&a4, mreq);
+    mem_array_alloc(&m, 101);
+    int nrec = 25;
+    mem_array_alloc(&a1, nrec);
+    mem_array_alloc(&a2, nrec);
+    mem_array_alloc(&a3, nrec);
+    mem_array_alloc(&a4, nrec);
   }
 
   /* initialization of constants */
@@ -417,15 +416,15 @@ rom1( int n, complex double *sum, int nx )
   if( first_call )
   {
     first_call = FALSE;
-    size_t mreq = 6 * sizeof(complex double);
-    mem_alloc((void **)&g1, mreq);
-    mem_alloc((void **)&g2, mreq);
-    mem_alloc((void **)&g3, mreq);
-    mem_alloc((void **)&g4, mreq);
-    mem_alloc((void **)&g5, mreq);
-    mem_alloc((void **)&t01, mreq);
-    mem_alloc((void **)&t10, mreq);
-    mem_alloc((void **)&t20, mreq);
+    int nrec = 6;
+    mem_array_alloc(&g1, nrec);
+    mem_array_alloc(&g2, nrec);
+    mem_array_alloc(&g3, nrec);
+    mem_array_alloc(&g4, nrec);
+    mem_array_alloc(&g5, nrec);
+    mem_array_alloc(&t01, nrec);
+    mem_array_alloc(&t10, nrec);
+    mem_array_alloc(&t20, nrec);
   }
 
   lstep=0;
@@ -596,12 +595,12 @@ gshank( complex double start, complex double dela,
   if( first_call )
   {
     first_call = FALSE;
-    size_t mreq = 6 * 20 * sizeof(complex double);
-    mem_alloc((void **)&q1, mreq);
-    mem_alloc((void **)&q2, mreq);
-    mreq = 6 * sizeof(complex double);
-    mem_alloc((void **)&ans1, mreq);
-    mem_alloc((void **)&ans2, mreq);
+    int nrec = 6 * 20;
+    mem_array_alloc(&q1, nrec);
+    mem_array_alloc(&q2, nrec);
+    nrec = 6;
+    mem_array_alloc(&ans1, nrec);
+    mem_array_alloc(&ans2, nrec);
   }
 
   rbk=creal(bk);
@@ -767,9 +766,9 @@ evlua( complex double *erv, complex double *ezv,
   if( first_call )
   {
     first_call = FALSE;
-    size_t mreq = 6 * sizeof(complex double);
-    mem_alloc((void **)&sum, mreq);
-    mem_alloc((void **)&ans, mreq);
+    int nrec = 6;
+    mem_array_alloc(&sum, nrec);
+    mem_array_alloc(&ans, nrec);
   }
 
   del=zph;
@@ -915,24 +914,18 @@ somnec( double epr, double sig, double fmhz )
   if( first_call )
   {
     first_call = FALSE;
+    mem_array_alloc(&ggrid.ar1, 11 * 10 * 4);
+    mem_array_alloc(&ggrid.ar2, 17 * 5 * 4);
+    mem_array_alloc(&ggrid.ar3, 9 * 8 * 4);
 
-    /* Allocate some buffers */
-    size_t mreq = sizeof(complex double) * 11 * 10 * 4;
-    mem_alloc((void **)&ggrid.ar1, mreq);
-    mreq = sizeof(complex double) * 17 * 5 * 4;
-    mem_alloc((void **)&ggrid.ar2, mreq);
-    mreq = sizeof(complex double) * 9 * 8 * 4;
-    mem_alloc((void **)&ggrid.ar3, mreq);
+    int nrec = 3;
+    mem_array_alloc(&ggrid.nxa, nrec);
+    mem_array_alloc(&ggrid.nya, nrec);
 
-    mreq = sizeof(int) * 3;
-    mem_alloc((void **)&ggrid.nxa, mreq);
-    mem_alloc((void **)&ggrid.nya, mreq);
-
-    mreq = sizeof(double) * 3;
-    mem_alloc((void **)&ggrid.dxa, mreq);
-    mem_alloc((void **)&ggrid.dya, mreq);
-    mem_alloc((void **)&ggrid.xsa, mreq);
-    mem_alloc((void **)&ggrid.ysa, mreq);
+    mem_array_alloc(&ggrid.dxa, nrec);
+    mem_array_alloc(&ggrid.dya, nrec);
+    mem_array_alloc(&ggrid.xsa, nrec);
+    mem_array_alloc(&ggrid.ysa, nrec);
 
     /* Initialize ground grid parameters for somnec */
     ggrid.nxa[0] = 11;

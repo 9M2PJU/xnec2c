@@ -34,7 +34,6 @@ fp_viewer_render(fp_plot_ctx_t *ctx)
 {
   static double *vgain = NULL, *netgain = NULL;
   char *titles[3];
-  size_t mreq = (size_t)ctx->num_fsteps * sizeof(double);
 
   /* Plotting frame titles */
   titles[0] = _("Raw Gain dBi");
@@ -42,14 +41,14 @@ fp_viewer_render(fp_plot_ctx_t *ctx)
 
   /* Viewer-direction gain comes from the shared per-frame measurement pass;
    * meas_calc already evaluated Viewer_Gain() for the active view. */
-  mem_realloc((void **)&vgain, mreq);
+  mem_array_realloc(&vgain, ctx->num_fsteps);
   fp_meas_column_t vcol = { vgain, MEAS_GAIN_VIEWER };
   fp_fill_meas_columns( ctx, &vcol, 1 );
 
   /* Plot net gain if selected */
   if( isFlagSet(PLOT_NETGAIN) )
   {
-    mem_realloc((void **)&netgain, mreq);
+    mem_array_realloc(&netgain, ctx->num_fsteps);
 
     fp_meas_column_t col = { netgain, MEAS_GAIN_VIEWER_NET };
     fp_fill_meas_columns( ctx, &col, 1 );

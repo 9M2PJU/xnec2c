@@ -338,7 +338,7 @@ int open_mathlib(mathlib_t *lib)
 	if (lib->init != NULL)
 		lib->init(lib);
 
-	mem_alloc((void **)&lib->functions, sizeof(void *) * num_mathfuncs);
+	mem_array_alloc(&lib->functions, num_mathfuncs);
 	for (fidx = 0; fidx < num_mathfuncs; fidx++)
 	{
 		// Clear any error state

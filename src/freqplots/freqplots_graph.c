@@ -131,7 +131,7 @@ Draw_Graph(
   circle_padding = CIRCLE_PADDING_PX;
 
   /* Calculate points to plot */
-  mem_alloc((void **)&points, (size_t)nval * sizeof(GdkPoint));
+  mem_array_alloc(&points, nval);
   if( points == NULL )
   {
     pr_err("memory allocation for points failed\n");

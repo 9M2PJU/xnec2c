@@ -75,7 +75,7 @@ Read_Comments( void )
 {
   char ain[3], line_buf[LINE_LEN];
   int i;
-  size_t mreq, line_len;
+  size_t line_len;
 
   /* Free old comment strings before reallocating array */
   for( i = 0; i < comments.num; i++ )
@@ -123,8 +123,7 @@ Read_Comments( void )
     /* Store CM card text (skip CE card) */
     if( strcmp(ain, "CM") == 0 )
     {
-      mreq = (size_t)(comments.num + 1) * sizeof(char *);
-      mem_realloc((void **)&comments.lines, mreq);
+      mem_array_realloc(&comments.lines, (comments.num + 1));
 
       line_len = strlen(&line_buf[3]) + 1;
       mem_alloc((void **)&comments.lines[comments.num], line_len);
@@ -833,7 +832,6 @@ datagn( void )
 Read_Geometry( void )
 {
   int idx;
-  size_t mreq;
 
   /* Initialize symbol table for SY card support */
   if( !sy_init() )
@@ -871,37 +869,23 @@ Read_Geometry( void )
   }
 
   sy_errors_end();
-
-  /* Memory allocation for temporary buffers */
-  mreq = (size_t)data.npm * sizeof(double);
-  mem_realloc((void **)&save.xtemp, mreq);
-  mem_realloc((void **)&save.ytemp, mreq);
-  mem_realloc((void **)&save.ztemp, mreq);
-  mem_realloc((void **)&save.bitemp, mreq);
+  mem_array_realloc(&save.xtemp, data.npm);
+  mem_array_realloc(&save.ytemp, data.npm);
+  mem_array_realloc(&save.ztemp, data.npm);
+  mem_array_realloc(&save.bitemp, data.npm);
   if( data.n > 0 )
   {
-    mreq = (size_t)data.n * sizeof(double);
-    mem_realloc((void **)&save.sitemp, mreq);
+    mem_array_realloc(&save.sitemp, data.n);
   }
-
-  /* Memory allocation for primary interacton matrix. */
-  mreq = (size_t)(data.np2m * (data.np + 2 * data.mp)) * sizeof(complex double);
-  mem_realloc((void **)&cm, mreq);
-
-  /* Memory allocation for current buffers */
-  mreq = (size_t)data.npm * sizeof( double);
-  mem_realloc((void **)&crnt.air, mreq);
-  mem_realloc((void **)&crnt.aii, mreq);
-  mem_realloc((void **)&crnt.bir, mreq);
-  mem_realloc((void **)&crnt.bii, mreq);
-  mem_realloc((void **)&crnt.cir, mreq);
-  mem_realloc((void **)&crnt.cii, mreq);
-  mreq = (size_t)data.np3m * sizeof( complex double);
-  mem_realloc((void **)&crnt.cur, mreq);
-
-  /* Memory allocation for loading buffers */
-  mreq = (size_t)data.npm * sizeof(complex double);
-  mem_realloc((void **)&zload.zarray, mreq);
+  mem_array_realloc(&cm, (data.np2m * (data.np + 2 * data.mp)));
+  mem_array_realloc(&crnt.air, data.npm);
+  mem_array_realloc(&crnt.aii, data.npm);
+  mem_array_realloc(&crnt.bir, data.npm);
+  mem_array_realloc(&crnt.bii, data.npm);
+  mem_array_realloc(&crnt.cir, data.npm);
+  mem_array_realloc(&crnt.cii, data.npm);
+  mem_array_realloc(&crnt.cur, data.np3m);
+  mem_array_realloc(&zload.zarray, data.npm);
 
   /* Save segment and patch data for freq scaling */
   if( data.n > 0 )
@@ -950,7 +934,6 @@ Read_Commands( void )
   int
     mpcnt, itmp1, itmp2, itmp3, itmp4,
     ain_num;   /* My addition, ain mnemonic as a number */
-  size_t mreq; /* My addition, size req. for malloc's   */
 
   /* Initializations etc from original fortran code */
   mpcnt = 0;
@@ -998,15 +981,11 @@ Read_Commands( void )
   zload.nload  = 0;
   calc_data.FR_cards    = 0;
   calc_data.steps_total = 0;
-
-  /* Allocate some buffers */
-  mreq = (size_t)data.np2m * sizeof(int);
-  mem_realloc((void **)&save.ip, mreq);
+  mem_array_realloc(&save.ip, data.np2m);
 
   /* Memory allocation for symmetry array */
   smat.nop = netcx.neq/netcx.npeq;
-  mreq = (size_t)(smat.nop * smat.nop) * sizeof( complex double);
-  mem_realloc((void **)&smat.ssx, mreq);
+  mem_array_realloc(&smat.ssx, (smat.nop * smat.nop));
 
   /* main input section, exits at various points */
   /* depending on error conditions or end of job */
@@ -1062,12 +1041,10 @@ Read_Commands( void )
           if( fpat.ixtyp == 5 )
           {
             vsorc.nvqd++;
-            mreq = (size_t)vsorc.nvqd * sizeof(int);
-            mem_realloc((void **)&vsorc.ivqd, mreq);
-            mem_realloc((void **)&vsorc.iqds, mreq);
-            mreq = (size_t)vsorc.nvqd * sizeof(complex double);
-            mem_realloc((void **)&vsorc.vqd, mreq);
-            mem_realloc((void **)&vsorc.vqds, mreq);
+            mem_array_realloc(&vsorc.ivqd, vsorc.nvqd);
+            mem_array_realloc(&vsorc.iqds, vsorc.nvqd);
+            mem_array_realloc(&vsorc.vqd, vsorc.nvqd);
+            mem_array_realloc(&vsorc.vqds, vsorc.nvqd);
             {
               int indx = vsorc.nvqd-1;
 
@@ -1086,10 +1063,8 @@ Read_Commands( void )
           {
             /* Else, applied E field */
             vsorc.nsant++;
-            mreq = (size_t)vsorc.nsant * sizeof(int);
-            mem_realloc((void **)&vsorc.isant, mreq);
-            mreq = (size_t)vsorc.nsant * sizeof(complex double);
-            mem_realloc((void **)&vsorc.vsant, mreq);
+            mem_array_realloc(&vsorc.isant, vsorc.nsant);
+            mem_array_realloc(&vsorc.vsant, vsorc.nsant);
             {
               int indx = vsorc.nsant-1;
 
@@ -1131,10 +1106,7 @@ Read_Commands( void )
       case FR: /* "fr" card, frequency parameters */
         /* Count of FR cards encountered */
         calc_data.FR_cards++;
-
-        /* Allocate the frequency data structure pointer FIXME */
-        mreq = (size_t)calc_data.FR_cards * sizeof(freq_loop_data_t);
-        mem_realloc((void **)&(calc_data.freq_loop_data), mreq);
+        mem_array_realloc(&calc_data.freq_loop_data, calc_data.FR_cards);
 
         /* Short cuts */
         freq_loop_data_t *fld = calc_data.freq_loop_data;
@@ -1156,15 +1128,13 @@ Read_Commands( void )
         /* Allocate normalization buffer */
         {
           calc_data.steps_total += fld[card].freq_steps;
-          mreq = (size_t)(calc_data.steps_total+1) * sizeof(double);
-          mem_realloc((void **)&(impedance_data.zreal), mreq);
-          mem_realloc((void **)&(impedance_data.zimag), mreq);
-          mem_realloc((void **)&(impedance_data.zmagn), mreq);
-          mem_realloc((void **)&(impedance_data.zphase), mreq);
-          mem_realloc((void **)&(save.freq), mreq);
-
-          mreq = (size_t)(calc_data.steps_total+1) * sizeof(char);
-          mem_realloc((void **)&(save.fstep), mreq);
+          int nrec = (calc_data.steps_total + 1);
+          mem_array_realloc(&impedance_data.zreal, nrec);
+          mem_array_realloc(&impedance_data.zimag, nrec);
+          mem_array_realloc(&impedance_data.zmagn, nrec);
+          mem_array_realloc(&impedance_data.zphase, nrec);
+          mem_array_realloc(&save.freq, nrec);
+          mem_array_realloc(&save.fstep, (calc_data.steps_total + 1));
         }
 
         if( CHILD ) continue;
@@ -1293,16 +1263,13 @@ Read_Commands( void )
 
           /* Reallocate loading buffers */
           zload.nload++;
-          mreq = (size_t)zload.nload * sizeof(int);
-          mem_realloc((void **)&calc_data.ldtyp, mreq);
-          mem_realloc((void **)&calc_data.ldtag, mreq);
-          mem_realloc((void **)&calc_data.ldtagf, mreq);
-          mem_realloc((void **)&calc_data.ldtagt, mreq);
-
-          mreq = (size_t)zload.nload * sizeof(double);
-          mem_realloc((void **)&calc_data.zlr, mreq);
-          mem_realloc((void **)&calc_data.zli, mreq);
-          mem_realloc((void **)&calc_data.zlc, mreq);
+          mem_array_realloc(&calc_data.ldtyp, zload.nload);
+          mem_array_realloc(&calc_data.ldtag, zload.nload);
+          mem_array_realloc(&calc_data.ldtagf, zload.nload);
+          mem_array_realloc(&calc_data.ldtagt, zload.nload);
+          mem_array_realloc(&calc_data.zlr, zload.nload);
+          mem_array_realloc(&calc_data.zli, zload.nload);
+          mem_array_realloc(&calc_data.zlc, zload.nload);
 
           idx = zload.nload-1;
           calc_data.ldtyp[idx]= itmp1;
@@ -1333,9 +1300,9 @@ Read_Commands( void )
             if( itmp3 == 0 ) /* All segs loaded */
             {
               nseg = data.n;
-              mreq = (size_t)(nseg + zload.nldseg) * sizeof(int);
-              mem_realloc((void **)&zload.ldsegn, mreq);
-              mem_realloc((void **)&zload.ldtype, mreq);
+              int nrec = (nseg + zload.nldseg);
+              mem_array_realloc(&zload.ldsegn, nrec);
+              mem_array_realloc(&zload.ldtype, nrec);
               for( idx = 0; idx < nseg; idx++ )
               {
                 zload.ldtype[zload.nldseg]   = itmp1;
@@ -1346,9 +1313,9 @@ Read_Commands( void )
             {
               nseg = itmp4 - itmp3 + 1;
               if( nseg <= 0 ) nseg = 1;
-              mreq = (size_t)(nseg + zload.nldseg) * sizeof(int);
-              mem_realloc((void **)&zload.ldsegn, mreq);
-              mem_realloc((void **)&zload.ldtype, mreq);
+              int nrec = (nseg + zload.nldseg);
+              mem_array_realloc(&zload.ldsegn, nrec);
+              mem_array_realloc(&zload.ldtype, nrec);
               for( idx = 0; idx < nseg; idx++ )
               {
                 zload.ldtype[zload.nldseg]   = itmp1;
@@ -1364,9 +1331,9 @@ Read_Commands( void )
               for( idx = 0; idx < data.n; idx++ )
                 if(data.segments[idx].itag == itmp2 )
                 {
-                  mreq = (size_t)(zload.nldseg + 1) * sizeof(int);
-                  mem_realloc((void **)&zload.ldsegn, mreq);
-                  mem_realloc((void **)&zload.ldtype, mreq);
+                  int nrec = (zload.nldseg + 1);
+                  mem_array_realloc(&zload.ldsegn, nrec);
+                  mem_array_realloc(&zload.ldtype, nrec);
                   zload.ldtype[zload.nldseg]   = itmp1;
                   zload.ldsegn[zload.nldseg++] = idx+1;
                 }
@@ -1375,9 +1342,9 @@ Read_Commands( void )
             {
               nseg = itmp4 - itmp3 + 1;
               if( nseg <= 0 ) nseg = 1; /* Just one seg of tag (=itmp3) */
-              mreq = (size_t)(zload.nldseg + nseg) * sizeof(int);
-              mem_realloc((void **)&zload.ldsegn, mreq);
-              mem_realloc((void **)&zload.ldtype, mreq);
+              int nrec = (zload.nldseg + nseg);
+              mem_array_realloc(&zload.ldsegn, nrec);
+              mem_array_realloc(&zload.ldtype, nrec);
               for( idx = 0; idx < nseg; idx++ )
               {
                 zload.ldtype[zload.nldseg] = itmp1;
@@ -1426,18 +1393,15 @@ Read_Commands( void )
 
           /* Re-allocate network buffers */
           netcx.nonet++;
-          mreq = (size_t)netcx.nonet * sizeof(int);
-          mem_realloc((void **)&netcx.ntyp, mreq);
-          mem_realloc((void **)&netcx.iseg1, mreq);
-          mem_realloc((void **)&netcx.iseg2, mreq);
-
-          mreq = (size_t)netcx.nonet * sizeof(double);
-          mem_realloc((void **)&netcx.x11r, mreq);
-          mem_realloc((void **)&netcx.x11i, mreq);
-          mem_realloc((void **)&netcx.x12r, mreq);
-          mem_realloc((void **)&netcx.x12i, mreq);
-          mem_realloc((void **)&netcx.x22r, mreq);
-          mem_realloc((void **)&netcx.x22i, mreq);
+          mem_array_realloc(&netcx.ntyp, netcx.nonet);
+          mem_array_realloc(&netcx.iseg1, netcx.nonet);
+          mem_array_realloc(&netcx.iseg2, netcx.nonet);
+          mem_array_realloc(&netcx.x11r, netcx.nonet);
+          mem_array_realloc(&netcx.x11i, netcx.nonet);
+          mem_array_realloc(&netcx.x12r, netcx.nonet);
+          mem_array_realloc(&netcx.x12i, netcx.nonet);
+          mem_array_realloc(&netcx.x22r, netcx.nonet);
+          mem_array_realloc(&netcx.x22i, netcx.nonet);
 
           idx = netcx.nonet-1;
           if( ain_num == NT )

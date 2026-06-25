@@ -35,10 +35,9 @@ fp_ant_temp_render(fp_plot_ctx_t *ctx)
   static double *gt_buf = NULL, *temp_buf = NULL;
   char *titles[3];
   int idx;
-  size_t mreq = (size_t)ctx->num_fsteps * sizeof(double);
 
-  mem_realloc((void **)&gt_buf, mreq);
-  mem_realloc((void **)&temp_buf, mreq);
+  mem_array_realloc(&gt_buf, ctx->num_fsteps);
+  mem_array_realloc(&temp_buf, ctx->num_fsteps);
 
   for( idx = 0; idx < ctx->num_fsteps; idx++ )
   {

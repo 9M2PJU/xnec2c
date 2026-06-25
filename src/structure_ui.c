@@ -139,27 +139,19 @@ free_crnt_step(void *elem)
   void
 Alloc_Crnt_Fstep_Buffers( int nfrq )
 {
-  size_t mreq;
-
   /* Resize the outer array, freeing only the shrink tail; surviving
    * entries keep their sub-buffers for reuse by the inner alloc loop. */
-  mem_array_resize((void **)&crnt_fstep, sizeof(crnt_t),
-      nfrq, free_crnt_step);
+  mem_array_resize(&crnt_fstep, nfrq, free_crnt_step);
 
   for( int i = 0; i < nfrq; i++ )
   {
-    /* Basis function coefficients: npm elements each */
-    mreq = (size_t)data.npm * sizeof(double);
-    mem_realloc((void **)&crnt_fstep[i].air, mreq);
-    mem_realloc((void **)&crnt_fstep[i].aii, mreq);
-    mem_realloc((void **)&crnt_fstep[i].bir, mreq);
-    mem_realloc((void **)&crnt_fstep[i].bii, mreq);
-    mem_realloc((void **)&crnt_fstep[i].cir, mreq);
-    mem_realloc((void **)&crnt_fstep[i].cii, mreq);
-
-    /* Solved current amplitudes: np3m elements */
-    mreq = (size_t)data.np3m * sizeof(complex double);
-    mem_realloc((void **)&crnt_fstep[i].cur, mreq);
+    mem_array_realloc(&crnt_fstep[i].air, data.npm);
+    mem_array_realloc(&crnt_fstep[i].aii, data.npm);
+    mem_array_realloc(&crnt_fstep[i].bir, data.npm);
+    mem_array_realloc(&crnt_fstep[i].bii, data.npm);
+    mem_array_realloc(&crnt_fstep[i].cir, data.npm);
+    mem_array_realloc(&crnt_fstep[i].cii, data.npm);
+    mem_array_realloc(&crnt_fstep[i].cur, data.np3m);
 
   }
 
@@ -337,9 +329,7 @@ reset_animation_phase(void)
   void
 Init_Struct_Drawing( void )
 {
-  /* We need n segs for wires + 4 edges per patch */
-  size_t mreq = (size_t)(data.n + 4*data.m) * sizeof(Segment_t);
-  mem_realloc((void **)&structure_segs, mreq);
+  mem_array_realloc(&structure_segs, (data.n + 4 * data.m));
   Prerender_Aggregate();
 
   /* Viewport only exists in the UI process; children skip this harmlessly.

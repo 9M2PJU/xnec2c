@@ -35,7 +35,6 @@ fp_vswr_render(fp_plot_ctx_t *ctx)
   static double *vswr = NULL, *s11 = NULL;
   char *titles[3];
   int idx;
-  size_t mreq = (size_t)ctx->num_fsteps * sizeof(double);
 
   /* Plotting frame titles */
   titles[0] = _("VSWR");
@@ -51,9 +50,9 @@ fp_vswr_render(fp_plot_ctx_t *ctx)
   }
 
   /* Gather VSWR and optional S11 in one measurement pass */
-  mem_realloc((void **)&vswr, mreq);
+  mem_array_realloc(&vswr, ctx->num_fsteps);
   if( rc_config.freqplots_s11 )
-    mem_realloc((void **)&s11, mreq);
+    mem_array_realloc(&s11, ctx->num_fsteps);
 
   fp_meas_column_t cols[2];
   int ncols = 0;

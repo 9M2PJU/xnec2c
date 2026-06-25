@@ -59,7 +59,6 @@ netwk( complex double *cmx, int *ip, complex double *einc )
   double pwr;
   complex double *vsrc = NULL, *rhs = NULL, *cmn = NULL;
   complex double *rhnt = NULL, *rhnx = NULL, ymit, vlt, cux;
-  size_t mreq;
 
   netcx.pin=0.0;
   netcx.pnls=0.0;
@@ -69,26 +68,18 @@ netwk( complex double *cmx, int *ip, complex double *einc )
   /* Allocate network buffers */
   if( netcx.nonet > 0 )
   {
-    mreq = (size_t)data.np3m * sizeof(complex double);
-    mem_alloc((void **)&rhs, mreq);
-
-    mreq = (size_t)j * sizeof(complex double);
-    mem_alloc((void **)&rhnt, mreq);
-    mem_alloc((void **)&rhnx, mreq);
-    mem_alloc((void **)&cmn, mreq * (size_t)j);
-
-    mreq = (size_t)j * sizeof(int);
-    mem_alloc((void **)&ntsca, mreq);
-    mem_alloc((void **)&nteqa, mreq);
-    mem_alloc((void **)&ipnt, mreq);
-
-    mreq = (size_t)vsorc.nsant * sizeof(complex double);
-    mem_alloc((void **)&vsrc, mreq);
+    mem_array_alloc(&rhs, data.np3m);
+    mem_array_alloc(&rhnt, j);
+    mem_array_alloc(&rhnx, j);
+    mem_array_alloc(&cmn, (size_t)j * j);
+    mem_array_alloc(&ntsca, j);
+    mem_array_alloc(&nteqa, j);
+    mem_array_alloc(&ipnt, j);
+    mem_array_alloc(&vsrc, vsorc.nsant);
   }
   else if( netcx.masym != 0)
   {
-    mreq = (size_t)j * sizeof(int);
-    mem_alloc((void **)&ipnt, mreq);
+    mem_array_alloc(&ipnt, j);
   }
 
 

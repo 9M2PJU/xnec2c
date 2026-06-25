@@ -522,7 +522,7 @@ Plot_Graph_Smith(
       plot_rect.y + plot_rect.height, layout_height, annot_text, th );
 
   /* Calculate points to plot */
-  mem_alloc((void **)&points, (size_t)nc * sizeof(GdkPoint));
+  mem_array_alloc(&points, nc);
 
   if( points == NULL )
   {

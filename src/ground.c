@@ -70,15 +70,15 @@ rom2( double a, double b,
   if( first_call )
   {
     first_call = FALSE;
-    size_t mreq = 9 * sizeof(complex double);
-    mem_alloc((void **)&g1, mreq);
-    mem_alloc((void **)&g2, mreq);
-    mem_alloc((void **)&g3, mreq);
-    mem_alloc((void **)&g4, mreq);
-    mem_alloc((void **)&g5, mreq);
-    mem_alloc((void **)&t01, mreq);
-    mem_alloc((void **)&t10, mreq);
-    mem_alloc((void **)&t20, mreq);
+    int nrec = 9;
+    mem_array_alloc(&g1, nrec);
+    mem_array_alloc(&g2, nrec);
+    mem_array_alloc(&g3, nrec);
+    mem_array_alloc(&g4, nrec);
+    mem_array_alloc(&g5, nrec);
+    mem_array_alloc(&t01, nrec);
+    mem_array_alloc(&t10, nrec);
+    mem_array_alloc(&t20, nrec);
   }
 
   z= a;

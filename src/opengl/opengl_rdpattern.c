@@ -203,10 +203,9 @@ gl_rdpat_draw_farfield(void *ctx, int fstep, const ff_draw_params_t *ff)
   {
     int i;
 
-    if( npts > mem_array_capacity(rdpat_translated_points, sizeof(point_3d_t)))
+    if( npts > mem_array_capacity(rdpat_translated_points))
     {
-      size_t mreq = (size_t)npts * sizeof(point_3d_t);
-      mem_realloc((void **)&rdpat_translated_points, mreq);
+      mem_array_realloc(&rdpat_translated_points, npts);
     }
 
     /* ff->x/y/z already pre-scaled to pattern space by dispatch */
