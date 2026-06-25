@@ -79,7 +79,7 @@ Read_Comments( void )
 
   /* Free old comment strings before reallocating array */
   for( i = 0; i < comments.num; i++ )
-    mem_free((void **)&comments.lines[i]);
+    mem_free(&comments.lines[i]);
 
   comments.num = 0;
 
@@ -126,7 +126,7 @@ Read_Comments( void )
       mem_array_realloc(&comments.lines, (comments.num + 1));
 
       line_len = strlen(&line_buf[3]) + 1;
-      mem_alloc((void **)&comments.lines[comments.num], line_len);
+      mem_alloc(&comments.lines[comments.num], line_len);
       Strlcpy( comments.lines[comments.num], &line_buf[3], line_len );
 
       comments.num++;
@@ -1112,8 +1112,6 @@ Read_Commands( void )
         freq_loop_data_t *fld = calc_data.freq_loop_data;
         int card = calc_data.FR_cards - 1;
 
-		memset(&fld[card], 0, sizeof(freq_loop_data_t));
-
         /* Defaults */
         fld[card].freq_steps = 1;
         fld[card].max_freq   = 0.0;
@@ -1701,7 +1699,7 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
     cmnd_fexprs[i][0] = '\0';
 
   /* read a line from input file */
-  mem_alloc((void **)&line_buf, LINE_LEN);
+  mem_alloc(&line_buf, LINE_LEN);
   if( line_buf == NULL ) return( FALSE );
   startptr = line_buf;
   eof = Load_Line( line_buf, input_fp );
@@ -1719,7 +1717,7 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
     Stop( ERR_OK, _("Command data card error\n"
           "Unexpected EOF while reading input file\n"
             "Appending a default EN card") );
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( FALSE );
   }
 
@@ -1733,7 +1731,7 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
     pr_err("command data card error: card's mnemonic code too short or missing\n");
     Stop( ERR_OK, _("Command data card error\n"
           "Mnemonic code too short or missing") );
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( FALSE );
   }
 
@@ -1744,7 +1742,7 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
   if( strcmp(mn, "SY") == 0 )
   {
     Strlcpy(sy_line_buffer_cmnd, line_buf + 2, sizeof(sy_line_buffer_cmnd));
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( TRUE );
   }
   else
@@ -1755,21 +1753,21 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
   /* Return if only mnemonic on card */
   if( len == 2 )
   {
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( TRUE );
   }
 
   /* Compatibility with NEC4, comments between data cards */
   if( strncmp(mn, "CM", 2) == 0 )
   {
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( TRUE );
   }
 
   /* Validate characters in command card data */
   if( !validate_card_characters(line_buf, 2, len, "command") )
   {
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( FALSE );
   }
 
@@ -1781,7 +1779,7 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
     double value;
     if( !parse_field_with_expression(&line_ptr, &endptr, &value, "command data", cmnd_iexprs[i]) )
     {
-      mem_free((void **)&startptr);
+      mem_free(&startptr);
       return( FALSE );
     }
     iarr[i] = (int)value;
@@ -1802,7 +1800,7 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
     *f4= rarr[3];
     *f5= rarr[4];
     *f6= rarr[5];
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( TRUE );
   }
 
@@ -1812,7 +1810,7 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
     const char *line_ptr = line_buf;
     if( !parse_field_with_expression(&line_ptr, &endptr, &rarr[i], "command data", cmnd_fexprs[i]) )
     {
-      mem_free((void **)&startptr);
+      mem_free(&startptr);
       return( FALSE );
     }
     line_buf = (char *)line_ptr;
@@ -1831,7 +1829,7 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
   *f5= rarr[4];
   *f6= rarr[5];
 
-  mem_free((void **)&startptr);
+  mem_free(&startptr);
   return( TRUE );
 } /* readmn() */
 
@@ -1907,7 +1905,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
     geom_fexprs[i][0] = '\0';
 
   /* read a line from input file */
-  mem_alloc((void **)&line_buf, LINE_LEN);
+  mem_alloc(&line_buf, LINE_LEN);
   if( line_buf == NULL ) return( FALSE );
   startptr = line_buf;
    eof = Load_Line( line_buf, input_fp );
@@ -1928,7 +1926,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
     Stop( ERR_OK, _("Geometry data card error\n"
           "Unexpected EOF while reading input file\n"
           "Appending a default GE card") );
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( FALSE );
   }
 
@@ -1942,7 +1940,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
     pr_err("geometry data card error: card's mnemonic code too short or missing\n");
     Stop( ERR_OK, _("Geometry data card error\n"
           "Card's mnemonic code too short or missing") );
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( FALSE );
   }
 
@@ -1953,7 +1951,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
   if( strcmp(gm, "SY") == 0 )
   {
     Strlcpy(sy_line_buffer, line_buf + 2, sizeof(sy_line_buffer));
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( TRUE );
   }
   else
@@ -1964,7 +1962,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
   /* Return if only mnemonic on card */
   if( len == 2 )
   {
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( TRUE );
   }
 
@@ -1972,14 +1970,14 @@ readgm( char *gm, int *i1, int *i2, double *x1,
    * comments between data cards */
   if( strcmp(gm, "CM") == 0 )
   {
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( TRUE );
   }
 
   /* Validate characters in geometry card data */
   if( !validate_card_characters(line_buf, 2, len, "geometry") )
   {
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( FALSE );
   }
 
@@ -1991,7 +1989,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
     double value;
     if( !parse_field_with_expression(&line_ptr, &endptr, &value, "geometry data", geom_iexprs[i]) )
     {
-      mem_free((void **)&startptr);
+      mem_free(&startptr);
       return( FALSE );
     }
     iarr[i] = (int)value;
@@ -2011,7 +2009,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
     *y2 = rarr[4];
     *z2 = rarr[5];
     *rad= rarr[6];
-    mem_free((void **)&startptr);
+    mem_free(&startptr);
     return( TRUE );
   }
 
@@ -2021,7 +2019,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
     const char *line_ptr = line_buf;
     if( !parse_field_with_expression(&line_ptr, &endptr, &rarr[i], "geometry data", geom_fexprs[i]) )
     {
-      mem_free((void **)&startptr);
+      mem_free(&startptr);
       return( FALSE );
     }
     line_buf = (char *)line_ptr;
@@ -2039,7 +2037,7 @@ readgm( char *gm, int *i1, int *i2, double *x1,
   *z2  = rarr[5];
   *rad = rarr[6];
 
-  mem_free((void **)&startptr);
+  mem_free(&startptr);
   return( TRUE );
 } /* readgm() */
 

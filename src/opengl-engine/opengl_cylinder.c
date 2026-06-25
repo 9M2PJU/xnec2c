@@ -294,7 +294,7 @@ opengl_lit_cylinder_free(lit_cylinder_mesh_t *mesh)
   if( !mesh )
     return;
 
-  mem_free((void **)&mesh->vertices);
+  mem_free(&mesh->vertices);
   mesh->vertex_count = 0;
   mesh->triangle_count = 0;
 

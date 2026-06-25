@@ -37,10 +37,10 @@ static void
 free_ff_pre_step(void *elem)
 {
   ff_pre_t *fp = elem;
-  mem_free((void **)&fp->vertices);
-  mem_free((void **)&fp->theta_rgb);
-  mem_free((void **)&fp->phi_rgb);
-  mem_free((void **)&fp->vertex_rgb);
+  mem_free(&fp->vertices);
+  mem_free(&fp->theta_rgb);
+  mem_free(&fp->phi_rgb);
+  mem_free(&fp->vertex_rgb);
 }
 
 /**
@@ -51,10 +51,10 @@ static void
 free_nf_pre_step(void *elem)
 {
   nf_pre_t *np = elem;
-  mem_free((void **)&np->e_vecs);
-  mem_free((void **)&np->h_vecs);
-  mem_free((void **)&np->pov_vecs);
-  mem_free((void **)&np->pr_buf);
+  mem_free(&np->e_vecs);
+  mem_free(&np->h_vecs);
+  mem_free(&np->pov_vecs);
+  mem_free(&np->pr_buf);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -101,7 +101,7 @@ prerender_state_free(void)
     int n = mem_array_count(ff_pre);
     for( i = 0; i < n; i++ )
       free_ff_pre_step(&ff_pre[i]);
-    mem_free((void **)&ff_pre);
+    mem_free(&ff_pre);
   }
 
   if( nf_pre != NULL )
@@ -109,16 +109,16 @@ prerender_state_free(void)
     int n = mem_array_count(nf_pre);
     for( i = 0; i < n; i++ )
       free_nf_pre_step(&nf_pre[i]);
-    mem_free((void **)&nf_pre);
+    mem_free(&nf_pre);
   }
 
-  mem_free((void **)&geom_pre.sin_theta);
-  mem_free((void **)&geom_pre.cos_theta);
-  mem_free((void **)&geom_pre.sin_phi);
-  mem_free((void **)&geom_pre.cos_phi);
-  mem_free((void **)&geom_pre.solid_angle);
-  mem_free((void **)&geom_pre.theta_topo);
-  mem_free((void **)&geom_pre.phi_topo);
+  mem_free(&geom_pre.sin_theta);
+  mem_free(&geom_pre.cos_theta);
+  mem_free(&geom_pre.sin_phi);
+  mem_free(&geom_pre.cos_phi);
+  mem_free(&geom_pre.solid_angle);
+  mem_free(&geom_pre.theta_topo);
+  mem_free(&geom_pre.phi_topo);
   geom_pre.n_theta_edges = 0;
   geom_pre.n_phi_edges   = 0;
 

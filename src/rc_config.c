@@ -431,7 +431,7 @@ int parse_var(rc_config_vars_t *v, char *line, char *locale)
 		return 0;
 
 	mreq = strlen(v->format)+4;
-	mem_alloc((void **)&format, mreq);
+	mem_alloc(&format, mreq);
 	snprintf(format, mreq-1, "%s%%n", v->format);
 
 	setlocale(LC_NUMERIC, locale);
@@ -458,7 +458,7 @@ int parse_var(rc_config_vars_t *v, char *line, char *locale)
 
 	setlocale(LC_NUMERIC, orig_numeric_locale);
 
-	mem_free((void **)&format);
+	mem_free(&format);
 
 	if (check != strlen(line))
 	{

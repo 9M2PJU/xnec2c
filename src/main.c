@@ -167,7 +167,7 @@ main (int argc, char *argv[])
   // so make a copy of it for later:
   setlocale(LC_ALL, "");
   char *l = setlocale(LC_NUMERIC, NULL);
-  mem_alloc((void **)&orig_numeric_locale, strlen(l) + 1);
+  mem_alloc(&orig_numeric_locale, strlen(l) + 1);
   strcpy(orig_numeric_locale, l);
 
   // Initialize gettext for internationalization
@@ -476,6 +476,9 @@ main (int argc, char *argv[])
   } /* if( calc_data.num_jobs > 1 ) */
   else
   {
+    /* No fork: one in-process worker. The length-one child_procs array holds
+     * the parent's own slot so the serial path indexes child_procs[0] like the
+     * forked path; pid=0 and -1 pipe fds mark it as non-forked. */
     mem_array_alloc(&child_procs, 1);
     child_procs[0] = NULL;
     mem_new(&child_procs[0]);
@@ -577,7 +580,7 @@ main (int argc, char *argv[])
 
   gtk_main ();
 
-  mem_free((void **)&orig_numeric_locale);
+  mem_free(&orig_numeric_locale);
 
   return 0;
 } // main()
@@ -633,7 +636,7 @@ Open_Input_File( gpointer arg )
 
   calc_data.freq_step = -1;
 
-  mem_free((void **)&freqplots_main_view()->fr_plots);
+  mem_array_free(&freqplots_main_view()->fr_plots);
 
   Open_File( &input_fp, rc_config.input_file, "r");
 

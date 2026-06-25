@@ -53,9 +53,9 @@ Plots_Window_Killed( void )
 
   // Release heap tables, then zero the whole view so the resize caches
   // (prev_*) restart and width_available rescales on the next open.
-  mem_free((void **)&v->fr_plots);
+  mem_array_free(&v->fr_plots);
   fp_locus_free(v);
-  mem_free((void **)&v->prev_click_event);
+  mem_free(&v->prev_click_event);
   if (v->text_layout != NULL)
     g_object_unref(v->text_layout);
   memset(v, 0, sizeof(*v));
@@ -240,7 +240,7 @@ Set_Frequency_On_Click( freqplots_view_t *v, GdkEvent *e)
 
   // Free the pending click since it was serviced.
   if (v->prev_click_event != NULL)
-	  mem_free((void **)&v->prev_click_event);
+	  mem_free(&v->prev_click_event);
 
 } /* Set_Freq_On_Click() */
 

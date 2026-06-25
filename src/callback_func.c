@@ -532,9 +532,9 @@ Alloc_Crnt_Buffs( void )
   static void
 Free_Crnt_Buffs( void )
 {
-  mem_free((void **)&ct1m);
-  mem_free((void **)&ct2m);
-  mem_free((void **)&cmag);
+  mem_free(&ct1m);
+  mem_free(&ct2m);
+  mem_free(&cmag);
 } /* Free_Crnt_Buffs() */
 
 /*-----------------------------------------------------------------------*/
@@ -813,7 +813,7 @@ Filechooser_Response(
       if( (str == NULL) || (str[strlen(filechooser_callback->extension)] != '\0') )
         Strlcat( filename, filechooser_callback->extension, sizeof(filename) );
       filechooser_callback->callback(filename);
-      mem_free((void **)&filechooser_callback);
+      mem_free(&filechooser_callback);
     }
     g_free( fname );
 
@@ -855,7 +855,7 @@ Filechooser_Response(
   } /* if( response_id == GTK_RESPONSE_OK ) */
   else
   {
-    mem_free((void **)&filechooser_callback);
+    mem_free(&filechooser_callback);
     ClearFlag( ALL_CHOOSER_FLAGS );
   }
 

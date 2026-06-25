@@ -714,7 +714,7 @@ opengl_structure_generate_geometry(
     : data.m * 6;
 
   /* Segment batch: always present at slot 0 */
-  mem_realloc((void **)&batches[bc].vertices,
+  mem_realloc(&batches[bc].vertices,
               (size_t)seg_verts * sizeof(structure_vertex_t));
 
   if( seg_line_mode )
@@ -732,7 +732,7 @@ opengl_structure_generate_geometry(
   if( data.m > 0 )
   {
     structure_patch_batch_index = bc;
-    mem_realloc((void **)&batches[bc].vertices,
+    mem_realloc(&batches[bc].vertices,
                 (size_t)patch_verts * sizeof(structure_vertex_t));
 
     if( patch_wireframe )
@@ -750,7 +750,7 @@ opengl_structure_generate_geometry(
   if( netcx.nonet > 0 )
   {
     structure_net_batch_index = bc;
-    mem_realloc((void **)&batches[bc].vertices,
+    mem_realloc(&batches[bc].vertices,
                 (size_t)(netcx.nonet * STRUCTURE_NETWORK_MAX_VERTS)
                 * sizeof(structure_vertex_t));
 
@@ -764,7 +764,7 @@ opengl_structure_generate_geometry(
     /* ntyp 1 polygon fill batch: GL_TRIANGLES with polygon_offset so the
      * fill recedes behind the connector lines that share its plane. */
     structure_net_fill_batch_index = bc;
-    mem_realloc((void **)&batches[bc].vertices,
+    mem_realloc(&batches[bc].vertices,
                 (size_t)(netcx.nonet * STRUCTURE_NETWORK_FILL_VERTS_PER_INSTANCE)
                 * sizeof(structure_vertex_t));
 
@@ -892,7 +892,7 @@ opengl_structure_geometry_cleanup(void)
   int i;
 
   for( i = 0; i < GL_VIEW_MAX_BATCHES; i++ )
-    mem_free((void **)&batches[i].vertices);
+    mem_free(&batches[i].vertices);
 
   batch_count = 0;
 }

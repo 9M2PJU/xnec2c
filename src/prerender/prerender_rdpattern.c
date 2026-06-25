@@ -125,11 +125,11 @@ compute_trig_tables(void)
 
   if( fpat.nth <= 0 || fpat.nph <= 0 )
   {
-    mem_free((void **)&geom_pre.sin_theta);
-    mem_free((void **)&geom_pre.cos_theta);
-    mem_free((void **)&geom_pre.sin_phi);
-    mem_free((void **)&geom_pre.cos_phi);
-    mem_free((void **)&geom_pre.solid_angle);
+    mem_free(&geom_pre.sin_theta);
+    mem_free(&geom_pre.cos_theta);
+    mem_free(&geom_pre.sin_phi);
+    mem_free(&geom_pre.cos_phi);
+    mem_free(&geom_pre.solid_angle);
     return;
   }
 
@@ -171,8 +171,8 @@ compute_ff_topology(void)
 
   if( fpat.nth < 2 || fpat.nph < 2 )
   {
-    mem_free((void **)&geom_pre.theta_topo);
-    mem_free((void **)&geom_pre.phi_topo);
+    mem_free(&geom_pre.theta_topo);
+    mem_free(&geom_pre.phi_topo);
     geom_pre.n_theta_edges = 0;
     geom_pre.n_phi_edges   = 0;
     return;

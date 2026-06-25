@@ -297,11 +297,10 @@ void fr_plots_init(freqplots_view_t *v)
 
   /* 2d array of plot rectangles popluated by the Plot_Graph function */
   if (v->ngraph > 0 && calc_data.FR_cards > 0)
-	  mem_realloc((void **)&v->fr_plots,
-                      sizeof(fr_plot_t) * v->ngraph * calc_data.FR_cards);
+	  mem_array_realloc(&v->fr_plots, v->ngraph * calc_data.FR_cards);
   else
   {
-	  mem_free((void **)&v->fr_plots);
+	  mem_array_free(&v->fr_plots);
 	  return;
   }
 
@@ -1028,12 +1027,12 @@ void freqplots_close_panel(fp_panel_t panel)
 		return;
 
 	fpv_popups[panel] = NULL;
-	mem_free((void **)&v->fr_plots);
+	mem_array_free(&v->fr_plots);
 	fp_locus_free(v);
-	mem_free((void **)&v->prev_click_event);
+	mem_free(&v->prev_click_event);
 	if (v->text_layout != NULL)
 		g_object_unref(v->text_layout);
-	mem_free((void **)&v);
+	mem_free(&v);
 }
 
 /* Destroy every open popup window; each window's destroy handler frees its

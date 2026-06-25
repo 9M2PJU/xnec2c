@@ -220,10 +220,10 @@ static void
 free_struct_colors_step(void *elem)
 {
   struct_colors_t *c = elem;
-  mem_free((void **)&c->wire_crnt_rgb);
-  mem_free((void **)&c->wire_chrg_rgb);
-  mem_free((void **)&c->patch_crnt_rgb);
-  mem_free((void **)&c->patch_flow_data);
+  mem_free(&c->wire_crnt_rgb);
+  mem_free(&c->wire_chrg_rgb);
+  mem_free(&c->patch_crnt_rgb);
+  mem_free(&c->patch_flow_data);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -277,12 +277,12 @@ free_struct_colors(void)
     nfrq = mem_array_count(struct_colors);
     for( i = 0; i < nfrq; i++ )
       free_struct_colors_step(&struct_colors[i]);
-    mem_free((void **)&struct_colors);
+    mem_free(&struct_colors);
   }
 
-  mem_free((void **)&seg_rgb);
-  mem_free((void **)&seg_width);
-  mem_free((void **)&patch_rgb);
+  mem_free(&seg_rgb);
+  mem_free(&seg_width);
+  mem_free(&patch_rgb);
 }
 
 /*-----------------------------------------------------------------------*/

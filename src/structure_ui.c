@@ -117,13 +117,13 @@ static void
 free_crnt_step(void *elem)
 {
   crnt_t *c = elem;
-  mem_free((void **)&c->air);
-  mem_free((void **)&c->aii);
-  mem_free((void **)&c->bir);
-  mem_free((void **)&c->bii);
-  mem_free((void **)&c->cir);
-  mem_free((void **)&c->cii);
-  mem_free((void **)&c->cur);
+  mem_free(&c->air);
+  mem_free(&c->aii);
+  mem_free(&c->bir);
+  mem_free(&c->bii);
+  mem_free(&c->cir);
+  mem_free(&c->cii);
+  mem_free(&c->cur);
 }
 
 /*-----------------------------------------------------------------------*/

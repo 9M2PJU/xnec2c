@@ -623,7 +623,7 @@ cmset( int nrow, complex double *cmx, double rkhx, int iexkx )
 
   } /* for( i = 0; i < it; i++ ) */
 
-  mem_free((void **)&scm);
+  mem_free(&scm);
 
   return;
 }
@@ -1211,7 +1211,7 @@ int factr_gauss_elim( int n, complex double *a, int *ip, int ndim)
 
   } /* for( r=0; r < n; r++ ) */
 
-  mem_free((void **)&scm);
+  mem_free(&scm);
 
   return 0;
 }
@@ -1384,7 +1384,7 @@ int solve_gauss_elim( int n, complex double *a, int *ip,
     b[i]=( scm[i]- sum)/ a[i+i*ndim];
   }
 
-  mem_free((void **)&scm);
+  mem_free(&scm);
 
   return 0;
 }
@@ -1514,7 +1514,7 @@ solves( complex double *a, int *ip,
 
   if( smat.nop == 1)
   {
-    mem_free((void **)&scm);
+    mem_free(&scm);
     return;
   }
 
@@ -1585,7 +1585,7 @@ solves( complex double *a, int *ip,
 
   } /* for( ic = 0; ic < nrh; ic++ ) */
 
-  mem_free((void **)&scm);
+  mem_free(&scm);
 
   return;
 }

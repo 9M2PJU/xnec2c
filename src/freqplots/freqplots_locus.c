@@ -154,8 +154,8 @@ fp_locus_frame_begin( freqplots_view_t *v )
 locus_copy( GdkPoint **dst_pts, double **dst_freq,
     const GdkPoint *src_pts, const double *src_freq, int n )
 {
-  mem_realloc( (void **)dst_pts,  (size_t)n * sizeof(GdkPoint) );
-  mem_realloc( (void **)dst_freq, (size_t)n * sizeof(double) );
+  mem_array_realloc( dst_pts,  n );
+  mem_array_realloc( dst_freq, n );
   memcpy( *dst_pts,  src_pts,  (size_t)n * sizeof(GdkPoint) );
   memcpy( *dst_freq, src_freq, (size_t)n * sizeof(double) );
 }
@@ -229,12 +229,12 @@ fp_locus_free( freqplots_view_t *v )
 
   for( i = 0; i < mem_array_count(v->loci); i++ )
   {
-    mem_free( (void **)&v->loci[i].pts );
-    mem_free( (void **)&v->loci[i].freq );
-    mem_free( (void **)&v->loci[i].snap_pts );
-    mem_free( (void **)&v->loci[i].snap_freq );
+    mem_array_free( &v->loci[i].pts );
+    mem_array_free( &v->loci[i].freq );
+    mem_array_free( &v->loci[i].snap_pts );
+    mem_array_free( &v->loci[i].snap_freq );
   }
 
-  mem_free( (void **)&v->loci );
+  mem_free(&v->loci);
   v->loci_n = 0;
 }

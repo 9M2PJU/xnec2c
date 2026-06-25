@@ -191,6 +191,6 @@ Draw_Graph(
                               1.0f, s, JUSTIFY_RIGHT, trace_c);
   }
 
-  mem_free((void **)&points);
+  mem_free(&points);
 
 } /* Draw_Graph() */
