@@ -1305,8 +1305,6 @@ void on_common_projection_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_view_preset_clicked(GtkButton *button, gpointer user_data);
 void on_main_rotate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 void on_main_incline_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
-gboolean on_main_rotate_spinbutton_scroll_event(GtkWidget *widget, GdkEvent *event, gpointer user_data);
-gboolean on_main_incline_spinbutton_scroll_event(GtkWidget *widget, GdkEvent *event, gpointer user_data);
 void on_main_currents_togglebutton_toggled(GtkToggleButton *togglebutton, gpointer user_data);
 void on_main_charges_togglebutton_toggled(GtkToggleButton *togglebutton, gpointer user_data);
 gboolean on_main_colorcode_drawingarea_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
@@ -1372,8 +1370,6 @@ void on_cairo_tab_reset_clicked(GtkButton *button, gpointer user_data);
 
 void on_rdpattern_rotate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 void on_rdpattern_incline_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
-gboolean on_rdpattern_rotate_spinbutton_scroll_event(GtkWidget *widget, GdkEvent *event, gpointer user_data);
-gboolean on_rdpattern_incline_spinbutton_scroll_event(GtkWidget *widget, GdkEvent *event, gpointer user_data);
 void on_rdpattern_gain_togglebutton_toggled(GtkToggleButton *togglebutton, gpointer user_data);
 void on_rdpattern_eh_togglebutton_toggled(GtkToggleButton *togglebutton, gpointer user_data);
 gboolean on_rdpattern_colorcode_drawingarea_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);

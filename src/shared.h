@@ -65,6 +65,9 @@ extern GtkWidget
 /* Frequency step entry */
 extern GtkEntry *rdpattern_fstep_entry ;
 
+/* Per-notch angular step for rotation and incline spin wheel scroll. */
+#define SCROLL_ANGLE_INCREMENT  5.0
+
 /* Radiation pattern rotation, freq and zoom spin buttons */
 extern GtkSpinButton
   *rotate_rdpattern,

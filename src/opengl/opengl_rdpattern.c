@@ -22,6 +22,7 @@
 #include "opengl_rdpattern.h"
 #include "opengl_rdpattern_geometry.h"
 #include "../settings/render_settings.h"
+#include "../gdk_scroll.h"
 #include "opengl_state.h"
 #include "opengl_structure.h"
 #include "opengl_structure_geometry.h"
@@ -416,11 +417,18 @@ rdpattern_on_shift_scroll(GtkWidget *_widget, GdkEventScroll *event, gpointer vi
   /* _widget unused: gl_scene_provider_t.on_shift_scroll interface mandates the parameter;
    * the shared handler queues rdpattern_drawingarea (swapped global) instead. */
   gl_view_state_t *state = (gl_view_state_t *)view_state;
+  scroll_step_t s;
 
   if( !state )
     return FALSE;
 
-  return rdpattern_overlay_shift_scroll(event->direction,
+  s = scroll_step_from_deltas((GdkEvent *)event);
+
+  if( !s.active ||
+      (s.direction != GDK_SCROLL_UP && s.direction != GDK_SCROLL_DOWN) )
+    return FALSE;
+
+  return rdpattern_overlay_shift_scroll(s.direction,
       (int)(state->viewport_height * state->aspect),
       (int)state->viewport_height,
       rc_config.rdpattern_overlay_scale_adj * 100.0);

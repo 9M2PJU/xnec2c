@@ -10738,7 +10738,7 @@ Save NEC2 Editor data first?
                     <property name="height-request">400</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="events">GDK_BUTTON_PRESS_MASK | GDK_SCROLL_MASK | GDK_BUTTON_MOTION_MASK | GDK_STRUCTURE_MASK</property>
+                    <property name="events">GDK_BUTTON_PRESS_MASK | GDK_SCROLL_MASK | GDK_SMOOTH_SCROLL_MASK | GDK_BUTTON_MOTION_MASK | GDK_STRUCTURE_MASK</property>
                     <property name="margin-left">2</property>
                     <property name="margin-right">2</property>
                     <property name="margin-top">2</property>
@@ -11662,7 +11662,6 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <signal name="value-changed" handler="on_main_rotate_spinbutton_value_changed" swapped="no"/>
-                <signal name="scroll-event" handler="on_main_rotate_spinbutton_scroll_event" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -11701,7 +11700,6 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <signal name="value-changed" handler="on_main_incline_spinbutton_value_changed" swapped="no"/>
-                <signal name="scroll-event" handler="on_main_incline_spinbutton_scroll_event" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -12181,7 +12179,7 @@ Save NEC2 Editor data first?
                     <property name="height-request">400</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="events">GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
+                    <property name="events">GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK | GDK_SMOOTH_SCROLL_MASK</property>
                     <property name="margin-left">2</property>
                     <property name="margin-right">2</property>
                     <property name="margin-top">2</property>
@@ -12873,7 +12871,6 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <signal name="value-changed" handler="on_rdpattern_rotate_spinbutton_value_changed" swapped="no"/>
-                <signal name="scroll-event" handler="on_rdpattern_rotate_spinbutton_scroll_event" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -12912,7 +12909,6 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <signal name="value-changed" handler="on_rdpattern_incline_spinbutton_value_changed" swapped="no"/>
-                <signal name="scroll-event" handler="on_rdpattern_incline_spinbutton_scroll_event" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -13526,7 +13522,7 @@ Save NEC2 Editor data first?
                     <property name="height-request">400</property>
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="events">GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK</property>
+                    <property name="events">GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_STRUCTURE_MASK | GDK_SCROLL_MASK | GDK_SMOOTH_SCROLL_MASK</property>
                     <property name="margin-left">2</property>
                     <property name="margin-right">2</property>
                     <property name="margin-top">2</property>

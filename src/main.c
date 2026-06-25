@@ -19,6 +19,7 @@
 
 #include "main.h"
 #include "shared.h"
+#include "gdk_scroll.h"
 #include "mathlib.h"
 #include "structure_ui.h"
 #include "opengl/opengl_structure.h"
@@ -559,6 +560,8 @@ main (int argc, char *argv[])
       Builder_Get_Object(main_window_builder, "main_rotate_spinbutton") );
   incline_structure = GTK_SPIN_BUTTON(
       Builder_Get_Object(main_window_builder, "main_incline_spinbutton") );
+  scroll_install_spin_notches( rotate_structure,  SCROLL_ANGLE_INCREMENT );
+  scroll_install_spin_notches( incline_structure, SCROLL_ANGLE_INCREMENT );
   structure_zoom = GTK_SPIN_BUTTON(
       Builder_Get_Object(main_window_builder, "main_zoom_spinbutton") );
   structure_fstep_entry = GTK_ENTRY(

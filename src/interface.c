@@ -21,6 +21,7 @@
 #include "interface.h"
 #include "shared.h"
 #include "callbacks.h"
+#include "gdk_scroll.h"
 #include "i18n.h"
 #include "themes/theme.h"
 
@@ -224,6 +225,7 @@ create_main_window( GtkBuilder **builder )
   GtkWidget *ret = NULL;
   gchar *object_ids[] = { MAIN_WINDOW_IDS };
   Gtk_Builder( builder, object_ids );
+  scroll_install_all_spins( *builder );
   ret = Builder_Get_Object( *builder, "main_window" );
   return( ret );
 }
@@ -285,7 +287,7 @@ create_freqplots_popup_window( freqplots_view_t *view, const char *graph_name )
   da = gtk_drawing_area_new();
   gtk_box_pack_start( GTK_BOX(vbox), da, TRUE, TRUE, 0 );
   gtk_widget_add_events( da,
-      GDK_BUTTON_PRESS_MASK | GDK_SCROLL_MASK |
+      GDK_BUTTON_PRESS_MASK | GDK_SCROLL_MASK | GDK_SMOOTH_SCROLL_MASK |
       GDK_BUTTON_MOTION_MASK );
 
   view->window      = win;
@@ -316,6 +318,7 @@ create_rdpattern_window( GtkBuilder **builder )
   GtkWidget *ret = NULL;
   gchar *object_ids[] = { RDPATTERN_WINDOW_IDS };
   Gtk_Builder( builder, object_ids );
+  scroll_install_all_spins( *builder );
   ret = Builder_Get_Object( *builder, "rdpattern_window" );
   return( ret );
 }

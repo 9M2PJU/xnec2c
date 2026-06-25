@@ -18,6 +18,7 @@
  */
 
 #include "callbacks.h"
+#include "gdk_scroll.h"
 #include "shared.h"
 #include "opt_ui.h"
 #include "measurements.h"
@@ -61,41 +62,12 @@ static void noise_interp_auto_switch(int fallback);
 static int editor_action = EDITOR_NEW;
 
 
-/* Scroll increment for mouse wheel on rotation spinbuttons */
-#define SCROLL_ANGLE_INCREMENT  5.0
-
 /* Motion-event decimation: accept 1 in MOTION_EVENTS_COUNT events.
  * Distinct from VIEW_DRAG_DIVISOR; this controls callback frequency,
  * not drag angular sensitivity. */
 #define MOTION_EVENTS_COUNT 8
 
 /*-----------------------------------------------------------------------*/
-
-/* handle_rotation_scroll()
- *
- * Handle mouse wheel scroll on rotation spinbuttons with 5-degree increment.
- *
- * The resulting value is passed to gtk_spin_button_set_value() which
- * fires value-changed; view_set_angles() then rebuilds the rotation
- * matrix and Extract_View_Angles() normalises the angles on readback.
- */
-  static gboolean
-handle_rotation_scroll(GtkSpinButton *spinbutton, GdkEventScroll *event)
-{
-  double current, delta;
-
-  if( event->direction != GDK_SCROLL_UP && event->direction != GDK_SCROLL_DOWN )
-    return( FALSE );
-
-  current = gtk_spin_button_get_value(spinbutton);
-  delta   = (event->direction == GDK_SCROLL_UP)
-              ? SCROLL_ANGLE_INCREMENT : -SCROLL_ANGLE_INCREMENT;
-
-  gtk_spin_button_set_value(spinbutton, current + delta);
-
-  return( TRUE );
-
-} /* handle_rotation_scroll() */
 
 static int saveas_width;
 static int saveas_height;
@@ -545,6 +517,12 @@ on_main_rdpattern_activate(
           rdpattern_window_builder, "rdpattern_zoom_spinbutton") );
     rdpattern_fstep_entry = GTK_ENTRY(Builder_Get_Object(
           rdpattern_window_builder, "rdpattern_fstep_entry") ) ;
+
+    /* Override the swept controllers on the rotation and incline spins so a
+     * wheel notch moves five degrees while a trackpad frame still floors at
+     * the one-degree quantum. */
+    scroll_install_spin_notches( rotate_rdpattern,  SCROLL_ANGLE_INCREMENT );
+    scroll_install_spin_notches( incline_rdpattern, SCROLL_ANGLE_INCREMENT );
 
     /* Create the rdpattern view before the GL widget; the GL widget
      * constructor installs observers on rdpattern_view and returns
@@ -1153,28 +1131,6 @@ on_main_incline_spinbutton_value_changed(
       gtk_spin_button_get_value( incline_structure ) );
 
 } /* on_main_incline_spinbutton_value_changed() */
-
-
-  gboolean
-on_main_rotate_spinbutton_scroll_event(
-    GtkWidget       *widget,
-    GdkEvent        *event,
-    gpointer         user_data)
-{
-  return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
-      (GdkEventScroll *)event) );
-}
-
-
-  gboolean
-on_main_incline_spinbutton_scroll_event(
-    GtkWidget       *widget,
-    GdkEvent        *event,
-    gpointer         user_data)
-{
-  return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
-      (GdkEventScroll *)event) );
-}
 
 
   void
@@ -2509,28 +2465,6 @@ on_rdpattern_incline_spinbutton_value_changed(
       gtk_spin_button_get_value( incline_rdpattern ) );
 
 } /* on_rdpattern_incline_spinbutton_value_changed() */
-
-
-  gboolean
-on_rdpattern_rotate_spinbutton_scroll_event(
-    GtkWidget       *widget,
-    GdkEvent        *event,
-    gpointer         user_data)
-{
-  return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
-      (GdkEventScroll *)event) );
-}
-
-
-  gboolean
-on_rdpattern_incline_spinbutton_scroll_event(
-    GtkWidget       *widget,
-    GdkEvent        *event,
-    gpointer         user_data)
-{
-  return( handle_rotation_scroll(GTK_SPIN_BUTTON(widget),
-      (GdkEventScroll *)event) );
-}
 
 
   void
@@ -6336,15 +6270,19 @@ on_structure_drawingarea_scroll_event(
   viewport_width  = gtk_widget_get_allocated_width(widget);
   viewport_height = gtk_widget_get_allocated_height(widget);
 
+  scroll_step_t ss = scroll_step_from_deltas(event);
+
   zoom_pct = gtk_spin_button_get_value( structure_zoom );
   scale    = compute_zoom_scale( viewport_width, viewport_height, zoom_pct );
 
-  if( event->scroll.direction == GDK_SCROLL_UP )
-    zoom_pct *= (1.0 + 0.1 * scale);
-  else if( event->scroll.direction == GDK_SCROLL_DOWN )
-    zoom_pct /= (1.0 + 0.1 * scale);
-  else
+  if( !ss.active ||
+      (ss.direction != GDK_SCROLL_UP && ss.direction != GDK_SCROLL_DOWN) )
     return( FALSE );
+
+  if( ss.direction == GDK_SCROLL_UP )
+    zoom_pct *= (1.0 + 0.1 * ss.step * scale);
+  else if( ss.direction == GDK_SCROLL_DOWN )
+    zoom_pct /= (1.0 + 0.1 * ss.step * scale);
 
   gtk_spin_button_set_value( structure_zoom, zoom_pct );
   return( FALSE );
@@ -6363,21 +6301,25 @@ on_rdpattern_drawingarea_scroll_event(
   viewport_width  = gtk_widget_get_allocated_width(widget);
   viewport_height = gtk_widget_get_allocated_height(widget);
 
+  scroll_step_t ss = scroll_step_from_deltas(event);
+
+  if( !ss.active ||
+      (ss.direction != GDK_SCROLL_UP && ss.direction != GDK_SCROLL_DOWN) )
+    return( FALSE );
+
   /* Shift+scroll adjusts overlay structure scale; zoom is unaffected */
   if( event->scroll.state & GDK_SHIFT_MASK )
-    return rdpattern_overlay_shift_scroll(event->scroll.direction,
+    return rdpattern_overlay_shift_scroll(ss.direction,
         viewport_width, viewport_height,
         rc_config.rdpattern_overlay_scale_adj * 100.0);
 
   zoom_pct = gtk_spin_button_get_value( rdpattern_zoom );
   scale    = compute_zoom_scale( viewport_width, viewport_height, zoom_pct );
 
-  if( event->scroll.direction == GDK_SCROLL_UP )
-    zoom_pct *= (1.0 + 0.1 * scale);
-  else if( event->scroll.direction == GDK_SCROLL_DOWN )
-    zoom_pct /= (1.0 + 0.1 * scale);
-  else
-    return( FALSE );
+  if( ss.direction == GDK_SCROLL_UP )
+    zoom_pct *= (1.0 + 0.1 * ss.step * scale);
+  else if( ss.direction == GDK_SCROLL_DOWN )
+    zoom_pct /= (1.0 + 0.1 * ss.step * scale);
 
   gtk_spin_button_set_value( rdpattern_zoom, zoom_pct );
   return( FALSE );

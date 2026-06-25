@@ -23,8 +23,14 @@
 #include "freqplots_internal.h"
 #include "freqplots_locus.h"
 #include "../shared.h"
+#include "../gdk_scroll.h"
 
+#include <math.h>
 #include <string.h>
+
+/* Per-notch pixel travel when resizing adjacent FR-card panels.  A wheel notch
+ * moves one grain; a trackpad frame scales the grain by its delta magnitude. */
+#define FP_RESIZE_GRAIN  20
 
 /* Plots_Window_Killed()
  *
@@ -90,9 +96,9 @@ Set_Frequency_On_Click( freqplots_view_t *v, GdkEvent *e)
   double fmhz = 0.0;
   int set_fmhz = 0, draw_freqplot = 0;
   int button;
+  scroll_step_t scroll = {0};
 
   GdkEventButton *button_event = (GdkEventButton *)e;
-  GdkEventScroll *scroll_event = (GdkEventScroll *)e;
   GdkEventMotion *motion_event = (GdkEventMotion *)e;
 
   // fr_plot: the plot where the mouse hovered:
@@ -116,11 +122,16 @@ Set_Frequency_On_Click( freqplots_view_t *v, GdkEvent *e)
   // Decode the button, scroll direction, or button-drag state.
   button = 0;
 
+  if (e->type == GDK_SCROLL)
+	  scroll = scroll_step_from_deltas(e);
+
   if (e->type == GDK_BUTTON_PRESS)
 	  button = button_event->button;
-  else if (e->type == GDK_SCROLL && scroll_event->direction == GDK_SCROLL_UP)
+  else if (scroll.active &&
+	  scroll.direction == GDK_SCROLL_UP)
 	  button = 4;
-  else if (e->type == GDK_SCROLL && scroll_event->direction == GDK_SCROLL_DOWN)
+  else if (scroll.active &&
+	  scroll.direction == GDK_SCROLL_DOWN)
 	  button = 5;
   else if (e->type == GDK_MOTION_NOTIFY)
   {
@@ -162,8 +173,10 @@ Set_Frequency_On_Click( freqplots_view_t *v, GdkEvent *e)
     if (fr_adj == NULL)
       return;
 
-    // the amount to adjust on scale:
-    int px_adjust = 20;
+    // Continuous pixel travel: a wheel notch (step near 1.0) moves one grain;
+    // a trackpad frame scales the grain by its delta magnitude, floored at one
+    // grain so an active frame always resizes.
+    int px_adjust = (int)round(fmax(1.0, scroll.step) * FP_RESIZE_GRAIN);
 
     // scroll up
     if (button == 4)

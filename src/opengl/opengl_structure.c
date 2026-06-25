@@ -20,6 +20,7 @@
 #include "opengl_structure.h"
 #include "opengl_rdpattern.h"
 #include "../shared.h"
+#include "../gdk_scroll.h"
 
 #ifdef HAVE_OPENGL
 
@@ -112,9 +113,17 @@ opengl_structure_on_ctrl_scroll(
   gl_view_state_t *state;
   double scale, new_scale;
 
+  scroll_step_t s;
+
   state = (gl_view_state_t *)view_state;
 
   if( !state )
+    return( FALSE );
+
+  s = scroll_step_from_deltas((GdkEvent *)event);
+
+  if( !s.active ||
+      (s.direction != GDK_SCROLL_UP && s.direction != GDK_SCROLL_DOWN) )
     return( FALSE );
 
   /* Compute increment matching zoom scroll feel */
@@ -125,7 +134,7 @@ opengl_structure_on_ctrl_scroll(
 
   new_scale = cylinder_radius_scale;
 
-  if( event->direction == GDK_SCROLL_UP )
+  if( s.direction == GDK_SCROLL_UP )
   {
     /* Scroll up: thicker. If at zero, jump to threshold. */
     if( new_scale < CYLINDER_SCALE_LINE_THRESHOLD )
@@ -134,22 +143,18 @@ opengl_structure_on_ctrl_scroll(
     }
     else
     {
-      new_scale *= (1.0 + 0.1 * scale);
+      new_scale *= (1.0 + 0.1 * s.step * scale);
     }
   }
-  else if( event->direction == GDK_SCROLL_DOWN )
+  else if( s.direction == GDK_SCROLL_DOWN )
   {
     /* Scroll down: thinner. Below threshold snaps to zero (line mode). */
-    new_scale /= (1.0 + 0.1 * scale);
+    new_scale /= (1.0 + 0.1 * s.step * scale);
 
     if( new_scale < CYLINDER_SCALE_LINE_THRESHOLD )
     {
       new_scale = 0.0;
     }
-  }
-  else
-  {
-    return( FALSE );
   }
 
   opengl_structure_set_radius_scale(new_scale);

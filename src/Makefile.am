@@ -15,6 +15,7 @@ xnec2c_SOURCES = \
     mathlib.c       mathlib.h \
     measurements.c  measurements.h \
     interface.c     interface.h \
+    gdk_scroll.c    gdk_scroll.h \
     callbacks.c     callbacks.h \
     console.c       console.h \
     callback_func.c callback_func.h \

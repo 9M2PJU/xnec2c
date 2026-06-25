@@ -19,6 +19,7 @@
 
 #include "opengl_view_input.h"
 #include "../shared.h"
+#include "../gdk_scroll.h"
 
 #ifdef HAVE_OPENGL
 
@@ -136,10 +137,14 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
   double value, scale, zoom_percent;
   int viewport_width, viewport_height;
 
+  scroll_step_t s;
+
   state = (gl_view_state_t *)user_data;
 
   if( !state )
     return( FALSE );
+
+  s = scroll_step_from_deltas((GdkEvent *)event);
 
   /* Ctrl+scroll: invoke segment radius scaling handler */
   if( (event->state & GDK_CONTROL_MASK) && state->scene->on_ctrl_scroll )
@@ -152,6 +157,10 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
   {
     return( state->scene->on_shift_scroll(widget, event, state) );
   }
+
+  if( !s.active ||
+      (s.direction != GDK_SCROLL_UP && s.direction != GDK_SCROLL_DOWN) )
+    return( FALSE );
 
   /* Normal scroll: adjust primary zoom via the view's bound spin */
   if( !state->view->zoom_spin )
@@ -166,12 +175,10 @@ on_scroll(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
 
   scale = compute_zoom_scale(viewport_width, viewport_height, zoom_percent);
 
-  if( event->direction == GDK_SCROLL_UP )
-    value *= (1.0 + 0.1 * scale);
-  else if( event->direction == GDK_SCROLL_DOWN )
-    value /= (1.0 + 0.1 * scale);
-  else
-    return( FALSE );
+  if( s.direction == GDK_SCROLL_UP )
+    value *= (1.0 + 0.1 * s.step * scale);
+  else if( s.direction == GDK_SCROLL_DOWN )
+    value /= (1.0 + 0.1 * s.step * scale);
 
   gtk_spin_button_set_value(spinbutton, value);
 
@@ -190,7 +197,7 @@ gl_view_input_connect(GtkWidget *gl_area, gl_view_state_t *state)
 {
   gtk_widget_add_events(gl_area,
     GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-    GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK);
+    GDK_POINTER_MOTION_MASK | GDK_SCROLL_MASK | GDK_SMOOTH_SCROLL_MASK);
 
   g_signal_connect(gl_area, "button-press-event",
     G_CALLBACK(on_button_press), state);
