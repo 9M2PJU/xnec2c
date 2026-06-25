@@ -585,7 +585,9 @@ static void _meas_calc(measurement_t *m, int idx)
 
 	// Everything below here is dependent on the radiation pattern
 	// having been calculated, so fields will remain invalid (-1).
-	if (rad_pattern == NULL)
+	// The rad_pattern outer array is always allocated; ENABLE_RDPAT is
+	// the authoritative signal that its per-fstep gain sub-buffers exist.
+	if (isFlagClear(ENABLE_RDPAT))
 		return;
 
 	/* Validate pol before indexing into NUM_POL-sized arrays */

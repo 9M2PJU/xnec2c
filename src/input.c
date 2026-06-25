@@ -1578,6 +1578,25 @@ Read_Commands( void )
         return( FALSE );
     } /* switch( ain_num ) */
 
+    /* Per-fstep outer arrays are an invariant of the frequency loop,
+     * independent of the RP/NE cards; freq_fields_xfer indexes them
+     * unconditionally, so allocate them before any disable branch.
+     * Each allocator self-gates its inner buffers by its own dimensions. */
+    Alloc_Rdpattern_Buffers( calc_data.steps_total + 1, fpat.nth, fpat.nph );
+    Alloc_Crnt_Fstep_Buffers( calc_data.steps_total + 1 );
+    prerender_state_alloc( calc_data.steps_total + 1 );
+
+    /* Near-field storage and normalization track the NE/NH cards alone. */
+    if( isFlagSet(ENABLE_NEAREH) )
+    {
+      Alloc_Nearfield_Buffers( fpat.nrx, fpat.nry, fpat.nrz );
+      Alloc_Nearfield_Fstep_Buffers( calc_data.steps_total + 1 );
+
+      /* nf_dr_norm reads fpat NF fields set by NE/NH cards above; both
+       * parent and child require it for Prerender_Near_Field. */
+      compute_nf_dr_norm();
+    }
+
     /* Disable radiation pattern plots */
     if( (fpat.nth < 1) || (fpat.nph < 1) || (gnd.ifar == 1) )
     {
@@ -1586,20 +1605,6 @@ Read_Commands( void )
     }
     else
     {
-      /* Allocate radiation pattern buffers FIXME */
-      Alloc_Rdpattern_Buffers( calc_data.steps_total + 1, fpat.nth, fpat.nph );
-      Alloc_Crnt_Fstep_Buffers( calc_data.steps_total + 1 );
-      if( isFlagSet(ENABLE_NEAREH) )
-      {
-        Alloc_Nearfield_Buffers( fpat.nrx, fpat.nry, fpat.nrz );
-        Alloc_Nearfield_Fstep_Buffers( calc_data.steps_total + 1 );
-      }
-      prerender_state_alloc( calc_data.steps_total + 1 );
-
-      /* nf_dr_norm reads fpat NF fields set by NE/NH cards above; both
-       * parent and child require it for Prerender_Near_Field. */
-      compute_nf_dr_norm();
-
       /* Trig tables and edge topology are parent-only: the child has no
        * consumer for trig tables or ff topology. */
       if( !CHILD )

@@ -1080,21 +1080,23 @@ _Alloc_Rdpattern_Buffers( int nfrq, int nth, int nph )
    * entries keep their sub-buffers for reuse by the inner alloc loop. */
   mem_array_resize(&rad_pattern, nfrq, free_rad_pattern_step);
 
-  for( idx = 0; idx < nfrq; idx++ )
-  {
-    /* Memory request for allocs */
-    int nrec = (nph * nth);
-    mem_array_alloc(&rad_pattern[idx].gtot, nrec);
-    mem_array_alloc(&rad_pattern[idx].axrt, nrec);
-    mem_array_alloc(&rad_pattern[idx].tilt, nrec);
-    mem_array_alloc(&rad_pattern[idx].max_gain, NUM_POL);
-    mem_array_alloc(&rad_pattern[idx].min_gain, NUM_POL);
-    mem_array_alloc(&rad_pattern[idx].max_gain_tht, NUM_POL);
-    mem_array_alloc(&rad_pattern[idx].max_gain_phi, NUM_POL);
-    mem_array_alloc(&rad_pattern[idx].max_gain_idx, NUM_POL);
-    mem_array_alloc(&rad_pattern[idx].min_gain_idx, NUM_POL);
-    mem_array_alloc(&rad_pattern[idx].sens, (nph * nth));
-  }
+  /* Per-fstep angular sample count; gates the inner sub-buffer alloc so
+   * the outer-array invariant holds even for a degenerate nth*nph. */
+  int nrec = (nph * nth);
+  if( nrec > 0 )
+    for( idx = 0; idx < nfrq; idx++ )
+    {
+      mem_array_alloc(&rad_pattern[idx].gtot, nrec);
+      mem_array_alloc(&rad_pattern[idx].axrt, nrec);
+      mem_array_alloc(&rad_pattern[idx].tilt, nrec);
+      mem_array_alloc(&rad_pattern[idx].max_gain, NUM_POL);
+      mem_array_alloc(&rad_pattern[idx].min_gain, NUM_POL);
+      mem_array_alloc(&rad_pattern[idx].max_gain_tht, NUM_POL);
+      mem_array_alloc(&rad_pattern[idx].max_gain_phi, NUM_POL);
+      mem_array_alloc(&rad_pattern[idx].max_gain_idx, NUM_POL);
+      mem_array_alloc(&rad_pattern[idx].min_gain_idx, NUM_POL);
+      mem_array_alloc(&rad_pattern[idx].sens, nrec);
+    }
   mem_array_realloc(&noise_temp, nfrq);
   mem_array_zero(noise_temp);
 
