@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include "../console.h"
+#include "../mem.h"
 #include <string.h>
 
 #include <gsl/gsl_blas.h>
@@ -214,7 +215,8 @@ static const size_t _vec_field_offsets[] =
  */
 void simple_var_deep_copy(simple_var_t *dst, const simple_var_t *src)
 {
-	dst->name = strdup(src->name);
+	mem_alloc(&dst->name, strlen(src->name) + 1);
+	memcpy((char *)dst->name, src->name, strlen(src->name) + 1);
 
 	for (size_t i = 0; i < NUM_VEC_FIELDS; i++)
 	{
@@ -236,8 +238,7 @@ void simple_var_free_contents(simple_var_t *v)
 		return;
 	}
 
-	free((char *)v->name);
-	v->name = NULL;
+	mem_free(&v->name);
 
 	for (size_t i = 0; i < NUM_VEC_FIELDS; i++)
 	{
@@ -280,16 +281,13 @@ static int _name_cmp(const void *a, const void *b)
 void simple_build_index_map(simple_t *s)
 {
 	/* Free previous map */
-	free(s->map_var);
-	free(s->map_elem);
-	free(s->sorted_var_indices);
-	s->map_var = NULL;
-	s->map_elem = NULL;
-	s->sorted_var_indices = NULL;
+	mem_free(&s->map_var);
+	mem_free(&s->map_elem);
+	mem_free(&s->sorted_var_indices);
 	s->total_dims = 0;
 
 	/* Build sorted index array */
-	s->sorted_var_indices = calloc(s->num_vars, sizeof(int));
+	mem_array_alloc(&s->sorted_var_indices, s->num_vars);
 	for (int i = 0; i < s->num_vars; i++)
 	{
 		s->sorted_var_indices[i] = i;
@@ -322,8 +320,8 @@ void simple_build_index_map(simple_t *s)
 	}
 
 	/* Allocate and populate maps */
-	s->map_var  = calloc(total, sizeof(int));
-	s->map_elem = calloc(total, sizeof(int));
+	mem_array_alloc(&s->map_var, total);
+	mem_array_alloc(&s->map_elem, total);
 
 	int dim = 0;
 	for (int si = 0; si < s->num_vars; si++)

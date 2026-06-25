@@ -14,6 +14,7 @@
 
 #include "opt_simple_internal.h"
 #include "../console.h"
+#include "../mem.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -33,7 +34,7 @@
  */
 static void _alloc_work_vars(simple_t *s)
 {
-	s->work_vars = calloc(s->num_vars, sizeof(simple_var_t));
+	mem_array_alloc(&s->work_vars, s->num_vars);
 
 	for (int i = 0; i < s->num_vars; i++)
 	{
@@ -71,8 +72,7 @@ static void _free_work_vars(simple_t *s)
 		}
 	}
 
-	free(s->work_vars);
-	s->work_vars = NULL;
+	mem_free(&s->work_vars);
 }
 
 /* ---- Single-pass backend construction ---- */
@@ -252,13 +252,13 @@ static void _populate_result(simple_t *s)
 		{
 			simple_var_free_contents(&s->result_vars[i]);
 		}
-		free(s->result_vars);
+		mem_free(&s->result_vars);
 	}
 
 	/* Deep-copy best_vars (or vars if no optimization occurred) */
 	const simple_var_t *source = s->best_vars ? s->best_vars : s->vars;
 
-	s->result_vars = calloc(s->num_vars, sizeof(simple_var_t));
+	mem_array_alloc(&s->result_vars, s->num_vars);
 	s->num_result_vars = s->num_vars;
 
 	for (int i = 0; i < s->num_vars; i++)
@@ -344,7 +344,8 @@ simple_t *simple_new(const simple_config_t *cfg)
 	}
 
 
-	simple_t *s = calloc(1, sizeof(*s));
+	simple_t *s = NULL;
+	mem_new(&s);
 	if (!s)
 	{
 		return NULL;
@@ -376,7 +377,7 @@ simple_t *simple_new(const simple_config_t *cfg)
 	srand(s->srand_seed);
 
 	/* Deep-copy vars */
-	s->vars = calloc(s->num_vars, sizeof(simple_var_t));
+	mem_array_alloc(&s->vars, s->num_vars);
 	for (int i = 0; i < s->num_vars; i++)
 	{
 		simple_var_deep_copy(&s->vars[i], &cfg->vars[i]);
@@ -394,16 +395,20 @@ simple_t *simple_new(const simple_config_t *cfg)
 			if (cfg->opts.simplex.num_ssize > 0 && cfg->opts.simplex.ssize)
 			{
 				s->algo_opts.simplex.num_ssize = cfg->opts.simplex.num_ssize;
-				s->algo_opts.simplex.ssize = malloc(
-					s->algo_opts.simplex.num_ssize * sizeof(double));
+				mem_array_alloc(&s->algo_opts.simplex.ssize,
+					s->algo_opts.simplex.num_ssize);
 				memcpy(s->algo_opts.simplex.ssize, cfg->opts.simplex.ssize,
 					s->algo_opts.simplex.num_ssize * sizeof(double));
 			}
 			else
 			{
-				/* Default: single pass with ssize=1.0 */
+				/* No caller ssize: seed a length-one array, not a
+				 * scalar. num_ssize drives the multi-pass loop count and
+				 * ssize[pass] supplies each pass's simplex start size, so a
+				 * zeroed num_ssize would run zero passes and a NULL ssize
+				 * would fault on the first ssize[pass] read. */
 				s->algo_opts.simplex.num_ssize = 1;
-				s->algo_opts.simplex.ssize = malloc(sizeof(double));
+				mem_array_alloc(&s->algo_opts.simplex.ssize, 1);
 				s->algo_opts.simplex.ssize[0] = 1.0;
 			}
 
@@ -482,8 +487,7 @@ double simple_optimize(simple_t *s)
 		{
 			simple_var_free_contents(&s->best_vars[i]);
 		}
-		free(s->best_vars);
-		s->best_vars = NULL;
+		mem_free(&s->best_vars);
 	}
 
 	if (s->best_vec)
@@ -561,12 +565,12 @@ void simple_set_vars(simple_t *s, const simple_var_t *vars, int num_vars)
 	{
 		simple_var_free_contents(&s->vars[i]);
 	}
-	free(s->vars);
+	mem_free(&s->vars);
 	_free_work_vars(s);
 
 	/* Deep-copy new vars */
 	s->num_vars = num_vars;
-	s->vars = calloc(num_vars, sizeof(simple_var_t));
+	mem_array_alloc(&s->vars, num_vars);
 	for (int i = 0; i < num_vars; i++)
 	{
 		simple_var_deep_copy(&s->vars[i], &vars[i]);
@@ -584,9 +588,9 @@ void simple_set_vars(simple_t *s, const simple_var_t *vars, int num_vars)
  */
 void simple_set_ssize(simple_t *s, double ssize)
 {
-	free(s->algo_opts.simplex.ssize);
+	mem_free(&s->algo_opts.simplex.ssize);
 	s->algo_opts.simplex.num_ssize = 1;
-	s->algo_opts.simplex.ssize = malloc(sizeof(double));
+	mem_array_alloc(&s->algo_opts.simplex.ssize, 1);
 	s->algo_opts.simplex.ssize[0] = ssize;
 }
 
@@ -631,7 +635,7 @@ void simple_free(simple_t *s)
 		{
 			simple_var_free_contents(&s->vars[i]);
 		}
-		free(s->vars);
+		mem_free(&s->vars);
 	}
 
 	/* Work vars */
@@ -644,7 +648,7 @@ void simple_free(simple_t *s)
 		{
 			simple_var_free_contents(&s->best_vars[i]);
 		}
-		free(s->best_vars);
+		mem_free(&s->best_vars);
 	}
 
 	if (s->best_vec)
@@ -659,22 +663,22 @@ void simple_free(simple_t *s)
 		{
 			simple_var_free_contents(&s->result_vars[i]);
 		}
-		free(s->result_vars);
+		mem_free(&s->result_vars);
 	}
 
 	/* Ssize array (simplex only; PSO union member overlaps, no action needed) */
 	if (s->algorithm == OPT_SIMPLEX)
 	{
-		free(s->algo_opts.simplex.ssize);
+		mem_free(&s->algo_opts.simplex.ssize);
 	}
 
 	/* Index map */
-	free(s->map_var);
-	free(s->map_elem);
-	free(s->sorted_var_indices);
+	mem_free(&s->map_var);
+	mem_free(&s->map_elem);
+	mem_free(&s->sorted_var_indices);
 
 	/* Cache */
 	simple_cache_clear(&s->cache);
 
-	free(s);
+	mem_free(&s);
 }

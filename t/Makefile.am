@@ -69,16 +69,24 @@ bin_sy_input_integration_test_CPPFLAGS = -I$(top_srcdir)/src $(GTK_CFLAGS) $(GMO
 bin_sy_input_integration_test_LDADD = $(GTK_LIBS) $(GMODULE_LIBS) -lm
 
 bin_pso_test_SOURCES = src/pso_test.c \
+	src/optimizer_test_stubs.c \
 	$(top_srcdir)/src/optimizers/particleswarm.c \
-	$(top_srcdir)/src/optimizers/particleswarm_engine.c
-bin_pso_test_CPPFLAGS = -I$(top_srcdir)/src/optimizers $(GSL_CFLAGS)
-bin_pso_test_LDADD = $(GSL_LIBS) -lm
+	$(top_srcdir)/src/optimizers/particleswarm_engine.c \
+	$(top_srcdir)/src/console.c \
+	$(top_srcdir)/src/mem.c \
+	$(top_srcdir)/src/mem_track.c
+bin_pso_test_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/optimizers $(GTK_CFLAGS) $(GSL_CFLAGS)
+bin_pso_test_LDADD = $(GTK_LIBS) $(GSL_LIBS) -lm
 
 bin_simplex_test_SOURCES = src/simplex_test.c \
+	src/optimizer_test_stubs.c \
 	$(top_srcdir)/src/optimizers/simplex.c \
-	$(top_srcdir)/src/optimizers/simplex_engine.c
-bin_simplex_test_CPPFLAGS = -I$(top_srcdir)/src/optimizers $(GSL_CFLAGS)
-bin_simplex_test_LDADD = $(GSL_LIBS) -lm
+	$(top_srcdir)/src/optimizers/simplex_engine.c \
+	$(top_srcdir)/src/console.c \
+	$(top_srcdir)/src/mem.c \
+	$(top_srcdir)/src/mem_track.c
+bin_simplex_test_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/optimizers $(GTK_CFLAGS) $(GSL_CFLAGS)
+bin_simplex_test_LDADD = $(GTK_LIBS) $(GSL_LIBS) -lm
 
 bin_opt_simple_test_SOURCES = src/opt_simple_test.c \
 	src/optimizer_test_stubs.c \

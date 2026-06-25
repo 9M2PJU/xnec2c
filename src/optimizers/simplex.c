@@ -20,6 +20,7 @@
 
 #include "simplex_internal.h"
 #include "optimizer_bounds.h"
+#include "../mem.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -115,7 +116,8 @@ simplex_t *simplex_new(const simplex_config_t *config)
 		}
 	}
 
-	simplex_t *s = calloc(1, sizeof(simplex_t));
+	simplex_t *s = NULL;
+	mem_new(&s);
 	if (!s)
 	{
 		return NULL;
@@ -496,5 +498,5 @@ void simplex_free(simplex_t *s)
 		gsl_rng_free(s->rng);
 	}
 
-	free(s);
+	mem_free(&s);
 }

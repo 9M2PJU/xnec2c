@@ -10,6 +10,7 @@
  */
 
 #include "optimizer.h"
+#include "../mem.h"
 
 #include <stdlib.h>
 
@@ -59,7 +60,8 @@ optimizer_t *optimizer_new_simplex(const simplex_config_t *cfg)
 		return NULL;
 	}
 
-	optimizer_t *o = calloc(1, sizeof(*o));
+	optimizer_t *o = NULL;
+	mem_new(&o);
 	if (!o)
 	{
 		simplex_free(s);
@@ -89,7 +91,8 @@ optimizer_t *optimizer_new_pso(const pso_config_t *cfg)
 		return NULL;
 	}
 
-	optimizer_t *o = calloc(1, sizeof(*o));
+	optimizer_t *o = NULL;
+	mem_new(&o);
 	if (!o)
 	{
 		pso_free(p);
@@ -143,5 +146,5 @@ void optimizer_free(optimizer_t *o)
 	}
 
 	o->free_fn(o->impl);
-	free(o);
+	mem_free(&o);
 }

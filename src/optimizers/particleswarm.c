@@ -20,6 +20,7 @@
 
 #include "particleswarm_internal.h"
 #include "optimizer_bounds.h"
+#include "../mem.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -95,7 +96,8 @@ pso_t *pso_new(const pso_config_t *config)
 		return NULL;
 	}
 
-	pso_t *pso = calloc(1, sizeof(pso_t));
+	pso_t *pso = NULL;
+	mem_new(&pso);
 	if (!pso)
 	{
 		return NULL;
@@ -161,7 +163,7 @@ pso_t *pso_new(const pso_config_t *config)
 	/* Plateau circular buffer */
 	if (pso->config.exit_plateau)
 	{
-		pso->best_best_by_iter = calloc(pso->config.exit_plateau_window, sizeof(double));
+		mem_array_alloc(&pso->best_best_by_iter, pso->config.exit_plateau_window);
 	}
 
 	pso->best_best = INFINITY;
@@ -190,7 +192,7 @@ void pso_init(pso_t *pso)
 
 	if (pso->best_best_by_iter)
 	{
-		memset(pso->best_best_by_iter, 0, pso->config.exit_plateau_window * sizeof(double));
+		mem_array_zero(pso->best_best_by_iter);
 	}
 
 	/* Initialize all particles */
@@ -360,14 +362,15 @@ void pso_free(pso_t *pso)
 		gsl_rng_free(pso->rng);
 	}
 
-	free(pso->best_best_by_iter);
-	free(pso);
+	mem_free(&pso->best_best_by_iter);
+	mem_free(&pso);
 }
 
 /** Allocate particle arrays for dims dimensions and np particles */
 static pso_particles_t *_alloc_particles(int dims, int np)
 {
-	pso_particles_t *p = calloc(1, sizeof(pso_particles_t));
+	pso_particles_t *p = NULL;
+	mem_new(&p);
 	if (!p)
 	{
 		return NULL;
@@ -410,5 +413,5 @@ static void _free_particles(pso_particles_t *p)
 	gsl_vector_free(p->next_fit);
 	gsl_vector_free(p->stalls);
 
-	free(p);
+	mem_free(&p);
 }

@@ -27,14 +27,15 @@
  * Format: "v0,v1,v2,..." with full IEEE 754 precision (%.17g).
  * Keyed on the packed vector directly to avoid perturb_scale round-trip
  * drift and to enable cache lookup before unpacking.
- * Returns malloc'd string; caller frees.
+ * Returns a managed string; caller frees.
  */
 static char *_cache_build_key(const gsl_vector *vec)
 {
 	/* Each %.17g value is at most 25 chars; add comma delimiter */
 	int dims = (int)vec->size;
 	int bufsize = dims * 26 + 1;
-	char *key = malloc(bufsize);
+	char *key = NULL;
+	mem_alloc(&key, bufsize);
 	int pos = 0;
 
 	for (int d = 0; d < dims; d++)
@@ -58,10 +59,10 @@ void simple_cache_clear(simple_cache_t *cache)
 {
 	for (int i = 0; i < cache->count; i++)
 	{
-		free(cache->entries[i].key);
+		mem_free(&cache->entries[i].key);
 	}
 
-	mem_free((void **)&cache->entries);
+	mem_free(&cache->entries);
 	cache->count = 0;
 }
 
@@ -89,14 +90,14 @@ double simple_cache_lookup(simple_t *s, const gsl_vector *vec, int *found)
 	{
 		if (strcmp(s->cache.entries[i].key, key) == 0)
 		{
-			free(key);
+			mem_free(&key);
 			s->cache_hits++;
 			*found = 1;
 			return s->cache.entries[i].value;
 		}
 	}
 
-	free(key);
+	mem_free(&key);
 	s->cache_misses++;
 	return NAN;
 }
@@ -203,10 +204,10 @@ double simple_fitness_trampoline(const gsl_vector *pos, void *ctx)
 			{
 				simple_var_free_contents(&s->best_vars[i]);
 			}
-			free(s->best_vars);
+			mem_free(&s->best_vars);
 		}
 
-		s->best_vars = calloc(s->num_vars, sizeof(simple_var_t));
+		mem_array_alloc(&s->best_vars, s->num_vars);
 		for (int i = 0; i < s->num_vars; i++)
 		{
 			simple_var_deep_copy(&s->best_vars[i], &s->work_vars[i]);
