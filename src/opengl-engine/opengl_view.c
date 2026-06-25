@@ -437,11 +437,13 @@ on_isolator_realize(GtkWidget *wrapper, gpointer user_data)
  * @scene: scene provider
  * @view: per-view rotation/pan/zoom/drag owner (borrowed, non-NULL)
  *
- * Returns a GtkEventBox containing a single GtkGLArea child.  The
- * event box carries a native X window that isolates the GL surface
- * from the toplevel drawable.  External callers treat the returned
- * widget as opaque; sites that need the inner GtkGLArea must call
- * gl_view_get_gl_area().
+ * On the X11 backend, returns a GtkEventBox isolator carrying a native
+ * X window that separates the GL surface from the toplevel drawable (see
+ * on_isolator_realize()).  On every other backend (e.g. Wayland) the
+ * native child window breaks GtkGLArea offscreen compositing, so the
+ * bare GtkGLArea is returned instead.  External callers treat the
+ * returned widget as opaque; sites that need the inner GtkGLArea must
+ * call gl_view_get_gl_area().
  */
   GtkWidget*
 gl_view_create_widget(
@@ -451,6 +453,7 @@ gl_view_create_widget(
 {
   GtkWidget *gl_area;
   GtkWidget *isolator;
+  GdkDisplay *display;
   gl_view_state_t *state;
 
   if( !config || !scene || !view )
@@ -491,24 +494,38 @@ gl_view_create_widget(
 
   g_object_set_data(G_OBJECT(gl_area), "gl_state", state);
 
-  /* Wrap the GtkGLArea in a GtkEventBox with a visible (native)
-   * GdkWindow so the GL surface has its own XID independent of the
-   * toplevel's backing pixmap.  See on_isolator_realize() above. */
-  isolator = gtk_event_box_new();
-  gtk_event_box_set_visible_window(GTK_EVENT_BOX(isolator), TRUE);
-  gtk_event_box_set_above_child(GTK_EVENT_BOX(isolator), FALSE);
+  /* The native-window isolation below is an X11/Compiz/NVIDIA-GLX
+   * remedy (commit f77930c).  On other backends, notably Wayland, the
+   * forced native child becomes a wl_subsurface that breaks GtkGLArea
+   * offscreen compositing (EGL_BAD_SURFACE).  Gate the isolator on the
+   * X11 backend, detected by the default display's type name so this
+   * carries no build-time dependency on the X11 headers (gdkx.h). */
+  display = gdk_display_get_default();
+  if( display &&
+      g_strcmp0(G_OBJECT_TYPE_NAME(display), "GdkX11Display") == 0 )
+  {
+    /* Wrap the GtkGLArea in a GtkEventBox with a visible (native)
+     * GdkWindow so the GL surface has its own XID independent of the
+     * toplevel's backing pixmap.  See on_isolator_realize() above. */
+    isolator = gtk_event_box_new();
+    gtk_event_box_set_visible_window(GTK_EVENT_BOX(isolator), TRUE);
+    gtk_event_box_set_above_child(GTK_EVENT_BOX(isolator), FALSE);
 
-  gtk_widget_set_size_request(isolator, 400, 400);
-  gtk_widget_set_hexpand(isolator, TRUE);
-  gtk_widget_set_vexpand(isolator, TRUE);
+    gtk_widget_set_size_request(isolator, 400, 400);
+    gtk_widget_set_hexpand(isolator, TRUE);
+    gtk_widget_set_vexpand(isolator, TRUE);
 
-  gtk_container_add(GTK_CONTAINER(isolator), gl_area);
-  gtk_widget_show(gl_area);
+    gtk_container_add(GTK_CONTAINER(isolator), gl_area);
+    gtk_widget_show(gl_area);
 
-  g_signal_connect(isolator, "realize",
-      G_CALLBACK(on_isolator_realize), NULL);
+    g_signal_connect(isolator, "realize",
+        G_CALLBACK(on_isolator_realize), NULL);
 
-  return( isolator );
+    return( isolator );
+  }
+
+  gtk_widget_set_size_request(gl_area, 400, 400);
+  return( gl_area );
 
 } /* gl_view_create_widget() */
 

@@ -184,7 +184,12 @@ main (int argc, char *argv[])
   sigaction( SIGABRT, &sa_new, NULL );
   sigaction( SIGCHLD, &sa_new, NULL );
 
-  gtk_init (&argc, &argv);
+  /* Use the non-fatal initializer so informational options such as
+   * --help and --version remain usable without a display (e.g. when
+   * DISPLAY and WAYLAND_DISPLAY are both unset).  A missing display is
+   * only fatal once the GUI is actually needed; see the check before
+   * create_main_window() below. */
+  gboolean gtk_ok = gtk_init_check( &argc, &argv );
 
   /* Create a default config if needed, abort on error */
   if( !Create_Default_Config() ) exit( -1 );
@@ -196,6 +201,23 @@ main (int argc, char *argv[])
 #else 
   calc_data.num_jobs = 1;
 #endif
+
+  /* Report the GDK windowing backend; the GL view gates its
+   * native-window isolation on X11 (see gl_view_create_widget()). */
+  {
+    GdkDisplay *display = gdk_display_get_default();
+    const char *type = display ? G_OBJECT_TYPE_NAME(display) : NULL;
+    const char *backend;
+    if( type && g_strcmp0(type, "GdkX11Display") == 0 )
+      backend = "X11";
+    else if( type && g_strcmp0(type, "GdkWaylandDisplay") == 0 )
+      backend = "Wayland";
+    else if( !gtk_ok || !display )
+      backend = "none (no display)";
+    else
+      backend = type;
+    pr_info("Detected %s windowing backend\n", backend);
+  }
 
   rc_config.input_file[0] = '\0';
 
@@ -410,6 +432,16 @@ main (int argc, char *argv[])
   {
 	  pr_crit("batch mode requires an input file\n");
 	  exit(1);
+  }
+
+  /* The GUI requires a display; informational options (--help,
+   * --version) have already run and exited above, so anything reaching
+   * here needs GTK initialized.  Fail cleanly before forking workers or
+   * touching GTK when DISPLAY/WAYLAND_DISPLAY are unset. */
+  if( !gtk_ok )
+  {
+    pr_crit("cannot open display: a running X11 or Wayland session is required\n");
+    exit( 1 );
   }
 
   /* When forking is useful, e.g. if more than 1 processor is
