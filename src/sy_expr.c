@@ -464,7 +464,7 @@ sy_tokenize(const gchar *expr)
     else if( is_sy_number_start(*p) )
     {
       token.type = SY_TOKEN_NUMBER;
-      token.value.number = strtod(p, &endptr);
+      token.value.number = Strtod((gchar *)p, &endptr);
       token.precedence = 0;
       g_array_append_val(tokens, token);
       p = endptr;

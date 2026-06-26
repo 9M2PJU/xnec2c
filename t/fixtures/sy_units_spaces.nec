@@ -1,0 +1,10 @@
+CM Reproduce issue 82: spaces around operator and unit in SY value
+CE
+SY freq=1090
+SY lambda=300/freq
+SY height=lambda/4
+SY r = 1.5 * mm
+GW 1 11 0 0 0 0 0 height r
+GE 0
+FR 0 1 0 0 freq 0
+EN

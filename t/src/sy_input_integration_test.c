@@ -10,6 +10,10 @@
 #include <libgen.h>
 #include <unistd.h>
 #include <limits.h>
+#include <locale.h>
+#include <errno.h>
+#include <sys/wait.h>
+#include <sys/resource.h>
 
 #include "common.h"
 #include "shared.h"
@@ -109,6 +113,11 @@ static const fixture_expectation_t expectations[] =
     0.0, 0.0, 0.0, 0.0, 0.0, 0.068807339449541284, 0.0015  /* height=300/1090/4 */
   },
   {
+    "sy_units_spaces.nec",
+    1, 11,                                   /* tag=1, segments=11 */
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.068807339449541284, 0.0015  /* r = 1.5 * mm */
+  },
+  {
     "sy_math_cmnd.nec",
     1, 11,                                   /* tag=1, segments=11 */
     0.0, 0.0, 0.0, 0.0, 0.0, 0.069, 0.0015  /* hardcoded geometry */
@@ -205,6 +214,145 @@ test_fixture(const fixture_expectation_t *exp)
   return ok;
 }
 
+/* Cap the calling process address space at its current footprint plus a
+ * fixed margin. A regression of the locale decimal-point bug appends to a
+ * GArray without bound; this limit makes the allocator fail and the child
+ * die at the margin instead of exhausting host memory. */
+static gboolean
+limit_address_space(void)
+{
+  FILE *fp;
+  unsigned long vm_pages = 0;
+  unsigned long base;
+  struct rlimit rl;
+  rlim_t desired;
+
+  fp = fopen("/proc/self/statm", "r");
+  if( fp != NULL )
+  {
+    if( fscanf(fp, "%lu", &vm_pages) != 1 )
+      vm_pages = 0;
+    fclose(fp);
+  }
+
+  base = vm_pages * (unsigned long)sysconf(_SC_PAGESIZE);
+  if( base == 0 )
+    base = 4UL * 1024 * 1024 * 1024;   /* baseline unknown: absolute floor */
+
+  /* Read the current hard limit and lower only the soft limit, so the
+   * call cannot fail by attempting to raise an unprivileged hard limit. */
+  if( getrlimit(RLIMIT_AS, &rl) != 0 )
+  {
+    printf("  FAIL: getrlimit(RLIMIT_AS) failed: %s\n", strerror(errno));
+    return FALSE;
+  }
+
+  desired = (rlim_t)base + (rlim_t)512 * 1024 * 1024;
+  if( rl.rlim_max == RLIM_INFINITY || desired < rl.rlim_max )
+    rl.rlim_cur = desired;
+  else
+    rl.rlim_cur = rl.rlim_max;
+
+  if( setrlimit(RLIMIT_AS, &rl) != 0 )
+  {
+    printf("  FAIL: setrlimit(RLIMIT_AS, %lu bytes) failed: %s\n",
+           (unsigned long)rl.rlim_cur, strerror(errno));
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/* Parse every fixture under the German numeric locale. NEC files are
+ * C-format regardless of locale, so the results must match the same
+ * expectations. Returns FALSE on any mismatch; TRUE when the locale is
+ * unavailable so an unconfigured host does not report a failure. */
+static gboolean
+de_locale_body(void)
+{
+  gboolean ok = TRUE;
+  int i;
+
+  if( setlocale(LC_NUMERIC, "de_DE.UTF-8") == NULL )
+  {
+    printf("  SKIP: de_DE.UTF-8 locale unavailable\n");
+    return TRUE;
+  }
+
+  for( i = 0; expectations[i].filename != NULL; i++ )
+  {
+    if( !test_fixture(&expectations[i]) )
+      ok = FALSE;
+  }
+
+  return ok;
+}
+
+/* Run body() in a memory-bounded child so a non-terminating allocator
+ * loop cannot crash the host. The locale change stays isolated to the
+ * child. Returns TRUE only on a clean child exit. */
+static gboolean
+run_bounded(gboolean (*body)(void))
+{
+  pid_t pid;
+  int status;
+  gboolean ok;
+
+  /* Drain the parent buffer before forking so the child does not inherit
+   * and later re-emit the parent's pending block-buffered output. */
+  fflush(stdout);
+
+  pid = fork();
+  if( pid < 0 )
+  {
+    printf("  FAIL: fork() failed\n");
+    ok = FALSE;
+  }
+  else if( pid == 0 )
+  {
+    gboolean child_ok;
+
+    /* Refuse to run unbounded: an unlimited child could exhaust the host. */
+    if( !limit_address_space() )
+    {
+      fflush(stdout);
+      _exit( 3 );
+    }
+
+    child_ok = body();
+
+    /* _exit() skips stdio flushing; flush so the child diagnostics survive. */
+    fflush(stdout);
+    _exit( child_ok ? 0 : 2 );
+  }
+  else
+  {
+    if( waitpid(pid, &status, 0) < 0 )
+    {
+      printf("  FAIL: waitpid() failed\n");
+      ok = FALSE;
+    }
+    else if( WIFSIGNALED(status) )
+    {
+      printf("  FAIL: child terminated by signal %d (memory bound or crash)\n",
+             WTERMSIG(status));
+      ok = FALSE;
+    }
+    else if( WIFEXITED(status) && WEXITSTATUS(status) == 0 )
+    {
+      ok = TRUE;
+    }
+    else
+    {
+      printf("  FAIL: child exit status %d\n",
+             WIFEXITED(status) ? WEXITSTATUS(status) : -1);
+      ok = FALSE;
+    }
+  }
+
+  return ok;
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -241,6 +389,10 @@ main(int argc, char *argv[])
   {
     test_fixture(&expectations[i]);
   }
+
+  printf("\n--- DE locale (memory-bounded) ---\n");
+  if( !run_bounded(de_locale_body) )
+    test_failures++;
 
   sy_cleanup();
 

@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <locale.h>
 #include <glib.h>
 #include <gtk/gtk.h>
 
@@ -264,11 +265,30 @@ Load_Line(char *buff, FILE *pfile)
   return 0;
 }
 
-/* Stub for string to double conversion */
+/* Locale-aware string to double conversion, mirroring src/utils.c Strtod.
+ * The decimal point is read on each call so a setlocale() switch or a
+ * fork() cannot leave it stale. */
 double
 Strtod(char *str, char **endptr)
 {
-  return strtod(str, endptr);
+  int idx;
+  size_t len;
+  double d = 0.0;
+  char dp;
+  struct lconv *lcnv;
+
+  lcnv = localeconv();
+  dp = *lcnv->decimal_point;
+
+  len = strlen( str );
+  for( idx = 0; idx < (int)len; idx++ )
+    if( (str[idx] == ',') || (str[idx] == '.') )
+      break;
+
+  if( idx < (int)len ) str[idx] = dp;
+  d = strtod( (const char *)str, endptr );
+
+  return d;
 }
 
 /* Stub for string copy */
