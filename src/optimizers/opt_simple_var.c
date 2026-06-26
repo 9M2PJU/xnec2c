@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include "../console.h"
-#include "../mem.h"
+#include "../mem/mem.h"
 #include <string.h>
 
 #include <gsl/gsl_blas.h>

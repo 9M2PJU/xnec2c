@@ -59,8 +59,10 @@ src/matrix.c
 src/matrix.h
 src/measurements.c
 src/measurements.h
-src/mem.c
-src/mem.h
+src/mem/mem.c
+src/mem/mem.h
+src/mem/mem_track.c
+src/mem/mem_track.h
 src/nec2_model.c
 src/nec2_model.h
 src/network.c

@@ -63,8 +63,8 @@ bin_sy_input_integration_test_SOURCES = src/sy_input_integration_test.c \
 	$(top_srcdir)/src/somnec.c \
 	$(top_srcdir)/src/radiation.c \
 	$(top_srcdir)/src/fields.c \
-	$(top_srcdir)/src/mem.c \
-	$(top_srcdir)/src/mem_track.c
+	$(top_srcdir)/src/mem/mem.c \
+	$(top_srcdir)/src/mem/mem_track.c
 bin_sy_input_integration_test_CPPFLAGS = -I$(top_srcdir)/src $(GTK_CFLAGS) $(GMODULE_CFLAGS)
 bin_sy_input_integration_test_LDADD = $(GTK_LIBS) $(GMODULE_LIBS) -lm
 
@@ -73,8 +73,8 @@ bin_pso_test_SOURCES = src/pso_test.c \
 	$(top_srcdir)/src/optimizers/particleswarm.c \
 	$(top_srcdir)/src/optimizers/particleswarm_engine.c \
 	$(top_srcdir)/src/console.c \
-	$(top_srcdir)/src/mem.c \
-	$(top_srcdir)/src/mem_track.c
+	$(top_srcdir)/src/mem/mem.c \
+	$(top_srcdir)/src/mem/mem_track.c
 bin_pso_test_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/optimizers $(GTK_CFLAGS) $(GSL_CFLAGS)
 bin_pso_test_LDADD = $(GTK_LIBS) $(GSL_LIBS) -lm
 
@@ -83,8 +83,8 @@ bin_simplex_test_SOURCES = src/simplex_test.c \
 	$(top_srcdir)/src/optimizers/simplex.c \
 	$(top_srcdir)/src/optimizers/simplex_engine.c \
 	$(top_srcdir)/src/console.c \
-	$(top_srcdir)/src/mem.c \
-	$(top_srcdir)/src/mem_track.c
+	$(top_srcdir)/src/mem/mem.c \
+	$(top_srcdir)/src/mem/mem_track.c
 bin_simplex_test_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/optimizers $(GTK_CFLAGS) $(GSL_CFLAGS)
 bin_simplex_test_LDADD = $(GTK_LIBS) $(GSL_LIBS) -lm
 
@@ -99,8 +99,8 @@ bin_opt_simple_test_SOURCES = src/opt_simple_test.c \
 	$(top_srcdir)/src/optimizers/particleswarm.c \
 	$(top_srcdir)/src/optimizers/particleswarm_engine.c \
 	$(top_srcdir)/src/console.c \
-	$(top_srcdir)/src/mem.c \
-	$(top_srcdir)/src/mem_track.c
+	$(top_srcdir)/src/mem/mem.c \
+	$(top_srcdir)/src/mem/mem_track.c
 bin_opt_simple_test_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/optimizers $(GTK_CFLAGS) $(GSL_CFLAGS)
 bin_opt_simple_test_LDADD = $(GTK_LIBS) $(GSL_LIBS) -lm
 
@@ -108,8 +108,8 @@ bin_opt_fitness_test_SOURCES = src/opt_fitness_test.c \
 	src/optimizer_test_stubs.c \
 	$(top_srcdir)/src/optimizers/opt_fitness.c \
 	$(top_srcdir)/src/console.c \
-	$(top_srcdir)/src/mem.c \
-	$(top_srcdir)/src/mem_track.c
+	$(top_srcdir)/src/mem/mem.c \
+	$(top_srcdir)/src/mem/mem_track.c
 bin_opt_fitness_test_CPPFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/optimizers $(GTK_CFLAGS)
 bin_opt_fitness_test_LDADD = $(GTK_LIBS) -lm
 

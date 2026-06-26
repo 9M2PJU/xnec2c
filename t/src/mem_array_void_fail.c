@@ -2,7 +2,7 @@
  * element-type guard. The real __LOCATION__ lives in common.h, not mem.h,
  * so a stand-in is defined before the only include. */
 #define __LOCATION__ "test"
-#include "mem.h"
+#include "mem/mem.h"
 
 void trigger(void)
 {

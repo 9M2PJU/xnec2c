@@ -16,7 +16,7 @@
 #include "../sy_expr.h"
 #include "../console.h"
 #include "../utils.h"
-#include "../mem_track.h"
+#include "../mem/mem_track.h"
 
 /* Synchronization for blocking the optimizer thread until freq loop completes */
 static GMutex eval_mutex;

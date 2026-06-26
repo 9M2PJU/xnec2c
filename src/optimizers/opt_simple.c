@@ -14,7 +14,7 @@
 
 #include "opt_simple_internal.h"
 #include "../console.h"
-#include "../mem.h"
+#include "../mem/mem.h"
 
 #include <math.h>
 #include <stdio.h>

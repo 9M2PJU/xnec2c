@@ -10,7 +10,7 @@
  */
 
 #include "optimizer.h"
-#include "../mem.h"
+#include "../mem/mem.h"
 
 #include <stdlib.h>
 

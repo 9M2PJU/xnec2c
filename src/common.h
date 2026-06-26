@@ -48,7 +48,7 @@
 
 #include "branch_hints.h"
 
-#include "mem.h"
+#include "mem/mem.h"
 #include "i18n.h"
 #include "view/view_core.h"
 

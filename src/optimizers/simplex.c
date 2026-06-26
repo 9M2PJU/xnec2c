@@ -20,7 +20,7 @@
 
 #include "simplex_internal.h"
 #include "optimizer_bounds.h"
-#include "../mem.h"
+#include "../mem/mem.h"
 
 #include <math.h>
 #include <stdio.h>
