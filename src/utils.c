@@ -615,18 +615,12 @@ double Strtod( char *nptr, char **endptr )
   int idx;
   size_t len;
   double d = 0.0;
-  static gboolean first_call = TRUE;
-  static char dp = '.';
+  char dp;
+  struct lconv *lcnv;
 
-
-  /* Find locale-dependent decimal point character */
-  if( first_call )
-  {
-    struct lconv *lcnv;
-    lcnv = localeconv();
-    dp = *lcnv->decimal_point;
-    first_call = FALSE;
-  }
+  /* Read the active locale decimal point on each call */
+  lcnv = localeconv();
+  dp = *lcnv->decimal_point;
 
   /* Look for a . or , decimal point character
    * in the supplied number buffer (string) */
