@@ -16,7 +16,6 @@
 #include "../sy_expr.h"
 #include "../console.h"
 #include "../utils.h"
-#include "../mem/mem_track.h"
 
 /* Synchronization for blocking the optimizer thread until freq loop completes */
 static GMutex eval_mutex;
@@ -242,9 +241,6 @@ int nec2_eval_run(const simple_var_t *vars, int num_vars,
 	}
 
 	g_rec_mutex_unlock(&freq_data_lock);
-
-	if (rc_config.mem_report_enabled)
-		mem_report("nec2_eval_run");
 
 	ClearFlag( SY_OPTIMIZER_ACTIVE );
 
