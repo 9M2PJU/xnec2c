@@ -635,7 +635,7 @@ child_procs_free( void )
   for( i = 0; i < n; i++ )
     mem_free( &child_procs[i] );
 
-  mem_free( &child_procs );
+  mem_array_free( &child_procs );
 
 } /* child_procs_free() */
 

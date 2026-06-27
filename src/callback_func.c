@@ -534,9 +534,9 @@ Alloc_Crnt_Buffs( void )
   static void
 Free_Crnt_Buffs( void )
 {
-  mem_free(&ct1m);
-  mem_free(&ct2m);
-  mem_free(&cmag);
+  mem_array_free(&ct1m);
+  mem_array_free(&ct2m);
+  mem_array_free(&cmag);
 } /* Free_Crnt_Buffs() */
 
 /*-----------------------------------------------------------------------*/

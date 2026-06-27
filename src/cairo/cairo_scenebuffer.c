@@ -66,16 +66,16 @@ scenebuffer_init(cairo_scenebuffer_t *sb, size_t initial_capacity)
   void
 scenebuffer_destroy(cairo_scenebuffer_t *sb)
 {
-  mem_free(&sb->segs);
+  mem_array_free(&sb->segs);
   sb->count    = 0;
 
-  mem_free(&sb->arcs);
+  mem_array_free(&sb->arcs);
   sb->arc_count    = 0;
 
-  mem_free(&sb->polys);
+  mem_array_free(&sb->polys);
   sb->poly_count    = 0;
 
-  mem_free(&sb->texts);
+  mem_array_free(&sb->texts);
   sb->text_count    = 0;
 
   sb->text_layout = NULL;

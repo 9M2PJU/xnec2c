@@ -161,7 +161,7 @@ static void opt_session_free(void)
 	fitness_config_free(&active_session->fitness_cfg);
 	if (active_session->simple_cfg.algorithm == OPT_SIMPLEX)
 	{
-		mem_free(&active_session->simple_cfg.opts.simplex.ssize);
+		mem_array_free(&active_session->simple_cfg.opts.simplex.ssize);
 	}
 	g_mutex_clear(&active_session->best_lock);
 	mem_free(&active_session);
@@ -258,7 +258,7 @@ cleanup:
 	session->running = FALSE;
 	if (algo == OPT_SIMPLEX)
 	{
-		mem_free(&session->simple_cfg.opts.simplex.ssize);
+		mem_array_free(&session->simple_cfg.opts.simplex.ssize);
 	}
 	mem_free(&session);
 	return -1;

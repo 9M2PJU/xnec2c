@@ -281,9 +281,9 @@ static int _name_cmp(const void *a, const void *b)
 void simple_build_index_map(simple_t *s)
 {
 	/* Free previous map */
-	mem_free(&s->map_var);
-	mem_free(&s->map_elem);
-	mem_free(&s->sorted_var_indices);
+	mem_array_free(&s->map_var);
+	mem_array_free(&s->map_elem);
+	mem_array_free(&s->sorted_var_indices);
 	s->total_dims = 0;
 
 	/* Build sorted index array */

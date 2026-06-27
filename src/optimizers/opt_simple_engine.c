@@ -62,7 +62,7 @@ void simple_cache_clear(simple_cache_t *cache)
 		mem_free(&cache->entries[i].key);
 	}
 
-	mem_free(&cache->entries);
+	mem_array_free(&cache->entries);
 	cache->count = 0;
 }
 
@@ -204,7 +204,7 @@ double simple_fitness_trampoline(const gsl_vector *pos, void *ctx)
 			{
 				simple_var_free_contents(&s->best_vars[i]);
 			}
-			mem_free(&s->best_vars);
+			mem_array_free(&s->best_vars);
 		}
 
 		mem_array_alloc(&s->best_vars, s->num_vars);

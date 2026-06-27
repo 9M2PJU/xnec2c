@@ -278,8 +278,8 @@ void opt_ui_cleanup(void)
 
 	formula_base_markup = NULL;
 
-	mem_free(&timer_meas);
-	mem_free(&timer_freq);
+	mem_array_free(&timer_meas);
+	mem_array_free(&timer_freq);
 }
 
 /*------------------------------------------------------------------------*/

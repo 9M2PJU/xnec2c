@@ -273,7 +273,7 @@ void close_mathlib(mathlib_t *lib)
 	if (lib == NULL)
 		return;
 
-	mem_free(&lib->functions);
+	mem_array_free(&lib->functions);
 
 	if (lib->handle != NULL)
 	{

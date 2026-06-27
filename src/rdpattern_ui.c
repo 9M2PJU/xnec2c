@@ -711,7 +711,7 @@ static void
 free_near_step(void *elem)
 {
   near_field_t *nf = elem;
-  mem_free(&nf->points);
+  mem_array_free(&nf->points);
 }
 
 /*-----------------------------------------------------------------------*/
@@ -755,7 +755,7 @@ Free_Nearfield_Fstep_Buffers( void )
   for( int i = 0; i < nfrq; i++ )
     free_near_step(&near_field_fstep[i]);
 
-  mem_free(&near_field_fstep);
+  mem_array_free(&near_field_fstep);
 
 } /* Free_Nearfield_Fstep_Buffers() */
 
@@ -1053,16 +1053,16 @@ static void
 free_rad_pattern_step(void *elem)
 {
   rad_pattern_t *rp = elem;
-  mem_free(&rp->gtot);
-  mem_free(&rp->max_gain);
-  mem_free(&rp->min_gain);
-  mem_free(&rp->max_gain_tht);
-  mem_free(&rp->max_gain_phi);
-  mem_free(&rp->max_gain_idx);
-  mem_free(&rp->min_gain_idx);
-  mem_free(&rp->axrt);
-  mem_free(&rp->tilt);
-  mem_free(&rp->sens);
+  mem_array_free(&rp->gtot);
+  mem_array_free(&rp->max_gain);
+  mem_array_free(&rp->min_gain);
+  mem_array_free(&rp->max_gain_tht);
+  mem_array_free(&rp->max_gain_phi);
+  mem_array_free(&rp->max_gain_idx);
+  mem_array_free(&rp->min_gain_idx);
+  mem_array_free(&rp->axrt);
+  mem_array_free(&rp->tilt);
+  mem_array_free(&rp->sens);
 }
 
 /*-----------------------------------------------------------------------*/

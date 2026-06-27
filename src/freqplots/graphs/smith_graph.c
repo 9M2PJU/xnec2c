@@ -568,7 +568,7 @@ Plot_Graph_Smith(
       .cont_pts = points, .cont_freq = fc, .cont_n = nc,
       .snap_pts = points, .snap_freq = fc, .snap_n = nc } );
 
-  mem_free(&points);
+  mem_array_free(&points);
 
   /* Draw a vertical line to show current freq if it was
    * changed by a user click on the plots drawingarea */

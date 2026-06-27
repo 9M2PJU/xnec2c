@@ -509,14 +509,14 @@ netwk( complex double *cmx, int *ip, complex double *einc )
   if( (vsorc.nsant+vsorc.nvqd) == 0)
   {
     /* Free network buffers */
-    mem_free(&ipnt);
-    mem_free(&nteqa);
-    mem_free(&ntsca);
-    mem_free(&vsrc);
-    mem_free(&rhs);
-    mem_free(&cmn);
-    mem_free(&rhnt);
-    mem_free(&rhnx);
+    mem_array_free(&ipnt);
+    mem_array_free(&nteqa);
+    mem_array_free(&ntsca);
+    mem_array_free(&vsrc);
+    mem_array_free(&rhs);
+    mem_array_free(&cmn);
+    mem_array_free(&rhnt);
+    mem_array_free(&rhnx);
     return;
   }
 
@@ -574,14 +574,14 @@ netwk( complex double *cmx, int *ip, complex double *einc )
     } /* for( i = 0; i < vsorc.nvqd; i++ ) */
 
   /* Free network buffers */
-  mem_free(&ipnt);
-  mem_free(&nteqa);
-  mem_free(&ntsca);
-  mem_free(&vsrc);
-  mem_free(&rhs);
-  mem_free(&cmn);
-  mem_free(&rhnt);
-  mem_free(&rhnx);
+  mem_array_free(&ipnt);
+  mem_array_free(&nteqa);
+  mem_array_free(&ntsca);
+  mem_array_free(&vsrc);
+  mem_array_free(&rhs);
+  mem_array_free(&cmn);
+  mem_array_free(&rhnt);
+  mem_array_free(&rhnx);
 
   return;
 }

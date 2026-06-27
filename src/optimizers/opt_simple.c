@@ -72,7 +72,7 @@ static void _free_work_vars(simple_t *s)
 		}
 	}
 
-	mem_free(&s->work_vars);
+	mem_array_free(&s->work_vars);
 }
 
 /* ---- Single-pass backend construction ---- */
@@ -252,7 +252,7 @@ static void _populate_result(simple_t *s)
 		{
 			simple_var_free_contents(&s->result_vars[i]);
 		}
-		mem_free(&s->result_vars);
+		mem_array_free(&s->result_vars);
 	}
 
 	/* Deep-copy best_vars (or vars if no optimization occurred) */
@@ -487,7 +487,7 @@ double simple_optimize(simple_t *s)
 		{
 			simple_var_free_contents(&s->best_vars[i]);
 		}
-		mem_free(&s->best_vars);
+		mem_array_free(&s->best_vars);
 	}
 
 	if (s->best_vec)
@@ -565,7 +565,7 @@ void simple_set_vars(simple_t *s, const simple_var_t *vars, int num_vars)
 	{
 		simple_var_free_contents(&s->vars[i]);
 	}
-	mem_free(&s->vars);
+	mem_array_free(&s->vars);
 	_free_work_vars(s);
 
 	/* Deep-copy new vars */
@@ -588,7 +588,7 @@ void simple_set_vars(simple_t *s, const simple_var_t *vars, int num_vars)
  */
 void simple_set_ssize(simple_t *s, double ssize)
 {
-	mem_free(&s->algo_opts.simplex.ssize);
+	mem_array_free(&s->algo_opts.simplex.ssize);
 	s->algo_opts.simplex.num_ssize = 1;
 	mem_array_alloc(&s->algo_opts.simplex.ssize, 1);
 	s->algo_opts.simplex.ssize[0] = ssize;
@@ -635,7 +635,7 @@ void simple_free(simple_t *s)
 		{
 			simple_var_free_contents(&s->vars[i]);
 		}
-		mem_free(&s->vars);
+		mem_array_free(&s->vars);
 	}
 
 	/* Work vars */
@@ -648,7 +648,7 @@ void simple_free(simple_t *s)
 		{
 			simple_var_free_contents(&s->best_vars[i]);
 		}
-		mem_free(&s->best_vars);
+		mem_array_free(&s->best_vars);
 	}
 
 	if (s->best_vec)
@@ -663,19 +663,19 @@ void simple_free(simple_t *s)
 		{
 			simple_var_free_contents(&s->result_vars[i]);
 		}
-		mem_free(&s->result_vars);
+		mem_array_free(&s->result_vars);
 	}
 
 	/* Ssize array (simplex only; PSO union member overlaps, no action needed) */
 	if (s->algorithm == OPT_SIMPLEX)
 	{
-		mem_free(&s->algo_opts.simplex.ssize);
+		mem_array_free(&s->algo_opts.simplex.ssize);
 	}
 
 	/* Index map */
-	mem_free(&s->map_var);
-	mem_free(&s->map_elem);
-	mem_free(&s->sorted_var_indices);
+	mem_array_free(&s->map_var);
+	mem_array_free(&s->map_elem);
+	mem_array_free(&s->sorted_var_indices);
 
 	/* Cache */
 	simple_cache_clear(&s->cache);

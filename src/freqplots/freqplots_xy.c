@@ -373,7 +373,7 @@ Plot_Graph(
 		offset += card_nfsteps[fr];
 	}
 
-	mem_free(&rail);
+	mem_array_free(&rail);
 
 	v->prev_width_available = width_available;
 	v->prev_ngraphs = v->ngraph;

@@ -235,6 +235,6 @@ fp_locus_free( freqplots_view_t *v )
     mem_array_free( &v->loci[i].snap_freq );
   }
 
-  mem_free(&v->loci);
+  mem_array_free(&v->loci);
   v->loci_n = 0;
 }

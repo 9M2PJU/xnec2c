@@ -1520,7 +1520,7 @@ Stop_Frequency_Loop( void )
 
 		  if( floop_state != NULL )
 		  {
-		    mem_free(&floop_state->idle_stack);
+		    mem_array_free(&floop_state->idle_stack);
 		    mem_free(&floop_state);
 		  }
 	  }
@@ -1541,7 +1541,7 @@ Stop_Frequency_Loop( void )
 	/* Both paths free state here; g_idle source was removed above */
 	if( floop_state != NULL )
 	{
-	  mem_free(&floop_state->idle_stack);
+	  mem_array_free(&floop_state->idle_stack);
 	  mem_free(&floop_state);
 	}
   }

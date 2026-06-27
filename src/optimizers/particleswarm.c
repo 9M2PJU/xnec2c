@@ -362,7 +362,7 @@ void pso_free(pso_t *pso)
 		gsl_rng_free(pso->rng);
 	}
 
-	mem_free(&pso->best_best_by_iter);
+	mem_array_free(&pso->best_best_by_iter);
 	mem_free(&pso);
 }
 
