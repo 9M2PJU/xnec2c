@@ -197,16 +197,27 @@ alloc_fail:
 }
 
 /**
- * _mem_free() - release a managed memory buffer
+ * _mem_free() - release a managed scalar or byte buffer, rejecting array blocks
  * @ptr: pointer to caller's void* (set to NULL on return)
  *
- * The public mem_free macro strips the pointer cast before calling here.
+ * The public mem_free macro strips the pointer cast before calling here. A
+ * block stamped with a non-zero array_elem_size was taken from an array verb
+ * and must be released through mem_array_free; freeing it here would mismatch
+ * the backing allocation. BUG does not unwind, so the wrongly typed block is
+ * left intact and surfaces in the report rather than being silently freed.
  */
 void _mem_free(void **ptr)
 {
 	if (*ptr != NULL)
 	{
 		mem_obj_t *m = mem_obj_from_ptr(*ptr);
+
+		if (unlikely(m->array_elem_size != 0))
+		{
+			BUG("mem_free: array block element size %lu; use mem_array_free\n",
+				(unsigned long)m->array_elem_size);
+			return;
+		}
 
 		mem_obj_free(m);
 	}
