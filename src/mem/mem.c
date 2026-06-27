@@ -199,14 +199,16 @@ alloc_fail:
 /**
  * _mem_free() - release a managed scalar or byte buffer, rejecting array blocks
  * @ptr: pointer to caller's void* (set to NULL on return)
+ * @site: caller location string ("file:line") for the rejection diagnostic
  *
- * The public mem_free macro strips the pointer cast before calling here. A
- * block stamped with a non-zero array_elem_size was taken from an array verb
- * and must be released through mem_array_free; freeing it here would mismatch
- * the backing allocation. BUG does not unwind, so the wrongly typed block is
- * left intact and surfaces in the report rather than being silently freed.
+ * The public mem_free macro strips the pointer cast and supplies the caller
+ * site before calling here. A block stamped with a non-zero array_elem_size
+ * was taken from an array verb and must be released through mem_array_free;
+ * freeing it here would mismatch the backing allocation. BUG does not unwind,
+ * so the wrongly typed block is left intact and surfaces in the report rather
+ * than being silently freed. The site names the offending mem_free call.
  */
-void _mem_free(void **ptr)
+void _mem_free(void **ptr, char *site)
 {
 	if (*ptr != NULL)
 	{
@@ -214,8 +216,8 @@ void _mem_free(void **ptr)
 
 		if (unlikely(m->array_elem_size != 0))
 		{
-			BUG("mem_free: array block element size %lu; use mem_array_free\n",
-				(unsigned long)m->array_elem_size);
+			BUG("mem_free at %s: array block element size %lu; use mem_array_free\n",
+				site, (unsigned long)m->array_elem_size);
 			return;
 		}
 

@@ -112,8 +112,8 @@ static inline void *_mem_realloc_fast(void **ptr, size_t req, char *str)
 
 void mem_backtrace(void *ptr);
 void mem_obj_dump(void *ptr);
-void _mem_free(void **ptr);
-#define mem_free(ptr) _mem_free((void **)(ptr))
+void _mem_free(void **ptr, char *site);
+#define mem_free(ptr) _mem_free((void **)(ptr), __LOCATION__)
 
 /* Typed array verbs: derive the element size from the pointer so callers
  * pass only a pointer and a quantity. The inner _mem_array_* helpers take
