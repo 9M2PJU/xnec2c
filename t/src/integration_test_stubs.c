@@ -215,6 +215,12 @@ _print_backtrace(char **strings)
   (void)strings;
 }
 
+char **
+_get_backtrace(void)
+{
+  return NULL;
+}
+
 /* Stub for flag operations */
 gboolean
 isFlagSet(unsigned long long int flag)

@@ -26,18 +26,23 @@ void _mem_validate_fail(void *ptr, void *base)
 
 /**
  * mem_obj_alloc() - allocate aligned memory, optionally copying from a source
- * @old_m: read-only source for data copy, or NULL for fresh allocation.
- *         Always allocates a new block; never modifies or frees old_m.
+ * @data_src: read-only source for the prior-data copy and element width, or
+ *            NULL for a fresh allocation with no data to preserve.
+ * @birth_src: birth-identity predecessor supplying serial, birth site, and
+ *             backtrace ownership; non-NULL only on a grow-beyond relocation.
+ *             NULL records @site and, when reporting is enabled, mints a
+ *             fresh serial and captures a backtrace.
  * @req: requested user-data size in bytes
  * @prev_used: bytes of old data to preserve (0 for fresh allocation)
  *
- * Uses posix_memalign with MEM_ALIGNMENT-byte alignment.
+ * Always allocates a new block; never modifies or frees @data_src or
+ * @birth_src. Uses posix_memalign with MEM_ALIGNMENT-byte alignment.
  * Total allocation is MEM_HEADER_SIZE + req.
  *
  * Return: pointer to new mem_obj_t, or NULL on failure
  */
-static inline mem_obj_t *mem_obj_alloc(const mem_obj_t *old_m, size_t req,
-	size_t prev_used, const char *site)
+static inline mem_obj_t *mem_obj_alloc(const mem_obj_t *data_src,
+	const mem_obj_t *birth_src, size_t req, size_t prev_used, const char *site)
 {
 	void *base = NULL;
 	mem_obj_t *m;
@@ -54,34 +59,45 @@ static inline mem_obj_t *mem_obj_alloc(const mem_obj_t *old_m, size_t req,
 	m = (mem_obj_t *)base;
 	m->size = req;
 	m->used = req;
-	/* Single relocation-persistence point: a grow-beyond reallocation
-	 * returns a fresh block, so every header field that must outlive the
-	 * predecessor is carried from it here. A fresh allocation has no
-	 * predecessor and starts at the scalar/byte default; the array layer
-	 * stamps the element size at birth. */
-	m->array_elem_size = (old_m != NULL) ? old_m->array_elem_size : 0;
-	m->backtrace = NULL;
-	/* Tag for leak accounting only while reporting is enabled.  An
-	 * untracked block carries a NULL site so its release skips the
-	 * accounting path, keeping add and drop balanced across the
-	 * monotonic flag edge without a mutex on the disabled fast path. */
-	m->site = rc_config.mem_report_enabled ? site : NULL;
+	/* Single relocation-persistence point with two predecessor roles:
+	 * data_src supplies element width and prior data; birth_src supplies the
+	 * carried birth identity (serial, site, backtrace). A grow-beyond
+	 * relocation passes the same block as both; a clone passes data_src only,
+	 * minting a fresh identity. A fresh allocation passes neither and starts at
+	 * the scalar/byte default while the array layer stamps width at birth. */
+	m->array_elem_size = (data_src != NULL) ? data_src->array_elem_size : 0;
+	/* Birth identity: a grow-beyond block inherits its predecessor's serial,
+	 * site, and backtrace; a fresh block records the caller site and, only
+	 * while reporting is enabled, mints a serial and captures a backtrace.
+	 * When reporting is disabled a fresh block keeps serial 0 and a NULL
+	 * backtrace, which the free path null-checks before releasing. Each field
+	 * is written once so the registry link below adds no further identity. */
+	m->birth_site = (birth_src != NULL) ? birth_src->birth_site : site;
+	m->serial = (birth_src != NULL) ? birth_src->serial
+		: (unlikely(rc_config.mem_report_enabled) ? mem_track_next_serial() : 0);
+	m->backtrace = (birth_src != NULL) ? birth_src->backtrace
+		: (unlikely(rc_config.mem_report_enabled) ? _get_backtrace() : NULL);
 	m->ptr = (char *)base + MEM_HEADER_SIZE;
 
 	/* Preserve old data when reallocating */
-	if (old_m != NULL && prev_used > 0)
+	if (data_src != NULL && prev_used > 0)
 	{
 		size_t copy_size = (prev_used < req) ? prev_used : req;
 
-		memcpy(m->ptr, old_m->ptr, copy_size);
+		memcpy(m->ptr, data_src->ptr, copy_size);
 	}
 
 	/* Zero newly extended region */
 	if (req > prev_used)
 		memset((char *)m->ptr + prev_used, 0, req - prev_used);
 
-	if (m->site != NULL)
-		mem_track_add(m->site, m->size);
+	/* Fast-path accounting gate: the live-registry link is consumed only by
+	 * the leak report, whose enablement is fixed at startup and never toggles
+	 * at runtime. When disabled the block never touches the registry mutex,
+	 * leaving the bare aligned allocation. Counterpart to the matching guard
+	 * in mem_obj_free. */
+	if (unlikely(rc_config.mem_report_enabled))
+		mem_track_register(m);
 
 	return m;
 }
@@ -90,13 +106,17 @@ static inline mem_obj_t *mem_obj_alloc(const mem_obj_t *old_m, size_t req,
  * mem_obj_free() - release a managed block and its backtrace
  * @m: header to release
  *
- * Single release point: drops the per-site live total for tracked
- * blocks, then frees the optional backtrace and the aligned base block.
+ * Single release point: unlinks the block from the live registry when
+ * reporting is enabled, then frees the optional backtrace and the aligned
+ * base block.
  */
 static inline void mem_obj_free(mem_obj_t *m)
 {
-	if (m->site != NULL)
-		mem_track_drop(m->site, m->size);
+	/* Fast path: a block is linked into the registry only when reporting
+	 * is enabled, a startup-fixed decision, so unlink it under the same
+	 * guard. Counterpart to the registry link in mem_obj_alloc. */
+	if (unlikely(rc_config.mem_report_enabled))
+		mem_track_unregister(m);
 
 	if (m->backtrace != NULL)
 		free(m->backtrace);
@@ -126,7 +146,7 @@ void *_mem_realloc(void **ptr, size_t req, char *str)
 	if (likely(*ptr == NULL))
 	{
 		/* Fresh allocation */
-		m = mem_obj_alloc(NULL, req, 0, str);
+		m = mem_obj_alloc(NULL, NULL, req, 0, str);
 		if (unlikely(m == NULL))
 			goto alloc_fail;
 
@@ -135,12 +155,6 @@ void *_mem_realloc(void **ptr, size_t req, char *str)
 	}
 
 	m = mem_obj_from_ptr(*ptr);
-
-	if (m->backtrace != NULL)
-	{
-		free(m->backtrace);
-		m->backtrace = NULL;
-	}
 
 	prev_used = m->used;
 
@@ -163,16 +177,15 @@ void *_mem_realloc(void **ptr, size_t req, char *str)
 	{
 		mem_obj_t *old_m = m;
 
-		m = mem_obj_alloc(old_m, req, prev_used, str);
+		m = mem_obj_alloc(old_m, old_m, req, prev_used, str);
 		if (unlikely(m == NULL))
 			goto alloc_fail;
 
-		/* Free the old block */
+		/* The new block now owns the carried backtrace; null the old
+		 * pointer so mem_obj_free does not release the transferred trace. */
+		old_m->backtrace = NULL;
 		mem_obj_free(old_m);
 	}
-
-	/* Debug only if you need it, this is very slow: */
-	/*m->backtrace = _get_backtrace();*/
 
 	*ptr = m->ptr;
 	return m->ptr;
@@ -239,21 +252,24 @@ void mem_backtrace(void *ptr)
 }
 
 /**
- * mem_clone() - duplicate a managed memory buffer
+ * _mem_clone() - duplicate a managed memory buffer
  * @ptr: user-facing pointer to an existing managed allocation
+ * @site: caller __LOCATION__ forwarded by the mem_clone macro, recorded as
+ *        the clone's birth site
  *
  * Allocates a new managed buffer of the same used size and copies
  * the contents of the source buffer into it.
  *
  * Return: user-facing pointer to the new allocation
  */
-void *mem_clone(void *ptr)
+void *_mem_clone(void *ptr, char *site)
 {
 	mem_obj_t *src = mem_obj_from_ptr(ptr);
 	mem_obj_t *dst;
 
-	/* mem_obj_alloc always creates a new block; src is read-only copy source */
-	dst = mem_obj_alloc(src, src->used, src->used, __LOCATION__);
+	/* Source supplies copy data and element width; a NULL birth predecessor
+	 * mints the clone a fresh serial and records the caller site. */
+	dst = mem_obj_alloc(src, NULL, src->used, src->used, site);
 	if (unlikely(dst == NULL))
 	{
 		pr_crit("mem_clone: allocation failed for %lu bytes\n",

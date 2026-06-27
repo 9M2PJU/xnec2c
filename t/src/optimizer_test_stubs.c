@@ -32,6 +32,12 @@ _print_backtrace(char **strings)
 	(void)strings;
 }
 
+char **
+_get_backtrace(void)
+{
+	return NULL;
+}
+
 gboolean
 isChild(void)
 {

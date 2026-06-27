@@ -2,6 +2,7 @@
 #define MEM_H
 
 #include <stddef.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "branch_hints.h"
@@ -9,14 +10,15 @@
 
 /* Alignment for cache-line and AVX-512 friendliness */
 #define MEM_ALIGNMENT  64
-#define MEM_HEADER_SIZE 64
+/* MEM_HEADER_SIZE must remain a multiple of MEM_ALIGNMENT (64). */
+#define MEM_HEADER_SIZE 128
 
 /* mem_obj_t occupies the first cache line of each allocation.
  * User data begins at base + MEM_HEADER_SIZE, also 64-byte aligned.
  *
  * Layout:
- *   |<-- MEM_HEADER_SIZE (64B) -->|<-- req bytes user data -->|
- *   [ mem_obj_t (48B) | pad 16B  ][ user ptr (64-byte aligned)]
+ *   |<-- MEM_HEADER_SIZE (128B) -->|<-- req bytes user data -->|
+ *   [ mem_obj_t (72B) | pad 56B   ][ user ptr (64-byte aligned)]
  *   ^                              ^
  *   base (64-aligned)              m->ptr = base + MEM_HEADER_SIZE
  *
@@ -29,9 +31,17 @@
  *   array_elem_size: element size for a managed array; 0 marks a scalar or
  *     byte block. The array layer is its single writer; element count and
  *     capacity derive from used/size divided by this size.
- *   backtrace: optional debug allocation trace
- *   site: __LOCATION__ of the allocating call, for leak accounting
+ *   backtrace: birth call path, captured at fresh birth only while reporting
+ *     is enabled, carried with birth identity across relocation, released at
+ *     free; NULL when reporting was disabled
+ *   birth_site: __LOCATION__ of the block's birth allocation, carried across
+ *     relocation; names the origin call site of a surviving block for leak
+ *     localization, the registry enumerating the live set rather than
+ *     adjudicating the leak
  *   ptr: pointer to user data region
+ *   serial: monotonic identity stamped at birth and carried across
+ *     relocation, naming a block independent of its reuse-prone address
+ *   reg_prev, reg_next: live-registry links threaded through the header
  */
 typedef struct mem_obj_t
 {
@@ -39,9 +49,13 @@ typedef struct mem_obj_t
 	size_t used;
 	size_t array_elem_size;
 	char **backtrace;
-	const char *site;
+	const char *birth_site;
 
 	void *ptr;
+
+	uint64_t serial;
+	struct mem_obj_t *reg_prev;
+	struct mem_obj_t *reg_next;
 } mem_obj_t;
 
 void *_mem_realloc(void **ptr, size_t req, char *str);
@@ -193,7 +207,8 @@ void _mem_array_reserve(void **arr, size_t elem_size, int needed,
 
 #define mem_array_reserve(arr, needed, initial_cap) \
 	((void)MEM_ARRAY_TYPED(arr), _mem_array_reserve((void **)(arr), sizeof(**(arr)), (needed), (initial_cap), __LOCATION__))
-void *mem_clone(void *ptr);
+void *_mem_clone(void *ptr, char *site);
+#define mem_clone(p) _mem_clone((p), __LOCATION__)
 int mem_bcmp(void *p1, void *p2);
 void mem_set(void *ptr, int c);
 

@@ -1,139 +1,237 @@
 #include <stdint.h>
+#include <stdatomic.h>
+#include <stdlib.h>
 #include <pthread.h>
 
 #include "common.h"
 #include "console.h"
 #include "mem_track.h"
 
-/* Open-addressed site table.  The location-string pointer is the key;
- * a NULL site marks an empty slot.  One mutex serialises access because
- * the parent allocates from both the GTK main thread and the
- * frequency-loop thread. */
-#define MEM_TRACK_SLOTS 8192u
-
-static mem_site_t mem_sites[MEM_TRACK_SLOTS];
+/* The registry spine is shared mutable state guarded by one mutex because
+ * the parent allocates from both the GTK main thread and the frequency-loop
+ * thread. The serial sequence is a lock-free atomic counter, drawn off the
+ * registry mutex so a birth stamp never contends with a link or unlink. */
+static mem_obj_t *mem_reg_head;
+static _Atomic uint64_t mem_serial_seq;
 static pthread_mutex_t mem_track_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-/**
- * mem_track_slot() - locate or insert the record for a call site
- * @site: stable location-string pointer (non-NULL key)
- *
- * Caller must hold mem_track_mutex.  Raises BUG on table overflow.
- *
- * Return: record pointer, or NULL when the table is exhausted
- */
-static mem_site_t *mem_track_slot(const char *site)
+/* Report-time snapshot record. mem_report copies the live registry into a
+ * private array under the lock, then emits unlocked, so a concurrent free
+ * never frees a node mid-report. Backtrace frames are deep-copied because
+ * their owning block may be freed once the lock is released. The grouped
+ * flag is report-derived state, held here rather than in the block header. */
+struct mem_report_rec
 {
-	uintptr_t h = (uintptr_t)site;
-	unsigned idx = (unsigned)((h >> 4) ^ (h >> 16)) & (MEM_TRACK_SLOTS - 1);
-	unsigned probe;
-
-	for (probe = 0; probe < MEM_TRACK_SLOTS; probe++)
-	{
-		mem_site_t *rec = &mem_sites[(idx + probe) & (MEM_TRACK_SLOTS - 1)];
-
-		if (rec->site == site)
-			return rec;
-
-		if (rec->site == NULL)
-		{
-			rec->site = site;
-			return rec;
-		}
-	}
-
-	BUG("mem_track: site table overflow (%u slots)\n", MEM_TRACK_SLOTS);
-	return NULL;
-}
+	const char *birth_site;
+	uint64_t serial;
+	size_t size;
+	size_t used;
+	char **frames;
+	int grouped;
+};
 
 /**
- * mem_track_add() - record a managed allocation against its call site
- * @site: location-string pointer of the allocating call
- * @bytes: capacity of the new block
+ * mem_track_register() - link a managed block into the live registry
+ * @m: header of the freshly allocated block
+ *
+ * Head-inserts under mem_track_mutex; paired with mem_track_unregister in
+ * mem_obj_free.
  */
-void mem_track_add(const char *site, size_t bytes)
+void mem_track_register(mem_obj_t *m)
 {
-	mem_site_t *rec;
-
 	pthread_mutex_lock(&mem_track_mutex);
 
-	rec = mem_track_slot(site);
-	if (rec != NULL)
-	{
-		rec->live_bytes += bytes;
-		rec->allocs++;
-	}
+	m->reg_prev = NULL;
+	m->reg_next = mem_reg_head;
+	if (mem_reg_head != NULL)
+		mem_reg_head->reg_prev = m;
+	mem_reg_head = m;
 
 	pthread_mutex_unlock(&mem_track_mutex);
 }
 
 /**
- * mem_track_drop() - record a managed release against its call site
- * @site: location-string pointer recorded at allocation time
- * @bytes: capacity of the released block
+ * mem_track_unregister() - splice a managed block out of the live registry
+ * @m: header of the block being freed
+ *
+ * Splices under mem_track_mutex; paired with mem_track_register in
+ * mem_obj_alloc.
  */
-void mem_track_drop(const char *site, size_t bytes)
+void mem_track_unregister(mem_obj_t *m)
 {
-	mem_site_t *rec;
-
 	pthread_mutex_lock(&mem_track_mutex);
 
-	rec = mem_track_slot(site);
-	if (rec != NULL)
-	{
-		rec->live_bytes -= bytes;
-		rec->frees++;
-	}
+	if (m->reg_prev != NULL)
+		m->reg_prev->reg_next = m->reg_next;
+	else
+		mem_reg_head = m->reg_next;
+
+	if (m->reg_next != NULL)
+		m->reg_next->reg_prev = m->reg_prev;
 
 	pthread_mutex_unlock(&mem_track_mutex);
 }
 
 /**
- * mem_report() - emit live-allocation totals per call site
+ * mem_track_next_serial() - draw the next monotonic birth identity
+ *
+ * Stamped into a block at birth and carried across relocation, so the
+ * serial names a block independent of its reuse-prone address.
+ *
+ * Return: a serial unique for the program lifetime
+ */
+uint64_t mem_track_next_serial(void)
+{
+	return atomic_fetch_add(&mem_serial_seq, 1) + 1;
+}
+
+/**
+ * mem_report_dup_frames() - deep-copy a backtrace frame array for the snapshot
+ * @frames: NULL-terminated birth backtrace owned by a live block, or NULL
+ *
+ * The owning block may be freed once the registry lock is released, taking
+ * its backtrace allocation with it, so the report keeps an independent copy
+ * to emit after unlocking. Uses raw allocation because the managed allocator
+ * would re-enter the registry mutex held during the snapshot.
+ *
+ * Return: a freshly allocated NULL-terminated copy, or NULL
+ */
+static char **mem_report_dup_frames(char *const *frames)
+{
+	if (frames == NULL)
+		return NULL;
+
+	int n = 0;
+	while (frames[n] != NULL)
+		n++;
+
+	char **copy = malloc((size_t)(n + 1) * sizeof(*copy));
+	if (copy == NULL)
+		return NULL;
+
+	for (int i = 0; i < n; i++)
+		copy[i] = strdup(frames[i]);
+	copy[n] = NULL;
+
+	return copy;
+}
+
+/**
+ * mem_report() - enumerate every live managed block, triaged by birth site
  * @tag: label identifying the report point
  *
- * Emits one line per site holding live bytes, reporting the delta
- * against the previous report so a repeating positive delta marks a
- * surviving leak.  Suppressed in forked compute children, which do not
- * hold the parent-side per-step buffers.
+ * Snapshots the live registry into a private array under the mutex, releases
+ * the lock, then emits, so a concurrent free never frees a node mid-report
+ * and no stderr write is held under the allocator lock. Pass one emits one
+ * aggregate line per first-seen birth site, grouping later records by
+ * birth_site pointer equality and summing survivor count, bytes, and the
+ * serial span; a totals line follows with live block, byte, and distinct-site
+ * counts. Pass two emits one line per survivor and, when the survivor carries
+ * a birth backtrace, one line per call-path frame. The forked compute child
+ * runs this identical path.
  */
 void mem_report(const char *tag)
 {
-	unsigned i;
+	mem_obj_t *m;
+	struct mem_report_rec *recs = NULL;
+	unsigned long long count = 0;
+	unsigned long long live_bytes = 0;
+	unsigned long long distinct_sites = 0;
 
-	if (CHILD)
-		return;
-
+	/* Snapshot under the lock: raw allocation avoids re-entering the registry
+	 * mutex the managed allocator would take. The list cannot be mutated while
+	 * the lock is held, so node and backtrace pointers stay valid across the
+	 * copy. */
 	pthread_mutex_lock(&mem_track_mutex);
 
-	for (i = 0; i < MEM_TRACK_SLOTS; i++)
+	for (m = mem_reg_head; m != NULL; m = m->reg_next)
+		count++;
+
+	if (count > 0)
 	{
-		mem_site_t *rec = &mem_sites[i];
-
-		if (rec->site == NULL)
-			continue;
-
-		if (rec->live_bytes != 0)
+		recs = malloc((size_t)count * sizeof(*recs));
+		if (recs == NULL)
 		{
-			long long delta_bytes = (long long)rec->live_bytes
-				- (long long)rec->prev_bytes;
-			/* Blocks allocated at this site and not yet freed,
-			 * derived from the two authoritative monotonic counters
-			 * rather than a mirrored tally.  A signed format surfaces
-			 * underflow from any unbalanced release. */
-			long long live_blocks = (long long)rec->allocs
-				- (long long)rec->frees;
-
-			/* Fields run raw-to-calculated, left to right: the
-			 * stored counters first, then the values derived at
-			 * print, with delta_bytes last as the leak-scan column. */
-			pr_info("mem-report %s: %s block_allocs=%lu block_frees=%lu live_bytes=%lu live_blocks=%+lld delta_bytes=%+lld\n",
-				tag, rec->site, rec->allocs, rec->frees,
-				(unsigned long)rec->live_bytes, live_blocks, delta_bytes);
+			pthread_mutex_unlock(&mem_track_mutex);
+			BUG("mem_report: snapshot allocation of %llu records failed\n",
+				count);
+			return;
 		}
 
-		rec->prev_bytes = rec->live_bytes;
+		unsigned long long i = 0;
+		for (m = mem_reg_head; m != NULL; m = m->reg_next, i++)
+		{
+			recs[i].birth_site = m->birth_site;
+			recs[i].serial = m->serial;
+			recs[i].size = m->size;
+			recs[i].used = m->used;
+			recs[i].frames = mem_report_dup_frames(m->backtrace);
+			recs[i].grouped = 0;
+			live_bytes += m->size;
+		}
 	}
 
 	pthread_mutex_unlock(&mem_track_mutex);
+
+	/* Pass one over the private snapshot: per first-seen birth site, count
+	 * survivors, sum bytes, and span the serials. The grouped flag retires
+	 * every later record sharing the site so the outer index visits each
+	 * site once. */
+	for (unsigned long long i = 0; i < count; i++)
+	{
+		if (recs[i].grouped)
+			continue;
+
+		unsigned long long site_count = 0;
+		unsigned long long site_bytes = 0;
+		uint64_t serial_min = recs[i].serial;
+		uint64_t serial_max = recs[i].serial;
+		for (unsigned long long j = i; j < count; j++)
+		{
+			if (recs[j].birth_site != recs[i].birth_site)
+				continue;
+
+			recs[j].grouped = 1;
+			site_count++;
+			site_bytes += recs[j].size;
+			if (recs[j].serial < serial_min)
+				serial_min = recs[j].serial;
+			if (recs[j].serial > serial_max)
+				serial_max = recs[j].serial;
+		}
+		distinct_sites++;
+
+		pr_info("mem-report %s: site=%s count=%llu bytes=%llu serial=[%llu..%llu]\n",
+			tag, recs[i].birth_site, site_count, site_bytes,
+			(unsigned long long)serial_min, (unsigned long long)serial_max);
+	}
+
+	pr_info("mem-report %s: live_blocks=%llu live_bytes=%llu distinct_sites=%llu\n",
+		tag, count, live_bytes, distinct_sites);
+
+	/* Pass two: one line per survivor, then its captured birth call path. */
+	for (unsigned long long i = 0; i < count; i++)
+	{
+		pr_info("mem-report %s: serial=%llu site=%s size=%lu used=%lu\n",
+			tag, (unsigned long long)recs[i].serial, recs[i].birth_site,
+			(unsigned long)recs[i].size, (unsigned long)recs[i].used);
+
+		if (recs[i].frames == NULL)
+			continue;
+
+		for (int f = 0; recs[i].frames[f] != NULL; f++)
+			pr_info("mem-report %s:   frame %d %s\n", tag, f, recs[i].frames[f]);
+	}
+
+	for (unsigned long long i = 0; i < count; i++)
+	{
+		if (recs[i].frames == NULL)
+			continue;
+
+		for (int f = 0; recs[i].frames[f] != NULL; f++)
+			free(recs[i].frames[f]);
+		free(recs[i].frames);
+	}
+
+	free(recs);
 }

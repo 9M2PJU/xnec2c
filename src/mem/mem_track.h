@@ -1,21 +1,18 @@
 #ifndef MEM_TRACK_H
 #define MEM_TRACK_H
 
-#include <stddef.h>
+#include <stdint.h>
 
-/* Per-call-site live-allocation accounting for the managed allocator.
- * Keyed by the stable __LOCATION__ string pointer passed to mem_alloc. */
-typedef struct
-{
-	const char    *site;
-	size_t         live_bytes;
-	size_t         prev_bytes;
-	unsigned long  allocs;
-	unsigned long  frees;
-} mem_site_t;
+#include "mem.h"
 
-void mem_track_add(const char *site, size_t bytes);
-void mem_track_drop(const char *site, size_t bytes);
+/* Live-allocation registry for the managed allocator. Every managed block
+ * links into one intrusive doubly linked list through its header; the list
+ * is the single source of truth for the live set, enumerated at report
+ * time. A monotonic serial stamped at birth names each block across the
+ * relocation a grow-beyond reallocation performs. */
+void mem_track_register(mem_obj_t *m);
+void mem_track_unregister(mem_obj_t *m);
+uint64_t mem_track_next_serial(void);
 void mem_report(const char *tag);
 
 #endif /* MEM_TRACK_H */
