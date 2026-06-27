@@ -189,6 +189,26 @@ void Save_FreqPlots_CSV(char *filename)
 
 /*-----------------------------------------------------------------------*/
 
+/* Poynting-vector coordinate buffers, reused across
+ * Save_RadPattern_Gnuplot_Data() calls. */
+static double *pov_x = NULL, *pov_y = NULL, *pov_z = NULL, *pov_r = NULL;
+
+/* gnuplot_data_free()
+ *
+ * Releases the Poynting-vector coordinate buffers.
+ */
+  void
+gnuplot_data_free( void )
+{
+  mem_array_free( &pov_x );
+  mem_array_free( &pov_y );
+  mem_array_free( &pov_z );
+  mem_array_free( &pov_r );
+
+} /* gnuplot_data_free() */
+
+/*-----------------------------------------------------------------------*/
+
 /* Save_RadPattern_Gnuplot_Data()
  *
  * Saves radiation pattern data to a file for gnuplot
@@ -283,10 +303,6 @@ Save_RadPattern_Gnuplot_Data( char *filename )
         (fpat.nfeh & NEAR_HFIELD) )
     {
       int ipv;
-
-      /* Co-ordinates of Poynting vectors */
-      static double *pov_x = NULL, *pov_y = NULL;
-      static double *pov_z = NULL, *pov_r = NULL;
 
       /* Range of Poynting vector values,
        * its max and min and log of max/min */

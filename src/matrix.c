@@ -630,13 +630,28 @@ cmset( int nrow, complex double *cmx, double rkhx, int iexkx )
 
 /*-----------------------------------------------------------------------*/
 
+/* Patch-current matrix-element scratch, reused across cmsw() calls. */
+static complex double *emel = NULL;
+
+/* matrix_data_free()
+ *
+ * Releases the cmsw() patch-current scratch buffer.
+ */
+  void
+matrix_data_free( void )
+{
+  mem_array_free( &emel );
+
+} /* matrix_data_free() */
+
+/*-----------------------------------------------------------------------*/
+
 /* computes matrix elements for e along wires due to patch current */
   void
 cmsw( int j1, int j2, int i1, int i2, complex double *cmx,
     complex double *cw, int ncw, int nrow, int itrp )
 {
   int jsnox; /* -1 offset to "jsno" for array indexing */
-  static complex double *emel = NULL;
   mem_array_alloc(&emel, 9);
 
   jsnox = segj.jsno-1;

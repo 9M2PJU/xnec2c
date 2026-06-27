@@ -599,6 +599,25 @@ conect( int ignd )
 
 /*-----------------------------------------------------------------------*/
 
+/* geometry_data_free()
+ *
+ * Releases the geometry segment and patch arrays and the segment-connection
+ * work buffers.
+ */
+  void
+geometry_data_free( void )
+{
+  mem_array_free( &data.segments );
+  mem_array_free( &data.patches );
+  mem_array_free( &segj.jco );
+  mem_array_free( &segj.ax );
+  mem_array_free( &segj.bx );
+  mem_array_free( &segj.cx );
+
+} /* geometry_data_free() */
+
+/*-----------------------------------------------------------------------*/
+
 /* subroutine helix generates segment geometry */
 /* data for a helix of ns segments */
   void

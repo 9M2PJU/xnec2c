@@ -60,6 +60,73 @@ lambda( double t, complex double *xlam, complex double *dxlam )
 
 /*-----------------------------------------------------------------------*/
 
+/* Series and integration scratch buffers, each built once on the first call
+ * to its owning routine below and reused for the program's lifetime.
+ * somnec_data_free() releases them at exit; ggrid_free() releases the
+ * interpolation-grid tables built by somnec(). */
+static int    *bessel_m  = NULL;
+static double *bessel_a1 = NULL, *bessel_a2 = NULL;
+static int    *m  = NULL;
+static double *a1 = NULL, *a2 = NULL, *a3 = NULL, *a4 = NULL;
+static complex double *g1 = NULL, *g2 = NULL, *g3 = NULL, *g4 = NULL, *g5 = NULL;
+static complex double *t01 = NULL, *t10 = NULL, *t20 = NULL;
+static complex double *q1 = NULL, *q2 = NULL, *ans1 = NULL, *ans2 = NULL;
+static complex double *sum = NULL, *ans = NULL;
+
+/* ggrid_free()
+ *
+ * Releases the Sommerfeld interpolation-grid tables built by somnec().
+ */
+  void
+ggrid_free( void )
+{
+  mem_array_free( &ggrid.ar1 );
+  mem_array_free( &ggrid.ar2 );
+  mem_array_free( &ggrid.ar3 );
+  mem_array_free( &ggrid.nxa );
+  mem_array_free( &ggrid.nya );
+  mem_array_free( &ggrid.dxa );
+  mem_array_free( &ggrid.dya );
+  mem_array_free( &ggrid.xsa );
+  mem_array_free( &ggrid.ysa );
+
+} /* ggrid_free() */
+
+/* somnec_data_free()
+ *
+ * Releases the Bessel, Hankel, Romberg, saddle-point, and Sommerfeld-integral
+ * scratch buffers reused across somnec evaluations.
+ */
+  void
+somnec_data_free( void )
+{
+  mem_array_free( &bessel_m );
+  mem_array_free( &bessel_a1 );
+  mem_array_free( &bessel_a2 );
+  mem_array_free( &m );
+  mem_array_free( &a1 );
+  mem_array_free( &a2 );
+  mem_array_free( &a3 );
+  mem_array_free( &a4 );
+  mem_array_free( &g1 );
+  mem_array_free( &g2 );
+  mem_array_free( &g3 );
+  mem_array_free( &g4 );
+  mem_array_free( &g5 );
+  mem_array_free( &t01 );
+  mem_array_free( &t10 );
+  mem_array_free( &t20 );
+  mem_array_free( &q1 );
+  mem_array_free( &q2 );
+  mem_array_free( &ans1 );
+  mem_array_free( &ans2 );
+  mem_array_free( &sum );
+  mem_array_free( &ans );
+
+} /* somnec_data_free() */
+
+/*-----------------------------------------------------------------------*/
+
 /* bessel evaluates the zero-order bessel function */
 /* and its derivative for complex argument z. */
   static void
@@ -67,8 +134,7 @@ bessel( complex double z,
     complex double *j0, complex double *j0p )
 {
   int k, ib;
-  static int *m = NULL, init = FALSE;
-  static double *a1 = NULL, *a2 = NULL;
+  static int init = FALSE;
   double zms;
   complex double p0z, p1z, q0z, q1z, zi, zi2, zk, cz, sz;
   complex double j0x=CPLX_00, j0px=CPLX_00;
@@ -79,15 +145,15 @@ bessel( complex double z,
     int i;
 
     int nrec = 101;
-    mem_array_alloc(&m, nrec);
-    mem_array_alloc(&a1, nrec);
-    mem_array_alloc(&a2, nrec);
+    mem_array_alloc(&bessel_m, nrec);
+    mem_array_alloc(&bessel_a1, nrec);
+    mem_array_alloc(&bessel_a2, nrec);
 
     for( k = 1; k <= 25; k++ )
     {
       i = k-1;
-      a1[i]=-.25/(k*k);
-      a2[i]=1.0/(k+1.0);
+      bessel_a1[i]=-.25/(k*k);
+      bessel_a2[i]=1.0/(k+1.0);
     }
 
     for( i = 1; i <= 101; i++ )
@@ -96,12 +162,12 @@ bessel( complex double z,
       for( k = 0; k < 24; k++ )
       {
         init = k;
-        tst *= -i*a1[k];
+        tst *= -i*bessel_a1[k];
         if( tst < 1.0e-6 )
           break;
       }
 
-      m[i-1] = init+1;
+      bessel_m[i-1] = init+1;
     } /* for( i = 1; i<= 101; i++ ) */
 
     init = TRUE;
@@ -125,7 +191,7 @@ bessel( complex double z,
 
     /* series expansion */
     iz=(int)zms;
-    miz=m[iz];
+    miz=bessel_m[iz];
     *j0=CPLX_10;
     *j0p=*j0;
     zk=*j0;
@@ -133,9 +199,9 @@ bessel( complex double z,
 
     for( k = 0; k < miz; k++ )
     {
-      zk *= a1[k]*zi;
+      zk *= bessel_a1[k]*zi;
       *j0 += zk;
-      *j0p += a2[k]*zk;
+      *j0p += bessel_a2[k]*zk;
     }
     *j0p *= -.5*z;
 
@@ -180,9 +246,8 @@ hankel( complex double z,
     complex double *h0, complex double *h0p )
 {
   int k, ib;
-  static int *m = NULL, init = FALSE;
-  static double *a1 = NULL, *a2 = NULL, *a3 = NULL;
-  static double *a4, psi, tst, zms;
+  static int init = FALSE;
+  static double psi, tst, zms;
   complex double clogz, j0, j0p, p0z, p1z, q0z, q1z;
   complex double y0 = CPLX_00, y0p = CPLX_00, zi, zi2, zk;
   static gboolean first_call = TRUE;
@@ -407,10 +472,6 @@ rom1( int n, complex double *sum, int nx )
   int jump, lstep, nogo, i, ns, nt;
   static double z, ze, s, ep, zend, dz=0.0, dzot=0.0, tr, ti;
   static complex double t00, t11, t02;
-  static complex double *g1 = NULL, *g2 = NULL;
-  static complex double *g3 = NULL, *g4 = NULL;
-  static complex double *g5 = NULL, *t01 = NULL;
-  static complex double *t10 = NULL, *t20 = NULL;
   static gboolean first_call = TRUE;
 
   if( first_call )
@@ -588,8 +649,6 @@ gshank( complex double start, complex double dela,
   int ibx, j, i, jm, intx, inx, brk=0, idx;
   static double rbk, amg, den, denm;
   complex double a1, a2, as1, as2, del, aa;
-  static complex double *q1 = NULL, *q2 = NULL;
-  static complex double *ans1 = NULL, *ans2 = NULL;
   static gboolean first_call = TRUE;
 
   if( first_call )
@@ -760,7 +819,6 @@ evlua( complex double *erv, complex double *ezv,
   int i, jump;
   static double del, slope, rmis;
   static complex double cp1, cp2, cp3, bk, delta, delta2;
-  static complex double *sum = NULL, *ans = NULL;
   static gboolean first_call = TRUE;
 
   if( first_call )

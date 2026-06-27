@@ -300,6 +300,19 @@ Ground_Parameters( void )
 
 /*-----------------------------------------------------------------------*/
 
+/* calc_data_free()
+ *
+ * Releases the per-FR-card frequency-loop descriptor array.
+ */
+  void
+calc_data_free( void )
+{
+  mem_array_free( &calc_data.freq_loop_data );
+
+} /* calc_data_free() */
+
+/*-----------------------------------------------------------------------*/
+
 /* Set_Interaction_Matrix()
  *
  * Sets and factors the interaction matrix

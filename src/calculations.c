@@ -580,6 +580,23 @@ double db20( double x )
 
 /*-----------------------------------------------------------------------*/
 
+/* Bivariate-interpolation grid-dimension tables, built once in intrp(). */
+static int *nda = NULL, *ndpa = NULL;
+
+/* calc_scratch_free()
+ *
+ * Releases the intrp() interpolation grid-dimension tables.
+ */
+  void
+calc_scratch_free( void )
+{
+  mem_array_free( &nda );
+  mem_array_free( &ndpa );
+
+} /* calc_scratch_free() */
+
+/*-----------------------------------------------------------------------*/
+
 /* intrp uses bivariate cubic interpolation to obtain */
 /* the values of 4 functions at the point (x,y). */
 void intrp( double x, double y, complex double *f1,
@@ -587,7 +604,6 @@ void intrp( double x, double y, complex double *f1,
 {
   static int ix, iy, ixs=-10, iys=-10, igrs=-10, ixeg=0, iyeg=0;
   static int nxm2, nym2, nxms, nyms, nd, ndp;
-  static int *nda = NULL, *ndpa = NULL;
   int jump;
   static double dx = 1.0, dy = 1.0, xs = 0.0, ys = 0.0, xz, yz;
   double xx, yy;

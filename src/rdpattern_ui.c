@@ -1126,6 +1126,19 @@ Alloc_Nearfield_Buffers( int n1, int n2, int n3 )
 
 /*-----------------------------------------------------------------------*/
 
+/* near_field_data_free()
+ *
+ * Releases the near E/H field point array.
+ */
+  void
+near_field_data_free( void )
+{
+  mem_array_free( &near_field.points );
+
+} /* near_field_data_free() */
+
+/*-----------------------------------------------------------------------*/
+
 /* Inverse_Scale_Gain()
  *
  * Calculates the actual dB value from a scaled gain value

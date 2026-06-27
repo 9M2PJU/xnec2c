@@ -29,10 +29,24 @@ fp_ant_temp_enabled(void)
   return isFlagSet(PLOT_ANT_TEMP) && isFlagSet(ENABLE_RDPAT);
 }
 
+/* Antenna-temperature trace buffers, reused across fp_ant_temp_render() calls. */
+static double *gt_buf = NULL, *temp_buf = NULL;
+
+/* fp_ant_temp_free()
+ *
+ * Releases the antenna-temperature trace buffers.
+ */
+  void
+fp_ant_temp_free( void )
+{
+  mem_array_free( &gt_buf );
+  mem_array_free( &temp_buf );
+
+} /* fp_ant_temp_free() */
+
   gboolean
 fp_ant_temp_render(fp_plot_ctx_t *ctx)
 {
-  static double *gt_buf = NULL, *temp_buf = NULL;
   char *titles[3];
   int idx;
 

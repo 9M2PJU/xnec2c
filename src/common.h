@@ -1278,6 +1278,23 @@ void Filechooser_Response(GtkDialog *dialog, gint response_id, int saveas_width,
 void Open_Nec2_Editor(int action);
 gboolean Nec2_Apply_Checkbutton(void);
 void Gtk_Quit(void);
+/* Exit-cleanup orchestration: named by-owner teardown invoked once after the
+ * event loop stops, before mem_report. */
+void xnec2c_cleanup(void);
+void main_windows_destroy(void);
+void input_data_free(void);
+void geometry_data_free(void);
+void ggrid_free(void);
+void near_field_data_free(void);
+void calc_data_free(void);
+void matrix_data_free(void);
+void fields_data_free(void);
+void calc_scratch_free(void);
+void somnec_data_free(void);
+void ground_data_free(void);
+void gnuplot_data_free(void);
+void child_procs_free(void);
+void freqplots_cleanup(void);
 void Nf_Peak_Vector(double exm, double eym, double ezm, double fx, double fy, double fz, double *rx, double *ry, double *rz, double *r);
 void Recompute_Near_Field_Vectors(int fstep, gboolean snapshot);
 void Draw_Colorcode(cairo_t *cr);

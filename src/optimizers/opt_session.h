@@ -94,6 +94,11 @@ int opt_start(simple_var_t *vars, int num_vars,
 void opt_cancel(void);
 
 /**
+ * opt_shutdown - cancel and join the worker, then free the session
+ */
+void opt_shutdown(void);
+
+/**
  * opt_is_running - check if optimizer thread is active
  */
 gboolean opt_is_running(void);

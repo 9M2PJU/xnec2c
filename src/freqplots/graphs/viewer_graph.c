@@ -29,10 +29,24 @@ fp_viewer_enabled(void)
   return isFlagSet(PLOT_GVIEWER) && isFlagSet(ENABLE_RDPAT);
 }
 
+/* Viewer-direction gain trace buffers, reused across fp_viewer_render() calls. */
+static double *vgain = NULL, *netgain = NULL;
+
+/* fp_viewer_free()
+ *
+ * Releases the viewer-direction gain trace buffers.
+ */
+  void
+fp_viewer_free( void )
+{
+  mem_array_free( &vgain );
+  mem_array_free( &netgain );
+
+} /* fp_viewer_free() */
+
   gboolean
 fp_viewer_render(fp_plot_ctx_t *ctx)
 {
-  static double *vgain = NULL, *netgain = NULL;
   char *titles[3];
 
   /* Plotting frame titles */

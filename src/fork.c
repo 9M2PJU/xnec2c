@@ -128,6 +128,22 @@ int read_exact(int fd, char *buf, int size)
 }
 
 
+/* pipe_fail_exit()
+ *
+ * Pipe teardown chokepoint.  In the forked child a broken pipe means the
+ * parent is gone; the parent reaches this only on an unrecoverable transfer
+ * error.  Child-side engine teardown is a stub left for a later change; both
+ * processes exit directly.
+ */
+  static void
+pipe_fail_exit( void )
+{
+  _exit( 0 );
+
+} /* pipe_fail_exit() */
+
+/*------------------------------------------------------------------------*/
+
 /* Read_Pipe()
  *
  * Reads data from a pipe (child and parent processes)
@@ -152,7 +168,7 @@ Read_Pipe( int idx, char *str, ssize_t len, gboolean err )
 	  if (retval == -1 && errno != EINTR)
 	  {
 		perror( "select()" );
-		_exit( 0 );
+		pipe_fail_exit();
 	  }
   } while (retval == -1 && errno == EINTR);
   
@@ -162,7 +178,7 @@ Read_Pipe( int idx, char *str, ssize_t len, gboolean err )
   {
     perror( "read()" );
     pr_err("child %d  length %d  return %d\n", idx, (int)len, (int)retval);
-    _exit( 0 );
+    pipe_fail_exit();
   }
   return( retval );
 
@@ -417,7 +433,7 @@ Write_Pipe( int idx, char *str, ssize_t len, gboolean err )
 	  if (retval == -1 && errno != EINTR)
 	  {
 		perror( "select()" );
-		_exit( 0 );
+		pipe_fail_exit();
 	  }
 
   } while (retval == -1 && errno == EINTR);
@@ -427,7 +443,7 @@ Write_Pipe( int idx, char *str, ssize_t len, gboolean err )
   if( (retval == -1) || ((retval != len) && err) )
   {
     perror( "write()" );
-    _exit( 0 );
+    pipe_fail_exit();
   }
 
   return( retval );

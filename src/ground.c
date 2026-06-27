@@ -47,6 +47,30 @@
 
 /*-------------------------------------------------------------------*/
 
+/* Romberg-integration ground-field scratch, reused across rom2() calls. */
+static complex double *g1 = NULL, *g2 = NULL, *g3 = NULL, *g4 = NULL, *g5 = NULL;
+static complex double *t01 = NULL, *t10 = NULL, *t20 = NULL;
+
+/* ground_data_free()
+ *
+ * Releases the rom2() Romberg-integration ground-field scratch buffers.
+ */
+  void
+ground_data_free( void )
+{
+  mem_array_free( &g1 );
+  mem_array_free( &g2 );
+  mem_array_free( &g3 );
+  mem_array_free( &g4 );
+  mem_array_free( &g5 );
+  mem_array_free( &t01 );
+  mem_array_free( &t10 );
+  mem_array_free( &t20 );
+
+} /* ground_data_free() */
+
+/*-----------------------------------------------------------------------*/
+
 /* segment to obtain the total field due to ground.  the method of */
 /* variable interval width romberg integration is used.  there are 9 */
 /* field components - the x, y, and z components due to constant, */
@@ -61,10 +85,6 @@ rom2( double a, double b,
   double z, s; /***also global***/
   double rx = 1.0e-4;
   complex double t00, t02, t11;
-  static complex double *g1 = NULL, *g2 = NULL;
-  static complex double *g3 = NULL, *g4 = NULL;
-  static complex double *t01 = NULL, *t10 = NULL;
-  static complex double *t20 = NULL, *g5 = NULL;
   static gboolean first_call = TRUE;
 
   if( first_call )

@@ -25,6 +25,8 @@
 #include "mem/mem_track.h"
 
 #include "opengl/opengl_structure.h"
+#include "sy_expr.h"
+#include "optimizers/opt_session.h"
 
 /*-----------------------------------------------------------------------*/
 
@@ -934,20 +936,90 @@ Gtk_Quit( void )
       kill( child_procs[num_child_procs]->pid, SIGKILL );
     }
 
-  /* Release prerender allocations */
-  prerender_state_free();
-  free_struct_colors();
-
-  /* Program-wide managed-allocator snapshot at teardown */
-  if( rc_config.mem_report_enabled )
-    mem_report("Gtk_Quit");
-
   /* Kill possibly nested loops */
   k = (int)gtk_main_level();
   for( i = 0; i < k; i++ )
     gtk_main_quit();
 
 } /* Gtk_Quit() */
+
+/*-----------------------------------------------------------------------*/
+
+/* main_windows_destroy()
+ *
+ * Destroys every top-level window, the SY overrides window included, to
+ * halt drawing and run each window's destroy chain before engine and view
+ * data are freed.  The SY window's chain frees its renderer.
+ */
+  void
+main_windows_destroy( void )
+{
+  Gtk_Widget_Destroy( &sy_overrides_window );
+  Gtk_Widget_Destroy( &nec2_edit_window );
+  Gtk_Widget_Destroy( &freqplots_window );
+  Gtk_Widget_Destroy( &rdpattern_window );
+  Gtk_Widget_Destroy( &main_window );
+
+} /* main_windows_destroy() */
+
+/*-----------------------------------------------------------------------*/
+
+/* xnec2c_cleanup()
+ *
+ * Frees every mem-tracked owner in reverse read-order, then emits the report.
+ * Run once after gtk_main() returns and at the forked child's exit.  The event
+ * loop has stopped, so destroying the windows below is the only remaining path
+ * that reads engine data.  Free each structure only after every reader is gone.
+ */
+  void
+xnec2c_cleanup( void )
+{
+  /* Stop the optimizer worker and free its session before any structure it
+   * reads is torn down: opt_cancel signals the thread; the join confirms exit. */
+  opt_shutdown();
+
+  /* Destroy every top-level window to halt drawing and run each destroy chain;
+   * the SY window's chain frees its renderer. */
+  main_windows_destroy();
+
+  /* Free the views and prerendered colors that no widget can reach now. */
+  view_free( &structure_view );
+  view_free( &rdpattern_view );
+  prerender_state_free();
+  free_struct_colors();
+
+  /* Free the frequency-plot views before the freq_loop_data array their
+   * entries point into. */
+  freqplots_cleanup();
+
+  /* Free the engine data buffers, then the freq_loop_data array. */
+  input_data_free();
+  geometry_data_free();
+  ggrid_free();
+  near_field_data_free();
+  calc_data_free();
+
+  /* Free the engine scratch buffers kept in file-scope statics. */
+  fields_data_free();
+  ground_data_free();
+  somnec_data_free();
+  matrix_data_free();
+  calc_scratch_free();
+  gnuplot_data_free();
+
+  /* Free the symbol table now that the worker and renderer have stopped
+   * reading it. */
+  sy_cleanup();
+
+  /* Free the per-process singletons. */
+  child_procs_free();
+  mem_free( &orig_numeric_locale );
+
+  /* Emit the report now; an empty registry makes any survivor an ownership bug. */
+  if( rc_config.mem_report_enabled )
+    mem_report("xnec2c_cleanup");
+
+} /* xnec2c_cleanup() */
 
 /*-----------------------------------------------------------------------*/
 

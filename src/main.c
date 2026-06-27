@@ -615,10 +615,29 @@ main (int argc, char *argv[])
 
   gtk_main ();
 
-  mem_free(&orig_numeric_locale);
+  /* Release every mem-tracked owner by name, then emit the report. */
+  xnec2c_cleanup();
 
   return 0;
 } // main()
+
+/*-----------------------------------------------------------------------*/
+
+/* child_procs_free()
+ *
+ * Releases each child-process slot struct, then the child_procs array.
+ */
+  void
+child_procs_free( void )
+{
+  size_t i, n = mem_array_count( child_procs );
+
+  for( i = 0; i < n; i++ )
+    mem_free( &child_procs[i] );
+
+  mem_free( &child_procs );
+
+} /* child_procs_free() */
 
 /*-----------------------------------------------------------------------*/
 

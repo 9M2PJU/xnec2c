@@ -66,6 +66,71 @@ static gboolean parse_field_with_expression(const char **line_ptr, char **endptr
 
 /*------------------------------------------------------------------------*/
 
+/* input_data_free()
+ *
+ * Releases the managed members of the NEC2 input-data structures: comment
+ * lines, the per-frequency save buffers, segment currents, loads, sources,
+ * impedance results, network parameters, and the symmetric-matrix store.
+ */
+  void
+input_data_free( void )
+{
+  int i;
+
+  for( i = 0; i < comments.num; i++ )
+    mem_free( &comments.lines[i] );
+  mem_array_free( &comments.lines );
+  comments.num = 0;
+
+  mem_array_free( &save.xtemp );
+  mem_array_free( &save.ytemp );
+  mem_array_free( &save.ztemp );
+  mem_array_free( &save.sitemp );
+  mem_array_free( &save.bitemp );
+  mem_array_free( &save.ip );
+  mem_array_free( &save.freq );
+  mem_array_free( &save.fstep );
+
+  mem_array_free( &crnt.air );
+  mem_array_free( &crnt.aii );
+  mem_array_free( &crnt.bir );
+  mem_array_free( &crnt.bii );
+  mem_array_free( &crnt.cir );
+  mem_array_free( &crnt.cii );
+  mem_array_free( &crnt.cur );
+
+  mem_array_free( &zload.zarray );
+  mem_array_free( &zload.ldsegn );
+  mem_array_free( &zload.ldtype );
+
+  mem_array_free( &vsorc.isant );
+  mem_array_free( &vsorc.ivqd );
+  mem_array_free( &vsorc.iqds );
+  mem_array_free( &vsorc.vqd );
+  mem_array_free( &vsorc.vqds );
+  mem_array_free( &vsorc.vsant );
+
+  mem_array_free( &impedance_data.zreal );
+  mem_array_free( &impedance_data.zimag );
+  mem_array_free( &impedance_data.zmagn );
+  mem_array_free( &impedance_data.zphase );
+
+  mem_array_free( &netcx.iseg1 );
+  mem_array_free( &netcx.iseg2 );
+  mem_array_free( &netcx.ntyp );
+  mem_array_free( &netcx.x11r );
+  mem_array_free( &netcx.x11i );
+  mem_array_free( &netcx.x12r );
+  mem_array_free( &netcx.x12i );
+  mem_array_free( &netcx.x22r );
+  mem_array_free( &netcx.x22i );
+
+  mem_array_free( &smat.ssx );
+
+} /* input_data_free() */
+
+/*------------------------------------------------------------------------*/
+
 /* Read_Comments()
  *
  * Reads CM comment cards from input file

@@ -249,6 +249,22 @@ ekscx( double bx, double s, double z,
 
 /*-----------------------------------------------------------------------*/
 
+/* Ground-reflection field scratch, reused across efld() calls. */
+static complex double *egnd = NULL;
+
+/* fields_data_free()
+ *
+ * Releases the efld() ground-reflection scratch buffer.
+ */
+  void
+fields_data_free( void )
+{
+  mem_array_free( &egnd );
+
+} /* fields_data_free() */
+
+/*-----------------------------------------------------------------------*/
+
 /* compute near e fields of a segment with sine, cosine, and */
 /* constant currents.  ground effect included. */
   void
@@ -271,7 +287,6 @@ efld( double xi, double yi,
   double xymag, xspec = 0.0, yspec = 0.0, rhospc = 0.0, dmin;
   complex double epx, epy, refs, refps, zrsin, zratx = 0.0, zscrn = 0.0;
   complex double tezs, ters, tezc = 0.0, terc = 0.0, tezk = 0.0, terk = 0.0;
-  static complex double *egnd = NULL;
   mem_array_alloc(&egnd, 9);
 
   xij= xi- dataj.xj;

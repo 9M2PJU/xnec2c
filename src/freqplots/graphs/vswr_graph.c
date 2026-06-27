@@ -29,10 +29,24 @@ fp_vswr_enabled(void)
   return isFlagSet(PLOT_VSWR);
 }
 
+/* VSWR and S11 trace buffers, reused across fp_vswr_render() calls. */
+static double *vswr = NULL, *s11 = NULL;
+
+/* fp_vswr_free()
+ *
+ * Releases the VSWR and S11 trace buffers.
+ */
+  void
+fp_vswr_free( void )
+{
+  mem_array_free( &vswr );
+  mem_array_free( &s11 );
+
+} /* fp_vswr_free() */
+
   gboolean
 fp_vswr_render(fp_plot_ctx_t *ctx)
 {
-  static double *vswr = NULL, *s11 = NULL;
   char *titles[3];
   int idx;
 

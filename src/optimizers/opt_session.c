@@ -143,6 +143,33 @@ static void *opt_thread_func(void *arg)
 /*------------------------------------------------------------------------*/
 
 /**
+ * opt_session_free - join the worker thread and release the active session
+ *
+ * Single source for tearing down active_session: waits for the worker to
+ * exit, releases the optimizer, fitness config, simplex step sizes, and the
+ * mutex, then frees and clears the session pointer.
+ */
+static void opt_session_free(void)
+{
+	if (active_session == NULL)
+	{
+		return;
+	}
+
+	pthread_join(active_session->thread, NULL);
+	simple_free(active_session->simple);
+	fitness_config_free(&active_session->fitness_cfg);
+	if (active_session->simple_cfg.algorithm == OPT_SIMPLEX)
+	{
+		mem_free(&active_session->simple_cfg.opts.simplex.ssize);
+	}
+	g_mutex_clear(&active_session->best_lock);
+	mem_free(&active_session);
+}
+
+/*------------------------------------------------------------------------*/
+
+/**
  * opt_start - launch optimizer in background thread
  */
 int opt_start(simple_var_t *vars, int num_vars,
@@ -160,18 +187,7 @@ int opt_start(simple_var_t *vars, int num_vars,
 	}
 
 	/* Free previous session */
-	if (active_session != NULL)
-	{
-		simple_free(active_session->simple);
-		fitness_config_free(&active_session->fitness_cfg);
-		if (active_session->simple_cfg.algorithm == OPT_SIMPLEX)
-		{
-			mem_free(&active_session->simple_cfg.opts.simplex.ssize);
-		}
-		g_mutex_clear(&active_session->best_lock);
-		mem_free(&active_session);
-		active_session = NULL;
-	}
+	opt_session_free();
 
 	mem_new(&session);
 	g_mutex_init(&session->best_lock);
@@ -236,8 +252,6 @@ int opt_start(simple_var_t *vars, int num_vars,
 		goto cleanup;
 	}
 
-	pthread_detach(session->thread);
-
 	return 0;
 
 cleanup:
@@ -263,6 +277,25 @@ void opt_cancel(void)
 	}
 
 	simple_cancel(active_session->simple);
+}
+
+/*------------------------------------------------------------------------*/
+
+/**
+ * opt_shutdown - cancel the running optimizer, join its thread, free session
+ *
+ * Exit-path teardown: signals the worker to stop, blocks until it has exited,
+ * then releases the session.  Idempotent and safe when no optimizer ever ran.
+ */
+void opt_shutdown(void)
+{
+	if (active_session == NULL)
+	{
+		return;
+	}
+
+	opt_cancel();
+	opt_session_free();
 }
 
 /*------------------------------------------------------------------------*/

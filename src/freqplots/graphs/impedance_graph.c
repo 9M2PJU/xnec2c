@@ -31,11 +31,27 @@ fp_impedance_enabled(void)
       isFlagSet(PLOT_SMITH);
 }
 
+/* Impedance trace buffers, reused across fp_impedance_render() calls. */
+static double *zreal_c = NULL, *zimag_c = NULL;
+static double *zmagn_c = NULL, *zphase_c = NULL;
+
+/* fp_impedance_free()
+ *
+ * Releases the impedance trace buffers.
+ */
+  void
+fp_impedance_free( void )
+{
+  mem_array_free( &zreal_c );
+  mem_array_free( &zimag_c );
+  mem_array_free( &zmagn_c );
+  mem_array_free( &zphase_c );
+
+} /* fp_impedance_free() */
+
   gboolean
 fp_impedance_render(fp_plot_ctx_t *ctx)
 {
-  static double *zreal_c = NULL, *zimag_c = NULL;
-  static double *zmagn_c = NULL, *zphase_c = NULL;
   char *titles[3];
 
   mem_array_realloc(&zreal_c, ctx->num_fsteps);

@@ -788,6 +788,33 @@ freqloop_card_of_fmhz( double fmhz )
   return -1;
 }
 
+/* Frequency-plot scratch arrays built per redraw in _Plot_Frequency_Data():
+ * the compact valid-step index, its plotted values, and per-card step counts.
+ * Capacity holds every sweep step plus the green-line extra slot. */
+static int    *valid_steps_map = NULL;
+static double *fplot           = NULL;
+static int    *card_nfsteps    = NULL;
+
+/* freqplots_cleanup()
+ *
+ * Releases the frequency-plot scratch arrays and every graph type's trace
+ * buffers at program exit.
+ */
+  void
+freqplots_cleanup( void )
+{
+  mem_array_free( &valid_steps_map );
+  mem_array_free( &fplot );
+  mem_array_free( &card_nfsteps );
+
+  fp_gain_free();
+  fp_viewer_free();
+  fp_vswr_free();
+  fp_impedance_free();
+  fp_ant_temp_free();
+
+} /* freqplots_cleanup() */
+
 /* Plot_Frequency_Data()
  *
  * Plots a graph of frequency-dependent parameters
@@ -839,9 +866,6 @@ _Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
 
   /* Build compact index list; out-of-order arrivals appear immediately.
    * Capacity holds every sweep step plus the green-line extra slot. */
-  static int    *valid_steps_map = NULL;
-  static double *fplot           = NULL;
-  static int    *card_nfsteps    = NULL;
   mem_array_realloc(&valid_steps_map, (calc_data.steps_total + 1));
   mem_array_realloc(&fplot, (calc_data.steps_total + 1));
   mem_array_realloc(&card_nfsteps, calc_data.FR_cards);

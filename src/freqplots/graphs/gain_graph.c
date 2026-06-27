@@ -29,11 +29,28 @@ fp_gain_enabled(void)
   return isFlagSet(PLOT_GMAX) && isFlagSet(ENABLE_RDPAT);
 }
 
+/* Max-gain plot trace buffers, reused across fp_gain_render() calls. */
+static double *gmax = NULL, *netgain = NULL;
+static double *gdir_tht = NULL, *gdir_phi = NULL, *fbratio = NULL;
+
+/* fp_gain_free()
+ *
+ * Releases the max-gain plot trace buffers.
+ */
+  void
+fp_gain_free( void )
+{
+  mem_array_free( &gmax );
+  mem_array_free( &netgain );
+  mem_array_free( &gdir_tht );
+  mem_array_free( &gdir_phi );
+  mem_array_free( &fbratio );
+
+} /* fp_gain_free() */
+
   gboolean
 fp_gain_render(fp_plot_ctx_t *ctx)
 {
-  static double *gmax = NULL, *netgain = NULL;
-  static double *gdir_tht = NULL, *gdir_phi = NULL, *fbratio = NULL;
   char *titles[3];
   gboolean no_fbr;
   int idx;
