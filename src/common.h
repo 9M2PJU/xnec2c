@@ -109,7 +109,7 @@ typedef struct Segment
 #define PCHCON  100000
 
 /* Max length of a line read from input file */
-#define LINE_LEN    135
+#define LINE_LEN    512
 
 /* Max length of strings used for creating file names */
 #define FILENAME_LEN    PATH_MAX
