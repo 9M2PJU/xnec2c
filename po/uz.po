@@ -18,122 +18,124 @@ msgstr ""
 
 #: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2194
 msgid "xnec2c"
-msgstr ""
+msgstr "xnec2c"
 
 #: files/xnec2c.desktop.in:4
 msgid "NEC2 Simulator"
-msgstr ""
+msgstr "NEC2 Simulyatori"
 
 #: files/xnec2c.desktop.in:5
 msgid "Numerical Electromagnetics Code software"
-msgstr ""
+msgstr "Raqamli elektromagnitizm kodi dasturi"
 
 #: files/xnec2c.desktop.in:11
 msgid "nec2;em;simulator;"
-msgstr ""
+msgstr "nec2;em;simulator;"
 
 #: resources/settings/cairo_settings.glade:34
 msgid "Anti-aliasing"
-msgstr ""
+msgstr "Anti-aliasing"
 
 #: resources/settings/cairo_settings.glade:42
 msgid "Default"
-msgstr ""
+msgstr "Standart"
 
 #: resources/settings/cairo_settings.glade:49
 msgid "Fast"
-msgstr ""
+msgstr "Tez"
 
 #: resources/settings/cairo_settings.glade:56
 msgid "None"
-msgstr ""
+msgstr "Yoʻq"
 
 #: resources/settings/cairo_settings.glade:68
 msgid "Color Quantization"
-msgstr ""
+msgstr "Rangni kvantlash"
 
 #: resources/settings/cairo_settings.glade:77
 msgid "Off"
-msgstr ""
+msgstr "Oʻchiq"
 
 #: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4100
 msgid "8"
-msgstr ""
+msgstr "8"
 
 #: resources/settings/cairo_settings.glade:91
 msgid "64"
-msgstr ""
+msgstr "64"
 
 #: resources/settings/cairo_settings.glade:98
 msgid "128"
-msgstr ""
+msgstr "128"
 
 #: resources/settings/cairo_settings.glade:105
 msgid "256"
-msgstr ""
+msgstr "256"
 
 #: resources/settings/cairo_settings.glade:117
 msgid "Line Cap"
-msgstr ""
+msgstr "Chiziq uchi"
 
 #: resources/settings/cairo_settings.glade:125
 msgid "Butt"
-msgstr ""
+msgstr "Tekis"
 
 #: resources/settings/cairo_settings.glade:132
 msgid "Round"
-msgstr ""
+msgstr "Yumaloq"
 
 #: resources/settings/cairo_settings.glade:139
 msgid "Square"
-msgstr ""
+msgstr "Toʻrtburchak"
 
 #: resources/settings/cairo_settings.glade:151
 msgid "Depth Bins"
-msgstr ""
+msgstr "Chuqurlik qutilari"
 
 #: resources/settings/cairo_settings.glade:184
 #: resources/settings/opengl_settings.glade:533
 #: resources/settings/render_settings.glade:50
 msgid "Reset to _Defaults"
-msgstr ""
+msgstr "_Standartga qaytarish"
 
 #: resources/settings/opengl_settings.glade:493
 msgid "Visual only — does not affect NEC2 model calculations."
-msgstr ""
+msgstr "Faqat vizual — NEC2 model hisoblariga taʼsir qilmaydi."
 
 #: resources/settings/render_settings.glade:72
 msgid "Rendering Settings"
-msgstr ""
+msgstr "Rendering sozlamalari"
 
 #: resources/settings/render_settings.glade:116
 #: resources/sy_overrides.glade:744
 msgid "_Close"
-msgstr ""
+msgstr "_Yopish"
 
 #: resources/sy_overrides.glade:34
 msgid "Symbol Overrides"
-msgstr ""
+msgstr "Belgilarni almashtirish"
 
 #: resources/sy_overrides.glade:688
 msgid "_Auto Apply"
-msgstr ""
+msgstr "_Avtomatik qoʻllash"
 
 #: resources/sy_overrides.glade:693
 msgid "Automatically apply changes and reload model after 300ms delay"
 msgstr ""
+"Oʻzgarishlarni avtomatik qoʻllash va modelni 300ms kechikishdan soʻng qayta "
+"yuklash"
 
 #: resources/sy_overrides.glade:714 src/geom_edit.c:2866
 msgid "_Apply"
-msgstr ""
+msgstr "_Qoʻllash"
 
 #: resources/sy_overrides.glade:729 src/geom_edit.c:2865
 msgid "_Cancel"
-msgstr ""
+msgstr "_Bekor qilish"
 
 #: resources/xnec2c.glade:14
 msgid "(C) 2007-2022 Neoklis Kyriazis"
-msgstr ""
+msgstr "(C) 2007-2022 Neoklis Kyriazis"
 
 #: resources/xnec2c.glade:15
 msgid ""
@@ -152,152 +154,179 @@ msgid ""
 "PLEASE read the documentation in the doc/ sub-directory as xnec2c is not "
 "fully compatible with NEC2 input files and it works in different ways!"
 msgstr ""
+"xnec2c — nec2c ning oʻzgartirilgan versiyasi atrofidagi interaktiv grafik "
+"qobiq boʻlib, nec2c oʻzi asl FORTRAN NEC2 Raqamli Elektromagnitizm kodining "
+"C tiliga tarjimasi hisoblanadi.\n"
+"\n"
+"xnec2c chastotaga bogʻliq maʼlumotlarni (kuchaytirish, kirish impedansi, "
+"VSWR va h.k.) grafik shaklda koʻrsatishi mumkin. U shuningdek nurlanish "
+"diagrammasi maʼlumotlarini aylanuvchi sim karkas formatida va yaqin maydonni "
+"(E, H, S vektorlar) tarmoq formatida koʻrsata oladi.\n"
+"\n"
+"xnec2c da antenna tavsif fayllarini yaratish yoki tahrirlash va NEC2 "
+"buyruqlarini belgilashni osonlashtiruvchi oʻrnatilgan NEC2 kirish fayli "
+"muharriri mavjud.\n"
+"\n"
+"Iltimos, doc/ kichik katalogidagi hujjatni oʻqing, chunki xnec2c NEC2 kirish "
+"fayllari bilan toʻliq mos kelmaydi va turlicha ishlaydi!"
 
 #. TRANSLATORS: Replace this string with your names, one name per line.
 #: resources/xnec2c.glade:27
 msgid "translator-credits"
-msgstr ""
+msgstr "Avtomatik tarjima, 2026"
 
 #: resources/xnec2c.glade:75 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
 #: src/rdpattern_ui.c:344
 msgid "Near Field Animation"
-msgstr ""
+msgstr "Yaqin maydon animatsiyasi"
 
 #: resources/xnec2c.glade:167
 msgid ""
 "Scrub the animation phase manually.\n"
 "Disabled while the animation is running."
 msgstr ""
+"Animatsiya fazasini qoʻlda boshqarish.\n"
+"Animatsiya ishlayotganda oʻchirilgan."
 
 #: resources/xnec2c.glade:184
 msgid "φ 0°"
-msgstr ""
+msgstr "φ 0°"
 
 #: resources/xnec2c.glade:198
 msgid "Phase"
-msgstr ""
+msgstr "Faza"
 
 #: resources/xnec2c.glade:221
 msgid "Frames/Sec"
-msgstr ""
+msgstr "Kadr/soniya"
 
 #: resources/xnec2c.glade:234
 msgid "Animate Freq (Hz)"
-msgstr ""
+msgstr "Animatsiya chastotasi (Hz)"
 
 #: resources/xnec2c.glade:309
 msgid "Show currents"
-msgstr ""
+msgstr "Tokni koʻrsatish"
 
 #: resources/xnec2c.glade:313
 msgid ""
 "Animate current magnitude and direction along the wires.\n"
 "Mirrors the Currents button in the main window."
 msgstr ""
+"Simlardagi tok kattaligi va yoʻnalishini animatsiya qilish.\n"
+"Asosiy oynадаги Toklar tugmasini aks ettiradi."
 
 #: resources/xnec2c.glade:328
 msgid "Flow direction:"
-msgstr ""
+msgstr "Oqim yoʻnalishi:"
 
 #: resources/xnec2c.glade:340
 msgid ""
 "Select how the animated current flow is rendered.\n"
 "Mirrors the Flow direction setting in the main window."
 msgstr ""
+"Animatsiya qilingan tok oqimi qanday koʻrsatilishini tanlang.\n"
+"Asosiy oynаdagi Oqim yoʻnalishi sozlamasini aks ettiradi."
 
 #: resources/xnec2c.glade:342
 msgid "Reference phase"
-msgstr ""
+msgstr "Tayanch faza"
 
 #: resources/xnec2c.glade:343
 msgid "LIC"
-msgstr ""
+msgstr "LIC"
 
 #: resources/xnec2c.glade:344
 msgid "Wireframe"
-msgstr ""
+msgstr "Sim karkas"
 
 #: resources/xnec2c.glade:360
 msgid "Structure"
-msgstr ""
+msgstr "Tuzilma"
 
 #: resources/xnec2c.glade:384
 msgid "Near E field"
-msgstr ""
+msgstr "Yaqin E maydoni"
 
 #: resources/xnec2c.glade:388
 msgid ""
 "Show the near electric field vectors while animating.\n"
 "Enable by opening the radiation pattern window."
 msgstr ""
+"Animatsiya paytida yaqin elektr maydoni vektorlarini koʻrsatish.\n"
+"Nurlanish diagrammasi oynasini ochib faollashtiring."
 
 #: resources/xnec2c.glade:400
 msgid "Near H field"
-msgstr ""
+msgstr "Yaqin H maydoni"
 
 #: resources/xnec2c.glade:404
 msgid ""
 "Show the near magnetic field vectors while animating.\n"
 "Enable by opening the radiation pattern window."
 msgstr ""
+"Animatsiya paytida yaqin magnit maydoni vektorlarini koʻrsatish.\n"
+"Nurlanish diagrammasi oynasini ochib faollashtiring."
 
 #: resources/xnec2c.glade:416
 msgid "Poynting vector"
-msgstr ""
+msgstr "Poyinting vektori"
 
 #: resources/xnec2c.glade:420
 msgid ""
 "Show the Poynting power-flow vectors while animating.\n"
 "Enable by opening the radiation pattern window."
 msgstr ""
+"Animatsiya paytida Poyinting quvvat oqimi vektorlarini koʻrsatish.\n"
+"Nurlanish diagrammasi oynasini ochib faollashtiring."
 
 #: resources/xnec2c.glade:436
 msgid "Near Field"
-msgstr ""
+msgstr "Yaqin maydon"
 
 #: resources/xnec2c.glade:516
 msgid "Arc Element (GA card)"
-msgstr ""
+msgstr "Yoy elementi (GA kartasi)"
 
 #: resources/xnec2c.glade:544 resources/xnec2c.glade:1579
 #: resources/xnec2c.glade:4006 resources/xnec2c.glade:15064 src/cmnd_edit.c:488
 msgid "Tag Number"
-msgstr ""
+msgstr "Teg raqami"
 
 #: resources/xnec2c.glade:557 resources/xnec2c.glade:15159
 msgid "No. Segments"
-msgstr ""
+msgstr "Segmentlar soni"
 
 #: resources/xnec2c.glade:570 resources/xnec2c.glade:4032
 #: resources/xnec2c.glade:15255
 msgid "Segs % lambda"
-msgstr ""
+msgstr "Segmentlar % lambda"
 
 #: resources/xnec2c.glade:583 resources/xnec2c.glade:4045
 #: resources/xnec2c.glade:15351
 msgid "Wire Diameter"
-msgstr ""
+msgstr "Sim diametri"
 
 #: resources/xnec2c.glade:671
 msgid "Radius from Y"
-msgstr ""
+msgstr "Y dan radius"
 
 #: resources/xnec2c.glade:684
 msgid "End 1 Angle"
-msgstr ""
+msgstr "1-uchi burchagi"
 
 #: resources/xnec2c.glade:697
 msgid "End 2 Angle"
-msgstr ""
+msgstr "2-uchi burchagi"
 
 #: resources/xnec2c.glade:710 resources/xnec2c.glade:4242
 #: resources/xnec2c.glade:15416 src/cmnd_edit.c:2024
 msgid "Conductivity S/m"
-msgstr ""
+msgstr "Oʻtkazuvchanlik S/m"
 
 #: resources/xnec2c.glade:808
 msgid "Wire Arc Data"
-msgstr ""
+msgstr "Sim yoy maʼlumotlari"
 
 #: resources/xnec2c.glade:870 resources/xnec2c.glade:1106
 #: resources/xnec2c.glade:1906 resources/xnec2c.glade:2129
@@ -311,1663 +340,1666 @@ msgstr ""
 #: resources/xnec2c.glade:14270 resources/xnec2c.glade:14869
 #: resources/xnec2c.glade:15705 resources/xnec2c.glade:15905
 msgid "Delete Card"
-msgstr ""
+msgstr "Kartani oʻchirish"
 
 #: resources/xnec2c.glade:948
 msgid "Cylindrical Structure (GR card)"
-msgstr ""
+msgstr "Silindrli tuzilma (GR kartasi)"
 
 #: resources/xnec2c.glade:978 resources/xnec2c.glade:9641
 msgid "Tag Number Increment"
-msgstr ""
+msgstr "Teg raqami orttirmasi"
 
 #: resources/xnec2c.glade:991
 msgid "Number of Structures"
-msgstr ""
+msgstr "Tuzilmalar soni"
 
 #: resources/xnec2c.glade:1045
 msgid "Cylindrical Structure"
-msgstr ""
+msgstr "Silindrli tuzilma"
 
 #: resources/xnec2c.glade:1171
 msgid "Xnec2c Error"
-msgstr ""
+msgstr "Xnec2c xatosi"
 
 #: resources/xnec2c.glade:1279
 msgid "Error"
-msgstr ""
+msgstr "Xato"
 
 #: resources/xnec2c.glade:1358
 msgid "Excitation Command (EX Card)"
-msgstr ""
+msgstr "Qoʻzgʻatish buyruqi (EX kartasi)"
 
 #: resources/xnec2c.glade:1384
 msgid "Incident LH Wave"
-msgstr ""
+msgstr "Tushuvchi chap qoʻl toʻlqini"
 
 #: resources/xnec2c.glade:1400
 msgid "Incident Linear Wave "
-msgstr ""
+msgstr "Tushuvchi chiziqli toʻlqin "
 
 #: resources/xnec2c.glade:1416
 msgid "Current Source"
-msgstr ""
+msgstr "Tok manbai"
 
 #: resources/xnec2c.glade:1432
 msgid "Incident RH Wave"
-msgstr ""
+msgstr "Tushuvchi oʻng qoʻl toʻlqini"
 
 #: resources/xnec2c.glade:1448
 msgid "Current Slope Discontinuity"
-msgstr ""
+msgstr "Tok qiyaligi uzilishi"
 
 #: resources/xnec2c.glade:1464
 msgid "Voltage Source"
-msgstr ""
+msgstr "Kuchlanish manbai"
 
 #: resources/xnec2c.glade:1486
 msgid "Excitation Type"
-msgstr ""
+msgstr "Qoʻzgʻatish turi"
 
 #: resources/xnec2c.glade:1511
 msgid "Maximum Admittance Matrix Asymmetry"
-msgstr ""
+msgstr "Admittans matritsasi maksimal assimetriyasi"
 
 #: resources/xnec2c.glade:1527
 msgid "Impedance of Source Segment"
-msgstr ""
+msgstr "Manba segmentining impedansi"
 
 #: resources/xnec2c.glade:1549
 msgid "Print Control"
-msgstr ""
+msgstr "Chop etish boshqaruvi"
 
 #: resources/xnec2c.glade:1592 src/cmnd_edit.c:489
 msgid "Segment Number"
-msgstr ""
+msgstr "Segment raqami"
 
 #: resources/xnec2c.glade:1641
 msgid "Voltage - Real Part"
-msgstr ""
+msgstr "Kuchlanish - haqiqiy qism"
 
 #: resources/xnec2c.glade:1654
 msgid "Voltage - Imaginary Part"
-msgstr ""
+msgstr "Kuchlanish - mavhum qism"
 
 #: resources/xnec2c.glade:1667
 msgid "Eta"
-msgstr ""
+msgstr "Eta"
 
 #: resources/xnec2c.glade:1737
 msgid "Theta"
-msgstr ""
+msgstr "Theta"
 
 #: resources/xnec2c.glade:1750
 msgid "Phi"
-msgstr ""
+msgstr "Phi"
 
 #: resources/xnec2c.glade:1763
 msgid "Ratio"
-msgstr ""
+msgstr "Nisbat"
 
 #: resources/xnec2c.glade:1844
 msgid "Excitation Parameters"
-msgstr ""
+msgstr "Qoʻzgʻatish parametrlari"
 
 #: resources/xnec2c.glade:1971
 msgid "Execute Command (XQ Card)"
-msgstr ""
+msgstr "Buyruqni bajarish (XQ kartasi)"
 
 #: resources/xnec2c.glade:1998
 msgid "No Pattern Cuts"
-msgstr ""
+msgstr "Kesimlar yoʻq"
 
 #: resources/xnec2c.glade:2014
 msgid "Pattern in XZ Plane"
-msgstr ""
+msgstr "XZ tekisligidagi diagramma"
 
 #: resources/xnec2c.glade:2030
 msgid "Pattern in YZ Plane"
-msgstr ""
+msgstr "YZ tekisligidagi diagramma"
 
 #: resources/xnec2c.glade:2046
 msgid "Both XZ/YZ Patterns"
-msgstr ""
+msgstr "XZ/YZ diagrammalar ikkisi ham"
 
 #: resources/xnec2c.glade:2068
 msgid "Execute Command"
-msgstr ""
+msgstr "Buyruqni bajarish"
 
 #: resources/xnec2c.glade:2299
 msgid "Frequency Command (FR Card)"
-msgstr ""
+msgstr "Chastota buyruqi (FR kartasi)"
 
 #: resources/xnec2c.glade:2324
 msgid "Additive Stepping"
-msgstr ""
+msgstr "Qoʻshimcha bosqich"
 
 #: resources/xnec2c.glade:2341
 msgid "Multiplicative Stepping"
-msgstr ""
+msgstr "Koʻpaytiruvchi bosqich"
 
 #: resources/xnec2c.glade:2364
 msgid "Frequency Stepping"
-msgstr ""
+msgstr "Chastota bosqichi"
 
 #: resources/xnec2c.glade:2394
 msgid "No. Frequency Points"
-msgstr ""
+msgstr "Chastota nuqtalari soni"
 
 #: resources/xnec2c.glade:2425
 msgid "Start Frequency (MHz)"
-msgstr ""
+msgstr "Boshlangʻich chastota (MHz)"
 
 #: resources/xnec2c.glade:2457
 msgid "Frequency Step (MHz)"
-msgstr ""
+msgstr "Chastota bosqichi (MHz)"
 
 #: resources/xnec2c.glade:2490
 msgid "End Frequency (MHz)"
-msgstr ""
+msgstr "Oxirgi chastota (MHz)"
 
 #: resources/xnec2c.glade:2526
 msgid "Frequency Stepping Parameters"
-msgstr ""
+msgstr "Chastota bosqichi parametrlari"
 
 #: resources/xnec2c.glade:2652
 msgid "Geometry End (GE Card)"
-msgstr ""
+msgstr "Geometriya oxiri (GE kartasi)"
 
 #: resources/xnec2c.glade:2677
 msgid "No Ground, Free Space condition"
-msgstr ""
+msgstr "Er yoʻq, erkin boʻshliq sharoiti"
 
 #: resources/xnec2c.glade:2694
 msgid "Ground present, Structure reflection"
-msgstr ""
+msgstr "Er mavjud, tuzilma aksi"
 
 #: resources/xnec2c.glade:2711
 msgid "Ground present, no Structure reflection"
-msgstr ""
+msgstr "Er mavjud, tuzilma aksi yoʻq"
 
 #: resources/xnec2c.glade:2734
 msgid "Ground Plane type"
-msgstr ""
+msgstr "Er tekisligi turi"
 
 #: resources/xnec2c.glade:2868
 msgid "Ground Parameters (GD Card)"
-msgstr ""
+msgstr "Er parametrlari (GD kartasi)"
 
 #: resources/xnec2c.glade:2897 resources/xnec2c.glade:3366
 #: resources/xnec2c.glade:3452
 msgid "Relative Dielectric Const."
-msgstr ""
+msgstr "Nisbiy dielektrik oʻtkazuvchanlik"
 
 #: resources/xnec2c.glade:2929 resources/xnec2c.glade:3485
 msgid "Distance to 2nd Medium"
-msgstr ""
+msgstr "2-muhitga masofa"
 
 #: resources/xnec2c.glade:2961 resources/xnec2c.glade:3398
 #: resources/xnec2c.glade:3517
 msgid "Ground Conductivity S/m"
-msgstr ""
+msgstr "Er oʻtkazuvchanligi S/m"
 
 #: resources/xnec2c.glade:2993 resources/xnec2c.glade:3549
 msgid "Dist. below 1st Medium"
-msgstr ""
+msgstr "1-muhitdan past masofa"
 
 #: resources/xnec2c.glade:3029 resources/xnec2c.glade:3585
 msgid "2nd Medium Parameters"
-msgstr ""
+msgstr "2-muhit parametrlari"
 
 #: resources/xnec2c.glade:3210
 msgid "Ground Parameters (GN & GD Cards)"
-msgstr ""
+msgstr "Er parametrlari (GN va GD kartalari)"
 
 #: resources/xnec2c.glade:3237
 msgid "Perfect Ground"
-msgstr ""
+msgstr "Ideal er"
 
 #: resources/xnec2c.glade:3253
 msgid "Sommerfeld/Norton"
-msgstr ""
+msgstr "Sommerfeld/Norton"
 
 #: resources/xnec2c.glade:3269
 msgid "Radial Ground Screen"
-msgstr ""
+msgstr "Radial er ekrani"
 
 #: resources/xnec2c.glade:3284
 msgid "Reflection Coeff. Approx"
-msgstr ""
+msgstr "Aks koeff. taxmin"
 
 #: resources/xnec2c.glade:3300
 msgid "Nullify Previous Params"
-msgstr ""
+msgstr "Oldingi parametrlarni bekor qilish"
 
 #: resources/xnec2c.glade:3316
 msgid "Second Medium (Cliff)"
-msgstr ""
+msgstr "Ikkinchi muhit (jarlik)"
 
 #: resources/xnec2c.glade:3337
 msgid "Ground Type"
-msgstr ""
+msgstr "Er turi"
 
 #: resources/xnec2c.glade:3465
 msgid "0.00000"
-msgstr ""
+msgstr "0.00000"
 
 #: resources/xnec2c.glade:3616
 msgid "Number of Radials"
-msgstr ""
+msgstr "Radiallar soni"
 
 #: resources/xnec2c.glade:3629
 msgid "Radial Screen Radius"
-msgstr ""
+msgstr "Radial ekran radiusi"
 
 #: resources/xnec2c.glade:3679
 msgid "Radial Wire Diameter"
-msgstr ""
+msgstr "Radial sim diametri"
 
 #: resources/xnec2c.glade:3715
 msgid "Radial Screen Parameters"
-msgstr ""
+msgstr "Radial ekran parametrlari"
 
 #: resources/xnec2c.glade:3915
 msgid "Helical Element (GA card)"
-msgstr ""
+msgstr "Spiral elementi (GA kartasi)"
 
 #: resources/xnec2c.glade:3940
 msgid "Right Hand Helix"
-msgstr ""
+msgstr "Oʻng qoʻl spiral"
 
 #: resources/xnec2c.glade:3956
 msgid "Left Hand Helix"
-msgstr ""
+msgstr "Chap qoʻl spiral"
 
 #: resources/xnec2c.glade:3972
 msgid "Right Hand Spiral"
-msgstr ""
+msgstr "Oʻng qoʻl tekis spiral"
 
 #: resources/xnec2c.glade:3988
 msgid "Left Hand Spiral"
-msgstr ""
+msgstr "Chap qoʻl tekis spiral"
 
 #: resources/xnec2c.glade:4019
 msgid "Segments/Turn"
-msgstr ""
+msgstr "Segmentlar/aylanma"
 
 #: resources/xnec2c.glade:4058
 msgid "0.0100"
-msgstr ""
+msgstr "0.0100"
 
 #: resources/xnec2c.glade:4079
 msgid "5.00"
-msgstr ""
+msgstr "5.00"
 
 #: resources/xnec2c.glade:4120 resources/xnec2c.glade:11998
 #: resources/xnec2c.glade:13222
 msgid "1"
-msgstr ""
+msgstr "1"
 
 #: resources/xnec2c.glade:4140
 msgid "Number of Turns"
-msgstr ""
+msgstr "Aylanmalar soni"
 
 #: resources/xnec2c.glade:4153
 msgid "8.0000"
-msgstr ""
+msgstr "8.0000"
 
 #: resources/xnec2c.glade:4174
 msgid "Helix Length (HL)"
-msgstr ""
+msgstr "Spiral uzunligi (HL)"
 
 #: resources/xnec2c.glade:4187
 msgid "5.0000"
-msgstr ""
+msgstr "5.0000"
 
 #: resources/xnec2c.glade:4208
 msgid "Turns Spacing"
-msgstr ""
+msgstr "Aylanmalar oraligʻi"
 
 #: resources/xnec2c.glade:4221 resources/xnec2c.glade:4333
 #: resources/xnec2c.glade:4386 resources/xnec2c.glade:4439
 #: resources/xnec2c.glade:4487
 msgid "1.0000"
-msgstr ""
+msgstr "1.0000"
 
 #: resources/xnec2c.glade:4255
 msgid "0.0000"
-msgstr ""
+msgstr "0.0000"
 
 #: resources/xnec2c.glade:4275
 msgid "Radius in X (A1)"
-msgstr ""
+msgstr "X dagi radius (A1)"
 
 #: resources/xnec2c.glade:4288
 msgid "Radius in Y (B1)"
-msgstr ""
+msgstr "Y dagi radius (B1)"
 
 #: resources/xnec2c.glade:4301
 msgid "Radius in X (A2)"
-msgstr ""
+msgstr "X dagi radius (A2)"
 
 #: resources/xnec2c.glade:4314
 msgid "Radius in Y (B2)"
-msgstr ""
+msgstr "Y dagi radius (B2)"
 
 #: resources/xnec2c.glade:4512
 msgid "GH Card"
-msgstr ""
+msgstr "GH kartasi"
 
 #: resources/xnec2c.glade:4649 resources/xnec2c.glade:15779
 msgid "Interaction Approx Range (KH Card)"
-msgstr ""
+msgstr "Taʼsir taxminiy diapazoni (KH kartasi)"
 
 #: resources/xnec2c.glade:4676
 msgid "Approximation Range (W/lengths)"
-msgstr ""
+msgstr "Taxminiy diapazon (T/uzunliklar)"
 
 #: resources/xnec2c.glade:4714
 msgid "Interaction Approximation Range"
-msgstr ""
+msgstr "Taʼsir taxminiy diapazoni"
 
 #: resources/xnec2c.glade:4840
 msgid "Thin Wire Kernel (EK Card)"
-msgstr ""
+msgstr "Nozik sim yadrosi (EK kartasi)"
 
 #: resources/xnec2c.glade:4858
 msgid "Extended Thin Wire Kernel"
-msgstr ""
+msgstr "Kengaytirilgan nozik sim yadrosi"
 
 #: resources/xnec2c.glade:4875
 msgid "Thin Wire Kernel"
-msgstr ""
+msgstr "Nozik sim yadrosi"
 
 #: resources/xnec2c.glade:5038
 msgid "Loading Command (LD Card)"
-msgstr ""
+msgstr "Yuklama buyruqi (LD kartasi)"
 
 #: resources/xnec2c.glade:5064
 msgid "Short all Loads (Nulls previous Loading Cards)"
 msgstr ""
+"Barcha yuklamalarni qisqa tutashuv (Oldingi yuklama kartalarini bekor qiladi)"
 
 #: resources/xnec2c.glade:5081
 msgid "Series, Lumped"
-msgstr ""
+msgstr "Ketma-ket, toʻplangan"
 
 #: resources/xnec2c.glade:5097
 msgid "Parallel, Distributed"
-msgstr ""
+msgstr "Parallel, taqsimlangan"
 
 #: resources/xnec2c.glade:5113
 msgid "Parallel, Lumped"
-msgstr ""
+msgstr "Parallel, toʻplangan"
 
 #: resources/xnec2c.glade:5129
 msgid "Resistance & Reactance"
-msgstr ""
+msgstr "Qarshilik va reaktans"
 
 #: resources/xnec2c.glade:5145
 msgid "Series, Distributed"
-msgstr ""
+msgstr "Ketma-ket, taqsimlangan"
 
 #: resources/xnec2c.glade:5161
 msgid "Wire Conductivity"
-msgstr ""
+msgstr "Sim oʻtkazuvchanligi"
 
 #: resources/xnec2c.glade:5183
 msgid "Loading Type"
-msgstr ""
+msgstr "Yuklama turi"
 
 #: resources/xnec2c.glade:5213
 msgid "Load Tag Number"
-msgstr ""
+msgstr "Yuklama teg raqami"
 
 #: resources/xnec2c.glade:5244
 msgid "Resistance"
-msgstr ""
+msgstr "Qarshilik"
 
 #: resources/xnec2c.glade:5276
 msgid "From Segment #"
-msgstr ""
+msgstr "Segment # dan"
 
 #: resources/xnec2c.glade:5307
 msgid "Inductance"
-msgstr ""
+msgstr "Induktivlik"
 
 #: resources/xnec2c.glade:5339
 msgid "To Segment #"
-msgstr ""
+msgstr "Segment # gacha"
 
 #: resources/xnec2c.glade:5370
 msgid "Capacitance"
-msgstr ""
+msgstr "Sigʻim"
 
 #: resources/xnec2c.glade:5406
 msgid "Loading Parameters"
-msgstr ""
+msgstr "Yuklama parametrlari"
 
 #: resources/xnec2c.glade:5621
 msgid "Near Fields Command (NE/NH Cards)"
-msgstr ""
+msgstr "Yaqin maydon buyruqi (NE/NH kartalari)"
 
 #: resources/xnec2c.glade:5648
 msgid "Near Electric Field"
-msgstr ""
+msgstr "Yaqin elektr maydoni"
 
 #: resources/xnec2c.glade:5664
 msgid "Rectangular Co-ordinates"
-msgstr ""
+msgstr "Toʻgʻri burchakli koordinatalar"
 
 #: resources/xnec2c.glade:5680
 msgid "Near Magnetic Field"
-msgstr ""
+msgstr "Yaqin magnit maydoni"
 
 #: resources/xnec2c.glade:5695
 msgid "Spherical Co-ordinates"
-msgstr ""
+msgstr "Sferik koordinatalar"
 
 #: resources/xnec2c.glade:5723
 msgid "Field Type & Co-ordinates"
-msgstr ""
+msgstr "Maydon turi va koordinatalar"
 
 #: resources/xnec2c.glade:5753
 msgid "NX"
-msgstr ""
+msgstr "NX"
 
 #: resources/xnec2c.glade:5784 resources/xnec2c.glade:11549
 #: resources/xnec2c.glade:12758
 msgid "X"
-msgstr ""
+msgstr "X"
 
 #: resources/xnec2c.glade:5816
 msgid "DX"
-msgstr ""
+msgstr "DX"
 
 #: resources/xnec2c.glade:5848
 msgid "NY"
-msgstr ""
+msgstr "NY"
 
 #: resources/xnec2c.glade:5879 resources/xnec2c.glade:11564
 #: resources/xnec2c.glade:12773
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: resources/xnec2c.glade:5911
 msgid "DY"
-msgstr ""
+msgstr "DY"
 
 #: resources/xnec2c.glade:5943
 msgid "NZ"
-msgstr ""
+msgstr "NZ"
 
 #: resources/xnec2c.glade:5974 resources/xnec2c.glade:11579
 #: resources/xnec2c.glade:12788
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: resources/xnec2c.glade:6006
 msgid "DZ"
-msgstr ""
+msgstr "DZ"
 
 #: resources/xnec2c.glade:6042
 msgid "Field Pattern Parameters"
-msgstr ""
+msgstr "Maydon diagrammasi parametrlari"
 
 #: resources/xnec2c.glade:6169
 msgid "Xnec2c: NEC2 Input File Editor"
-msgstr ""
+msgstr "Xnec2c: NEC2 kirish fayli muharriri"
 
 #: resources/xnec2c.glade:6256
 msgid "Manage Cards"
-msgstr ""
+msgstr "Kartalarni boshqarish"
 
 #: resources/xnec2c.glade:6353
 msgid "File Save"
-msgstr ""
+msgstr "Faylni saqlash"
 
 #: resources/xnec2c.glade:6413 src/nec2_model.c:278
 msgid "Comments"
-msgstr ""
+msgstr "Izohlar"
 
 #: resources/xnec2c.glade:6440
 msgid "Wire"
-msgstr ""
+msgstr "Sim"
 
 #: resources/xnec2c.glade:6454
 msgid "Arc"
-msgstr ""
+msgstr "Yoy"
 
 #: resources/xnec2c.glade:6468
 msgid "Helix"
-msgstr ""
+msgstr "Spiral"
 
 #: resources/xnec2c.glade:6482
 msgid "Patch"
-msgstr ""
+msgstr "Patch"
 
 #: resources/xnec2c.glade:6496
 msgid "Cylinder"
-msgstr ""
+msgstr "Silindr"
 
 #: resources/xnec2c.glade:6510
 msgid "Move"
-msgstr ""
+msgstr "Koʻchirish"
 
 #: resources/xnec2c.glade:6524
 msgid "Reflect"
-msgstr ""
+msgstr "Aks ettirish"
 
 #: resources/xnec2c.glade:6538
 msgid "Scale"
-msgstr ""
+msgstr "Masshtab"
 
 #: resources/xnec2c.glade:6552 resources/xnec2c.glade:6836
 msgid "Add Var (SY)"
-msgstr ""
+msgstr "Oʻzgaruvchi qoʻshish (SY)"
 
 #: resources/xnec2c.glade:6572
 msgid "Edit Geometry Data"
-msgstr ""
+msgstr "Geometriya maʼlumotlarini tahrirlash"
 
 #: resources/xnec2c.glade:6626
 msgid "Geometry"
-msgstr ""
+msgstr "Geometriya"
 
 #: resources/xnec2c.glade:6653
 msgid "Excitation"
-msgstr ""
+msgstr "Qoʻzgʻatish"
 
 #: resources/xnec2c.glade:6667
 msgid "Radiation"
-msgstr ""
+msgstr "Nurlanish"
 
 #: resources/xnec2c.glade:6681
 msgid "Frequency"
-msgstr ""
+msgstr "Chastota"
 
 #: resources/xnec2c.glade:6695
 msgid "Near Fields"
-msgstr ""
+msgstr "Yaqin maydonlar"
 
 #: resources/xnec2c.glade:6709
 msgid "Ground (GN)"
-msgstr ""
+msgstr "Er (GN)"
 
 #: resources/xnec2c.glade:6723
 msgid "Ground (GD)"
-msgstr ""
+msgstr "Er (GD)"
 
 #: resources/xnec2c.glade:6737
 msgid "Loading"
-msgstr ""
+msgstr "Yuklama"
 
 #: resources/xnec2c.glade:6751
 msgid "Kernel"
-msgstr ""
+msgstr "Yadro"
 
 #: resources/xnec2c.glade:6765
 msgid "Network"
-msgstr ""
+msgstr "Tarmoq"
 
 #: resources/xnec2c.glade:6779
 msgid "Interaction"
-msgstr ""
+msgstr "Taʼsir"
 
 #: resources/xnec2c.glade:6793
 msgid "Transm. Line"
-msgstr ""
+msgstr "Uzatish liniyasi"
 
 #: resources/xnec2c.glade:6808
 msgid "Execute"
-msgstr ""
+msgstr "Bajarish"
 
 #: resources/xnec2c.glade:6822
 msgid "Zo"
-msgstr ""
+msgstr "Zo"
 
 #: resources/xnec2c.glade:6856
 msgid "Edit Control Commands"
-msgstr ""
+msgstr "Boshqaruv buyruqlarini tahrirlash"
 
 #: resources/xnec2c.glade:6910
 msgid "Commands"
-msgstr ""
+msgstr "Buyruqlar"
 
 #: resources/xnec2c.glade:6929
 msgid "Unsaved Data"
-msgstr ""
+msgstr "Saqlanmagan maʼlumotlar"
 
 #: resources/xnec2c.glade:7005
 msgid ""
 "Unsaved data in NEC2 Editor.\n"
 "Save NEC2 Editor data first?\n"
 msgstr ""
+"NEC2 Muharriridagi maʼlumotlar saqlanmagan.\n"
+"Avval NEC2 Muharriri maʼlumotlarini saqlansinmi?\n"
 
 #: resources/xnec2c.glade:7104
 msgid "Network Command (NT Card)"
-msgstr ""
+msgstr "Tarmoq buyruqi (NT kartasi)"
 
 #: resources/xnec2c.glade:7133
 msgid "Tag Number, Port 1  "
-msgstr ""
+msgstr "Teg raqami, port 1  "
 
 #: resources/xnec2c.glade:7164
 msgid "Tag Number, Port 2  "
-msgstr ""
+msgstr "Teg raqami, port 2  "
 
 #: resources/xnec2c.glade:7195
 msgid "Segment Num, Port 1"
-msgstr ""
+msgstr "Segment raqami, port 1"
 
 #: resources/xnec2c.glade:7226
 msgid "Segment Num, Port 2"
-msgstr ""
+msgstr "Segment raqami, port 2"
 
 #: resources/xnec2c.glade:7261 resources/xnec2c.glade:14565
 msgid "Segment Identity"
-msgstr ""
+msgstr "Segment identifikatori"
 
 #: resources/xnec2c.glade:7291
 msgid "Element 1,1 Real Part"
-msgstr ""
+msgstr "1,1 elementi haqiqiy qism"
 
 #: resources/xnec2c.glade:7323
 msgid "Element 1,2 Real Part"
-msgstr ""
+msgstr "1,2 elementi haqiqiy qism"
 
 #: resources/xnec2c.glade:7355
 msgid "Element 2,2 Real Part"
-msgstr ""
+msgstr "2,2 elementi haqiqiy qism"
 
 #: resources/xnec2c.glade:7387
 msgid "Element 1,1 Imag Part"
-msgstr ""
+msgstr "1,1 elementi mavhum qism"
 
 #: resources/xnec2c.glade:7419
 msgid "Element 1,2 Imag Part"
-msgstr ""
+msgstr "1,2 elementi mavhum qism"
 
 #: resources/xnec2c.glade:7451
 msgid "Element 2,2 Imag Part"
-msgstr ""
+msgstr "2,2 elementi mavhum qism"
 
 #: resources/xnec2c.glade:7487
 msgid "Admittance Matrix Elements"
-msgstr ""
+msgstr "Admittans matritsasi elementlari"
 
 #: resources/xnec2c.glade:7702
 msgid "Patch Element (SP & SC Cards)"
-msgstr ""
+msgstr "Patch elementi (SP va SC kartalari)"
 
 #: resources/xnec2c.glade:7726
 msgid "Arbitrary"
-msgstr ""
+msgstr "Ixtiyoriy"
 
 #: resources/xnec2c.glade:7743
 msgid "Rectangle"
-msgstr ""
+msgstr "Toʻrtburchak"
 
 #: resources/xnec2c.glade:7760
 msgid "Triangle"
-msgstr ""
+msgstr "Uchburchak"
 
 #: resources/xnec2c.glade:7777
 msgid "Quadrilateral"
-msgstr ""
+msgstr "Toʻrtburchakli"
 
 #: resources/xnec2c.glade:7794
 msgid "Surface"
-msgstr ""
+msgstr "Sirt"
 
 #: resources/xnec2c.glade:7817
 msgid "Patch Type"
-msgstr ""
+msgstr "Patch turi"
 
 #: resources/xnec2c.glade:7847
 msgid "Corners 1-2 sub-division (NX)"
-msgstr ""
+msgstr "1-2 burchaklar boʻlinishi (NX)"
 
 #: resources/xnec2c.glade:7878
 msgid "Corners 2-3 sub-division (NY)"
-msgstr ""
+msgstr "2-3 burchaklar boʻlinishi (NY)"
 
 #: resources/xnec2c.glade:7913
 msgid "Surface Sub-division"
-msgstr ""
+msgstr "Sirt boʻlinishi"
 
 #: resources/xnec2c.glade:7943 src/geom_edit.c:1157
 msgid "Center - X"
-msgstr ""
+msgstr "Markaz - X"
 
 #: resources/xnec2c.glade:7975 src/geom_edit.c:1163
 msgid "Normal - Elev."
-msgstr ""
+msgstr "Normal - balandlik"
 
 #: resources/xnec2c.glade:8007 src/geom_edit.c:1159
 msgid "Center - Y"
-msgstr ""
+msgstr "Markaz - Y"
 
 #: resources/xnec2c.glade:8039 src/geom_edit.c:1165
 msgid "Normal - Azim."
-msgstr ""
+msgstr "Normal - azimut"
 
 #: resources/xnec2c.glade:8071 src/geom_edit.c:1161
 msgid "Center - Z"
-msgstr ""
+msgstr "Markaz - Z"
 
 #: resources/xnec2c.glade:8103 src/geom_edit.c:1167
 msgid "Patch Area"
-msgstr ""
+msgstr "Patch maydoni"
 
 #: resources/xnec2c.glade:8139
 msgid "SP/SM Cards"
-msgstr ""
+msgstr "SP/SM kartalari"
 
 #: resources/xnec2c.glade:8175
 msgid "Corner 3 - X"
-msgstr ""
+msgstr "3-burchak - X"
 
 #: resources/xnec2c.glade:8207
 msgid "Corner 3 - Y"
-msgstr ""
+msgstr "3-burchak - Y"
 
 #: resources/xnec2c.glade:8239
 msgid "Corner 3 - Z"
-msgstr ""
+msgstr "3-burchak - Z"
 
 #: resources/xnec2c.glade:8287
 msgid "Corner 4 - X"
-msgstr ""
+msgstr "4-burchak - X"
 
 #: resources/xnec2c.glade:8319
 msgid "Corner 4 - Y"
-msgstr ""
+msgstr "4-burchak - Y"
 
 #: resources/xnec2c.glade:8351
 msgid "Corner 4 - Z"
-msgstr ""
+msgstr "4-burchak - Z"
 
 #: resources/xnec2c.glade:8394
 msgid "SC Card"
-msgstr ""
+msgstr "SC kartasi"
 
 #: resources/xnec2c.glade:8610
 msgid "Quit xnec2c?"
-msgstr ""
+msgstr "xnec2c dasturidan chiqilsinmi?"
 
 #: resources/xnec2c.glade:8689
 msgid "Radiation Pattern (RP Card)"
-msgstr ""
+msgstr "Nurlanish diagrammasi (RP kartasi)"
 
 #: resources/xnec2c.glade:8716
 msgid "Normal (Space) Wave"
-msgstr ""
+msgstr "Oddiy (boʻshliq) toʻlqin"
 
 #: resources/xnec2c.glade:8732
 msgid "Space + Ground Wave"
-msgstr ""
+msgstr "Boʻshliq + er toʻlqini"
 
 #: resources/xnec2c.glade:8748
 msgid "Linear Cliff"
-msgstr ""
+msgstr "Chiziqli jarlik"
 
 #: resources/xnec2c.glade:8764
 msgid "Radial wire screen"
-msgstr ""
+msgstr "Radial sim ekrani"
 
 #: resources/xnec2c.glade:8780
 msgid "Circular Cliff + Radials"
-msgstr ""
+msgstr "Doiraviy jarlik + radiallar"
 
 #: resources/xnec2c.glade:8796
 msgid "Circular Cliff"
-msgstr ""
+msgstr "Doiraviy jarlik"
 
 #: resources/xnec2c.glade:8812
 msgid "Linear Cliff + Radials"
-msgstr ""
+msgstr "Chiziqli jarlik + radiallar"
 
 #: resources/xnec2c.glade:8830
 msgid "<b>See GN/GD Card Documentation</b>"
-msgstr ""
+msgstr "<b>GN/GD kartasi hujjatiga qarang</b>"
 
 #: resources/xnec2c.glade:8848
 msgid "Wave Type and Ground (I1)"
-msgstr ""
+msgstr "Toʻlqin turi va er (I1)"
 
 #: resources/xnec2c.glade:8876
 msgid "Major & Minor Axis & Total Gain"
-msgstr ""
+msgstr "Asosiy va kichik oʻq va umumiy kuchaytirish"
 
 #: resources/xnec2c.glade:8892
 msgid "Vertical, Horizontal & Total Gain"
-msgstr ""
+msgstr "Vertikal, gorizontal va umumiy kuchaytirish"
 
 #: resources/xnec2c.glade:8908
 msgid "Major Axis Gain Normalized"
-msgstr ""
+msgstr "Asosiy oʻq kuchaytirishni normallashtirish"
 
 #: resources/xnec2c.glade:8924
 msgid "Vertical Axis Gain Normalized"
-msgstr ""
+msgstr "Vertikal oʻq kuchaytirishni normallashtirish"
 
 #: resources/xnec2c.glade:8940
 msgid "Total Gain Normalized"
-msgstr ""
+msgstr "Umumiy kuchaytirishni normallashtirish"
 
 #: resources/xnec2c.glade:8956
 msgid "Print/Normalize Directive Gain"
-msgstr ""
+msgstr "Direktiv kuchaytirishni chop etish/normallashtirish"
 
 #: resources/xnec2c.glade:8972
 msgid "No Normalized Gain"
-msgstr ""
+msgstr "Normallashtirilgan kuchaytirish yoʻq"
 
 #: resources/xnec2c.glade:8988
 msgid "Minor Axis Gain Normalized"
-msgstr ""
+msgstr "Kichik oʻq kuchaytirishni normallashtirish"
 
 #: resources/xnec2c.glade:9004
 msgid "Horizontal Axis Gain Normalized"
-msgstr ""
+msgstr "Gorizontal oʻq kuchaytirishni normallashtirish"
 
 #: resources/xnec2c.glade:9020
 msgid "Print/Normalize Power Gain"
-msgstr ""
+msgstr "Quvvat kuchaytirishini chop etish/normallashtirish"
 
 #: resources/xnec2c.glade:9036
 msgid "No Gain Averaging"
-msgstr ""
+msgstr "Kuchaytirishni oʻrtalashtirish yoʻq"
 
 #: resources/xnec2c.glade:9052
 msgid "Points in Average Not Printed"
-msgstr ""
+msgstr "Oʻrtachadagi nuqtalar chop etilmaydi"
 
 #: resources/xnec2c.glade:9068
 msgid "Average Gain Computed"
-msgstr ""
+msgstr "Oʻrtacha kuchaytirish hisoblandi"
 
 #: resources/xnec2c.glade:9086
 msgid "<b>See RP Card Documentation</b>"
-msgstr ""
+msgstr "<b>RP kartasi hujjatiga qarang</b>"
 
 #: resources/xnec2c.glade:9104
 msgid "Data Output Control (XNDA)"
-msgstr ""
+msgstr "Maʼlumot chiqishi boshqaruvi (XNDA)"
 
 #: resources/xnec2c.glade:9134
 msgid "Points in Theta"
-msgstr ""
+msgstr "Theta dagi nuqtalar"
 
 #: resources/xnec2c.glade:9148 src/cmnd_edit.c:1763
 msgid "Initial Theta (deg)"
-msgstr ""
+msgstr "Boshlangʻich Theta (daraja)"
 
 #: resources/xnec2c.glade:9161 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
 msgid "Increment in Theta"
-msgstr ""
+msgstr "Theta orttirmasi"
 
 #: resources/xnec2c.glade:9230 src/cmnd_edit.c:1762
 msgid "Points in Phi"
-msgstr ""
+msgstr "Phi dagi nuqtalar"
 
 #: resources/xnec2c.glade:9243
 msgid "Initial Phi (deg)"
-msgstr ""
+msgstr "Boshlangʻich Phi (daraja)"
 
 #: resources/xnec2c.glade:9256 src/cmnd_edit.c:2708
 msgid "Increment in Phi"
-msgstr ""
+msgstr "Phi orttirmasi"
 
 #: resources/xnec2c.glade:9325
 msgid "Field Point Distance"
-msgstr ""
+msgstr "Maydon nuqtasi masofasi"
 
 #: resources/xnec2c.glade:9357
 msgid "Gain Normalization"
-msgstr ""
+msgstr "Kuchaytirishni normallashtirish"
 
 #: resources/xnec2c.glade:9399
 msgid "Radiation Pattern Parameters"
-msgstr ""
+msgstr "Nurlanish diagrammasi parametrlari"
 
 #: resources/xnec2c.glade:9566
 msgid "Reflect Structure (GX card)"
-msgstr ""
+msgstr "Tuzilmani aks ettirish (GX kartasi)"
 
 #: resources/xnec2c.glade:9594
 msgid "Reflect in YZ plane"
-msgstr ""
+msgstr "YZ tekisligida aks ettirish"
 
 #: resources/xnec2c.glade:9609
 msgid "Reflect in XY plane"
-msgstr ""
+msgstr "XY tekisligida aks ettirish"
 
 #: resources/xnec2c.glade:9624
 msgid "Reflect in XZ plane"
-msgstr ""
+msgstr "XZ tekisligida aks ettirish"
 
 #: resources/xnec2c.glade:9680
 msgid "Reflect Options"
-msgstr ""
+msgstr "Aks ettirish parametrlari"
 
 #: resources/xnec2c.glade:9811
 msgid "Xnec2c: Frequency Data Plots"
-msgstr ""
+msgstr "Xnec2c: Chastota maʼlumotlari grafiklari"
 
 #: resources/xnec2c.glade:9836 resources/xnec2c.glade:10807
 #: resources/xnec2c.glade:12252
 msgid "_File"
-msgstr ""
+msgstr "_Fayl"
 
 #: resources/xnec2c.glade:9898 resources/xnec2c.glade:10869
 #: resources/xnec2c.glade:12314
 msgid "Save as _gnuplot"
-msgstr ""
+msgstr "_gnuplot sifatida saqlash"
 
 #: resources/xnec2c.glade:9909 resources/xnec2c.glade:12324
 msgid "Save as _CSV"
-msgstr ""
+msgstr "_CSV sifatida saqlash"
 
 #: resources/xnec2c.glade:9921
 msgid "Save as _Touchstone (.SnP)"
-msgstr ""
+msgstr "_Touchstone (.SnP) sifatida saqlash"
 
 #: resources/xnec2c.glade:9928
 msgid "Save as S_1P: Reflection Only"
-msgstr ""
+msgstr "S_1P sifatida saqlash: faqat aks"
 
 #: resources/xnec2c.glade:9938
 msgid "Save as S2P: _Max Gain (S21)"
-msgstr ""
+msgstr "S2P sifatida saqlash: _Maks kuchaytirish (S21)"
 
 #: resources/xnec2c.glade:9948
 msgid "Save as S2P: _Viewer Gain (S21)"
-msgstr ""
+msgstr "S2P sifatida saqlash: _Koʻruvchi kuchaytirishini (S21)"
 
 #: resources/xnec2c.glade:9985 resources/xnec2c.glade:11235
 #: resources/xnec2c.glade:12358
 msgid "_View"
-msgstr ""
+msgstr "_Koʻrinish"
 
 #: resources/xnec2c.glade:9994 resources/xnec2c.glade:11265
 #: resources/xnec2c.glade:12368
 msgid "_Polarization"
-msgstr ""
+msgstr "_Qutblanish"
 
 #: resources/xnec2c.glade:10010 resources/xnec2c.glade:11281
 #: resources/xnec2c.glade:12384
 msgid "_Total"
-msgstr ""
+msgstr "_Umumiy"
 
 #: resources/xnec2c.glade:10021 resources/xnec2c.glade:11292
 #: resources/xnec2c.glade:12395
 msgid "_Horizontal"
-msgstr ""
+msgstr "_Gorizontal"
 
 #: resources/xnec2c.glade:10032 resources/xnec2c.glade:11303
 #: resources/xnec2c.glade:12406
 msgid "_Vertical"
-msgstr ""
+msgstr "_Vertikal"
 
 #: resources/xnec2c.glade:10043 resources/xnec2c.glade:11314
 #: resources/xnec2c.glade:12417
 msgid "_Right Hand"
-msgstr ""
+msgstr "_Oʻng qoʻl"
 
 #: resources/xnec2c.glade:10054 resources/xnec2c.glade:11325
 #: resources/xnec2c.glade:12428
 msgid "_Left Hand"
-msgstr ""
+msgstr "_Chap qoʻl"
 
 #: resources/xnec2c.glade:10069
 msgid "_Color Theme"
-msgstr ""
+msgstr "_Rang mavzusi"
 
 #: resources/xnec2c.glade:10088
 msgid "_Net Gain"
-msgstr ""
+msgstr "_Sof kuchaytirish"
 
 #: resources/xnec2c.glade:10097
 msgid "Show _Min/Max Values"
-msgstr ""
+msgstr "_Min/Maks qiymatlarini koʻrsatish"
 
 #: resources/xnec2c.glade:10106
 msgid "Show _S11 (dB) Values"
-msgstr ""
+msgstr "_S11 (dB) qiymatlarini koʻrsatish"
 
 #: resources/xnec2c.glade:10115
 msgid "Clamp _VSWR Graph to 10"
-msgstr ""
+msgstr "_VSWR grafikini 10 ga cheklash"
 
 #: resources/xnec2c.glade:10124
 msgid "Show Ta instead of TA"
-msgstr ""
+msgstr "TA oʻrniga Ta ni koʻrsatish"
 
 #: resources/xnec2c.glade:10133
 msgid "Round _X Axis Frequency Values"
-msgstr ""
+msgstr "_X oʻqi chastota qiymatlarini yaxlitlash"
 
 #: resources/xnec2c.glade:10142
 msgid "S_wap Left/Right Click Frequency Selection"
-msgstr ""
+msgstr "Chap/oʻng klik chastota tanla_shini almashtirish"
 
 #: resources/xnec2c.glade:10166 resources/xnec2c.glade:10330
 msgid "Max Gain"
-msgstr ""
+msgstr "Maks kuchaytirish"
 
 #: resources/xnec2c.glade:10181
 msgid "Direction"
-msgstr ""
+msgstr "Yoʻnalish"
 
 #: resources/xnec2c.glade:10196
 msgid "Viewer"
-msgstr ""
+msgstr "Koʻruvchi"
 
 #: resources/xnec2c.glade:10211 resources/xnec2c.glade:10435
 #: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:40
 msgid "VSWR"
-msgstr ""
+msgstr "VSWR"
 
 #: resources/xnec2c.glade:10226
 msgid "Zr/Zi"
-msgstr ""
+msgstr "Zr/Zi"
 
 #: resources/xnec2c.glade:10241
 msgid "Zm/Zph"
-msgstr ""
+msgstr "Zm/Zph"
 
 #: resources/xnec2c.glade:10256
 msgid "Smith"
-msgstr ""
+msgstr "Smit"
 
 #: resources/xnec2c.glade:10271
 msgid "G/Ta"
-msgstr ""
+msgstr "G/Ta"
 
 #: resources/xnec2c.glade:10314 resources/xnec2c.glade:10349
 #: resources/xnec2c.glade:10384 resources/xnec2c.glade:10419
 #: resources/xnec2c.glade:10638 resources/xnec2c.glade:10673
 #: resources/xnec2c.glade:10708 resources/xnec2c.glade:13481
 msgid " - - -"
-msgstr ""
+msgstr " - - -"
 
 #: resources/xnec2c.glade:10365 src/freqplots/graphs/impedance_graph.c:58
 msgid "Z-imag"
-msgstr ""
+msgstr "Z-mavhum"
 
 #: resources/xnec2c.glade:10400 src/freqplots/graphs/impedance_graph.c:56
 msgid "Z-real"
-msgstr ""
+msgstr "Z-haqiqiy"
 
 #: resources/xnec2c.glade:10455
 msgid " - - - - "
-msgstr ""
+msgstr " - - - - "
 
 #: resources/xnec2c.glade:10471
 msgid "Freq MHz"
-msgstr ""
+msgstr "Chastota MHz"
 
 #: resources/xnec2c.glade:10510
 msgid "Tx Line Zo"
-msgstr ""
+msgstr "Uzatish liniyasi Zo"
 
 #: resources/xnec2c.glade:10524 resources/xnec2c.glade:12013
 #: resources/xnec2c.glade:13253
 msgid "Freq Loop"
-msgstr ""
+msgstr "Chastota sikli"
 
 #: resources/xnec2c.glade:10619 resources/xnec2c.glade:13359
 msgid "T<sub>A</sub>(Elev.°)"
-msgstr ""
+msgstr "T<sub>A</sub>(Baland.°)"
 
 #: resources/xnec2c.glade:10654
 msgid "T<sub>a</sub>"
-msgstr ""
+msgstr "T<sub>a</sub>"
 
 #: resources/xnec2c.glade:10689
 msgid "G/T<sub>a</sub>"
-msgstr ""
+msgstr "G/T<sub>a</sub>"
 
 #: resources/xnec2c.glade:10763
 msgid "Frequency Data Plots"
-msgstr ""
+msgstr "Chastota maʼlumotlari grafiklari"
 
 #: resources/xnec2c.glade:10880
 msgid "Save _Currents/Charges as CSV"
-msgstr ""
+msgstr "_Tok/Zaryadlarni CSV sifatida saqlash"
 
 #: resources/xnec2c.glade:10899
 msgid "Optimization Settings"
-msgstr ""
+msgstr "Optimallashtirish sozlamalari"
 
 #: resources/xnec2c.glade:10914
 msgid "Reload and write data on .NEC file changes"
-msgstr ""
+msgstr ".NEC fayl oʻzgarishida maʼlumotlarni qayta yuklash va yozish"
 
 #: resources/xnec2c.glade:10921
 msgid "_Write files selected below, now."
-msgstr ""
+msgstr "Quyida tanlangan fayllarni hozir _yozish."
 
 #: resources/xnec2c.glade:10936
 msgid "After calculation, write <file>.csv"
-msgstr ""
+msgstr "Hisobdan soʻng <file>.csv ni yozish"
 
 #: resources/xnec2c.glade:10945
 msgid "After calculation, write <file>.s_1p"
-msgstr ""
+msgstr "Hisobdan soʻng <file>.s_1p ni yozish"
 
 #: resources/xnec2c.glade:10954
 msgid "After calculation, write <file>-_maxgain.s2p"
-msgstr ""
+msgstr "Hisobdan soʻng <file>-_maxgain.s2p ni yozish"
 
 #: resources/xnec2c.glade:10963
 msgid "After calculation, write <file>-_viewergain.s2p"
-msgstr ""
+msgstr "Hisobdan soʻng <file>-_viewergain.s2p ni yozish"
 
 #: resources/xnec2c.glade:10972
 msgid "After calculation, write <file>-_radpattern.csv"
-msgstr ""
+msgstr "Hisobdan soʻng <file>-_radpattern.csv ni yozish"
 
 #: resources/xnec2c.glade:10981
 msgid "After calculation, write <file>-_currents.csv"
-msgstr ""
+msgstr "Hisobdan soʻng <file>-_currents.csv ni yozish"
 
 #: resources/xnec2c.glade:10990
 msgid "After calculation, write <file>-_structure.gplot"
-msgstr ""
+msgstr "Hisobdan soʻng <file>-_structure.gplot ni yozish"
 
 #: resources/xnec2c.glade:10999
 msgid "After calculation, write <file>-_patch-currents.csv"
-msgstr ""
+msgstr "Hisobdan soʻng <file>-_patch-currents.csv ni yozish"
 
 #: resources/xnec2c.glade:11014
 msgid "_Math Libraries"
-msgstr ""
+msgstr "_Matematik kutubxonalar"
 
 #: resources/xnec2c.glade:11023
 msgid "_Interactive"
-msgstr ""
+msgstr "_Interaktiv"
 
 #: resources/xnec2c.glade:11043
 msgid "_Batch"
-msgstr ""
+msgstr "_Paketli"
 
 #: resources/xnec2c.glade:11069
 msgid "Mathlib _Help"
-msgstr ""
+msgstr "Mathlib _Yordam"
 
 #: resources/xnec2c.glade:11082
 msgid "Mathlib _Benchmarks"
-msgstr ""
+msgstr "Mathlib _Benchmarklar"
 
 #: resources/xnec2c.glade:11093
 msgid "_Selected Mathlibs"
-msgstr ""
+msgstr "_Tanlangan Mathliblar"
 
 #: resources/xnec2c.glade:11107
 msgid "Select All/None"
-msgstr ""
+msgstr "Barchasini/Hech birini tanlash"
 
 #: resources/xnec2c.glade:11132
 msgid "_Parallel (-j N):\t\tO(N/J)"
-msgstr ""
+msgstr "_Parallel (-j N):\t\tO(N/J)"
 
 #: resources/xnec2c.glade:11141
 msgid "_Single Job (-j 1):\tO(N)"
-msgstr ""
+msgstr "_Yagona vazifa (-j 1):\tO(N)"
 
 #: resources/xnec2c.glade:11150
 msgid "_Iterate -j N/=2:\tO(N*log2(J))"
-msgstr ""
+msgstr "_Takrorlash -j N/=2:\tO(N*log2(J))"
 
 #: resources/xnec2c.glade:11159
 msgid "_Iterate -j N-=1:\tO(N*J)"
-msgstr ""
+msgstr "_Takrorlash -j N-=1:\tO(N*J)"
 
 #: resources/xnec2c.glade:11174
 msgid "Benchmark _Help"
-msgstr ""
+msgstr "Benchmark _Yordam"
 
 #: resources/xnec2c.glade:11193
 msgid "Begin Frequency Loop at Startup"
-msgstr ""
+msgstr "Ishga tushirishda chastota siklini boshlash"
 
 #: resources/xnec2c.glade:11204
 msgid "Confirm Quit"
-msgstr ""
+msgstr "Chiqishni tasdiqlash"
 
 #: resources/xnec2c.glade:11245
 msgid "_Radiation Pattern"
-msgstr ""
+msgstr "_Nurlanish diagrammasi"
 
 #: resources/xnec2c.glade:11255
 msgid "_Frequency Plots"
-msgstr ""
+msgstr "_Chastota grafiklari"
 
 #: resources/xnec2c.glade:11340
 msgid "Current _Visualization"
-msgstr ""
+msgstr "Tok _vizualizatsiyasi"
 
 #: resources/xnec2c.glade:11356
 msgid "Animated"
-msgstr ""
+msgstr "Animatsiyali"
 
 #: resources/xnec2c.glade:11363
 msgid "_Reference Phase"
-msgstr ""
+msgstr "_Tayanch faza"
 
 #: resources/xnec2c.glade:11374
 msgid "_LIC Texture"
-msgstr ""
+msgstr "_LIC toʻqimasi"
 
 #: resources/xnec2c.glade:11385 resources/xnec2c.glade:12575
 msgid "_Wireframe"
-msgstr ""
+msgstr "_Sim karkas"
 
 #: resources/xnec2c.glade:11403
 msgid "Static"
-msgstr ""
+msgstr "Statik"
 
 #: resources/xnec2c.glade:11410
 msgid "Polarization _Axis"
-msgstr ""
+msgstr "Qutblanish _oʻqi"
 
 #: resources/xnec2c.glade:11421
 msgid "Peak _Magnitude"
-msgstr ""
+msgstr "Choʻqqi _kattaligi"
 
 #: resources/xnec2c.glade:11436
 msgid "A_nimate"
-msgstr ""
+msgstr "A_nimatsiya"
 
 #: resources/xnec2c.glade:11445 resources/xnec2c.glade:12692
 msgid "Common _Projection"
-msgstr ""
+msgstr "Umumiy _proeksiya"
 
 #: resources/xnec2c.glade:11462
 msgid "_Symbol Overrides"
-msgstr ""
+msgstr "_Belgilarni almashtirish"
 
 #: resources/xnec2c.glade:11472
 msgid "Rendering _Settings..."
-msgstr ""
+msgstr "Rendering _sozlamalari..."
 
 #: resources/xnec2c.glade:11483
 msgid "_Help"
-msgstr ""
+msgstr "_Yordam"
 
 #: resources/xnec2c.glade:11492
 msgid "_About"
-msgstr ""
+msgstr "_Haqida"
 
 #: resources/xnec2c.glade:11519
 msgid "Currents"
-msgstr ""
+msgstr "Toklar"
 
 #: resources/xnec2c.glade:11534
 msgid "Charges"
-msgstr ""
+msgstr "Zaryadlar"
 
 #: resources/xnec2c.glade:11715
 msgid " Zoom"
-msgstr ""
+msgstr " Zoom"
 
 #: resources/xnec2c.glade:11858 resources/xnec2c.glade:13189
 #: src/freqplots/freqplots_core.c:54
 msgid "Gain"
-msgstr ""
+msgstr "Kuchaytirish"
 
 #: resources/xnec2c.glade:11873 resources/xnec2c.glade:11889
 #: resources/xnec2c.glade:13202 resources/xnec2c.glade:13463
 msgid "0.0"
-msgstr ""
+msgstr "0.0"
 
 #: resources/xnec2c.glade:11923
 msgid "- - - "
-msgstr ""
+msgstr "- - - "
 
 #: resources/xnec2c.glade:11965 resources/xnec2c.glade:13346
 msgid "dB"
-msgstr ""
+msgstr "dB"
 
 #: resources/xnec2c.glade:11979 resources/xnec2c.glade:13238
 msgid "Step"
-msgstr ""
+msgstr "Qadam"
 
 #: resources/xnec2c.glade:12126 resources/xnec2c.glade:13286
 msgid "Apply Freq"
-msgstr ""
+msgstr "Chastotani qoʻllash"
 
 #: resources/xnec2c.glade:12146
 msgid "Frequency Mhz"
-msgstr ""
+msgstr "Chastota MHz"
 
 #: resources/xnec2c.glade:12207
 msgid "Structure Geometry"
-msgstr ""
+msgstr "Tuzilma geometriyasi"
 
 #: resources/xnec2c.glade:12226
 msgid "Xnec2c: Radiation Patterns"
-msgstr ""
+msgstr "Xnec2c: Nurlanish diagrammalari"
 
 #: resources/xnec2c.glade:12443
 msgid "_Gain Scaling"
-msgstr ""
+msgstr "_Kuchaytirish masshtabi"
 
 #: resources/xnec2c.glade:12458
 msgid "Linear _Power"
-msgstr ""
+msgstr "Chiziqli _quvvat"
 
 #: resources/xnec2c.glade:12469
 msgid "Linear _Voltage"
-msgstr ""
+msgstr "Chiziqli _kuchlanish"
 
 #: resources/xnec2c.glade:12480
 msgid "_ARRL Style"
-msgstr ""
+msgstr "_ARRL uslubi"
 
 #: resources/xnec2c.glade:12491
 msgid "_Logarithmic"
-msgstr ""
+msgstr "_Logaritmik"
 
 #: resources/xnec2c.glade:12502
 msgid "_Noise Temperature"
-msgstr ""
+msgstr "_Shovqin harorati"
 
 #: resources/xnec2c.glade:12513
 msgid "Noise Temp (_log scale)"
-msgstr ""
+msgstr "Shovqin harorati (_log masshtab)"
 
 #: resources/xnec2c.glade:12528
 msgid "Noise _Models"
-msgstr ""
+msgstr "Shovqin _modellari"
 
 #: resources/xnec2c.glade:12547
 msgid "_Gradient Key"
-msgstr ""
+msgstr "_Gradient kalit"
 
 #: resources/xnec2c.glade:12557
 msgid "Draw St_yle"
-msgstr ""
+msgstr "Chizish _uslubi"
 
 #: resources/xnec2c.glade:12566
 msgid "S_urface"
-msgstr ""
+msgstr "S_irt"
 
 #: resources/xnec2c.glade:12585
 msgid "_Both"
-msgstr ""
+msgstr "_Ikkalasi"
 
 #: resources/xnec2c.glade:12600
 msgid "_Near Field"
-msgstr ""
+msgstr "_Yaqin maydon"
 
 #: resources/xnec2c.glade:12615
 msgid "Near _E Field"
-msgstr ""
+msgstr "Yaqin _E maydoni"
 
 #: resources/xnec2c.glade:12625
 msgid "Near _H Field"
-msgstr ""
+msgstr "Yaqin _H maydoni"
 
 #: resources/xnec2c.glade:12635
 msgid "_Poynting Vector"
-msgstr ""
+msgstr "_Poyinting vektori"
 
 #: resources/xnec2c.glade:12644
 msgid "_Animate Dialog"
-msgstr ""
+msgstr "_Animatsiya oynasi"
 
 #: resources/xnec2c.glade:12653
 msgid "_Total Field"
-msgstr ""
+msgstr "_Umumiy maydon"
 
 #: resources/xnec2c.glade:12662
 msgid "_Peak Value"
-msgstr ""
+msgstr "_Choʻqqi qiymat"
 
 #: resources/xnec2c.glade:12673
 msgid "_Instantaneous (φ=0)"
-msgstr ""
+msgstr "_Momentan (φ=0)"
 
 #: resources/xnec2c.glade:12703
 msgid "_Overlay Structure"
-msgstr ""
+msgstr "_Tuzilmani ustiga qoʻyish"
 
 #: resources/xnec2c.glade:12728
 msgid "Gain Pattern"
-msgstr ""
+msgstr "Kuchaytirish diagrammasi"
 
 #: resources/xnec2c.glade:12743
 msgid "E/H Fields"
-msgstr ""
+msgstr "E/H maydonlari"
 
 #: resources/xnec2c.glade:12926
 msgid "Zoom % "
-msgstr ""
+msgstr "Zoom % "
 
 #: resources/xnec2c.glade:12965
 msgid "Elev.°"
-msgstr ""
+msgstr "Baland.°"
 
 #: resources/xnec2c.glade:13306
 msgid "Frequency MHz"
-msgstr ""
+msgstr "Chastota MHz"
 
 #: resources/xnec2c.glade:13323
 msgid "0.010"
-msgstr ""
+msgstr "0.010"
 
 #: resources/xnec2c.glade:13377 resources/xnec2c.glade:13410
 #: resources/xnec2c.glade:13445
 msgid "— K"
-msgstr ""
+msgstr "— K"
 
 #: resources/xnec2c.glade:13392
 msgid "T<sub>earth</sub>"
-msgstr ""
+msgstr "T<sub>yer</sub>"
 
 #: resources/xnec2c.glade:13427
 msgid "T<sub>sky</sub>"
-msgstr ""
+msgstr "T<sub>osmon</sub>"
 
 #: resources/xnec2c.glade:13548 src/rdpattern_ui.c:999
 msgid "Radiation Patterns"
-msgstr ""
+msgstr "Nurlanish diagrammalari"
 
 #: resources/xnec2c.glade:13583
 msgid "Scale Structure (GS card)"
-msgstr ""
+msgstr "Tuzilmani masshtablash (GS kartasi)"
 
 #: resources/xnec2c.glade:13614
 msgid "Structure Scale Factor"
-msgstr ""
+msgstr "Tuzilma masshtab koeffitsienti"
 
 #: resources/xnec2c.glade:13627
 msgid "From Tag No."
-msgstr ""
+msgstr "Teg raqamidan"
 
 #: resources/xnec2c.glade:13677
 msgid "To Tag No."
-msgstr ""
+msgstr "Teg raqamigacha"
 
 #: resources/xnec2c.glade:13712
 msgid "Scale Structure"
-msgstr ""
+msgstr "Tuzilmani masshtablash"
 
 #: resources/xnec2c.glade:13889
 msgid "Co-ordinate Transformation (GM card)"
-msgstr ""
+msgstr "Koordinatalar transformatsiyasi (GM kartasi)"
 
 #: resources/xnec2c.glade:13919
 msgid "Tag Increment"
-msgstr ""
+msgstr "Teg orttirmasi"
 
 #: resources/xnec2c.glade:13950
 msgid "Rotate about X"
-msgstr ""
+msgstr "X atrofida aylantirish"
 
 #: resources/xnec2c.glade:13982
 msgid "Move along X"
-msgstr ""
+msgstr "X boʻylab koʻchirish"
 
 #: resources/xnec2c.glade:14014
 msgid "New Structures"
-msgstr ""
+msgstr "Yangi tuzilmalar"
 
 #: resources/xnec2c.glade:14045
 msgid "Rotate about Y"
-msgstr ""
+msgstr "Y atrofida aylantirish"
 
 #: resources/xnec2c.glade:14077
 msgid "Move along Y"
-msgstr ""
+msgstr "Y boʻylab koʻchirish"
 
 #: resources/xnec2c.glade:14109
 msgid "Start From Tag"
-msgstr ""
+msgstr "Tegdan boshlash"
 
 #: resources/xnec2c.glade:14141
 msgid "Rotate about Z"
-msgstr ""
+msgstr "Z atrofida aylantirish"
 
 #: resources/xnec2c.glade:14173
 msgid "Move along Z"
-msgstr ""
+msgstr "Z boʻylab koʻchirish"
 
 #: resources/xnec2c.glade:14209
 msgid "Co-ordinate Transformation Data"
-msgstr ""
+msgstr "Koordinatalar transformatsiyasi maʼlumotlari"
 
 #: resources/xnec2c.glade:14405
 msgid "Trans. Line Command (TL Card)"
-msgstr ""
+msgstr "Uzatish liniyasi buyruqi (TL kartasi)"
 
 #: resources/xnec2c.glade:14435
 msgid "Tag Number, End 1  "
-msgstr ""
+msgstr "Teg raqami, 1-uchi  "
 
 #: resources/xnec2c.glade:14467
 msgid "Tag Number, End 2  "
-msgstr ""
+msgstr "Teg raqami, 2-uchi  "
 
 #: resources/xnec2c.glade:14498
 msgid "Segment Num, End 1"
-msgstr ""
+msgstr "Segment raqami, 1-uchi"
 
 #: resources/xnec2c.glade:14530
 msgid "Segment Num, End 2"
-msgstr ""
+msgstr "Segment raqami, 2-uchi"
 
 #: resources/xnec2c.glade:14594
 msgid "Crossed Transmission Line"
-msgstr ""
+msgstr "Kesishgan uzatish liniyasi"
 
 #: resources/xnec2c.glade:14612
 msgid "Characteristic Impedance"
-msgstr ""
+msgstr "Xarakteristik impedans"
 
 #: resources/xnec2c.glade:14644
 msgid "End 1 Y Real Part (S)"
-msgstr ""
+msgstr "1-uchi Y haqiqiy qism (S)"
 
 #: resources/xnec2c.glade:14676
 msgid "End 2 Y Real Part (S)"
-msgstr ""
+msgstr "2-uchi Y haqiqiy qism (S)"
 
 #: resources/xnec2c.glade:14708
 msgid "Length of Tx Line (m)"
-msgstr ""
+msgstr "Uzatish liniyasi uzunligi (m)"
 
 #: resources/xnec2c.glade:14740
 msgid "End 1 Y Imag Part (S)"
-msgstr ""
+msgstr "1-uchi Y mavhum qism (S)"
 
 #: resources/xnec2c.glade:14772
 msgid "End 2 Y Imag Part (S)"
-msgstr ""
+msgstr "2-uchi Y mavhum qism (S)"
 
 #: resources/xnec2c.glade:14808
 msgid "Transmission Line"
-msgstr ""
+msgstr "Uzatish liniyasi"
 
 #: resources/xnec2c.glade:15035
 msgid "Wire Element (GW & GC cards)"
-msgstr ""
+msgstr "Sim elementi (GW va GC kartalari)"
 
 #: resources/xnec2c.glade:15095
 msgid "Wire X1"
-msgstr ""
+msgstr "Sim X1"
 
 #: resources/xnec2c.glade:15127
 msgid "Wire X2"
-msgstr ""
+msgstr "Sim X2"
 
 #: resources/xnec2c.glade:15190
 msgid "Wire Y1"
-msgstr ""
+msgstr "Sim Y1"
 
 #: resources/xnec2c.glade:15223
 msgid "Wire Y2"
-msgstr ""
+msgstr "Sim Y2"
 
 #: resources/xnec2c.glade:15287
 msgid "Wire Z1"
-msgstr ""
+msgstr "Sim Z1"
 
 #: resources/xnec2c.glade:15319
 msgid "Wire Z2"
-msgstr ""
+msgstr "Sim Z2"
 
 #: resources/xnec2c.glade:15384
 msgid "Wire Length"
-msgstr ""
+msgstr "Sim uzunligi"
 
 #: resources/xnec2c.glade:15455
 msgid "Wire Data"
-msgstr ""
+msgstr "Sim maʼlumotlari"
 
 #: resources/xnec2c.glade:15467
 msgid "Tapered Wire"
-msgstr ""
+msgstr "Torayuvchi sim"
 
 #: resources/xnec2c.glade:15509
 msgid "Length Taper"
-msgstr ""
+msgstr "Uzunlik torayishi"
 
 #: resources/xnec2c.glade:15541
 msgid "Diameter Seg 1"
-msgstr ""
+msgstr "1-segment diametri"
 
 #: resources/xnec2c.glade:15573
 msgid "Diameter Seg N"
-msgstr ""
+msgstr "N-segment diametri"
 
 #: resources/xnec2c.glade:15605
 msgid "Diam. Taper"
-msgstr ""
+msgstr "Diam. torayishi"
 
 #: resources/xnec2c.glade:15641
 msgid "Wire Taper Data"
-msgstr ""
+msgstr "Sim torayishi maʼlumotlari"
 
 #: resources/xnec2c.glade:15806
 msgid "Impedance (Zo) Ohm"
-msgstr ""
+msgstr "Impedans (Zo) Om"
 
 #: resources/xnec2c.glade:15821
 msgid "50.00"
-msgstr ""
+msgstr "50.00"
 
 #: resources/xnec2c.glade:15844
 msgid "Transmission Line Impedance (Zo)"
-msgstr ""
+msgstr "Uzatish liniyasi impedansi (Zo)"
 
 #: src/cairo/cairo_frame.c:46
 #, c-format
 msgid "cairo_frame_get_scenebuffer: unknown view_type %d\n"
-msgstr ""
+msgstr "cairo_frame_get_scenebuffer: nomaʼlum view_type %d\n"
 
 #: src/cairo/cairo_frame.c:153
 #, c-format
@@ -1975,72 +2007,78 @@ msgid ""
 "cairo: segs=%d groups=%d batch=%.1fx bins=%d deposit=%.2fms sort=%.2fms "
 "stroke=%.2fms flush=%.2fms total=%.2fms cap=%d\n"
 msgstr ""
+"cairo: segs=%d groups=%d batch=%.1fx bins=%d deposit=%.2fms sort=%.2fms "
+"stroke=%.2fms flush=%.2fms total=%.2fms cap=%d\n"
 
 #: src/cairo/cairo_scenebuffer.c:195
 #, c-format
 msgid "scenebuffer_add_polygon: n=%d > SCENE_POLY_MAX\n"
-msgstr ""
+msgstr "scenebuffer_add_polygon: n=%d > SCENE_POLY_MAX\n"
 
 #: src/cairo/cairo_scenebuffer.c:220
 msgid "scenebuffer_add_text: no base layout set\n"
-msgstr ""
+msgstr "scenebuffer_add_text: asosiy tartib belgilanmagan\n"
 
 #: src/cairo/cairo_scenebuffer_flush.c:540
 #, c-format
 msgid "scenebuffer_flush: depth_bins=%d\n"
-msgstr ""
+msgstr "scenebuffer_flush: depth_bins=%d\n"
 
 #: src/cairo/cairo_scenebuffer_flush.c:606
 msgid "scenebuffer_flush: layout has no base font description\n"
-msgstr ""
+msgstr "scenebuffer_flush: tartibda asosiy shrift tavsifi yoʻq\n"
 
 #: src/cairo/cairo_structure.c:133
 msgid "draw_wire_segments: wire_widths is NULL\n"
-msgstr ""
+msgstr "draw_wire_segments: wire_widths NULL\n"
 
 #: src/cairo/cairo_structure.c:207
 #, c-format
 msgid "draw_wire_segments: unknown ntyp=%d\n"
-msgstr ""
+msgstr "draw_wire_segments: nomaʼlum ntyp=%d\n"
 
 #: src/calculations.c:117 src/calculations.c:1272
 #, c-format
 msgid "segment connection error for segment %5d\n"
-msgstr ""
+msgstr "segment %5d uchun ulanish xatosi\n"
 
 #: src/calculations.c:118
 msgid "Segment connection error in tbf()"
-msgstr ""
+msgstr "tbf() da segment ulanish xatosi"
 
 #: src/calculations.c:890
 #, c-format
 msgid "step size limited at z= %10.5f\n"
-msgstr ""
+msgstr "qadam oʻlchami z= %10.5f da cheklandi\n"
 
 #: src/calculations.c:1054
 #, c-format
 msgid "segment connection error for segment %d\n"
-msgstr ""
+msgstr "segment %d uchun ulanish xatosi\n"
 
 #: src/calculations.c:1055
 msgid "Segment connection error in sbf()"
-msgstr ""
+msgstr "sbf() da segment ulanish xatosi"
 
 #: src/calculations.c:1273
 msgid "Segment connection error in trio()"
-msgstr ""
+msgstr "trio() da segment ulanish xatosi"
 
 #: src/callback_func.c:145
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
 msgstr ""
+"Chastota sikli ishlayapti.\n"
+"Hisobni tugatishni hohlaysizmi?"
 
 #: src/callback_func.c:149
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
 msgstr ""
+"Chastota sikli ishlayapti.\n"
+"Bu oynani yopishni xohlaysizmi?"
 
 #: src/callback_func.c:384
 #, c-format
@@ -2048,6 +2086,9 @@ msgid ""
 "Frequency plots window closed: excitation type %d is incompatible.\n"
 "Use type 0 (Applied E Field) or 5 (Current Discontinuity) instead."
 msgstr ""
+"Chastota grafiklari oynasi yopildi: qoʻzgʻatish turi %d mos kelmaydi.\n"
+"Buning oʻrniga 0-tur (Qoʻllangan E maydoni) yoki 5-tur (Tok uzilishi) "
+"foydalaning."
 
 #: src/callback_func.c:390
 #, c-format
@@ -2056,52 +2097,60 @@ msgid ""
 "This model uses Incident Field or Elementary Current Source excitation.\n"
 "Change the EX card to type 0 (Applied E Field) or 5 (Current Discontinuity)."
 msgstr ""
+"Chastota grafiklari qoʻzgʻatish turi %d bilan mavjud emas.\n"
+"Bu model Tushuvchi maydon yoki Elementar tok manbai qoʻzgʻatishidan "
+"foydalanadi.\n"
+"EX kartasini 0-tur (Qoʻllangan E maydoni) yoki 5-tur (Tok uzilishi) ga "
+"oʻzgartiring."
 
 #: src/callback_func.c:560
 msgid "View Currents"
-msgstr ""
+msgstr "Tokni koʻrish"
 
 #: src/callback_func.c:576 src/callback_func.c:626
 msgid "View Geometry"
-msgstr ""
+msgstr "Geometriyani koʻrish"
 
 #: src/callback_func.c:610
 msgid "View Charges"
-msgstr ""
+msgstr "Zaryadlarni koʻrish"
 
 #: src/callback_func.c:667
 msgid "PNG images (*.png)"
-msgstr ""
+msgstr "PNG rasmlari (*.png)"
 
 #: src/callback_func.c:669
 msgid "GNUplot files (*.gplot)"
-msgstr ""
+msgstr "GNUplot fayllari (*.gplot)"
 
 #: src/callback_func.c:671
 msgid "NEC2 files (*.nec)"
-msgstr ""
+msgstr "NEC2 fayllari (*.nec)"
 
 #: src/callback_func.c:673
 msgid "Touchstone 1-port files (*.s1p)"
-msgstr ""
+msgstr "Touchstone 1-portli fayllar (*.s1p)"
 
 #: src/callback_func.c:675
 msgid "Touchstone 2-port files (*.s2p)"
-msgstr ""
+msgstr "Touchstone 2-portli fayllar (*.s2p)"
 
 #: src/callback_func.c:677
 msgid "Comma-separated CSV files (*.csv)"
-msgstr ""
+msgstr "Vergul bilan ajratilgan CSV fayllar (*.csv)"
 
 #: src/callbacks.c:99 src/callbacks.c:115 src/freqplots/freqplots_core.c:61
 msgid "Antenna Temperature"
-msgstr ""
+msgstr "Antenna harorati"
 
 #: src/callbacks.c:100
 msgid ""
 "Ground plane detected in model. Ta results will overcount ground effects. "
 "Free-space models are standard for antenna temperature evaluation."
 msgstr ""
+"Modelda er tekisligi aniqlandi. Ta natijalari er taʼsirini ortiqcha "
+"hisoblaydi. Antenna haroratini baholash uchun erkin boʻshliq modellari "
+"standart hisoblanadi."
 
 #: src/callbacks.c:116
 #, c-format
@@ -2109,36 +2158,44 @@ msgid ""
 "Max gain at θ=%.0f° (%.0f° from XY plane). Convention assumes beam in XY "
 "plane with observation elevation set by spinbutton."
 msgstr ""
+"θ=%.0f° da maks kuchaytirish (XY tekisligidan %.0f°). Konvensiya XY "
+"tekisligidagi nurni kuzatish balandligi bilan belgilaydi."
 
 #: src/callbacks.c:186 src/callbacks.c:483 src/callbacks.c:2584
 #: src/callbacks.c:3437
 msgid "Are you sure you wish to quit xnec2c?"
-msgstr ""
+msgstr "xnec2c dasturidan chiqishni xohlaysizmi?"
 
 #: src/callbacks.c:229
 msgid ""
 "A new NEC2 input file may not be created\n"
 "while the Frequency Loop is running"
 msgstr ""
+"Chastota sikli ishlayotganda yangi NEC2\n"
+"kirish fayli yaratib boʻlmaydi"
 
 #: src/callbacks.c:266
 msgid ""
 "A new NEC2 input file may not be opened\n"
 "while the Frequency Loop is running"
 msgstr ""
+"Chastota sikli ishlayotganda yangi NEC2\n"
+"kirish faylini ochib boʻlmaydi"
 
 #: src/callbacks.c:385
 msgid "xnec2c geometry optimizer"
-msgstr ""
+msgstr "xnec2c geometriya optimallashtiruvchisi"
 
 #: src/callbacks.c:386
 msgid ""
 "xnec2c was built without inotify support: the optimizer cannot be enabled."
 msgstr ""
+"xnec2c inotify qoʻllab-quvvatlamasdan qurilgan: optimallashtiruvchini "
+"faollashtirish mumkin emas."
 
 #: src/callbacks.c:410
 msgid "Xnec2c Optimizer"
-msgstr ""
+msgstr "Xnec2c Optimallashtiruvchisi"
 
 #: src/callbacks.c:410
 msgid ""
@@ -2146,51 +2203,60 @@ msgid ""
 "recalculate the input file on modification when triggered by inotify.Select "
 "files for writing in \"File->Optimization Settings\"."
 msgstr ""
+"Yozish uchun hech qanday fayl tanlanmagan. Biroq xnec2c inotify orqali ishga "
+"tushganda kirish faylini qayta yuklaydi va hisobni bajaradi. \"Fayl-"
+">Optimallashtirish sozlamalari\" da yozish uchun fayllarni tanlang."
 
 #: src/callbacks.c:421
 msgid "failed to create Optimizer Output thread\n"
-msgstr ""
+msgstr "Optimallashtiruvchi chiqish iplini yaratib boʻlmadi\n"
 
 #: src/callbacks.c:1356 src/callbacks.c:1750 src/callbacks.c:3463
 msgid "Are you sure you wish to close this window?"
-msgstr ""
+msgstr "Bu oynani yopishni xohlaysizmi?"
 
 #: src/callbacks.c:2331
 msgid "OpenGL is not available on this display; cannot enable renderer.\n"
-msgstr ""
+msgstr "OpenGL bu displeyda mavjud emas; renderni faollashtirib boʻlmaydi.\n"
 
 #: src/callbacks.c:2761 src/callbacks.c:2774
 msgid "unexpected canonical widget type"
-msgstr ""
+msgstr "kutilmagan kanonik vidjet turi"
 
 #: src/callbacks.c:2914
 msgid ""
 "Current flow animation requires surface patches (SP/SM cards) in the model."
 msgstr ""
+"Tok oqimi animatsiyasi modelda sirt patchlarini (SP/SM kartalari) talab "
+"qiladi."
 
 #: src/callbacks.c:3181
 msgid "Animation"
-msgstr ""
+msgstr "Animatsiya"
 
 #: src/callbacks.c:3182
 msgid ""
 "Animation requires surface patches (SP/SM NEC cards) or near-field data (NE/"
 "NH NEC cards)"
 msgstr ""
+"Animatsiya sirt patchlarini (SP/SM NEC kartalari) yoki yaqin maydon "
+"maʼlumotlarini (NE/NH NEC kartalari) talab qiladi"
 
 #: src/callbacks.c:3401
 msgid "No open NEC2 input file"
-msgstr ""
+msgstr "Ochiq NEC2 kirish fayli yoʻq"
 
 #: src/callbacks.c:3494 src/callbacks.c:3524
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
 msgstr ""
+"Chastota sikli ishlayotganda NEC2 Muharriri\n"
+"maʼlumotlarini saqlab boʻlmaydi"
 
 #: src/callbacks.c:3506 src/callbacks.c:3532
 msgid "untitled.nec"
-msgstr ""
+msgstr "nomsiz.nec"
 
 #: src/callbacks.c:3997 src/callbacks.c:4017 src/callbacks.c:4037
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
@@ -2198,229 +2264,237 @@ msgid ""
 "Frequency (FR) cards not yet processed.\n"
 "You may need to save the NEC2 Editor data first."
 msgstr ""
+"Chastota (FR) kartalari hali qayta ishlanmagan.\n"
+"Avval NEC2 Muharriri maʼlumotlarini saqlashingiz kerak."
 
 #: src/cmnd_edit.c:108
 msgid ""
 "Get_Command_Data(): Error reading\n"
 "row data: Invalid list iterator"
 msgstr ""
+"Get_Command_Data(): Qator maʼlumotlarini oʻqishda xato:\n"
+"Yaroqsiz roʻyxat iterator"
 
 #: src/cmnd_edit.c:151
 msgid ""
 "Set_Command_Data(): Error writing row data\n"
 "Please re-select row"
 msgstr ""
+"Set_Command_Data(): Qator maʼlumotlarini yozishda xato.\n"
+"Iltimos, qatorni qayta tanlang"
 
 #: src/cmnd_edit.c:490
 msgid "Voltage Real Part"
-msgstr ""
+msgstr "Kuchlanish haqiqiy qismi"
 
 #: src/cmnd_edit.c:491
 msgid "Voltage Imaginary Part"
-msgstr ""
+msgstr "Kuchlanish mavhum qismi"
 
 #: src/cmnd_edit.c:492 src/cmnd_edit.c:1774
 msgid "Normalization Factor"
-msgstr ""
+msgstr "Normallashtirish koeffitsienti"
 
 #: src/cmnd_edit.c:493 src/cmnd_edit.c:494 src/cmnd_edit.c:495
 #: src/cmnd_edit.c:531 src/cmnd_edit.c:532 src/cmnd_edit.c:2014
 #: src/cmnd_edit.c:2025 src/cmnd_edit.c:2026
 msgid "  ** NOT USED **"
-msgstr ""
+msgstr "  ** ISHLATILMAYDI **"
 
 #: src/cmnd_edit.c:513
 msgid "Num of Theta Angles"
-msgstr ""
+msgstr "Theta burchaklari soni"
 
 #: src/cmnd_edit.c:514
 msgid "Num of Phi Angles"
-msgstr ""
+msgstr "Phi burchaklari soni"
 
 #: src/cmnd_edit.c:515
 msgid "Theta Angle (deg)"
-msgstr ""
+msgstr "Theta burchagi (daraja)"
 
 #: src/cmnd_edit.c:516
 msgid "Phi Angle (deg)"
-msgstr ""
+msgstr "Phi burchagi (daraja)"
 
 #: src/cmnd_edit.c:517
 msgid "Eta Angle (deg)"
-msgstr ""
+msgstr "Eta burchagi (daraja)"
 
 #: src/cmnd_edit.c:518
 msgid "Theta Increment (deg)"
-msgstr ""
+msgstr "Theta orttirmasi (daraja)"
 
 #: src/cmnd_edit.c:519
 msgid "Phi Increment (deg)"
-msgstr ""
+msgstr "Phi orttirmasi (daraja)"
 
 #: src/cmnd_edit.c:520
 msgid "Minor/Major Axis"
-msgstr ""
+msgstr "Kichik/Asosiy oʻq"
 
 #: src/cmnd_edit.c:533
 msgid "X Position (m)"
-msgstr ""
+msgstr "X holati (m)"
 
 #: src/cmnd_edit.c:534
 msgid "Y Position (m)"
-msgstr ""
+msgstr "Y holati (m)"
 
 #: src/cmnd_edit.c:535
 msgid "Z Position (m)"
-msgstr ""
+msgstr "Z holati (m)"
 
 #: src/cmnd_edit.c:536
 msgid "alpha Angle (deg)"
-msgstr ""
+msgstr "alpha burchagi (daraja)"
 
 #: src/cmnd_edit.c:537
 msgid "beta Angle (deg)"
-msgstr ""
+msgstr "beta burchagi (daraja)"
 
 #: src/cmnd_edit.c:538
 msgid "Current Moment (A.m)"
-msgstr ""
+msgstr "Tok momenti (A.m)"
 
 #: src/cmnd_edit.c:1751
 msgid "Points in Z"
-msgstr ""
+msgstr "Z dagi nuqtalar"
 
 #: src/cmnd_edit.c:1752
 msgid "Initial Z (m)"
-msgstr ""
+msgstr "Boshlangʻich Z (m)"
 
 #: src/cmnd_edit.c:1753
 msgid "Increment in Z"
-msgstr ""
+msgstr "Z orttirmasi"
 
 #: src/cmnd_edit.c:1754
 msgid "Field Point R (m)"
-msgstr ""
+msgstr "Maydon nuqtasi R (m)"
 
 #: src/cmnd_edit.c:1765
 msgid "R (m) (Optional)"
-msgstr ""
+msgstr "R (m) (Ixtiyoriy)"
 
 #: src/cmnd_edit.c:1778
 msgid "** NOT USED **"
-msgstr ""
+msgstr "** ISHLATILMAYDI **"
 
 #: src/cmnd_edit.c:1988 src/cmnd_edit.c:2012
 msgid "Resistance Ohm"
-msgstr ""
+msgstr "Qarshilik Om"
 
 #: src/cmnd_edit.c:1989
 msgid "Inductance uH"
-msgstr ""
+msgstr "Induktivlik uH"
 
 #: src/cmnd_edit.c:1990
 msgid "Capacitance pF"
-msgstr ""
+msgstr "Sigʻim pF"
 
 #: src/cmnd_edit.c:2000
 msgid "Resistance Ohm/m"
-msgstr ""
+msgstr "Qarshilik Om/m"
 
 #: src/cmnd_edit.c:2001
 msgid "Inductance uH/m"
-msgstr ""
+msgstr "Induktivlik uH/m"
 
 #: src/cmnd_edit.c:2002
 msgid "Capacitance pF/m"
-msgstr ""
+msgstr "Sigʻim pF/m"
 
 #: src/cmnd_edit.c:2013
 msgid "Reactance Ohm"
-msgstr ""
+msgstr "Reaktans Om"
 
 #: src/cmnd_edit.c:2685
 msgid "Points in X-axis"
-msgstr ""
+msgstr "X oʻqidagi nuqtalar"
 
 #: src/cmnd_edit.c:2686
 msgid "Points in Y-axis"
-msgstr ""
+msgstr "Y oʻqidagi nuqtalar"
 
 #: src/cmnd_edit.c:2687
 msgid "Points in Z-axis"
-msgstr ""
+msgstr "Z oʻqidagi nuqtalar"
 
 #: src/cmnd_edit.c:2688
 msgid "First Point X (m)"
-msgstr ""
+msgstr "Birinchi nuqta X (m)"
 
 #: src/cmnd_edit.c:2689
 msgid "First Point Y (m)"
-msgstr ""
+msgstr "Birinchi nuqta Y (m)"
 
 #: src/cmnd_edit.c:2690
 msgid "First Point Z (m)"
-msgstr ""
+msgstr "Birinchi nuqta Z (m)"
 
 #: src/cmnd_edit.c:2691
 msgid "Increment in X (m)"
-msgstr ""
+msgstr "X orttirmasi (m)"
 
 #: src/cmnd_edit.c:2692
 msgid "Increment in Y (m)"
-msgstr ""
+msgstr "Y orttirmasi (m)"
 
 #: src/cmnd_edit.c:2693
 msgid "Increment in Z (m)"
-msgstr ""
+msgstr "Z orttirmasi (m)"
 
 #: src/cmnd_edit.c:2701
 msgid "Points along R"
-msgstr ""
+msgstr "R boʻylab nuqtalar"
 
 #: src/cmnd_edit.c:2702
 msgid "Points along Phi"
-msgstr ""
+msgstr "Phi boʻylab nuqtalar"
 
 #: src/cmnd_edit.c:2703
 msgid "Points along Theta"
-msgstr ""
+msgstr "Theta boʻylab nuqtalar"
 
 #: src/cmnd_edit.c:2704
 msgid "First Point R (m)"
-msgstr ""
+msgstr "Birinchi nuqta R (m)"
 
 #: src/cmnd_edit.c:2705
 msgid "First Point Phi"
-msgstr ""
+msgstr "Birinchi nuqta Phi"
 
 #: src/cmnd_edit.c:2706
 msgid "First Point Theta"
-msgstr ""
+msgstr "Birinchi nuqta Theta"
 
 #: src/cmnd_edit.c:2707
 msgid "Increment in R (m)"
-msgstr ""
+msgstr "R orttirmasi (m)"
 
 #: src/expr_edit.h:34
 msgid ""
 "Value is controlled by an SY expression.\n"
 "Edit the SY card to change this value."
 msgstr ""
+"Qiymat SY ifodasi bilan boshqariladi.\n"
+"Bu qiymatni oʻzgartirish uchun SY kartasini tahrirlang."
 
 #: src/fields.c:923
 #, c-format
 msgid "step size limited at z= %10.5f"
-msgstr ""
+msgstr "qadam oʻlchami z= %10.5f da cheklandi"
 
 #: src/fork.c:164 src/fork.c:452
 #, c-format
 msgid "child %d  length %d  return %d\n"
-msgstr ""
+msgstr "bola %d  uzunlik %d  qaytish %d\n"
 
 #: src/fork.c:458
 #, c-format
 msgid "early EOF?, child %d  length %d  return %d\n"
-msgstr ""
+msgstr "erta EOF?, bola %d  uzunlik %d  qaytish %d\n"
 
 #: src/geom_edit.c:108 src/geom_edit.c:2000 src/geom_edit.c:2272
 #: src/geom_edit.c:2703
@@ -2428,138 +2502,158 @@ msgid ""
 "Error reading row data\n"
 "Invalid list iterator"
 msgstr ""
+"Qator maʼlumotlarini oʻqishda xato\n"
+"Yaroqsiz roʻyxat iterator"
 
 #: src/geom_edit.c:151 src/geom_edit.c:181
 msgid ""
 "Error writing row data\n"
 "Please re-select row"
 msgstr ""
+"Qator maʼlumotlarini yozishda xato\n"
+"Iltimos, qatorni qayta tanlang"
 
 #: src/geom_edit.c:583
 msgid ""
 "GC card preceded by GW card\n"
 "with non-zero wire radius"
 msgstr ""
+"GC kartasidan oldin nol boʻlmagan sim radiusli\n"
+"GW kartasi keladi"
 
 #: src/geom_edit.c:587
 msgid "No GW card before GC card"
-msgstr ""
+msgstr "GC kartasidan oldin GW kartasi yoʻq"
 
 #: src/geom_edit.c:611
 msgid ""
 "No GC card after a GW card\n"
 "with a zero wire radius"
 msgstr ""
+"Nol sim radiusli GW kartasidan\n"
+"keyin GC kartasi yoʻq"
 
 #: src/geom_edit.c:620
 msgid ""
 "GC card follows a GW card\n"
 "with non-zero wire radius"
 msgstr ""
+"GC kartasi nol boʻlmagan sim radiusli\n"
+"GW kartasidan keyin keladi"
 
 #: src/geom_edit.c:1025
 msgid ""
 "SC card preceded by SP card\n"
 "with arbitrary patch type"
 msgstr ""
+"SC kartasidan oldin ixtiyoriy patch turli\n"
+"SP kartasi keladi"
 
 #: src/geom_edit.c:1037
 msgid "No SP or SM card before SC card"
-msgstr ""
+msgstr "SC kartasidan oldin SP yoki SM kartasi yoʻq"
 
 #: src/geom_edit.c:1057
 msgid ""
 "No SC card after an SP card\n"
 "with non-arbitrary patch type"
 msgstr ""
+"Ixtiyoriy boʻlmagan patch turli SP\n"
+"kartasidan keyin SC kartasi yoʻq"
 
 #: src/geom_edit.c:1064
 msgid ""
 "SC card follows an SP card\n"
 "with arbitrary patch type"
 msgstr ""
+"SC kartasi ixtiyoriy patch turli\n"
+"SP kartasidan keyin keladi"
 
 #: src/geom_edit.c:1077
 msgid "No SC card after an SM card"
-msgstr ""
+msgstr "SM kartasidan keyin SC kartasi yoʻq"
 
 #: src/geom_edit.c:1172
 msgid "Corner 1 - X"
-msgstr ""
+msgstr "1-burchak - X"
 
 #: src/geom_edit.c:1174
 msgid "Corner 1 - Y"
-msgstr ""
+msgstr "1-burchak - Y"
 
 #: src/geom_edit.c:1176
 msgid "Corner 1 - Z"
-msgstr ""
+msgstr "1-burchak - Z"
 
 #: src/geom_edit.c:1178
 msgid "Corner 2 - X"
-msgstr ""
+msgstr "2-burchak - X"
 
 #: src/geom_edit.c:1180
 msgid "Corner 2 - Y"
-msgstr ""
+msgstr "2-burchak - Y"
 
 #: src/geom_edit.c:1182
 msgid "Corner 2 - Z"
-msgstr ""
+msgstr "2-burchak - Z"
 
 #: src/geom_edit.c:2861
 msgid "SY Card Editor"
-msgstr ""
+msgstr "SY Karta Muharriri"
 
 #: src/geom_edit.c:2871
 msgid "SY definition (e.g. FREQ=146, LAMBDA=300/FREQ):"
-msgstr ""
+msgstr "SY taʼrifi (masalan FREQ=146, LAMBDA=300/FREQ):"
 
 #: src/geom_edit.c:2970
 msgid "NEC2 editor window not open"
-msgstr ""
+msgstr "NEC2 muharriri oynasi ochiq emas"
 
 #: src/geometry.c:97
 msgid "Number of segments < 1"
-msgstr ""
+msgstr "Segmentlar soni < 1"
 
 #: src/geometry.c:134
 msgid "Arc angle exceeds 360 degrees"
-msgstr ""
+msgstr "Yoy burchagi 360 darajadan oshib ketdi"
 
 #: src/geometry.c:273
 msgid "Error in conect(): np > n"
-msgstr ""
+msgstr "conect() da xato: np > n"
 
 #: src/geometry.c:304 src/geometry.c:352
 #, c-format
 msgid "geometry data error: segment %d extends below ground\n"
-msgstr ""
+msgstr "geometriya maʼlumot xatosi: segment %d erdan pastga oʻtadi\n"
 
 #: src/geometry.c:305 src/geometry.c:353
 msgid ""
 "Geometry data error\n"
 "Segment extends below ground"
 msgstr ""
+"Geometriya maʼlumot xatosi\n"
+"Segment erdan pastga oʻtadi"
 
 #: src/geometry.c:362
 #, c-format
 msgid "geometry data error: segment %d lies in ground plane\n"
-msgstr ""
+msgstr "geometriya maʼlumot xatosi: segment %d er tekisligida yotadi\n"
 
 #: src/geometry.c:363
 msgid ""
 "Geometry data error\n"
 "Segment lies in ground plane"
 msgstr ""
+"Geometriya maʼlumot xatosi\n"
+"Segment er tekisligida yotadi"
 
 #: src/geometry.c:453
 msgid "ipsym = 0\n"
-msgstr ""
+msgstr "ipsym = 0\n"
 
 #: src/geometry.c:454
 msgid "Error: ipsym = 0"
-msgstr ""
+msgstr "Xato: ipsym = 0"
 
 #: src/geometry.c:507
 #, c-format
@@ -2567,29 +2661,37 @@ msgid ""
 "Segment connection count exceeds a full mesh, which is unlikely: data.n=%ld "
 "segj.maxcon=%lu\n"
 msgstr ""
+"Segment ulanish soni toʻliq toʻrdan oshib ketdi, bu ehtimolsiz: data.n=%ld "
+"segj.maxcon=%lu\n"
 
 #: src/geometry.c:509
 msgid ""
 "Segment connection count exceeds a full mesh, which is unlikely!\n"
 "Check for overlapping or nearly-connected segments\n"
 msgstr ""
+"Segment ulanish soni toʻliq toʻrdan oshib ketdi, bu ehtimolsiz!\n"
+"Bir-biriga oʻchib ketgan yoki yaqin ulangan segmentlarni tekshiring\n"
 
 #: src/geometry.c:704
 msgid ""
 "check data, parameter specifying segment: position in a group of equal tags "
 "must not be zero\n"
 msgstr ""
+"maʼlumotni tekshiring, segment parametri: teng teglar guruhidagi\n"
+"pozitsiya nol boʻlmasligi kerak\n"
 
 #: src/geometry.c:705
 msgid ""
 "Parameter specifying segment\n"
 "position in a group of equal tags is zero"
 msgstr ""
+"Teng teglar guruhidagi segment pozitsiyasini\n"
+"belgilovchi parametr nolga teng"
 
 #: src/geometry.c:737
 #, c-format
 msgid "no segment has an itag of %d\n"
-msgstr ""
+msgstr "hech bir segmentning itag qiymati %d emas\n"
 
 #: src/geometry.c:741
 msgid ""
@@ -2598,6 +2700,11 @@ msgid ""
 "valid.\n"
 "For GM cards: verify 'start from tag' and 'tag increment' don't create tag 0."
 msgstr ""
+"Segment teg raqami xatosi: Teg 0 zahirada va ishlatib boʻlmaydi.\n"
+"Teg qiymatlari toʻgʻriligini tekshirish uchun geometriya kartalarini "
+"(ayniqsa GM) koʻrib chiqing.\n"
+"GM uchun: 'tegdan boshlash' va 'teg orttirmasi' teg 0 yaratmasligini "
+"tekshiring."
 
 #: src/geometry.c:749
 #, c-format
@@ -2606,6 +2713,9 @@ msgid ""
 "You are referencing an unknown tag or segment in a control card.\n"
 "Valid tags in your geometry are those assigned to GW/GA/GH/SP cards."
 msgstr ""
+"Segment teg raqami xatosi: Teg %d bilan segment topilmadi.\n"
+"Siz boshqaruv kartasida nomaʼlum teg yoki segmentga murojaat qilyapsiz.\n"
+"Geometriyangizdagi toʻgʻri teglar GW/GA/GH/SP kartalariga tayinlanganlardir."
 
 #: src/geometry.c:752 src/input.c:1576 src/input.c:1577 src/mathlib.c:752
 #: src/mathlib.c:989 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
@@ -2613,39 +2723,45 @@ msgstr ""
 #: src/utils.c:444
 #, c-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: src/geometry.c:1024
 msgid "corners of quadrilateral: patch do not lie in a plane\n"
-msgstr ""
+msgstr "toʻrtburchak burchaklari: patch bir tekislikda yotmaydi\n"
 
 #: src/geometry.c:1025
 msgid ""
 "Corners of quadrilateral\n"
 "patch do not lie in a plane"
 msgstr ""
+"Toʻrtburchak burchaklari\n"
+"patch bir tekislikda yotmaydi"
 
 #: src/geometry.c:1130 src/geometry.c:1207 src/geometry.c:1285
 #, c-format
 msgid "geometry data error: segment %d lies in plane of symmetry\n"
-msgstr ""
+msgstr "geometriya maʼlumot xatosi: segment %d simmetriya tekisligida yotadi\n"
 
 #: src/geometry.c:1131 src/geometry.c:1208 src/geometry.c:1286
 msgid ""
 "Geometry data error\n"
 "Segment lies in plane of symmetry"
 msgstr ""
+"Geometriya maʼlumot xatosi\n"
+"Segment simmetriya tekisligida yotadi"
 
 #: src/geometry.c:1167 src/geometry.c:1244 src/geometry.c:1319
 #, c-format
 msgid "geometry data error: patch %d lies in plane of symmetry\n"
-msgstr ""
+msgstr "geometriya maʼlumot xatosi: patch %d simmetriya tekisligida yotadi\n"
 
 #: src/geometry.c:1168 src/geometry.c:1245 src/geometry.c:1320
 msgid ""
 "Geometry data error\n"
 "Patch lies in plane of symmetry"
 msgstr ""
+"Geometriya maʼlumot xatosi\n"
+"Patch simmetriya tekisligida yotadi"
 
 #: src/geometry.c:1440
 #, c-format
@@ -2653,11 +2769,14 @@ msgid ""
 "tag=%d/seg=%d: endpoint distance=%.3e is too close (below connection "
 "threshold=%.3e); segment will connect to itself\n"
 msgstr ""
+"teg=%d/seg=%d: oxirgi nuqta masofasi=%.3e juda yaqin (ulash chegarasidan "
+"past=%.3e); segment oʻziga ulanadi\n"
 
 #: src/geometry.c:1445
 #, c-format
 msgid "tag=%d: suppressing additional self-connection warnings\n"
 msgstr ""
+"teg=%d: qoʻshimcha oʻz-oʻziga ulanish ogohlantirishlari bostirilyapti\n"
 
 #: src/geometry.c:1495
 #, c-format
@@ -2665,11 +2784,13 @@ msgid ""
 "tag=%d/seg=%d: distance=%.3e to tag=%d/seg=%d closer than 2x connection "
 "threshold %.3e; unintended connections possible\n"
 msgstr ""
+"teg=%d/seg=%d: masofa=%.3e teg=%d/seg=%d ga ulash chegarasi %.3e dan 2 "
+"baravar yaqin; kutilmagan ulanishlar mumkin\n"
 
 #: src/geometry.c:1501
 #, c-format
 msgid "tag=%d: suppressing additional overlap warnings\n"
-msgstr ""
+msgstr "teg=%d: qoʻshimcha qoplashish ogohlantirishlari bostirilyapti\n"
 
 #: src/geometry.c:1570
 #, c-format
@@ -2677,6 +2798,9 @@ msgid ""
 "tag=%d/seg=%d: length=%.3e is too short (and close enough) to tag=%d/seg=%d "
 "length=%.3e that connection detection may fail or short\n"
 msgstr ""
+"teg=%d/seg=%d: uzunlik=%.3e juda qisqa (va yaqin) teg=%d/seg=%d uzunligi="
+"%.3e ga, ulanishni aniqlash muvaffaqiyatsiz boʻlishi yoki qisqa tutashuv "
+"mumkin\n"
 
 #: src/geometry.c:1576
 #, c-format
@@ -2684,6 +2808,8 @@ msgid ""
 "tag=%d: suppressing additional connection detection may fail or short "
 "warnings\n"
 msgstr ""
+"teg=%d: qoʻshimcha ulanish aniqlash muvaffaqiyatsizligi yoki qisqa tutashuv "
+"ogohlantirishlari bostirilyapti\n"
 
 #: src/geometry.c:1609
 #, c-format
@@ -2692,11 +2818,15 @@ msgid ""
 "current components leads to numerical inaccuracies (min=0.001, fine=0.05, "
 "recommended <= 0.1)\n"
 msgstr ""
+"teg=%d/seg=%d: uzunlik/toʻlqin uzunligi nisbati %.3f < 0.001; tok "
+"komponentlarining oʻxshashligi raqamli noaniqliqlarga olib keladi "
+"(min=0.001, yaxshi=0.05, tavsiya <=0.1)\n"
 
 #: src/geometry.c:1614
 #, c-format
 msgid "tag=%d: suppressing additional short wavelength ratio errors\n"
 msgstr ""
+"teg=%d: qoʻshimcha qisqa toʻlqin uzunligi nisbati xatolari bostirilyapti\n"
 
 #: src/geometry.c:1628
 #, c-format
@@ -2705,11 +2835,16 @@ msgid ""
 "resolution limited by segment spacing (min=0.001, fine=0.05, recommended <= "
 "0.1)\n"
 msgstr ""
+"teg=%d/seg=%d: uzunlik/toʻlqin uzunligi nisbati %.3f > 0.1; tok namunalash "
+"ruxsati segment oraligʻi bilan cheklangan (min=0.001, yaxshi=0.05, tavsiya "
+"<=0.1)\n"
 
 #: src/geometry.c:1633
 #, c-format
 msgid "tag=%d: suppressing additional long wavelength ratio warnings\n"
 msgstr ""
+"teg=%d: qoʻshimcha uzun toʻlqin uzunligi nisbati ogohlantirishlari "
+"bostirilyapti\n"
 
 #: src/geometry.c:1647
 #, c-format
@@ -2718,11 +2853,14 @@ msgid ""
 "increase accuracy in regions of rapid current change (min=0.001, fine=0.05, "
 "recommended <=0.1)\n"
 msgstr ""
+"teg=%d/seg=%d: uzunlik/toʻlqin uzunligi nisbati %.3f > 0.05; qisqaroq "
+"segmentlar tez tok oʻzgarishi hududlarida aniqlikni oshiradi (min=0.001, "
+"yaxshi=0.05, tavsiya <=0.1)\n"
 
 #: src/geometry.c:1652
 #, c-format
 msgid "tag=%d: suppressing additional accuracy improvement suggestions\n"
-msgstr ""
+msgstr "teg=%d: qoʻshimcha aniqlikni yaxshilash tavsiyalari bostirilyapti\n"
 
 #: src/geometry.c:1683
 #, c-format
@@ -2730,11 +2868,13 @@ msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; standard thin-wire kernel "
 "field error exceeds 1%% by a large margin (min=2.0, 1%%accurate=8.0)\n"
 msgstr ""
+"teg=%d/seg=%d: uzunlik/radius nisbati %.1f < 2.0; standart yupqa sim yadrosi "
+"maydon xatosi 1%% dan katta farqda oshib ketadi (min=2.0, 1%%aniq=8.0)\n"
 
 #: src/geometry.c:1688
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio errors\n"
-msgstr ""
+msgstr "teg=%d: qoʻshimcha standart yadro nisbati xatolari bostirilyapti\n"
 
 #: src/geometry.c:1702
 #, c-format
@@ -2742,11 +2882,14 @@ msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 8.0; standard thin-wire kernel "
 "field error exceeds 1%% (min=2.0, 1%%accurate=8.0)\n"
 msgstr ""
+"teg=%d/seg=%d: uzunlik/radius nisbati %.1f < 8.0; standart yupqa sim yadrosi "
+"maydon xatosi 1%% dan oshib ketadi (min=2.0, 1%%aniq=8.0)\n"
 
 #: src/geometry.c:1707
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio warnings\n"
 msgstr ""
+"teg=%d: qoʻshimcha standart yadro nisbati ogohlantirishlari bostirilyapti\n"
 
 #: src/geometry.c:1723
 #, c-format
@@ -2754,11 +2897,15 @@ msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 0.5; extended thin-wire kernel "
 "field error exceeds 1%% by a large margin (min=0.5, 1%%accurate=2.0)\n"
 msgstr ""
+"teg=%d/seg=%d: uzunlik/radius nisbati %.1f < 0.5; kengaytirilgan yupqa sim "
+"yadrosi maydon xatosi 1%% dan katta farqda oshib ketadi (min=0.5, "
+"1%%aniq=2.0)\n"
 
 #: src/geometry.c:1728
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio errors\n"
 msgstr ""
+"teg=%d: qoʻshimcha kengaytirilgan yadro nisbati xatolari bostirilyapti\n"
 
 #: src/geometry.c:1742
 #, c-format
@@ -2766,39 +2913,47 @@ msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; extended thin-wire kernel "
 "field error exceeds 1%% (min=0.5, 1%%accurate=2.0)\n"
 msgstr ""
+"teg=%d/seg=%d: uzunlik/radius nisbati %.1f < 2.0; kengaytirilgan yupqa sim "
+"yadrosi maydon xatosi 1%% dan oshib ketadi (min=0.5, 1%%aniq=2.0)\n"
 
 #: src/geometry.c:1747
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio warnings\n"
 msgstr ""
+"teg=%d: qoʻshimcha kengaytirilgan yadro nisbati ogohlantirishlari "
+"bostirilyapti\n"
 
 #: src/geometry.c:1764
 #, c-format
 msgid "Skipping overlap check for %d segments (use --force-verify to enable)\n"
 msgstr ""
+"%d segment uchun qoplashish tekshiruvi oʻtkazib yuborilmoqda (yoqish uchun --"
+"force-verify dan foydalaning)\n"
 
 #: src/geometry.c:1768
 #, c-format
 msgid "Forcing overlap check for %d segments\n"
-msgstr ""
+msgstr "%d segment uchun qoplashish tekshiruvi majburlab bajarilmoqda\n"
 
 #: src/geometry.c:1779
 msgid ""
 "verify_segments() skipping frequency-dependent checks - no frequency data\n"
 msgstr ""
+"verify_segments() chastotaga bogʻliq tekshiruvlarni oʻtkazib yubormoqda - "
+"chastota maʼlumotlari yoʻq\n"
 
 #: src/gnuplot.c:47
 msgid "Gnuplot Data"
-msgstr ""
+msgstr "Gnuplot maʼlumotlari"
 
 #: src/gnuplot.c:47 src/gnuplot.c:91 src/gnuplot.c:174
 msgid "Cannot save data while frequency loop is running"
-msgstr ""
+msgstr "Chastota aylanishi ishlayotganda maʼlumotlarni saqlab boʻlmaydi"
 
 #: src/gnuplot.c:61
 #, c-format
 msgid "# Reference impedance Z0 = %.2f Ohm\n"
-msgstr ""
+msgstr "# Mos yozuvlar impedansi Z0 = %.2f Ohm\n"
 
 #: src/gnuplot.c:63
 #, c-format
@@ -2806,6 +2961,8 @@ msgid ""
 "# To plot in gnuplot you can modify this command.  Presently it plots MHz vs "
 "zreal and zimag:\n"
 msgstr ""
+"# Gnuplot da chizish uchun ushbu buyruqni oʻzgartirish mumkin. Hozirda u MHz "
+"va zreal hamda zimag ni chizadi:\n"
 
 #: src/gnuplot.c:64
 #, c-format
@@ -2813,50 +2970,52 @@ msgid ""
 "#    plot for [i=2:3]  'filename.gplot' using 1:i with lines smooth bezier "
 "title columnhead(i);\n"
 msgstr ""
+"#    plot for [i=2:3]  'filename.gplot' using 1:i with lines smooth bezier "
+"title columnhead(i);\n"
 
 #: src/gnuplot.c:91 src/gnuplot.c:174
 msgid "Touchstone Data"
-msgstr ""
+msgstr "Touchstone maʼlumotlari"
 
 #: src/gnuplot.c:105
 #, c-format
 msgid "! Reference impedance Z0 = %.2f Ohm\n"
-msgstr ""
+msgstr "! Mos yozuvlar impedansi Z0 = %.2f Ohm\n"
 
 #: src/gnuplot.c:133
 #, c-format
 msgid "This should never happen. touchstone type=%d\n"
-msgstr ""
+msgstr "Bu hech qachon boʻlmasligi kerak. touchstone turi=%d\n"
 
 #: src/gnuplot.c:237
 #, c-format
 msgid "# Near E field\n"
-msgstr ""
+msgstr "# Yaqin E maydoni\n"
 
 #: src/gnuplot.c:260
 #, c-format
 msgid "# Near H field\n"
-msgstr ""
+msgstr "# Yaqin H maydoni\n"
 
 #: src/gnuplot.c:306
 #, c-format
 msgid "# Poynting Vector\n"
-msgstr ""
+msgstr "# Poyting vektori\n"
 
 #: src/gnuplot.c:378
 #, c-format
 msgid "# Radiation Pattern\n"
-msgstr ""
+msgstr "# Nurlanish diagrammasi\n"
 
 #: src/gnuplot.c:516
 #, c-format
 msgid "# structure patch segments\n"
-msgstr ""
+msgstr "# tuzilma patch segmentlari\n"
 
 #: src/gnuplot.c:551
 #, c-format
 msgid "# structure wire segments\n"
-msgstr ""
+msgstr "# tuzilma sim segmentlari\n"
 
 #: src/gnuplot.c:581
 #, c-format
@@ -2864,51 +3023,61 @@ msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
 "close\"\n"
 msgstr ""
+"Koʻrish uchun: gnuplot -e \"set terminal qt; splot '%s' with lines; pause "
+"mouse close\"\n"
 
 #: src/gnuplot.c:593
 msgid "Save Currents and Charges to CSV"
-msgstr ""
+msgstr "Toklar va zaryadlarni CSV ga saqlash"
 
 #: src/gnuplot.c:594
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
 msgstr ""
+"Asosiy xnec2c oynasida \"Toklar\" yoki \"Zaryadlar\" tugmasini bosib tok "
+"maʼlumotlarini yoqishingiz kerak."
 
 #: src/gnuplot.c:659 src/gnuplot.c:669
 msgid "Save Patch Currents to CSV"
-msgstr ""
+msgstr "Patch toklarini CSV ga saqlash"
 
 #: src/gnuplot.c:660
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
 msgstr ""
+"Asosiy xnec2c oynasida \"Toklar\" yoki \"Zaryadlar\" tugmasini bosib tok "
+"maʼlumotlarini yoqishingiz kerak."
 
 #: src/gnuplot.c:670
 msgid "No surface patches in this model."
-msgstr ""
+msgstr "Bu modelda sirt patch segmentlari yoʻq."
 
 #: src/ground.c:90
 msgid "b less than a"
-msgstr ""
+msgstr "b a dan kichik"
 
 #: src/ground.c:215
 #, c-format
 msgid "step size limited at z = %12.5E\n"
-msgstr ""
+msgstr "qadam oʻlchami z = %12.5E da cheklangan\n"
 
 #: src/input.c:92
 msgid ""
 "Error reading Comments\n"
 "Unexpected EOF (End of File)"
 msgstr ""
+"Izohlarni oʻqishda xato\n"
+"Kutilmagan fayl oxiri (EOF)"
 
 #: src/input.c:106
 msgid ""
 "Error reading Comments\n"
 "Comment mnemonic short or missing"
 msgstr ""
+"Izohlarni oʻqishda xato\n"
+"Izoh mnemonik kodi qisqa yoki yoʻq"
 
 #: src/input.c:117
 msgid ""
@@ -2916,85 +3085,96 @@ msgid ""
 " Error reading input file\n"
 "Comment mnemonic incorrect"
 msgstr ""
+"Read_Comments():\n"
+" Kirish faylini oʻqishda xato\n"
+"Izoh mnemonik kodi notoʻgʻri"
 
 #: src/input.c:155
 msgid ""
 "Geometry data error\n"
 "Tag number is less than 1"
 msgstr ""
+"Geometriya maʼlumot xatosi\n"
+"Teg raqami 1 dan kichik"
 
 #: src/input.c:162
 msgid ""
 "Geometry data error\n"
 "Number of segments is less than 1"
 msgstr ""
+"Geometriya maʼlumot xatosi\n"
+"Segmentlar soni 1 dan kichik"
 
 #: src/input.c:169
 msgid "warning - number of segments is greater than 1000000\n"
-msgstr ""
+msgstr "ogohlantirish - segmentlar soni 1000000 dan katta\n"
 
 #: src/input.c:217
 #, c-format
 msgid "%s data card error: Spurious character '%c' at column %d\n"
-msgstr ""
+msgstr "%s maʼlumot kartasi xatosi: '%c' notoʻgʻri belgi %d-ustunda\n"
 
 #: src/input.c:219
 msgid ""
 "Data card error\n"
 "Spurious character in card"
 msgstr ""
+"Maʼlumot kartasi xatosi\n"
+"Kartada notoʻgʻri belgi"
 
 #: src/input.c:274
 #, c-format
 msgid "%s: expression evaluation failed for \"%s\"\n"
-msgstr ""
+msgstr "%s: \"%s\" uchun ifodani baholash muvaffaqiyatsiz boʻldi\n"
 
 #: src/input.c:315
 msgid "SY card: no line content available\n"
-msgstr ""
+msgstr "SY kartasi: satr mazmuni mavjud emas\n"
 
 #: src/input.c:316
 msgid "SY card: no line content available"
-msgstr ""
+msgstr "SY kartasi: satr mazmuni mavjud emas"
 
 #: src/input.c:333
 msgid "SY card: missing '=' in definition\n"
-msgstr ""
+msgstr "SY kartasi: taʼrifda '=' belgisi yoʻq\n"
 
 #: src/input.c:334
 msgid "SY card: missing '=' in definition"
-msgstr ""
+msgstr "SY kartasi: taʼrifda '=' belgisi yoʻq"
 
 #: src/input.c:367
 #, c-format
 msgid "SY card: symbol definition failed for %s=%s\n"
-msgstr ""
+msgstr "SY kartasi: %s=%s uchun ramz taʼrifi muvaffaqiyatsiz boʻldi\n"
 
 #: src/input.c:445
 msgid ""
 "Geometry data error\n"
 "No GC card for tapered wire"
 msgstr ""
+"Geometriya maʼlumot xatosi\n"
+"Torayuvchi sim uchun GC kartasi yoʻq"
 
 #: src/input.c:452
 msgid "Geometry GC data card error"
-msgstr ""
+msgstr "Geometriya GC maʼlumot kartasi xatosi"
 
 #: src/input.c:468
 msgid "Geometry GX data card error"
-msgstr ""
+msgstr "Geometriya GX maʼlumot kartasi xatosi"
 
 #: src/input.c:491
 msgid "Geometry GR data card error"
-msgstr ""
+msgstr "Geometriya GR maʼlumot kartasi xatosi"
 
 #: src/input.c:545
 msgid "No geometry data cards"
-msgstr ""
+msgstr "Geometriya maʼlumot kartalari yoʻq"
 
 #: src/input.c:556
 msgid "Probable invalid segment geometry.\n"
-msgstr ""
+msgstr "Ehtimol, notoʻgʻri segment geometriyasi.\n"
 
 #: src/input.c:557
 msgid ""
@@ -3002,92 +3182,101 @@ msgid ""
 "See warnings in the console for detail.\n"
 "Trying to continue..."
 msgstr ""
+"Notoʻgʻri segment geometriyasi.\n"
+"Tafsilot uchun konsoldagi ogohlantirishlarni koʻring.\n"
+"Davom etishga urinilmoqda..."
 
 #: src/input.c:563
 msgid "Probable invalid segment geometry (see above)\n"
-msgstr ""
+msgstr "Ehtimol, notoʻgʻri segment geometriyasi (yuqoriga qarang)\n"
 
 #: src/input.c:567
 msgid "Read_Geometry: verify_segments() passed\n"
-msgstr ""
+msgstr "Read_Geometry: verify_segments() muvaffaqiyatli oʻtdi\n"
 
 #: src/input.c:604
 #, c-format
 msgid "segment data error: tag=%d si=%lf, bi=%lf\n"
-msgstr ""
+msgstr "segment maʼlumot xatosi: teg=%d si=%lf, bi=%lf\n"
 
 #: src/input.c:606
 msgid "Segment data error, zero-length line?  See console."
-msgstr ""
+msgstr "Segment maʼlumot xatosi, nol uzunlikli chiziq?  Konsolga qarang."
 
 #: src/input.c:646
 msgid "Move GM data card error"
-msgstr ""
+msgstr "GM koʻchirish maʼlumot kartasi xatosi"
 
 #: src/input.c:662 src/input.c:703 src/input.c:720 src/input.c:738
 #: src/input.c:746
 msgid "Patch data card error"
-msgstr ""
+msgstr "Patch maʼlumot kartasi xatosi"
 
 #: src/input.c:684
 msgid "Patch data error"
-msgstr ""
+msgstr "Patch maʼlumot xatosi"
 
 #: src/input.c:793
 msgid ""
 "\"GF\" card (NGF solution)\n"
 "is not supported"
 msgstr ""
+"\"GF\" kartasi (NGF yechimi)\n"
+"qoʻllab-quvvatlanmaydi"
 
 #: src/input.c:798
 msgid "Ignoring CM card in geometry"
-msgstr ""
+msgstr "Geometriyadagi CM kartasi eʼtiborga olinmaydi"
 
 #: src/input.c:811
 #, c-format
 msgid "geometry data card error (nwire=%d)\n"
-msgstr ""
+msgstr "geometriya maʼlumot kartasi xatosi (nwire=%d)\n"
 
 #: src/input.c:812
 #, c-format
 msgid "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
-msgstr ""
+msgstr "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
 
 #: src/input.c:815
 msgid "Geometry data card error"
-msgstr ""
+msgstr "Geometriya maʼlumot kartasi xatosi"
 
 #: src/input.c:839
 msgid "Failed to initialize symbol table\n"
-msgstr ""
+msgstr "Ramzlar jadvalini ishga tushirishda muvaffaqiyatsizlik\n"
 
 #: src/input.c:840
 msgid "Failed to initialize symbol table"
-msgstr ""
+msgstr "Ramzlar jadvalini ishga tushirishda muvaffaqiyatsizlik"
 
 #: src/input.c:1012
 msgid "ignoring CM card in commands\n"
-msgstr ""
+msgstr "buyruqlardagi CM kartasi eʼtiborga olinmaydi\n"
 
 #: src/input.c:1013
 msgid "Ignoring CM card in commands"
-msgstr ""
+msgstr "Buyruqlardagi CM kartasi eʼtiborga olinmaydi"
 
 #: src/input.c:1017
 msgid ""
 "CP card is ignored\n"
 "Coupling calculation not implemented"
 msgstr ""
+"CP kartasi eʼtiborga olinmaydi\n"
+"Birlashuv hisob-kitobi amalga oshirilmagan"
 
 #: src/input.c:1184
 msgid "Max frequency <= Min frequency in FR card\n"
-msgstr ""
+msgstr "FR kartasida maksimal chastota <= minimal chastota\n"
 
 #: src/input.c:1185
 msgid ""
 "Max frequency <= Min frequency in FR card\n"
 "Please check FR card data and correct"
 msgstr ""
+"FR kartasida maksimal chastota <= minimal chastota\n"
+"Iltimos, FR kartasi maʼlumotlarini tekshiring va toʻgʻirlang"
 
 #: src/input.c:1208
 msgid ""
@@ -3095,28 +3284,36 @@ msgid ""
 "The GE card specifies that a ground is present, but the GN indicates "
 "otherwise."
 msgstr ""
+"GE/GN kartalarini tuzating:\n"
+"GE kartasi zaminning mavjudligini koʻrsatadi, lekin GN boshqacha koʻrsatadi."
 
 #: src/input.c:1222
 msgid "theta > 90 deg. with ground specified\n"
-msgstr ""
+msgstr "er belgilanganda theta > 90 daraja.\n"
 
 #: src/input.c:1223 src/radiation.c:663
 msgid ""
 "Theta > 90 deg with ground specified\n"
 "Please check RP card data and correct"
 msgstr ""
+"Zamin belgilanganda Theta > 90 daraja\n"
+"Iltimos, RP kartasi maʼlumotlarini tekshiring va toʻgʻirlang"
 
 #: src/input.c:1232
 msgid ""
 "radial wire g.s. approximation: may not be used with Sommerfeld ground "
 "option\n"
 msgstr ""
+"radial sim z.s. taxminiylik: Sommerfeld zamin opsiyasi bilan ishlatib "
+"boʻlmaydi\n"
 
 #: src/input.c:1233
 msgid ""
 "radial wire g.s. approximation\n"
 "may not be used with Sommerfeld ground option"
 msgstr ""
+"radial sim z.s. taxminiylik\n"
+"Sommerfeld zamin opsiyasi bilan ishlatib boʻlmaydi"
 
 #: src/input.c:1281
 #, c-format
@@ -3124,99 +3321,127 @@ msgid ""
 "data fault on loading card no %d: itag step1 %d is greater than itag step2 "
 "%d\n"
 msgstr ""
+"karta yuklanishida maʼlumot xatosi %d: itag qadam1 %d itag qadam2 %d dan "
+"katta\n"
 
 #: src/input.c:1283
 msgid ""
 "Data fault on loading card\n"
 "itag step1 is greater than itag step2"
 msgstr ""
+"Karta yuklanishida maʼlumot xatosi\n"
+"itag qadam1 itag qadam2 dan katta"
 
 #: src/input.c:1412
 msgid ""
 "Transmission Line impedance = 0: is not valid. Please correct NT or TL card\n"
 msgstr ""
+"Uzatish liniyasi impedansi = 0: yaroqsiz. Iltimos, NT yoki TL kartasini "
+"toʻgʻirlang\n"
 
 #: src/input.c:1413
 msgid ""
 "Transmission Line impedance = 0\n"
 "is not valid. Please correct NT or TL card"
 msgstr ""
+"Uzatish liniyasi impedansi = 0\n"
+"yaroqsiz. Iltimos, NT yoki TL kartasini toʻgʻirlang"
 
 #: src/input.c:1422
 msgid "Segment number error in TL or NT card\n"
-msgstr ""
+msgstr "TL yoki NT kartasida segment raqam xatosi\n"
 
 #: src/input.c:1423
 msgid ""
 "Segment number\n"
 "error in NT or TL card"
 msgstr ""
+"Segment raqami\n"
+"NT yoki TL kartasida xato"
 
 #: src/input.c:1444
 msgid "PQ and PT cards are ignored: Printing to file not implemented\n"
 msgstr ""
+"PQ va PT kartalari eʼtiborga olinmaydi: Faylga chop etish amalga "
+"oshirilmagan\n"
 
 #: src/input.c:1445
 msgid ""
 "PQ and PT cards are ignored\n"
 "Printing to file not implemented"
 msgstr ""
+"PQ va PT kartalari eʼtiborga olinmaydi\n"
+"Faylga chop etish amalga oshirilmagan"
 
 #: src/input.c:1452
 msgid "Surface wave option (I1=1): of RP command not implemented\n"
-msgstr ""
+msgstr "Sirt toʻlqini opsiyasi (I1=1): RP buyrugʻi amalga oshirilmagan\n"
 
 #: src/input.c:1453
 msgid ""
 "Surface wave option (I1=1)\n"
 "of RP command not implemented"
 msgstr ""
+"Sirt toʻlqini opsiyasi (I1=1)\n"
+"RP buyrugʻi amalga oshirilmagan"
 
 #: src/input.c:1478
 msgid "Average gain diagnostic enabled (use --skip-verify to disable)\n"
 msgstr ""
+"Oʻrtacha kuchaytirish diagnostikasi yoqildi (oʻchirish uchun --skip-verify "
+"dan foydalaning)\n"
 
 #: src/input.c:1487
 #, c-format
 msgid "Average power gain disabled: nth=%d nph=%d (both must be >= 2)\n"
 msgstr ""
+"Oʻrtacha quvvat kuchayishi oʻchirildi: nth=%d nph=%d (ikkalasi ham >= 2 "
+"boʻlishi kerak)\n"
 
 #: src/input.c:1492
 #, c-format
 msgid "Average power gain calculation enabled (XNDA A=%d)\n"
-msgstr ""
+msgstr "Oʻrtacha quvvat kuchayishi hisobi yoqildi (XNDA A=%d)\n"
 
 #: src/input.c:1508
 msgid ""
 "Theta > 90 deg. with ground specified: Please check RP card data and "
 "correct\n"
 msgstr ""
+"Zamin belgilanganda Theta > 90 daraja.: Iltimos, RP kartasi maʼlumotlarini "
+"tekshiring va toʻgʻirlang\n"
 
 #: src/input.c:1509
 msgid ""
 "Theta > 90 deg. with ground specified\n"
 "Please check RP card data and correct"
 msgstr ""
+"Zamin belgilanganda Theta > 90 daraja.\n"
+"Iltimos, RP kartasi maʼlumotlarini tekshiring va toʻgʻirlang"
 
 #: src/input.c:1574
 msgid "Faulty data card"
-msgstr ""
+msgstr "Nosoz maʼlumot kartasi"
 
 #: src/input.c:1603
 msgid ""
 "Missing or surface-wave RP card: Radiation pattern and gain calculations "
 "disabled\n"
 msgstr ""
+"RP kartasi yoʻq yoki sirt-toʻlqin RP kartasi: Nurlanish diagrammasi va "
+"kuchaytirish hisob-kitoblari oʻchirildi\n"
 
 #: src/input.c:1630
 msgid "Unexpected exit from while loop"
-msgstr ""
+msgstr "While siklidan kutilmagan chiqish"
 
 #: src/input.c:1721
 msgid ""
 "command data card error: Unexpected EOF while reading input file - appending "
 "EN card\n"
 msgstr ""
+"buyruq maʼlumot kartasi xatosi: Kirish faylini oʻqishda kutilmagan EOF - EN "
+"kartasi qoʻshilmoqda\n"
 
 #: src/input.c:1722
 msgid ""
@@ -3224,22 +3449,31 @@ msgid ""
 "Unexpected EOF while reading input file\n"
 "Appending a default EN card"
 msgstr ""
+"Buyruq maʼlumot kartasi xatosi\n"
+"Kirish faylini oʻqishda kutilmagan EOF\n"
+"Birlamchi EN kartasi qoʻshilmoqda"
 
 #: src/input.c:1736
 msgid "command data card error: card's mnemonic code too short or missing\n"
 msgstr ""
+"buyruq maʼlumot kartasi xatosi: kartaning mnemonik kodi juda qisqa yoki "
+"yoʻq\n"
 
 #: src/input.c:1737
 msgid ""
 "Command data card error\n"
 "Mnemonic code too short or missing"
 msgstr ""
+"Buyruq maʼlumot kartasi xatosi\n"
+"Mnemonik kod juda qisqa yoki yoʻq"
 
 #: src/input.c:1930
 msgid ""
 "geometry data card error: Unexpected EOF while reading input file - "
 "appending GE card\n"
 msgstr ""
+"geometriya maʼlumot kartasi xatosi: Kirish faylini oʻqishda kutilmagan EOF - "
+"GE kartasi qoʻshilmoqda\n"
 
 #: src/input.c:1931
 msgid ""
@@ -3247,283 +3481,299 @@ msgid ""
 "Unexpected EOF while reading input file\n"
 "Appending a default GE card"
 msgstr ""
+"Geometriya maʼlumot kartasi xatosi\n"
+"Kirish faylini oʻqishda kutilmagan EOF\n"
+"Birlamchi GE kartasi qoʻshilmoqda"
 
 #: src/input.c:1945
 msgid "geometry data card error: card's mnemonic code too short or missing\n"
 msgstr ""
+"geometriya maʼlumot kartasi xatosi: kartaning mnemonik kodi juda qisqa yoki "
+"yoʻq\n"
 
 #: src/input.c:1946
 msgid ""
 "Geometry data card error\n"
 "Card's mnemonic code too short or missing"
 msgstr ""
+"Geometriya maʼlumot kartasi xatosi\n"
+"Kartaning mnemonik kodi juda qisqa yoki yoʻq"
 
 #: src/interface.c:135
 #, c-format
 msgid "xnec2c Main: %s"
-msgstr ""
+msgstr "xnec2c Asosiy: %s"
 
 #: src/interface.c:141
 #, c-format
 msgid "xnec2c Editor: %s"
-msgstr ""
+msgstr "xnec2c Muharrir: %s"
 
 #: src/interface.c:147
 #, c-format
 msgid "xnec2c Frequency Plots: %s"
-msgstr ""
+msgstr "xnec2c Chastota grafiklari: %s"
 
 #: src/interface.c:153
 #, c-format
 msgid "xnec2c Radiation Pattern: %s"
-msgstr ""
+msgstr "xnec2c Nurlanish diagrammasi: %s"
 
 #: src/interface.c:168
 #, c-format
 msgid "Fatal Error: builder could not find object '%s'"
-msgstr ""
+msgstr "Jiddiy xato: quruvchi '%s' obʼektini topa olmadi"
 
 #: src/interface.c:193
 #, c-format
 msgid "failed to add objects to builder: %s\n"
-msgstr ""
+msgstr "quruvchiga obʼektlar qoʻshishda muvaffaqiyatsizlik: %s\n"
 
 #: src/interface.c:195
 msgid "Listing Object Ids:\n"
-msgstr ""
+msgstr "Obʼekt identifikatorlari roʻyxati:\n"
 
 #: src/interface.c:199 src/utils.c:191 src/utils.c:195 src/utils.c:205
 #: src/utils.c:207
 #, c-format
 msgid "%s\n"
-msgstr ""
+msgstr "%s\n"
 
 #: src/interface.c:210 src/interface.c:213
 msgid ""
 "libgmodule not supported: xnec2c may not function properly on this "
 "platform.\n"
 msgstr ""
+"libgmodule qoʻllab-quvvatlanmaydi: xnec2c ushbu platformada toʻgʻri "
+"ishlamasligi mumkin.\n"
 
 #: src/interface.c:277
 #, c-format
 msgid "xnec2c %s: %s"
-msgstr ""
+msgstr "xnec2c %s: %s"
 
 #: src/main.c:138
 #, c-format
 msgid "%s requires a positive integer argument\n"
-msgstr ""
+msgstr "%s musbat butun son argumentini talab qiladi\n"
 
 #: src/main.c:201
 #, c-format
 msgid "Detected %d CPUs\n"
-msgstr ""
+msgstr "%d protsessor aniqlandi\n"
 
 #: src/main.c:220
 #, c-format
 msgid "Detected %s windowing backend\n"
-msgstr ""
+msgstr "%s oyna tizimi aniqlandi\n"
 
 #: src/main.c:230
 msgid "config file path too long\n"
-msgstr ""
+msgstr "konfiguratsiya fayl yoʻli juda uzun\n"
 
 #: src/main.c:248
 #, c-format
 msgid "config file does not exist or is not readable: %s\n"
-msgstr ""
+msgstr "konfiguratsiya fayli mavjud emas yoki oʻqib boʻlmaydi: %s\n"
 
 #: src/main.c:257
 #, c-format
 msgid "config file path too long ( > %d char )\n"
-msgstr ""
+msgstr "konfiguratsiya fayl yoʻli juda uzun ( > %d belgi )\n"
 
 #: src/main.c:269
 #, c-format
 msgid "input file name too long ( > %d char )\n"
-msgstr ""
+msgstr "kirish fayl nomi juda uzun ( > %d belgi )\n"
 
 #: src/main.c:296
 msgid "Forking disabled!\n"
-msgstr ""
+msgstr "Tarmoqlash oʻchirildi!\n"
 
 #: src/main.c:304
 msgid "pthread freqloop disabled!\n"
-msgstr ""
+msgstr "pthread chastota aylanishi oʻchirildi!\n"
 
 #: src/main.c:308
 msgid "batch mode enabled, will exit after first loop\n"
-msgstr ""
+msgstr "paketli rejim yoqildi, birinchi sikldan keyin chiqiladi\n"
 
 #: src/main.c:374
 msgid "verify segments check disabled\n"
-msgstr ""
+msgstr "segmentlarni tekshirish oʻchirildi\n"
 
 #: src/main.c:379
 msgid "forcing overlap check on large models\n"
-msgstr ""
+msgstr "katta modellarda qoplashish tekshiruvini majburlab bajarish\n"
 
 #: src/main.c:384
 msgid "managed allocator leak report enabled\n"
-msgstr ""
+msgstr "boshqariladigan ajratuvchi sizib chiqish hisoboti yoqildi\n"
 
 #: src/main.c:398
 msgid "--batch and --optimize are mutual exclusive.\n"
-msgstr ""
+msgstr "--batch va --optimize oʻzaro mos kelmaydi.\n"
 
 #: src/main.c:414
 #, c-format
 msgid "input file path name too long ( > %d char )\n"
-msgstr ""
+msgstr "kirish fayl yoʻl nomi juda uzun ( > %d belgi )\n"
 
 #: src/main.c:421
 #, c-format
 msgid "unexpected argument '%s' does not appear to be a .nec file\n"
-msgstr ""
+msgstr "kutilmagan argument '%s' .nec fayli emas\n"
 
 #: src/main.c:428
 #, c-format
 msgid "unexpected argument: %s\n"
-msgstr ""
+msgstr "kutilmagan argument: %s\n"
 
 #: src/main.c:434
 msgid "batch mode requires an input file\n"
-msgstr ""
+msgstr "paketli rejim kirish faylini talab qiladi\n"
 
 #: src/main.c:444
 msgid "cannot open display: a running X11 or Wayland session is required\n"
 msgstr ""
+"displeyni ochib boʻlmaydi: ishlaydigan X11 yoki Wayland sessiyasi talab "
+"qilinadi\n"
 
 #: src/main.c:463
 #, c-format
 msgid "Forking %d jobs.\n"
-msgstr ""
+msgstr "%d ish tarmoqlanmoqda.\n"
 
 #: src/main.c:475 src/main.c:483
 msgid "exiting after fatal error: pipe() failed"
-msgstr ""
+msgstr "jiddiy xatodan keyin chiqilmoqda: pipe() muvaffaqiyatsiz boʻldi"
 
 #: src/main.c:492
 msgid "exiting after fatal error: fork() failed"
-msgstr ""
+msgstr "jiddiy xatodan keyin chiqilmoqda: fork() muvaffaqiyatsiz boʻldi"
 
 #: src/main.c:907
 msgid "exiting via user interrupt\n"
-msgstr ""
+msgstr "foydalanuvchi uzilishi orqali chiqilmoqda\n"
 
 #: src/main.c:911
 msgid "segmentation fault, exiting\n"
-msgstr ""
+msgstr "segmentatsiya xatosi, chiqilmoqda\n"
 
 #: src/main.c:915
 msgid "floating point exception, exiting\n"
-msgstr ""
+msgstr "suzuvchi nuqta istisnosi, chiqilmoqda\n"
 
 #: src/main.c:919
 msgid "abort signal received, exiting\n"
-msgstr ""
+msgstr "toʻxtatish signali qabul qilindi, chiqilmoqda\n"
 
 #: src/main.c:923
 msgid "termination request received, exiting\n"
-msgstr ""
+msgstr "tugatish soʻrovi qabul qilindi, chiqilmoqda\n"
 
 #: src/main.c:933
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
-msgstr ""
+msgstr "tarmoqlanmagan, pid %d dan SIGCHLD eʼtiborga olinmaydi\n"
 
 #: src/main.c:941
 #, c-format
 msgid "child process pid %d exited\n"
-msgstr ""
+msgstr "bola jarayoni pid %d chiqdi\n"
 
 #: src/main.c:950
 #, c-format
 msgid "default exit with signal: %d\n"
-msgstr ""
+msgstr "signal bilan standart chiqish: %d\n"
 
 #: src/mathlib.c:28
 msgid ""
 "Linear algebra library selection.\n"
 "Restart to change MKL threading library."
 msgstr ""
+"Chiziqli algebra kutubxonasini tanlash.\n"
+"MKL iplash kutubxonasini oʻzgartirish uchun qayta ishga tushiring."
 
 #: src/mathlib.c:296
 msgid "open_mathlib: lib is NULL\n"
-msgstr ""
+msgstr "open_mathlib: lib NULL\n"
 
 #: src/mathlib.c:306
 #, c-format
 msgid "setenv(%s, %s): %s\n"
-msgstr ""
+msgstr "setenv(%s, %s): %s\n"
 
 #: src/mathlib.c:320 src/utils.c:448
 #, c-format
 msgid "%s: %s\n"
-msgstr ""
+msgstr "%s: %s\n"
 
 #: src/mathlib.c:325
 #, c-format
 msgid "%s: opened %s\n"
-msgstr ""
+msgstr "%s: %s ochildi\n"
 
 #: src/mathlib.c:333
 #, c-format
 msgid "%s: library not found or nonfunctional, skipping: %s\n"
-msgstr ""
+msgstr "%s: kutubxona topilmadi yoki ishlamaydi, oʻtkazib yuborilmoqda: %s\n"
 
 #: src/mathlib.c:358
 #, c-format
 msgid "  %s: unable to bind %s: %s\n"
-msgstr ""
+msgstr "  %s: %s ga bogʻlab boʻlmaydi: %s\n"
 
 #: src/mathlib.c:394
 #, c-format
 msgid "%s: loaded\n"
-msgstr ""
+msgstr "%s: yuklandi\n"
 
 #: src/mathlib.c:464
 #, c-format
 msgid "Migrated legacy mathlib index %d to ID '%s'\n"
-msgstr ""
+msgstr "Eski mathlib indeksi %d '%s' ID ga koʻchirildi\n"
 
 #: src/mathlib.c:469
 #, c-format
 msgid ""
 "Legacy mathlib index %d out of range [0-%d], triggering first-run scan\n"
 msgstr ""
+"Eski mathlib indeksi %d [0-%d] oraligʻidan tashqarida, birinchi ishga "
+"tushirish skaneri ishga tushirilmoqda\n"
 
 #: src/mathlib.c:498
 #, c-format
 msgid "Mathlib ID '%s' not found in available libraries.\n"
-msgstr ""
+msgstr "Mathlib ID '%s' mavjud kutubxonalarda topilmadi.\n"
 
 #: src/mathlib.c:500
 #, c-format
 msgid "Mathlib '%s' is not available.\n"
-msgstr ""
+msgstr "Mathlib '%s' mavjud emas.\n"
 
 #: src/mathlib.c:505
 #, c-format
 msgid "Selected first available mathlib: %s\n"
-msgstr ""
+msgstr "Birinchi mavjud mathlib tanlandi: %s\n"
 
 #: src/mathlib.c:596
 msgid "set_mathlib_interactive: lib == NULL\n"
-msgstr ""
+msgstr "set_mathlib_interactive: lib == NULL\n"
 
 #: src/mathlib.c:605
 #, c-format
 msgid "set_mathlib_interactive[%d]: mathlib.available=0, skipping: %s\n"
 msgstr ""
+"set_mathlib_interactive[%d]: mathlib.available=0, oʻtkazib yuborilmoqda: %s\n"
 
 #: src/mathlib.c:636
 msgid "set_mathlib_batch: lib == NULL\n"
-msgstr ""
+msgstr "set_mathlib_batch: lib == NULL\n"
 
 #: src/mathlib.c:641
 msgid "Batch Math Library"
-msgstr ""
+msgstr "Paketli matematik kutubxona"
 
 #: src/mathlib.c:642
 msgid ""
@@ -3531,19 +3781,21 @@ msgid ""
 "command line. (However, this selection will be saved for next time xnec2c is "
 "opened.)\n"
 msgstr ""
+"Paketli matematik kutubxonani tanlash buyruq satriga -j belgilanmasa taʼsir "
+"qilmaydi. (Biroq, bu tanlov keyingi xnec2c ochilganda saqlanadi.)\n"
 
 #: src/mathlib.c:681
 #, c-format
 msgid "%s: benchmark=%d\n"
-msgstr ""
+msgstr "%s: sinov=%d\n"
 
 #: src/mathlib.c:752
 msgid "Mathlib Help"
-msgstr ""
+msgstr "Mathlib yordami"
 
 #: src/mathlib.c:788
 msgid "Mathlib Benchmark Help"
-msgstr ""
+msgstr "Mathlib sinov yordami"
 
 #: src/mathlib.c:790
 msgid ""
@@ -3586,29 +3838,68 @@ msgid ""
 "* Iterate -j N-=2: O(N*J) time: Same as -j N/=2 above, but instead decrement "
 "the number of jobs by 1.  This takes the longest to run.\n"
 msgstr ""
+"xnec2c tomonidan ishlar tarmoqlanadi va parallel ravishda bajariladi, "
+"mathlib amalga oshirilishi esa bitta ish uchun chiziqli algebra hisob-"
+"kitobini parallellashtirish uchun iplardan foydalanadi. Parallel algoritmlar "
+"uchun quyidagi muhit oʻzgaruvchilari bilan algoritmdan foydalanadigan iplar "
+"sonini kamaytirishingiz mumkin:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS ip chegarasi\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP ip chegarasi\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL ip chegarasi\n"
+"\n"
+"Har bir sinov taxminan qancha vaqt ketishini koʻrsatish uchun murakkablikni "
+"belgilaydi. Masalan, O(N) vaqt N bilan, O(N*J) esa N*J bilan oʻlchamini "
+"koʻrsatadi:\n"
+"  * N — bu yerda tanlangan mathlib lari soni:\n"
+"      Fayl->Mathlib sinovlari->Tanlangan mathlib lar\n"
+"  * J — buyruq satridagi -j bilan belgilangan ishlar soni (masalan, -j 8)\n"
+"\n"
+"Yuqori murakkablikdagi parametrlar xnec2c ishlash vaqtini optimallashtirish "
+"haqida qoʻshimcha maʼlumot berish uchun koʻproq sinovlarni bajaradi. Sinov "
+"menyu parametrlari quyidagicha:  \n"
+"\n"
+"* Parallel (-j N): O(N/J) vaqt: Har bir mathlib ni buyruq satridagi -j bilan "
+"belgilangan ishlar soni bilan parallel holda sinab koʻrish.\n"
+"\n"
+"* Bitta ish (-j 1): O(N) vaqt: Buyruq satriga -j belgilangan boʻlsa ham har "
+"bir mathlib ni bitta ish bilan sinab koʻrish. Bu interaktiv mathlib ni "
+"topishda foydali — chastotani UI da Frequency MHz +/- vidjetini oʻzgartirish "
+"yoki chastota grafigini (oʻng) bosish orqali.\n"
+"\n"
+"* Takrorlash -j N/=2: O(N*log2(J)) vaqt: Dastlab -j bilan belgilangan ishlar "
+"soni bilan parallel sinab koʻrish, soʻng faqat bitta ish qolguncha har bir "
+"keyingi takrorlash uchun ishlar sonini yarmiga kamaytirish. Bu -j bilan "
+"belgilangan parallel ishlar soni va yuqoridagi muhit oʻzgaruvchilari bilan "
+"oʻzgartirilgan chiziqli algebra kutubxonasi tomonidan ishlatiladigan iplar "
+"soni oʻrtasida muvozanat topishda foydali.\n"
+"\n"
+"* Takrorlash -j N-=2: O(N*J) vaqt: Yuqoridagi -j N/=2 bilan bir xil, lekin "
+"ishlar sonini 1 ga kamaytirish. Bu eng uzoq davom etadi.\n"
 
 #: src/mathlib.c:839 src/mathlib.c:846 src/mathlib.c:852 src/mathlib.c:869
 #: src/mathlib.c:874 src/mathlib.c:989
 msgid "Mathlib Benchmark"
-msgstr ""
+msgstr "Mathlib sinovi"
 
 #: src/mathlib.c:840
 msgid "Benchmarks are disabled while optimization is activated."
-msgstr ""
+msgstr "Optimallashtirish faol boʻlganda sinovlar oʻchirilgan."
 
 #: src/mathlib.c:847
 msgid "You must load a NEC2 input file before running benchmarks."
-msgstr ""
+msgstr "Sinovlarni bajarishdan oldin NEC2 kirish faylini yuklashingiz kerak."
 
 #: src/mathlib.c:853
 msgid ""
 "Choosing a benchmark other than \"Single Job\" has no effect unless -j is "
 "specified on the command line."
 msgstr ""
+"\"Bitta ish\" dan boshqa sinov tanlash buyruq satriga -j belgilanmasa taʼsir "
+"qilmaydi."
 
 #: src/mathlib.c:870
 msgid "You must select at least one math library to benchmark"
-msgstr ""
+msgstr "Sinov uchun kamida bitta matematik kutubxona tanlashingiz kerak"
 
 #: src/mathlib.c:875
 #, c-format
@@ -3637,16 +3928,42 @@ msgid ""
 "\n"
 "Click OK to proceed, this dialog will close when complete."
 msgstr ""
+"Bu har bir aniqlangan chiziqli algebra kutubxonasi uchun chastota aylanishi "
+"sinovini bajaradi va keyin xulosani taqdim etadi. NEC2 qancha katta va "
+"qancha chastotalardan foydalanishiga qarab bajarilishi biroz vaqt olishi "
+"mumkin. Batafsil vaqtlash terminalde koʻrsatiladi.\n"
+"\n"
+"Eslatmalar:\n"
+"* Faqat bitta Intel MKL kutubxonasi xnec2c ni qayta ishga tushirmasdan "
+"sinovdan oʻtkazilishi mumkin, shuning uchun davom etishdan oldin qaysi "
+"birini sinab koʻrishni tanlang, aks holda roʻyxatdagi birinchisini tanlaydi "
+"va qolganlarini oʻtkazib yuboradi.\n"
+"\n"
+"* Koʻp oqimli kutubxonalar uchun -j N parametridan foydalanganda, "
+"tarmoqlangan jarayonlarni kutubxona iplari bilan birgalikda qoʻllash uchun "
+"yetarli protsessorlar mavjud boʻlmasa, ip toʻqnashuvi yuzaga keladi. Qaysi "
+"kutubxona tarmoqlash va iplash aralashmasida eng yaxshi ishlashini topish "
+"uchun sinovda -j N qiymatini kamaytiring; protsessor foydalanishini kuzatish "
+"uchun `top` dan foydalaning va agar 0%% boʻsh vaqtga yetsa -j N ni "
+"kamaytirishni oʻylab koʻring.\n"
+"\n"
+"Quyidagi muhit oʻzgaruvchilarini sozlab koʻrishingiz mumkin:\n"
+"  * OPENBLAS_NUM_THREADS=N\t# OpenBLAS ip chegarasi\n"
+"  * OMP_NUM_THREADS=N\t\t# OpenMP ip chegarasi\n"
+"  * MKL_NUM_THREADS=N\t\t# Intel MKL ip chegarasi\n"
+"\n"
+"Davom etish uchun OK tugmasini bosing, ushbu muloqot oynasi tugagach "
+"yopiladi."
 
 #: src/mathlib.c:931
 #, c-format
 msgid "Starting %s benchmark (-j %d)\n"
-msgstr ""
+msgstr "%s sinovi boshlanmoqda (-j %d)\n"
 
 #: src/mathlib.c:1022
 #, c-format
 msgid "mathlib_lock_intel: Cannot find library for mathlib ID='%s'\n"
-msgstr ""
+msgstr "mathlib_lock_intel: mathlib ID='%s' uchun kutubxona topilmadi\n"
 
 #: src/mathlib.c:1033
 #, c-format
@@ -3663,84 +3980,101 @@ msgid ""
 "* \n"
 "* See Intel's documentation on mkl_set_threading_layer() for more detail.\n"
 msgstr ""
+"\n"
+"* Eslatma: \"%s\" tanlandi, lekin siz faqat boshqa Intel MKL iplash\n"
+"* kutubxonasiga xnec2c ni qayta ishga tushirish orqali oʻtishingiz mumkin.\n"
+"* \n"
+"* Biroq, ushbu xuddi shu Intel MKL kutubxonasi ham kiruvchi har qanday\n"
+"* boshqa chiziqli algebra kutubxonasini qayta ishga tushirmasdan\n"
+"* tanlashda davom etishingiz mumkin. Barcha boshqa Intel MKL iplash\n"
+"* kutubxonalari qayta ishga tushirishgacha oʻchirilgan, chunki MKL iplash\n"
+"* kutubxonasi ishlash vaqtida faqat bir marta dinamik bogʻlanishi mumkin.\n"
+"* \n"
+"* Batafsil maʼlumot uchun Intel ning mkl_set_threading_layer() hujjatiga "
+"qarang.\n"
 
 #: src/mathlib.c:1108
 msgid "zgetrf: current_mathlib is NULL, this should never happen.\n"
-msgstr ""
+msgstr "zgetrf: current_mathlib NULL, bu hech qachon boʻlmasligi kerak.\n"
 
 #: src/mathlib.c:1132 src/mathlib.c:1177
 #, c-format
 msgid "%s: unsupported mathlib type %d\n"
-msgstr ""
+msgstr "%s: qoʻllab-quvvatlanmaydigan mathlib turi %d\n"
 
 #: src/mathlib.c:1145
 msgid "zgetrs: current_mathlib is NULL, this should never happen.\n"
-msgstr ""
+msgstr "zgetrs: current_mathlib NULL, bu hech qachon boʻlmasligi kerak.\n"
 
 #: src/mathlib.c:1170
 #, c-format
 msgid "zgetrs warning: lda(%d) != ldb(%d)\n"
-msgstr ""
+msgstr "zgetrs ogohlantirishi: lda(%d) != ldb(%d)\n"
 
 #: src/mathlib.c:1205
 #, c-format
 msgid "dlsym(mkl_set_threading_layer): %s\n"
-msgstr ""
+msgstr "dlsym(mkl_set_threading_layer): %s\n"
 
 #: src/matrix.c:1208
 #, c-format
 msgid "pivot(%d)= %16.8E\n"
-msgstr ""
+msgstr "pivot(%d)= %16.8E\n"
 
 #: src/matrix.c:1242
 #, c-format
 msgid "LU Decomposition Failed: %d\n"
-msgstr ""
+msgstr "LU dekompozitsiyasi muvaffaqiyatsiz boʻldi: %d\n"
 
 #: src/matrix.c:1298
 #, c-format
 msgid "symmetry error - nrow:%d ncol:%d\n"
-msgstr ""
+msgstr "simmetriya xatosi - nrow:%d ncol:%d\n"
 
 #: src/matrix.c:1299
 msgid "Symmetry error"
-msgstr ""
+msgstr "Simmetriya xatosi"
 
 #: src/matrix.c:1403
 #, c-format
 msgid "Solving Failed: %d\n"
-msgstr ""
+msgstr "Yechish muvaffaqiyatsiz boʻldi: %d\n"
 
 #: src/measurements.c:424
 msgid ""
 "noise_temp_resolve: noise_temp table not allocated; t_sky/t_earth defaulting "
 "to 0\n"
 msgstr ""
+"noise_temp_resolve: noise_temp jadvali ajratilmagan; t_sky/t_earth 0 ga "
+"qaytarilmoqda\n"
 
 #: src/measurements.c:596
 #, c-format
 msgid "BUG: pol=%d out of range [0,%d): idx=%d freq_step=%d thr=%lu\n"
 msgstr ""
+"BUG: pol=%d [0,%d) oraligʻidan tashqarida: idx=%d freq_step=%d thr=%lu\n"
 
 #: src/measurements.c:610
 #, c-format
 msgid "BUG: mgidx=%d out of range [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n"
 msgstr ""
+"BUG: mgidx=%d [0,%d) oraligʻidan tashqarida: idx=%d pol=%d freq_step=%d thr="
+"%lu\n"
 
 #: src/measurements.c:613
 #, c-format
 msgid "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
-msgstr ""
+msgstr "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
 
 #: src/measurements.c:616
 #, c-format
 msgid "BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n"
-msgstr ""
+msgstr "BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n"
 
 #: src/measurements.c:620
 #, c-format
 msgid "BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
-msgstr ""
+msgstr "BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
 
 #: src/measurements.c:751
 #, c-format
@@ -3748,66 +4082,69 @@ msgid ""
 "BUG: F/B nth=%d out of [0,%d) after over-ground recalc: idx=%d pol=%d "
 "max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n"
 msgstr ""
+"BUG: F/B nth=%d [0,%d) dan tashqarida zamin ustida qayta hisoblashdan keyin: "
+"idx=%d pol=%d max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n"
 
 #: src/measurements.c:798
 #, c-format
 msgid "meas_name_idx: Invalid name with length=%d: %s\n"
-msgstr ""
+msgstr "meas_name_idx: Uzunlik=%d bilan yaroqsiz nom: %s\n"
 
 #: src/measurements.c:859
 msgid "meas_format: output overflow\n"
-msgstr ""
+msgstr "meas_format: chiqish toʻlib toshdi\n"
 
 #: src/mem/mem.c:22
 #, c-format
 msgid "mem_obj_from_ptr: ptr %p does not match m->ptr %p (base %p)\n"
-msgstr ""
+msgstr "mem_obj_from_ptr: ptr %p m->ptr %p ga mos kelmaydi (asos %p)\n"
 
 #: src/mem/mem.c:194
 #, c-format
 msgid "Memory allocation denied %s: requested %lu bytes\n"
-msgstr ""
+msgstr "Xotira ajratish rad etildi %s: %lu bayt soʻraldi\n"
 
 #: src/mem/mem.c:225
 #, c-format
 msgid "mem_obj_t at %p: size=%lu used=%lu addr=%p\n"
-msgstr ""
+msgstr "mem_obj_t %p da: size=%lu used=%lu addr=%p\n"
 
 #: src/mem/mem.c:246
 #, c-format
 msgid "mem_backtrace(%p):\n"
-msgstr ""
+msgstr "mem_backtrace(%p):\n"
 
 #: src/mem/mem.c:249
 msgid "  m->backtrace is null, no backtrace data\n"
-msgstr ""
+msgstr "  m->backtrace null, orqaga iz maʼlumotlari yoʻq\n"
 
 #: src/mem/mem.c:275
 #, c-format
 msgid "mem_clone: allocation failed for %lu bytes\n"
-msgstr ""
+msgstr "mem_clone: %lu bayt uchun ajratish muvaffaqiyatsiz boʻldi\n"
 
 #: src/mem/mem.c:332
 #, c-format
 msgid "mem_array verb: element size %lu does not match header %lu\n"
-msgstr ""
+msgstr "mem_array amali: element hajmi %lu sarlavha %lu ga mos kelmaydi\n"
 
 #: src/mem/mem.c:424
 #, c-format
 msgid "mem_zero: array block element size %lu; use mem_array_zero\n"
 msgstr ""
+"mem_zero: massiv blok element hajmi %lu; mem_array_zero dan foydalaning\n"
 
 #: src/nec2_model.c:278 src/nec2_model.c:282 src/nec2_model.c:286
 msgid "Card"
-msgstr ""
+msgstr "Karta"
 
 #: src/nec2_model.c:368
 msgid "--- NEC2 Input File created or edited by "
-msgstr ""
+msgstr "--- NEC2 kirish fayli yaratilgan yoki tahrirlangan: "
 
 #: src/nec2_model.c:385
 msgid "--- End Comments ---"
-msgstr ""
+msgstr "--- Izohlar tugadi ---"
 
 #: src/nec2_model.c:524
 msgid ""
@@ -3815,6 +4152,9 @@ msgid ""
 "Error reading input file\n"
 "Unexpected EOF (End of File)"
 msgstr ""
+"List_Comments():\n"
+"Kirish faylini oʻqishda xato\n"
+"Kutilmagan fayl oxiri (EOF)"
 
 #: src/nec2_model.c:531
 msgid ""
@@ -3822,10 +4162,13 @@ msgid ""
 "Error reading input file\n"
 "Comment mnemonic short or missing"
 msgstr ""
+"List_Comments():\n"
+"Kirish faylini oʻqishda xato\n"
+"Izoh mnemonik kodi qisqa yoki yoʻq"
 
 #: src/nec2_model.c:812
 msgid "End Comments"
-msgstr ""
+msgstr "Izohlar tugadi"
 
 #: src/nec2_model.c:910
 msgid ""
@@ -3833,211 +4176,222 @@ msgid ""
 "Please use the Save button\n"
 "to specify a file path"
 msgstr ""
+"Daraxt koʻrinishidagi maʼlumotlarni saqlab boʻlmaydi\n"
+"Fayl yoʻlini belgilash uchun\n"
+"Saqlash tugmasidan foydalaning"
 
 #: src/network.c:637
 #, c-format
 msgid "improper load type chosen, requested type is %d\n"
-msgstr ""
+msgstr "notoʻgʻri yuklama turi tanlandi, soʻralgan tur %d\n"
 
 #: src/network.c:638
 msgid "Improper load type chose"
-msgstr ""
+msgstr "Notoʻgʻri yuklama turi tanlandi"
 
 #: src/network.c:726
 #, c-format
 msgid "loading data card error, no segment has an itag = %d\n"
-msgstr ""
+msgstr "maʼlumot kartasi yuklanish xatosi, itag = %d boʻlgan segment yoʻq\n"
 
 #: src/network.c:727
 msgid ""
 "Loading data card\n"
 "Tag number mismatch error"
 msgstr ""
+"Maʼlumot kartasi yuklanmoqda\n"
+"Teg raqami mos kelmash xatosi"
 
 #: src/opengl-engine/opengl_axes.c:132
 #, c-format
 msgid "Generated label texture atlas (ID=%u)\n"
-msgstr ""
+msgstr "Yorliq tekstura atlasi yaratildi (ID=%u)\n"
 
 #: src/opengl-engine/opengl_axes.c:156
 msgid "Failed to load axes line shader\n"
-msgstr ""
+msgstr "Oʻq chiziq shaderini yuklashda muvaffaqiyatsizlik\n"
 
 #: src/opengl-engine/opengl_axes.c:189
 msgid "Axes renderer initialized\n"
-msgstr ""
+msgstr "Oʻq renderlash tizimi ishga tushirildi\n"
 
 #: src/opengl-engine/opengl_axes.c:193
 msgid "Failed to load text shaders\n"
-msgstr ""
+msgstr "Matn shaderlarini yuklashda muvaffaqiyatsizlik\n"
 
 #: src/opengl-engine/opengl_cairo_overlay.c:60
 msgid "Failed to load cairo overlay shaders\n"
-msgstr ""
+msgstr "Cairo ustki qatlam shaderlarini yuklashda muvaffaqiyatsizlik\n"
 
 #: src/opengl-engine/opengl_gradient_overlay.c:39
 msgid "Failed to create cairo overlay base\n"
-msgstr ""
+msgstr "Cairo ustki qatlam asosini yaratishda muvaffaqiyatsizlik\n"
 
 #: src/opengl-engine/opengl_ground_plane.c:103
 msgid "Failed to load ground plane shaders\n"
-msgstr ""
+msgstr "Er tekisligi shaderlarini yuklashda muvaffaqiyatsizlik\n"
 
 #: src/opengl-engine/opengl_renderer.c:55
 #, c-format
 msgid "Failed to load shader: %s (%s)\n"
-msgstr ""
+msgstr "Shaderni yuklashda muvaffaqiyatsizlik: %s (%s)\n"
 
 #: src/opengl-engine/opengl_renderer.c:84
 #, c-format
 msgid "Shader compile error: %s: %s\n"
-msgstr ""
+msgstr "Shader kompilyatsiya xatosi: %s: %s\n"
 
 #: src/opengl-engine/opengl_renderer.c:126
 #, c-format
 msgid "Shader link failed: %s + %s\n"
-msgstr ""
+msgstr "Shader bogʻlash muvaffaqiyatsiz boʻldi: %s + %s\n"
 
 #: src/opengl-engine/opengl_view.c:139
 msgid ""
 "OpenGL context error — no OpenGL implementation available on this display\n"
 msgstr ""
+"OpenGL kontekst xatosi — ushbu displeyda OpenGL amalga oshirilishi mavjud "
+"emas\n"
 
 #: src/opengl-engine/opengl_view.c:152
 msgid "Disabling OpenGL: scene shader failed\n"
-msgstr ""
+msgstr "OpenGL oʻchirilmoqda: sahna shaderi muvaffaqiyatsiz boʻldi\n"
 
 #: src/opengl-engine/opengl_view.c:167
 msgid "Disabling OpenGL: overlay shader failed\n"
-msgstr ""
+msgstr "OpenGL oʻchirilmoqda: ustki qatlam shaderi muvaffaqiyatsiz boʻldi\n"
 
 #: src/opengl-engine/opengl_view.c:179
 msgid "Disabling OpenGL: axes renderer failed\n"
-msgstr ""
+msgstr "OpenGL oʻchirilmoqda: oʻq renderlash tizimi muvaffaqiyatsiz boʻldi\n"
 
 #: src/opengl-engine/opengl_view.c:212
 msgid "Disabling OpenGL: ground plane shader failed\n"
-msgstr ""
+msgstr "OpenGL oʻchirilmoqda: er tekisligi shaderi muvaffaqiyatsiz boʻldi\n"
 
 #: src/opengl-engine/opengl_view.c:234
 #, c-format
 msgid "Renderable count %u exceeds MAX_RENDERABLES (%d)\n"
-msgstr ""
+msgstr "Renderlash obʼektlari soni %u MAX_RENDERABLES (%d) dan oshib ketdi\n"
 
 #: src/opengl-engine/opengl_view.c:313
 msgid "Disabling OpenGL: peel composite shader failed\n"
-msgstr ""
+msgstr "OpenGL oʻchirilmoqda: qatlam kompozit shaderi muvaffaqiyatsiz boʻldi\n"
 
 #: src/opengl-engine/opengl_view_msaa.c:149
 msgid "MSAA framebuffer incomplete\n"
-msgstr ""
+msgstr "MSAA freymbufer toʻliq emas\n"
 
 #: src/opengl-engine/opengl_view_msaa.c:181
 msgid "MSAA resolve framebuffer incomplete\n"
-msgstr ""
+msgstr "MSAA yechim freymbufer toʻliq emas\n"
 
 #: src/opengl-engine/opengl_view_overlay.c:359
 msgid "Failed to load overlay shaders\n"
-msgstr ""
+msgstr "Ustki qatlam shaderlarini yuklashda muvaffaqiyatsizlik\n"
 
 #: src/opengl-engine/opengl_view_peel.c:254
 #, c-format
 msgid "Peel FBO %d incomplete\n"
-msgstr ""
+msgstr "Peel FBO %d toʻliq emas\n"
 
 #: src/opengl-engine/opengl_view_peel.c:265
 #, c-format
 msgid "Peel MSAA FBO %d incomplete\n"
-msgstr ""
+msgstr "Peel MSAA FBO %d toʻliq emas\n"
 
 #: src/opengl-engine/opengl_view_peel.c:276
 msgid "Peel accumulation FBO incomplete\n"
-msgstr ""
+msgstr "Peel toʻplash FBO toʻliq emas\n"
 
 #: src/opengl-engine/opengl_view_peel.c:285
 msgid "Layer depth FBO incomplete\n"
-msgstr ""
+msgstr "Qatlam chuqurligi FBO toʻliq emas\n"
 
 #: src/opengl-engine/opengl_view_render.c:295
 msgid "Transparent renderables skipped: peel FBOs unavailable\n"
 msgstr ""
+"Shaffof renderlash obʼektlari oʻtkazib yuborildi: peel FBO lar mavjud emas\n"
 
 #: src/opengl-engine/opengl_view_scene.c:291
 msgid "Failed to load shaders\n"
-msgstr ""
+msgstr "Shaderlarni yuklashda muvaffaqiyatsizlik\n"
 
 #: src/opengl/opengl_rdpattern.c:337
 #, c-format
 msgid "rdpattern: invalid draw style %d, using surface\n"
-msgstr ""
+msgstr "rdpattern: yaroqsiz chizish uslubi %d, sirtdan foydalanilmoqda\n"
 
 #: src/opengl/opengl_state.c:57
 msgid ""
 "OpenGL is not available on this display; switching to Cairo renderer. See "
 "'OpenGL Renderer' in View > Rendering Settings.\n"
 msgstr ""
+"OpenGL ushbu displeyda mavjud emas; Cairo renderlash tizimiga oʻtilmoqda. "
+"Koʻrish > Renderlash sozlamalari boʻlimidagi 'OpenGL Renderlash tizimi' ga "
+"qarang.\n"
 
 #: src/opengl/opengl_structure_geometry.c:227
 #, c-format
 msgid "generate_network_lines: unknown ntyp=%d\n"
-msgstr ""
+msgstr "generate_network_lines: nomaʼlum ntyp=%d\n"
 
 #: src/opt_file.c:342
 #, c-format
 msgid "opt_file_save: %s\n"
-msgstr ""
+msgstr "opt_file_save: %s\n"
 
 #: src/opt_file.c:533
 #, c-format
 msgid "opt_file_load: unknown metric in [%s]\n"
-msgstr ""
+msgstr "opt_file_load: [%s] da nomaʼlum metrika\n"
 
 #: src/opt_file.c:615
 #, c-format
 msgid "Loaded %d optimizer goals\n"
-msgstr ""
+msgstr "%d optimallashtiruvchi maqsadi yuklandi\n"
 
 #: src/opt_file.c:651
 #, c-format
 msgid "opt_file_load: %s\n"
-msgstr ""
+msgstr "opt_file_load: %s\n"
 
 #: src/optimize.c:83
 #, c-format
 msgid "saving %s: %s\n"
-msgstr ""
+msgstr "saqlanmoqda %s: %s\n"
 
 #: src/optimize.c:100
 msgid "xnec2c was built without inotify.\n"
-msgstr ""
+msgstr "xnec2c inotify siz qurilgan.\n"
 
 #: src/optimize.c:157
 #, c-format
 msgid "inotify: matched companion file: %s\n"
-msgstr ""
+msgstr "inotify: hamroh fayl mos keldi: %s\n"
 
 #: src/optimize.c:198
 #, c-format
 msgid "Unable to configure file modification detection to %s: %s\n"
-msgstr ""
+msgstr "%s ga fayl oʻzgarishini aniqlashni sozlab boʻlmadi: %s\n"
 
 #: src/optimize.c:203
 #, c-format
 msgid "Monitoring directory for %s: %s\n"
-msgstr ""
+msgstr "%s uchun katalog kuzatilmoqda: %s\n"
 
 #: src/optimize.c:301
 msgid "Exited optimizer thread.\n"
-msgstr ""
+msgstr "Optimallashtiruvchi ipi chiqdi.\n"
 
 #: src/optimize.c:307
 msgid "optimize.c: exit because this is a child process.\n"
-msgstr ""
+msgstr "optimize.c: bu bolalar jarayon boʻlgani uchun chiqilmoqda.\n"
 
 #: src/optimize.c:333
 #, c-format
 msgid "inotify: read %zd bytes from inotify fd\n"
-msgstr ""
+msgstr "inotify: inotify fd dan %zd bayt oʻqildi\n"
 
 #: src/optimize.c:337
 #, c-format
@@ -4045,11 +4399,13 @@ msgid ""
 "inotify: SKIP all events (flags) - FREQ_LOOP_RUNNING=%d FREQ_LOOP_INIT=%d "
 "INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n"
 msgstr ""
+"inotify: barcha voqealar oʻtkazib yuborildi (bayroqlar) - FREQ_LOOP_RUNNING="
+"%d FREQ_LOOP_INIT=%d INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n"
 
 #: src/optimize.c:356
 #, c-format
 msgid "inotify: EVENT @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
-msgstr ""
+msgstr "inotify: VOQEA @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
 
 #: src/optimize.c:360
 #, c-format
@@ -4057,24 +4413,28 @@ msgid ""
 "inotify: EVENT flags: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
 "IN_CREATE=%d IN_DELETE=%d IN_MODIFY=%d\n"
 msgstr ""
+"inotify: VOQEA bayroqlari: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
+"IN_CREATE=%d IN_DELETE=%d IN_MODIFY=%d\n"
 
 #: src/optimize.c:368
 #, c-format
 msgid "inotify: FILTER: target='%s' event_name='%s' match=%d\n"
-msgstr ""
+msgstr "inotify: FILTR: target='%s' event_name='%s' match=%d\n"
 
 #: src/optimize.c:375
 msgid "inotify: SKIP event (filename mismatch)\n"
-msgstr ""
+msgstr "inotify: voqea oʻtkazib yuborildi (fayl nomi mos kelmaydi)\n"
 
 #: src/optimize.c:382
 msgid "inotify: IN_MODIFY on target, setting modify_seen=TRUE\n"
-msgstr ""
+msgstr "inotify: maqsadda IN_MODIFY, modify_seen=TRUE oʻrnatilmoqda\n"
 
 #: src/optimize.c:390
 msgid ""
 "inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n"
 msgstr ""
+"inotify: maqsadda IN_MOVED_TO (atomik yozish tugadi), qayta yuklash ishga "
+"tushirilmoqda\n"
 
 #: src/optimize.c:401 src/optimize.c:434
 #, c-format
@@ -4082,52 +4442,60 @@ msgid ""
 "inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), "
 "retrying\n"
 msgstr ""
+"inotify: fayl stat muvaffaqiyatsiz yoki nol bayt (ret=%d size=%ld errno=%s), "
+"qayta urinilmoqda\n"
 
 #: src/optimize.c:407 src/optimize.c:440
 #, c-format
 msgid "inotify: file stat OK - size=%ld bytes\n"
-msgstr ""
+msgstr "inotify: fayl stat OK - size=%ld bayt\n"
 
 #: src/optimize.c:423
 msgid ""
 "inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
 "triggering reload\n"
 msgstr ""
+"inotify: modify_seen=TRUE dan keyin IN_CLOSE_WRITE (toʻgʻridan-toʻgʻri "
+"yozish tugadi), qayta yuklash ishga tushirilmoqda\n"
 
 #: src/optimize.c:451
 msgid ""
 "inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
 "skipping\n"
 msgstr ""
+"inotify: modify_seen siz IN_CLOSE_WRITE (soxta yopilish, eski inode), "
+"oʻtkazib yuborilmoqda\n"
 
 #: src/optimize.c:458
 #, c-format
 msgid "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 msgstr ""
+"inotify: voqea oʻtkazib yuborildi (MODIFY/CLOSE_WRITE/MOVED_TO emas, mask=0x"
+"%08x)\n"
 
 #: src/optimizers/opt_fitness.c:345
 #, c-format
 msgid "fitness_config_add: invalid meas_index %d\n"
-msgstr ""
+msgstr "fitness_config_add: yaroqsiz meas_index %d\n"
 
 #: src/optimizers/opt_fitness.c:472
 #, c-format
 msgid "fitness_transform: unknown direction %d\n"
-msgstr ""
+msgstr "fitness_transform: nomaʼlum yoʻnalish %d\n"
 
 #: src/optimizers/opt_fitness.c:545
 #, c-format
 msgid "reduce_values: unknown reduction method %d\n"
-msgstr ""
+msgstr "reduce_values: nomaʼlum kamaytirish usuli %d\n"
 
 #: src/optimizers/opt_nec2_eval.c:81
 #, c-format
 msgid "nec2_eval_signal: eval_mutex contention, blocking (thr=%lu)\n"
-msgstr ""
+msgstr "nec2_eval_signal: eval_mutex raqobati, bloklanyapti (thr=%lu)\n"
 
 #: src/optimizers/opt_nec2_eval.c:195
 msgid "nec2_eval_run: not initialized\n"
-msgstr ""
+msgstr "nec2_eval_run: ishga tushirilmagan\n"
 
 #: src/optimizers/opt_session.c:96
 #, c-format
@@ -4135,138 +4503,143 @@ msgid ""
 "opt: pass %d/%d iter %d fitness %.6g best %.6g ssize %.4g stagnant %d cache "
 "%d/%d\n"
 msgstr ""
+"opt: oʻtish %d/%d iter %d moslashish %.6g eng yaxshi %.6g ssize %.4g toʻxtab "
+"qolgan %d kesh %d/%d\n"
 
 #: src/optimizers/opt_session.c:120
 #, c-format
 msgid "opt: optimization complete, best fitness: %.6g\n"
-msgstr ""
+msgstr "opt: optimallashtirish tugadi, eng yaxshi moslashish: %.6g\n"
 
 #: src/optimizers/opt_session.c:158
 msgid "opt_start: optimizer already running\n"
-msgstr ""
+msgstr "opt_start: optimallashtiruvchi allaqachon ishlayapti\n"
 
 #: src/optimizers/opt_session.c:224
 msgid "opt_start: simple_new failed\n"
-msgstr ""
+msgstr "opt_start: simple_new muvaffaqiyatsiz boʻldi\n"
 
 #: src/optimizers/opt_session.c:233
 #, c-format
 msgid "opt_start: pthread_create failed: %d\n"
-msgstr ""
+msgstr "opt_start: pthread_create muvaffaqiyatsiz boʻldi: %d\n"
 
 #: src/optimizers/opt_simple.c:297
 #, c-format
 msgid "simple_config_init: unknown algorithm %d\n"
-msgstr ""
+msgstr "simple_config_init: nomaʼlum algoritm %d\n"
 
 #: src/optimizers/opt_simple_var.c:43
 #, c-format
 msgid "var[%d] name is NULL or empty\n"
-msgstr ""
+msgstr "var[%d] nomi NULL yoki boʻsh\n"
 
 #: src/optimizers/opt_simple_var.c:49
 #, c-format
 msgid "var '%s' values is NULL or empty\n"
-msgstr ""
+msgstr "var '%s' qiymatlari NULL yoki boʻsh\n"
 
 #: src/optimizers/opt_simple_var.c:60
 #, c-format
 msgid "var '%s' enabled->size (%zu) != values->size (%zu)\n"
-msgstr ""
+msgstr "var '%s' enabled->size (%zu) != values->size (%zu)\n"
 
 #: src/optimizers/opt_simple_var.c:70
 #, c-format
 msgid "var '%s' enabled[%zu] = %g (must be 0.0 or 1.0)\n"
-msgstr ""
+msgstr "var '%s' enabled[%zu] = %g (0.0 yoki 1.0 boʻlishi kerak)\n"
 
 #: src/optimizers/opt_simple_var.c:80
 #, c-format
 msgid "var '%s' min and max must both be set or both NULL\n"
 msgstr ""
+"var '%s' min va max ikkalasi ham belgilanishi yoki ikkalasi ham NULL "
+"boʻlishi kerak\n"
 
 #: src/optimizers/opt_simple_var.c:89
 #, c-format
 msgid "var '%s' min/max size mismatch with values\n"
-msgstr ""
+msgstr "var '%s' min/max hajmi qiymatlar bilan mos kelmaydi\n"
 
 #: src/optimizers/opt_simple_var.c:100
 #, c-format
 msgid "var '%s' min[%zu]=%g >= max[%zu]=%g (zero or negative range)\n"
-msgstr ""
+msgstr "var '%s' min[%zu]=%g >= max[%zu]=%g (nol yoki manfiy diapazoni)\n"
 
 #: src/optimizers/opt_simple_var.c:113
 #, c-format
 msgid "var '%s'[%zu] initial value %g outside [%g, %g]\n"
-msgstr ""
+msgstr "var '%s'[%zu] boshlangʻich qiymati %g [%g, %g] dan tashqarida\n"
 
 #: src/optimizers/opt_simple_var.c:126
 #, c-format
 msgid "var '%s' perturb_scale size mismatch\n"
-msgstr ""
+msgstr "var '%s' perturb_scale hajmi mos kelmaydi\n"
 
 #: src/optimizers/opt_simple_var.c:134
 #, c-format
 msgid "var '%s' perturb_scale[%zu] is zero\n"
-msgstr ""
+msgstr "var '%s' perturb_scale[%zu] nol\n"
 
 #: src/optimizers/opt_simple_var.c:146
 #, c-format
 msgid "var '%s' round_each size mismatch\n"
-msgstr ""
+msgstr "var '%s' round_each hajmi mos kelmaydi\n"
 
 #: src/optimizers/opt_simple_var.c:152
 #, c-format
 msgid "var '%s' round_each has element <= 0\n"
-msgstr ""
+msgstr "var '%s' round_each da element <= 0 mavjud\n"
 
 #: src/optimizers/opt_simple_var.c:163
 #, c-format
 msgid "var '%s' round_result size mismatch\n"
-msgstr ""
+msgstr "var '%s' round_result hajmi mos kelmaydi\n"
 
 #: src/optimizers/opt_simple_var.c:169
 #, c-format
 msgid "var '%s' round_result has element <= 0\n"
-msgstr ""
+msgstr "var '%s' round_result da element <= 0 mavjud\n"
 
 #: src/opt_ui_session.c:76
 #, c-format
 msgid "opt_ui: optimization finished, best fitness: %.6g\n"
-msgstr ""
+msgstr "opt_ui: optimallashtirish tugadi, eng yaxshi moslashish: %.6g\n"
 
 #: src/opt_ui_session.c:112 src/opt_ui_session.c:145 src/opt_ui_session.c:175
 #: src/opt_ui_session.c:277
 msgid "Optimization"
-msgstr ""
+msgstr "Optimallashtirish"
 
 #: src/freqplots/freqplots_core.c:55
 msgid "Gain Direction"
-msgstr ""
+msgstr "Kuchaytirish yoʻnalishi"
 
 #: src/freqplots/freqplots_core.c:56
 msgid "Viewer Gain"
-msgstr ""
+msgstr "Koʻruvchi yoʻnalishidagi kuchaytirish"
 
 #: src/freqplots/freqplots_core.c:58
 msgid "Impedance (real/imag)"
-msgstr ""
+msgstr "Impedans (real/imag)"
 
 #: src/freqplots/freqplots_core.c:59
 msgid "Impedance (mag/phase)"
-msgstr ""
+msgstr "Impedans (mag/faza)"
 
 #: src/freqplots/freqplots_core.c:60 src/freqplots/graphs/smith_graph.c:476
 msgid "Smith Chart"
-msgstr ""
+msgstr "Smit diagrammasi"
 
 #: src/freqplots/freqplots_core.c:190
 #, c-format
 msgid "fp_field_cond_active: unhandled cond %d\n"
-msgstr ""
+msgstr "fp_field_cond_active: qayta ishlanmagan shart %d\n"
 
 #: src/freqplots/freqplots_core.c:206
 msgid "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
 msgstr ""
+"fp_readout_field_count: maydon toʻplami FP_READOUT_MAX chegarasidan oshdi\n"
 
 #: src/freqplots/freqplots_core.c:393
 #, c-format
@@ -4274,6 +4647,8 @@ msgid ""
 "fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
 "%d posn=%d valid=%d\n"
 msgstr ""
+"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
+"%d posn=%d valid=%d\n"
 
 #: src/freqplots/freqplots_core.c:409
 #, c-format
@@ -4281,164 +4656,168 @@ msgid ""
 "fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
 "%d]\n"
 msgstr ""
+"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
+"%d]\n"
 
 #: src/freqplots/freqplots_graph.c:137 src/freqplots/graphs/smith_graph.c:529
 msgid "memory allocation for points failed\n"
-msgstr ""
+msgstr "nuqtalar uchun xotira ajratib boʻlmadi\n"
 
 #: src/freqplots/freqplots_graph.c:138 src/freqplots/graphs/smith_graph.c:530
 msgid "Draw_Graph():Memory allocation for points failed"
-msgstr ""
+msgstr "Draw_Graph(): Nuqtalar uchun xotira ajratib boʻlmadi"
 
 #: src/freqplots/graphs/smith_graph.c:384
 msgid "0 Ω"
-msgstr ""
+msgstr "0 Ω"
 
 #: src/freqplots/graphs/smith_graph.c:387
 #: src/freqplots/graphs/smith_graph.c:462
 msgid "∞ Ω"
-msgstr ""
+msgstr "∞ Ω"
 
 #: src/freqplots/graphs/smith_graph.c:407
 msgid "constant R"
-msgstr ""
+msgstr "doimiy R"
 
 #: src/freqplots/graphs/smith_graph.c:408
 msgid "constant X"
-msgstr ""
+msgstr "doimiy X"
 
 #: src/freqplots/graphs/smith_graph.c:409
 msgid "unity R, X"
-msgstr ""
+msgstr "birlik R, X"
 
 #: src/freqplots/graphs/smith_graph.c:410
 msgid "match (z = 1)"
-msgstr ""
+msgstr "moslashish (z = 1)"
 
 #: src/freqplots/graphs/smith_graph.c:411
 msgid "impedance vs freq"
-msgstr ""
+msgstr "impedans / chastota"
 
 #: src/freqplots/graphs/smith_graph.c:412
 msgid "selected frequency"
-msgstr ""
+msgstr "tanlangan chastota"
 
 #: src/freqplots/graphs/smith_graph.c:413
 msgid "reflection angle (°)"
-msgstr ""
+msgstr "aks ettirish burchagi (°)"
 
 #: src/freqplots/graphs/smith_graph.c:414
 msgid "wavelengths → gen"
-msgstr ""
+msgstr "toʻlqin uzunliklari → gen"
 
 #: src/freqplots/graphs/smith_graph.c:507
 #, c-format
 msgid "Z0 = %g Ω"
-msgstr ""
+msgstr "Z0 = %g Ω"
 
 #: src/freqplots/graphs/smith_graph.c:514
 msgid "INDUCTIVE (+jX)"
-msgstr ""
+msgstr "INDUKTIV (+jX)"
 
 #: src/freqplots/graphs/smith_graph.c:517
 msgid "CAPACITIVE (-jX)"
-msgstr ""
+msgstr "KAPASITIV (-jX)"
 
 #: src/freqplots/graphs/gain_graph.c:66 src/freqplots/graphs/viewer_graph.c:39
 msgid "Raw Gain dBi"
-msgstr ""
+msgstr "Xom kuchaytirish dBi"
 
 #: src/freqplots/graphs/gain_graph.c:71
 msgid "Max Gain & Net Gain vs Frequency"
-msgstr ""
+msgstr "Maks. kuchaytirish va sof kuchaytirish / chastota"
 
 #: src/freqplots/graphs/gain_graph.c:72
 msgid "Net Gain dBi"
-msgstr ""
+msgstr "Sof kuchaytirish dBi"
 
 #: src/freqplots/graphs/gain_graph.c:77 src/freqplots/graphs/gain_graph.c:84
 msgid "Max Gain & F/B Ratio vs Frequency"
-msgstr ""
+msgstr "Maks. kuchaytirish va F/B nisbati / chastota"
 
 #: src/freqplots/graphs/gain_graph.c:85
 msgid "F/B Ratio dB"
-msgstr ""
+msgstr "F/B nisbati dB"
 
 #: src/freqplots/graphs/gain_graph.c:91
 msgid "Rad Angle - deg"
-msgstr ""
+msgstr "Nurlanish burchagi - daraja"
 
 #: src/freqplots/graphs/gain_graph.c:92
 msgid "Max Gain Direction vs Frequency"
-msgstr ""
+msgstr "Maks. kuchaytirish yoʻnalishi / chastota"
 
 #: src/freqplots/graphs/gain_graph.c:93
 msgid "Phi - deg"
-msgstr ""
+msgstr "Phi - daraja"
 
 #: src/freqplots/graphs/viewer_graph.c:40
 msgid "Gain in Viewer Direction vs Frequency"
-msgstr ""
+msgstr "Koʻruvchi yoʻnalishidagi kuchaytirish / chastota"
 
 #: src/freqplots/graphs/viewer_graph.c:56
 msgid "Net gain dBi"
-msgstr ""
+msgstr "Sof kuchaytirish dBi"
 
 #: src/freqplots/graphs/vswr_graph.c:43
 msgid "VSWR & S11 vs Frequency"
-msgstr ""
+msgstr "VSWR va S11 / chastota"
 
 #: src/freqplots/graphs/vswr_graph.c:44
 msgid "S11 dB"
-msgstr ""
+msgstr "S11 dB"
 
 #: src/freqplots/graphs/vswr_graph.c:48
 msgid "VSWR vs Frequency"
-msgstr ""
+msgstr "VSWR / chastota"
 
 #: src/freqplots/graphs/impedance_graph.c:57
 #: src/freqplots/graphs/impedance_graph.c:62
 msgid "Impedance vs Frequency"
-msgstr ""
+msgstr "Impedans / chastota"
 
 #: src/freqplots/graphs/impedance_graph.c:61
 msgid "Z-magn"
-msgstr ""
+msgstr "Z-modul"
 
 #: src/freqplots/graphs/impedance_graph.c:63
 msgid "Z-phase"
-msgstr ""
+msgstr "Z-faza"
 
 #: src/freqplots/graphs/anttemp_graph.c:54
 msgid "G/Ta (dB)"
-msgstr ""
+msgstr "G/Ta (dB)"
 
 #: src/freqplots/graphs/anttemp_graph.c:55
 msgid "G/Ta & TA - Antenna noise temperature"
-msgstr ""
+msgstr "G/Ta va TA — Antenna shovqin harorati"
 
 #: src/freqplots/graphs/anttemp_graph.c:57
 msgid "Ta (K)"
-msgstr ""
+msgstr "Ta (K)"
 
 #: src/freqplots/graphs/anttemp_graph.c:59
 msgid "TA (K)"
-msgstr ""
+msgstr "TA (K)"
 
 #: src/prerender/prerender_color.c:107
 #, c-format
 msgid "segment_type_to_rgb: unknown type %d\n"
-msgstr ""
+msgstr "segment_type_to_rgb: nomaʼlum tur %d\n"
 
 #: src/prerender/prerender_color.c:134
 #, c-format
 msgid "segment_type_to_width: unknown type %d\n"
-msgstr ""
+msgstr "segment_type_to_width: nomaʼlum tur %d\n"
 
 #: src/radiation.c:838
 #, c-format
 msgid "Average gain %.4f exceeds expected %.4f; check RP theta/phi ranges\n"
 msgstr ""
+"Oʻrtacha kuchaytirish %.4f kutilgan %.4f dan oshdi; RP theta/phi "
+"diapazonlarini tekshiring\n"
 
 #: src/radiation.c:842
 #, c-format
@@ -4446,22 +4825,26 @@ msgid ""
 "Average gain: %.4f (%.2f dBi), efficiency: %.1f%%, solid angle: %.4f * pi "
 "sr\n"
 msgstr ""
+"Oʻrtacha kuchaytirish: %.4f (%.2f dBi), FIK: %.1f%%, qattiq burchak: %.4f * "
+"pi sr\n"
 
 #: src/rc_config.c:376
 #, c-format
 msgid "unable to getcwd(): %s\n"
-msgstr ""
+msgstr "getcwd() bajarib boʻlmadi: %s\n"
 
 #: src/rc_config.c:380
 #, c-format
 msgid "environment variable HOME is undefined, using %s\n"
-msgstr ""
+msgstr "HOME muhit oʻzgaruvchisi aniqlanmagan, %s ishlatilmoqda\n"
 
 #: src/rc_config.c:465
 #, c-format
 msgid ""
 "%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
 msgstr ""
+"%s (locale=%s): faqat %d / %lu belgi mos keldi, boshqa locale sinab "
+"koʻrilmoqda: %s\n"
 
 #: src/rc_config.c:526
 #, c-format
@@ -4469,6 +4852,8 @@ msgid ""
 "rc_config: %s: builder_check_menu_item_id is NULL but builder_window is "
 "defined.\n"
 msgstr ""
+"rc_config: %s: builder_check_menu_item_id NULL, lekin builder_window "
+"aniqlangan.\n"
 
 #: src/rc_config.c:529
 #, c-format
@@ -4476,31 +4861,33 @@ msgid ""
 "rc_config: %s: builder_window is NULL but builder_check_menu_item_id is "
 "defined.\n"
 msgstr ""
+"rc_config: %s: builder_window NULL, lekin builder_check_menu_item_id "
+"aniqlangan.\n"
 
 #: src/rc_config.c:542
 #, c-format
 msgid "match: %s\n"
-msgstr ""
+msgstr "mos keldi: %s\n"
 
 #: src/rc_config.c:567
 #, c-format
 msgid "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
-msgstr ""
+msgstr "oyna: x=%-5d y=%-5d w=%-5d h=%-5d  sarlavha: \"%s\"\n"
 
 #: src/rc_config.c:615
 #, c-format
 msgid "%s: EOF reading application version.\n"
-msgstr ""
+msgstr "%s: dastur versiyasini oʻqishda EOF.\n"
 
 #: src/rc_config.c:621
 #, c-format
 msgid "existing config file version differs: %s != %s\n"
-msgstr ""
+msgstr "mavjud konfiguratsiya fayli versiyasi farq qiladi: %s != %s\n"
 
 #: src/rc_config.c:920
 #, c-format
 msgid "stat failed for %s: %s\n"
-msgstr ""
+msgstr "%s uchun stat muvaffaqiyatsiz: %s\n"
 
 #: src/rc_config.c:926
 #, c-format
@@ -4508,41 +4895,48 @@ msgid ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
 "4e62893b.\n"
 msgstr ""
+"4e62893b xatosidan kelib chiqqan %s katalog ruxsatnomalari 0%o dan 0%o ga "
+"tuzatildi.\n"
 
 #: src/rc_config.c:957
 #, c-format
 msgid "%s:%d: Line not parsed: %s\n"
-msgstr ""
+msgstr "%s:%d: Qator tahlil qilinmadi: %s\n"
 
 #: src/rc_config.c:963
 #, c-format
 msgid "%s:%d: Early end of file for %s: %s \n"
-msgstr ""
+msgstr "%s:%d: %s uchun fayl erta tugadi: %s \n"
 
 #: src/rc_config.c:988
 #, c-format
 msgid "%s:%d: parse error (%s): %s \n"
-msgstr ""
+msgstr "%s:%d: tahlil xatosi (%s): %s \n"
 
 #: src/rc_config.c:1011
 #, c-format
 msgid "Invalid sky model index %d in config, resetting to default\n"
 msgstr ""
+"Konfiguratsiyada notoʻgʻri osmon modeli indeksi %d, standartga "
+"qaytarilmoqda\n"
 
 #: src/rc_config.c:1017
 #, c-format
 msgid "Invalid earth model index %d in config, resetting to default\n"
 msgstr ""
+"Konfiguratsiyada notoʻgʻri yer modeli indeksi %d, standartga qaytarilmoqda\n"
 
 #: src/rc_config.c:1023
 #, c-format
 msgid "Invalid interp method %d in config, resetting to default\n"
 msgstr ""
+"Konfiguratsiyada notoʻgʻri interpolyatsiya usuli %d, standartga "
+"qaytarilmoqda\n"
 
 #: src/rc_config.c:1341
 #, c-format
 msgid "cannot open xnec2c's config file %s: %s\n"
-msgstr ""
+msgstr "xnec2c konfiguratsiya faylini ochib boʻlmadi %s: %s\n"
 
 #: src/rdpattern_ui.c:36
 msgid ""
@@ -4552,6 +4946,11 @@ msgid ""
 "H-field animation: Add NH card to NEC file\n"
 "Poynting vector: Add both NE and NH cards"
 msgstr ""
+"Animatsiya yaqin maydon maʼlumotlarini talab qiladi.\n"
+"\n"
+"E-maydoni animatsiyasi: NEC fayliga NE kartasini qoʻshing\n"
+"H-maydoni animatsiyasi: NEC fayliga NH kartasini qoʻshing\n"
+"Poyinting vektori: NE va NH kartalarini ikkalasini ham qoʻshing"
 
 #: src/rdpattern_ui.c:92
 #, c-format
@@ -4559,253 +4958,265 @@ msgid ""
 "Scale_Gain_Resolved: gain_style %d out of range [0..%d], defaulting to "
 "GS_LINP\n"
 msgstr ""
+"Scale_Gain_Resolved: gain_style %d [0..%d] diapazonidan tashqari, GS_LINP ga "
+"qaytarilmoqda\n"
 
 #: src/rdpattern_ui.c:561 src/rdpattern_ui.c:567
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
 msgstr ""
+"Kuzatish balandlik burchagi. Antenna haroratini baholash uchun osmon/yer "
+"chegarasini siljitadi. 0° = gorizont."
 
 #: src/rdpattern_ui.c:564 src/rdpattern_ui.c:570
 msgid ""
 "Observation elevation for antenna temperature.\n"
 "Select Gain Style → Noise Temperature to enable."
 msgstr ""
+"Antenna harorati uchun kuzatish balandligi.\n"
+"Yoqish uchun Kuchaytirish uslubi → Shovqin harorati ni tanlang."
 
 #: src/rdpattern_ui.c:573
 msgid ""
 "Independent sky, earth, and interpolation selectors for noise temperature "
 "models."
 msgstr ""
+"Shovqin harorati modellari uchun mustaqil osmon, yer va interpolyatsiya "
+"tanlovlari."
 
 #: src/rdpattern_ui.c:575
 msgid ""
 "Sky and earth noise temperature models.\n"
 "Select Gain Style → Noise Temperature to enable."
 msgstr ""
+"Osmon va yer shovqin harorati modellari.\n"
+"Yoqish uchun Kuchaytirish uslubi → Shovqin harorati ni tanlang."
 
 #: src/rdpattern_ui.c:976
 msgid "Total Gain"
-msgstr ""
+msgstr "Jami kuchaytirish"
 
 #: src/rdpattern_ui.c:977
 msgid "Horizontal Polarization"
-msgstr ""
+msgstr "Gorizontal qutblanish"
 
 #: src/rdpattern_ui.c:978
 msgid "Vertical Polarization"
-msgstr ""
+msgstr "Vertikal qutblanish"
 
 #: src/rdpattern_ui.c:979
 msgid "RH Circular Polarization"
-msgstr ""
+msgstr "Oʻng qoʻllik doiraviy qutblanish"
 
 #: src/rdpattern_ui.c:980
 msgid "LH Circular Polarization"
-msgstr ""
+msgstr "Chap qoʻllik doiraviy qutblanish"
 
 #: src/rdpattern_ui.c:985
 msgid "Linear Power"
-msgstr ""
+msgstr "Chiziqli quvvat"
 
 #: src/rdpattern_ui.c:986
 msgid "Linear Voltage"
-msgstr ""
+msgstr "Chiziqli kuchlanish"
 
 #: src/rdpattern_ui.c:987
 msgid "ARRL Scale"
-msgstr ""
+msgstr "ARRL shkalasi"
 
 #: src/rdpattern_ui.c:988
 msgid "Logarithmic Scale"
-msgstr ""
+msgstr "Logarifmik shkala"
 
 #: src/rdpattern_ui.c:989
 msgid "Noise Temperature"
-msgstr ""
+msgstr "Shovqin harorati"
 
 #: src/rdpattern_ui.c:990
 msgid "Noise Temp (log scale)"
-msgstr ""
+msgstr "Shovqin harorati (log shkala)"
 
 #: src/rdpattern_ui.c:1002
 msgid "Radiation Pattern: - "
-msgstr ""
+msgstr "Nurlanish diagrammasi: - "
 
 #: src/rdpattern_ui.c:1022
 msgid "Near Fields:"
-msgstr ""
+msgstr "Yaqin maydonlar:"
 
 #: src/rdpattern_ui.c:1024
 msgid " - E Field"
-msgstr ""
+msgstr " - E maydoni"
 
 #: src/rdpattern_ui.c:1026
 msgid " - H Field"
-msgstr ""
+msgstr " - H maydoni"
 
 #: src/rdpattern_ui.c:1028
 msgid " - Poynting Vector"
-msgstr ""
+msgstr " - Poyinting vektori"
 
 #: src/rdpattern_ui.c:1038
 msgid "Frequency Data Plots - "
-msgstr ""
+msgstr "Chastota maʼlumotlari grafiklari - "
 
 #: src/render/gradient_cache.c:77
 #, c-format
 msgid "fstep=%d is out of bounds. calc_data.steps_total=%d"
-msgstr ""
+msgstr "fstep=%d chegaradan tashqari. calc_data.steps_total=%d"
 
 #: src/render/gradient_cache.c:311
 #, c-format
 msgid "gradient_cache_update: surface creation failed (%dx%d)\n"
-msgstr ""
+msgstr "gradient_cache_update: sirt yaratib boʻlmadi (%dx%d)\n"
 
 #: src/render/render_dispatch.c:413
 #, c-format
 msgid "render: unhandled mode %d\n"
-msgstr ""
+msgstr "render: qayta ishlanmagan rejim %d\n"
 
 #: src/settings/render_settings_common.c:124
 #, c-format
 msgid "render_settings_init: failed to load glade: %s\n"
-msgstr ""
+msgstr "render_settings_init: glade yuklab boʻlmadi: %s\n"
 
 #: src/settings/render_settings_common.c:134
 #, c-format
 msgid "render_settings_init: failed to load opengl glade: %s\n"
-msgstr ""
+msgstr "render_settings_init: opengl glade yuklab boʻlmadi: %s\n"
 
 #: src/settings/render_settings_common.c:144
 #, c-format
 msgid "render_settings_init: failed to load cairo glade: %s\n"
-msgstr ""
+msgstr "render_settings_init: cairo glade yuklab boʻlmadi: %s\n"
 
 #: src/settings/render_settings_common.c:157
 msgid "render_settings_init: failed to get render_settings_window from glade\n"
-msgstr ""
+msgstr "render_settings_init: glade dan render_settings_window olib boʻlmadi\n"
 
 #: src/settings/render_settings_dispatch.c:104
 #, c-format
 msgid "config_apply_entry: missing widget '%s'\n"
-msgstr ""
+msgstr "config_apply_entry: '%s' vidjet topilmadi\n"
 
 #: src/settings/render_settings_dispatch.c:136
 #, c-format
 msgid "config_apply_entry: unknown widget type for '%s'\n"
-msgstr ""
+msgstr "config_apply_entry: '%s' uchun nomaʼlum vidjet turi\n"
 
 #: src/settings/render_settings_dispatch.c:164
 #, c-format
 msgid "config_sync_entry: missing widget '%s'\n"
-msgstr ""
+msgstr "config_sync_entry: '%s' vidjet topilmadi\n"
 
 #: src/settings/render_settings_dispatch.c:193
 #, c-format
 msgid "config_sync_entry: unknown widget type for '%s'\n"
-msgstr ""
+msgstr "config_sync_entry: '%s' uchun nomaʼlum vidjet turi\n"
 
 #: src/somnec.c:237
 msgid "Hankel not valid for z = 0"
-msgstr ""
+msgstr "Hankel z = 0 uchun yaroqsiz"
 
 #: src/somnec.c:748
 msgid "No convergence"
-msgstr ""
+msgstr "Yaqinlashuv yoʻq"
 
 #: src/sy_expr.c:137
 msgid "(further errors suppressed)\n"
-msgstr ""
+msgstr "(keyingi xatolar yashirildi)\n"
 
 #: src/sy_expr.c:583
 msgid "Expression syntax error: unexpected character"
-msgstr ""
+msgstr "Ifoda sintaksis xatosi: kutilmagan belgi"
 
 #: src/sy_expr.c:720
 msgid "Expression parsing error: unexpected token"
-msgstr ""
+msgstr "Ifoda tahlil xatosi: kutilmagan token"
 
 #: src/sy_expr.c:732
 msgid "Expression error: mismatched parentheses"
-msgstr ""
+msgstr "Ifoda xatosi: qavs mos kelmadi"
 
 #: src/sy_expr.c:814
 #, c-format
 msgid "Undefined symbol: %s"
-msgstr ""
+msgstr "Aniqlanmagan belgi: %s"
 
 #: src/sy_expr.c:839 src/sy_expr.c:849
 msgid "Expression error: missing operand"
-msgstr ""
+msgstr "Ifoda xatosi: operand yoʻq"
 
 #: src/sy_expr.c:861
 msgid "Unknown operator"
-msgstr ""
+msgstr "Nomaʼlum operator"
 
 #: src/sy_expr.c:873
 msgid "Division by zero"
-msgstr ""
+msgstr "Nolga boʻlish"
 
 #: src/sy_expr.c:896
 #, c-format
 msgid "Unknown function: %s"
-msgstr ""
+msgstr "Nomaʼlum funksiya: %s"
 
 #: src/sy_expr.c:908 src/sy_expr.c:926 src/sy_expr.c:936
 msgid "Function error: missing argument"
-msgstr ""
+msgstr "Funksiya xatosi: argument yoʻq"
 
 #: src/sy_expr.c:953
 msgid "Function error: invalid arity"
-msgstr ""
+msgstr "Funksiya xatosi: notoʻgʻri argumentlar soni"
 
 #: src/sy_expr.c:967
 msgid "Expression error: unexpected token type in RPN"
-msgstr ""
+msgstr "Ifoda xatosi: RPN da kutilmagan token turi"
 
 #: src/sy_expr.c:975
 msgid "Expression error: invalid result"
-msgstr ""
+msgstr "Ifoda xatosi: notoʻgʻri natija"
 
 #: src/sy_expr.c:1123
 msgid "Invalid arguments to sy_evaluate"
-msgstr ""
+msgstr "sy_evaluate uchun notoʻgʻri argumentlar"
 
 #: src/sy_expr.c:1246
 #, c-format
 msgid "sy_load_overrides: malformed line (no colon): %s"
-msgstr ""
+msgstr "sy_load_overrides: notoʻgʻri qator (ikki nuqta yoʻq): %s"
 
 #: src/sy_expr.c:1336
 #, c-format
 msgid "Loaded %d symbol overrides from %s\n"
-msgstr ""
+msgstr "%2$s dan %1$d ta belgi ustidan yozish yuklandi\n"
 
 #: src/sy_expr.c:1453
 #, c-format
 msgid "sy_save_overrides: cannot open %s for writing: %s\n"
-msgstr ""
+msgstr "sy_save_overrides: %s ni yozish uchun ochib boʻlmadi: %s\n"
 
 #: src/sy_expr.c:1475
 #, c-format
 msgid "Saved %d symbol overrides to %s\n"
-msgstr ""
+msgstr "%d ta belgi ustidan yozish %s ga saqlandi\n"
 
 #: src/sy_overrides.c:1093
 #, c-format
 msgid "sy_overrides_init: failed to load glade: %s\n"
-msgstr ""
+msgstr "sy_overrides_init: glade yuklab boʻlmadi: %s\n"
 
 #: src/sy_overrides.c:1107
 msgid "sy_overrides_init: failed to get widgets from glade\n"
-msgstr ""
+msgstr "sy_overrides_init: glade dan vidjetlarni olib boʻlmadi\n"
 
 #: src/sy_overrides.c:1486
 msgid ""
 "Controls whether this parameter overrides the NEC model value.\n"
 "Uncheck Opt to control independently."
 msgstr ""
+"Ushbu parametr NEC modeli qiymatini bekor qilib qoʻyishini boshqaradi.\n"
+"Mustaqil boshqarish uchun Opt belgisini olib tashlang."
 
 #: src/utils.c:42
 #, c-format
@@ -4846,6 +5257,51 @@ msgid ""
 "  --write-gnuplot-structure <filename> - write gnuplot structure file\n"
 "  --write-patch-currents  <filename>  - write CSV of patch surface currents\n"
 msgstr ""
+"Foydalanish: xnec2c [parametrlar] [<kirish-fayl-nomi>]\n"
+"  -i|--input         <kirish-fayl-nomi>\n"
+"  -c|--config        <konfiguratsiya-fayl-yoli>     - fayl mavjud boʻlishi "
+"kerak\n"
+"  -C|--new-config    <yangi-konfiguratsiya-fayl-yoli> - yoʻq boʻlsa "
+"yaratadi\n"
+"  -j|--jobs  <SMP mashinasidagi protsessorlar soni> (-j0 forkni oʻchiradi)\n"
+"     --openblas-threads <n>  OpenBLAS ip sonini belgilash (standart: 1)\n"
+"     --mkl-threads <n>       Intel MKL ip sonini belgilash (standart: 1)\n"
+"     --omp-threads <n>       OpenMP ip sonini belgilash (standart: 1)\n"
+"  -b|--batch:        paketli rejimni yoqish, chastota tsikli tugagach "
+"chiqish\n"
+"  -P|--no-pthreads:  pthreadsni oʻchirish va nosozlik tuzatish uchun GTK "
+"tsikldan foydalanish\n"
+"  -h|--help:         foydalanish maʼlumotlarini chiqarish va chiqish\n"
+"  -V|--version:      xnec2c versiya raqamini chiqarish va chiqish\n"
+"  -v|--verbose:      tafsilotlilikni oshirish, bir necha marta belgilanishi "
+"mumkin\n"
+"  -d|--debug:        nosozlik tuzatish chiqishini yoqish (-dd orqa izlarni "
+"oʻz ichiga oladi)\n"
+"  -d|--quiet:        nosozlik tuzatish/tafsilotli chiqishni yashirish\n"
+"\n"
+"  --optimize:        Optimallashtiruvchini darhol faollashtirish.\n"
+"  --skip-verify:     geometriya tekshiruvlarini oʻtkazib yuborish\n"
+"  --mem-report:      har bir chaqiruv joyidagi boshqariladigan ajratuvchi "
+"baytlarini bildirish\n"
+"\n"
+"Quyidagi argumentlar chastota tsikli tugagandan soʻng chiqish fayliga "
+"yozadi.\n"
+"Bular --batch bilan birlashtirishda foydali; Agar --batch rejimisiz\n"
+"fayl nomlarini belgilashni xohlasangiz, File->Optimizer\n"
+"Settings ni yoqing, aks holda buyruq satrida belgilangan fayllar "
+"yozilmaydi.\n"
+"\n"
+"  --write-csv             <fayl-nomi>  - oʻlchov CSV faylini yozish\n"
+"  --write-s1p             <fayl-nomi>  - S-parametrlar S1P faylini yozish\n"
+"  --write-s2p-max-gain    <fayl-nomi>  - S2P fayli yozish, port-2 maks-"
+"kuchaytirish\n"
+"  --write-s2p-viewer-gain <fayl-nomi>  - S2P fayli yozish, port-2 koʻruvchi-"
+"kuchaytirish\n"
+"  --write-rdpat           <fayl-nomi>  - nurlanish diagrammasi CSV ni "
+"yozish\n"
+"  --write-currents        <fayl-nomi>  - toklar va zaryadlar CSV ni yozish\n"
+"  --write-gnuplot-structure <fayl-nomi> - gnuplot tuzilma faylini yozish\n"
+"  --write-patch-currents  <fayl-nomi>  - patch sirt toklari CSV ni yozish\n"
 
 #: src/utils.c:98 src/utils.c:103
 #, c-format
@@ -4855,49 +5311,54 @@ msgid ""
 "%s\n"
 "\n"
 msgstr ""
+"\n"
+"=== Eslatma: %s ===\n"
+"%s\n"
+"\n"
 
 #: src/utils.c:184
 #, c-format
 msgid "Stop: %s\n"
-msgstr ""
+msgstr "Toʻxtash: %s\n"
 
 #: src/utils.c:220 src/utils.c:222
 #, c-format
 msgid "Stop during freq loop, deadlock prevented: %s\n"
-msgstr ""
+msgstr "Chastota tsiklida toʻxtash, deadlock oldini olindi: %s\n"
 
 #: src/utils.c:402
 #, c-format
 msgid "using %d OpenMP threads per job (%d/%d CPUs)\n"
-msgstr ""
+msgstr "har bir ish uchun %d ta OpenMP ip ishlatilmoqda (%d/%d CPU)\n"
 
 #: src/utils.c:418
 #, c-format
 msgid "%s[%d]: %f seconds\n"
-msgstr ""
+msgstr "%s[%d]: %f soniya\n"
 
 #: src/utils.c:443
 #, c-format
 msgid "xnec2c[%d]: %s: Failed to open file: %s\n"
-msgstr ""
+msgstr "xnec2c[%d]: %s: Faylni ochib boʻlmadi: %s\n"
 
 #: src/utils.c:833
 msgid "Optimizer loop incomplete, suppressing intermediate redraw.\n"
 msgstr ""
+"Optimallashtiruvchi tsikli tugallanmadi, oraliq qayta chizish yashirildi.\n"
 
 #: src/utils.c:849
 msgid "  Backtrace:\n"
-msgstr ""
+msgstr "  Qayta iz:\n"
 
 #: src/utils.c:851
 #, c-format
 msgid "    %d. %s\n"
-msgstr ""
+msgstr "    %d. %s\n"
 
 #: src/utils.c:878
 #, c-format
 msgid "%s:\n"
-msgstr ""
+msgstr "%s:\n"
 
 #: src/xnec2c.c:281
 #, c-format
@@ -4905,47 +5366,52 @@ msgid ""
 "complex dielectric constant from file: %12.5E%+12.5Ej, requested: %12.5E"
 "%+12.5Ej\n"
 msgstr ""
+"fayldan murakkab dielektrik doimiy: %12.5E%+12.5Ej, soʻralgan: %12.5E"
+"%+12.5Ej\n"
 
 #: src/xnec2c.c:284
 msgid "Ground_Parameters():Error in ground parameters"
-msgstr ""
+msgstr "Ground_Parameters(): Er parametrlarida xato"
 
 #: src/xnec2c.c:611
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
-msgstr ""
+msgstr "%.6f MHz: %f soniya. (%s)\n"
 
 #: src/xnec2c.c:865
 #, c-format
 msgid "green_line_eval returned unknown class %d\n"
-msgstr ""
+msgstr "green_line_eval nomaʼlum sinf %d qaytardi\n"
 
 #: src/xnec2c.c:946
 #, c-format
 msgid ""
 "step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
 msgstr ""
+"%d qadam poyga: yuborilgan %.6f MHz, joriy %.6f MHz; qayta hisoblanadi\n"
 
 #: src/xnec2c.c:1042
 #, c-format
 msgid "child %d has invalid pipe fd during forked collect\n"
-msgstr ""
+msgstr "fork yigʻish paytida %d bola notoʻgʻri pipe fd ga ega\n"
 
 #: src/xnec2c.c:1097
 msgid "Failed to read data from forked child\n"
-msgstr ""
+msgstr "Fork qilingan boladan maʼlumot oʻqib boʻlmadi\n"
 
 #: src/xnec2c.c:1174
 #, c-format
 msgid ""
 "fmhz_save %.4f MHz outside FR card ranges; reset to %.4f MHz (VSWR %.2f)\n"
 msgstr ""
+"fmhz_save %.4f MHz FR karta diapazonlaridan tashqari; %.4f MHz ga qaytarildi "
+"(VSWR %.2f)\n"
 
 #: src/xnec2c.c:1199
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
-msgstr ""
+msgstr "Chastota tsikli vaqti: %f soniya. (%s)\n"
 
 #: src/xnec2c.c:1438
 msgid "failed to start Frequency_Loop_Thread\n"
-msgstr ""
+msgstr "Frequency_Loop_Thread ni ishga tushirib boʻlmadi\n"
