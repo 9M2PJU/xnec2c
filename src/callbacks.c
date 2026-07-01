@@ -393,9 +393,6 @@ on_optimizer_output_toggled(
   {
     GtkWidget *w = Builder_Get_Object(main_window_builder, "main_freqplots");
 
-    // Enable frequency data output to Optimizer's file
-    SetFlag( SUPPRESS_INTERMEDIATE_REDRAWS );
-
     if (!gtk_check_menu_item_get_active( GTK_CHECK_MENU_ITEM(w)))
         gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(w), TRUE);
     else if(isFlagClear(FREQ_LOOP_DONE))
@@ -413,15 +410,8 @@ on_optimizer_output_toggled(
             "Select files for writing in \"File->Optimization Settings\"."));
     }
 
-    // Create a thread to play back demodulation buffer
-    pthread_t thrd;
-    int ret = pthread_create( &thrd, NULL, Optimizer_Output, NULL );
-    if( ret != 0 )
-    {
-      pr_err("failed to create Optimizer Output thread\n");
-      perror( "pthread_create()" );
-      exit( -1 );
-    }
+    // Start the inotify watcher that reloads the engine on file change
+    optimizer_output_start();
   }
   else
   {
@@ -437,10 +427,10 @@ on_optimizer_output_toggled(
       }
     }
 
-    // Auto-apply active: keep flag set
+    // Auto-apply active: keep the watcher running
     if( !auto_active )
     {
-      ClearFlag( SUPPRESS_INTERMEDIATE_REDRAWS );
+      optimizer_output_stop();
     }
   }
 }

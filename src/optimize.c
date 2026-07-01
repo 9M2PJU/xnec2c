@@ -98,16 +98,47 @@ void Write_Optimizer_Data( void )
 #ifndef HAVE_INOTIFY
 
 void *Optimizer_Output( void *arg ) { pr_err("xnec2c was built without inotify.\n"); return NULL; }
+void optimizer_output_start( void ) { }
+void optimizer_output_stop( void ) { }
 
 // Otherwise, normal optimize code:
 #else
 
 #include <poll.h>
+#include <pthread.h>
+#include <stdint.h>
+#include <sys/eventfd.h>
 #include <sys/inotify.h>
 #include <sys/stat.h>
 
 /* File extensions to watch - both trigger the same reload handler */
 static const char *watch_extensions[] = { ".nec", ".sy", NULL };
+
+/* External optimizer watcher thread handle and its private run flag.  The flag
+ * is the watcher's sole control: optimizer_output_stop() clears it and joins.
+ * The watcher owns SUPPRESS_INTERMEDIATE_REDRAWS while it runs: start sets it,
+ * stop clears it, so the render flag tracks the active optimization. */
+static pthread_t optimizer_output_thread;
+static _Atomic gboolean optimizer_output_running = FALSE;
+
+/* eventfd used to wake the watcher's blocked poll() at stop, so the join does
+ * not wait out an inotify quiet period. */
+static int optimizer_output_wakefd = -1;
+
+/* optimizer_output_release()
+ *
+ * Closes the wake eventfd, resets its handle, and clears the render-suppression
+ * flag.  Called by stop(), the start() thread-create failure path, and the
+ * watcher's own pre-loop abort.
+ */
+static void
+optimizer_output_release( void )
+{
+  if( optimizer_output_wakefd >= 0 )
+    close( optimizer_output_wakefd );
+  optimizer_output_wakefd = -1;
+  ClearFlag( SUPPRESS_INTERMEDIATE_REDRAWS );
+}
 
 /* Derive companion filename by replacing extension
  * Returns static buffer - not thread safe, caller must use immediately
@@ -208,6 +239,27 @@ int inotify_open(struct pollfd *pfd)
   return fd;
 }
 
+/* wait_for_nonempty_file()
+ *
+ * Polls until the watched input file exists with non-zero size so a reload
+ * does not race a momentarily-truncated file mid-save.  Returns FALSE when the
+ * run flag clears, abandoning the reload so the watcher exits promptly. */
+static gboolean
+wait_for_nonempty_file( struct stat *st )
+{
+  while( optimizer_output_running )
+  {
+    errno = 0;
+    if( stat(rc_config.input_file, st) == 0 && st->st_size > 0 )
+      return TRUE;
+
+    pr_warn("inotify: file stat failed or zero bytes (errno=%s), retrying\n", strerror(errno));
+    usleep(100000);
+  }
+
+  return FALSE;
+}
+
 /* Optimizer_Output()
  *
  * Watches the NEC2 (.nec) input file for modifications using inotify and
@@ -265,7 +317,7 @@ int inotify_open(struct pollfd *pfd)
 Optimizer_Output( void *arg )
 {
   int fd = -1, poll_num;
-  struct pollfd pfd;
+  struct pollfd pfds[2];
   char buf[256] __attribute__ ((aligned(__alignof__(struct inotify_event))));
   const struct inotify_event *event;
   ssize_t len;
@@ -276,6 +328,10 @@ Optimizer_Output( void *arg )
 
   char prev_input_file[sizeof(rc_config.input_file)] = {0};
 
+  /* Second poll slot watches the wake eventfd so stop() can interrupt poll. */
+  pfds[1].fd     = optimizer_output_wakefd;
+  pfds[1].events = POLLIN;
+
   /* Wait for watch events */
   while( TRUE )
   {
@@ -285,18 +341,21 @@ Optimizer_Output( void *arg )
     {
       if (fd > 0) close( fd );
 
-      fd = inotify_open( &pfd );
+      fd = inotify_open( &pfds[0] );
       if (fd < 0)
       {
-        ClearFlag( SUPPRESS_INTERMEDIATE_REDRAWS );
+        /* Watcher aborts before the loop; no stop() will reconcile this exit,
+         * so release what optimizer_output_start() allocated. */
+        optimizer_output_running = FALSE;
+        optimizer_output_release();
         return( NULL );
       }
 
       Strlcpy(prev_input_file, rc_config.input_file, sizeof(prev_input_file));
 	}
 
-    // Exit thread if optimizer output has been cancelled
-    if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS))
+    // Exit thread when the watcher run flag has been cleared
+    if( !optimizer_output_running )
     {
       pr_debug("Exited optimizer thread.\n");
       break;
@@ -308,8 +367,9 @@ Optimizer_Output( void *arg )
 		break;
 	}
 
-    // Poll inotify file descriptor, timeout 1 sec
-    poll_num = poll( &pfd, 1, 1000 );
+    /* Block on inotify and the stop-wake eventfd; the 1 s timeout re-checks
+     * rc_config.input_file for a watch-directory change. */
+    poll_num = poll( pfds, 2, 1000 );
 
     if (poll_num == -1)
     {
@@ -318,9 +378,18 @@ Optimizer_Output( void *arg )
       exit( -1 );
     }
 
+    /* Stop wake: drain the eventfd and re-check the run flag at the loop top. */
+    if( poll_num > 0 && (pfds[1].revents & POLLIN) )
+    {
+      uint64_t wake;
+      ssize_t wr = read( optimizer_output_wakefd, &wake, sizeof(wake) );
+      (void)wr;
+      continue;
+    }
+
     if( poll_num > 0 )
     {
-      if( pfd.revents & POLLIN )
+      if( pfds[0].revents & POLLIN )
       {
         /* Inotify events are available. Read some events. */
         len = read( fd, buf, sizeof(buf) );
@@ -347,7 +416,6 @@ Optimizer_Output( void *arg )
 
 		for (ptr = buf; ptr < buf + len; )
 		{
-			int done;
 			struct stat st;
 			gboolean flag;
 
@@ -389,27 +457,11 @@ Optimizer_Output( void *arg )
 			{
 				pr_debug("inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n");
 
-				done = 0;
-
-				do
+				if (wait_for_nonempty_file(&st))
 				{
-					errno = 0;
-					int stat_ret = stat(rc_config.input_file, &st);
-					done = (stat_ret == 0 && st.st_size > 0);
-					if (!done)
-					{
-						pr_warn("inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), retrying\n",
-							stat_ret, (long)st.st_size, strerror(errno));
-						usleep(100000);
-					}
-					else
-					{
-						pr_debug("inotify: file stat OK - size=%ld bytes\n", (long)st.st_size);
-					}
-				} while (!done);
-
-				flag = FALSE;
-				g_idle_add( Open_Input_File, (gpointer) &flag );
+					flag = FALSE;
+					g_idle_add( Open_Input_File, (gpointer) &flag );
+				}
 
 				modify_seen = FALSE;
 				ptr += sizeof(struct inotify_event) + event->len;
@@ -422,27 +474,11 @@ Optimizer_Output( void *arg )
 				{
 					pr_debug("inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), triggering reload\n");
 
-					done = 0;
-
-					do
+					if (wait_for_nonempty_file(&st))
 					{
-						errno = 0;
-						int stat_ret = stat(rc_config.input_file, &st);
-						done = (stat_ret == 0 && st.st_size > 0);
-						if (!done)
-						{
-							pr_warn("inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), retrying\n",
-								stat_ret, (long)st.st_size, strerror(errno));
-							usleep(100000);
-						}
-						else
-						{
-							pr_debug("inotify: file stat OK - size=%ld bytes\n", (long)st.st_size);
-						}
-					} while (!done);
-
-					gboolean flag = FALSE;
-					g_idle_add( Open_Input_File, (gpointer) &flag );
+						gboolean flag = FALSE;
+						g_idle_add( Open_Input_File, (gpointer) &flag );
+					}
 
 					modify_seen = FALSE;
 				}
@@ -466,6 +502,72 @@ Optimizer_Output( void *arg )
   if( fd >= 0) close( fd );
   return( NULL );
 } // Optimizer_Output()
+
+/*------------------------------------------------------------------------*/
+
+/* optimizer_output_start()
+ *
+ * Creates the inotify watcher thread and stores its handle.  Idempotent: a
+ * call while the watcher already runs is a no-op.
+ */
+  void
+optimizer_output_start( void )
+{
+  if( optimizer_output_running )
+    return;
+
+  optimizer_output_running = TRUE;
+  SetFlag( SUPPRESS_INTERMEDIATE_REDRAWS );
+
+  optimizer_output_wakefd = eventfd( 0, EFD_CLOEXEC );
+  if( optimizer_output_wakefd == -1 )
+  {
+    optimizer_output_running = FALSE;
+    ClearFlag( SUPPRESS_INTERMEDIATE_REDRAWS );
+    pr_err("failed to create optimizer wake eventfd\n");
+    perror( "eventfd()" );
+    exit( -1 );
+  }
+
+  int ret = pthread_create(
+      &optimizer_output_thread, NULL, Optimizer_Output, NULL );
+  if( ret != 0 )
+  {
+    optimizer_output_running = FALSE;
+    optimizer_output_release();
+    pr_err("failed to create Optimizer Output thread\n");
+    perror( "pthread_create()" );
+    exit( -1 );
+  }
+
+} /* optimizer_output_start() */
+
+/*------------------------------------------------------------------------*/
+
+/* optimizer_output_stop()
+ *
+ * Clears the run flag, wakes the watcher's blocked poll() via the eventfd, and
+ * joins.  Idempotent: a no-op when the watcher is not running.
+ */
+  void
+optimizer_output_stop( void )
+{
+  if( !optimizer_output_running )
+    return;
+
+  optimizer_output_running = FALSE;
+
+  /* Wake the watcher so the join does not wait for an inotify event; the
+   * cleared run flag makes it break at the loop top. */
+  uint64_t wake = 1;
+  ssize_t wr = write( optimizer_output_wakefd, &wake, sizeof(wake) );
+  (void)wr;
+
+  pthread_join( optimizer_output_thread, NULL );
+
+  optimizer_output_release();
+
+} /* optimizer_output_stop() */
 
 #endif // HAVE_INOTIFY
 

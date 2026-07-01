@@ -1830,6 +1830,8 @@ void load(int *ldtyp, int *ldtag, int *ldtagf, int *ldtagt, double *zlr, double 
 /* optimize.c */
 void Write_Optimizer_Data(void);
 void *Optimizer_Output(void *arg);
+void optimizer_output_start(void);
+void optimizer_output_stop(void);
 int opt_have_files_to_save(void);
 /* freqplots */
 void Plot_Frequency_Data(freqplots_view_t *view, cairo_t *cr);
