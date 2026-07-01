@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-05-25 01:51-0700\n"
+"POT-Creation-Date: 2026-06-26 14:17-0700\n"
 "PO-Revision-Date: 2025-12-27 16:01-0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:1962
+#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2194
 msgid "xnec2c"
 msgstr "xnec2c"
 
@@ -57,7 +57,7 @@ msgstr "כימות _צבע"
 msgid "Off"
 msgstr "כבוי"
 
-#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:3868
+#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4100
 msgid "8"
 msgstr "8"
 
@@ -94,20 +94,20 @@ msgid "Depth Bins"
 msgstr "סלי עומק"
 
 #: resources/settings/cairo_settings.glade:184
-#: resources/settings/opengl_settings.glade:523
-#: resources/settings/render_settings.glade:61
+#: resources/settings/opengl_settings.glade:533
+#: resources/settings/render_settings.glade:50
 msgid "Reset to _Defaults"
 msgstr "איפוס ל_ברירות מחדל"
 
-#: resources/settings/opengl_settings.glade:502
+#: resources/settings/opengl_settings.glade:493
 msgid "Visual only — does not affect NEC2 model calculations."
 msgstr "חזותי בלבד — אינו משפיע על חישובי מודל NEC2."
 
-#: resources/settings/render_settings.glade:83
+#: resources/settings/render_settings.glade:72
 msgid "Rendering Settings"
 msgstr "הגדרות רינדור"
 
-#: resources/settings/render_settings.glade:127
+#: resources/settings/render_settings.glade:116
 #: resources/sy_overrides.glade:744
 msgid "_Close"
 msgstr "_סגור"
@@ -171,702 +171,798 @@ msgstr ""
 msgid "translator-credits"
 msgstr "קרדיט מתרגמים"
 
-#: resources/xnec2c.glade:69 src/rdpattern_ui.c:331 src/rdpattern_ui.c:339
-#: src/rdpattern_ui.c:346
+#: resources/xnec2c.glade:75 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
+#: src/rdpattern_ui.c:344
 msgid "Near Field Animation"
 msgstr "הנפשת שדה קרוב"
 
-#: resources/xnec2c.glade:153
+#: resources/xnec2c.glade:167
+msgid ""
+"Scrub the animation phase manually.\n"
+"Disabled while the animation is running."
+msgstr ""
+"גרור את פאזת ההנפשה ידנית.\n"
+"מושבת בזמן שההנפשה פועלת."
+
+#: resources/xnec2c.glade:184
+msgid "φ 0°"
+msgstr "φ 0°"
+
+#: resources/xnec2c.glade:198
+msgid "Phase"
+msgstr "פאזה"
+
+#: resources/xnec2c.glade:221
 msgid "Frames/Sec"
 msgstr "פריימים/שנייה"
 
-#: resources/xnec2c.glade:166
+#: resources/xnec2c.glade:234
 msgid "Animate Freq (Hz)"
 msgstr "תדר הנפשה (Hz)"
 
-#: resources/xnec2c.glade:284
+#: resources/xnec2c.glade:309
+msgid "Show currents"
+msgstr "הצג זרמים"
+
+#: resources/xnec2c.glade:313
+msgid ""
+"Animate current magnitude and direction along the wires.\n"
+"Mirrors the Currents button in the main window."
+msgstr ""
+"הנפש את עוצמת הזרם וכיוונו לאורך התילים.\n"
+"משקף את כפתור הזרמים בחלון הראשי."
+
+#: resources/xnec2c.glade:328
+msgid "Flow direction:"
+msgstr "כיוון זרימה:"
+
+#: resources/xnec2c.glade:340
+msgid ""
+"Select how the animated current flow is rendered.\n"
+"Mirrors the Flow direction setting in the main window."
+msgstr ""
+"בחר כיצד זרימת הזרם המונפשת מוצגת.\n"
+"משקף את הגדרת כיוון הזרימה בחלון הראשי."
+
+#: resources/xnec2c.glade:342
+msgid "Reference phase"
+msgstr "פאזת ייחוס"
+
+#: resources/xnec2c.glade:343
+msgid "LIC"
+msgstr "LIC"
+
+#: resources/xnec2c.glade:344
+msgid "Wireframe"
+msgstr "מסגרת תיל"
+
+#: resources/xnec2c.glade:360
+msgid "Structure"
+msgstr "מבנה"
+
+#: resources/xnec2c.glade:384
+msgid "Near E field"
+msgstr "שדה E קרוב"
+
+#: resources/xnec2c.glade:388
+msgid ""
+"Show the near electric field vectors while animating.\n"
+"Enable by opening the radiation pattern window."
+msgstr ""
+"הצג את וקטורי שדה E הקרוב בזמן הנפשה.\n"
+"הפעל על ידי פתיחת חלון תבנית הקרינה."
+
+#: resources/xnec2c.glade:400
+msgid "Near H field"
+msgstr "שדה H קרוב"
+
+#: resources/xnec2c.glade:404
+msgid ""
+"Show the near magnetic field vectors while animating.\n"
+"Enable by opening the radiation pattern window."
+msgstr ""
+"הצג את וקטורי שדה H הקרוב בזמן הנפשה.\n"
+"הפעל על ידי פתיחת חלון תבנית הקרינה."
+
+#: resources/xnec2c.glade:416
+msgid "Poynting vector"
+msgstr "וקטור פוינטינג"
+
+#: resources/xnec2c.glade:420
+msgid ""
+"Show the Poynting power-flow vectors while animating.\n"
+"Enable by opening the radiation pattern window."
+msgstr ""
+"הצג את וקטורי זרימת הספק פוינטינג בזמן הנפשה.\n"
+"הפעל על ידי פתיחת חלון תבנית הקרינה."
+
+#: resources/xnec2c.glade:436
+msgid "Near Field"
+msgstr "שדה קרוב"
+
+#: resources/xnec2c.glade:516
 msgid "Arc Element (GA card)"
 msgstr "אלמנט קשת (כרטיס GA)"
 
-#: resources/xnec2c.glade:312 resources/xnec2c.glade:1347
-#: resources/xnec2c.glade:3774 resources/xnec2c.glade:14808 src/cmnd_edit.c:488
+#: resources/xnec2c.glade:544 resources/xnec2c.glade:1579
+#: resources/xnec2c.glade:4006 resources/xnec2c.glade:15064 src/cmnd_edit.c:488
 msgid "Tag Number"
 msgstr "מספר תגית"
 
-#: resources/xnec2c.glade:325 resources/xnec2c.glade:14903
+#: resources/xnec2c.glade:557 resources/xnec2c.glade:15159
 msgid "No. Segments"
 msgstr "מספר מקטעים"
 
-#: resources/xnec2c.glade:338 resources/xnec2c.glade:3800
-#: resources/xnec2c.glade:14999
+#: resources/xnec2c.glade:570 resources/xnec2c.glade:4032
+#: resources/xnec2c.glade:15255
 msgid "Segs % lambda"
 msgstr "מקטעים % אורך גל"
 
-#: resources/xnec2c.glade:351 resources/xnec2c.glade:3813
-#: resources/xnec2c.glade:15095
+#: resources/xnec2c.glade:583 resources/xnec2c.glade:4045
+#: resources/xnec2c.glade:15351
 msgid "Wire Diameter"
 msgstr "קוטר חוט"
 
-#: resources/xnec2c.glade:439
+#: resources/xnec2c.glade:671
 msgid "Radius from Y"
 msgstr "רדיוס מ-Y"
 
-#: resources/xnec2c.glade:452
+#: resources/xnec2c.glade:684
 msgid "End 1 Angle"
 msgstr "זווית קצה 1"
 
-#: resources/xnec2c.glade:465
+#: resources/xnec2c.glade:697
 msgid "End 2 Angle"
 msgstr "זווית קצה 2"
 
-#: resources/xnec2c.glade:478 resources/xnec2c.glade:4010
-#: resources/xnec2c.glade:15160 src/cmnd_edit.c:2024
+#: resources/xnec2c.glade:710 resources/xnec2c.glade:4242
+#: resources/xnec2c.glade:15416 src/cmnd_edit.c:2024
 msgid "Conductivity S/m"
 msgstr "מוליכות S/m"
 
-#: resources/xnec2c.glade:576
+#: resources/xnec2c.glade:808
 msgid "Wire Arc Data"
 msgstr "נתוני קשת חוט"
 
-#: resources/xnec2c.glade:638 resources/xnec2c.glade:874
-#: resources/xnec2c.glade:1674 resources/xnec2c.glade:1897
-#: resources/xnec2c.glade:2355 resources/xnec2c.glade:2547
-#: resources/xnec2c.glade:2858 resources/xnec2c.glade:3544
-#: resources/xnec2c.glade:4344 resources/xnec2c.glade:4543
-#: resources/xnec2c.glade:4704 resources/xnec2c.glade:5236
-#: resources/xnec2c.glade:5872 resources/xnec2c.glade:7316
-#: resources/xnec2c.glade:8223 resources/xnec2c.glade:9229
-#: resources/xnec2c.glade:9509 resources/xnec2c.glade:13501
-#: resources/xnec2c.glade:14014 resources/xnec2c.glade:14613
-#: resources/xnec2c.glade:15449 resources/xnec2c.glade:15649
+#: resources/xnec2c.glade:870 resources/xnec2c.glade:1106
+#: resources/xnec2c.glade:1906 resources/xnec2c.glade:2129
+#: resources/xnec2c.glade:2587 resources/xnec2c.glade:2779
+#: resources/xnec2c.glade:3090 resources/xnec2c.glade:3776
+#: resources/xnec2c.glade:4576 resources/xnec2c.glade:4775
+#: resources/xnec2c.glade:4936 resources/xnec2c.glade:5468
+#: resources/xnec2c.glade:6104 resources/xnec2c.glade:7548
+#: resources/xnec2c.glade:8455 resources/xnec2c.glade:9461
+#: resources/xnec2c.glade:9741 resources/xnec2c.glade:13757
+#: resources/xnec2c.glade:14270 resources/xnec2c.glade:14869
+#: resources/xnec2c.glade:15705 resources/xnec2c.glade:15905
 msgid "Delete Card"
 msgstr "מחק כרטיס"
 
-#: resources/xnec2c.glade:716
+#: resources/xnec2c.glade:948
 msgid "Cylindrical Structure (GR card)"
 msgstr "מבנה גלילי (כרטיס GR)"
 
-#: resources/xnec2c.glade:746 resources/xnec2c.glade:9409
+#: resources/xnec2c.glade:978 resources/xnec2c.glade:9641
 msgid "Tag Number Increment"
 msgstr "תוספת מספר תגית"
 
-#: resources/xnec2c.glade:759
+#: resources/xnec2c.glade:991
 msgid "Number of Structures"
 msgstr "מספר מבנים"
 
-#: resources/xnec2c.glade:813
+#: resources/xnec2c.glade:1045
 msgid "Cylindrical Structure"
 msgstr "מבנה גלילי"
 
-#: resources/xnec2c.glade:939
+#: resources/xnec2c.glade:1171
 msgid "Xnec2c Error"
 msgstr "שגיאת Xnec2c"
 
-#: resources/xnec2c.glade:1047
+#: resources/xnec2c.glade:1279
 msgid "Error"
 msgstr "שגיאה"
 
-#: resources/xnec2c.glade:1126
+#: resources/xnec2c.glade:1358
 msgid "Excitation Command (EX Card)"
 msgstr "פקודת עירור (כרטיס EX)"
 
-#: resources/xnec2c.glade:1152
+#: resources/xnec2c.glade:1384
 msgid "Incident LH Wave"
 msgstr "גל פוגע שמאלי"
 
-#: resources/xnec2c.glade:1168
+#: resources/xnec2c.glade:1400
 msgid "Incident Linear Wave "
 msgstr "גל פוגע ליניארי "
 
-#: resources/xnec2c.glade:1184
+#: resources/xnec2c.glade:1416
 msgid "Current Source"
 msgstr "מקור זרם"
 
-#: resources/xnec2c.glade:1200
+#: resources/xnec2c.glade:1432
 msgid "Incident RH Wave"
 msgstr "גל פוגע ימני"
 
-#: resources/xnec2c.glade:1216
+#: resources/xnec2c.glade:1448
 msgid "Current Slope Discontinuity"
 msgstr "אי-רציפות שיפוע זרם"
 
-#: resources/xnec2c.glade:1232
+#: resources/xnec2c.glade:1464
 msgid "Voltage Source"
 msgstr "מקור מתח"
 
-#: resources/xnec2c.glade:1254
+#: resources/xnec2c.glade:1486
 msgid "Excitation Type"
 msgstr "סוג עירור"
 
-#: resources/xnec2c.glade:1279
+#: resources/xnec2c.glade:1511
 msgid "Maximum Admittance Matrix Asymmetry"
 msgstr "אי-סימטריה מרבית של מטריצת ההולכה"
 
-#: resources/xnec2c.glade:1295
+#: resources/xnec2c.glade:1527
 msgid "Impedance of Source Segment"
 msgstr "עכבת מקטע המקור"
 
-#: resources/xnec2c.glade:1317
+#: resources/xnec2c.glade:1549
 msgid "Print Control"
 msgstr "בקרת הדפסה"
 
-#: resources/xnec2c.glade:1360 src/cmnd_edit.c:489
+#: resources/xnec2c.glade:1592 src/cmnd_edit.c:489
 msgid "Segment Number"
 msgstr "מספר מקטע"
 
-#: resources/xnec2c.glade:1409
+#: resources/xnec2c.glade:1641
 msgid "Voltage - Real Part"
 msgstr "מתח - חלק ממשי"
 
-#: resources/xnec2c.glade:1422
+#: resources/xnec2c.glade:1654
 msgid "Voltage - Imaginary Part"
 msgstr "מתח - חלק מדומה"
 
-#: resources/xnec2c.glade:1435
+#: resources/xnec2c.glade:1667
 msgid "Eta"
 msgstr "אטא"
 
-#: resources/xnec2c.glade:1505
+#: resources/xnec2c.glade:1737
 msgid "Theta"
 msgstr "תטא"
 
-#: resources/xnec2c.glade:1518
+#: resources/xnec2c.glade:1750
 msgid "Phi"
 msgstr "פי"
 
-#: resources/xnec2c.glade:1531
+#: resources/xnec2c.glade:1763
 msgid "Ratio"
 msgstr "יחס"
 
-#: resources/xnec2c.glade:1612
+#: resources/xnec2c.glade:1844
 msgid "Excitation Parameters"
 msgstr "פרמטרי עירור"
 
-#: resources/xnec2c.glade:1739
+#: resources/xnec2c.glade:1971
 msgid "Execute Command (XQ Card)"
 msgstr "פקודת ביצוע (כרטיס XQ)"
 
-#: resources/xnec2c.glade:1766
+#: resources/xnec2c.glade:1998
 msgid "No Pattern Cuts"
 msgstr "ללא חתכי תבנית"
 
-#: resources/xnec2c.glade:1782
+#: resources/xnec2c.glade:2014
 msgid "Pattern in XZ Plane"
 msgstr "תבנית במישור XZ"
 
-#: resources/xnec2c.glade:1798
+#: resources/xnec2c.glade:2030
 msgid "Pattern in YZ Plane"
 msgstr "תבנית במישור YZ"
 
-#: resources/xnec2c.glade:1814
+#: resources/xnec2c.glade:2046
 msgid "Both XZ/YZ Patterns"
 msgstr "שתי תבניות XZ/YZ"
 
-#: resources/xnec2c.glade:1836
+#: resources/xnec2c.glade:2068
 msgid "Execute Command"
 msgstr "פקודת ביצוע"
 
-#: resources/xnec2c.glade:2067
+#: resources/xnec2c.glade:2299
 msgid "Frequency Command (FR Card)"
 msgstr "פקודת תדר (כרטיס FR)"
 
-#: resources/xnec2c.glade:2092
+#: resources/xnec2c.glade:2324
 msgid "Additive Stepping"
 msgstr "צעידה חיבורית"
 
-#: resources/xnec2c.glade:2109
+#: resources/xnec2c.glade:2341
 msgid "Multiplicative Stepping"
 msgstr "צעידה כפלית"
 
-#: resources/xnec2c.glade:2132
+#: resources/xnec2c.glade:2364
 msgid "Frequency Stepping"
 msgstr "צעידת תדר"
 
-#: resources/xnec2c.glade:2162
+#: resources/xnec2c.glade:2394
 msgid "No. Frequency Points"
 msgstr "מספר נקודות תדר"
 
-#: resources/xnec2c.glade:2193
+#: resources/xnec2c.glade:2425
 msgid "Start Frequency (MHz)"
 msgstr "תדר התחלה (MHz)"
 
-#: resources/xnec2c.glade:2225
+#: resources/xnec2c.glade:2457
 msgid "Frequency Step (MHz)"
 msgstr "צעד תדר (MHz)"
 
-#: resources/xnec2c.glade:2258
+#: resources/xnec2c.glade:2490
 msgid "End Frequency (MHz)"
 msgstr "תדר סיום (MHz)"
 
-#: resources/xnec2c.glade:2294
+#: resources/xnec2c.glade:2526
 msgid "Frequency Stepping Parameters"
 msgstr "פרמטרי צעידת תדר"
 
-#: resources/xnec2c.glade:2420
+#: resources/xnec2c.glade:2652
 msgid "Geometry End (GE Card)"
 msgstr "סיום גאומטריה (כרטיס GE)"
 
-#: resources/xnec2c.glade:2445
+#: resources/xnec2c.glade:2677
 msgid "No Ground, Free Space condition"
 msgstr "ללא הארקה, תנאי חלל חופשי"
 
-#: resources/xnec2c.glade:2462
+#: resources/xnec2c.glade:2694
 msgid "Ground present, Structure reflection"
 msgstr "הארקה קיימת, השתקפות מבנה"
 
-#: resources/xnec2c.glade:2479
+#: resources/xnec2c.glade:2711
 msgid "Ground present, no Structure reflection"
 msgstr "הארקה קיימת, ללא השתקפות מבנה"
 
-#: resources/xnec2c.glade:2502
+#: resources/xnec2c.glade:2734
 msgid "Ground Plane type"
 msgstr "סוג מישור הארקה"
 
-#: resources/xnec2c.glade:2636
+#: resources/xnec2c.glade:2868
 msgid "Ground Parameters (GD Card)"
 msgstr "פרמטרי הארקה (כרטיס GD)"
 
-#: resources/xnec2c.glade:2665 resources/xnec2c.glade:3134
-#: resources/xnec2c.glade:3220
+#: resources/xnec2c.glade:2897 resources/xnec2c.glade:3366
+#: resources/xnec2c.glade:3452
 msgid "Relative Dielectric Const."
 msgstr "קבוע דיאלקטרי יחסי"
 
-#: resources/xnec2c.glade:2697 resources/xnec2c.glade:3253
+#: resources/xnec2c.glade:2929 resources/xnec2c.glade:3485
 msgid "Distance to 2nd Medium"
 msgstr "מרחק למדיום השני"
 
-#: resources/xnec2c.glade:2729 resources/xnec2c.glade:3166
-#: resources/xnec2c.glade:3285
+#: resources/xnec2c.glade:2961 resources/xnec2c.glade:3398
+#: resources/xnec2c.glade:3517
 msgid "Ground Conductivity S/m"
 msgstr "מוליכות הארקה S/m"
 
-#: resources/xnec2c.glade:2761 resources/xnec2c.glade:3317
+#: resources/xnec2c.glade:2993 resources/xnec2c.glade:3549
 msgid "Dist. below 1st Medium"
 msgstr "מרחק מתחת למדיום הראשון"
 
-#: resources/xnec2c.glade:2797 resources/xnec2c.glade:3353
+#: resources/xnec2c.glade:3029 resources/xnec2c.glade:3585
 msgid "2nd Medium Parameters"
 msgstr "פרמטרי המדיום השני"
 
-#: resources/xnec2c.glade:2978
+#: resources/xnec2c.glade:3210
 msgid "Ground Parameters (GN & GD Cards)"
 msgstr "פרמטרי הארקה (כרטיסי GN ו-GD)"
 
-#: resources/xnec2c.glade:3005
+#: resources/xnec2c.glade:3237
 msgid "Perfect Ground"
 msgstr "הארקה מושלמת"
 
-#: resources/xnec2c.glade:3021
+#: resources/xnec2c.glade:3253
 msgid "Sommerfeld/Norton"
 msgstr "Sommerfeld/Norton"
 
-#: resources/xnec2c.glade:3037
+#: resources/xnec2c.glade:3269
 msgid "Radial Ground Screen"
 msgstr "מסך הארקה רדיאלי"
 
-#: resources/xnec2c.glade:3052
+#: resources/xnec2c.glade:3284
 msgid "Reflection Coeff. Approx"
 msgstr "קירוב מקדם השתקפות"
 
-#: resources/xnec2c.glade:3068
+#: resources/xnec2c.glade:3300
 msgid "Nullify Previous Params"
 msgstr "ביטול פרמטרים קודמים"
 
-#: resources/xnec2c.glade:3084
+#: resources/xnec2c.glade:3316
 msgid "Second Medium (Cliff)"
 msgstr "מדיום שני (צוק)"
 
-#: resources/xnec2c.glade:3105
+#: resources/xnec2c.glade:3337
 msgid "Ground Type"
 msgstr "סוג הארקה"
 
-#: resources/xnec2c.glade:3233
+#: resources/xnec2c.glade:3465
 msgid "0.00000"
 msgstr "0.00000"
 
-#: resources/xnec2c.glade:3384
+#: resources/xnec2c.glade:3616
 msgid "Number of Radials"
 msgstr "מספר רדיאלים"
 
-#: resources/xnec2c.glade:3397
+#: resources/xnec2c.glade:3629
 msgid "Radial Screen Radius"
 msgstr "רדיוס מסך רדיאלי"
 
-#: resources/xnec2c.glade:3447
+#: resources/xnec2c.glade:3679
 msgid "Radial Wire Diameter"
 msgstr "קוטר חוט רדיאלי"
 
-#: resources/xnec2c.glade:3483
+#: resources/xnec2c.glade:3715
 msgid "Radial Screen Parameters"
 msgstr "פרמטרי מסך רדיאלי"
 
-#: resources/xnec2c.glade:3683
+#: resources/xnec2c.glade:3915
 msgid "Helical Element (GA card)"
 msgstr "אלמנט סלילי (כרטיס GA)"
 
-#: resources/xnec2c.glade:3708
+#: resources/xnec2c.glade:3940
 msgid "Right Hand Helix"
 msgstr "סליל ימני"
 
-#: resources/xnec2c.glade:3724
+#: resources/xnec2c.glade:3956
 msgid "Left Hand Helix"
 msgstr "סליל שמאלי"
 
-#: resources/xnec2c.glade:3740
+#: resources/xnec2c.glade:3972
 msgid "Right Hand Spiral"
 msgstr "ספירלה ימנית"
 
-#: resources/xnec2c.glade:3756
+#: resources/xnec2c.glade:3988
 msgid "Left Hand Spiral"
 msgstr "ספירלה שמאלית"
 
-#: resources/xnec2c.glade:3787
+#: resources/xnec2c.glade:4019
 msgid "Segments/Turn"
 msgstr "מקטעים/סיבוב"
 
-#: resources/xnec2c.glade:3826
+#: resources/xnec2c.glade:4058
 msgid "0.0100"
 msgstr "0.0100"
 
-#: resources/xnec2c.glade:3847
+#: resources/xnec2c.glade:4079
 msgid "5.00"
 msgstr "5.00"
 
-#: resources/xnec2c.glade:3888 resources/xnec2c.glade:11740
-#: resources/xnec2c.glade:12966
+#: resources/xnec2c.glade:4120 resources/xnec2c.glade:11998
+#: resources/xnec2c.glade:13222
 msgid "1"
 msgstr "1"
 
-#: resources/xnec2c.glade:3908
+#: resources/xnec2c.glade:4140
 msgid "Number of Turns"
 msgstr "מספר סיבובים"
 
-#: resources/xnec2c.glade:3921
+#: resources/xnec2c.glade:4153
 msgid "8.0000"
 msgstr "8.0000"
 
-#: resources/xnec2c.glade:3942
+#: resources/xnec2c.glade:4174
 msgid "Helix Length (HL)"
 msgstr "אורך סליל (HL)"
 
-#: resources/xnec2c.glade:3955
+#: resources/xnec2c.glade:4187
 msgid "5.0000"
 msgstr "5.0000"
 
-#: resources/xnec2c.glade:3976
+#: resources/xnec2c.glade:4208
 msgid "Turns Spacing"
 msgstr "מרווח סיבובים"
 
-#: resources/xnec2c.glade:3989 resources/xnec2c.glade:4101
-#: resources/xnec2c.glade:4154 resources/xnec2c.glade:4207
-#: resources/xnec2c.glade:4255
+#: resources/xnec2c.glade:4221 resources/xnec2c.glade:4333
+#: resources/xnec2c.glade:4386 resources/xnec2c.glade:4439
+#: resources/xnec2c.glade:4487
 msgid "1.0000"
 msgstr "1.0000"
 
-#: resources/xnec2c.glade:4023
+#: resources/xnec2c.glade:4255
 msgid "0.0000"
 msgstr "0.0000"
 
-#: resources/xnec2c.glade:4043
+#: resources/xnec2c.glade:4275
 msgid "Radius in X (A1)"
 msgstr "רדיוס ב-X (A1)"
 
-#: resources/xnec2c.glade:4056
+#: resources/xnec2c.glade:4288
 msgid "Radius in Y (B1)"
 msgstr "רדיוס ב-Y (B1)"
 
-#: resources/xnec2c.glade:4069
+#: resources/xnec2c.glade:4301
 msgid "Radius in X (A2)"
 msgstr "רדיוס ב-X (A2)"
 
-#: resources/xnec2c.glade:4082
+#: resources/xnec2c.glade:4314
 msgid "Radius in Y (B2)"
 msgstr "רדיוס ב-Y (B2)"
 
-#: resources/xnec2c.glade:4280
+#: resources/xnec2c.glade:4512
 msgid "GH Card"
 msgstr "כרטיס GH"
 
-#: resources/xnec2c.glade:4417 resources/xnec2c.glade:15523
+#: resources/xnec2c.glade:4649 resources/xnec2c.glade:15779
 msgid "Interaction Approx Range (KH Card)"
 msgstr "טווח קירוב אינטראקציה (כרטיס KH)"
 
-#: resources/xnec2c.glade:4444
+#: resources/xnec2c.glade:4676
 msgid "Approximation Range (W/lengths)"
 msgstr "טווח קירוב (אורכי גל)"
 
-#: resources/xnec2c.glade:4482
+#: resources/xnec2c.glade:4714
 msgid "Interaction Approximation Range"
 msgstr "טווח קירוב אינטראקציה"
 
-#: resources/xnec2c.glade:4608
+#: resources/xnec2c.glade:4840
 msgid "Thin Wire Kernel (EK Card)"
 msgstr "גרעין חוט דק (כרטיס EK)"
 
-#: resources/xnec2c.glade:4626
+#: resources/xnec2c.glade:4858
 msgid "Extended Thin Wire Kernel"
 msgstr "גרעין חוט דק מורחב"
 
-#: resources/xnec2c.glade:4643
+#: resources/xnec2c.glade:4875
 msgid "Thin Wire Kernel"
 msgstr "גרעין חוט דק"
 
-#: resources/xnec2c.glade:4806
+#: resources/xnec2c.glade:5038
 msgid "Loading Command (LD Card)"
 msgstr "פקודת עומס (כרטיס LD)"
 
-#: resources/xnec2c.glade:4832
+#: resources/xnec2c.glade:5064
 msgid "Short all Loads (Nulls previous Loading Cards)"
 msgstr "קצר את כל העומסים (מבטל כרטיסי עומס קודמים)"
 
-#: resources/xnec2c.glade:4849
+#: resources/xnec2c.glade:5081
 msgid "Series, Lumped"
 msgstr "טורי, מקובץ"
 
-#: resources/xnec2c.glade:4865
+#: resources/xnec2c.glade:5097
 msgid "Parallel, Distributed"
 msgstr "מקבילי, מפורס"
 
-#: resources/xnec2c.glade:4881
+#: resources/xnec2c.glade:5113
 msgid "Parallel, Lumped"
 msgstr "מקבילי, מקובץ"
 
-#: resources/xnec2c.glade:4897
+#: resources/xnec2c.glade:5129
 msgid "Resistance & Reactance"
 msgstr "התנגדות והיגב"
 
-#: resources/xnec2c.glade:4913
+#: resources/xnec2c.glade:5145
 msgid "Series, Distributed"
 msgstr "טורי, מפורס"
 
-#: resources/xnec2c.glade:4929
+#: resources/xnec2c.glade:5161
 msgid "Wire Conductivity"
 msgstr "מוליכות חוט"
 
-#: resources/xnec2c.glade:4951
+#: resources/xnec2c.glade:5183
 msgid "Loading Type"
 msgstr "סוג עומס"
 
-#: resources/xnec2c.glade:4981
+#: resources/xnec2c.glade:5213
 msgid "Load Tag Number"
 msgstr "מספר תגית עומס"
 
-#: resources/xnec2c.glade:5012
+#: resources/xnec2c.glade:5244
 msgid "Resistance"
 msgstr "התנגדות"
 
-#: resources/xnec2c.glade:5044
+#: resources/xnec2c.glade:5276
 msgid "From Segment #"
 msgstr "מקטע מספר #"
 
-#: resources/xnec2c.glade:5075
+#: resources/xnec2c.glade:5307
 msgid "Inductance"
 msgstr "השראות"
 
-#: resources/xnec2c.glade:5107
+#: resources/xnec2c.glade:5339
 msgid "To Segment #"
 msgstr "למקטע מספר #"
 
-#: resources/xnec2c.glade:5138
+#: resources/xnec2c.glade:5370
 msgid "Capacitance"
 msgstr "קיבול"
 
-#: resources/xnec2c.glade:5174
+#: resources/xnec2c.glade:5406
 msgid "Loading Parameters"
 msgstr "פרמטרי עומס"
 
-#: resources/xnec2c.glade:5389
+#: resources/xnec2c.glade:5621
 msgid "Near Fields Command (NE/NH Cards)"
 msgstr "פקודת שדות קרובים (כרטיסי NE/NH)"
 
-#: resources/xnec2c.glade:5416
+#: resources/xnec2c.glade:5648
 msgid "Near Electric Field"
 msgstr "שדה חשמלי קרוב"
 
-#: resources/xnec2c.glade:5432
+#: resources/xnec2c.glade:5664
 msgid "Rectangular Co-ordinates"
 msgstr "קואורדינטות מלבניות"
 
-#: resources/xnec2c.glade:5448
+#: resources/xnec2c.glade:5680
 msgid "Near Magnetic Field"
 msgstr "שדה מגנטי קרוב"
 
-#: resources/xnec2c.glade:5463
+#: resources/xnec2c.glade:5695
 msgid "Spherical Co-ordinates"
 msgstr "קואורדינטות כדוריות"
 
-#: resources/xnec2c.glade:5491
+#: resources/xnec2c.glade:5723
 msgid "Field Type & Co-ordinates"
 msgstr "סוג שדה וקואורדינטות"
 
-#: resources/xnec2c.glade:5521
+#: resources/xnec2c.glade:5753
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:5552 resources/xnec2c.glade:11289
-#: resources/xnec2c.glade:12500
+#: resources/xnec2c.glade:5784 resources/xnec2c.glade:11549
+#: resources/xnec2c.glade:12758
 msgid "X"
 msgstr "X"
 
-#: resources/xnec2c.glade:5584
+#: resources/xnec2c.glade:5816
 msgid "DX"
 msgstr "DX"
 
-#: resources/xnec2c.glade:5616
+#: resources/xnec2c.glade:5848
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:5647 resources/xnec2c.glade:11304
-#: resources/xnec2c.glade:12515
+#: resources/xnec2c.glade:5879 resources/xnec2c.glade:11564
+#: resources/xnec2c.glade:12773
 msgid "Y"
 msgstr "Y"
 
-#: resources/xnec2c.glade:5679
+#: resources/xnec2c.glade:5911
 msgid "DY"
 msgstr "DY"
 
-#: resources/xnec2c.glade:5711
+#: resources/xnec2c.glade:5943
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:5742 resources/xnec2c.glade:11319
-#: resources/xnec2c.glade:12530
+#: resources/xnec2c.glade:5974 resources/xnec2c.glade:11579
+#: resources/xnec2c.glade:12788
 msgid "Z"
 msgstr "Z"
 
-#: resources/xnec2c.glade:5774
+#: resources/xnec2c.glade:6006
 msgid "DZ"
 msgstr "DZ"
 
-#: resources/xnec2c.glade:5810
+#: resources/xnec2c.glade:6042
 msgid "Field Pattern Parameters"
 msgstr "פרמטרי תבנית שדה"
 
-#: resources/xnec2c.glade:5937
+#: resources/xnec2c.glade:6169
 msgid "Xnec2c: NEC2 Input File Editor"
 msgstr "Xnec2c: עורך קובץ קלט NEC2"
 
-#: resources/xnec2c.glade:6024
+#: resources/xnec2c.glade:6256
 msgid "Manage Cards"
 msgstr "ניהול כרטיסים"
 
-#: resources/xnec2c.glade:6121
+#: resources/xnec2c.glade:6353
 msgid "File Save"
 msgstr "שמירת קובץ"
 
-#: resources/xnec2c.glade:6181 src/nec2_model.c:278
+#: resources/xnec2c.glade:6413 src/nec2_model.c:278
 msgid "Comments"
 msgstr "הערות"
 
-#: resources/xnec2c.glade:6208
+#: resources/xnec2c.glade:6440
 msgid "Wire"
 msgstr "תיל"
 
-#: resources/xnec2c.glade:6222
+#: resources/xnec2c.glade:6454
 msgid "Arc"
 msgstr "קשת"
 
-#: resources/xnec2c.glade:6236
+#: resources/xnec2c.glade:6468
 msgid "Helix"
 msgstr "סליל"
 
-#: resources/xnec2c.glade:6250
+#: resources/xnec2c.glade:6482
 msgid "Patch"
 msgstr "טלאי"
 
-#: resources/xnec2c.glade:6264
+#: resources/xnec2c.glade:6496
 msgid "Cylinder"
 msgstr "גליל"
 
-#: resources/xnec2c.glade:6278
+#: resources/xnec2c.glade:6510
 msgid "Move"
 msgstr "הזזה"
 
-#: resources/xnec2c.glade:6292
+#: resources/xnec2c.glade:6524
 msgid "Reflect"
 msgstr "השתקפות"
 
-#: resources/xnec2c.glade:6306
+#: resources/xnec2c.glade:6538
 msgid "Scale"
 msgstr "קנה מידה"
 
-#: resources/xnec2c.glade:6320 resources/xnec2c.glade:6604
+#: resources/xnec2c.glade:6552 resources/xnec2c.glade:6836
 msgid "Add Var (SY)"
 msgstr "הוסף משתנה (SY)"
 
-#: resources/xnec2c.glade:6340
+#: resources/xnec2c.glade:6572
 msgid "Edit Geometry Data"
 msgstr "עריכת נתוני גאומטריה"
 
-#: resources/xnec2c.glade:6394
+#: resources/xnec2c.glade:6626
 msgid "Geometry"
 msgstr "גאומטריה"
 
-#: resources/xnec2c.glade:6421
+#: resources/xnec2c.glade:6653
 msgid "Excitation"
 msgstr "עירור"
 
-#: resources/xnec2c.glade:6435
+#: resources/xnec2c.glade:6667
 msgid "Radiation"
 msgstr "קרינה"
 
-#: resources/xnec2c.glade:6449
+#: resources/xnec2c.glade:6681
 msgid "Frequency"
 msgstr "תדר"
 
-#: resources/xnec2c.glade:6463
+#: resources/xnec2c.glade:6695
 msgid "Near Fields"
 msgstr "שדות קרובים"
 
-#: resources/xnec2c.glade:6477
+#: resources/xnec2c.glade:6709
 msgid "Ground (GN)"
 msgstr "הארקה (GN)"
 
-#: resources/xnec2c.glade:6491
+#: resources/xnec2c.glade:6723
 msgid "Ground (GD)"
 msgstr "הארקה (GD)"
 
-#: resources/xnec2c.glade:6505
+#: resources/xnec2c.glade:6737
 msgid "Loading"
 msgstr "עומס"
 
-#: resources/xnec2c.glade:6519
+#: resources/xnec2c.glade:6751
 msgid "Kernel"
 msgstr "גרעין"
 
-#: resources/xnec2c.glade:6533
+#: resources/xnec2c.glade:6765
 msgid "Network"
 msgstr "רשת"
 
-#: resources/xnec2c.glade:6547
+#: resources/xnec2c.glade:6779
 msgid "Interaction"
 msgstr "אינטראקציה"
 
-#: resources/xnec2c.glade:6561
+#: resources/xnec2c.glade:6793
 msgid "Transm. Line"
 msgstr "קו תמסורת"
 
-#: resources/xnec2c.glade:6576
+#: resources/xnec2c.glade:6808
 msgid "Execute"
 msgstr "הפעלה"
 
-#: resources/xnec2c.glade:6590
+#: resources/xnec2c.glade:6822
 msgid "Zo"
 msgstr "Zo"
 
-#: resources/xnec2c.glade:6624
+#: resources/xnec2c.glade:6856
 msgid "Edit Control Commands"
 msgstr "עריכת פקודות בקרה"
 
-#: resources/xnec2c.glade:6678
+#: resources/xnec2c.glade:6910
 msgid "Commands"
 msgstr "פקודות"
 
-#: resources/xnec2c.glade:6697
+#: resources/xnec2c.glade:6929
 msgid "Unsaved Data"
 msgstr "נתונים שלא נשמרו"
 
-#: resources/xnec2c.glade:6773
+#: resources/xnec2c.glade:7005
 msgid ""
 "Unsaved data in NEC2 Editor.\n"
 "Save NEC2 Editor data first?\n"
@@ -874,1015 +970,1024 @@ msgstr ""
 "נתונים שלא נשמרו בעורך NEC2.\n"
 "לשמור קודם את נתוני עורך NEC2?\n"
 
-#: resources/xnec2c.glade:6872
+#: resources/xnec2c.glade:7104
 msgid "Network Command (NT Card)"
 msgstr "פקודת רשת (כרטיס NT)"
 
-#: resources/xnec2c.glade:6901
+#: resources/xnec2c.glade:7133
 msgid "Tag Number, Port 1  "
 msgstr "מספר תגית, פורט 1  "
 
-#: resources/xnec2c.glade:6932
+#: resources/xnec2c.glade:7164
 msgid "Tag Number, Port 2  "
 msgstr "מספר תגית, פורט 2  "
 
-#: resources/xnec2c.glade:6963
+#: resources/xnec2c.glade:7195
 msgid "Segment Num, Port 1"
 msgstr "מספר מקטע, פורט 1"
 
-#: resources/xnec2c.glade:6994
+#: resources/xnec2c.glade:7226
 msgid "Segment Num, Port 2"
 msgstr "מספר מקטע, פורט 2"
 
-#: resources/xnec2c.glade:7029 resources/xnec2c.glade:14309
+#: resources/xnec2c.glade:7261 resources/xnec2c.glade:14565
 msgid "Segment Identity"
 msgstr "זיהוי מקטע"
 
-#: resources/xnec2c.glade:7059
+#: resources/xnec2c.glade:7291
 msgid "Element 1,1 Real Part"
 msgstr "רכיב 1,1 חלק ממשי"
 
-#: resources/xnec2c.glade:7091
+#: resources/xnec2c.glade:7323
 msgid "Element 1,2 Real Part"
 msgstr "רכיב 1,2 חלק ממשי"
 
-#: resources/xnec2c.glade:7123
+#: resources/xnec2c.glade:7355
 msgid "Element 2,2 Real Part"
 msgstr "רכיב 2,2 חלק ממשי"
 
-#: resources/xnec2c.glade:7155
+#: resources/xnec2c.glade:7387
 msgid "Element 1,1 Imag Part"
 msgstr "רכיב 1,1 חלק מדומה"
 
-#: resources/xnec2c.glade:7187
+#: resources/xnec2c.glade:7419
 msgid "Element 1,2 Imag Part"
 msgstr "רכיב 1,2 חלק מדומה"
 
-#: resources/xnec2c.glade:7219
+#: resources/xnec2c.glade:7451
 msgid "Element 2,2 Imag Part"
 msgstr "רכיב 2,2 חלק מדומה"
 
-#: resources/xnec2c.glade:7255
+#: resources/xnec2c.glade:7487
 msgid "Admittance Matrix Elements"
 msgstr "רכיבי מטריצת מוליכות"
 
-#: resources/xnec2c.glade:7470
+#: resources/xnec2c.glade:7702
 msgid "Patch Element (SP & SC Cards)"
 msgstr "רכיב טלאי (כרטיסי SP ו-SC)"
 
-#: resources/xnec2c.glade:7494
+#: resources/xnec2c.glade:7726
 msgid "Arbitrary"
 msgstr "שרירותי"
 
-#: resources/xnec2c.glade:7511
+#: resources/xnec2c.glade:7743
 msgid "Rectangle"
 msgstr "מלבן"
 
-#: resources/xnec2c.glade:7528
+#: resources/xnec2c.glade:7760
 msgid "Triangle"
 msgstr "משולש"
 
-#: resources/xnec2c.glade:7545
+#: resources/xnec2c.glade:7777
 msgid "Quadrilateral"
 msgstr "מרובע"
 
-#: resources/xnec2c.glade:7562
+#: resources/xnec2c.glade:7794
 msgid "Surface"
 msgstr "משטח"
 
-#: resources/xnec2c.glade:7585
+#: resources/xnec2c.glade:7817
 msgid "Patch Type"
 msgstr "סוג טלאי"
 
-#: resources/xnec2c.glade:7615
+#: resources/xnec2c.glade:7847
 msgid "Corners 1-2 sub-division (NX)"
 msgstr "חלוקת פינות 1-2 (NX)"
 
-#: resources/xnec2c.glade:7646
+#: resources/xnec2c.glade:7878
 msgid "Corners 2-3 sub-division (NY)"
 msgstr "חלוקת פינות 2-3 (NY)"
 
-#: resources/xnec2c.glade:7681
+#: resources/xnec2c.glade:7913
 msgid "Surface Sub-division"
 msgstr "חלוקת משטח"
 
-#: resources/xnec2c.glade:7711 src/geom_edit.c:1157
+#: resources/xnec2c.glade:7943 src/geom_edit.c:1157
 msgid "Center - X"
 msgstr "מרכז - X"
 
-#: resources/xnec2c.glade:7743 src/geom_edit.c:1163
+#: resources/xnec2c.glade:7975 src/geom_edit.c:1163
 msgid "Normal - Elev."
 msgstr "נורמל - גובה"
 
-#: resources/xnec2c.glade:7775 src/geom_edit.c:1159
+#: resources/xnec2c.glade:8007 src/geom_edit.c:1159
 msgid "Center - Y"
 msgstr "מרכז - Y"
 
-#: resources/xnec2c.glade:7807 src/geom_edit.c:1165
+#: resources/xnec2c.glade:8039 src/geom_edit.c:1165
 msgid "Normal - Azim."
 msgstr "נורמל - אזימוט"
 
-#: resources/xnec2c.glade:7839 src/geom_edit.c:1161
+#: resources/xnec2c.glade:8071 src/geom_edit.c:1161
 msgid "Center - Z"
 msgstr "מרכז - Z"
 
-#: resources/xnec2c.glade:7871 src/geom_edit.c:1167
+#: resources/xnec2c.glade:8103 src/geom_edit.c:1167
 msgid "Patch Area"
 msgstr "שטח טלאי"
 
-#: resources/xnec2c.glade:7907
+#: resources/xnec2c.glade:8139
 msgid "SP/SM Cards"
 msgstr "כרטיסי SP/SM"
 
-#: resources/xnec2c.glade:7943
+#: resources/xnec2c.glade:8175
 msgid "Corner 3 - X"
 msgstr "פינה 3 - X"
 
-#: resources/xnec2c.glade:7975
+#: resources/xnec2c.glade:8207
 msgid "Corner 3 - Y"
 msgstr "פינה 3 - Y"
 
-#: resources/xnec2c.glade:8007
+#: resources/xnec2c.glade:8239
 msgid "Corner 3 - Z"
 msgstr "פינה 3 - Z"
 
-#: resources/xnec2c.glade:8055
+#: resources/xnec2c.glade:8287
 msgid "Corner 4 - X"
 msgstr "פינה 4 - X"
 
-#: resources/xnec2c.glade:8087
+#: resources/xnec2c.glade:8319
 msgid "Corner 4 - Y"
 msgstr "פינה 4 - Y"
 
-#: resources/xnec2c.glade:8119
+#: resources/xnec2c.glade:8351
 msgid "Corner 4 - Z"
 msgstr "פינה 4 - Z"
 
-#: resources/xnec2c.glade:8162
+#: resources/xnec2c.glade:8394
 msgid "SC Card"
 msgstr "כרטיס SC"
 
-#: resources/xnec2c.glade:8378
+#: resources/xnec2c.glade:8610
 msgid "Quit xnec2c?"
 msgstr "לצאת מ-xnec2c?"
 
-#: resources/xnec2c.glade:8457
+#: resources/xnec2c.glade:8689
 msgid "Radiation Pattern (RP Card)"
 msgstr "תבנית קרינה (כרטיס RP)"
 
-#: resources/xnec2c.glade:8484
+#: resources/xnec2c.glade:8716
 msgid "Normal (Space) Wave"
 msgstr "גל רגיל (מרחבי)"
 
-#: resources/xnec2c.glade:8500
+#: resources/xnec2c.glade:8732
 msgid "Space + Ground Wave"
 msgstr "גל מרחבי + קרקעי"
 
-#: resources/xnec2c.glade:8516
+#: resources/xnec2c.glade:8748
 msgid "Linear Cliff"
 msgstr "צוק ליניארי"
 
-#: resources/xnec2c.glade:8532
+#: resources/xnec2c.glade:8764
 msgid "Radial wire screen"
 msgstr "מסך תילים רדיאלי"
 
-#: resources/xnec2c.glade:8548
+#: resources/xnec2c.glade:8780
 msgid "Circular Cliff + Radials"
 msgstr "צוק מעגלי + רדיאליים"
 
-#: resources/xnec2c.glade:8564
+#: resources/xnec2c.glade:8796
 msgid "Circular Cliff"
 msgstr "צוק מעגלי"
 
-#: resources/xnec2c.glade:8580
+#: resources/xnec2c.glade:8812
 msgid "Linear Cliff + Radials"
 msgstr "צוק ליניארי + רדיאליים"
 
-#: resources/xnec2c.glade:8598
+#: resources/xnec2c.glade:8830
 msgid "<b>See GN/GD Card Documentation</b>"
 msgstr "<b>ראה תיעוד כרטיסי GN/GD</b>"
 
-#: resources/xnec2c.glade:8616
+#: resources/xnec2c.glade:8848
 msgid "Wave Type and Ground (I1)"
 msgstr "סוג גל וקרקע (I1)"
 
-#: resources/xnec2c.glade:8644
+#: resources/xnec2c.glade:8876
 msgid "Major & Minor Axis & Total Gain"
 msgstr "ציר ראשי ומשני והגבר כולל"
 
-#: resources/xnec2c.glade:8660
+#: resources/xnec2c.glade:8892
 msgid "Vertical, Horizontal & Total Gain"
 msgstr "הגבר אנכי, אופקי וכולל"
 
-#: resources/xnec2c.glade:8676
+#: resources/xnec2c.glade:8908
 msgid "Major Axis Gain Normalized"
 msgstr "הגבר ציר ראשי מנורמל"
 
-#: resources/xnec2c.glade:8692
+#: resources/xnec2c.glade:8924
 msgid "Vertical Axis Gain Normalized"
 msgstr "הגבר ציר אנכי מנורמל"
 
-#: resources/xnec2c.glade:8708
+#: resources/xnec2c.glade:8940
 msgid "Total Gain Normalized"
 msgstr "הגבר כולל מנורמל"
 
-#: resources/xnec2c.glade:8724
+#: resources/xnec2c.glade:8956
 msgid "Print/Normalize Directive Gain"
 msgstr "הדפס/נרמל הגבר כיווני"
 
-#: resources/xnec2c.glade:8740
+#: resources/xnec2c.glade:8972
 msgid "No Normalized Gain"
 msgstr "ללא הגבר מנורמל"
 
-#: resources/xnec2c.glade:8756
+#: resources/xnec2c.glade:8988
 msgid "Minor Axis Gain Normalized"
 msgstr "הגבר ציר משני מנורמל"
 
-#: resources/xnec2c.glade:8772
+#: resources/xnec2c.glade:9004
 msgid "Horizontal Axis Gain Normalized"
 msgstr "הגבר ציר אופקי מנורמל"
 
-#: resources/xnec2c.glade:8788
+#: resources/xnec2c.glade:9020
 msgid "Print/Normalize Power Gain"
 msgstr "הדפס/נרמל הגבר הספק"
 
-#: resources/xnec2c.glade:8804
+#: resources/xnec2c.glade:9036
 msgid "No Gain Averaging"
 msgstr "ללא ממוצע הגבר"
 
-#: resources/xnec2c.glade:8820
+#: resources/xnec2c.glade:9052
 msgid "Points in Average Not Printed"
 msgstr "נקודות בממוצע לא מודפסות"
 
-#: resources/xnec2c.glade:8836
+#: resources/xnec2c.glade:9068
 msgid "Average Gain Computed"
 msgstr "הגבר ממוצע מחושב"
 
-#: resources/xnec2c.glade:8854
+#: resources/xnec2c.glade:9086
 msgid "<b>See RP Card Documentation</b>"
 msgstr "<b>ראה תיעוד כרטיס RP</b>"
 
-#: resources/xnec2c.glade:8872
+#: resources/xnec2c.glade:9104
 msgid "Data Output Control (XNDA)"
 msgstr "בקרת פלט נתונים (XNDA)"
 
-#: resources/xnec2c.glade:8902
+#: resources/xnec2c.glade:9134
 msgid "Points in Theta"
 msgstr "נקודות ב-תטא"
 
-#: resources/xnec2c.glade:8916 src/cmnd_edit.c:1763
+#: resources/xnec2c.glade:9148 src/cmnd_edit.c:1763
 msgid "Initial Theta (deg)"
 msgstr "תטא התחלתי (מעלות)"
 
-#: resources/xnec2c.glade:8929 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
+#: resources/xnec2c.glade:9161 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
 msgid "Increment in Theta"
 msgstr "תוספת בתטא"
 
-#: resources/xnec2c.glade:8998 src/cmnd_edit.c:1762
+#: resources/xnec2c.glade:9230 src/cmnd_edit.c:1762
 msgid "Points in Phi"
 msgstr "נקודות ב-פי"
 
-#: resources/xnec2c.glade:9011
+#: resources/xnec2c.glade:9243
 msgid "Initial Phi (deg)"
 msgstr "פי התחלתי (מעלות)"
 
-#: resources/xnec2c.glade:9024 src/cmnd_edit.c:2708
+#: resources/xnec2c.glade:9256 src/cmnd_edit.c:2708
 msgid "Increment in Phi"
 msgstr "תוספת בפי"
 
-#: resources/xnec2c.glade:9093
+#: resources/xnec2c.glade:9325
 msgid "Field Point Distance"
 msgstr "מרחק נקודת שדה"
 
-#: resources/xnec2c.glade:9125
+#: resources/xnec2c.glade:9357
 msgid "Gain Normalization"
 msgstr "נרמול הגבר"
 
-#: resources/xnec2c.glade:9167
+#: resources/xnec2c.glade:9399
 msgid "Radiation Pattern Parameters"
 msgstr "פרמטרי תבנית קרינה"
 
-#: resources/xnec2c.glade:9334
+#: resources/xnec2c.glade:9566
 msgid "Reflect Structure (GX card)"
 msgstr "שיקוף מבנה (כרטיס GX)"
 
-#: resources/xnec2c.glade:9362
+#: resources/xnec2c.glade:9594
 msgid "Reflect in YZ plane"
 msgstr "שיקוף במישור YZ"
 
-#: resources/xnec2c.glade:9377
+#: resources/xnec2c.glade:9609
 msgid "Reflect in XY plane"
 msgstr "שיקוף במישור XY"
 
-#: resources/xnec2c.glade:9392
+#: resources/xnec2c.glade:9624
 msgid "Reflect in XZ plane"
 msgstr "שיקוף במישור XZ"
 
-#: resources/xnec2c.glade:9448
+#: resources/xnec2c.glade:9680
 msgid "Reflect Options"
 msgstr "אפשרויות שיקוף"
 
-#: resources/xnec2c.glade:9579
+#: resources/xnec2c.glade:9811
 msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: גרפי נתוני תדר"
 
-#: resources/xnec2c.glade:9604 resources/xnec2c.glade:10547
-#: resources/xnec2c.glade:11994
+#: resources/xnec2c.glade:9836 resources/xnec2c.glade:10807
+#: resources/xnec2c.glade:12252
 msgid "_File"
 msgstr "_קובץ"
 
-#: resources/xnec2c.glade:9666 resources/xnec2c.glade:10609
-#: resources/xnec2c.glade:12056
+#: resources/xnec2c.glade:9898 resources/xnec2c.glade:10869
+#: resources/xnec2c.glade:12314
 msgid "Save as _gnuplot"
 msgstr "שמור כ-_gnuplot"
 
-#: resources/xnec2c.glade:9677 resources/xnec2c.glade:12066
+#: resources/xnec2c.glade:9909 resources/xnec2c.glade:12324
 msgid "Save as _CSV"
 msgstr "שמור כ-_CSV"
 
-#: resources/xnec2c.glade:9689
+#: resources/xnec2c.glade:9921
 msgid "Save as _Touchstone (.SnP)"
 msgstr "שמור כ-_Touchstone (.SnP)"
 
-#: resources/xnec2c.glade:9696
+#: resources/xnec2c.glade:9928
 msgid "Save as S_1P: Reflection Only"
 msgstr "שמור כ-S_1P: החזרה בלבד"
 
-#: resources/xnec2c.glade:9706
+#: resources/xnec2c.glade:9938
 msgid "Save as S2P: _Max Gain (S21)"
 msgstr "שמור כ-S2P: הגבר _מרבי (S21)"
 
-#: resources/xnec2c.glade:9716
+#: resources/xnec2c.glade:9948
 msgid "Save as S2P: _Viewer Gain (S21)"
 msgstr "שמור כ-S2P: הגבר _צופה (S21)"
 
-#: resources/xnec2c.glade:9753 resources/xnec2c.glade:10975
-#: resources/xnec2c.glade:12100
+#: resources/xnec2c.glade:9985 resources/xnec2c.glade:11235
+#: resources/xnec2c.glade:12358
 msgid "_View"
 msgstr "_תצוגה"
 
-#: resources/xnec2c.glade:9762 resources/xnec2c.glade:11005
-#: resources/xnec2c.glade:12110
+#: resources/xnec2c.glade:9994 resources/xnec2c.glade:11265
+#: resources/xnec2c.glade:12368
 msgid "_Polarization"
 msgstr "_קיטוב"
 
-#: resources/xnec2c.glade:9778 resources/xnec2c.glade:11021
-#: resources/xnec2c.glade:12126
+#: resources/xnec2c.glade:10010 resources/xnec2c.glade:11281
+#: resources/xnec2c.glade:12384
 msgid "_Total"
 msgstr "_כולל"
 
-#: resources/xnec2c.glade:9789 resources/xnec2c.glade:11032
-#: resources/xnec2c.glade:12137
+#: resources/xnec2c.glade:10021 resources/xnec2c.glade:11292
+#: resources/xnec2c.glade:12395
 msgid "_Horizontal"
 msgstr "_אופקי"
 
-#: resources/xnec2c.glade:9800 resources/xnec2c.glade:11043
-#: resources/xnec2c.glade:12148
+#: resources/xnec2c.glade:10032 resources/xnec2c.glade:11303
+#: resources/xnec2c.glade:12406
 msgid "_Vertical"
 msgstr "_אנכי"
 
-#: resources/xnec2c.glade:9811 resources/xnec2c.glade:11054
-#: resources/xnec2c.glade:12159
+#: resources/xnec2c.glade:10043 resources/xnec2c.glade:11314
+#: resources/xnec2c.glade:12417
 msgid "_Right Hand"
 msgstr "יד _ימין"
 
-#: resources/xnec2c.glade:9822 resources/xnec2c.glade:11065
-#: resources/xnec2c.glade:12170
+#: resources/xnec2c.glade:10054 resources/xnec2c.glade:11325
+#: resources/xnec2c.glade:12428
 msgid "_Left Hand"
 msgstr "יד _שמאל"
 
-#: resources/xnec2c.glade:9837
+#: resources/xnec2c.glade:10069
+msgid "_Color Theme"
+msgstr "_ערכת צבעים"
+
+#: resources/xnec2c.glade:10088
 msgid "_Net Gain"
 msgstr "הגבר _נטו"
 
-#: resources/xnec2c.glade:9846
+#: resources/xnec2c.glade:10097
 msgid "Show _Min/Max Values"
 msgstr "הצג ערכי _מינ/מקס"
 
-#: resources/xnec2c.glade:9855
+#: resources/xnec2c.glade:10106
 msgid "Show _S11 (dB) Values"
 msgstr "הצג ערכי _S11 (dB)"
 
-#: resources/xnec2c.glade:9864
+#: resources/xnec2c.glade:10115
 msgid "Clamp _VSWR Graph to 10"
 msgstr "הגבל גרף _VSWR ל-10"
 
-#: resources/xnec2c.glade:9873
+#: resources/xnec2c.glade:10124
 msgid "Show Ta instead of TA"
 msgstr "הצג Ta במקום TA"
 
-#: resources/xnec2c.glade:9882
+#: resources/xnec2c.glade:10133
 msgid "Round _X Axis Frequency Values"
 msgstr "עגל ערכי תדר בציר _X"
 
-#: resources/xnec2c.glade:9906 resources/xnec2c.glade:10070
+#: resources/xnec2c.glade:10142
+msgid "S_wap Left/Right Click Frequency Selection"
+msgstr "ה_חלף בחירת תדר לחיצה שמאל/ימין"
+
+#: resources/xnec2c.glade:10166 resources/xnec2c.glade:10330
 msgid "Max Gain"
 msgstr "הגבר מרבי"
 
-#: resources/xnec2c.glade:9921
+#: resources/xnec2c.glade:10181
 msgid "Direction"
 msgstr "כיוון"
 
-#: resources/xnec2c.glade:9936
+#: resources/xnec2c.glade:10196
 msgid "Viewer"
 msgstr "צופה"
 
-#: resources/xnec2c.glade:9951 resources/xnec2c.glade:10175
-#: src/plot_freqdata.c:1612
+#: resources/xnec2c.glade:10211 resources/xnec2c.glade:10435
+#: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:40
 msgid "VSWR"
 msgstr "VSWR"
 
-#: resources/xnec2c.glade:9966
+#: resources/xnec2c.glade:10226
 msgid "Zr/Zi"
 msgstr "Zr/Zi"
 
-#: resources/xnec2c.glade:9981
+#: resources/xnec2c.glade:10241
 msgid "Zm/Zph"
 msgstr "Zm/Zph"
 
-#: resources/xnec2c.glade:9996
+#: resources/xnec2c.glade:10256
 msgid "Smith"
 msgstr "Smith"
 
-#: resources/xnec2c.glade:10011
+#: resources/xnec2c.glade:10271
 msgid "G/Ta"
 msgstr "G/Ta"
 
-#: resources/xnec2c.glade:10054 resources/xnec2c.glade:10089
-#: resources/xnec2c.glade:10124 resources/xnec2c.glade:10159
-#: resources/xnec2c.glade:10378 resources/xnec2c.glade:10413
-#: resources/xnec2c.glade:10448 resources/xnec2c.glade:13225
+#: resources/xnec2c.glade:10314 resources/xnec2c.glade:10349
+#: resources/xnec2c.glade:10384 resources/xnec2c.glade:10419
+#: resources/xnec2c.glade:10638 resources/xnec2c.glade:10673
+#: resources/xnec2c.glade:10708 resources/xnec2c.glade:13481
 msgid " - - -"
 msgstr " - - -"
 
-#: resources/xnec2c.glade:10105 src/plot_freqdata.c:1684
+#: resources/xnec2c.glade:10365 src/freqplots/graphs/impedance_graph.c:58
 msgid "Z-imag"
 msgstr "Z-מדומה"
 
-#: resources/xnec2c.glade:10140 src/plot_freqdata.c:1682
+#: resources/xnec2c.glade:10400 src/freqplots/graphs/impedance_graph.c:56
 msgid "Z-real"
 msgstr "Z-ממשי"
 
-#: resources/xnec2c.glade:10195
+#: resources/xnec2c.glade:10455
 msgid " - - - - "
 msgstr " - - - - "
 
-#: resources/xnec2c.glade:10211
+#: resources/xnec2c.glade:10471
 msgid "Freq MHz"
 msgstr "תדר MHz"
 
-#: resources/xnec2c.glade:10250
+#: resources/xnec2c.glade:10510
 msgid "Tx Line Zo"
 msgstr "Zo קו שידור"
 
-#: resources/xnec2c.glade:10264 resources/xnec2c.glade:11755
-#: resources/xnec2c.glade:12997
+#: resources/xnec2c.glade:10524 resources/xnec2c.glade:12013
+#: resources/xnec2c.glade:13253
 msgid "Freq Loop"
 msgstr "לולאת תדר"
 
-#: resources/xnec2c.glade:10359 resources/xnec2c.glade:13103
+#: resources/xnec2c.glade:10619 resources/xnec2c.glade:13359
 msgid "T<sub>A</sub>(Elev.°)"
 msgstr "T<sub>A</sub>(הגבהה°)"
 
-#: resources/xnec2c.glade:10394
+#: resources/xnec2c.glade:10654
 msgid "T<sub>a</sub>"
 msgstr "T<sub>a</sub>"
 
-#: resources/xnec2c.glade:10429
+#: resources/xnec2c.glade:10689
 msgid "G/T<sub>a</sub>"
 msgstr "G/T<sub>a</sub>"
 
-#: resources/xnec2c.glade:10503
+#: resources/xnec2c.glade:10763
 msgid "Frequency Data Plots"
 msgstr "גרפי נתוני תדר"
 
-#: resources/xnec2c.glade:10620
+#: resources/xnec2c.glade:10880
 msgid "Save _Currents/Charges as CSV"
 msgstr "שמור _זרמים/מטענים כ-CSV"
 
-#: resources/xnec2c.glade:10639
+#: resources/xnec2c.glade:10899
 msgid "Optimization Settings"
 msgstr "הגדרות אופטימיזציה"
 
-#: resources/xnec2c.glade:10654
+#: resources/xnec2c.glade:10914
 msgid "Reload and write data on .NEC file changes"
 msgstr "טען מחדש וכתוב נתונים בשינויי קובץ .NEC"
 
-#: resources/xnec2c.glade:10661
+#: resources/xnec2c.glade:10921
 msgid "_Write files selected below, now."
 msgstr "_כתוב קבצים שנבחרו למטה, כעת."
 
-#: resources/xnec2c.glade:10676
+#: resources/xnec2c.glade:10936
 msgid "After calculation, write <file>.csv"
 msgstr "לאחר חישוב, כתוב <file>.csv"
 
-#: resources/xnec2c.glade:10685
+#: resources/xnec2c.glade:10945
 msgid "After calculation, write <file>.s_1p"
 msgstr "לאחר חישוב, כתוב <file>.s_1p"
 
-#: resources/xnec2c.glade:10694
+#: resources/xnec2c.glade:10954
 msgid "After calculation, write <file>-_maxgain.s2p"
 msgstr "לאחר חישוב, כתוב <file>-_maxgain.s2p"
 
-#: resources/xnec2c.glade:10703
+#: resources/xnec2c.glade:10963
 msgid "After calculation, write <file>-_viewergain.s2p"
 msgstr "לאחר חישוב, כתוב <file>-_viewergain.s2p"
 
-#: resources/xnec2c.glade:10712
+#: resources/xnec2c.glade:10972
 msgid "After calculation, write <file>-_radpattern.csv"
 msgstr "לאחר חישוב, כתוב <file>-_radpattern.csv"
 
-#: resources/xnec2c.glade:10721
+#: resources/xnec2c.glade:10981
 msgid "After calculation, write <file>-_currents.csv"
 msgstr "לאחר חישוב, כתוב <file>-_currents.csv"
 
-#: resources/xnec2c.glade:10730
+#: resources/xnec2c.glade:10990
 msgid "After calculation, write <file>-_structure.gplot"
 msgstr "לאחר חישוב, כתוב <file>-_structure.gplot"
 
-#: resources/xnec2c.glade:10739
+#: resources/xnec2c.glade:10999
 msgid "After calculation, write <file>-_patch-currents.csv"
 msgstr "לאחר חישוב, כתוב <file>-_patch-currents.csv"
 
-#: resources/xnec2c.glade:10754
+#: resources/xnec2c.glade:11014
 msgid "_Math Libraries"
 msgstr "ספריות _מתמטיקה"
 
-#: resources/xnec2c.glade:10763
+#: resources/xnec2c.glade:11023
 msgid "_Interactive"
 msgstr "_אינטראקטיבי"
 
-#: resources/xnec2c.glade:10783
+#: resources/xnec2c.glade:11043
 msgid "_Batch"
 msgstr "_אצווה"
 
-#: resources/xnec2c.glade:10809
+#: resources/xnec2c.glade:11069
 msgid "Mathlib _Help"
 msgstr "_עזרת Mathlib"
 
-#: resources/xnec2c.glade:10822
+#: resources/xnec2c.glade:11082
 msgid "Mathlib _Benchmarks"
 msgstr "_מבחני ביצועים Mathlib"
 
-#: resources/xnec2c.glade:10833
+#: resources/xnec2c.glade:11093
 msgid "_Selected Mathlibs"
 msgstr "Mathlibs _שנבחרו"
 
-#: resources/xnec2c.glade:10847
+#: resources/xnec2c.glade:11107
 msgid "Select All/None"
 msgstr "בחר הכל/כלום"
 
-#: resources/xnec2c.glade:10872
+#: resources/xnec2c.glade:11132
 msgid "_Parallel (-j N):\t\tO(N/J)"
 msgstr "_מקבילי (-j N):\t\tO(N/J)"
 
-#: resources/xnec2c.glade:10881
+#: resources/xnec2c.glade:11141
 msgid "_Single Job (-j 1):\tO(N)"
 msgstr "עבודה _בודדת (-j 1):\tO(N)"
 
-#: resources/xnec2c.glade:10890
+#: resources/xnec2c.glade:11150
 msgid "_Iterate -j N/=2:\tO(N*log2(J))"
 msgstr "_איטרציה -j N/=2:\tO(N*log2(J))"
 
-#: resources/xnec2c.glade:10899
+#: resources/xnec2c.glade:11159
 msgid "_Iterate -j N-=1:\tO(N*J)"
 msgstr "_איטרציה -j N-=1:\tO(N*J)"
 
-#: resources/xnec2c.glade:10914
+#: resources/xnec2c.glade:11174
 msgid "Benchmark _Help"
 msgstr "_עזרת מבחני ביצועים"
 
-#: resources/xnec2c.glade:10933
+#: resources/xnec2c.glade:11193
 msgid "Begin Frequency Loop at Startup"
 msgstr "התחל לולאת תדר בהפעלה"
 
-#: resources/xnec2c.glade:10944
+#: resources/xnec2c.glade:11204
 msgid "Confirm Quit"
 msgstr "אשר יציאה"
 
-#: resources/xnec2c.glade:10985
+#: resources/xnec2c.glade:11245
 msgid "_Radiation Pattern"
 msgstr "תבנית _קרינה"
 
-#: resources/xnec2c.glade:10995
+#: resources/xnec2c.glade:11255
 msgid "_Frequency Plots"
 msgstr "גרפי _תדר"
 
-#: resources/xnec2c.glade:11080
+#: resources/xnec2c.glade:11340
 msgid "Current _Visualization"
 msgstr "_הדמיית זרם"
 
-#: resources/xnec2c.glade:11096
+#: resources/xnec2c.glade:11356
 msgid "Animated"
 msgstr "מונפש"
 
-#: resources/xnec2c.glade:11103
+#: resources/xnec2c.glade:11363
 msgid "_Reference Phase"
 msgstr "_פאזת ייחוס"
 
-#: resources/xnec2c.glade:11114
+#: resources/xnec2c.glade:11374
 msgid "_LIC Texture"
 msgstr "טקסטורת _LIC"
 
-#: resources/xnec2c.glade:11125 resources/xnec2c.glade:12317
+#: resources/xnec2c.glade:11385 resources/xnec2c.glade:12575
 msgid "_Wireframe"
-msgstr "_מסגרת"
+msgstr "_מסגרת תיל"
 
-#: resources/xnec2c.glade:11143
+#: resources/xnec2c.glade:11403
 msgid "Static"
 msgstr "סטטי"
 
-#: resources/xnec2c.glade:11150
+#: resources/xnec2c.glade:11410
 msgid "Polarization _Axis"
 msgstr "ציר _קיטוב"
 
-#: resources/xnec2c.glade:11161
+#: resources/xnec2c.glade:11421
 msgid "Peak _Magnitude"
 msgstr "_גודל שיא"
 
-#: resources/xnec2c.glade:11176
+#: resources/xnec2c.glade:11436
 msgid "A_nimate"
 msgstr "ה_נפשה"
 
-#: resources/xnec2c.glade:11185 resources/xnec2c.glade:12434
+#: resources/xnec2c.glade:11445 resources/xnec2c.glade:12692
 msgid "Common _Projection"
 msgstr "_הטלה משותפת"
 
-#: resources/xnec2c.glade:11202
+#: resources/xnec2c.glade:11462
 msgid "_Symbol Overrides"
 msgstr "_דריסות סמלים"
 
-#: resources/xnec2c.glade:11212
+#: resources/xnec2c.glade:11472
 msgid "Rendering _Settings..."
 msgstr "הגדרות _רינדור..."
 
-#: resources/xnec2c.glade:11223
+#: resources/xnec2c.glade:11483
 msgid "_Help"
 msgstr "_עזרה"
 
-#: resources/xnec2c.glade:11232
+#: resources/xnec2c.glade:11492
 msgid "_About"
 msgstr "_אודות"
 
-#: resources/xnec2c.glade:11259
+#: resources/xnec2c.glade:11519
 msgid "Currents"
 msgstr "זרמים"
 
-#: resources/xnec2c.glade:11274
+#: resources/xnec2c.glade:11534
 msgid "Charges"
 msgstr "מטענים"
 
-#: resources/xnec2c.glade:11457
+#: resources/xnec2c.glade:11715
 msgid " Zoom"
 msgstr " זום"
 
-#: resources/xnec2c.glade:11600 resources/xnec2c.glade:12933
+#: resources/xnec2c.glade:11858 resources/xnec2c.glade:13189
+#: src/freqplots/freqplots_core.c:54
 msgid "Gain"
 msgstr "הגבר"
 
-#: resources/xnec2c.glade:11615 resources/xnec2c.glade:11631
-#: resources/xnec2c.glade:12946 resources/xnec2c.glade:13207
+#: resources/xnec2c.glade:11873 resources/xnec2c.glade:11889
+#: resources/xnec2c.glade:13202 resources/xnec2c.glade:13463
 msgid "0.0"
 msgstr "0.0"
 
-#: resources/xnec2c.glade:11665
+#: resources/xnec2c.glade:11923
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:11707 resources/xnec2c.glade:13090
+#: resources/xnec2c.glade:11965 resources/xnec2c.glade:13346
 msgid "dB"
 msgstr "dB"
 
-#: resources/xnec2c.glade:11721 resources/xnec2c.glade:12982
+#: resources/xnec2c.glade:11979 resources/xnec2c.glade:13238
 msgid "Step"
 msgstr "צעד"
 
-#: resources/xnec2c.glade:11868 resources/xnec2c.glade:13030
+#: resources/xnec2c.glade:12126 resources/xnec2c.glade:13286
 msgid "Apply Freq"
 msgstr "החל תדר"
 
-#: resources/xnec2c.glade:11888
+#: resources/xnec2c.glade:12146
 msgid "Frequency Mhz"
 msgstr "תדר MHz"
 
-#: resources/xnec2c.glade:11949
+#: resources/xnec2c.glade:12207
 msgid "Structure Geometry"
 msgstr "גאומטריית מבנה"
 
-#: resources/xnec2c.glade:11968
+#: resources/xnec2c.glade:12226
 msgid "Xnec2c: Radiation Patterns"
 msgstr "Xnec2c: תבניות קרינה"
 
-#: resources/xnec2c.glade:12185
+#: resources/xnec2c.glade:12443
 msgid "_Gain Scaling"
 msgstr "_קנה מידת הגבר"
 
-#: resources/xnec2c.glade:12200
+#: resources/xnec2c.glade:12458
 msgid "Linear _Power"
 msgstr "_הספק ליניארי"
 
-#: resources/xnec2c.glade:12211
+#: resources/xnec2c.glade:12469
 msgid "Linear _Voltage"
 msgstr "_מתח ליניארי"
 
-#: resources/xnec2c.glade:12222
+#: resources/xnec2c.glade:12480
 msgid "_ARRL Style"
 msgstr "סגנון _ARRL"
 
-#: resources/xnec2c.glade:12233
+#: resources/xnec2c.glade:12491
 msgid "_Logarithmic"
 msgstr "_לוגריתמי"
 
-#: resources/xnec2c.glade:12244
+#: resources/xnec2c.glade:12502
 msgid "_Noise Temperature"
 msgstr "טמפרטורת _רעש"
 
-#: resources/xnec2c.glade:12255
+#: resources/xnec2c.glade:12513
 msgid "Noise Temp (_log scale)"
 msgstr "טמפ' רעש (סולם _לוגריתמי)"
 
-#: resources/xnec2c.glade:12270
+#: resources/xnec2c.glade:12528
 msgid "Noise _Models"
 msgstr "מודלי _רעש"
 
-#: resources/xnec2c.glade:12289
+#: resources/xnec2c.glade:12547
 msgid "_Gradient Key"
 msgstr "מפתח _מדרג"
 
-#: resources/xnec2c.glade:12299
+#: resources/xnec2c.glade:12557
 msgid "Draw St_yle"
 msgstr "ס_גנון ציור"
 
-#: resources/xnec2c.glade:12308
+#: resources/xnec2c.glade:12566
 msgid "S_urface"
 msgstr "_משטח"
 
-#: resources/xnec2c.glade:12327
+#: resources/xnec2c.glade:12585
 msgid "_Both"
 msgstr "ש_ניהם"
 
-#: resources/xnec2c.glade:12342
+#: resources/xnec2c.glade:12600
 msgid "_Near Field"
 msgstr "שדה _קרוב"
 
-#: resources/xnec2c.glade:12357
+#: resources/xnec2c.glade:12615
 msgid "Near _E Field"
 msgstr "שדה _E קרוב"
 
-#: resources/xnec2c.glade:12367
+#: resources/xnec2c.glade:12625
 msgid "Near _H Field"
 msgstr "שדה _H קרוב"
 
-#: resources/xnec2c.glade:12377
+#: resources/xnec2c.glade:12635
 msgid "_Poynting Vector"
 msgstr "וקטור _פוינטינג"
 
-#: resources/xnec2c.glade:12386
+#: resources/xnec2c.glade:12644
 msgid "_Animate Dialog"
 msgstr "תיבת דו-שיח ה_נפשה"
 
-#: resources/xnec2c.glade:12395
+#: resources/xnec2c.glade:12653
 msgid "_Total Field"
 msgstr "שדה _כולל"
 
-#: resources/xnec2c.glade:12404
+#: resources/xnec2c.glade:12662
 msgid "_Peak Value"
 msgstr "ערך _שיא"
 
-#: resources/xnec2c.glade:12415
+#: resources/xnec2c.glade:12673
 msgid "_Instantaneous (φ=0)"
 msgstr "_רגעי (φ=0)"
 
-#: resources/xnec2c.glade:12445
+#: resources/xnec2c.glade:12703
 msgid "_Overlay Structure"
 msgstr "_שכבת מבנה"
 
-#: resources/xnec2c.glade:12470
+#: resources/xnec2c.glade:12728
 msgid "Gain Pattern"
 msgstr "תבנית הגבר"
 
-#: resources/xnec2c.glade:12485
+#: resources/xnec2c.glade:12743
 msgid "E/H Fields"
 msgstr "שדות E/H"
 
-#: resources/xnec2c.glade:12670
+#: resources/xnec2c.glade:12926
 msgid "Zoom % "
 msgstr "זום % "
 
-#: resources/xnec2c.glade:12709
+#: resources/xnec2c.glade:12965
 msgid "Elev.°"
 msgstr "הגבהה°"
 
-#: resources/xnec2c.glade:13050
+#: resources/xnec2c.glade:13306
 msgid "Frequency MHz"
 msgstr "תדר MHz"
 
-#: resources/xnec2c.glade:13067
+#: resources/xnec2c.glade:13323
 msgid "0.010"
 msgstr "0.010"
 
-#: resources/xnec2c.glade:13121 resources/xnec2c.glade:13154
-#: resources/xnec2c.glade:13189
+#: resources/xnec2c.glade:13377 resources/xnec2c.glade:13410
+#: resources/xnec2c.glade:13445
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:13136
+#: resources/xnec2c.glade:13392
 msgid "T<sub>earth</sub>"
 msgstr "T<sub>earth</sub>"
 
-#: resources/xnec2c.glade:13171
+#: resources/xnec2c.glade:13427
 msgid "T<sub>sky</sub>"
 msgstr "T<sub>sky</sub>"
 
-#: resources/xnec2c.glade:13292 src/rdpattern_ui.c:969
+#: resources/xnec2c.glade:13548 src/rdpattern_ui.c:999
 msgid "Radiation Patterns"
 msgstr "תבניות קרינה"
 
-#: resources/xnec2c.glade:13327
+#: resources/xnec2c.glade:13583
 msgid "Scale Structure (GS card)"
 msgstr "קנה מידה למבנה (כרטיס GS)"
 
-#: resources/xnec2c.glade:13358
+#: resources/xnec2c.glade:13614
 msgid "Structure Scale Factor"
 msgstr "מקדם קנה מידה למבנה"
 
-#: resources/xnec2c.glade:13371
+#: resources/xnec2c.glade:13627
 msgid "From Tag No."
 msgstr "מתגית מס׳"
 
-#: resources/xnec2c.glade:13421
+#: resources/xnec2c.glade:13677
 msgid "To Tag No."
 msgstr "עד תגית מס׳"
 
-#: resources/xnec2c.glade:13456
+#: resources/xnec2c.glade:13712
 msgid "Scale Structure"
 msgstr "שנה קנה מידה למבנה"
 
-#: resources/xnec2c.glade:13633
+#: resources/xnec2c.glade:13889
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "המרת קואורדינטות (כרטיס GM)"
 
-#: resources/xnec2c.glade:13663
+#: resources/xnec2c.glade:13919
 msgid "Tag Increment"
 msgstr "תוספת תגית"
 
-#: resources/xnec2c.glade:13694
+#: resources/xnec2c.glade:13950
 msgid "Rotate about X"
 msgstr "סיבוב סביב X"
 
-#: resources/xnec2c.glade:13726
+#: resources/xnec2c.glade:13982
 msgid "Move along X"
 msgstr "הזזה לאורך X"
 
-#: resources/xnec2c.glade:13758
+#: resources/xnec2c.glade:14014
 msgid "New Structures"
 msgstr "מבנים חדשים"
 
-#: resources/xnec2c.glade:13789
+#: resources/xnec2c.glade:14045
 msgid "Rotate about Y"
 msgstr "סיבוב סביב Y"
 
-#: resources/xnec2c.glade:13821
+#: resources/xnec2c.glade:14077
 msgid "Move along Y"
 msgstr "הזזה לאורך Y"
 
-#: resources/xnec2c.glade:13853
+#: resources/xnec2c.glade:14109
 msgid "Start From Tag"
 msgstr "התחל מתגית"
 
-#: resources/xnec2c.glade:13885
+#: resources/xnec2c.glade:14141
 msgid "Rotate about Z"
 msgstr "סיבוב סביב Z"
 
-#: resources/xnec2c.glade:13917
+#: resources/xnec2c.glade:14173
 msgid "Move along Z"
 msgstr "הזזה לאורך Z"
 
-#: resources/xnec2c.glade:13953
+#: resources/xnec2c.glade:14209
 msgid "Co-ordinate Transformation Data"
 msgstr "נתוני המרת קואורדינטות"
 
-#: resources/xnec2c.glade:14149
+#: resources/xnec2c.glade:14405
 msgid "Trans. Line Command (TL Card)"
 msgstr "פקודת קו תמסורת (כרטיס TL)"
 
-#: resources/xnec2c.glade:14179
+#: resources/xnec2c.glade:14435
 msgid "Tag Number, End 1  "
 msgstr "מספר תגית, קצה 1  "
 
-#: resources/xnec2c.glade:14211
+#: resources/xnec2c.glade:14467
 msgid "Tag Number, End 2  "
 msgstr "מספר תגית, קצה 2  "
 
-#: resources/xnec2c.glade:14242
+#: resources/xnec2c.glade:14498
 msgid "Segment Num, End 1"
 msgstr "מספר מקטע, קצה 1"
 
-#: resources/xnec2c.glade:14274
+#: resources/xnec2c.glade:14530
 msgid "Segment Num, End 2"
 msgstr "מספר מקטע, קצה 2"
 
-#: resources/xnec2c.glade:14338
+#: resources/xnec2c.glade:14594
 msgid "Crossed Transmission Line"
 msgstr "קו תמסורת מוצלב"
 
-#: resources/xnec2c.glade:14356
+#: resources/xnec2c.glade:14612
 msgid "Characteristic Impedance"
 msgstr "עכבה אופיינית"
 
-#: resources/xnec2c.glade:14388
+#: resources/xnec2c.glade:14644
 msgid "End 1 Y Real Part (S)"
 msgstr "קצה 1 Y חלק ממשי (S)"
 
-#: resources/xnec2c.glade:14420
+#: resources/xnec2c.glade:14676
 msgid "End 2 Y Real Part (S)"
 msgstr "קצה 2 Y חלק ממשי (S)"
 
-#: resources/xnec2c.glade:14452
+#: resources/xnec2c.glade:14708
 msgid "Length of Tx Line (m)"
 msgstr "אורך קו תמסורת (מ׳)"
 
-#: resources/xnec2c.glade:14484
+#: resources/xnec2c.glade:14740
 msgid "End 1 Y Imag Part (S)"
 msgstr "קצה 1 Y חלק מדומה (S)"
 
-#: resources/xnec2c.glade:14516
+#: resources/xnec2c.glade:14772
 msgid "End 2 Y Imag Part (S)"
 msgstr "קצה 2 Y חלק מדומה (S)"
 
-#: resources/xnec2c.glade:14552
+#: resources/xnec2c.glade:14808
 msgid "Transmission Line"
 msgstr "קו תמסורת"
 
-#: resources/xnec2c.glade:14779
+#: resources/xnec2c.glade:15035
 msgid "Wire Element (GW & GC cards)"
 msgstr "אלמנט תיל (כרטיסי GW & GC)"
 
-#: resources/xnec2c.glade:14839
+#: resources/xnec2c.glade:15095
 msgid "Wire X1"
 msgstr "תיל X1"
 
-#: resources/xnec2c.glade:14871
+#: resources/xnec2c.glade:15127
 msgid "Wire X2"
 msgstr "תיל X2"
 
-#: resources/xnec2c.glade:14934
+#: resources/xnec2c.glade:15190
 msgid "Wire Y1"
 msgstr "תיל Y1"
 
-#: resources/xnec2c.glade:14967
+#: resources/xnec2c.glade:15223
 msgid "Wire Y2"
 msgstr "תיל Y2"
 
-#: resources/xnec2c.glade:15031
+#: resources/xnec2c.glade:15287
 msgid "Wire Z1"
 msgstr "תיל Z1"
 
-#: resources/xnec2c.glade:15063
+#: resources/xnec2c.glade:15319
 msgid "Wire Z2"
 msgstr "תיל Z2"
 
-#: resources/xnec2c.glade:15128
+#: resources/xnec2c.glade:15384
 msgid "Wire Length"
 msgstr "אורך תיל"
 
-#: resources/xnec2c.glade:15199
+#: resources/xnec2c.glade:15455
 msgid "Wire Data"
 msgstr "נתוני תיל"
 
-#: resources/xnec2c.glade:15211
+#: resources/xnec2c.glade:15467
 msgid "Tapered Wire"
 msgstr "תיל מחודד"
 
-#: resources/xnec2c.glade:15253
+#: resources/xnec2c.glade:15509
 msgid "Length Taper"
 msgstr "חידוד אורך"
 
-#: resources/xnec2c.glade:15285
+#: resources/xnec2c.glade:15541
 msgid "Diameter Seg 1"
 msgstr "קוטר מקטע 1"
 
-#: resources/xnec2c.glade:15317
+#: resources/xnec2c.glade:15573
 msgid "Diameter Seg N"
 msgstr "קוטר מקטע N"
 
-#: resources/xnec2c.glade:15349
+#: resources/xnec2c.glade:15605
 msgid "Diam. Taper"
 msgstr "חידוד קוטר"
 
-#: resources/xnec2c.glade:15385
+#: resources/xnec2c.glade:15641
 msgid "Wire Taper Data"
 msgstr "נתוני חידוד תיל"
 
-#: resources/xnec2c.glade:15550
+#: resources/xnec2c.glade:15806
 msgid "Impedance (Zo) Ohm"
 msgstr "עכבה (Zo) Ohm"
 
-#: resources/xnec2c.glade:15565
+#: resources/xnec2c.glade:15821
 msgid "50.00"
 msgstr "50.00"
 
-#: resources/xnec2c.glade:15588
+#: resources/xnec2c.glade:15844
 msgid "Transmission Line Impedance (Zo)"
 msgstr "עכבת קו תמסורת (Zo)"
 
@@ -1900,10 +2005,23 @@ msgstr ""
 "cairo: segs=%d groups=%d batch=%.1fx bins=%d deposit=%.2fms sort=%.2fms "
 "stroke=%.2fms flush=%.2fms total=%.2fms cap=%d\n"
 
-#: src/cairo/cairo_scenebuffer_flush.c:150
+#: src/cairo/cairo_scenebuffer.c:195
+#, c-format
+msgid "scenebuffer_add_polygon: n=%d > SCENE_POLY_MAX\n"
+msgstr "scenebuffer_add_polygon: n=%d > SCENE_POLY_MAX\n"
+
+#: src/cairo/cairo_scenebuffer.c:220
+msgid "scenebuffer_add_text: no base layout set\n"
+msgstr "scenebuffer_add_text: אין פריסת בסיס מוגדרת\n"
+
+#: src/cairo/cairo_scenebuffer_flush.c:540
 #, c-format
 msgid "scenebuffer_flush: depth_bins=%d\n"
 msgstr "scenebuffer_flush: depth_bins=%d\n"
+
+#: src/cairo/cairo_scenebuffer_flush.c:606
+msgid "scenebuffer_flush: layout has no base font description\n"
+msgstr "scenebuffer_flush: לפריסה אין תיאור גופן בסיסי\n"
 
 #: src/cairo/cairo_structure.c:133
 msgid "draw_wire_segments: wire_widths is NULL\n"
@@ -1914,7 +2032,7 @@ msgstr "draw_wire_segments: wire_widths הוא NULL\n"
 msgid "draw_wire_segments: unknown ntyp=%d\n"
 msgstr "draw_wire_segments: ntyp=%d לא מוכר\n"
 
-#: src/calculations.c:117 src/calculations.c:1276
+#: src/calculations.c:117 src/calculations.c:1272
 #, c-format
 msgid "segment connection error for segment %5d\n"
 msgstr "שגיאת חיבור מקטע עבור מקטע %5d\n"
@@ -1937,11 +2055,11 @@ msgstr "שגיאת חיבור מקטע עבור מקטע %d\n"
 msgid "Segment connection error in sbf()"
 msgstr "שגיאת חיבור מקטע ב-sbf()"
 
-#: src/calculations.c:1277
+#: src/calculations.c:1273
 msgid "Segment connection error in trio()"
 msgstr "שגיאת חיבור מקטע ב-trio()"
 
-#: src/callback_func.c:144
+#: src/callback_func.c:145
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
@@ -1949,7 +2067,7 @@ msgstr ""
 "לולאת התדר פועלת\n"
 "האם אתה בטוח שברצונך לסיים את החישוב?"
 
-#: src/callback_func.c:148
+#: src/callback_func.c:149
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
@@ -1957,7 +2075,7 @@ msgstr ""
 "לולאת התדר פועלת\n"
 "האם אתה בטוח שברצונך לסגור חלון זה?"
 
-#: src/callback_func.c:383
+#: src/callback_func.c:384
 #, c-format
 msgid ""
 "Frequency plots window closed: excitation type %d is incompatible.\n"
@@ -1966,7 +2084,7 @@ msgstr ""
 "חלון גרפי התדר נסגר: סוג עירור %d אינו תואם.\n"
 "השתמש בסוג 0 (שדה E מיושם) או 5 (אי-רציפות זרם) במקום זאת."
 
-#: src/callback_func.c:389
+#: src/callback_func.c:390
 #, c-format
 msgid ""
 "Frequency plots are not available with excitation type %d.\n"
@@ -1977,47 +2095,47 @@ msgstr ""
 "מודל זה משתמש בעירור שדה פוגע או מקור זרם אלמנטרי.\n"
 "שנה את כרטיס EX לסוג 0 (שדה E מיושם) או 5 (אי-רציפות זרם)."
 
-#: src/callback_func.c:583
+#: src/callback_func.c:560
 msgid "View Currents"
 msgstr "הצג זרמים"
 
-#: src/callback_func.c:599 src/callback_func.c:649
+#: src/callback_func.c:576 src/callback_func.c:626
 msgid "View Geometry"
 msgstr "הצג גאומטריה"
 
-#: src/callback_func.c:633
+#: src/callback_func.c:610
 msgid "View Charges"
 msgstr "הצג מטענים"
 
-#: src/callback_func.c:690
+#: src/callback_func.c:667
 msgid "PNG images (*.png)"
 msgstr "תמונות PNG (*.png)"
 
-#: src/callback_func.c:692
+#: src/callback_func.c:669
 msgid "GNUplot files (*.gplot)"
 msgstr "קבצי GNUplot (*.gplot)"
 
-#: src/callback_func.c:694
+#: src/callback_func.c:671
 msgid "NEC2 files (*.nec)"
 msgstr "קבצי NEC2 (*.nec)"
 
-#: src/callback_func.c:696
+#: src/callback_func.c:673
 msgid "Touchstone 1-port files (*.s1p)"
 msgstr "קבצי Touchstone חד-פורטיים (*.s1p)"
 
-#: src/callback_func.c:698
+#: src/callback_func.c:675
 msgid "Touchstone 2-port files (*.s2p)"
 msgstr "קבצי Touchstone דו-פורטיים (*.s2p)"
 
-#: src/callback_func.c:700
+#: src/callback_func.c:677
 msgid "Comma-separated CSV files (*.csv)"
 msgstr "קבצי CSV מופרדים בפסיקים (*.csv)"
 
-#: src/callbacks.c:134 src/callbacks.c:150
+#: src/callbacks.c:99 src/callbacks.c:115 src/freqplots/freqplots_core.c:61
 msgid "Antenna Temperature"
 msgstr "טמפרטורת אנטנה"
 
-#: src/callbacks.c:135
+#: src/callbacks.c:100
 msgid ""
 "Ground plane detected in model. Ta results will overcount ground effects. "
 "Free-space models are standard for antenna temperature evaluation."
@@ -2025,7 +2143,7 @@ msgstr ""
 "זוהה מישור הארקה במודל. תוצאות Ta יספרו ביתר את השפעות ההארקה. מודלים של "
 "מרחב חופשי הם התקן להערכת טמפרטורת אנטנה."
 
-#: src/callbacks.c:151
+#: src/callbacks.c:116
 #, c-format
 msgid ""
 "Max gain at θ=%.0f° (%.0f° from XY plane). Convention assumes beam in XY "
@@ -2034,12 +2152,12 @@ msgstr ""
 "הגבר מרבי ב-θ=%.0f° (%.0f° ממישור XY). המוסכמה מניחה קרן במישור XY עם הגבהת "
 "תצפית הנקבעת על ידי לחצן הסיבוב."
 
-#: src/callbacks.c:221 src/callbacks.c:518 src/callbacks.c:2532
-#: src/callbacks.c:3030
+#: src/callbacks.c:186 src/callbacks.c:483 src/callbacks.c:2584
+#: src/callbacks.c:3437
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "האם אתה בטוח שברצונך לצאת מ-xnec2c?"
 
-#: src/callbacks.c:264
+#: src/callbacks.c:229
 msgid ""
 "A new NEC2 input file may not be created\n"
 "while the Frequency Loop is running"
@@ -2047,7 +2165,7 @@ msgstr ""
 "לא ניתן ליצור קובץ קלט NEC2 חדש\n"
 "בזמן שלולאת התדר פועלת"
 
-#: src/callbacks.c:301
+#: src/callbacks.c:266
 msgid ""
 "A new NEC2 input file may not be opened\n"
 "while the Frequency Loop is running"
@@ -2055,20 +2173,20 @@ msgstr ""
 "לא ניתן לפתוח קובץ קלט NEC2 חדש\n"
 "בזמן שלולאת התדר פועלת"
 
-#: src/callbacks.c:420
+#: src/callbacks.c:385
 msgid "xnec2c geometry optimizer"
 msgstr "מייעל גאומטריה של xnec2c"
 
-#: src/callbacks.c:421
+#: src/callbacks.c:386
 msgid ""
 "xnec2c was built without inotify support: the optimizer cannot be enabled."
 msgstr "xnec2c נבנה ללא תמיכת inotify: לא ניתן להפעיל את המייעל."
 
-#: src/callbacks.c:445
+#: src/callbacks.c:410
 msgid "Xnec2c Optimizer"
 msgstr "מייעל Xnec2c"
 
-#: src/callbacks.c:445
+#: src/callbacks.c:410
 msgid ""
 "No files are selected for writing. However, xnec2c will still reload and "
 "recalculate the input file on modification when triggered by inotify.Select "
@@ -2078,35 +2196,44 @@ msgstr ""
 "הקלט בעת שינוי כאשר מופעל על ידי inotify. בחר קבצים לכתיבה ב-\"File-"
 ">Optimization Settings\"."
 
-#: src/callbacks.c:456
+#: src/callbacks.c:421
 msgid "failed to create Optimizer Output thread\n"
 msgstr "יצירת תהליכון פלט המייעל נכשלה\n"
 
-#: src/callbacks.c:1345 src/callbacks.c:1676 src/callbacks.c:3056
+#: src/callbacks.c:1356 src/callbacks.c:1750 src/callbacks.c:3463
 msgid "Are you sure you wish to close this window?"
 msgstr "האם אתה בטוח שברצונך לסגור חלון זה?"
 
-#: src/callbacks.c:2255
+#: src/callbacks.c:2331
 msgid "OpenGL is not available on this display; cannot enable renderer.\n"
 msgstr "OpenGL אינו זמין בתצוגה זו; לא ניתן להפעיל את המרנדר.\n"
 
-#: src/callbacks.c:2786
+#: src/callbacks.c:2761 src/callbacks.c:2774
+msgid "unexpected canonical widget type"
+msgstr "סוג רכיב קנוני לא צפוי"
+
+#: src/callbacks.c:2914
+msgid ""
+"Current flow animation requires surface patches (SP/SM cards) in the model."
+msgstr "הנפשת זרם דורשת טלאי משטח (כרטיסי SP/SM) במודל."
+
+#: src/callbacks.c:3181
 msgid "Animation"
 msgstr "הנפשה"
 
-#: src/callbacks.c:2787
+#: src/callbacks.c:3182
 msgid ""
 "Animation requires surface patches (SP/SM NEC cards) or near-field data (NE/"
 "NH NEC cards)"
 msgstr ""
-"הנפשה דורשת מדבקות משטח (כרטיסי NEC מסוג SP/SM) או נתוני שדה קרוב (כרטיסי "
-"NEC מסוג NE/NH)"
+"הנפשה דורשת טלאי משטח (כרטיסי NEC מסוג SP/SM) או נתוני שדה קרוב (כרטיסי NEC "
+"מסוג NE/NH)"
 
-#: src/callbacks.c:2994
+#: src/callbacks.c:3401
 msgid "No open NEC2 input file"
 msgstr "אין קובץ קלט NEC2 פתוח"
 
-#: src/callbacks.c:3087 src/callbacks.c:3117
+#: src/callbacks.c:3494 src/callbacks.c:3524
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -2114,11 +2241,11 @@ msgstr ""
 "לא ניתן לשמור את נתוני עורך NEC2\n"
 "בזמן שלולאת התדר פועלת"
 
-#: src/callbacks.c:3099 src/callbacks.c:3125
+#: src/callbacks.c:3506 src/callbacks.c:3532
 msgid "untitled.nec"
 msgstr "untitled.nec"
 
-#: src/callbacks.c:3590 src/callbacks.c:3610 src/callbacks.c:3630
+#: src/callbacks.c:3997 src/callbacks.c:4017 src/callbacks.c:4037
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
@@ -2341,7 +2468,7 @@ msgstr ""
 "הערך נשלט על ידי ביטוי SY.\n"
 "ערוך את כרטיס SY כדי לשנות ערך זה."
 
-#: src/fields.c:925
+#: src/fields.c:923
 #, c-format
 msgid "step size limited at z= %10.5f"
 msgstr "גודל צעד מוגבל ב-Z= %10.5f"
@@ -2473,20 +2600,20 @@ msgstr "חלון עורך NEC2 אינו פתוח"
 msgid "Number of segments < 1"
 msgstr "מספר המקטעים < 1"
 
-#: src/geometry.c:138
+#: src/geometry.c:134
 msgid "Arc angle exceeds 360 degrees"
 msgstr "זווית הקשת עולה על 360 מעלות"
 
-#: src/geometry.c:281
+#: src/geometry.c:273
 msgid "Error in conect(): np > n"
 msgstr "שגיאה ב-conect(): np > n"
 
-#: src/geometry.c:314 src/geometry.c:362
+#: src/geometry.c:304 src/geometry.c:352
 #, c-format
 msgid "geometry data error: segment %d extends below ground\n"
 msgstr "שגיאת נתוני גאומטריה: מקטע %d משתרע מתחת לקרקע\n"
 
-#: src/geometry.c:315 src/geometry.c:363
+#: src/geometry.c:305 src/geometry.c:353
 msgid ""
 "Geometry data error\n"
 "Segment extends below ground"
@@ -2494,12 +2621,12 @@ msgstr ""
 "שגיאת נתוני גאומטריה\n"
 "מקטע משתרע מתחת לקרקע"
 
-#: src/geometry.c:372
+#: src/geometry.c:362
 #, c-format
 msgid "geometry data error: segment %d lies in ground plane\n"
 msgstr "שגיאת נתוני גאומטריה: מקטע %d נמצא במישור הקרקע\n"
 
-#: src/geometry.c:373
+#: src/geometry.c:363
 msgid ""
 "Geometry data error\n"
 "Segment lies in ground plane"
@@ -2507,15 +2634,15 @@ msgstr ""
 "שגיאת נתוני גאומטריה\n"
 "מקטע נמצא במישור הקרקע"
 
-#: src/geometry.c:463
+#: src/geometry.c:453
 msgid "ipsym = 0\n"
 msgstr "ipsym = 0\n"
 
-#: src/geometry.c:464
+#: src/geometry.c:454
 msgid "Error: ipsym = 0"
 msgstr "שגיאה: ipsym = 0"
 
-#: src/geometry.c:520
+#: src/geometry.c:507
 #, c-format
 msgid ""
 "Segment connection count exceeds a full mesh, which is unlikely: data.n=%ld "
@@ -2524,7 +2651,7 @@ msgstr ""
 "ספירת חיבורי מקטעים חורגת מרשת מלאה, דבר שאינו סביר: data.n=%ld segj.maxcon="
 "%lu\n"
 
-#: src/geometry.c:522
+#: src/geometry.c:509
 msgid ""
 "Segment connection count exceeds a full mesh, which is unlikely!\n"
 "Check for overlapping or nearly-connected segments\n"
@@ -2532,7 +2659,7 @@ msgstr ""
 "ספירת חיבורי מקטעים חורגת מרשת מלאה, דבר שאינו סביר!\n"
 "בדוק מקטעים חופפים או כמעט מחוברים\n"
 
-#: src/geometry.c:725
+#: src/geometry.c:704
 msgid ""
 "check data, parameter specifying segment: position in a group of equal tags "
 "must not be zero\n"
@@ -2540,7 +2667,7 @@ msgstr ""
 "בדוק נתונים, פרמטר המציין מקטע: מיקום בקבוצת תגיות שוות חייב להיות שונה "
 "מאפס\n"
 
-#: src/geometry.c:726
+#: src/geometry.c:705
 msgid ""
 "Parameter specifying segment\n"
 "position in a group of equal tags is zero"
@@ -2548,12 +2675,12 @@ msgstr ""
 "פרמטר המציין מיקום מקטע\n"
 "בקבוצת תגיות שוות הוא אפס"
 
-#: src/geometry.c:758
+#: src/geometry.c:737
 #, c-format
 msgid "no segment has an itag of %d\n"
 msgstr "אין מקטע עם itag של %d\n"
 
-#: src/geometry.c:762
+#: src/geometry.c:741
 msgid ""
 "Segment tag number error: Tag 0 is reserved and cannot be used.\n"
 "Check your geometry cards (especially GM cards) to ensure tag values are "
@@ -2565,7 +2692,7 @@ msgstr ""
 "חוקיים.\n"
 "עבור כרטיסי GM: ודא ש'התחל מתגית' ו'תוספת תגית' אינם יוצרים תגית 0."
 
-#: src/geometry.c:770
+#: src/geometry.c:749
 #, c-format
 msgid ""
 "Segment tag number error: No segment found with tag %d.\n"
@@ -2576,19 +2703,19 @@ msgstr ""
 "אתה מפנה לתגית או מקטע לא ידועים בכרטיס בקרה.\n"
 "תגיות חוקיות בגאומטריה שלך הן אלה שהוקצו לכרטיסי GW/GA/GH/SP."
 
-#: src/geometry.c:773 src/input.c:1614 src/input.c:1615 src/mathlib.c:752
-#: src/mathlib.c:989 src/rdpattern_ui.c:331 src/rdpattern_ui.c:339
-#: src/rdpattern_ui.c:346 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:132
-#: src/utils.c:443
+#: src/geometry.c:752 src/input.c:1576 src/input.c:1577 src/mathlib.c:752
+#: src/mathlib.c:989 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
+#: src/rdpattern_ui.c:344 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:133
+#: src/utils.c:444
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: src/geometry.c:1054
+#: src/geometry.c:1024
 msgid "corners of quadrilateral: patch do not lie in a plane\n"
 msgstr "פינות טלאי מרובע אינן נמצאות במישור אחד\n"
 
-#: src/geometry.c:1055
+#: src/geometry.c:1025
 msgid ""
 "Corners of quadrilateral\n"
 "patch do not lie in a plane"
@@ -2596,12 +2723,12 @@ msgstr ""
 "פינות טלאי מרובע\n"
 "אינן נמצאות במישור אחד"
 
-#: src/geometry.c:1165 src/geometry.c:1246 src/geometry.c:1328
+#: src/geometry.c:1130 src/geometry.c:1207 src/geometry.c:1285
 #, c-format
 msgid "geometry data error: segment %d lies in plane of symmetry\n"
 msgstr "שגיאת נתוני גאומטריה: מקטע %d נמצא במישור הסימטריה\n"
 
-#: src/geometry.c:1166 src/geometry.c:1247 src/geometry.c:1329
+#: src/geometry.c:1131 src/geometry.c:1208 src/geometry.c:1286
 msgid ""
 "Geometry data error\n"
 "Segment lies in plane of symmetry"
@@ -2609,12 +2736,12 @@ msgstr ""
 "שגיאת נתוני גאומטריה\n"
 "מקטע נמצא במישור הסימטריה"
 
-#: src/geometry.c:1204 src/geometry.c:1285 src/geometry.c:1365
+#: src/geometry.c:1167 src/geometry.c:1244 src/geometry.c:1319
 #, c-format
 msgid "geometry data error: patch %d lies in plane of symmetry\n"
 msgstr "שגיאת נתוני גאומטריה: טלאי %d נמצא במישור הסימטריה\n"
 
-#: src/geometry.c:1205 src/geometry.c:1286 src/geometry.c:1366
+#: src/geometry.c:1168 src/geometry.c:1245 src/geometry.c:1320
 msgid ""
 "Geometry data error\n"
 "Patch lies in plane of symmetry"
@@ -2622,7 +2749,7 @@ msgstr ""
 "שגיאת נתוני גאומטריה\n"
 "טלאי נמצא במישור הסימטריה"
 
-#: src/geometry.c:1492
+#: src/geometry.c:1440
 #, c-format
 msgid ""
 "tag=%d/seg=%d: endpoint distance=%.3e is too close (below connection "
@@ -2631,12 +2758,12 @@ msgstr ""
 "tag=%d/seg=%d: מרחק קצה=%.3e קרוב מדי (מתחת לסף חיבור=%.3e); המקטע יתחבר "
 "לעצמו\n"
 
-#: src/geometry.c:1497
+#: src/geometry.c:1445
 #, c-format
 msgid "tag=%d: suppressing additional self-connection warnings\n"
 msgstr "tag=%d: מדכא אזהרות נוספות על חיבור עצמי\n"
 
-#: src/geometry.c:1547
+#: src/geometry.c:1495
 #, c-format
 msgid ""
 "tag=%d/seg=%d: distance=%.3e to tag=%d/seg=%d closer than 2x connection "
@@ -2645,12 +2772,12 @@ msgstr ""
 "tag=%d/seg=%d: מרחק=%.3e ל-tag=%d/seg=%d קרוב יותר מפי 2 מסף החיבור %.3e; "
 "חיבורים לא מכוונים אפשריים\n"
 
-#: src/geometry.c:1553
+#: src/geometry.c:1501
 #, c-format
 msgid "tag=%d: suppressing additional overlap warnings\n"
 msgstr "tag=%d: מדכא אזהרות חפיפה נוספות\n"
 
-#: src/geometry.c:1622
+#: src/geometry.c:1570
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length=%.3e is too short (and close enough) to tag=%d/seg=%d "
@@ -2659,14 +2786,14 @@ msgstr ""
 "tag=%d/seg=%d: אורך=%.3e קצר מדי (וקרוב מספיק) ל-tag=%d/seg=%d אורך=%.3e כך "
 "שזיהוי חיבור עלול להיכשל או לקצר\n"
 
-#: src/geometry.c:1628
+#: src/geometry.c:1576
 #, c-format
 msgid ""
 "tag=%d: suppressing additional connection detection may fail or short "
 "warnings\n"
 msgstr "tag=%d: מדכא אזהרות נוספות על כשל או קיצור בזיהוי חיבור\n"
 
-#: src/geometry.c:1661
+#: src/geometry.c:1609
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f < 0.001; similarity of "
@@ -2676,12 +2803,12 @@ msgstr ""
 "tag=%d/seg=%d: יחס אורך/אורך גל של %.3f < 0.001; דמיון רכיבי זרם מוביל לאי-"
 "דיוקים מספריים (מינימום=0.001, טוב=0.05, מומלץ <= 0.1)\n"
 
-#: src/geometry.c:1666
+#: src/geometry.c:1614
 #, c-format
 msgid "tag=%d: suppressing additional short wavelength ratio errors\n"
 msgstr "tag=%d: מדכא שגיאות נוספות של יחס אורך גל קצר\n"
 
-#: src/geometry.c:1680
+#: src/geometry.c:1628
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.1; current sampling "
@@ -2691,12 +2818,12 @@ msgstr ""
 "tag=%d/seg=%d: יחס אורך/אורך גל של %.3f > 0.1; רזולוציית דגימת הזרם מוגבלת "
 "על ידי מרווח המקטעים (מינימום=0.001, טוב=0.05, מומלץ <= 0.1)\n"
 
-#: src/geometry.c:1685
+#: src/geometry.c:1633
 #, c-format
 msgid "tag=%d: suppressing additional long wavelength ratio warnings\n"
 msgstr "tag=%d: מדכא אזהרות נוספות של יחס אורך גל ארוך\n"
 
-#: src/geometry.c:1699
+#: src/geometry.c:1647
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.05; shorter segments "
@@ -2706,12 +2833,12 @@ msgstr ""
 "tag=%d/seg=%d: יחס אורך/אורך גל של %.3f > 0.05; מקטעים קצרים יותר מגבירים "
 "דיוק באזורים של שינוי זרם מהיר (מינימום=0.001, טוב=0.05, מומלץ <=0.1)\n"
 
-#: src/geometry.c:1704
+#: src/geometry.c:1652
 #, c-format
 msgid "tag=%d: suppressing additional accuracy improvement suggestions\n"
 msgstr "tag=%d: מדכא הצעות נוספות לשיפור דיוק\n"
 
-#: src/geometry.c:1735
+#: src/geometry.c:1683
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; standard thin-wire kernel "
@@ -2720,12 +2847,12 @@ msgstr ""
 "tag=%d/seg=%d: יחס אורך/רדיוס של %.1f < 2.0; שגיאת שדה גרעין חוט דק סטנדרטי "
 "עולה על 1%% בהרבה (מינימום=2.0, דיוק 1%%=8.0)\n"
 
-#: src/geometry.c:1740
+#: src/geometry.c:1688
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio errors\n"
 msgstr "tag=%d: מדכא שגיאות נוספות של יחס גרעין סטנדרטי\n"
 
-#: src/geometry.c:1754
+#: src/geometry.c:1702
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 8.0; standard thin-wire kernel "
@@ -2734,12 +2861,12 @@ msgstr ""
 "tag=%d/seg=%d: יחס אורך/רדיוס של %.1f < 8.0; שגיאת שדה גרעין חוט דק סטנדרטי "
 "עולה על 1%% (מינימום=2.0, דיוק 1%%=8.0)\n"
 
-#: src/geometry.c:1759
+#: src/geometry.c:1707
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio warnings\n"
 msgstr "tag=%d: מדכא אזהרות נוספות של יחס גרעין סטנדרטי\n"
 
-#: src/geometry.c:1775
+#: src/geometry.c:1723
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 0.5; extended thin-wire kernel "
@@ -2748,12 +2875,12 @@ msgstr ""
 "tag=%d/seg=%d: יחס אורך/רדיוס של %.1f < 0.5; שגיאת שדה גרעין חוט דק מורחב "
 "עולה על 1%% בהרבה (מינימום=0.5, דיוק 1%%=2.0)\n"
 
-#: src/geometry.c:1780
+#: src/geometry.c:1728
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio errors\n"
 msgstr "tag=%d: מדכא שגיאות נוספות של יחס גרעין מורחב\n"
 
-#: src/geometry.c:1794
+#: src/geometry.c:1742
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; extended thin-wire kernel "
@@ -2762,22 +2889,22 @@ msgstr ""
 "tag=%d/seg=%d: יחס אורך/רדיוס של %.1f < 2.0; שגיאת שדה גרעין חוט דק מורחב "
 "עולה על 1%% (מינימום=0.5, דיוק 1%%=2.0)\n"
 
-#: src/geometry.c:1799
+#: src/geometry.c:1747
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio warnings\n"
 msgstr "tag=%d: מדכא אזהרות נוספות של יחס גרעין מורחב\n"
 
-#: src/geometry.c:1816
+#: src/geometry.c:1764
 #, c-format
 msgid "Skipping overlap check for %d segments (use --force-verify to enable)\n"
 msgstr "מדלג על בדיקת חפיפה עבור %d מקטעים (השתמש ב--force-verify להפעלה)\n"
 
-#: src/geometry.c:1820
+#: src/geometry.c:1768
 #, c-format
 msgid "Forcing overlap check for %d segments\n"
 msgstr "מאלץ בדיקת חפיפה עבור %d מקטעים\n"
 
-#: src/geometry.c:1831
+#: src/geometry.c:1779
 msgid ""
 "verify_segments() skipping frequency-dependent checks - no frequency data\n"
 msgstr "verify_segments() מדלג על בדיקות תלויות תדר - אין נתוני תדר\n"
@@ -2837,27 +2964,27 @@ msgstr "# שדה E קרוב\n"
 msgid "# Near H field\n"
 msgstr "# שדה H קרוב\n"
 
-#: src/gnuplot.c:307
+#: src/gnuplot.c:306
 #, c-format
 msgid "# Poynting Vector\n"
 msgstr "# וקטור פוינטינג\n"
 
-#: src/gnuplot.c:379
+#: src/gnuplot.c:378
 #, c-format
 msgid "# Radiation Pattern\n"
 msgstr "# תבנית קרינה\n"
 
-#: src/gnuplot.c:517
+#: src/gnuplot.c:516
 #, c-format
 msgid "# structure patch segments\n"
 msgstr "# מקטעי טלאי מבנה\n"
 
-#: src/gnuplot.c:552
+#: src/gnuplot.c:551
 #, c-format
 msgid "# structure wire segments\n"
 msgstr "# מקטעי חוט מבנה\n"
 
-#: src/gnuplot.c:582
+#: src/gnuplot.c:581
 #, c-format
 msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
@@ -2866,11 +2993,11 @@ msgstr ""
 "צפה באמצעות: gnuplot -e \"set terminal qt; splot '%s' with lines; pause "
 "mouse close\"\n"
 
-#: src/gnuplot.c:594
+#: src/gnuplot.c:593
 msgid "Save Currents and Charges to CSV"
 msgstr "שמור זרמים ומטענים ל-CSV"
 
-#: src/gnuplot.c:595
+#: src/gnuplot.c:594
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
@@ -2878,11 +3005,11 @@ msgstr ""
 "עליך להפעיל נתוני זרם על ידי לחיצה על \"זרמים\" או \"מטענים\" בחלון הראשי של "
 "xnec2c."
 
-#: src/gnuplot.c:660 src/gnuplot.c:670
+#: src/gnuplot.c:659 src/gnuplot.c:669
 msgid "Save Patch Currents to CSV"
 msgstr "שמור זרמי טלאי ל-CSV"
 
-#: src/gnuplot.c:661
+#: src/gnuplot.c:660
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
@@ -2890,7 +3017,7 @@ msgstr ""
 "עליך להפעיל נתוני זרם על ידי לחיצה על \"זרמים\" או \"מטענים\" בחלון הראשי של "
 "xnec2c."
 
-#: src/gnuplot.c:671
+#: src/gnuplot.c:670
 msgid "No surface patches in this model."
 msgstr "אין טלאי משטח במודל זה."
 
@@ -2929,7 +3056,7 @@ msgstr ""
 " שגיאה בקריאת קובץ קלט\n"
 "מנמוניק הערה שגוי"
 
-#: src/input.c:156
+#: src/input.c:155
 msgid ""
 "Geometry data error\n"
 "Tag number is less than 1"
@@ -2937,7 +3064,7 @@ msgstr ""
 "שגיאת נתוני גאומטריה\n"
 "מספר תגית קטן מ-1"
 
-#: src/input.c:163
+#: src/input.c:162
 msgid ""
 "Geometry data error\n"
 "Number of segments is less than 1"
@@ -2945,16 +3072,16 @@ msgstr ""
 "שגיאת נתוני גאומטריה\n"
 "מספר מקטעים קטן מ-1"
 
-#: src/input.c:170
+#: src/input.c:169
 msgid "warning - number of segments is greater than 1000000\n"
 msgstr "אזהרה - מספר מקטעים גדול מ-1000000\n"
 
-#: src/input.c:218
+#: src/input.c:217
 #, c-format
 msgid "%s data card error: Spurious character '%c' at column %d\n"
 msgstr "שגיאת כרטיס נתונים %s: תו זר '%c' בעמודה %d\n"
 
-#: src/input.c:220
+#: src/input.c:219
 msgid ""
 "Data card error\n"
 "Spurious character in card"
@@ -2962,33 +3089,33 @@ msgstr ""
 "שגיאת כרטיס נתונים\n"
 "תו זר בכרטיס"
 
-#: src/input.c:275
+#: src/input.c:274
 #, c-format
 msgid "%s: expression evaluation failed for \"%s\"\n"
 msgstr "%s: הערכת ביטוי נכשלה עבור \"%s\"\n"
 
-#: src/input.c:316
+#: src/input.c:315
 msgid "SY card: no line content available\n"
 msgstr "כרטיס SY: אין תוכן שורה זמין\n"
 
-#: src/input.c:317
+#: src/input.c:316
 msgid "SY card: no line content available"
 msgstr "כרטיס SY: אין תוכן שורה זמין"
 
-#: src/input.c:334
+#: src/input.c:333
 msgid "SY card: missing '=' in definition\n"
 msgstr "כרטיס SY: חסר '=' בהגדרה\n"
 
-#: src/input.c:335
+#: src/input.c:334
 msgid "SY card: missing '=' in definition"
 msgstr "כרטיס SY: חסר '=' בהגדרה"
 
-#: src/input.c:368
+#: src/input.c:367
 #, c-format
 msgid "SY card: symbol definition failed for %s=%s\n"
 msgstr "כרטיס SY: הגדרת סמל נכשלה עבור %s=%s\n"
 
-#: src/input.c:446
+#: src/input.c:445
 msgid ""
 "Geometry data error\n"
 "No GC card for tapered wire"
@@ -2996,27 +3123,27 @@ msgstr ""
 "שגיאת נתוני גאומטריה\n"
 "אין כרטיס GC עבור חוט מתחדד"
 
-#: src/input.c:453
+#: src/input.c:452
 msgid "Geometry GC data card error"
 msgstr "שגיאת כרטיס נתוני גאומטריה GC"
 
-#: src/input.c:469
+#: src/input.c:468
 msgid "Geometry GX data card error"
 msgstr "שגיאת כרטיס נתוני גאומטריה GX"
 
-#: src/input.c:492
+#: src/input.c:491
 msgid "Geometry GR data card error"
 msgstr "שגיאת כרטיס נתוני גאומטריה GR"
 
-#: src/input.c:546
+#: src/input.c:545
 msgid "No geometry data cards"
 msgstr "אין כרטיסי נתוני גאומטריה"
 
-#: src/input.c:557
+#: src/input.c:556
 msgid "Probable invalid segment geometry.\n"
 msgstr "ככל הנראה גאומטריית מקטע לא תקינה.\n"
 
-#: src/input.c:558
+#: src/input.c:557
 msgid ""
 "Invalid segment geometry.\n"
 "See warnings in the console for detail.\n"
@@ -3026,37 +3153,37 @@ msgstr ""
 "ראה אזהרות בקונסולה לפרטים.\n"
 "מנסה להמשיך..."
 
-#: src/input.c:564
+#: src/input.c:563
 msgid "Probable invalid segment geometry (see above)\n"
 msgstr "ככל הנראה גאומטריית מקטע לא תקינה (ראה למעלה)\n"
 
-#: src/input.c:568
+#: src/input.c:567
 msgid "Read_Geometry: verify_segments() passed\n"
 msgstr "Read_Geometry: verify_segments() עבר\n"
 
-#: src/input.c:605
+#: src/input.c:604
 #, c-format
 msgid "segment data error: tag=%d si=%lf, bi=%lf\n"
 msgstr "שגיאת נתוני מקטע: tag=%d si=%lf, bi=%lf\n"
 
-#: src/input.c:607
+#: src/input.c:606
 msgid "Segment data error, zero-length line?  See console."
 msgstr "שגיאת נתוני מקטע, קו באורך אפס?  ראה קונסולה."
 
-#: src/input.c:647
+#: src/input.c:646
 msgid "Move GM data card error"
 msgstr "שגיאת כרטיס נתוני העברה GM"
 
-#: src/input.c:663 src/input.c:704 src/input.c:721 src/input.c:739
-#: src/input.c:747
+#: src/input.c:662 src/input.c:703 src/input.c:720 src/input.c:738
+#: src/input.c:746
 msgid "Patch data card error"
 msgstr "שגיאת כרטיס נתוני טלאי"
 
-#: src/input.c:685
+#: src/input.c:684
 msgid "Patch data error"
 msgstr "שגיאת נתוני טלאי"
 
-#: src/input.c:794
+#: src/input.c:793
 msgid ""
 "\"GF\" card (NGF solution)\n"
 "is not supported"
@@ -3064,41 +3191,41 @@ msgstr ""
 "כרטיס \"GF\" (פתרון NGF)\n"
 "אינו נתמך"
 
-#: src/input.c:799
+#: src/input.c:798
 msgid "Ignoring CM card in geometry"
 msgstr "מתעלם מכרטיס CM בגאומטריה"
 
-#: src/input.c:812
+#: src/input.c:811
 #, c-format
 msgid "geometry data card error (nwire=%d)\n"
 msgstr "שגיאת כרטיס נתוני גאומטריה (nwire=%d)\n"
 
-#: src/input.c:813
+#: src/input.c:812
 #, c-format
 msgid "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
 msgstr "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
 
-#: src/input.c:816
+#: src/input.c:815
 msgid "Geometry data card error"
 msgstr "שגיאת כרטיס נתוני גאומטריה"
 
-#: src/input.c:841
+#: src/input.c:839
 msgid "Failed to initialize symbol table\n"
 msgstr "אתחול טבלת סמלים נכשל\n"
 
-#: src/input.c:842
+#: src/input.c:840
 msgid "Failed to initialize symbol table"
 msgstr "אתחול טבלת סמלים נכשל"
 
-#: src/input.c:1033
+#: src/input.c:1012
 msgid "ignoring CM card in commands\n"
 msgstr "מתעלם מכרטיס CM בפקודות\n"
 
-#: src/input.c:1034
+#: src/input.c:1013
 msgid "Ignoring CM card in commands"
 msgstr "מתעלם מכרטיס CM בפקודות"
 
-#: src/input.c:1038
+#: src/input.c:1017
 msgid ""
 "CP card is ignored\n"
 "Coupling calculation not implemented"
@@ -3106,11 +3233,11 @@ msgstr ""
 "כרטיס CP מתעלם\n"
 "חישוב צימוד לא מיושם"
 
-#: src/input.c:1216
+#: src/input.c:1184
 msgid "Max frequency <= Min frequency in FR card\n"
 msgstr "תדר מקסימלי <= תדר מינימלי בכרטיס FR\n"
 
-#: src/input.c:1217
+#: src/input.c:1185
 msgid ""
 "Max frequency <= Min frequency in FR card\n"
 "Please check FR card data and correct"
@@ -3118,7 +3245,7 @@ msgstr ""
 "תדר מקסימלי <= תדר מינימלי בכרטיס FR\n"
 "אנא בדוק את נתוני כרטיס FR ותקן"
 
-#: src/input.c:1240
+#: src/input.c:1208
 msgid ""
 "Fix the GE/GN cards:\n"
 "The GE card specifies that a ground is present, but the GN indicates "
@@ -3127,11 +3254,11 @@ msgstr ""
 "תקן את כרטיסי GE/GN:\n"
 "כרטיס GE מציין שקרקע קיימת, אך כרטיס GN מציין אחרת."
 
-#: src/input.c:1254
+#: src/input.c:1222
 msgid "theta > 90 deg. with ground specified\n"
 msgstr "תטא > 90 מעלות עם קרקע מוגדרת\n"
 
-#: src/input.c:1255 src/radiation.c:663
+#: src/input.c:1223 src/radiation.c:663
 msgid ""
 "Theta > 90 deg with ground specified\n"
 "Please check RP card data and correct"
@@ -3139,13 +3266,13 @@ msgstr ""
 "תטא > 90 מעלות עם קרקע מוגדרת\n"
 "אנא בדוק את נתוני כרטיס RP ותקן"
 
-#: src/input.c:1264
+#: src/input.c:1232
 msgid ""
 "radial wire g.s. approximation: may not be used with Sommerfeld ground "
 "option\n"
 msgstr "קירוב g.s. חוטים רדיאליים: לא ניתן לשימוש עם אפשרות קרקע Sommerfeld\n"
 
-#: src/input.c:1265
+#: src/input.c:1233
 msgid ""
 "radial wire g.s. approximation\n"
 "may not be used with Sommerfeld ground option"
@@ -3153,14 +3280,14 @@ msgstr ""
 "קירוב g.s. חוטים רדיאליים\n"
 "לא ניתן לשימוש עם אפשרות קרקע Sommerfeld"
 
-#: src/input.c:1316
+#: src/input.c:1281
 #, c-format
 msgid ""
 "data fault on loading card no %d: itag step1 %d is greater than itag step2 "
 "%d\n"
 msgstr "תקלת נתונים בכרטיס טעינה מספר %d: itag step1 %d גדול מ-itag step2 %d\n"
 
-#: src/input.c:1318
+#: src/input.c:1283
 msgid ""
 "Data fault on loading card\n"
 "itag step1 is greater than itag step2"
@@ -3168,12 +3295,12 @@ msgstr ""
 "תקלת נתונים בכרטיס טעינה\n"
 "itag step1 גדול מ-itag step2"
 
-#: src/input.c:1450
+#: src/input.c:1412
 msgid ""
 "Transmission Line impedance = 0: is not valid. Please correct NT or TL card\n"
 msgstr "עכבת קו תמסורת = 0: לא תקין. אנא תקן כרטיס NT או TL\n"
 
-#: src/input.c:1451
+#: src/input.c:1413
 msgid ""
 "Transmission Line impedance = 0\n"
 "is not valid. Please correct NT or TL card"
@@ -3181,11 +3308,11 @@ msgstr ""
 "עכבת קו תמסורת = 0\n"
 "לא תקין. אנא תקן כרטיס NT או TL"
 
-#: src/input.c:1460
+#: src/input.c:1422
 msgid "Segment number error in TL or NT card\n"
 msgstr "שגיאת מספר מקטע בכרטיס TL או NT\n"
 
-#: src/input.c:1461
+#: src/input.c:1423
 msgid ""
 "Segment number\n"
 "error in NT or TL card"
@@ -3193,11 +3320,11 @@ msgstr ""
 "שגיאת מספר מקטע\n"
 "בכרטיס NT או TL"
 
-#: src/input.c:1482
+#: src/input.c:1444
 msgid "PQ and PT cards are ignored: Printing to file not implemented\n"
 msgstr "כרטיסי PQ ו-PT מתעלמים: הדפסה לקובץ לא מיושמת\n"
 
-#: src/input.c:1483
+#: src/input.c:1445
 msgid ""
 "PQ and PT cards are ignored\n"
 "Printing to file not implemented"
@@ -3205,11 +3332,11 @@ msgstr ""
 "כרטיסי PQ ו-PT מתעלמים\n"
 "הדפסה לקובץ לא מיושמת"
 
-#: src/input.c:1490
+#: src/input.c:1452
 msgid "Surface wave option (I1=1): of RP command not implemented\n"
 msgstr "אפשרות גל פני שטח (I1=1): של פקודת RP לא מיושמת\n"
 
-#: src/input.c:1491
+#: src/input.c:1453
 msgid ""
 "Surface wave option (I1=1)\n"
 "of RP command not implemented"
@@ -3217,27 +3344,27 @@ msgstr ""
 "אפשרות גל פני שטח (I1=1)\n"
 "של פקודת RP לא מיושמת"
 
-#: src/input.c:1516
+#: src/input.c:1478
 msgid "Average gain diagnostic enabled (use --skip-verify to disable)\n"
 msgstr "אבחון הגבר ממוצע מופעל (השתמש ב--skip-verify להשבתה)\n"
 
-#: src/input.c:1525
+#: src/input.c:1487
 #, c-format
 msgid "Average power gain disabled: nth=%d nph=%d (both must be >= 2)\n"
 msgstr "הגבר הספק ממוצע מושבת: nth=%d nph=%d (שניהם חייבים להיות >= 2)\n"
 
-#: src/input.c:1530
+#: src/input.c:1492
 #, c-format
 msgid "Average power gain calculation enabled (XNDA A=%d)\n"
 msgstr "חישוב הגבר הספק ממוצע מופעל (XNDA A=%d)\n"
 
-#: src/input.c:1546
+#: src/input.c:1508
 msgid ""
 "Theta > 90 deg. with ground specified: Please check RP card data and "
 "correct\n"
 msgstr "תטא > 90 מעלות עם קרקע מוגדרת: אנא בדוק את נתוני כרטיס RP ותקן\n"
 
-#: src/input.c:1547
+#: src/input.c:1509
 msgid ""
 "Theta > 90 deg. with ground specified\n"
 "Please check RP card data and correct"
@@ -3245,28 +3372,28 @@ msgstr ""
 "תטא > 90 מעלות עם קרקע מוגדרת\n"
 "אנא בדוק את נתוני כרטיס RP ותקן"
 
-#: src/input.c:1612
+#: src/input.c:1574
 msgid "Faulty data card"
 msgstr "כרטיס נתונים פגום"
 
-#: src/input.c:1622
+#: src/input.c:1603
 msgid ""
 "Missing or surface-wave RP card: Radiation pattern and gain calculations "
 "disabled\n"
 msgstr "כרטיס RP חסר או גל פני שטח: חישובי תבנית קרינה והגבר מושבתים\n"
 
-#: src/input.c:1663
+#: src/input.c:1630
 msgid "Unexpected exit from while loop"
 msgstr "יציאה בלתי צפויה מלולאת while"
 
-#: src/input.c:1754
+#: src/input.c:1721
 msgid ""
 "command data card error: Unexpected EOF while reading input file - appending "
 "EN card\n"
 msgstr ""
 "שגיאת כרטיס נתוני פקודה: EOF בלתי צפוי בקריאת קובץ קלט - מוסיף כרטיס EN\n"
 
-#: src/input.c:1755
+#: src/input.c:1722
 msgid ""
 "Command data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -3276,11 +3403,11 @@ msgstr ""
 "EOF בלתי צפוי בקריאת קובץ קלט\n"
 "מוסיף כרטיס EN ברירת מחדל"
 
-#: src/input.c:1769
+#: src/input.c:1736
 msgid "command data card error: card's mnemonic code too short or missing\n"
 msgstr "שגיאת כרטיס נתוני פקודה: קוד מנמוני של כרטיס קצר מדי או חסר\n"
 
-#: src/input.c:1770
+#: src/input.c:1737
 msgid ""
 "Command data card error\n"
 "Mnemonic code too short or missing"
@@ -3288,14 +3415,14 @@ msgstr ""
 "שגיאת כרטיס נתוני פקודה\n"
 "קוד מנמוני קצר מדי או חסר"
 
-#: src/input.c:1963
+#: src/input.c:1930
 msgid ""
 "geometry data card error: Unexpected EOF while reading input file - "
 "appending GE card\n"
 msgstr ""
 "שגיאת כרטיס נתוני גאומטריה: EOF בלתי צפוי בקריאת קובץ קלט - מוסיף כרטיס GE\n"
 
-#: src/input.c:1964
+#: src/input.c:1931
 msgid ""
 "Geometry data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -3305,11 +3432,11 @@ msgstr ""
 "EOF בלתי צפוי בקריאת קובץ קלט\n"
 "מוסיף כרטיס GE ברירת מחדל"
 
-#: src/input.c:1978
+#: src/input.c:1945
 msgid "geometry data card error: card's mnemonic code too short or missing\n"
 msgstr "שגיאת כרטיס נתוני גאומטריה: קוד מנמוני של כרטיס קצר מדי או חסר\n"
 
-#: src/input.c:1979
+#: src/input.c:1946
 msgid ""
 "Geometry data card error\n"
 "Card's mnemonic code too short or missing"
@@ -3317,168 +3444,186 @@ msgstr ""
 "שגיאת כרטיס נתוני גאומטריה\n"
 "קוד מנמוני של כרטיס קצר מדי או חסר"
 
-#: src/interface.c:116
+#: src/interface.c:135
 #, c-format
 msgid "xnec2c Main: %s"
 msgstr "xnec2c ראשי: %s"
 
-#: src/interface.c:122
+#: src/interface.c:141
 #, c-format
 msgid "xnec2c Editor: %s"
 msgstr "xnec2c עורך: %s"
 
-#: src/interface.c:128
+#: src/interface.c:147
 #, c-format
 msgid "xnec2c Frequency Plots: %s"
 msgstr "xnec2c גרפי תדר: %s"
 
-#: src/interface.c:134
+#: src/interface.c:153
 #, c-format
 msgid "xnec2c Radiation Pattern: %s"
 msgstr "xnec2c תבנית קרינה: %s"
 
-#: src/interface.c:149
+#: src/interface.c:168
 #, c-format
 msgid "Fatal Error: builder could not find object '%s'"
 msgstr "שגיאה חמורה: builder לא מצא את האובייקט '%s'"
 
-#: src/interface.c:174
+#: src/interface.c:193
 #, c-format
 msgid "failed to add objects to builder: %s\n"
 msgstr "נכשלה הוספת אובייקטים ל-builder: %s\n"
 
-#: src/interface.c:176
+#: src/interface.c:195
 msgid "Listing Object Ids:\n"
 msgstr "רשימת מזהי אובייקטים:\n"
 
-#: src/interface.c:180 src/utils.c:190 src/utils.c:194 src/utils.c:204
-#: src/utils.c:206
+#: src/interface.c:199 src/utils.c:191 src/utils.c:195 src/utils.c:205
+#: src/utils.c:207
 #, c-format
 msgid "%s\n"
 msgstr "%s\n"
 
-#: src/interface.c:191 src/interface.c:194
+#: src/interface.c:210 src/interface.c:213
 msgid ""
 "libgmodule not supported: xnec2c may not function properly on this "
 "platform.\n"
 msgstr "libgmodule אינו נתמך: xnec2c עלול לא לתפקד כראוי בפלטפורמה זו.\n"
 
-#: src/main.c:133
+#: src/interface.c:277
+#, c-format
+msgid "xnec2c %s: %s"
+msgstr "xnec2c %s: %s"
+
+#: src/main.c:138
 #, c-format
 msgid "%s requires a positive integer argument\n"
 msgstr "%s דורש ארגומנט מספר שלם חיובי\n"
 
-#: src/main.c:191
+#: src/main.c:201
 #, c-format
 msgid "Detected %d CPUs\n"
 msgstr "זוהו %d מעבדים\n"
 
-#: src/main.c:203
+#: src/main.c:220
+#, c-format
+msgid "Detected %s windowing backend\n"
+msgstr "זוהה ממשק חלונות %s\n"
+
+#: src/main.c:230
 msgid "config file path too long\n"
 msgstr "נתיב קובץ תצורה ארוך מדי\n"
 
-#: src/main.c:221
+#: src/main.c:248
 #, c-format
 msgid "config file does not exist or is not readable: %s\n"
 msgstr "קובץ תצורה לא קיים או לא ניתן לקריאה: %s\n"
 
-#: src/main.c:230
+#: src/main.c:257
 #, c-format
 msgid "config file path too long ( > %d char )\n"
 msgstr "נתיב קובץ תצורה ארוך מדי ( > %d תווים )\n"
 
-#: src/main.c:242
+#: src/main.c:269
 #, c-format
 msgid "input file name too long ( > %d char )\n"
 msgstr "שם קובץ קלט ארוך מדי ( > %d תווים )\n"
 
-#: src/main.c:269
+#: src/main.c:296
 msgid "Forking disabled!\n"
 msgstr "פיצול (Forking) מושבת!\n"
 
-#: src/main.c:277
+#: src/main.c:304
 msgid "pthread freqloop disabled!\n"
 msgstr "pthread freqloop מושבת!\n"
 
-#: src/main.c:281
+#: src/main.c:308
 msgid "batch mode enabled, will exit after first loop\n"
 msgstr "מצב אצווה מופעל, ייצא לאחר לולאה ראשונה\n"
 
-#: src/main.c:347
+#: src/main.c:374
 msgid "verify segments check disabled\n"
 msgstr "בדיקת אימות מקטעים מושבתת\n"
 
-#: src/main.c:352
+#: src/main.c:379
 msgid "forcing overlap check on large models\n"
 msgstr "מכריח בדיקת חפיפה על מודלים גדולים\n"
 
-#: src/main.c:366
+#: src/main.c:384
+msgid "managed allocator leak report enabled\n"
+msgstr "דוח זליגת מקצה מנוהל מופעל\n"
+
+#: src/main.c:398
 msgid "--batch and --optimize are mutual exclusive.\n"
 msgstr "--batch ו--optimize הם בלעדיים הדדית.\n"
 
-#: src/main.c:382
+#: src/main.c:414
 #, c-format
 msgid "input file path name too long ( > %d char )\n"
 msgstr "נתיב שם קובץ קלט ארוך מדי ( > %d תווים )\n"
 
-#: src/main.c:389
+#: src/main.c:421
 #, c-format
 msgid "unexpected argument '%s' does not appear to be a .nec file\n"
 msgstr "ארגומנט בלתי צפוי '%s' לא נראה כקובץ .nec\n"
 
-#: src/main.c:396
+#: src/main.c:428
 #, c-format
 msgid "unexpected argument: %s\n"
 msgstr "ארגומנט בלתי צפוי: %s\n"
 
-#: src/main.c:402
+#: src/main.c:434
 msgid "batch mode requires an input file\n"
 msgstr "מצב אצווה דורש קובץ קלט\n"
 
-#: src/main.c:423
+#: src/main.c:444
+msgid "cannot open display: a running X11 or Wayland session is required\n"
+msgstr "לא ניתן לפתוח תצוגה: נדרש סשן X11 או Wayland פעיל\n"
+
+#: src/main.c:463
 #, c-format
 msgid "Forking %d jobs.\n"
 msgstr "מפצל %d משימות.\n"
 
-#: src/main.c:435 src/main.c:443
+#: src/main.c:475 src/main.c:483
 msgid "exiting after fatal error: pipe() failed"
 msgstr "יוצא לאחר שגיאה חמורה: pipe() נכשל"
 
-#: src/main.c:452
+#: src/main.c:492
 msgid "exiting after fatal error: fork() failed"
 msgstr "יוצא לאחר שגיאה חמורה: fork() נכשל"
 
-#: src/main.c:891
+#: src/main.c:907
 msgid "exiting via user interrupt\n"
 msgstr "יציאה באמצעות הפסקת משתמש\n"
 
-#: src/main.c:895
+#: src/main.c:911
 msgid "segmentation fault, exiting\n"
 msgstr "שגיאת סגמנטציה, יוצא\n"
 
-#: src/main.c:899
+#: src/main.c:915
 msgid "floating point exception, exiting\n"
 msgstr "חריגת נקודה צפה, יוצא\n"
 
-#: src/main.c:903
+#: src/main.c:919
 msgid "abort signal received, exiting\n"
 msgstr "התקבל אות ביטול, יוצא\n"
 
-#: src/main.c:907
+#: src/main.c:923
 msgid "termination request received, exiting\n"
 msgstr "התקבלה בקשת סיום, יוצא\n"
 
-#: src/main.c:917
+#: src/main.c:933
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
 msgstr "לא בוצע fork, מתעלם מ-SIGCHLD מ-pid %d\n"
 
-#: src/main.c:925
+#: src/main.c:941
 #, c-format
 msgid "child process pid %d exited\n"
 msgstr "תהליך בן pid %d יצא\n"
 
-#: src/main.c:934
+#: src/main.c:950
 #, c-format
 msgid "default exit with signal: %d\n"
 msgstr "יציאת ברירת מחדל עם אות: %d\n"
@@ -3500,7 +3645,7 @@ msgstr "open_mathlib: lib הוא NULL\n"
 msgid "setenv(%s, %s): %s\n"
 msgstr "setenv(%s, %s): %s\n"
 
-#: src/mathlib.c:320 src/utils.c:447
+#: src/mathlib.c:320 src/utils.c:448
 #, c-format
 msgid "%s: %s\n"
 msgstr "%s: %s\n"
@@ -3799,26 +3944,26 @@ msgstr "zgetrs אזהרה: lda(%d) != ldb(%d)\n"
 msgid "dlsym(mkl_set_threading_layer): %s\n"
 msgstr "dlsym(mkl_set_threading_layer): %s\n"
 
-#: src/matrix.c:1216
+#: src/matrix.c:1208
 #, c-format
 msgid "pivot(%d)= %16.8E\n"
 msgstr "pivot(%d)= %16.8E\n"
 
-#: src/matrix.c:1250
+#: src/matrix.c:1242
 #, c-format
 msgid "LU Decomposition Failed: %d\n"
 msgstr "פירוק LU נכשל: %d\n"
 
-#: src/matrix.c:1306
+#: src/matrix.c:1298
 #, c-format
 msgid "symmetry error - nrow:%d ncol:%d\n"
 msgstr "שגיאת סימטריה - nrow:%d ncol:%d\n"
 
-#: src/matrix.c:1307
+#: src/matrix.c:1299
 msgid "Symmetry error"
 msgstr "שגיאת סימטריה"
 
-#: src/matrix.c:1414
+#: src/matrix.c:1403
 #, c-format
 msgid "Solving Failed: %d\n"
 msgstr "הפתרון נכשל: %d\n"
@@ -3831,32 +3976,32 @@ msgstr ""
 "noise_temp_resolve: טבלת noise_temp לא הוקצתה; ברירת מחדל t_sky/t_earth היא "
 "0\n"
 
-#: src/measurements.c:594
+#: src/measurements.c:596
 #, c-format
 msgid "BUG: pol=%d out of range [0,%d): idx=%d freq_step=%d thr=%lu\n"
 msgstr "BUG: pol=%d מחוץ לטווח [0,%d): idx=%d freq_step=%d thr=%lu\n"
 
-#: src/measurements.c:608
+#: src/measurements.c:610
 #, c-format
 msgid "BUG: mgidx=%d out of range [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n"
 msgstr "BUG: mgidx=%d מחוץ לטווח [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n"
 
-#: src/measurements.c:611
+#: src/measurements.c:613
 #, c-format
 msgid "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
 msgstr "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
 
-#: src/measurements.c:614
+#: src/measurements.c:616
 #, c-format
 msgid "BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n"
 msgstr "BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n"
 
-#: src/measurements.c:618
+#: src/measurements.c:620
 #, c-format
 msgid "BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
 msgstr "BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
 
-#: src/measurements.c:749
+#: src/measurements.c:751
 #, c-format
 msgid ""
 "BUG: F/B nth=%d out of [0,%d) after over-ground recalc: idx=%d pol=%d "
@@ -3865,43 +4010,53 @@ msgstr ""
 "BUG: F/B nth=%d מחוץ לטווח [0,%d) לאחר חישוב מחדש מעל הקרקע: idx=%d pol=%d "
 "max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n"
 
-#: src/measurements.c:796
+#: src/measurements.c:798
 #, c-format
 msgid "meas_name_idx: Invalid name with length=%d: %s\n"
 msgstr "meas_name_idx: שם לא חוקי באורך=%d: %s\n"
 
-#: src/measurements.c:857
+#: src/measurements.c:859
 msgid "meas_format: output overflow\n"
 msgstr "meas_format: גלישת פלט\n"
 
-#: src/mem.c:21
+#: src/mem/mem.c:22
 #, c-format
 msgid "mem_obj_from_ptr: ptr %p does not match m->ptr %p (base %p)\n"
 msgstr "mem_obj_from_ptr: ptr %p אינו תואם ל-m->ptr %p (base %p)\n"
 
-#: src/mem.c:148
+#: src/mem/mem.c:194
 #, c-format
 msgid "Memory allocation denied %s: requested %lu bytes\n"
 msgstr "הקצאת זיכרון נדחתה %s: נדרשו %lu בייטים\n"
 
-#: src/mem.c:181
+#: src/mem/mem.c:225
 #, c-format
 msgid "mem_obj_t at %p: size=%lu used=%lu addr=%p\n"
 msgstr "mem_obj_t ב-%p: גודל=%lu בשימוש=%lu כתובת=%p\n"
 
-#: src/mem.c:202
+#: src/mem/mem.c:246
 #, c-format
 msgid "mem_backtrace(%p):\n"
 msgstr "mem_backtrace(%p):\n"
 
-#: src/mem.c:205
+#: src/mem/mem.c:249
 msgid "  m->backtrace is null, no backtrace data\n"
 msgstr "  m->backtrace הוא null, אין נתוני מעקב\n"
 
-#: src/mem.c:228
+#: src/mem/mem.c:275
 #, c-format
 msgid "mem_clone: allocation failed for %lu bytes\n"
 msgstr "mem_clone: הקצאת זיכרון נכשלה עבור %lu בייטים\n"
+
+#: src/mem/mem.c:332
+#, c-format
+msgid "mem_array verb: element size %lu does not match header %lu\n"
+msgstr "mem_array verb: גודל איבר %lu אינו תואם לכותרת %lu\n"
+
+#: src/mem/mem.c:424
+#, c-format
+msgid "mem_zero: array block element size %lu; use mem_array_zero\n"
+msgstr "mem_zero: גודל איבר בלוק מערך %lu; השתמש ב-mem_array_zero\n"
 
 #: src/nec2_model.c:278 src/nec2_model.c:282 src/nec2_model.c:286
 msgid "Card"
@@ -3949,21 +4104,21 @@ msgstr ""
 "אנא השתמש בלחצן שמור\n"
 "כדי לציין נתיב קובץ"
 
-#: src/network.c:646
+#: src/network.c:637
 #, c-format
 msgid "improper load type chosen, requested type is %d\n"
 msgstr "נבחר סוג עומס לא תקין, הסוג המבוקש הוא %d\n"
 
-#: src/network.c:647
+#: src/network.c:638
 msgid "Improper load type chose"
 msgstr "נבחר סוג עומס לא תקין"
 
-#: src/network.c:735
+#: src/network.c:726
 #, c-format
 msgid "loading data card error, no segment has an itag = %d\n"
 msgstr "שגיאה בטעינת כרטיס נתונים, לאף מקטע אין itag = %d\n"
 
-#: src/network.c:736
+#: src/network.c:727
 msgid ""
 "Loading data card\n"
 "Tag number mismatch error"
@@ -4045,11 +4200,15 @@ msgstr "מספר אובייקטים לרינדור %u חורג מ-MAX_RENDERABLE
 msgid "Disabling OpenGL: peel composite shader failed\n"
 msgstr "מבטל OpenGL: שיידר הרכבת ה-peel נכשל\n"
 
-#: src/opengl-engine/opengl_view_msaa.c:137
+#: src/opengl-engine/opengl_view_msaa.c:149
 msgid "MSAA framebuffer incomplete\n"
 msgstr "מאגר מסגרת MSAA לא שלם\n"
 
-#: src/opengl-engine/opengl_view_overlay.c:352
+#: src/opengl-engine/opengl_view_msaa.c:181
+msgid "MSAA resolve framebuffer incomplete\n"
+msgstr "מאגר מסגרת MSAA resolve לא שלם\n"
+
+#: src/opengl-engine/opengl_view_overlay.c:359
 msgid "Failed to load overlay shaders\n"
 msgstr "נכשלה טעינת שיידרי שכבת-על\n"
 
@@ -4071,15 +4230,15 @@ msgstr "Peel accumulation FBO לא שלם\n"
 msgid "Layer depth FBO incomplete\n"
 msgstr "FBO עומק שכבה לא שלם\n"
 
-#: src/opengl-engine/opengl_view_render.c:294
+#: src/opengl-engine/opengl_view_render.c:295
 msgid "Transparent renderables skipped: peel FBOs unavailable\n"
 msgstr "אובייקטים שקופים דולגו: peel FBOs לא זמינים\n"
 
-#: src/opengl-engine/opengl_view_scene.c:284
+#: src/opengl-engine/opengl_view_scene.c:291
 msgid "Failed to load shaders\n"
 msgstr "נכשלה טעינת שיידרים\n"
 
-#: src/opengl/opengl_rdpattern.c:284
+#: src/opengl/opengl_rdpattern.c:337
 #, c-format
 msgid "rdpattern: invalid draw style %d, using surface\n"
 msgstr "rdpattern: סגנון ציור לא חוקי %d, משתמש במשטח\n"
@@ -4091,6 +4250,11 @@ msgid ""
 msgstr ""
 "OpenGL אינו זמין בתצוגה זו; עובר למרנדר Cairo. ראה 'מרנדר OpenGL' תחת תצוגה "
 "> הגדרות רינדור.\n"
+
+#: src/opengl/opengl_structure_geometry.c:227
+#, c-format
+msgid "generate_network_lines: unknown ntyp=%d\n"
+msgstr "generate_network_lines: ntyp=%d לא מוכר\n"
 
 #: src/opt_file.c:342
 #, c-format
@@ -4224,27 +4388,27 @@ msgid "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 msgstr ""
 "inotify: דילוג על אירוע (לא MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 
-#: src/optimizers/opt_fitness.c:347
+#: src/optimizers/opt_fitness.c:345
 #, c-format
 msgid "fitness_config_add: invalid meas_index %d\n"
 msgstr "fitness_config_add: meas_index לא חוקי %d\n"
 
-#: src/optimizers/opt_fitness.c:485
+#: src/optimizers/opt_fitness.c:472
 #, c-format
 msgid "fitness_transform: unknown direction %d\n"
 msgstr "fitness_transform: כיוון לא מוכר %d\n"
 
-#: src/optimizers/opt_fitness.c:558
+#: src/optimizers/opt_fitness.c:545
 #, c-format
 msgid "reduce_values: unknown reduction method %d\n"
 msgstr "reduce_values: שיטת צמצום לא מוכרת %d\n"
 
-#: src/optimizers/opt_nec2_eval.c:80
+#: src/optimizers/opt_nec2_eval.c:81
 #, c-format
 msgid "nec2_eval_signal: eval_mutex contention, blocking (thr=%lu)\n"
 msgstr "nec2_eval_signal: תחרות eval_mutex, חוסם (thr=%lu)\n"
 
-#: src/optimizers/opt_nec2_eval.c:194
+#: src/optimizers/opt_nec2_eval.c:195
 msgid "nec2_eval_run: not initialized\n"
 msgstr "nec2_eval_run: לא אותחל\n"
 
@@ -4280,72 +4444,72 @@ msgstr "opt_start: pthread_create נכשל: %d\n"
 msgid "simple_config_init: unknown algorithm %d\n"
 msgstr "simple_config_init: אלגוריתם לא מוכר %d\n"
 
-#: src/optimizers/opt_simple_var.c:42
+#: src/optimizers/opt_simple_var.c:43
 #, c-format
 msgid "var[%d] name is NULL or empty\n"
 msgstr "var[%d] שם הוא NULL או ריק\n"
 
-#: src/optimizers/opt_simple_var.c:48
+#: src/optimizers/opt_simple_var.c:49
 #, c-format
 msgid "var '%s' values is NULL or empty\n"
 msgstr "var '%s' ערכים הם NULL או ריקים\n"
 
-#: src/optimizers/opt_simple_var.c:59
+#: src/optimizers/opt_simple_var.c:60
 #, c-format
 msgid "var '%s' enabled->size (%zu) != values->size (%zu)\n"
 msgstr "var '%s' enabled->size (%zu) != values->size (%zu)\n"
 
-#: src/optimizers/opt_simple_var.c:69
+#: src/optimizers/opt_simple_var.c:70
 #, c-format
 msgid "var '%s' enabled[%zu] = %g (must be 0.0 or 1.0)\n"
 msgstr "var '%s' enabled[%zu] = %g (חייב להיות 0.0 או 1.0)\n"
 
-#: src/optimizers/opt_simple_var.c:79
+#: src/optimizers/opt_simple_var.c:80
 #, c-format
 msgid "var '%s' min and max must both be set or both NULL\n"
 msgstr "var '%s' min ו-max חייבים להיות מוגדרים שניהם או שניהם NULL\n"
 
-#: src/optimizers/opt_simple_var.c:88
+#: src/optimizers/opt_simple_var.c:89
 #, c-format
 msgid "var '%s' min/max size mismatch with values\n"
 msgstr "var '%s' אי-התאמת גודל min/max עם ערכים\n"
 
-#: src/optimizers/opt_simple_var.c:99
+#: src/optimizers/opt_simple_var.c:100
 #, c-format
 msgid "var '%s' min[%zu]=%g >= max[%zu]=%g (zero or negative range)\n"
 msgstr "var '%s' min[%zu]=%g >= max[%zu]=%g (טווח אפס או שלילי)\n"
 
-#: src/optimizers/opt_simple_var.c:112
+#: src/optimizers/opt_simple_var.c:113
 #, c-format
 msgid "var '%s'[%zu] initial value %g outside [%g, %g]\n"
 msgstr "var '%s'[%zu] ערך התחלתי %g מחוץ ל-[%g, %g]\n"
 
-#: src/optimizers/opt_simple_var.c:125
+#: src/optimizers/opt_simple_var.c:126
 #, c-format
 msgid "var '%s' perturb_scale size mismatch\n"
 msgstr "var '%s' אי-התאמת גודל perturb_scale\n"
 
-#: src/optimizers/opt_simple_var.c:133
+#: src/optimizers/opt_simple_var.c:134
 #, c-format
 msgid "var '%s' perturb_scale[%zu] is zero\n"
 msgstr "var '%s' perturb_scale[%zu] הוא אפס\n"
 
-#: src/optimizers/opt_simple_var.c:145
+#: src/optimizers/opt_simple_var.c:146
 #, c-format
 msgid "var '%s' round_each size mismatch\n"
 msgstr "var '%s' אי-התאמת גודל round_each\n"
 
-#: src/optimizers/opt_simple_var.c:151
+#: src/optimizers/opt_simple_var.c:152
 #, c-format
 msgid "var '%s' round_each has element <= 0\n"
 msgstr "var '%s' round_each מכיל איבר <= 0\n"
 
-#: src/optimizers/opt_simple_var.c:162
+#: src/optimizers/opt_simple_var.c:163
 #, c-format
 msgid "var '%s' round_result size mismatch\n"
 msgstr "var '%s' אי-התאמת גודל round_result\n"
 
-#: src/optimizers/opt_simple_var.c:168
+#: src/optimizers/opt_simple_var.c:169
 #, c-format
 msgid "var '%s' round_result has element <= 0\n"
 msgstr "var '%s' round_result מכיל איבר <= 0\n"
@@ -4360,135 +4524,202 @@ msgstr "opt_ui: אופטימיזציה הושלמה, התאמה מיטבית: %.
 msgid "Optimization"
 msgstr "אופטימיזציה"
 
-#: src/plot_freqdata.c:131
-#, c-format
-msgid ""
-"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d calc_data.ngraph="
-"%d fr=%d posn=%d valid=%d\n"
-msgstr ""
-"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d calc_data.ngraph="
-"%d fr=%d posn=%d valid=%d\n"
+#: src/freqplots/freqplots_core.c:55
+msgid "Gain Direction"
+msgstr "כיוון הגבר"
 
-#: src/plot_freqdata.c:147
-#, c-format
-msgid ""
-"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
-"%d]\n"
-msgstr ""
-"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
-"%d]\n"
+#: src/freqplots/freqplots_core.c:56
+msgid "Viewer Gain"
+msgstr "הגבר צופה"
 
-#: src/plot_freqdata.c:884 src/plot_freqdata.c:1353
-msgid "memory allocation for points failed\n"
-msgstr "הקצאת זיכרון לנקודות נכשלה\n"
+#: src/freqplots/freqplots_core.c:58
+msgid "Impedance (real/imag)"
+msgstr "עכבה (ממשי/מדומה)"
 
-#: src/plot_freqdata.c:885 src/plot_freqdata.c:1354
-msgid "Draw_Graph():Memory allocation for points failed"
-msgstr "Draw_Graph(): הקצאת זיכרון לנקודות נכשלה"
+#: src/freqplots/freqplots_core.c:59
+msgid "Impedance (mag/phase)"
+msgstr "עכבה (גודל/פאזה)"
 
-#: src/plot_freqdata.c:1316
+#: src/freqplots/freqplots_core.c:60 src/freqplots/graphs/smith_graph.c:476
 msgid "Smith Chart"
 msgstr "תרשים סמית"
 
-#: src/plot_freqdata.c:1526 src/plot_freqdata.c:1545 src/plot_freqdata.c:1570
+#: src/freqplots/freqplots_core.c:190
+#, c-format
+msgid "fp_field_cond_active: unhandled cond %d\n"
+msgstr "fp_field_cond_active: תנאי לא מטופל %d\n"
+
+#: src/freqplots/freqplots_core.c:206
+msgid "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
+msgstr "fp_readout_field_count: קבוצת השדות חורגת מ-FP_READOUT_MAX\n"
+
+#: src/freqplots/freqplots_core.c:393
+#, c-format
+msgid ""
+"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
+"%d posn=%d valid=%d\n"
+msgstr ""
+"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
+"%d posn=%d valid=%d\n"
+
+#: src/freqplots/freqplots_core.c:409
+#, c-format
+msgid ""
+"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
+"%d]\n"
+msgstr ""
+"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
+"%d]\n"
+
+#: src/freqplots/freqplots_graph.c:137 src/freqplots/graphs/smith_graph.c:529
+msgid "memory allocation for points failed\n"
+msgstr "הקצאת זיכרון לנקודות נכשלה\n"
+
+#: src/freqplots/freqplots_graph.c:138 src/freqplots/graphs/smith_graph.c:530
+msgid "Draw_Graph():Memory allocation for points failed"
+msgstr "Draw_Graph(): הקצאת זיכרון לנקודות נכשלה"
+
+#: src/freqplots/graphs/smith_graph.c:384
+msgid "0 Ω"
+msgstr "0 Ω"
+
+#: src/freqplots/graphs/smith_graph.c:387
+#: src/freqplots/graphs/smith_graph.c:462
+msgid "∞ Ω"
+msgstr "∞ Ω"
+
+#: src/freqplots/graphs/smith_graph.c:407
+msgid "constant R"
+msgstr "R קבוע"
+
+#: src/freqplots/graphs/smith_graph.c:408
+msgid "constant X"
+msgstr "X קבוע"
+
+#: src/freqplots/graphs/smith_graph.c:409
+msgid "unity R, X"
+msgstr "R, X יחידה"
+
+#: src/freqplots/graphs/smith_graph.c:410
+msgid "match (z = 1)"
+msgstr "התאמה (z = 1)"
+
+#: src/freqplots/graphs/smith_graph.c:411
+msgid "impedance vs freq"
+msgstr "עכבה מול תדר"
+
+#: src/freqplots/graphs/smith_graph.c:412
+msgid "selected frequency"
+msgstr "תדר נבחר"
+
+#: src/freqplots/graphs/smith_graph.c:413
+msgid "reflection angle (°)"
+msgstr "זווית השתקפות (°)"
+
+#: src/freqplots/graphs/smith_graph.c:414
+msgid "wavelengths → gen"
+msgstr "אורכי גל → מחולל"
+
+#: src/freqplots/graphs/smith_graph.c:507
+#, c-format
+msgid "Z0 = %g Ω"
+msgstr "Z0 = %g Ω"
+
+#: src/freqplots/graphs/smith_graph.c:514
+msgid "INDUCTIVE (+jX)"
+msgstr "אינדוקטיבי (+jX)"
+
+#: src/freqplots/graphs/smith_graph.c:517
+msgid "CAPACITIVE (-jX)"
+msgstr "קפסיטיבי (-jX)"
+
+#: src/freqplots/graphs/gain_graph.c:66 src/freqplots/graphs/viewer_graph.c:39
 msgid "Raw Gain dBi"
 msgstr "הגבר גולמי dBi"
 
-#: src/plot_freqdata.c:1529
+#: src/freqplots/graphs/gain_graph.c:71
 msgid "Max Gain & Net Gain vs Frequency"
 msgstr "הגבר מרבי והגבר נטו מול תדר"
 
-#: src/plot_freqdata.c:1530
+#: src/freqplots/graphs/gain_graph.c:72
 msgid "Net Gain dBi"
 msgstr "הגבר נטו dBi"
 
-#: src/plot_freqdata.c:1536 src/plot_freqdata.c:1546
+#: src/freqplots/graphs/gain_graph.c:77 src/freqplots/graphs/gain_graph.c:84
 msgid "Max Gain & F/B Ratio vs Frequency"
 msgstr "הגבר מרבי ויחס קדמי/אחורי מול תדר"
 
-#: src/plot_freqdata.c:1547
+#: src/freqplots/graphs/gain_graph.c:85
 msgid "F/B Ratio dB"
 msgstr "יחס קדמי/אחורי dB"
 
-#: src/plot_freqdata.c:1556
+#: src/freqplots/graphs/gain_graph.c:91
 msgid "Rad Angle - deg"
 msgstr "זווית קרינה - מעלות"
 
-#: src/plot_freqdata.c:1557
+#: src/freqplots/graphs/gain_graph.c:92
 msgid "Max Gain Direction vs Frequency"
 msgstr "כיוון הגבר מרבי מול תדר"
 
-#: src/plot_freqdata.c:1558
+#: src/freqplots/graphs/gain_graph.c:93
 msgid "Phi - deg"
 msgstr "פי - מעלות"
 
-#: src/plot_freqdata.c:1571
+#: src/freqplots/graphs/viewer_graph.c:40
 msgid "Gain in Viewer Direction vs Frequency"
 msgstr "הגבר בכיוון הצופה מול תדר"
 
-#: src/plot_freqdata.c:1594
+#: src/freqplots/graphs/viewer_graph.c:56
 msgid "Net gain dBi"
 msgstr "הגבר נטו dBi"
 
-#: src/plot_freqdata.c:1615
+#: src/freqplots/graphs/vswr_graph.c:43
 msgid "VSWR & S11 vs Frequency"
 msgstr "VSWR ו-S11 מול תדר"
 
-#: src/plot_freqdata.c:1616
+#: src/freqplots/graphs/vswr_graph.c:44
 msgid "S11 dB"
 msgstr "S11 dB"
 
-#: src/plot_freqdata.c:1620
+#: src/freqplots/graphs/vswr_graph.c:48
 msgid "VSWR vs Frequency"
 msgstr "VSWR מול תדר"
 
-#: src/plot_freqdata.c:1634
-msgid "memory allocation for vswr/s11 failed\n"
-msgstr "הקצאת זיכרון עבור vswr/s11 נכשלה\n"
-
-#: src/plot_freqdata.c:1635
-msgid "Plot_Frequency_Data():Memory allocation for vswr/s11 failed"
-msgstr "Plot_Frequency_Data(): הקצאת זיכרון עבור vswr/s11 נכשלה"
-
-#: src/plot_freqdata.c:1683 src/plot_freqdata.c:1692
+#: src/freqplots/graphs/impedance_graph.c:57
+#: src/freqplots/graphs/impedance_graph.c:62
 msgid "Impedance vs Frequency"
 msgstr "עכבה מול תדר"
 
-#: src/plot_freqdata.c:1691
+#: src/freqplots/graphs/impedance_graph.c:61
 msgid "Z-magn"
 msgstr "Z-גודל"
 
-#: src/plot_freqdata.c:1693
+#: src/freqplots/graphs/impedance_graph.c:63
 msgid "Z-phase"
 msgstr "Z-פאזה"
 
-#: src/plot_freqdata.c:1727
+#: src/freqplots/graphs/anttemp_graph.c:54
 msgid "G/Ta (dB)"
 msgstr "G/Ta (dB)"
 
-#: src/plot_freqdata.c:1728
+#: src/freqplots/graphs/anttemp_graph.c:55
 msgid "G/Ta & TA - Antenna noise temperature"
 msgstr "G/Ta ו-TA — טמפרטורת רעש אנטנה"
 
-#: src/plot_freqdata.c:1731
+#: src/freqplots/graphs/anttemp_graph.c:57
 msgid "Ta (K)"
 msgstr "Ta (K)"
 
-#: src/plot_freqdata.c:1735
+#: src/freqplots/graphs/anttemp_graph.c:59
 msgid "TA (K)"
 msgstr "TA (K)"
 
-#: src/plot_freqdata.c:1977
-#, c-format
-msgid "mouse button: unknown button %d\n"
-msgstr "לחצן עכבר: לחצן לא מוכר %d\n"
-
-#: src/prerender/prerender_color.c:109
+#: src/prerender/prerender_color.c:107
 #, c-format
 msgid "segment_type_to_rgb: unknown type %d\n"
 msgstr "segment_type_to_rgb: סוג לא מוכר %d\n"
 
-#: src/prerender/prerender_color.c:136
+#: src/prerender/prerender_color.c:134
 #, c-format
 msgid "segment_type_to_width: unknown type %d\n"
 msgstr "segment_type_to_width: סוג לא מוכר %d\n"
@@ -4506,23 +4737,23 @@ msgid ""
 msgstr ""
 "הגבר ממוצע: %.4f (%.2f dBi), נצילות: %.1f%%, זווית מוצקה: %.4f * pi sr\n"
 
-#: src/rc_config.c:367
+#: src/rc_config.c:376
 #, c-format
 msgid "unable to getcwd(): %s\n"
 msgstr "לא ניתן לבצע getcwd(): %s\n"
 
-#: src/rc_config.c:371
+#: src/rc_config.c:380
 #, c-format
 msgid "environment variable HOME is undefined, using %s\n"
 msgstr "משתנה הסביבה HOME אינו מוגדר, משתמש ב-%s\n"
 
-#: src/rc_config.c:456
+#: src/rc_config.c:465
 #, c-format
 msgid ""
 "%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
 msgstr "%s (locale=%s): תאם רק %d מתוך %lu תווים, מנסה locale אחר: %s\n"
 
-#: src/rc_config.c:517
+#: src/rc_config.c:526
 #, c-format
 msgid ""
 "rc_config: %s: builder_check_menu_item_id is NULL but builder_window is "
@@ -4530,7 +4761,7 @@ msgid ""
 msgstr ""
 "rc_config: %s: builder_check_menu_item_id הוא NULL אך builder_window מוגדר.\n"
 
-#: src/rc_config.c:520
+#: src/rc_config.c:529
 #, c-format
 msgid ""
 "rc_config: %s: builder_window is NULL but builder_check_menu_item_id is "
@@ -4538,74 +4769,74 @@ msgid ""
 msgstr ""
 "rc_config: %s: builder_window הוא NULL אך builder_check_menu_item_id מוגדר.\n"
 
-#: src/rc_config.c:533
+#: src/rc_config.c:542
 #, c-format
 msgid "match: %s\n"
 msgstr "התאמה: %s\n"
 
-#: src/rc_config.c:558
+#: src/rc_config.c:567
 #, c-format
 msgid "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
 msgstr "חלון: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
 
-#: src/rc_config.c:606
+#: src/rc_config.c:615
 #, c-format
 msgid "%s: EOF reading application version.\n"
 msgstr "%s: EOF בקריאת גרסת היישום.\n"
 
-#: src/rc_config.c:612
+#: src/rc_config.c:621
 #, c-format
 msgid "existing config file version differs: %s != %s\n"
 msgstr "גרסת קובץ התצורה הקיימת שונה: %s != %s\n"
 
-#: src/rc_config.c:916
+#: src/rc_config.c:920
 #, c-format
 msgid "stat failed for %s: %s\n"
 msgstr "stat נכשל עבור %s: %s\n"
 
-#: src/rc_config.c:922
+#: src/rc_config.c:926
 #, c-format
 msgid ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
 "4e62893b.\n"
 msgstr "תוקנו הרשאות תיקיית %s מ-0%o ל-0%o מבאג שהוכנס ב-4e62893b.\n"
 
-#: src/rc_config.c:953
+#: src/rc_config.c:957
 #, c-format
 msgid "%s:%d: Line not parsed: %s\n"
 msgstr "%s:%d: שורה לא נותחה: %s\n"
 
-#: src/rc_config.c:959
+#: src/rc_config.c:963
 #, c-format
 msgid "%s:%d: Early end of file for %s: %s \n"
 msgstr "%s:%d: סוף קובץ מוקדם עבור %s: %s \n"
 
-#: src/rc_config.c:984
+#: src/rc_config.c:988
 #, c-format
 msgid "%s:%d: parse error (%s): %s \n"
 msgstr "%s:%d: שגיאת ניתוח (%s): %s \n"
 
-#: src/rc_config.c:1007
+#: src/rc_config.c:1011
 #, c-format
 msgid "Invalid sky model index %d in config, resetting to default\n"
 msgstr "אינדקס מודל שמיים לא חוקי %d בתצורה, מאפס לברירת מחדל\n"
 
-#: src/rc_config.c:1013
+#: src/rc_config.c:1017
 #, c-format
 msgid "Invalid earth model index %d in config, resetting to default\n"
 msgstr "אינדקס מודל קרקע לא חוקי %d בתצורה, מאפס לברירת מחדל\n"
 
-#: src/rc_config.c:1019
+#: src/rc_config.c:1023
 #, c-format
 msgid "Invalid interp method %d in config, resetting to default\n"
 msgstr "שיטת אינטרפולציה לא חוקית %d בתצורה, מאפס לברירת מחדל\n"
 
-#: src/rc_config.c:1268
+#: src/rc_config.c:1341
 #, c-format
 msgid "cannot open xnec2c's config file %s: %s\n"
 msgstr "לא ניתן לפתוח את קובץ התצורה של xnec2c %s: %s\n"
 
-#: src/rdpattern_ui.c:38
+#: src/rdpattern_ui.c:36
 msgid ""
 "Animation requires near field data.\n"
 "\n"
@@ -4619,7 +4850,7 @@ msgstr ""
 "הנפשת שדה H: הוסף כרטיס NH לקובץ NEC\n"
 "וקטור פוינטינג: הוסף כרטיסי NE ו-NH"
 
-#: src/rdpattern_ui.c:94
+#: src/rdpattern_ui.c:92
 #, c-format
 msgid ""
 "Scale_Gain_Resolved: gain_style %d out of range [0..%d], defaulting to "
@@ -4627,14 +4858,14 @@ msgid ""
 msgstr ""
 "Scale_Gain_Resolved: gain_style %d מחוץ לטווח [0..%d], ברירת מחדל GS_LINP\n"
 
-#: src/rdpattern_ui.c:563 src/rdpattern_ui.c:569
+#: src/rdpattern_ui.c:561 src/rdpattern_ui.c:567
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
 msgstr ""
 "זווית הגבהת תצפית. מזיזה את גבול שמיים/ארץ להערכת טמפרטורת אנטנה. 0° = אופק."
 
-#: src/rdpattern_ui.c:566 src/rdpattern_ui.c:572
+#: src/rdpattern_ui.c:564 src/rdpattern_ui.c:570
 msgid ""
 "Observation elevation for antenna temperature.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -4642,13 +4873,13 @@ msgstr ""
 "גובה תצפית לטמפרטורת אנטנה.\n"
 "בחר סגנון רווח ← טמפרטורת רעש כדי להפעיל."
 
-#: src/rdpattern_ui.c:575
+#: src/rdpattern_ui.c:573
 msgid ""
 "Independent sky, earth, and interpolation selectors for noise temperature "
 "models."
 msgstr "בוררי שמיים, קרקע ואינטרפולציה עצמאיים עבור מודלי טמפרטורת רעש."
 
-#: src/rdpattern_ui.c:577
+#: src/rdpattern_ui.c:575
 msgid ""
 "Sky and earth noise temperature models.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -4656,110 +4887,105 @@ msgstr ""
 "מודלי טמפרטורת רעש של שמיים וקרקע.\n"
 "בחר סגנון רווח ← טמפרטורת רעש כדי להפעיל."
 
-#: src/rdpattern_ui.c:946
+#: src/rdpattern_ui.c:976
 msgid "Total Gain"
 msgstr "הגבר כולל"
 
-#: src/rdpattern_ui.c:947
+#: src/rdpattern_ui.c:977
 msgid "Horizontal Polarization"
 msgstr "קיטוב אופקי"
 
-#: src/rdpattern_ui.c:948
+#: src/rdpattern_ui.c:978
 msgid "Vertical Polarization"
 msgstr "קיטוב אנכי"
 
-#: src/rdpattern_ui.c:949
+#: src/rdpattern_ui.c:979
 msgid "RH Circular Polarization"
 msgstr "קיטוב מעגלי ימני"
 
-#: src/rdpattern_ui.c:950
+#: src/rdpattern_ui.c:980
 msgid "LH Circular Polarization"
 msgstr "קיטוב מעגלי שמאלי"
 
-#: src/rdpattern_ui.c:955
+#: src/rdpattern_ui.c:985
 msgid "Linear Power"
 msgstr "הספק לינארי"
 
-#: src/rdpattern_ui.c:956
+#: src/rdpattern_ui.c:986
 msgid "Linear Voltage"
 msgstr "מתח לינארי"
 
-#: src/rdpattern_ui.c:957
+#: src/rdpattern_ui.c:987
 msgid "ARRL Scale"
 msgstr "סולם ARRL"
 
-#: src/rdpattern_ui.c:958
+#: src/rdpattern_ui.c:988
 msgid "Logarithmic Scale"
 msgstr "סולם לוגריתמי"
 
-#: src/rdpattern_ui.c:959
+#: src/rdpattern_ui.c:989
 msgid "Noise Temperature"
 msgstr "טמפרטורת רעש"
 
-#: src/rdpattern_ui.c:960
+#: src/rdpattern_ui.c:990
 msgid "Noise Temp (log scale)"
 msgstr "טמפ' רעש (סולם לוגריתמי)"
 
-#: src/rdpattern_ui.c:972
+#: src/rdpattern_ui.c:1002
 msgid "Radiation Pattern: - "
 msgstr "תבנית קרינה: - "
 
-#: src/rdpattern_ui.c:992
+#: src/rdpattern_ui.c:1022
 msgid "Near Fields:"
 msgstr "שדות קרובים:"
 
-#: src/rdpattern_ui.c:994
+#: src/rdpattern_ui.c:1024
 msgid " - E Field"
 msgstr " - שדה E"
 
-#: src/rdpattern_ui.c:996
+#: src/rdpattern_ui.c:1026
 msgid " - H Field"
 msgstr " - שדה H"
 
-#: src/rdpattern_ui.c:998
+#: src/rdpattern_ui.c:1028
 msgid " - Poynting Vector"
 msgstr " - וקטור פוינטינג"
 
-#: src/rdpattern_ui.c:1008
+#: src/rdpattern_ui.c:1038
 msgid "Frequency Data Plots - "
 msgstr "תרשימי נתוני תדר - "
 
-#: src/rdpattern_ui.c:1310
+#: src/render/gradient_cache.c:77
 #, c-format
 msgid "fstep=%d is out of bounds. calc_data.steps_total=%d"
 msgstr "fstep=%d חורג מהגבולות. calc_data.steps_total=%d"
 
-#: src/render/gradient_cache.c:69
+#: src/render/gradient_cache.c:311
 #, c-format
 msgid "gradient_cache_update: surface creation failed (%dx%d)\n"
 msgstr "gradient_cache_update: יצירת משטח נכשלה (%dx%d)\n"
 
-#: src/render/render_dispatch.c:402
+#: src/render/render_dispatch.c:413
 #, c-format
 msgid "render: unhandled mode %d\n"
 msgstr "render: מצב לא מטופל %d\n"
-
-#: src/settings/render_settings.c:82
-#, c-format
-msgid "on_render_settings_changed: unknown tab %d\n"
-msgstr "on_render_settings_changed: לשונית לא מוכרת %d\n"
 
 #: src/settings/render_settings_common.c:124
 #, c-format
 msgid "render_settings_init: failed to load glade: %s\n"
 msgstr "render_settings_init: נכשלה טעינת glade: %s\n"
 
-#: src/settings/render_settings_common.c:133
+#: src/settings/render_settings_common.c:134
 #, c-format
 msgid "render_settings_init: failed to load opengl glade: %s\n"
 msgstr "render_settings_init: נכשלה טעינת opengl glade: %s\n"
 
-#: src/settings/render_settings_common.c:142
+#: src/settings/render_settings_common.c:144
 #, c-format
 msgid "render_settings_init: failed to load cairo glade: %s\n"
 msgstr "render_settings_init: נכשלה טעינת cairo glade: %s\n"
 
-#: src/settings/render_settings_common.c:155
+#: src/settings/render_settings_common.c:157
 msgid "render_settings_init: failed to get render_settings_window from glade\n"
 msgstr "render_settings_init: נכשלה השגת render_settings_window מ-glade\n"
 
@@ -4783,11 +5009,11 @@ msgstr "config_sync_entry: רכיב חסר '%s'\n"
 msgid "config_sync_entry: unknown widget type for '%s'\n"
 msgstr "config_sync_entry: סוג רכיב לא מוכר עבור '%s'\n"
 
-#: src/somnec.c:238
+#: src/somnec.c:237
 msgid "Hankel not valid for z = 0"
 msgstr "Hankel לא תקף עבור Z = 0"
 
-#: src/somnec.c:749
+#: src/somnec.c:748
 msgid "No convergence"
 msgstr "אין התכנסות"
 
@@ -4907,6 +5133,7 @@ msgid ""
 "\n"
 "  --optimize:        Activate the optimizer immediately.\n"
 "  --skip-verify:     skip geometry verification checks\n"
+"  --mem-report:      report managed allocator live bytes per call site\n"
 "\n"
 "The following arguments write to an output file after the frequency loop\n"
 "completes.  These are useful to combine with --batch; If you wish to "
@@ -4944,6 +5171,7 @@ msgstr ""
 "\n"
 "  --optimize:        הפעל את המייעל מיד.\n"
 "  --skip-verify:     דלג על בדיקות אימות גאומטריה\n"
+"  --mem-report:      דווח על בייטים חיים של מקצה מנוהל לכל אתר קריאה\n"
 "\n"
 "הארגומנטים הבאים כותבים לקובץ פלט לאחר השלמת לולאת התדר.\n"
 "אלה שימושיים בשילוב עם --batch; אם ברצונך לציין שמות קבצים\n"
@@ -4959,7 +5187,7 @@ msgstr ""
 "  --write-gnuplot-structure <שם-קובץ> - כתוב קובץ מבנה gnuplot\n"
 "  --write-patch-currents  <שם-קובץ>  - כתוב CSV של זרמי משטח טלאי\n"
 
-#: src/utils.c:97 src/utils.c:102
+#: src/utils.c:98 src/utils.c:103
 #, c-format
 msgid ""
 "\n"
@@ -4972,45 +5200,45 @@ msgstr ""
 "%s\n"
 "\n"
 
-#: src/utils.c:183
+#: src/utils.c:184
 #, c-format
 msgid "Stop: %s\n"
 msgstr "עצור: %s\n"
 
-#: src/utils.c:219 src/utils.c:221
+#: src/utils.c:220 src/utils.c:222
 #, c-format
 msgid "Stop during freq loop, deadlock prevented: %s\n"
 msgstr "עצירה במהלך לולאת תדר, מניעת קפאון: %s\n"
 
-#: src/utils.c:401
+#: src/utils.c:402
 #, c-format
 msgid "using %d OpenMP threads per job (%d/%d CPUs)\n"
 msgstr "משתמש ב-%d תהליכוני OpenMP לכל משימה (%d/%d מעבדים)\n"
 
-#: src/utils.c:417
+#: src/utils.c:418
 #, c-format
 msgid "%s[%d]: %f seconds\n"
 msgstr "%s[%d]: %f שניות\n"
 
-#: src/utils.c:442
+#: src/utils.c:443
 #, c-format
 msgid "xnec2c[%d]: %s: Failed to open file: %s\n"
 msgstr "xnec2c[%d]: %s: נכשל בפתיחת קובץ: %s\n"
 
-#: src/utils.c:838
+#: src/utils.c:833
 msgid "Optimizer loop incomplete, suppressing intermediate redraw.\n"
 msgstr "לולאת האופטימיזציה לא הושלמה, מונע ציור מחדש ביניים.\n"
 
-#: src/utils.c:854
+#: src/utils.c:849
 msgid "  Backtrace:\n"
 msgstr "  מעקב:\n"
 
-#: src/utils.c:856
+#: src/utils.c:851
 #, c-format
 msgid "    %d. %s\n"
 msgstr "    %d. %s\n"
 
-#: src/utils.c:883
+#: src/utils.c:878
 #, c-format
 msgid "%s:\n"
 msgstr "%s:\n"
@@ -5026,37 +5254,42 @@ msgstr "קבוע דיאלקטרי מרוכב מקובץ: %12.5E%+12.5Ej, מבו�
 msgid "Ground_Parameters():Error in ground parameters"
 msgstr "Ground_Parameters(): שגיאה בפרמטרי הארקה"
 
-#: src/xnec2c.c:612
+#: src/xnec2c.c:611
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
 msgstr "%.6f MHz: %f שניות. (%s)\n"
 
-#: src/xnec2c.c:864
+#: src/xnec2c.c:865
+#, c-format
+msgid "green_line_eval returned unknown class %d\n"
+msgstr "green_line_eval החזיר מחלקה לא ידועה %d\n"
+
+#: src/xnec2c.c:946
 #, c-format
 msgid ""
 "step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
 msgstr "צעד %d התחרה: נשלח %.6f MHz, נוכחי %.6f MHz; יחושב מחדש\n"
 
-#: src/xnec2c.c:960
+#: src/xnec2c.c:1042
 #, c-format
 msgid "child %d has invalid pipe fd during forked collect\n"
 msgstr "תהליך בן %d כולל מתאר צינור לא תקין בעת איסוף fork\n"
 
-#: src/xnec2c.c:1015
+#: src/xnec2c.c:1097
 msgid "Failed to read data from forked child\n"
 msgstr "נכשלה קריאת נתונים מתהליך בן\n"
 
-#: src/xnec2c.c:1103
+#: src/xnec2c.c:1174
 #, c-format
 msgid ""
 "fmhz_save %.4f MHz outside FR card ranges; reset to %.4f MHz (VSWR %.2f)\n"
 msgstr "fmhz_save %.4f MHz מחוץ לטווחי כרטיס FR; אופס ל-%.4f MHz (VSWR %.2f)\n"
 
-#: src/xnec2c.c:1128
+#: src/xnec2c.c:1199
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
 msgstr "זמן לולאת תדר שחלף: %f שניות. (%s)\n"
 
-#: src/xnec2c.c:1363
+#: src/xnec2c.c:1438
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "נכשל בהפעלת Frequency_Loop_Thread\n"
