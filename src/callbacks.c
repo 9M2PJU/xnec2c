@@ -21,6 +21,7 @@
 #include "gdk_scroll.h"
 #include "shared.h"
 #include "opt_ui.h"
+#include "optimizers/opt_session.h"
 #include "measurements.h"
 #include "themes/theme.h"
 #include "rdpattern_ui.h"
@@ -167,6 +168,8 @@ on_main_window_delete_event(
     gpointer         user_data)
 {
   kill_window = main_window;
+  /* Boundary quit intent: MAIN_QUIT is read upstream by Nec2_Edit_Save and the
+   * confirm-dialog re-prompt; xnec2c_request_quit sets it again unconditionally. */
   SetFlag( MAIN_QUIT );
 
   /* Prompt user to save NEC2 data */
@@ -179,7 +182,7 @@ on_main_window_delete_event(
   /* Quit without confirmation dialog */
   if( !rc_config.confirm_quit )
   {
-    Gtk_Widget_Destroy( &main_window );
+    xnec2c_request_quit();
     return( TRUE );
   }
 
@@ -454,6 +457,8 @@ on_quit_activate(
     gpointer         user_data)
 {
   kill_window = main_window;
+  /* Boundary quit intent: MAIN_QUIT is read upstream by Nec2_Edit_Save and the
+   * confirm-dialog re-prompt; xnec2c_request_quit sets it again unconditionally. */
   SetFlag( MAIN_QUIT );
 
   /* Prompt user to save NEC2 data */
@@ -466,7 +471,7 @@ on_quit_activate(
   /* Quit without confirmation dialog */
   if( !rc_config.confirm_quit )
   {
-    Gtk_Widget_Destroy( &main_window );
+    xnec2c_request_quit();
     return;
   }
 
@@ -2564,6 +2569,16 @@ on_quit_okbutton_clicked(
     GtkButton       *button,
     gpointer         user_data)
 {
+  /* Optimizer running: defer the quit through xnec2c_request_quit so the worker
+   * settles on the live main loop; its evaluation pumps the loop re-entrantly,
+   * so the Stop_Frequency_Loop branch below must not run. */
+  if( opt_is_running() )
+  {
+    Gtk_Widget_Destroy( &quit_dialog );
+    xnec2c_request_quit();
+    return;
+  }
+
   if( isFlagSet(FREQ_LOOP_RUNNING) )
   {
     if( isFlagSet(MAIN_QUIT) )
@@ -3408,6 +3423,8 @@ on_nec2_editor_key_press_event(
       (event->state & GDK_CONTROL_MASK) )
   {
     kill_window = main_window;
+    /* Boundary quit intent: MAIN_QUIT is read upstream by Nec2_Edit_Save and the
+     * confirm-dialog re-prompt; xnec2c_request_quit sets it again unconditionally. */
     SetFlag( MAIN_QUIT );
 
     /* Prompt user to save NEC2 data */
@@ -3420,7 +3437,7 @@ on_nec2_editor_key_press_event(
     /* Quit without confirmation dialog */
     if( !rc_config.confirm_quit )
     {
-      Gtk_Widget_Destroy( &main_window );
+      xnec2c_request_quit();
       return( TRUE );
     }
 
@@ -3843,7 +3860,7 @@ on_error_quitbutton_clicked(
     gpointer         user_data)
 {
   Gtk_Widget_Destroy( &error_dialog );
-  Gtk_Widget_Destroy( &main_window );
+  xnec2c_request_quit();
 }
 
 

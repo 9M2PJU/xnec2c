@@ -68,6 +68,11 @@ typedef struct
 	double           best_snap_fitness;           /**< Fitness of snapshot */
 	GMutex           best_lock;                  /**< Guards best_meas/freq */
 	gboolean         has_best_meas;              /**< TRUE after first best */
+
+	/* Generic completion notifier fired on the main thread via g_idle_add_once
+	 * after the worker clears running; set once at opt_start, immutable
+	 * thereafter, carries no quit meaning. */
+	GSourceOnceFunc  on_complete;
 } opt_session_t;
 
 /**
@@ -80,13 +85,15 @@ typedef struct
  * @max_iter: maximum iterations per pass
  * @stagnant_count: stagnation iteration limit (0 = off)
  * @stagnant_tol: stagnation tolerance
+ * @on_complete: generic finished notifier fired on the main thread at worker exit
  *
  * Returns 0 on success, -1 if already running.
  */
 int opt_start(simple_var_t *vars, int num_vars,
 	const fitness_config_t *fitness_cfg,
 	enum optimizer_algo algo, const opt_algo_params_t *algo_params,
-	int max_iter, int stagnant_count, double stagnant_tol);
+	int max_iter, int stagnant_count, double stagnant_tol,
+	GSourceOnceFunc on_complete);
 
 /**
  * opt_cancel - request early termination of running optimizer

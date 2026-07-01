@@ -19,6 +19,7 @@ xnec2c_SOURCES = \
     callbacks.c     callbacks.h \
     console.c       console.h \
     callback_func.c callback_func.h \
+    quit.c \
     calculations.c  calculations.h \
     cmnd_edit.c     cmnd_edit.h \
     geom_edit.c     geom_edit.h \

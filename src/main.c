@@ -618,7 +618,7 @@ main (int argc, char *argv[])
   gtk_main ();
 
   /* Release every mem-tracked owner by name, then emit the report. */
-  xnec2c_cleanup();
+  parent_cleanup();
 
   return 0;
 } // main()

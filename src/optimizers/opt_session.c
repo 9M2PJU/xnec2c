@@ -135,7 +135,15 @@ static void *opt_thread_func(void *arg)
 
 	nec2_eval_cleanup();
 	ClearFlag(SUPPRESS_INTERMEDIATE_REDRAWS);
+
+	/* Clear running under best_lock for snapshot consistency, then fire the
+	 * immutable completion notifier set at opt_start.  No lock guards
+	 * on_complete: it never changes after the worker was created. */
+	g_mutex_lock(&session->best_lock);
 	session->running = FALSE;
+	g_mutex_unlock(&session->best_lock);
+
+	g_idle_add_once(session->on_complete, NULL);
 
 	return NULL;
 }
@@ -175,7 +183,8 @@ static void opt_session_free(void)
 int opt_start(simple_var_t *vars, int num_vars,
 	const fitness_config_t *fitness_cfg,
 	enum optimizer_algo algo, const opt_algo_params_t *algo_params,
-	int max_iter, int stagnant_count, double stagnant_tol)
+	int max_iter, int stagnant_count, double stagnant_tol,
+	GSourceOnceFunc on_complete)
 {
 	opt_session_t *session = NULL;
 	int ret;
@@ -186,6 +195,14 @@ int opt_start(simple_var_t *vars, int num_vars,
 		return -1;
 	}
 
+	/* The worker fires on_complete unconditionally at exit; a NULL notifier
+	 * would crash the worker thread inside g_idle_add_once. */
+	if (on_complete == NULL)
+	{
+		BUG("opt_start: on_complete notifier is NULL\n");
+		return -1;
+	}
+
 	/* Free previous session */
 	opt_session_free();
 
@@ -193,6 +210,7 @@ int opt_start(simple_var_t *vars, int num_vars,
 	g_mutex_init(&session->best_lock);
 	fitness_config_copy(&session->fitness_cfg, fitness_cfg);
 	session->running = TRUE;
+	session->on_complete = on_complete;
 	session->best_fitness = INFINITY;
 	session->best_snap_fitness = INFINITY;
 

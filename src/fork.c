@@ -153,16 +153,35 @@ close_child_command_pipes( void )
 
 /*------------------------------------------------------------------------*/
 
+/* child_exit()
+ *
+ * Single child cleanup chokepoint.  Releases the child's mem-tracked owners
+ * and emits the report through child_cleanup(), then exits.  Reached from
+ * pipe_fail_exit() when the parent closes the command pipe (EOF) or on any
+ * pipe error.
+ */
+static void child_exit( void ) __attribute__ ((noreturn));
+  static void
+child_exit( void )
+{
+  child_cleanup();
+  _exit( 0 );
+
+} /* child_exit() */
+
+/*------------------------------------------------------------------------*/
+
 /* pipe_fail_exit()
  *
  * Pipe teardown chokepoint.  In the forked child a broken pipe means the
- * parent is gone; the parent reaches this only on an unrecoverable transfer
- * error.  Child-side engine teardown is a stub left for a later change; both
- * processes exit directly.
+ * parent is gone, so route through child_exit() to release the child's owners;
+ * the parent reaches this only on an unrecoverable transfer error and exits
+ * directly.
  */
   static void
 pipe_fail_exit( void )
 {
+  if( CHILD ) child_exit();
   _exit( 0 );
 
 } /* pipe_fail_exit() */
@@ -198,6 +217,12 @@ Read_Pipe( int idx, char *str, ssize_t len, gboolean err )
   } while (retval == -1 && errno == EINTR);
   
   retval = read_exact( pipefd, str, (size_t)len );
+
+  /* A zero-length read in the child is the parent closing the command pipe at
+   * teardown: EOF is the graceful-quit signal, not a transfer error.  Route to
+   * child_exit() without reporting a short read.  The parent keeps the error
+   * path below so a child that dies mid-run still surfaces. */
+  if( CHILD && retval == 0 ) child_exit();
 
   if( (retval == -1) || ((retval != len) && err ) )
   {

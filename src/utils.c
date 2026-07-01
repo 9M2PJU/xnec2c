@@ -209,7 +209,10 @@ Stop( int err, const char *format, ... )
     SetFlag(FREQ_LOOP_STOP);
     if (!locked)
       Stop_Frequency_Loop();
-    gtk_main_quit();
+    /* Marshal the completion primitive onto the main thread; runs on the
+     * worker thread, so it must not enter the coordinator (see
+     * src/quit.c banner). */
+    g_idle_add_once_sync((GSourceOnceFunc)xnec2c_quit, NULL);
     return( err );
   }
 

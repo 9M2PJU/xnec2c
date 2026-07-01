@@ -916,83 +916,16 @@ Nec2_Apply_Checkbutton( void )
 
 /*-----------------------------------------------------------------------*/
 
-/* Gtk_Quit()
+/* engine_buffers_free()
  *
- * Quits gtk main
+ * Frees every mem-tracked owner shared by parent and child: engine data and
+ * scratch buffers, the symbol table, child_procs (inherited across fork), and
+ * the locale, then emits the report.  Both cleanup paths end here.
  */
-  void
-Gtk_Quit( void )
+  static void
+engine_buffers_free( void )
 {
-  int i, k;
-
-  Close_File( &input_fp );
-  SetFlag( MAIN_QUIT );
-
-  /* Kill child processes */
-  if( FORKED && !CHILD )
-    while( num_child_procs )
-    {
-      num_child_procs--;
-      kill( child_procs[num_child_procs]->pid, SIGKILL );
-    }
-
-  /* Kill possibly nested loops */
-  k = (int)gtk_main_level();
-  for( i = 0; i < k; i++ )
-    gtk_main_quit();
-
-} /* Gtk_Quit() */
-
-/*-----------------------------------------------------------------------*/
-
-/* main_windows_destroy()
- *
- * Destroys every top-level window, the SY overrides window included, to
- * halt drawing and run each window's destroy chain before engine and view
- * data are freed.  The SY window's chain frees its renderer.
- */
-  void
-main_windows_destroy( void )
-{
-  Gtk_Widget_Destroy( &sy_overrides_window );
-  Gtk_Widget_Destroy( &nec2_edit_window );
-  Gtk_Widget_Destroy( &freqplots_window );
-  Gtk_Widget_Destroy( &rdpattern_window );
-  Gtk_Widget_Destroy( &main_window );
-
-} /* main_windows_destroy() */
-
-/*-----------------------------------------------------------------------*/
-
-/* xnec2c_cleanup()
- *
- * Frees every mem-tracked owner in reverse read-order, then emits the report.
- * Run once after gtk_main() returns and at the forked child's exit.  The event
- * loop has stopped, so destroying the windows below is the only remaining path
- * that reads engine data.  Free each structure only after every reader is gone.
- */
-  void
-xnec2c_cleanup( void )
-{
-  /* Stop the optimizer worker and free its session before any structure it
-   * reads is torn down: opt_cancel signals the thread; the join confirms exit. */
-  opt_shutdown();
-
-  /* Destroy every top-level window to halt drawing and run each destroy chain;
-   * the SY window's chain frees its renderer. */
-  main_windows_destroy();
-
-  /* Free the views and prerendered colors that no widget can reach now. */
-  view_free( &structure_view );
-  view_free( &rdpattern_view );
-  prerender_state_free();
-  free_struct_colors();
-
-  /* Free the frequency-plot views before the freq_loop_data array their
-   * entries point into. */
-  freqplots_cleanup();
-
-  /* Free the engine data buffers, then the freq_loop_data array. */
+  /* Free the engine data buffers owned by parent and child alike. */
   input_data_free();
   geometry_data_free();
   ggrid_free();
@@ -1007,19 +940,70 @@ xnec2c_cleanup( void )
   calc_scratch_free();
   gnuplot_data_free();
 
-  /* Free the symbol table now that the worker and renderer have stopped
-   * reading it. */
+  /* Free the symbol table now that every reader has stopped. */
   sy_cleanup();
 
-  /* Free the per-process singletons. */
+  /* child_procs is inherited across fork(); both processes free their copy. */
   child_procs_free();
+
   mem_free( &orig_numeric_locale );
 
   /* Emit the report now; an empty registry makes any survivor an ownership bug. */
   if( rc_config.mem_report_enabled )
-    mem_report("xnec2c_cleanup");
+    mem_report("exit");
 
-} /* xnec2c_cleanup() */
+} /* engine_buffers_free() */
+
+/*-----------------------------------------------------------------------*/
+
+/* parent_cleanup()
+ *
+ * Parent teardown, run once after gtk_main() returns.  Stops both optimizers
+ * and tears down the windows, views, and frequency-plot state the child never
+ * builds, then frees the shared engine buffers.
+ */
+  void
+parent_cleanup( void )
+{
+  /* Stop both optimizers before any structure they read is torn down:
+   * opt_shutdown cancels and joins the built-in simplex/PSO worker;
+   * optimizer_output_stop signals the external inotify watcher's run flag
+   * and joins it. */
+  opt_shutdown();
+  optimizer_output_stop();
+
+  /* Destroy every top-level window to halt drawing and run each destroy
+   * chain; the SY window's chain frees its renderer. */
+  main_windows_destroy();
+
+  /* Free the views and prerendered colors that no widget can reach now. */
+  view_free( &structure_view );
+  view_free( &rdpattern_view );
+  prerender_state_free();
+  free_struct_colors();
+
+  /* Free the frequency-plot views before the freq_loop_data array their
+   * entries point into. */
+  freqplots_cleanup();
+
+  engine_buffers_free();
+
+} /* parent_cleanup() */
+
+/*-----------------------------------------------------------------------*/
+
+/* child_cleanup()
+ *
+ * Forked-child teardown, run from child_exit() on command-pipe EOF.  The child
+ * builds no windows, views, or optimizers, so it frees only the shared engine
+ * buffers and emits its report.
+ */
+  void
+child_cleanup( void )
+{
+  engine_buffers_free();
+
+} /* child_cleanup() */
 
 /*-----------------------------------------------------------------------*/
 

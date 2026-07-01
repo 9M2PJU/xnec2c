@@ -1280,8 +1280,12 @@ gboolean Nec2_Apply_Checkbutton(void);
 void Gtk_Quit(void);
 /* Exit-cleanup orchestration: named by-owner teardown invoked once after the
  * event loop stops, before mem_report. */
-void xnec2c_cleanup(void);
+void parent_cleanup(void);
+void child_cleanup(void);
 void main_windows_destroy(void);
+void xnec2c_request_quit(void);
+void xnec2c_quit(gpointer user_data);
+gboolean xnec2c_quit_if_pending(void);
 void input_data_free(void);
 void geometry_data_free(void);
 void ggrid_free(void);

@@ -1379,7 +1379,10 @@ void *Frequency_Loop_Thread(void *p)
 	// Exit if in batch mode
 	if (rc_config.batch_mode)
 	{
-		g_idle_add_once_sync((GSourceOnceFunc)Gtk_Quit, NULL);
+		/* Batch teardown converges on the shared completion primitive; runs on
+		 * the loop thread, so it must not enter the coordinator (see
+		 * src/quit.c banner). */
+		g_idle_add_once_sync((GSourceOnceFunc)xnec2c_quit, NULL);
 		goto out;
 	}
 

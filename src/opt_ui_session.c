@@ -18,19 +18,42 @@
 
 static void pso_auto_populate_particles(int num_vars);
 
+/* Display-only status timer source; its latency never gates exit. */
+static guint opt_status_source = 0;
+
 /**
- * check_opt_complete - periodic check if optimizer has finished
+ * opt_status_tick - periodic status-display refresh while the optimizer runs
  */
-static gboolean check_opt_complete(gpointer user_data)
+static gboolean opt_status_tick(gpointer user_data)
 {
 	(void)user_data;
 
-	/* Update status display while running */
 	opt_ui_update_status();
 
-	if (opt_is_running())
+	return G_SOURCE_CONTINUE;
+}
+
+/**
+ * opt_finished - optimizer completion handler, the on_complete event
+ *
+ * Registered with opt_start and fired on the main thread when the worker
+ * exits.  Resolves a pending quit first (see src/quit.c banner); on a
+ * normal finish it restores the UI and applies results.
+ */
+static void opt_finished(gpointer _u)
+{
+	(void)_u;
+
+	/* Stop the display-only status timer; exit never gated on its latency. */
+	if (opt_status_source != 0)
 	{
-		return G_SOURCE_CONTINUE;
+		g_source_remove(opt_status_source);
+		opt_status_source = 0;
+	}
+
+	if (xnec2c_quit_if_pending())
+	{
+		return;
 	}
 
 	/* Optimization finished: update UI */
@@ -75,8 +98,6 @@ static gboolean check_opt_complete(gpointer user_data)
 
 	pr_notice("opt_ui: optimization finished, best fitness: %.6g\n",
 		opt_get_best_fitness());
-
-	return G_SOURCE_REMOVE;
 }
 
 /*------------------------------------------------------------------------*/
@@ -249,7 +270,7 @@ void on_opt_start_clicked(GtkButton *button, gpointer user_data)
 
 	/* Launch optimizer */
 	ret = opt_start(vars, num_vars, &fit_cfg, algo, &algo_params,
-		max_iter, stagnant_count, stagnant_tol);
+		max_iter, stagnant_count, stagnant_tol, opt_finished);
 
 	/* vars deep-copied by simple_new inside opt_start; free original */
 	sy_overrides_free_opt_vars(vars, num_vars);
@@ -269,8 +290,9 @@ void on_opt_start_clicked(GtkButton *button, gpointer user_data)
 			gtk_label_set_text(GTK_LABEL(status_label), "Starting...");
 		}
 
-		/* Poll for progress and completion */
-		g_timeout_add(500, check_opt_complete, NULL);
+		/* Refresh status display while running; completion is delivered by
+		 * opt_finished via the on_complete event, not by this timer. */
+		opt_status_source = g_timeout_add(500, opt_status_tick, NULL);
 	}
 	else
 	{
