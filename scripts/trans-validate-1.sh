@@ -76,7 +76,7 @@ This prevents over-correction while maintaining technical accuracy.
 
 Axis names like X/Y/Z must be uppercase unless the native language convention is different
 
-GTK hotkeys use preceding underscores. Prevent duplicates in the same UI by shifting the underscore to another letter. Example: Avoid Spanish Cancel/Close colliding as _Cancelar and _Cerrar by using (eg) _Cancelar and C_errar instead.Choose the most appropriate hotkey letter based on language expectations. 
+GTK hotkeys use preceding underscores. Prevent duplicates in the same UI by shifting the underscore to another letter. Example: Avoid Spanish Cancel/Close colliding as _Cancelar and _Cerrar by using (eg) _Cancelar and C_errar instead.Choose the most appropriate hotkey letter based on language expectations. The chosen letter prefixed by the underscore must be genuinely typable by a common keyboard in that locale. 
 
 # Procedure
 
@@ -94,7 +94,7 @@ Your responses to each evaluation section must not duplicate any meaning from an
 ## Phase 2: inspection
 
 1. Read approximately 30 lines around the next scoped entry's line number using offset/limit
-2. Translate scoped entries within this region: for each untranslated entry (empty msgstr), write the translation. For each fuzzy entry, evaluate the existing translation against the changed msgid, correct it, and remove the fuzzy marker (#, fuzzy line AND the comma-fuzzy within any flags line). Verify format specifiers (%s, %d, %f, %c, %%) are preserved in identical order.
+2. Translate scoped entries within this region: for each untranslated entry (empty msgstr), write the translation. For each fuzzy entry, evaluate the existing translation against the changed msgid, correct it, and remove the fuzzy marker (#, fuzzy line AND the comma-fuzzy within any flags line). Verify format specifiers (%s, %d, %f, %c, %%) are preserved in identical order, or proper language grammar order using (eg) `%2$s ... %1$s` as appropriate. 
 3. Verify that all translations map onto the enumerated lists you provided in Phase 1: 1.1-1.4
 4. Validate #2 and #3 again: does it follow all best practices considering computer user interface requirements for this particular language ($l)? This is critically important to avoid potential insult.
 5. List priorities, in order:

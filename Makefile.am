@@ -361,7 +361,9 @@ nobase_dist_pkgdata_DATA += examples/data/satellite.csv
 # committed reference data under examples/data/*.csv stays in the list.
 CLEANFILES += examples-automake.lst
 CLEANFILES += examples-srcdir.lst
-check-local: check-examples-file-list
+check-local: check-examples-file-list check-potfiles-list
+check-potfiles-list:
+	@$(srcdir)/scripts/trans-update.sh --check
 check-examples-file-list:
 	@for f in $(nobase_dist_pkgdata_DATA); do echo "$$f"; done | sort > examples-automake.lst
 	@(cd $(srcdir) && find examples -type f -not -name '*.sy' -not -name '*.SY' -not \( -path 'examples/*.csv' ! -path 'examples/*/*.csv' \)) | sort > examples-srcdir.lst
