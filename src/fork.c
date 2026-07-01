@@ -128,6 +128,31 @@ int read_exact(int fd, char *buf, int size)
 }
 
 
+/* close_child_command_pipes()
+ *
+ * Closes every forked child's command pipe so each wakes on EOF and routes
+ * through pipe_fail_exit() -> child_exit(); a child mid-write drains in
+ * child_procs_free() before it is reaped.  Only close() and integer work runs
+ * here, so a signal handler may call it directly; the SIGKILL that teardown
+ * would otherwise force denies each child its report.  A no-op in a child or
+ * when unforked.
+ */
+  void
+close_child_command_pipes( void )
+{
+  if( !FORKED || CHILD )
+    return;
+
+  while( num_child_procs )
+  {
+    num_child_procs--;
+    close( child_procs[num_child_procs]->to_child[WRITE] );
+  }
+
+} /* close_child_command_pipes() */
+
+/*------------------------------------------------------------------------*/
+
 /* pipe_fail_exit()
  *
  * Pipe teardown chokepoint.  In the forked child a broken pipe means the

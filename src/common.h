@@ -1294,6 +1294,7 @@ void somnec_data_free(void);
 void ground_data_free(void);
 void gnuplot_data_free(void);
 void child_procs_free(void);
+void close_child_command_pipes(void);
 void freqplots_cleanup(void);
 void Nf_Peak_Vector(double exm, double eym, double ezm, double fx, double fy, double fz, double *rx, double *ry, double *rz, double *r);
 void Recompute_Near_Field_Vectors(int fstep, gboolean snapshot);
