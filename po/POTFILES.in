@@ -20,6 +20,7 @@ src/calculations.c
 src/calculations.h
 src/callback_func.c
 src/callback_func.h
+src/branch_hints.h
 src/callbacks.c
 src/callbacks.h
 src/cmnd_edit.c
@@ -34,6 +35,8 @@ src/fields.c
 src/fields.h
 src/fork.c
 src/fork.h
+src/gdk_scroll.c
+src/gdk_scroll.h
 src/geom_edit.c
 src/geom_edit.h
 src/geometry.c
@@ -47,6 +50,7 @@ src/input.c
 src/input.h
 src/interface.c
 src/interface.h
+src/location.h
 src/main.c
 src/main.h
 src/mathlib.c
@@ -146,6 +150,12 @@ src/freqplots/graphs/anttemp_graph.c
 src/freqplots/freqplots_xy.c
 src/freqplots/freqplots_scale.c
 src/freqplots/freqplots_input.c
+src/freqplots/freqplots_internal.h
+src/freqplots/freqplots_locus.c
+src/freqplots/freqplots_locus.h
+src/freqplots/freqplots_render.c
+src/freqplots/freqplots_render.h
+src/freqplots/freqplots_theme_menu.c
 src/plot_freqdata.h
 src/prerender/prerender_aggregate.c
 src/prerender/prerender_aggregate.h
@@ -195,6 +205,8 @@ src/sy_expr.c
 src/sy_expr.h
 src/sy_overrides.c
 src/sy_overrides.h
+src/themes/theme.c
+src/themes/theme.h
 src/utils.c
 src/utils.h
 src/view/view_angles.c
