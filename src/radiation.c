@@ -49,6 +49,47 @@
 
 /*-----------------------------------------------------------------------*/
 
+/* Nearest theta grid cell for an angle in degrees. */
+  int
+fpat_theta_cell( double theta_deg )
+{
+  if( fpat.dth == 0.0 )
+    return 0;
+
+  int j = (int)( (theta_deg - fpat.thets) / fpat.dth + 0.5 );
+  if( j < 0 )
+    return 0;
+  if( j >= fpat.nth )
+    return fpat.nth - 1;
+  return j;
+
+} /* fpat_theta_cell() */
+
+/*-----------------------------------------------------------------------*/
+
+/* Nearest phi grid cell for an angle in degrees. */
+  int
+fpat_phi_cell( double phi_deg )
+{
+  if( fpat.dph == 0.0 )
+    return 0;
+
+  /* normalize azimuth into [0,360) so phi_m+180 and negatives resolve */
+  phi_deg = fmod( phi_deg, 360.0 );
+  if( phi_deg < 0.0 )
+    phi_deg += 360.0;
+
+  int k = (int)( (phi_deg - fpat.phis) / fpat.dph + 0.5 );
+  if( k < 0 )
+    return 0;
+  if( k >= fpat.nph )
+    return fpat.nph - 1;
+  return k;
+
+} /* fpat_phi_cell() */
+
+/*-----------------------------------------------------------------------*/
+
 /* calculates the xyz components of the electric */
 /* field due to surface currents */
 static void

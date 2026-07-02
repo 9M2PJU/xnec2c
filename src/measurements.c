@@ -557,7 +557,6 @@ static void _meas_calc(measurement_t *m, int idx)
 
 	double complex cs11 = 20*clog10( cgamma );
 
-	double fbdir;
 	int fbidx, nth, nph;
 
 	// Start with invalidated values (-1) in case something cannot be
@@ -727,55 +726,30 @@ static void _meas_calc(measurement_t *m, int idx)
 		}
 	}
 
-	// Find F/B direction in theta
-	fbdir = 180.0 - rad_pattern[idx].max_gain_tht[pol];
-	if (fpat.dth == 0.0)
-		nth = 0;
-	else
-		nth = (int) (fbdir / fpat.dth + 0.5);
-
-	/* If the antenna is modelled over ground, then use the same
-	   theta as the max gain direction, relying on phi alone to take
-	   us to the back. Patch supplied by Rik van Riel AB1KW */
-	if ((nth >= fpat.nth) || (nth < 0))
+	/* Back direction: antipode in free space; over a ground plane the antipode
+	   elevation is below the sampled horizon, so keep the max-gain elevation and
+	   swing azimuth by 180 (rear lobe at the same take-off angle). */
+	if (fpat.nph < 2)
 	{
-		fbdir = rad_pattern[idx].max_gain_tht[pol];
-		if (fpat.dth == 0.0)
-			nth = 0;
-		else
-			nth = (int) (fbdir / fpat.dth + 0.5);
-
-		// Validate nth after over-ground recalculation
-		if (nth < 0 || nth >= fpat.nth)
-		{
-			BUG("BUG: F/B nth=%d out of [0,%d) after over-ground recalc: "
-				"idx=%d pol=%d max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n",
-				nth, fpat.nth, idx, pol,
-				rad_pattern[idx].max_gain_tht[pol], fbdir, fpat.dth);
-			m->fb_ratio = -1;
-			return;
-		}
-	}
-
-	// Find F/B direction in phi
-	fbdir = m->gain_max_phi + 180.0;
-	if (fbdir >= 360.0)
-		fbdir -= 360.0;
-	nph = (int) (fbdir / fpat.dph + 0.5);
-
-	// No F/B calc. possible if no phi step at +180 from max gain
-	if ((nph >= fpat.nph) || (nph < 0))
-	{
+		// no distinct rear azimuth is sampled
 		m->fb_ratio = -1;
 	}
 	else
 	{
-		// Index to gtot buffer for gain in back direction
+		gboolean over_ground = (gnd.ksymp == 2) && (gnd.ifar != 1);
+		double back_tht;
+		if (over_ground)
+			back_tht = rad_pattern[idx].max_gain_tht[pol];
+		else
+			back_tht = 180.0 - rad_pattern[idx].max_gain_tht[pol];
+
+		nth = fpat_theta_cell(back_tht);
+		nph = fpat_phi_cell(m->gain_max_phi + 180.0);
 		fbidx = nth + nph * fpat.nth;
 
-		// Front to back ratio 
 		m->fb_ratio = pow(10.0, m->gain_max / 10.0);
-		m->fb_ratio /= pow(10.0, (rad_pattern[idx].gtot[fbidx] + Polarization_Factor(pol, idx, fbidx)) / 10.0);
+		m->fb_ratio /= pow(10.0, (rad_pattern[idx].gtot[fbidx]
+						+ Polarization_Factor(pol, idx, fbidx)) / 10.0);
 		m->fb_ratio = 10.0 * log10(m->fb_ratio);
 	}
 

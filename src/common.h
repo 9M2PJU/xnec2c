@@ -805,6 +805,14 @@ typedef struct
 
 } fpat_t;
 
+/* Nearest theta grid cell for an angle in degrees. No azimuth wrap.
+   dth == 0 selects the single sample, cell 0. Rounds, clamps to [0, nth). */
+int fpat_theta_cell(double theta_deg);
+
+/* Nearest phi grid cell for an angle in degrees. Normalizes into [0,360) first.
+   dph == 0 selects the single sample, cell 0. Rounds, clamps to [0, nph). */
+int fpat_phi_cell(double phi_deg);
+
 /*common  /ggrid/ */
 typedef struct
 {

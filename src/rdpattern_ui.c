@@ -896,30 +896,14 @@ Viewer_Gain( view_t *v, int fstep )
   if( isnan(phi) )
     phi = 0.0;
 
-  /* Calculate theta step from proj params */
-  if( fpat.dth == 0.0 ) nth = 0;
-  else
-  {
-    if( (gnd.ksymp == 2) &&
-        (theta > 90.01)  &&
-        (gnd.ifar != 1) )
-      return( -999.99 );
+  /* Ground-plane occlusion on the resolved direction */
+  if( (gnd.ksymp == 2) &&
+      (theta > 90.01)  &&
+      (gnd.ifar != 1) )
+    return( -999.99 );
 
-    nth = (int)( (theta - fpat.thets) / fpat.dth + 0.5 );
-    if( (nth >= fpat.nth) || (nth < 0) )
-      nth = fpat.nth-1;
-  }
-
-  /* Calculate phi step from proj params */
-  if( fpat.dph == 0.0 ) nph = 0;
-  else
-  {
-    while( phi < 0.0 ) phi += 360.0;
-    nph = (int)( (phi - fpat.phis) / fpat.dph + 0.5 );
-    if( (nph >= fpat.nph) || (nph < 0) )
-      nph = fpat.nph-1;
-  }
-
+  nth = fpat_theta_cell( theta );
+  nph = fpat_phi_cell( phi );
   idx = nth + nph * fpat.nth;
   gain = rad_pattern[fstep].gtot[idx] +
     Polarization_Factor(calc_data.pol_type, fstep, idx);
@@ -1265,26 +1249,8 @@ Viewer_Noise_Value(view_t *v, int fstep)
 		return 0.0;
 
 	/* Snap to pattern grid */
-	if (fpat.dth == 0.0)
-		nth = 0;
-	else
-	{
-		nth = (int)((theta_deg - fpat.thets) / fpat.dth + 0.5);
-		if (nth >= fpat.nth || nth < 0)
-			nth = fpat.nth - 1;
-	}
-
-	if (fpat.dph == 0.0)
-		nph = 0;
-	else
-	{
-		while (phi_deg < 0.0)
-			phi_deg += 360.0;
-		nph = (int)((phi_deg - fpat.phis) / fpat.dph + 0.5);
-		if (nph >= fpat.nph || nph < 0)
-			nph = fpat.nph - 1;
-	}
-
+	nth = fpat_theta_cell(theta_deg);
+	nph = fpat_phi_cell(phi_deg);
 	idx = nth + nph * fpat.nth;
 	double gain = rad_pattern[fstep].gtot[idx]
 		+ Polarization_Factor(pol, fstep, idx);
