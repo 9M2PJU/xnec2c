@@ -28,7 +28,6 @@
 #include "opengl/opengl_structure.h"
 #include "opengl/opengl_msaa.h"
 #include "settings/render_settings.h"
-#include "settings/render_settings_common.h"
 
 
 /* Add configuration options here. To add new variables:
@@ -37,6 +36,8 @@
  *    Create references to the .vars structure to load/save values
  */
 
+static void working_dir_set_default(rc_config_vars_t *v);
+
 rc_config_vars_t rc_config_vars[] = {
 	// Historical typo "Vesrsion", but it cannot changed for backwards
 	// compatibility because we parse the comment:
@@ -44,13 +45,16 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { PACKAGE_STRING } },
 
 	{ .desc = "Current Working Directory", .format = "%s",
-		.vars = { rc_config.working_dir }, .size = FILENAME_LEN },
+		.vars = { rc_config.working_dir }, .size = FILENAME_LEN,
+		.set_default = working_dir_set_default },
 
 	{ .desc = "Main Window Size, in pixels", .format = "%d,%d",
-		.vars = { &rc_config.main_width, &rc_config.main_height } },
+		.vars = { &rc_config.main_width, &rc_config.main_height },
+		.def = { { .i = 600 }, { .i = 400 } } },
 
 	{ .desc = "Main Window Position (root x and y)", .format = "%d,%d",
-		.vars = { &rc_config.main_x, &rc_config.main_y } },
+		.vars = { &rc_config.main_x, &rc_config.main_y },
+		.def = { { .i = 50 }, { .i = 50 } } },
 
 	{ .desc = "Main Window Currents toggle button state", .format = "%d",
 		.vars = { &rc_config.main_currents_togglebutton } },
@@ -74,57 +78,59 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.main_left_hand } },
 
 	{ .desc = "Main Window Frequency loop start state", .format = "%d",
-		.vars = { &rc_config.main_loop_start },
+		.vars = { &rc_config.main_loop_start }, .def = { { .i = 1 } },
 		.builder_window = &main_window_builder,
 		.builder_check_menu_item_id = "config_main_loop_start"
 		},
 
 	{ .desc = "Main Window Rotate spinbutton state", .format = "%d",
-		.vars = { &rc_config.main_rotate_spinbutton } },
+		.vars = { &rc_config.main_rotate_spinbutton }, .def = { { .i = 45 } } },
 
 	{ .desc = "Main Window Incline spinbutton state", .format = "%d",
-		.vars = { &rc_config.main_incline_spinbutton } },
+		.vars = { &rc_config.main_incline_spinbutton }, .def = { { .i = 45 } } },
 
 	{ .desc = "Main Window Zoom spinbutton state", .format = "%d",
-		.vars = { &rc_config.main_zoom_spinbutton } },
+		.vars = { &rc_config.main_zoom_spinbutton }, .def = { { .i = 100 } } },
 
 	{ .desc = "Radiation Pattern Window Size, in pixels", .format = "%d,%d",
 		.vars = { &rc_config.rdpattern_width, &rc_config.rdpattern_height } },
 
 	{ .desc = "Radiation Pattern Window Position (root x and y)", .format = "%d,%d",
-		.vars = { &rc_config.rdpattern_x, &rc_config.rdpattern_y } },
+		.vars = { &rc_config.rdpattern_x, &rc_config.rdpattern_y },
+		.def = { { .i = -1 }, { .i = -1 } } },
 
 	{ .desc = "Radiation Pattern Window Gain toggle button state", .format = "%d",
-		.vars = { &rc_config.rdpattern_gain_togglebutton } },
+		.vars = { &rc_config.rdpattern_gain_togglebutton }, .def = { { .i = 1 } } },
 
 	{ .desc = "Radiation Pattern Window EH toggle button state", .format = "%d",
 		.vars = { &rc_config.rdpattern_eh_togglebutton } },
 
 	{ .desc = "Radiation Pattern Window Menu E-field state", .format = "%d",
-		.vars = { &rc_config.rdpattern_e_field } },
+		.vars = { &rc_config.rdpattern_e_field }, .def = { { .i = 1 } } },
 
 	{ .desc = "Radiation Pattern Window Menu H-field state", .format = "%d",
-		.vars = { &rc_config.rdpattern_h_field } },
+		.vars = { &rc_config.rdpattern_h_field }, .def = { { .i = 1 } } },
 
 	{ .desc = "Radiation Pattern Window Menu Poynting vector state", .format = "%d",
 		.vars = { &rc_config.rdpattern_poynting_vector } },
 
 	{ .desc = "Radiation Pattern Window Gradient Key", .format = "%d",
-		.vars = { &rc_config.rdpattern_gradient_key },
+		.vars = { &rc_config.rdpattern_gradient_key }, .def = { { .i = 1 } },
 		.builder_window = &rdpattern_window_builder,
 		.builder_check_menu_item_id = "rdpattern_gradient_key" },
 
 	{ .desc = "Radiation Pattern Window Zoom spinbutton state", .format = "%d",
-		.vars = { &rc_config.rdpattern_zoom_spinbutton } },
+		.vars = { &rc_config.rdpattern_zoom_spinbutton }, .def = { { .i = 100 } } },
 
 	{ .desc = "Use OpenGL Renderer for Radiation Patterns", .format = "%d",
-		.vars = { &rc_config.use_opengl_renderer } },
+		.vars = { &rc_config.use_opengl_renderer },
+		.def = { { .i = RENDERER_RESET_DEFAULT } } },
 
 	{ .desc = "Use Constrained View Drag Rotation", .format = "%d",
-		.vars = { &rc_config.view_drag_constrained } },
+		.vars = { &rc_config.view_drag_constrained }, .def = { { .i = 1 } } },
 
 	{ .desc = "Main Window Common Projection", .format = "%d",
-		.vars = { &rc_config.main_common_projection },
+		.vars = { &rc_config.main_common_projection }, .def = { { .i = 1 } },
 		.builder_window = &main_window_builder,
 		.builder_check_menu_item_id = "main_common_projection" },
 
@@ -139,76 +145,80 @@ rc_config_vars_t rc_config_vars[] = {
 		.builder_check_menu_item_id = "rdpattern_overlay_structure" },
 
 	{ .desc = "Radiation Pattern Draw Style", .format = "%d",
-		.vars = { &rc_config.rdpattern_draw_style } },
+		.vars = { &rc_config.rdpattern_draw_style },
+		.def = { { .i = RDPAT_STYLE_BOTH } } },
 
 	{ .desc = "OpenGL Transparent on Click", .format = "%d",
-		.vars = { &rc_config.opengl_transparent_on_click } },
+		.vars = { &rc_config.opengl_transparent_on_click }, .def = { { .i = 1 } } },
 
 	{ .desc = "OpenGL Orthographic Projection", .format = "%d",
-		.vars = { &rc_config.opengl_orthographic } },
+		.vars = { &rc_config.opengl_orthographic }, .def = { { .i = 1 } } },
 
 	{ .desc = "OpenGL Anti-Aliasing Samples", .format = "%d",
-		.vars = { &rc_config.opengl_msaa_samples } },
+		.vars = { &rc_config.opengl_msaa_samples }, .def = { { .i = MSAA_4X } } },
 
 	{ .desc = "OpenGL Cylinder Radius Scale", .format = "%lf",
-		.vars = { &rc_config.opengl_cylinder_radius_scale } },
+		.vars = { &rc_config.opengl_cylinder_radius_scale }, .def = { { .d = 1.0 } } },
 
 	{ .desc = "Rdpattern Overlay Scale Adjustment", .format = "%lf",
-		.vars = { &rc_config.rdpattern_overlay_scale_adj } },
+		.vars = { &rc_config.rdpattern_overlay_scale_adj }, .def = { { .d = 1.0 } } },
 
 	{ .desc = "Cairo Anti-Aliasing Mode", .format = "%d",
-		.vars = { &rc_config.cairo_antialias } },
+		.vars = { &rc_config.cairo_antialias },
+		.def = { { .i = CAIRO_ANTIALIAS_DEFAULT } } },
 
 	{ .desc = "Cairo Depth Bins", .format = "%d",
-		.vars = { &rc_config.cairo_depth_bins } },
+		.vars = { &rc_config.cairo_depth_bins }, .def = { { .i = 16 } } },
 
 	{ .desc = "Cairo Color Quantization Levels", .format = "%d",
 		.vars = { &rc_config.cairo_color_quant } },
 
 	{ .desc = "Cairo Line Cap Style", .format = "%d",
-		.vars = { &rc_config.cairo_line_cap } },
+		.vars = { &rc_config.cairo_line_cap },
+		.def = { { .i = CAIRO_LINE_CAP_BUTT } } },
 
 	{ .desc = "Current Flow Visualization Mode", .format = "%d",
-		.vars = { &rc_config.current_flow_visualization_mode } },
+		.vars = { &rc_config.current_flow_visualization_mode },
+		.def = { { .i = FLOW_DIR_REFERENCE_PHASE } } },
 
 	{ .desc = "Brightness Segments", .format = "%f",
-		.vars = { &rc_config.brightness_segments } },
+		.vars = { &rc_config.brightness_segments }, .def = { { .f = 0.47f } } },
 
 	{ .desc = "Brightness Patches", .format = "%f",
-		.vars = { &rc_config.brightness_patches } },
+		.vars = { &rc_config.brightness_patches }, .def = { { .f = 0.47f } } },
 
 	{ .desc = "Brightness Rdpat Surface", .format = "%f",
-		.vars = { &rc_config.brightness_rdpat_surface } },
+		.vars = { &rc_config.brightness_rdpat_surface }, .def = { { .f = 0.47f } } },
 
 	{ .desc = "Brightness Rdpat Wire", .format = "%f",
-		.vars = { &rc_config.brightness_rdpat_wire } },
+		.vars = { &rc_config.brightness_rdpat_wire }, .def = { { .f = 1.0f } } },
 
 	{ .desc = "Brightness Nearfield", .format = "%f",
-		.vars = { &rc_config.brightness_nearfield } },
+		.vars = { &rc_config.brightness_nearfield }, .def = { { .f = 1.0f } } },
 
 	{ .desc = "Brightness Ground Plane", .format = "%f",
-		.vars = { &rc_config.brightness_ground_plane } },
+		.vars = { &rc_config.brightness_ground_plane }, .def = { { .f = 1.0f } } },
 
 	{ .desc = "Brightness Axes", .format = "%f",
-		.vars = { &rc_config.brightness_axes } },
+		.vars = { &rc_config.brightness_axes }, .def = { { .f = 1.0f } } },
 
 	{ .desc = "Transparency Segments", .format = "%f",
-		.vars = { &rc_config.transparency_segments } },
+		.vars = { &rc_config.transparency_segments }, .def = { { .f = 0.5f } } },
 
 	{ .desc = "Transparency Patches", .format = "%f",
-		.vars = { &rc_config.transparency_patches } },
+		.vars = { &rc_config.transparency_patches }, .def = { { .f = 0.5f } } },
 
 	{ .desc = "Transparency Rdpat Surface", .format = "%f",
-		.vars = { &rc_config.transparency_rdpat_surface } },
+		.vars = { &rc_config.transparency_rdpat_surface }, .def = { { .f = 0.5f } } },
 
 	{ .desc = "Transparency Rdpat Wire", .format = "%f",
-		.vars = { &rc_config.transparency_rdpat_wire } },
+		.vars = { &rc_config.transparency_rdpat_wire }, .def = { { .f = 0.5f } } },
 
 	{ .desc = "Transparency Nearfield", .format = "%f",
 		.vars = { &rc_config.transparency_nearfield } },
 
 	{ .desc = "Transparency Ground Plane", .format = "%f",
-		.vars = { &rc_config.transparency_ground_plane } },
+		.vars = { &rc_config.transparency_ground_plane }, .def = { { .f = 0.5f } } },
 
 	{ .desc = "Transparency Axes", .format = "%f",
 		.vars = { &rc_config.transparency_axes } },
@@ -217,10 +227,11 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.freqplots_width, &rc_config.freqplots_height } },
 
 	{ .desc = "Frequency Plots Window Position (root x and y)", .format = "%d,%d",
-		.vars = { &rc_config.freqplots_x, &rc_config.freqplots_y } },
+		.vars = { &rc_config.freqplots_x, &rc_config.freqplots_y },
+		.def = { { .i = -1 }, { .i = -1 } } },
 
 	{ .desc = "Frequency Plots Window Max Gain toggle button state", .format = "%d",
-		.vars = { &rc_config.freqplots_gmax_togglebutton } },
+		.vars = { &rc_config.freqplots_gmax_togglebutton }, .def = { { .i = 1 } } },
 
 	{ .desc = "Frequency Plots Window Gain Direction toggle button state", .format = "%d",
 		.vars = { &rc_config.freqplots_gdir_togglebutton } },
@@ -229,7 +240,7 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.freqplots_gviewer_togglebutton } },
 
 	{ .desc = "Frequency Plots Window VSWR toggle button state", .format = "%d",
-		.vars = { &rc_config.freqplots_vswr_togglebutton } },
+		.vars = { &rc_config.freqplots_vswr_togglebutton }, .def = { { .i = 1 } } },
 
 	{ .desc = "Frequency Plots Window Z-real/Z-imag toggle button state", .format = "%d",
 		.vars = { &rc_config.freqplots_zrlzim_togglebutton } },
@@ -259,7 +270,7 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.nec2_edit_x, &rc_config.nec2_edit_y } },
 
 	{ .desc = "Enable Confirm Quit Dialog", .format = "%d",
-		.vars = { &rc_config.confirm_quit } },
+		.vars = { &rc_config.confirm_quit }, .def = { { .i = 1 } } },
 
 	{ .desc = "Selected Mathlib", .format = "%s",
 		.vars = { rc_config.mathlib_id }, .size = MATHLIB_ID_LEN, .init = mathlib_config_init },
@@ -278,16 +289,16 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.freqplots_s11 } },
 
 	{ .desc = "Frequency Plots Show Clamp VSWR checkbutton state", .format = "%d",
-		.vars = { &rc_config.freqplots_clamp_vswr } },
+		.vars = { &rc_config.freqplots_clamp_vswr }, .def = { { .i = 1 } } },
 
 	{ .desc = "Radiation Plots Gain Style", .format = "%d",
-		.vars = { &rc_config.gain_style } },
+		.vars = { &rc_config.gain_style }, .def = { { .i = GS_LINP } } },
 
 	{ .desc = "Round X Axis", .format = "%d",
 		.vars = { &rc_config.freqplots_round_x_axis } },
 
 	{ .desc = "Frequency Plots Swap Click", .format = "%d",
-		.vars = { &rc_config.freqplots_swap_click } },
+		.vars = { &rc_config.freqplots_swap_click }, .def = { { .i = 1 } } },
 
 	{ .desc = "Optimizer Write CSV", .format = "%d", .batch_mode_skip = TRUE,
 		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_csv",
@@ -321,11 +332,16 @@ rc_config_vars_t rc_config_vars[] = {
 		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_patch_currents",
 		.vars = { &rc_config.opt_write_patch_currents} },
 
+	// The *_is_open values below default to "1" for backward compatiblity.  It
+	// still does not open the window if width/height are undefined so defaults
+	// are consistent.  However, if they are defined but *_is_open is not defined
+	// (ie, <= v4.1.12) then the specified windows will open.  After the first
+	// run the new version will use xnec2c.conf for *_is_open values.
 	{ .desc = "Frequency Plots window is open", .format = "%d",
-		.vars = { &rc_config.freqplots_is_open } },
+		.vars = { &rc_config.freqplots_is_open }, .def = { { .i = 1 } } },
 
 	{ .desc = "Radiation Pattern Window window is open", .format = "%d",
-		.vars = { &rc_config.rdpattern_is_open } },
+		.vars = { &rc_config.rdpattern_is_open }, .def = { { .i = 1 } } },
 
 	{ .desc = "Symbol Overrides Window is open", .format = "%d",
 		.vars = { &rc_config.sy_overrides_is_open } },
@@ -334,28 +350,34 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.sy_overrides_width, &rc_config.sy_overrides_height } },
 
 	{ .desc = "Symbol Overrides Window Position (root x and y)", .format = "%d,%d",
-		.vars = { &rc_config.sy_overrides_x, &rc_config.sy_overrides_y } },
+		.vars = { &rc_config.sy_overrides_x, &rc_config.sy_overrides_y },
+		.def = { { .i = -1 }, { .i = -1 } } },
 
 	{ .desc = "Antenna Temp Sky Model", .format = "%d",
-		.vars = { &rc_config.ant_temp_sky } },
+		.vars = { &rc_config.ant_temp_sky },
+		.def = { { .i = ANT_TEMP_SKY_SYNTH_AVG } } },
 
 	{ .desc = "Antenna Temp Earth Model", .format = "%d",
-		.vars = { &rc_config.ant_temp_earth } },
+		.vars = { &rc_config.ant_temp_earth },
+		.def = { { .i = ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL } } },
 
 	{ .desc = "Antenna Temp Interp Method", .format = "%d",
-		.vars = { &rc_config.ant_temp_interp } },
+		.vars = { &rc_config.ant_temp_interp }, .def = { { .i = ANT_TEMP_INTERP } } },
 
 	{ .desc = "Antenna Temp Elevation (deg, +=up)", .format = "%lf",
 		.vars = { &rc_config.ant_temp_elevation } },
 
 	{ .desc = "Antenna Temp Custom Sky (K)", .format = "%lf",
-		.vars = { &rc_config.ant_temp_custom_t_sky } },
+		.vars = { &rc_config.ant_temp_custom_t_sky },
+		.def = { { .d = ANT_TEMP_CUSTOM_T_SKY_DEFAULT } } },
 
 	{ .desc = "Antenna Temp Custom Earth (K)", .format = "%lf",
-		.vars = { &rc_config.ant_temp_custom_t_earth } },
+		.vars = { &rc_config.ant_temp_custom_t_earth },
+		.def = { { .d = ANT_TEMP_CUSTOM_T_EARTH_DEFAULT } } },
 
 	{ .desc = "Frequency Plots Color Theme", .format = "%s",
-		.vars = { rc_config.freqplots_theme }, .size = sizeof(rc_config.freqplots_theme) },
+		.vars = { rc_config.freqplots_theme }, .size = sizeof(rc_config.freqplots_theme),
+		.def = { { .s = "legacy" } } },
 
 	{ .desc = "Frequency Plots Theme Inverted", .format = "%d",
 		.vars = { &rc_config.freqplots_theme_invert } },
@@ -510,6 +532,111 @@ int fprint_var(FILE *fp, rc_config_vars_t *v)
 }
 
 
+// Compute the working-directory default at reset time: the user's home
+// directory (or the get_conf_dir fallback) with a trailing slash.
+static void working_dir_set_default(rc_config_vars_t *v)
+{
+	char home[PATH_MAX];
+
+	Strlcpy((char*)v->vars[0], get_conf_dir(home, sizeof(home)), v->size);
+	Strlcat((char*)v->vars[0], "/", v->size);
+}
+
+// Return the first config row whose primary variable matches f, or NULL.
+rc_config_vars_t *rc_config_find_by_field(void *f)
+{
+	if (f == NULL)
+		return NULL;
+
+	for (int i = 0; i < num_rc_config_vars; i++)
+		if (rc_config_vars[i].vars[0] == f)
+			return &rc_config_vars[i];
+
+	return NULL;
+}
+
+// Return the compiled-in integer default for the field f.  A missing owner row
+// or non-integer format is a build-time wiring error, so surface it and yield
+// zero; callers clamp a local copy without mutating the stored value.
+int rc_config_default_int(void *f)
+{
+	rc_config_vars_t *v = rc_config_find_by_field(f);
+
+	if (v == NULL || strcmp(v->format, "%d") != 0)
+	{
+		BUG("rc_config_default_int: no integer default for field\n");
+		return 0;
+	}
+
+	return v->def[0].i;
+}
+
+// Reset one config row to its compiled-in default.  The type switch mirrors
+// fprint_var(); the %s branch writes only when a string default is present so
+// init-reactive rows (eg mathlib) keep their loaded value.  A set_default hook
+// computes the default instead (eg the runtime working directory).
+void rc_config_set_default(rc_config_vars_t *v)
+{
+	if (v == NULL)
+		return;
+
+	if (v->set_default != NULL)
+	{
+		v->set_default(v);
+		return;
+	}
+
+	// Skip read-only, custom parse/save, and unbacked rows.
+	if (v->ro || v->parse != NULL || v->save != NULL || v->vars[0] == NULL)
+		return;
+
+	if (strcmp(v->format, "%d") == 0)
+		*(int*)v->vars[0] = v->def[0].i;
+	else if (strcmp(v->format, "%s") == 0)
+	{
+		if (v->def[0].s != NULL)
+			Strlcpy((char*)v->vars[0], v->def[0].s, v->size);
+	}
+	else if (strcmp(v->format, "%f") == 0)
+		*(float*)v->vars[0] = v->def[0].f;
+	else if (strcmp(v->format, "%lf") == 0)
+		*(double*)v->vars[0] = v->def[0].d;
+	else if (strcmp(v->format, "%d,%d") == 0)
+	{
+		*(int*)v->vars[0] = v->def[0].i;
+		*(int*)v->vars[1] = v->def[1].i;
+	}
+	else if (strcmp(v->format, "%f,%f") == 0)
+	{
+		*(float*)v->vars[0] = v->def[0].f;
+		*(float*)v->vars[1] = v->def[1].f;
+	}
+	else if (strcmp(v->format, "%lf,%lf") == 0)
+	{
+		*(double*)v->vars[0] = v->def[0].d;
+		*(double*)v->vars[1] = v->def[1].d;
+	}
+}
+
+// Apply every row's compiled-in default; the sole init-time default path.
+void rc_config_apply_defaults(void)
+{
+	for (int i = 0; i < num_rc_config_vars; i++)
+	{
+		rc_config_vars_t *v = &rc_config_vars[i];
+
+		// A field may appear in more than one row (eg the dual
+		// main_common_projection keys kept for backward compatibility).
+		// Only the first row owning the field applies its default; later
+		// rows defer to that canonical owner.
+		if (v->vars[0] != NULL && rc_config_find_by_field(v->vars[0]) != v)
+			continue;
+
+		rc_config_set_default(v);
+	}
+}
+
+
 /*
  * rc_callback_check_menu_item()
  *
@@ -586,24 +713,10 @@ int Get_Window_Geometry(
  * and save a new file if it is missing using the defaults defined below.
  */
 
-/** render_config_set_defaults - Reset all rendering tab fields via dispatch
- *
- * Resets GENERAL, OPENGL, and CAIRO tabs to compiled-in defaults.
- * Called by Create_Default_Config() at init time (no post_apply hooks).
- */
-  void
-render_config_set_defaults( void )
-{
-  config_reset_tab(SETTINGS_TAB_GENERAL);
-  config_reset_tab(SETTINGS_TAB_OPENGL);
-  config_reset_tab(SETTINGS_TAB_CAIRO);
-}
-
   gboolean
 Create_Default_Config( void )
 {
   char line[LINE_LEN];
-  char home[PATH_MAX];
   FILE *fp = NULL;
 
   fp = fopen(rc_config.config_file, "r");
@@ -623,102 +736,7 @@ Create_Default_Config( void )
     Close_File( &fp );
   }
 
-  /* For main window */
-  Strlcpy( rc_config.working_dir, get_conf_dir(home, sizeof(home)), sizeof(rc_config.working_dir) );
-  Strlcat( rc_config.working_dir, "/", sizeof(rc_config.working_dir) );
-  rc_config.main_width  = 600;
-  rc_config.main_height = 400;
-  rc_config.main_x = 50;
-  rc_config.main_y = 50;
-  rc_config.main_currents_togglebutton = 0;
-  rc_config.main_charges_togglebutton  = 0;
-  rc_config.main_total = 0;
-  rc_config.main_horizontal = 0;
-  rc_config.main_vertical   = 0;
-  rc_config.main_right_hand = 0;
-  rc_config.main_left_hand  = 0;
-  rc_config.main_loop_start = 1;
-  rc_config.main_rotate_spinbutton  = 45;
-  rc_config.main_incline_spinbutton = 45;
-  rc_config.main_zoom_spinbutton    = 100;
-
-  // The *_is_open values below default to "1" for backward compatiblity.  It
-  // still does not open the window if width/height are undefined so defaults
-  // are consistent.  However, if they are defined but *_is_open is not defined
-  // (ie, <= v4.1.12) then the specified windows will open.  After the first
-  // run the new version will use xnec2c.conf for *_is_open values.
-
-  /* For rdpattern window */
-  rc_config.rdpattern_is_open = 1;
-  rc_config.rdpattern_width  = 0;
-  rc_config.rdpattern_height = 0;
-  rc_config.rdpattern_x = -1;
-  rc_config.rdpattern_y = -1;
-  rc_config.rdpattern_gain_togglebutton = 1;
-  rc_config.rdpattern_eh_togglebutton   = 0;
-  rc_config.rdpattern_e_field = 1;
-  rc_config.rdpattern_h_field = 1;
-  rc_config.rdpattern_poynting_vector = 0;
-  rc_config.rdpattern_gradient_key = 1;
-  rc_config.rdpattern_zoom_spinbutton = 100;
-  rc_config.current_flow_visualization_mode = FLOW_DIR_REFERENCE_PHASE;
-  render_config_set_defaults();
-
-  /* Common projection default on, overlay structure default off */
-  rc_config.main_common_projection = 1;
-  rc_config.rdpattern_overlay_structure = 0;
-
-  /* See enum GAIN_SCALE */
-  rc_config.gain_style = GS_LINP;
-
-  /* For freq plots window */
-  rc_config.freqplots_is_open = 1;
-  rc_config.freqplots_width  = 0;
-  rc_config.freqplots_height = 0;
-  rc_config.freqplots_x = -1;
-  rc_config.freqplots_y = -1;
-  rc_config.freqplots_gmax_togglebutton    = 1;
-  rc_config.freqplots_gdir_togglebutton    = 0;
-  rc_config.freqplots_gviewer_togglebutton = 0;
-  rc_config.freqplots_vswr_togglebutton    = 1;
-  rc_config.freqplots_zrlzim_togglebutton  = 0;
-  rc_config.freqplots_zmgzph_togglebutton  = 0;
-  rc_config.freqplots_smith_togglebutton   = 0;
-  rc_config.freqplots_ant_temp_togglebutton = 0;
-  rc_config.freqplots_show_ant_temp = 0;
-  rc_config.freqplots_net_gain = 0;
-  rc_config.freqplots_min_max = 0;
-  rc_config.freqplots_s11 = 0;
-
-  /* Symbol overrides window */
-  rc_config.sy_overrides_is_open = 0;
-  rc_config.sy_overrides_width = 0;
-  rc_config.sy_overrides_height = 0;
-  rc_config.sy_overrides_x = -1;
-  rc_config.sy_overrides_y = -1;
-
-  rc_config.freqplots_clamp_vswr = 1;
-  rc_config.freqplots_round_x_axis = 0;
-  rc_config.freqplots_swap_click = 1;
-  Strlcpy( rc_config.freqplots_theme, "legacy", sizeof(rc_config.freqplots_theme) );
-  rc_config.freqplots_theme_invert = 0;
-
-  /* Antenna temperature defaults (Synth Practical Avg sky + DG7YBN Residential earth) */
-  rc_config.ant_temp_sky = ANT_TEMP_SKY_SYNTH_AVG;
-  rc_config.ant_temp_earth = ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL;
-  rc_config.ant_temp_interp = ANT_TEMP_INTERP;
-  rc_config.ant_temp_elevation = 0.0;
-  rc_config.ant_temp_custom_t_sky = ANT_TEMP_CUSTOM_T_SKY_DEFAULT;
-  rc_config.ant_temp_custom_t_earth = ANT_TEMP_CUSTOM_T_EARTH_DEFAULT;
-
-  /* For NEC2 editor window */
-  rc_config.nec2_edit_width  = 0;
-  rc_config.nec2_edit_height = 0;
-  rc_config.nec2_edit_x = 0;
-  rc_config.nec2_edit_y = 0;
-
-  /* Enable Quit Dialog */
-  rc_config.confirm_quit = 1;
+  rc_config_apply_defaults();
 
   return( TRUE );
 
@@ -1010,26 +1028,26 @@ Read_Config( void )
   {
     pr_warn("Invalid sky model index %d in config, resetting to default\n",
         rc_config.ant_temp_sky);
-    rc_config.ant_temp_sky = ANT_TEMP_SKY_SYNTH_AVG;
+    rc_config_set_default(rc_config_find_by_field(&rc_config.ant_temp_sky));
   }
   if (rc_config.ant_temp_earth < 0 || rc_config.ant_temp_earth >= ANT_TEMP_EARTH_COUNT)
   {
     pr_warn("Invalid earth model index %d in config, resetting to default\n",
         rc_config.ant_temp_earth);
-    rc_config.ant_temp_earth = ANT_TEMP_EARTH_DG7YBN_RESIDENTIAL;
+    rc_config_set_default(rc_config_find_by_field(&rc_config.ant_temp_earth));
   }
   if (rc_config.ant_temp_interp < 0 || rc_config.ant_temp_interp >= ANT_TEMP_METHOD_COUNT)
   {
     pr_warn("Invalid interp method %d in config, resetting to default\n",
         rc_config.ant_temp_interp);
-    rc_config.ant_temp_interp = ANT_TEMP_INTERP;
+    rc_config_set_default(rc_config_find_by_field(&rc_config.ant_temp_interp));
   }
 
   /* Custom temperatures must be positive (zero collapses the pattern) */
   if (rc_config.ant_temp_custom_t_sky <= ANT_TEMP_K_MIN)
-    rc_config.ant_temp_custom_t_sky = ANT_TEMP_CUSTOM_T_SKY_DEFAULT;
+    rc_config_set_default(rc_config_find_by_field(&rc_config.ant_temp_custom_t_sky));
   if (rc_config.ant_temp_custom_t_earth <= ANT_TEMP_K_MIN)
-    rc_config.ant_temp_custom_t_earth = ANT_TEMP_CUSTOM_T_EARTH_DEFAULT;
+    rc_config_set_default(rc_config_find_by_field(&rc_config.ant_temp_custom_t_earth));
 
   Restore_GUI_State();
 

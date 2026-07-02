@@ -19,6 +19,7 @@
 
 #include "rdpattern_ui.h"
 #include "measurements.h"
+#include "rc_config.h"
 #include "prerender/prerender_nearfield.h"
 #include "render/render_dispatch.h"
 #include "shared.h"
@@ -92,7 +93,7 @@ Scale_Gain_Resolved(double gain, int fstep, int idx,
       pr_err("Scale_Gain_Resolved: gain_style %d out of range [0..%d], defaulting to GS_LINP\n",
           gs, NUM_SCALES - 1);
     }
-    gs = GS_LINP;
+    gs = rc_config_default_int(&rc_config.gain_style);
   }
 
   switch( gs )

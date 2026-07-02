@@ -27,15 +27,36 @@
 
 #define DEFAULT_CONFIG_FILE     ".xnec2c/xnec2c.conf"
 
+// Compiled-in reset default for the OpenGL renderer toggle; enabled only in
+// OpenGL builds.  Consumed by the rc_config_vars row for use_opengl_renderer.
+#ifdef HAVE_OPENGL
+# define RENDERER_RESET_DEFAULT 1
+#else
+# define RENDERER_RESET_DEFAULT 0
+#endif
+
+// Compiled-in default for one variable, discriminated by the row's format
+// string exactly as parse_var/fprint_var dispatch on it.
+typedef union {
+	int i;
+	float f;
+	double d;
+	const char *s;
+} rc_config_default_t;
+
 typedef struct rc_config_vars_t {
 	size_t size;
 	int ro;          // read-only field like version
 	char *desc;
 	char *format;
 	void *vars[2];
+	rc_config_default_t def[2];  // def[1] used only by pair formats (%d,%d)
 	void (*init)(struct rc_config_vars_t *, char *);  // call this to initialize if not NULL
 	int (*parse)(struct rc_config_vars_t *, char *); // call this to parse, ignore "format"
 	int (*save)(struct rc_config_vars_t *, FILE *);  // call this to save, ignore "format"
+
+	// Compute a runtime default in place of def[]; overrides the generic applier.
+	void (*set_default)(struct rc_config_vars_t *);
 
 	// True if the variable should not be set when rc_config.batch_mode is true.
 	int batch_mode_skip;
@@ -53,5 +74,10 @@ extern rc_config_vars_t rc_config_vars[];
 extern int num_rc_config_vars;
 
 char *get_conf_dir(char *s, int len);
+
+void rc_config_set_default(rc_config_vars_t *v);
+void rc_config_apply_defaults(void);
+rc_config_vars_t *rc_config_find_by_field(void *f);
+int rc_config_default_int(void *f);
 
 #endif

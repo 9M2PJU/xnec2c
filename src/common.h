@@ -1377,9 +1377,6 @@ void opengl_set_renderer(gboolean enable);
 void opengl_set_constrained_rotation(gboolean constrained);
 void on_flow_direction_activate(GtkMenuItem *menuitem, gpointer user_data);
 
-/* rc_config.c — rendering tab defaults for init-time use */
-void render_config_set_defaults(void);
-
 /* render_settings.c — Rendering Settings window */
 void on_render_settings_show_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_render_settings_changed(GtkWidget *widget, gpointer user_data);
