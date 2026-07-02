@@ -38,8 +38,9 @@ typedef struct {
   size_t       size;        /* sizeof(rc_config.some_field) */
   const char  *widget_id;   /* glade widget id, or NULL if no widget */
   void       (*post_apply)(void); /* called after field changes; NULL = none */
+  /* Radio widget-to-value binding read by apply/sync; unread for scalar
+   * widgets whose value lives in the widget itself. */
   union { int i; float f; double d; } def;
-  gboolean     is_default;  /* TRUE = reset-default entry for this field */
 } config_default_t;
 
 /* Per-tab collection of dispatch entries */
@@ -66,20 +67,24 @@ typedef struct {
   _Static_assert(_Generic(rc_config.field, double: 1, default: 0), \
       "CFG_DBL: " #field " is not double")
 
-/* Table entry macros — type validated at compile time via
- * CFG_{INT,FLT,DBL}_ASSERT placed at file scope in each per-tab module. */
-#define CFG_INT(field, wid, hook, val) \
-  { &rc_config.field, sizeof(rc_config.field), wid, hook, { .i = (val) }, TRUE }
-
-#define CFG_FLT(field, wid, hook, val) \
-  { &rc_config.field, sizeof(rc_config.field), wid, hook, { .f = (val) }, TRUE }
-
-#define CFG_DBL(field, wid, hook, val) \
-  { &rc_config.field, sizeof(rc_config.field), wid, hook, { .d = (val) }, TRUE }
-
-/* Radio group sibling: same field, different value, not used for reset */
+/* Radio entry: binds one glade radio widget to the enum value it represents.
+ * Every radio in a group is such an entry; the reset default is owned solely
+ * by rc_config_vars.  Type validated at file scope via CFG_INT_ASSERT. */
 #define CFG_INT_RADIO(field, wid, hook, val) \
-  { &rc_config.field, sizeof(rc_config.field), wid, hook, { .i = (val) }, FALSE }
+  { &rc_config.field, sizeof(rc_config.field), wid, hook, { .i = (val) } }
+
+/* Value-less reset entries for non-radio widgets: the compiled-in default is
+ * owned by rc_config_vars and applied via rc_config_set_default, so no value
+ * rides here.  The zeroed def union goes unread by sync/apply for these widget
+ * types (spin, scale, toggle). */
+#define CFG_INT_W(field, wid, hook) \
+  { &rc_config.field, sizeof(rc_config.field), wid, hook, { .i = 0 } }
+
+#define CFG_FLT_W(field, wid, hook) \
+  { &rc_config.field, sizeof(rc_config.field), wid, hook, { .f = 0 } }
+
+#define CFG_DBL_W(field, wid, hook) \
+  { &rc_config.field, sizeof(rc_config.field), wid, hook, { .d = 0 } }
 
 /*------------------------------------------------------------------------*/
 
@@ -87,24 +92,14 @@ typedef struct {
  * because per-tab instances reside in separate translation units) */
 extern const config_tab_defaults_t *render_tab_defaults[SETTINGS_TAB_COUNT];
 
-/** config_reset_tab - Reset one tab's fields to compiled-in defaults
- * @tab: which tab to reset
- *
- * Iterates only the entries array (not session); memcpy each default.
- * Does not invoke post_apply hooks (safe for init-time use before widgets exist).
- */
-void config_reset_tab(settings_tab_t tab);
-
 /** config_reset_tab_user - Reset one tab and invoke post_apply hooks
  * @tab: which tab to reset
  *
- * Same as config_reset_tab but invokes post_apply for each entry whose
- * field value changed.  For user-initiated resets only (widgets must exist).
+ * Applies each field's compiled-in default from rc_config_vars and invokes
+ * post_apply for each entry whose value changed.  For user-initiated resets
+ * only (widgets must exist).
  */
 void config_reset_tab_user(settings_tab_t tab);
-
-/** config_reset_all - Reset all tabs to compiled-in defaults */
-void config_reset_all(void);
 
 /** config_apply_tab - Read widgets into rc_config for one tab
  * @tab: which tab to apply

@@ -49,22 +49,15 @@ static void post_apply_set_constrained(void)
 
 /*------------------------------------------------------------------------*/
 
-/* Reset default: enable OpenGL renderer only when built with OpenGL support */
-#ifdef HAVE_OPENGL
-# define RENDERER_RESET_DEFAULT 1
-#else
-# define RENDERER_RESET_DEFAULT 0
-#endif
-
 /* General tab defaults: renderer toggle, constrained rotation, and
  * overlay scale (renderer-agnostic; used by both Cairo and OpenGL paths).
  * Orthographic projection lives in the OpenGL tab (OpenGL-only). */
 static const config_default_t general_defaults[] = {
-  CFG_INT(use_opengl_renderer, "chk_opengl_renderer", post_apply_set_renderer, RENDERER_RESET_DEFAULT),
-  CFG_INT(view_drag_constrained, "chk_constrained_rotation", post_apply_set_constrained, 1),
+  CFG_INT_W(use_opengl_renderer, "chk_opengl_renderer", post_apply_set_renderer),
+  CFG_INT_W(view_drag_constrained, "chk_constrained_rotation", post_apply_set_constrained),
 
   /* Overlay scale (no widget; programmatic session state via shift+scroll) */
-  CFG_DBL(rdpattern_overlay_scale_adj, NULL, NULL, 1.0),
+  CFG_DBL_W(rdpattern_overlay_scale_adj, NULL, NULL),
 };
 
 const config_tab_defaults_t general_tab_defaults = {

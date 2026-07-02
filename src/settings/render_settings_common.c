@@ -25,6 +25,7 @@
 
 #include "../shared.h"
 #include "../callbacks.h"
+#include "../rc_config.h"
 #include "render_settings_common.h"
 #include "render_settings_internal.h"
 
@@ -42,66 +43,45 @@ const config_tab_defaults_t *render_tab_defaults[SETTINGS_TAB_COUNT] = {
 
 /*------------------------------------------------------------------------*/
 
-/** config_reset_tab - Reset one tab's fields to compiled-in defaults
- * @tab: which tab to reset
- *
- * Iterates only the entries array (not session); memcpy each default value.
- */
-void
-config_reset_tab(settings_tab_t tab)
-{
-  const config_tab_defaults_t *td = render_tab_defaults[tab];
-  int i;
-
-  for( i = 0; i < td->count; i++ )
-  {
-    if( !td->entries[i].is_default )
-      continue;
-
-    memcpy(td->entries[i].field, &td->entries[i].def, td->entries[i].size);
-  }
-}
-
-/*------------------------------------------------------------------------*/
-
 /** config_reset_tab_user - Reset one tab and invoke post_apply hooks
  * @tab: which tab to reset
  *
- * Iterates entries; for each field group, compares current value against
- * default, writes the default, and invokes post_apply when the value changed.
+ * Joins each render row to its persistence row by field pointer, applies the
+ * rc_config_vars default, and invokes post_apply when the value changed.
+ * Radio siblings share one field; each field resets once through its first
+ * occurrence in the tab.
  */
 void
 config_reset_tab_user(settings_tab_t tab)
 {
   const config_tab_defaults_t *td = render_tab_defaults[tab];
-  int i;
+  int i, j;
 
   for( i = 0; i < td->count; i++ )
   {
+    const config_default_t *e = &td->entries[i];
+    rc_config_vars_t *v;
     char old_val[sizeof(double)];
 
-    if( !td->entries[i].is_default )
+    /* Skip a field already reset by an earlier entry (radio siblings). */
+    for( j = 0; j < i && td->entries[j].field != e->field; j++ )
+      ;
+    if( j < i )
       continue;
 
-    memcpy(old_val, td->entries[i].field, td->entries[i].size);
-    memcpy(td->entries[i].field, &td->entries[i].def, td->entries[i].size);
+    v = rc_config_find_by_field(e->field);
+    if( v == NULL )
+    {
+      BUG("config_reset_tab_user: field has no rc_config_vars row\n");
+      continue;
+    }
 
-    if( td->entries[i].post_apply != NULL &&
-        memcmp(old_val, td->entries[i].field, td->entries[i].size) != 0 )
-      td->entries[i].post_apply();
+    memcpy(old_val, e->field, e->size);
+    rc_config_set_default(v);
+
+    if( e->post_apply != NULL && memcmp(old_val, e->field, e->size) != 0 )
+      e->post_apply();
   }
-}
-
-/*------------------------------------------------------------------------*/
-
-/** config_reset_all - Reset all tabs to compiled-in defaults */
-void
-config_reset_all(void)
-{
-  int t;
-
-  for( t = 0; t < SETTINGS_TAB_COUNT; t++ )
-    config_reset_tab((settings_tab_t)t);
 }
 
 /*------------------------------------------------------------------------*/

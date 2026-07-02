@@ -73,46 +73,47 @@ static void post_apply_set_radius_scale(void)
 /*------------------------------------------------------------------------*/
 
 /* OpenGL tab dispatch table: brightness, transparency, toggles, radios.
- * Radio groups: first entry carries the reset default value. */
+ * Radio entries bind each widget to its enum value; reset defaults come
+ * from rc_config_vars. */
 static const config_default_t opengl_defaults[] = {
   /* Orthographic projection toggle (widget in OpenGL tab glade;
    * config entry here since it only affects the OpenGL renderer) */
-  CFG_INT(opengl_orthographic, "chk_orthographic", post_apply_sync_ortho, 1),
+  CFG_INT_W(opengl_orthographic, "chk_orthographic", post_apply_sync_ortho),
 
   /* Per-type brightness sliders (0.0=black, 1.0=full) */
-  CFG_FLT(brightness_segments,      "scale_bright_segments",      NULL, 0.47f),
-  CFG_FLT(brightness_patches,       "scale_bright_patches",       NULL, 0.47f),
-  CFG_FLT(brightness_rdpat_surface, "scale_bright_rdpat_surface", NULL, 0.47f),
-  CFG_FLT(brightness_rdpat_wire,    "scale_bright_rdpat_wire",    NULL, 1.0f),
-  CFG_FLT(brightness_nearfield,     "scale_bright_nearfield",     NULL, 1.0f),
-  CFG_FLT(brightness_ground_plane,  "scale_bright_ground_plane",  NULL, 1.0f),
-  CFG_FLT(brightness_axes,          "scale_bright_axes",          NULL, 1.0f),
+  CFG_FLT_W(brightness_segments,      "scale_bright_segments",      NULL),
+  CFG_FLT_W(brightness_patches,       "scale_bright_patches",       NULL),
+  CFG_FLT_W(brightness_rdpat_surface, "scale_bright_rdpat_surface", NULL),
+  CFG_FLT_W(brightness_rdpat_wire,    "scale_bright_rdpat_wire",    NULL),
+  CFG_FLT_W(brightness_nearfield,     "scale_bright_nearfield",     NULL),
+  CFG_FLT_W(brightness_ground_plane,  "scale_bright_ground_plane",  NULL),
+  CFG_FLT_W(brightness_axes,          "scale_bright_axes",          NULL),
 
   /* Per-type transparency sliders (0.0=opaque, 1.0=fully transparent) */
-  CFG_FLT(transparency_segments,      "scale_trans_segments",      NULL, 0.5f),
-  CFG_FLT(transparency_patches,       "scale_trans_patches",       NULL, 0.5f),
-  CFG_FLT(transparency_rdpat_surface, "scale_trans_rdpat_surface", NULL, 0.5f),
-  CFG_FLT(transparency_rdpat_wire,    "scale_trans_rdpat_wire",    NULL, 0.5f),
-  CFG_FLT(transparency_nearfield,     "scale_trans_nearfield",     NULL, 0.0f),
-  CFG_FLT(transparency_ground_plane,  "scale_trans_ground_plane",  NULL, 0.5f),
-  CFG_FLT(transparency_axes,          "scale_trans_axes",          NULL, 0.0f),
+  CFG_FLT_W(transparency_segments,      "scale_trans_segments",      NULL),
+  CFG_FLT_W(transparency_patches,       "scale_trans_patches",       NULL),
+  CFG_FLT_W(transparency_rdpat_surface, "scale_trans_rdpat_surface", NULL),
+  CFG_FLT_W(transparency_rdpat_wire,    "scale_trans_rdpat_wire",    NULL),
+  CFG_FLT_W(transparency_nearfield,     "scale_trans_nearfield",     NULL),
+  CFG_FLT_W(transparency_ground_plane,  "scale_trans_ground_plane",  NULL),
+  CFG_FLT_W(transparency_axes,          "scale_trans_axes",          NULL),
 
   /* Cylinder radius scale slider */
-  CFG_DBL(opengl_cylinder_radius_scale, "scale_cylinder_scale",
-      post_apply_set_radius_scale, 1.0),
+  CFG_DBL_W(opengl_cylinder_radius_scale, "scale_cylinder_scale",
+      post_apply_set_radius_scale),
 
   /* Transparency on-click toggle */
-  CFG_INT(opengl_transparent_on_click, "chk_only_on_click", NULL, 1),
+  CFG_INT_W(opengl_transparent_on_click, "chk_only_on_click", NULL),
 
-  /* MSAA radio group — first entry is reset default (4X) */
-  CFG_INT(opengl_msaa_samples, "radio_msaa_4x",  post_apply_set_msaa, MSAA_4X),
+  /* MSAA radio group; each entry binds a widget to its enum value */
+  CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_4x",  post_apply_set_msaa, MSAA_4X),
   CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_off", post_apply_set_msaa, MSAA_OFF),
   CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_2x",  post_apply_set_msaa, MSAA_2X),
   CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_8x",  post_apply_set_msaa, MSAA_8X),
   CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_16x", post_apply_set_msaa, MSAA_16X),
 
-  /* Draw style radio group — first entry is reset default (both) */
-  CFG_INT(rdpattern_draw_style, "radio_style_both",      NULL, RDPAT_STYLE_BOTH),
+  /* Draw style radio group; each entry binds a widget to its enum value */
+  CFG_INT_RADIO(rdpattern_draw_style, "radio_style_both",      NULL, RDPAT_STYLE_BOTH),
   CFG_INT_RADIO(rdpattern_draw_style, "radio_style_surface",   NULL, RDPAT_STYLE_SURFACE),
   CFG_INT_RADIO(rdpattern_draw_style, "radio_style_wireframe", NULL, RDPAT_STYLE_WIREFRAME),
 };

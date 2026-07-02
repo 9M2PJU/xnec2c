@@ -30,27 +30,28 @@ CFG_INT_ASSERT(cairo_line_cap);
 CFG_INT_ASSERT(cairo_depth_bins);
 
 /* Cairo tab dispatch table: anti-aliasing, color quantization, line cap, depth bins.
- * Radio groups: first entry carries the reset default value. */
+ * Radio entries bind each widget to its enum value; reset defaults come
+ * from rc_config_vars. */
 static const config_default_t cairo_defaults[] = {
   /* Anti-aliasing radio group */
-  CFG_INT(cairo_antialias, "radio_cairo_antialias_default", NULL, CAIRO_ANTIALIAS_DEFAULT),
+  CFG_INT_RADIO(cairo_antialias, "radio_cairo_antialias_default", NULL, CAIRO_ANTIALIAS_DEFAULT),
   CFG_INT_RADIO(cairo_antialias, "radio_cairo_antialias_fast",    NULL, CAIRO_ANTIALIAS_FAST),
   CFG_INT_RADIO(cairo_antialias, "radio_cairo_antialias_none",    NULL, CAIRO_ANTIALIAS_NONE),
 
   /* Color quantization radio group (value = number of levels; 0=off) */
-  CFG_INT(cairo_color_quant, "radio_cairo_color_quant_off", NULL, 0),
+  CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_off", NULL, 0),
   CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_8",   NULL, 8),
   CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_64",  NULL, 64),
   CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_128", NULL, 128),
   CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_256", NULL, 256),
 
   /* Line cap radio group */
-  CFG_INT(cairo_line_cap, "radio_cairo_line_cap_butt",   NULL, CAIRO_LINE_CAP_BUTT),
+  CFG_INT_RADIO(cairo_line_cap, "radio_cairo_line_cap_butt",   NULL, CAIRO_LINE_CAP_BUTT),
   CFG_INT_RADIO(cairo_line_cap, "radio_cairo_line_cap_round",  NULL, CAIRO_LINE_CAP_ROUND),
   CFG_INT_RADIO(cairo_line_cap, "radio_cairo_line_cap_square", NULL, CAIRO_LINE_CAP_SQUARE),
 
   /* Depth bins spinner */
-  CFG_INT(cairo_depth_bins, "spin_cairo_depth_bins", NULL, 16),
+  CFG_INT_W(cairo_depth_bins, "spin_cairo_depth_bins", NULL),
 };
 
 const config_tab_defaults_t cairo_tab_defaults = {
@@ -73,7 +74,7 @@ on_cairo_tab_reset_clicked(GtkButton *button, gpointer user_data)
   (void)button;
   (void)user_data;
 
-  config_reset_tab(SETTINGS_TAB_CAIRO);
+  config_reset_tab_user(SETTINGS_TAB_CAIRO);
   config_sync_tab(SETTINGS_TAB_CAIRO);
   xnec2_widget_queue_draw(structure_drawingarea, TRUE);
   xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
