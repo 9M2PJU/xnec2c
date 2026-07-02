@@ -746,6 +746,15 @@ guint _g_idle_add_once(GSourceOnceFunc function, gpointer data, int lock)
 	if (rc_config.disable_pthread_freqloop)
 		lock = 0;
 
+	// A synchronous wait issued from the thread that owns the GTK main
+	// context would block the dispatcher that must run the scheduled
+	// callback, deadlocking.  Stop() reaches its batch teardown this way
+	// from Open_Input_File, which runs as a main-thread idle callback.
+	// Downgrade to async so the callback runs on a later main-loop
+	// iteration once the caller unwinds.
+	if (lock && g_main_context_is_owner(g_main_context_default()))
+		lock = 0;
+
 	if (lock)
 	{
 		g_mutex_init(&cbdata->lock);
