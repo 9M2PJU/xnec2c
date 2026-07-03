@@ -26,42 +26,17 @@
 #include "xnec2c.h"
 #include "editors.h"
 #include "nec2_model.h"
+#include "config/config_widget.h"
 
 #include <gdk/gdkkeysyms.h>
 
 /* OpenGL common projection sync */
 void opengl_common_projection_sync(void);
 
-/* Frequency spinbutton value-changed callback; referenced by
- * SIGNAL_BLOCK/SIGNAL_UNBLOCK in programmatic update sites. */
-void on_freq_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
-
-/* Ortho toolbar toggle handler; stub in non-OpenGL builds */
-void on_ortho_toggled(GtkToggleButton *button, gpointer user_data);
-
-/* Ortho toolbar projection sync (defined in callbacks.c) */
-void sync_ortho_toolbar_button(void);
-
 #ifndef HAVE_OPENGL
 /* Hide a widget by builder id; removes OpenGL-only toolbar buttons */
 void hide_widget_by_id(GtkBuilder *builder, const char *widget_id);
 #endif /* !HAVE_OPENGL */
-
-/* ISO C forbids casting a function pointer to gpointer (void *) directly.
- * A union reinterpret is defined behavior under C99/C11 and avoids that cast.
- * g_signal_handlers_block_by_func is bypassed in favor of the underlying
- * g_signal_handlers_block_matched to keep the cast site visible and explicit. */
-#define SIGNAL_BLOCK(widget, func) \
-  do { \
-    union { GCallback cb; gpointer p; } _u = { .cb = (GCallback)(func) }; \
-    g_signal_handlers_block_matched((widget), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, _u.p, NULL); \
-  } while(0)
-
-#define SIGNAL_UNBLOCK(widget, func) \
-  do { \
-    union { GCallback cb; gpointer p; } _u = { .cb = (GCallback)(func) }; \
-    g_signal_handlers_unblock_matched((widget), G_SIGNAL_MATCH_FUNC, 0, 0, NULL, _u.p, NULL); \
-  } while(0)
 
 #endif
 

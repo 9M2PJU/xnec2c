@@ -120,7 +120,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property>
                 <property name="label">Off</property>
                 <property name="tooltip-text">Disable multi-sample anti-aliasing</property>
-                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="expand">False</property><property name="fill">False</property><property name="position">0</property></packing>
             </child>
@@ -130,7 +130,7 @@
                 <property name="label">2x</property>
                 <property name="group">radio_msaa_off</property>
                 <property name="tooltip-text">2x multi-sample anti-aliasing</property>
-                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="expand">False</property><property name="fill">False</property><property name="position">1</property></packing>
             </child>
@@ -140,7 +140,7 @@
                 <property name="label">4x</property>
                 <property name="group">radio_msaa_off</property>
                 <property name="tooltip-text">4x multi-sample anti-aliasing</property>
-                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="expand">False</property><property name="fill">False</property><property name="position">2</property></packing>
             </child>
@@ -150,7 +150,7 @@
                 <property name="label">8x</property>
                 <property name="group">radio_msaa_off</property>
                 <property name="tooltip-text">8x multi-sample anti-aliasing — higher GPU cost</property>
-                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="expand">False</property><property name="fill">False</property><property name="position">3</property></packing>
             </child>
@@ -160,7 +160,7 @@
                 <property name="label">16x</property>
                 <property name="group">radio_msaa_off</property>
                 <property name="tooltip-text">16x multi-sample anti-aliasing — highest quality, highest GPU cost</property>
-                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="expand">False</property><property name="fill">False</property><property name="position">4</property></packing>
             </child>
@@ -214,7 +214,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_bright_segments</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Brightness of wire segment cylinders (0=black, 1=full)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">1</property><property name="top-attach">1</property></packing>
             </child>
@@ -223,7 +223,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_trans_segments</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Transparency of wire segments (0=opaque, 1=invisible)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">2</property><property name="top-attach">1</property></packing>
             </child>
@@ -236,7 +236,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_bright_patches</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Brightness of surface patches (0=black, 1=full)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">1</property><property name="top-attach">2</property></packing>
             </child>
@@ -245,7 +245,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_trans_patches</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Transparency of surface patches (0=opaque, 1=invisible)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">2</property><property name="top-attach">2</property></packing>
             </child>
@@ -299,7 +299,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_bright_rdpat_surface</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Brightness of radiation pattern filled surface (0=black, 1=full). In Both mode, dimmed further so wireframe lines stand out.</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">1</property><property name="top-attach">1</property></packing>
             </child>
@@ -308,7 +308,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_trans_rdpat_surface</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Transparency of radiation pattern surface (0=opaque, 1=invisible)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">2</property><property name="top-attach">1</property></packing>
             </child>
@@ -321,7 +321,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_bright_rdpat_wire</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Brightness of radiation pattern wireframe lines (0=black, 1=full)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">1</property><property name="top-attach">2</property></packing>
             </child>
@@ -330,7 +330,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_trans_rdpat_wire</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Transparency of radiation pattern wireframe (0=opaque, 1=invisible)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">2</property><property name="top-attach">2</property></packing>
             </child>
@@ -343,7 +343,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_bright_nearfield</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Brightness of near-field visualization lines (0=black, 1=full)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">1</property><property name="top-attach">3</property></packing>
             </child>
@@ -352,7 +352,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_trans_nearfield</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Transparency of near-field lines (0=opaque, 1=invisible)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">2</property><property name="top-attach">3</property></packing>
             </child>
@@ -367,7 +367,7 @@
                   <object class="GtkRadioButton" id="radio_style_surface">
                     <property name="visible">True</property><property name="can-focus">True</property><property name="label">Surface</property>
                     <property name="tooltip-text">Render radiation pattern as filled triangulated surface</property>
-                    <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                   </object>
                 </child>
                 <child>
@@ -375,7 +375,7 @@
                     <property name="visible">True</property><property name="can-focus">True</property><property name="label">Wireframe</property>
                     <property name="group">radio_style_surface</property>
                     <property name="tooltip-text">Render radiation pattern as wireframe lines</property>
-                    <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                   </object>
                 </child>
                 <child>
@@ -383,7 +383,7 @@
                     <property name="visible">True</property><property name="can-focus">True</property><property name="label">Both</property>
                     <property name="group">radio_style_surface</property>
                     <property name="tooltip-text">Render radiation pattern with surface and wireframe overlay</property>
-                    <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                   </object>
                 </child>
               </object>
@@ -439,7 +439,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_bright_ground_plane</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Brightness of the ground plane grid (0=black, 1=full)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">1</property><property name="top-attach">1</property></packing>
             </child>
@@ -448,7 +448,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_trans_ground_plane</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Transparency of the ground plane (0=opaque, 1=invisible)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">2</property><property name="top-attach">1</property></packing>
             </child>
@@ -461,7 +461,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_bright_axes</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Brightness of the coordinate axes (0=black, 1=full)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">1</property><property name="top-attach">2</property></packing>
             </child>
@@ -470,7 +470,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_trans_axes</property><property name="digits">2</property><property name="value-pos">right</property>
                 <property name="tooltip-text">Transparency of the coordinate axes (0=opaque, 1=invisible)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">2</property><property name="top-attach">2</property></packing>
             </child>
@@ -483,7 +483,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property><property name="hexpand">True</property>
                 <property name="adjustment">adj_cylinder_scale</property><property name="digits">2</property><property name="value-pos">right</property><property name="margin-top">4</property>
                 <property name="tooltip-text">Visual thickness of wire segments (does not affect NEC2 model calculations)</property>
-                <signal name="value-changed" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">1</property><property name="top-attach">3</property><property name="width">2</property></packing>
             </child>
@@ -501,7 +501,7 @@
                 <property name="visible">True</property><property name="can-focus">True</property>
                 <property name="label">Transparency Only on Click</property><property name="active">True</property><property name="margin-top">4</property>
                 <property name="tooltip-text">Apply per-type transparency only while dragging; otherwise always active</property>
-                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">0</property><property name="top-attach">5</property><property name="width">3</property></packing>
             </child>
@@ -511,7 +511,7 @@
                 <property name="label">Orthographic Projection</property><property name="margin-top">4</property>
                 <property name="tooltip-text">Use orthographic projection; disables perspective foreshortening.
 Enable for precise angular measurements or flat pattern inspection.</property>
-                <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing><property name="left-attach">0</property><property name="top-attach">6</property><property name="width">3</property></packing>
             </child>

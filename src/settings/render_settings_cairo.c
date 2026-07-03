@@ -23,50 +23,31 @@
 
 /*------------------------------------------------------------------------*/
 
-/* Compile-time width checks for int-typed config fields */
-CFG_INT_ASSERT(cairo_antialias);
-CFG_INT_ASSERT(cairo_color_quant);
-CFG_INT_ASSERT(cairo_line_cap);
-CFG_INT_ASSERT(cairo_depth_bins);
+/* Compile-time width checks for the fields bound to Cairo-tab widgets */
+CONFIG_FIELD_INT_ASSERT(rc_config.cairo_antialias);
+CONFIG_FIELD_INT_ASSERT(rc_config.cairo_color_quant);
+CONFIG_FIELD_INT_ASSERT(rc_config.cairo_line_cap);
+CONFIG_FIELD_INT_ASSERT(rc_config.cairo_depth_bins);
 
-/* Cairo tab dispatch table: anti-aliasing, color quantization, line cap, depth bins.
- * Radio entries bind each widget to its enum value; reset defaults come
- * from rc_config_vars. */
-static const config_default_t cairo_defaults[] = {
-  /* Anti-aliasing radio group */
-  CFG_INT_RADIO(cairo_antialias, "radio_cairo_antialias_default", NULL, CAIRO_ANTIALIAS_DEFAULT),
-  CFG_INT_RADIO(cairo_antialias, "radio_cairo_antialias_fast",    NULL, CAIRO_ANTIALIAS_FAST),
-  CFG_INT_RADIO(cairo_antialias, "radio_cairo_antialias_none",    NULL, CAIRO_ANTIALIAS_NONE),
+/*------------------------------------------------------------------------*/
 
-  /* Color quantization radio group (value = number of levels; 0=off) */
-  CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_off", NULL, 0),
-  CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_8",   NULL, 8),
-  CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_64",  NULL, 64),
-  CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_128", NULL, 128),
-  CFG_INT_RADIO(cairo_color_quant, "radio_cairo_color_quant_256", NULL, 256),
-
-  /* Line cap radio group */
-  CFG_INT_RADIO(cairo_line_cap, "radio_cairo_line_cap_butt",   NULL, CAIRO_LINE_CAP_BUTT),
-  CFG_INT_RADIO(cairo_line_cap, "radio_cairo_line_cap_round",  NULL, CAIRO_LINE_CAP_ROUND),
-  CFG_INT_RADIO(cairo_line_cap, "radio_cairo_line_cap_square", NULL, CAIRO_LINE_CAP_SQUARE),
-
-  /* Depth bins spinner */
-  CFG_INT_W(cairo_depth_bins, "spin_cairo_depth_bins", NULL),
-};
-
-const config_tab_defaults_t cairo_tab_defaults = {
-  .entries       = cairo_defaults,
-  .count         = (int)(sizeof(cairo_defaults) / sizeof(cairo_defaults[0])),
-  .session       = NULL,
-  .session_count = 0,
+/* Cairo tab reset-field list: anti-aliasing, color quantization, line cap,
+ * and depth bins. */
+void *const cairo_tab_fields[] = {
+  &rc_config.cairo_antialias,
+  &rc_config.cairo_color_quant,
+  &rc_config.cairo_line_cap,
+  &rc_config.cairo_depth_bins,
+  NULL,
 };
 
 /*------------------------------------------------------------------------*/
 
 /** on_cairo_tab_reset_clicked - Per-tab Reset button handler for Cairo tab
  *
- * Restores Cairo rendering settings to defaults, syncs widgets, and
- * redraws Cairo drawing areas only.
+ * Restores Cairo rendering settings to compiled-in defaults;
+ * config_reset_tab_user syncs peer widgets and runs each changed field's
+ * hook, then the Cairo drawing areas redraw.
  */
 void
 on_cairo_tab_reset_clicked(GtkButton *button, gpointer user_data)
@@ -75,7 +56,6 @@ on_cairo_tab_reset_clicked(GtkButton *button, gpointer user_data)
   (void)user_data;
 
   config_reset_tab_user(SETTINGS_TAB_CAIRO);
-  config_sync_tab(SETTINGS_TAB_CAIRO);
   xnec2_widget_queue_draw(structure_drawingarea, TRUE);
   xnec2_widget_queue_draw(rdpattern_drawingarea, TRUE);
 }

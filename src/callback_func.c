@@ -79,34 +79,6 @@ Motion_Event(
 
 /*-----------------------------------------------------------------------*/
 
-/* Plot_Select()
- *
- * Sets up plotting of requested freq data
- */
-  void
-Plot_Select( GtkToggleButton *togglebutton, unsigned long long int flag )
-{
-  if( gtk_toggle_button_get_active(togglebutton) )
-  {
-    SetFlag( flag | PLOT_SELECT );
-    calc_data.ngraph++;
-  }
-  else
-  {
-    ClearFlag( flag );
-    calc_data.ngraph--;
-  }
-
-  /* Trigger a redraw of frequency plots drawingarea */
-  if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
-  {
-    freqplots_redraw_all(TRUE);
-  }
-
-} /* Plot_Select() */
-
-/*-----------------------------------------------------------------------*/
-
 /* Nec2_Edit_Save()
  *
  * Prompts user to save NEC2 data if edited
@@ -155,65 +127,6 @@ Delete_Event( gchar *mesg )
         Builder_Get_Object(quit_dialog_builder, "quit_label")), mesg );
 
 } /* Delete_Event() */
-
-/*-----------------------------------------------------------------------*/
-
-/* Set_Pol_Menuitem()
- *
- * Sets the polarization type menuitem to current setting
- */
-  void
-Set_Pol_Menuitem( window_t window )
-{
-  gchar *main_pol_menu[NUM_POL] =
-  {
-    "main_total",
-    "main_horizontal",
-    "main_vertical",
-    "main_right_hand",
-    "main_left_hand",
-  };
-
-  gchar *freqplots_pol_menu[NUM_POL] =
-  {
-    "freqplots_total",
-    "freqplots_horizontal",
-    "freqplots_vertical",
-    "freqplots_right_hand",
-    "freqplots_left_hand",
-  };
-
-  gchar *rdpattern_pol_menu[NUM_POL] =
-  {
-    "rdpattern_total",
-    "rdpattern_horizontal",
-    "rdpattern_vertical",
-    "rdpattern_right_hand",
-    "rdpattern_left_hand",
-  };
-
-  switch( window )
-  {
-    case MAIN_WINDOW:
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-            Builder_Get_Object(main_window_builder,
-              main_pol_menu[calc_data.pol_type])), TRUE );
-      break;
-
-    case FREQPLOTS_WINDOW:
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-            Builder_Get_Object(freqplots_window_builder,
-              freqplots_pol_menu[calc_data.pol_type])), TRUE );
-      break;
-
-    case RDPATTERN_WINDOW:
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-            Builder_Get_Object(rdpattern_window_builder,
-              rdpattern_pol_menu[calc_data.pol_type])), TRUE );
-      break;
-  } /* switch( window ) */
-
-} /* Set_Pol_Menuitem() */
 
 /*-----------------------------------------------------------------------*/
 

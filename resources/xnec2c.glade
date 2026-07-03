@@ -312,7 +312,7 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                         <property name="receives-default">False</property>
                         <property name="tooltip-text" translatable="yes">Animate current magnitude and direction along the wires.&#10;Mirrors the Currents button in the main window.</property>
                         <property name="draw-indicator">True</property>
-                        <signal name="toggled" handler="on_anim_mirror_toggled" swapped="no"/>
+                        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -343,7 +343,7 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                           <item translatable="yes">LIC</item>
                           <item translatable="yes">Wireframe</item>
                         </items>
-                        <signal name="changed" handler="on_anim_flow_dir_changed" swapped="no"/>
+                        <signal name="changed" handler="on_config_widget_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -387,7 +387,7 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                         <property name="receives-default">False</property>
                         <property name="tooltip-text" translatable="yes">Show the near electric field vectors while animating.&#10;Enable by opening the radiation pattern window.</property>
                         <property name="draw-indicator">True</property>
-                        <signal name="toggled" handler="on_anim_mirror_toggled" swapped="no"/>
+                        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -403,7 +403,7 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                         <property name="receives-default">False</property>
                         <property name="tooltip-text" translatable="yes">Show the near magnetic field vectors while animating.&#10;Enable by opening the radiation pattern window.</property>
                         <property name="draw-indicator">True</property>
-                        <signal name="toggled" handler="on_anim_mirror_toggled" swapped="no"/>
+                        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -419,7 +419,7 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                         <property name="receives-default">False</property>
                         <property name="tooltip-text" translatable="yes">Show the Poynting power-flow vectors while animating.&#10;Enable by opening the radiation pattern window.</property>
                         <property name="draw-indicator">True</property>
-                        <signal name="toggled" handler="on_anim_mirror_toggled" swapped="no"/>
+                        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -9992,9 +9992,7 @@ Save NEC2 Editor data first?
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">_Polarization</property>
-                            <property name="use-underline">True</property>
-                            <signal name="activate" handler="freqplots_pol_menu_activate" swapped="no"/>
-                            <child type="submenu">
+                            <property name="use-underline">True</property>                            <child type="submenu">
                               <object class="GtkMenu" id="freqplots_pol_menu_menu">
                                 <property name="can-focus">False</property>
                                 <child>
@@ -10011,7 +10009,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="active">True</property>
                                     <property name="draw-as-radio">True</property>
-                                    <signal name="activate" handler="on_rdpattern_total_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10022,7 +10020,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">freqplots_total</property>
-                                    <signal name="activate" handler="on_rdpattern_horizontal_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10033,7 +10031,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">freqplots_total</property>
-                                    <signal name="activate" handler="on_rdpattern_vertical_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10044,7 +10042,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">freqplots_total</property>
-                                    <signal name="activate" handler="on_rdpattern_right_hand_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10055,7 +10053,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">freqplots_total</property>
-                                    <signal name="activate" handler="on_rdpattern_left_hand_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                               </object>
@@ -10087,7 +10085,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">_Net Gain</property>
                             <property name="use-underline">True</property>
-                            <signal name="activate" handler="on_freqplots_net_gain_activate" swapped="no"/>
+                            <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -10096,7 +10094,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">Show _Min/Max Values</property>
                             <property name="use-underline">True</property>
-                            <signal name="activate" handler="on_freqplots_min_max_activate" swapped="no"/>
+                            <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -10105,7 +10103,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">Show _S11 (dB) Values</property>
                             <property name="use-underline">True</property>
-                            <signal name="activate" handler="on_freqplots_s11_activate" swapped="no"/>
+                            <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -10114,7 +10112,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">Clamp _VSWR Graph to 10</property>
                             <property name="use-underline">True</property>
-                            <signal name="activate" handler="on_freqplots_clamp_vswr_activate" swapped="no"/>
+                            <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -10123,7 +10121,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">Show Ta instead of TA</property>
                             <property name="use-underline">True</property>
-                            <signal name="activate" handler="on_freqplots_show_ant_temp_activate" swapped="no"/>
+                            <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -10132,7 +10130,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">Round _X Axis Frequency Values</property>
                             <property name="use-underline">True</property>
-                            <signal name="activate" handler="on_freqplots_round_x_axis_activate" swapped="no"/>
+                            <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -10141,7 +10139,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">S_wap Left/Right Click Frequency Selection</property>
                             <property name="use-underline">True</property>
-                            <signal name="activate" handler="on_freqplots_swap_click_activate" swapped="no"/>
+                            <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -10167,7 +10165,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_freqplots_gmax_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="m" signal="activate"/>
                   </object>
                   <packing>
@@ -10182,7 +10180,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_freqplots_gdir_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="d" signal="activate"/>
                   </object>
                   <packing>
@@ -10197,7 +10195,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_freqplots_gviewer_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="w" signal="activate"/>
                   </object>
                   <packing>
@@ -10212,7 +10210,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_freqplots_vswr_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="v" signal="activate"/>
                   </object>
                   <packing>
@@ -10227,7 +10225,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_freqplots_zrlzim_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="z" signal="activate"/>
                   </object>
                   <packing>
@@ -10242,7 +10240,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_freqplots_zmgzph_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="p" signal="activate"/>
                   </object>
                   <packing>
@@ -10257,7 +10255,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_freqplots_smith_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="p" signal="activate"/>
                   </object>
                   <packing>
@@ -10272,7 +10270,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_freqplots_ant_temp_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -10937,7 +10935,7 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10946,7 +10944,7 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10955,7 +10953,7 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10964,7 +10962,7 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10973,7 +10971,7 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10982,7 +10980,7 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -10991,7 +10989,7 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -11000,7 +10998,7 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                               </object>
@@ -11194,7 +11192,7 @@ Save NEC2 Editor data first?
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="use-underline">True</property>
-                            <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                            <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -11204,7 +11202,7 @@ Save NEC2 Editor data first?
                             <property name="label" translatable="yes">Confirm Quit</property>
                             <property name="use-underline">True</property>
                             <property name="active">True</property>
-                            <signal name="toggled" handler="on_confirm_quit_toggled" swapped="no"/>
+                            <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -11233,9 +11231,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">_View</property>
-                    <property name="use-underline">True</property>
-                    <signal name="activate" handler="main_view_menuitem_activate" swapped="no"/>
-                    <child type="submenu">
+                    <property name="use-underline">True</property>                    <child type="submenu">
                       <object class="GtkMenu" id="main_view_menuitem_menu">
                         <property name="can-focus">False</property>
                         <child>
@@ -11263,9 +11259,7 @@ Save NEC2 Editor data first?
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">_Polarization</property>
-                            <property name="use-underline">True</property>
-                            <signal name="activate" handler="main_pol_menu_activate" swapped="no"/>
-                            <child type="submenu">
+                            <property name="use-underline">True</property>                            <child type="submenu">
                               <object class="GtkMenu" id="main_pol_menu_menu">
                                 <property name="can-focus">False</property>
                                 <child>
@@ -11282,7 +11276,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="active">True</property>
                                     <property name="draw-as-radio">True</property>
-                                    <signal name="activate" handler="on_rdpattern_total_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -11293,7 +11287,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">main_total</property>
-                                    <signal name="activate" handler="on_rdpattern_horizontal_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -11304,7 +11298,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">main_total</property>
-                                    <signal name="activate" handler="on_rdpattern_vertical_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -11315,7 +11309,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">main_total</property>
-                                    <signal name="activate" handler="on_rdpattern_right_hand_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -11326,7 +11320,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">main_total</property>
-                                    <signal name="activate" handler="on_rdpattern_left_hand_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                               </object>
@@ -11364,7 +11358,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="active">True</property>
                                     <property name="draw-as-radio">True</property>
-                                    <signal name="activate" handler="on_flow_direction_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -11375,7 +11369,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">main_flow_dir_ref_phase</property>
-                                    <signal name="activate" handler="on_flow_direction_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -11386,7 +11380,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">main_flow_dir_ref_phase</property>
-                                    <signal name="activate" handler="on_flow_direction_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -11411,7 +11405,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">main_flow_dir_ref_phase</property>
-                                    <signal name="activate" handler="on_flow_direction_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -11422,7 +11416,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">main_flow_dir_ref_phase</property>
-                                    <signal name="activate" handler="on_flow_direction_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                               </object>
@@ -11444,8 +11438,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">Common _Projection</property>
                             <property name="use-underline">True</property>
-                            <signal name="toggled" handler="on_common_projection_activate" swapped="no"/>
-                            <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                            <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
 
@@ -11461,7 +11454,6 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">_Symbol Overrides</property>
                             <property name="use-underline">True</property>
-                            <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
                             <signal name="activate" handler="on_show_sy_overrides_activate" swapped="no"/>
                           </object>
                         </child>
@@ -11520,7 +11512,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_main_currents_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="i" signal="activate"/>
                   </object>
                   <packing>
@@ -11535,7 +11527,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_main_charges_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="v" signal="activate"/>
                   </object>
                   <packing>
@@ -11820,7 +11812,7 @@ Save NEC2 Editor data first?
                 <property name="receives-default">False</property>
                 <property name="hexpand">True</property>
                 <property name="tooltip-text">Toggle orthographic projection; disables perspective foreshortening. Active when showing orthographic view.</property>
-                <signal name="toggled" handler="on_ortho_toggled" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                 <child>
                   <object class="GtkImage" id="main_ortho_image">
                     <property name="visible">True</property>
@@ -11948,7 +11940,7 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <property name="value">0.01</property>
-                <signal name="value-changed" handler="on_freq_spinbutton_value_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">3</property>
@@ -12131,7 +12123,7 @@ Save NEC2 Editor data first?
                 <property name="hexpand">True</property>
                 <property name="active">True</property>
                 <property name="draw-indicator">True</property>
-                <signal name="toggled" handler="on_freq_apply_checkbutton_toggled" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">5</property>
@@ -12356,9 +12348,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">_View</property>
-                    <property name="use-underline">True</property>
-                    <signal name="activate" handler="rdpattern_view_menuitem_activate" swapped="no"/>
-                    <child type="submenu">
+                    <property name="use-underline">True</property>                    <child type="submenu">
                       <object class="GtkMenu" id="rdpattern_view_menuitem_menu">
                         <property name="can-focus">False</property>
                         <child>
@@ -12366,9 +12356,7 @@ Save NEC2 Editor data first?
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">_Polarization</property>
-                            <property name="use-underline">True</property>
-                            <signal name="activate" handler="rdpattern_pol_menu_activate" swapped="no"/>
-                            <child type="submenu">
+                            <property name="use-underline">True</property>                            <child type="submenu">
                               <object class="GtkMenu" id="rdpattern_pol_menu_menu">
                                 <property name="can-focus">False</property>
                                 <child>
@@ -12385,7 +12373,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="active">True</property>
                                     <property name="draw-as-radio">True</property>
-                                    <signal name="activate" handler="on_rdpattern_total_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -12396,7 +12384,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">rdpattern_total</property>
-                                    <signal name="activate" handler="on_rdpattern_horizontal_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -12407,7 +12395,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">rdpattern_total</property>
-                                    <signal name="activate" handler="on_rdpattern_vertical_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -12418,7 +12406,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">rdpattern_total</property>
-                                    <signal name="activate" handler="on_rdpattern_right_hand_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -12429,7 +12417,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
                                     <property name="group">rdpattern_total</property>
-                                    <signal name="activate" handler="on_rdpattern_left_hand_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                               </object>
@@ -12547,7 +12535,7 @@ Save NEC2 Editor data first?
                             <property name="label" translatable="yes">_Gradient Key</property>
                             <property name="use-underline">True</property>
                             <property name="active">True</property>
-                            <signal name="toggled" handler="on_rdpattern_gradient_key_toggled" swapped="no"/>
+                            <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -12565,7 +12553,7 @@ Save NEC2 Editor data first?
                                     <property name="can-focus">False</property>
                                     <property name="label" translatable="yes">S_urface</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="activate" handler="on_rdpattern_draw_style_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -12575,7 +12563,7 @@ Save NEC2 Editor data first?
                                     <property name="label" translatable="yes">_Wireframe</property>
                                     <property name="use-underline">True</property>
                                     <property name="group">rdpattern_style_surface</property>
-                                    <signal name="activate" handler="on_rdpattern_draw_style_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -12586,7 +12574,7 @@ Save NEC2 Editor data first?
                                     <property name="use-underline">True</property>
                                     <property name="active">True</property>
                                     <property name="group">rdpattern_style_surface</property>
-                                    <signal name="activate" handler="on_rdpattern_draw_style_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                               </object>
@@ -12615,7 +12603,7 @@ Save NEC2 Editor data first?
                                     <property name="label" translatable="yes">Near _E Field</property>
                                     <property name="use-underline">True</property>
                                     <property name="active">True</property>
-                                    <signal name="activate" handler="on_rdpattern_e_field_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -12625,7 +12613,7 @@ Save NEC2 Editor data first?
                                     <property name="label" translatable="yes">Near _H Field</property>
                                     <property name="use-underline">True</property>
                                     <property name="active">True</property>
-                                    <signal name="activate" handler="on_rdpattern_h_field_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -12634,7 +12622,7 @@ Save NEC2 Editor data first?
                                     <property name="can-focus">False</property>
                                     <property name="label" translatable="yes">_Poynting Vector</property>
                                     <property name="use-underline">True</property>
-                                    <signal name="activate" handler="on_rdpattern_poynting_vector_activate" swapped="no"/>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -12691,8 +12679,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">Common _Projection</property>
                             <property name="use-underline">True</property>
-                            <signal name="toggled" handler="on_common_projection_activate" swapped="no"/>
-                            <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                            <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
 
@@ -12702,8 +12689,7 @@ Save NEC2 Editor data first?
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">_Overlay Structure</property>
                             <property name="use-underline">True</property>
-                            <signal name="toggled" handler="on_rdpattern_overlay_structure_activate" swapped="no"/>
-                            <signal name="toggled" handler="rc_callback_check_menu_item" swapped="no"/>
+                            <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                           </object>
                         </child>
                       </object>
@@ -12729,7 +12715,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_rdpattern_gain_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="g" signal="activate"/>
                   </object>
                   <packing>
@@ -12744,7 +12730,7 @@ Save NEC2 Editor data first?
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">False</property>
-                    <signal name="toggled" handler="on_rdpattern_eh_togglebutton_toggled" swapped="no"/>
+                    <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                     <accelerator key="f" signal="activate"/>
                   </object>
                   <packing>
@@ -13072,7 +13058,7 @@ Save NEC2 Editor data first?
                 <property name="receives-default">False</property>
                 <property name="hexpand">True</property>
                 <property name="tooltip-text">Toggle orthographic projection; disables perspective foreshortening. Active when showing orthographic view.</property>
-                <signal name="toggled" handler="on_ortho_toggled" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
                 <child>
                   <object class="GtkImage" id="rdpattern_ortho_image">
                     <property name="visible">True</property>
@@ -13290,7 +13276,7 @@ Save NEC2 Editor data first?
                 <property name="hexpand">True</property>
                 <property name="active">True</property>
                 <property name="draw-indicator">True</property>
-                <signal name="toggled" handler="on_freq_apply_checkbutton_toggled" swapped="no"/>
+                <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">7</property>
@@ -13330,7 +13316,7 @@ Save NEC2 Editor data first?
                 <property name="numeric">True</property>
                 <property name="update-policy">if-valid</property>
                 <property name="value">0.01</property>
-                <signal name="value-changed" handler="on_freq_spinbutton_value_changed" swapped="no"/>
+                <signal name="value-changed" handler="on_config_widget_changed" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">6</property>

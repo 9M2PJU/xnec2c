@@ -28,13 +28,12 @@
 /* Shared window widget; defined in render_settings.c */
 extern GtkWidget *render_settings_window;
 
-/* Per-tab dispatch table instances */
-extern const config_tab_defaults_t general_tab_defaults;
-extern const config_tab_defaults_t opengl_tab_defaults;
-extern const config_tab_defaults_t cairo_tab_defaults;
-
-/* General tab: sync widgets from rc_config and apply GL-availability sensitivity */
-void general_tab_sync(void);
+/* Per-tab reset-field lists: NULL-terminated arrays of rc_config field
+ * addresses, aggregated by render_tab_fields for config_reset_tab_user. */
+extern void *const general_tab_fields[];
+extern void *const opengl_tab_fields[];
+extern void *const cairo_tab_fields[];
+extern void *const *render_tab_fields[SETTINGS_TAB_COUNT];
 
 /* Available in both HAVE_OPENGL and non-OpenGL builds */
 void render_settings_sync_from_config(void);

@@ -29,52 +29,51 @@
 
 /*------------------------------------------------------------------------*/
 
-/* Compile-time width checks for int-typed config fields */
-CFG_INT_ASSERT(view_drag_constrained);
-CFG_DBL_ASSERT(rdpattern_overlay_scale_adj);
+/* Compile-time width checks for the fields bound to General-tab widgets */
+CONFIG_FIELD_INT_ASSERT(rc_config.use_opengl_renderer);
+CONFIG_FIELD_INT_ASSERT(rc_config.view_drag_constrained);
 
-/* Post-apply wrappers: read new value from rc_config after generic write */
+/*------------------------------------------------------------------------*/
 
-CFG_INT_ASSERT(use_opengl_renderer);
-
-static void post_apply_set_renderer(void)
+/** hook_set_renderer - Switch the active renderer, then redraw
+ *
+ * Change-edge hook for the OpenGL-renderer toggle.
+ */
+void
+hook_set_renderer(void)
 {
   opengl_set_renderer(rc_config.use_opengl_renderer);
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
 }
 
-static void post_apply_set_constrained(void)
+/** hook_set_constrained - Apply constrained-rotation mode, then redraw */
+void
+hook_set_constrained(void)
 {
   opengl_set_constrained_rotation(rc_config.view_drag_constrained);
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
 }
 
 /*------------------------------------------------------------------------*/
 
-/* General tab defaults: renderer toggle, constrained rotation, and
- * overlay scale (renderer-agnostic; used by both Cairo and OpenGL paths).
- * Orthographic projection lives in the OpenGL tab (OpenGL-only). */
-static const config_default_t general_defaults[] = {
-  CFG_INT_W(use_opengl_renderer, "chk_opengl_renderer", post_apply_set_renderer),
-  CFG_INT_W(view_drag_constrained, "chk_constrained_rotation", post_apply_set_constrained),
-
-  /* Overlay scale (no widget; programmatic session state via shift+scroll) */
-  CFG_DBL_W(rdpattern_overlay_scale_adj, NULL, NULL),
-};
-
-const config_tab_defaults_t general_tab_defaults = {
-  .entries       = general_defaults,
-  .count         = (int)(sizeof(general_defaults) / sizeof(general_defaults[0])),
-  .session       = NULL,
-  .session_count = 0,
+/* General tab reset-field list: renderer toggle and constrained rotation.
+ * Overlay scale is programmatic session state (shift+scroll) with no widget,
+ * so it is excluded from the settings reset. */
+void *const general_tab_fields[] = {
+  &rc_config.use_opengl_renderer,
+  &rc_config.view_drag_constrained,
+  NULL,
 };
 
 /*------------------------------------------------------------------------*/
-
 
 /** on_general_reset_clicked - Per-tab Reset button handler for General tab
  *
- * Resets constrained rotation, renderer toggle, and overlay scale to
- * defaults, syncs widgets, and redraws.  The renderer toggle is disabled
- * when OpenGL is unavailable (build-time or runtime context failure).
+ * Resets the renderer toggle and constrained rotation to compiled-in
+ * defaults; config_reset_tab_user syncs peer widgets and runs each changed
+ * field's hook.
  */
 void
 on_general_reset_clicked(GtkButton *button, gpointer user_data)
@@ -83,8 +82,6 @@ on_general_reset_clicked(GtkButton *button, gpointer user_data)
   (void)user_data;
 
   config_reset_tab_user(SETTINGS_TAB_GENERAL);
-
-  general_tab_sync();
   Queue_Structure_Redraw();
   Queue_Radiation_Redraw();
 }

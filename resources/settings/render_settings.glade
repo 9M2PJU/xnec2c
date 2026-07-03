@@ -24,7 +24,7 @@
         <property name="can-focus">True</property>
         <property name="label">Use OpenGL Renderer</property>
         <property name="tooltip-text">Enable OpenGL hardware rendering; uncheck to use Cairo software rendering</property>
-        <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
       </object>
     </child>
 
@@ -34,7 +34,7 @@
         <property name="can-focus">True</property>
         <property name="label">Constrained Rotation</property>
         <property name="tooltip-text">Constrain view drag rotation to horizontal and vertical axes</property>
-        <signal name="toggled" handler="on_render_settings_changed" swapped="no"/>
+        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
       </object>
     </child>
 

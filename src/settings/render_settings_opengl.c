@@ -30,99 +30,73 @@
 
 /*------------------------------------------------------------------------*/
 
-/* Compile-time width checks for int-typed config fields */
-CFG_INT_ASSERT(opengl_msaa_samples);
-CFG_INT_ASSERT(opengl_transparent_on_click);
-CFG_INT_ASSERT(rdpattern_draw_style);
+/* Compile-time width checks for the fields bound to OpenGL-tab widgets */
+CONFIG_FIELD_INT_ASSERT(rc_config.opengl_msaa_samples);
+CONFIG_FIELD_INT_ASSERT(rc_config.opengl_transparent_on_click);
+CONFIG_FIELD_INT_ASSERT(rc_config.rdpattern_draw_style);
+CONFIG_FIELD_INT_ASSERT(rc_config.opengl_orthographic);
+CONFIG_FIELD_DBL_ASSERT(rc_config.opengl_cylinder_radius_scale);
 
-CFG_FLT_ASSERT(brightness_segments);
-CFG_FLT_ASSERT(brightness_patches);
-CFG_FLT_ASSERT(brightness_rdpat_surface);
-CFG_FLT_ASSERT(brightness_rdpat_wire);
-CFG_FLT_ASSERT(brightness_nearfield);
-CFG_FLT_ASSERT(brightness_ground_plane);
-CFG_FLT_ASSERT(brightness_axes);
-CFG_FLT_ASSERT(transparency_segments);
-CFG_FLT_ASSERT(transparency_patches);
-CFG_FLT_ASSERT(transparency_rdpat_surface);
-CFG_FLT_ASSERT(transparency_rdpat_wire);
-CFG_FLT_ASSERT(transparency_nearfield);
-CFG_FLT_ASSERT(transparency_ground_plane);
-CFG_FLT_ASSERT(transparency_axes);
-CFG_INT_ASSERT(opengl_orthographic);
-CFG_DBL_ASSERT(opengl_cylinder_radius_scale);
+CONFIG_FIELD_FLT_ASSERT(rc_config.brightness_segments);
+CONFIG_FIELD_FLT_ASSERT(rc_config.brightness_patches);
+CONFIG_FIELD_FLT_ASSERT(rc_config.brightness_rdpat_surface);
+CONFIG_FIELD_FLT_ASSERT(rc_config.brightness_rdpat_wire);
+CONFIG_FIELD_FLT_ASSERT(rc_config.brightness_nearfield);
+CONFIG_FIELD_FLT_ASSERT(rc_config.brightness_ground_plane);
+CONFIG_FIELD_FLT_ASSERT(rc_config.brightness_axes);
+CONFIG_FIELD_FLT_ASSERT(rc_config.transparency_segments);
+CONFIG_FIELD_FLT_ASSERT(rc_config.transparency_patches);
+CONFIG_FIELD_FLT_ASSERT(rc_config.transparency_rdpat_surface);
+CONFIG_FIELD_FLT_ASSERT(rc_config.transparency_rdpat_wire);
+CONFIG_FIELD_FLT_ASSERT(rc_config.transparency_nearfield);
+CONFIG_FIELD_FLT_ASSERT(rc_config.transparency_ground_plane);
+CONFIG_FIELD_FLT_ASSERT(rc_config.transparency_axes);
 
-/* Post-apply wrappers: read value from rc_config after generic write */
+/*------------------------------------------------------------------------*/
 
-static void post_apply_sync_ortho(void)
-{
-  sync_ortho_toolbar_button();
-}
-
-
-static void post_apply_set_msaa(void)
+/** hook_set_msaa - Apply the MSAA sample count, then redraw */
+void
+hook_set_msaa(void)
 {
   Set_MSAA_Samples(rc_config.opengl_msaa_samples);
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
 }
 
-static void post_apply_set_radius_scale(void)
+/** hook_set_radius_scale - Apply the cylinder radius scale, then redraw */
+void
+hook_set_radius_scale(void)
 {
   opengl_structure_set_radius_scale(rc_config.opengl_cylinder_radius_scale);
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
 }
 
 /*------------------------------------------------------------------------*/
 
-/* OpenGL tab dispatch table: brightness, transparency, toggles, radios.
- * Radio entries bind each widget to its enum value; reset defaults come
- * from rc_config_vars. */
-static const config_default_t opengl_defaults[] = {
-  /* Orthographic projection toggle (widget in OpenGL tab glade;
-   * config entry here since it only affects the OpenGL renderer) */
-  CFG_INT_W(opengl_orthographic, "chk_orthographic", post_apply_sync_ortho),
-
-  /* Per-type brightness sliders (0.0=black, 1.0=full) */
-  CFG_FLT_W(brightness_segments,      "scale_bright_segments",      NULL),
-  CFG_FLT_W(brightness_patches,       "scale_bright_patches",       NULL),
-  CFG_FLT_W(brightness_rdpat_surface, "scale_bright_rdpat_surface", NULL),
-  CFG_FLT_W(brightness_rdpat_wire,    "scale_bright_rdpat_wire",    NULL),
-  CFG_FLT_W(brightness_nearfield,     "scale_bright_nearfield",     NULL),
-  CFG_FLT_W(brightness_ground_plane,  "scale_bright_ground_plane",  NULL),
-  CFG_FLT_W(brightness_axes,          "scale_bright_axes",          NULL),
-
-  /* Per-type transparency sliders (0.0=opaque, 1.0=fully transparent) */
-  CFG_FLT_W(transparency_segments,      "scale_trans_segments",      NULL),
-  CFG_FLT_W(transparency_patches,       "scale_trans_patches",       NULL),
-  CFG_FLT_W(transparency_rdpat_surface, "scale_trans_rdpat_surface", NULL),
-  CFG_FLT_W(transparency_rdpat_wire,    "scale_trans_rdpat_wire",    NULL),
-  CFG_FLT_W(transparency_nearfield,     "scale_trans_nearfield",     NULL),
-  CFG_FLT_W(transparency_ground_plane,  "scale_trans_ground_plane",  NULL),
-  CFG_FLT_W(transparency_axes,          "scale_trans_axes",          NULL),
-
-  /* Cylinder radius scale slider */
-  CFG_DBL_W(opengl_cylinder_radius_scale, "scale_cylinder_scale",
-      post_apply_set_radius_scale),
-
-  /* Transparency on-click toggle */
-  CFG_INT_W(opengl_transparent_on_click, "chk_only_on_click", NULL),
-
-  /* MSAA radio group; each entry binds a widget to its enum value */
-  CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_4x",  post_apply_set_msaa, MSAA_4X),
-  CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_off", post_apply_set_msaa, MSAA_OFF),
-  CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_2x",  post_apply_set_msaa, MSAA_2X),
-  CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_8x",  post_apply_set_msaa, MSAA_8X),
-  CFG_INT_RADIO(opengl_msaa_samples, "radio_msaa_16x", post_apply_set_msaa, MSAA_16X),
-
-  /* Draw style radio group; each entry binds a widget to its enum value */
-  CFG_INT_RADIO(rdpattern_draw_style, "radio_style_both",      NULL, RDPAT_STYLE_BOTH),
-  CFG_INT_RADIO(rdpattern_draw_style, "radio_style_surface",   NULL, RDPAT_STYLE_SURFACE),
-  CFG_INT_RADIO(rdpattern_draw_style, "radio_style_wireframe", NULL, RDPAT_STYLE_WIREFRAME),
-};
-
-const config_tab_defaults_t opengl_tab_defaults = {
-  .entries       = opengl_defaults,
-  .count         = (int)(sizeof(opengl_defaults) / sizeof(opengl_defaults[0])),
-  .session       = NULL,
-  .session_count = 0,
+/* OpenGL tab reset-field list: orthographic projection, per-type brightness
+ * and transparency, cylinder scale, transparent-on-click, MSAA, draw style. */
+void *const opengl_tab_fields[] = {
+  &rc_config.opengl_orthographic,
+  &rc_config.brightness_segments,
+  &rc_config.brightness_patches,
+  &rc_config.brightness_rdpat_surface,
+  &rc_config.brightness_rdpat_wire,
+  &rc_config.brightness_nearfield,
+  &rc_config.brightness_ground_plane,
+  &rc_config.brightness_axes,
+  &rc_config.transparency_segments,
+  &rc_config.transparency_patches,
+  &rc_config.transparency_rdpat_surface,
+  &rc_config.transparency_rdpat_wire,
+  &rc_config.transparency_nearfield,
+  &rc_config.transparency_ground_plane,
+  &rc_config.transparency_axes,
+  &rc_config.opengl_cylinder_radius_scale,
+  &rc_config.opengl_transparent_on_click,
+  &rc_config.opengl_msaa_samples,
+  &rc_config.rdpattern_draw_style,
+  NULL,
 };
 
 /*------------------------------------------------------------------------*/
@@ -130,8 +104,9 @@ const config_tab_defaults_t opengl_tab_defaults = {
 /** on_opengl_tab_reset_clicked - Per-tab Reset button handler for OpenGL tab
  *
  * Restores orthographic projection, brightness, transparency, cylinder scale,
- * MSAA, and draw style to compiled-in defaults. Syncs widgets and redraws
- * OpenGL views.
+ * MSAA, and draw style to compiled-in defaults.  config_reset_tab_user syncs
+ * peer widgets and runs each changed field's hook; the invalidate and redraws
+ * refresh the OpenGL views.
  */
 void
 on_opengl_tab_reset_clicked(GtkButton *button, gpointer user_data)
@@ -140,7 +115,6 @@ on_opengl_tab_reset_clicked(GtkButton *button, gpointer user_data)
   (void)user_data;
 
   config_reset_tab_user(SETTINGS_TAB_OPENGL);
-  config_sync_tab(SETTINGS_TAB_OPENGL);
   opengl_structure_invalidate();
   Queue_Structure_Redraw();
   Queue_Radiation_Redraw();

@@ -440,18 +440,6 @@ on_optimizer_output_toggled(
 
 
   void
-on_confirm_quit_toggled(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    rc_config.confirm_quit = 1;
-  else
-    rc_config.confirm_quit = 0;
-}
-
-
-  void
 on_quit_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
@@ -563,101 +551,10 @@ on_main_rdpattern_activate(
 
     view_set_viewport( rdpattern_view, rdpattern_width, rdpattern_height );
 
-    /* Restore radiation pattern window widgets state */
-    if( rc_config.rdpattern_gain_togglebutton )
-    {
-      widget = Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_gain_togglebutton" );
-      gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      SetFlag(DRAW_GAIN);
-    }
-
-    if( rc_config.rdpattern_eh_togglebutton )
-    {
-      widget = Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_eh_togglebutton" );
-      gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      SetFlag(DRAW_EHFIELD);
-    }
-
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_e_field" );
-    if( rc_config.rdpattern_e_field )
-    {
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      SetFlag( DRAW_EFIELD );
-    }
-    else
-    {
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
-      ClearFlag( DRAW_EFIELD );
-    }
-
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_h_field" );
-    if( rc_config.rdpattern_h_field )
-    {
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      SetFlag( DRAW_HFIELD );
-    }
-    else
-    {
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
-      ClearFlag( DRAW_HFIELD );
-    }
-
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_poynting_vector" );
-    if( rc_config.rdpattern_poynting_vector )
-    {
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      SetFlag( DRAW_POYNTING );
-    }
-    else
-    {
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
-      ClearFlag( DRAW_POYNTING );
-    }
-
-    /* Restore overlay structure state */
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_overlay_structure" );
-    if( rc_config.rdpattern_overlay_structure )
-    {
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      SetFlag( OVERLAY_STRUCT );
-    }
-    else
-    {
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
-      ClearFlag( OVERLAY_STRUCT );
-    }
-
-    /* Restore radiation pattern draw style radio state */
-    {
-      static gchar *style_ids[] = {
-        "rdpattern_style_surface",
-        "rdpattern_style_wireframe",
-        "rdpattern_style_both",
-      };
-
-      int style = rc_config.rdpattern_draw_style;
-      if( style >= 0 && style < NUM_RDPAT_STYLES )
-      {
-        widget = Builder_Get_Object(
-            rdpattern_window_builder, style_ids[style]);
-        gtk_check_menu_item_set_active(
-            GTK_CHECK_MENU_ITEM(widget), TRUE);
-      }
-    }
-
-    /* Sync rdpattern common projection widget from main window state */
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_common_projection" );
-    if( rc_config.main_common_projection )
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-    else
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
+    /* Restore radiation pattern window widget state from the bound config
+     * fields, then run each tree's hook to refresh the derived draw flags. */
+    config_widget_sync_builder( &rdpattern_window_builder );
+    config_widget_run_hooks( &rdpattern_window_builder );
 
     /* Request geometry and show after all structural mutations and
      * widget state restorations so sizing is the last layout operation */
@@ -763,8 +660,6 @@ on_main_freqplots_activate(
   {
     if( Main_Freqplots_Activate() )
     {
-      GtkWidget *widget;
-
       if (rc_config.freqplots_x < 0 || rc_config.rdpattern_y < 0)
       {
           Get_GUI_State();
@@ -793,111 +688,11 @@ on_main_freqplots_activate(
       freqplots_main_view()->width  = alloc.width;
       freqplots_main_view()->height = alloc.height;
 
-      /* Restore frequency plots window widgets state */
-      if( rc_config.freqplots_gmax_togglebutton )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_gmax_togglebutton" );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_gdir_togglebutton )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_gdir_togglebutton" );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_gviewer_togglebutton )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_gviewer_togglebutton" );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_vswr_togglebutton )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_vswr_togglebutton" );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_zrlzim_togglebutton )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_zrlzim_togglebutton" );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_zmgzph_togglebutton )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_zmgzph_togglebutton" );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_smith_togglebutton )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_smith_togglebutton" );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_ant_temp_togglebutton )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_ant_temp_togglebutton" );
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_net_gain )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_net_gain" );
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_min_max )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_min_max" );
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_s11 )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_s11" );
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_clamp_vswr )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_clamp_vswr" );
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_show_ant_temp )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_show_ant_temp" );
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_round_x_axis )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_round_x_axis" );
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      }
-
-      if( rc_config.freqplots_swap_click )
-      {
-        widget = Builder_Get_Object(
-            freqplots_window_builder, "freqplots_swap_click" );
-        gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-      }
+      /* Restore frequency plots window widget state from the bound config
+       * fields, then run each tree's hook to set the derived plot-select
+       * flags and recompute the active-plot count. */
+      config_widget_sync_builder( &freqplots_window_builder );
+      config_widget_run_hooks( &freqplots_window_builder );
 
       /* Request geometry and show after all widget state restorations
        * so sizing is the last layout operation */
@@ -919,51 +714,6 @@ on_main_freqplots_activate(
 }
 
 
-  void
-on_rdpattern_total_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  Set_Polarization( POL_TOTAL );
-}
-
-
-  void
-on_rdpattern_horizontal_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  Set_Polarization( POL_HORIZ );
-}
-
-
-  void
-on_rdpattern_vertical_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  Set_Polarization( POL_VERT );
-}
-
-
-  void
-on_rdpattern_right_hand_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  Set_Polarization( POL_RHCP );
-}
-
-
-  void
-on_rdpattern_left_hand_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  Set_Polarization( POL_LHCP );
-}
-
-
 /* opengl_common_projection_sync()
  *
  * Public entry point used by main.c when the rdpattern window is
@@ -971,7 +721,6 @@ on_rdpattern_left_hand_activate(
  * projection preference by installing or removing the master-follower
  * link between the two view_t instances.
  */
-#ifdef HAVE_OPENGL
   void
 opengl_common_projection_sync(void)
 {
@@ -983,32 +732,8 @@ opengl_common_projection_sync(void)
   else
     view_unshare_master( rdpattern_view );
 }
-#endif
 
 /*-----------------------------------------------------------------------*/
-
-  void
-on_common_projection_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  /* Common projection makes rdpattern_view a follower of structure_view;
-   * the follower reads the master's rotation matrix directly so no
-   * angle copy is required. */
-  gboolean active =
-      gtk_check_menu_item_get_active( GTK_CHECK_MENU_ITEM(menuitem) );
-
-  rc_config.main_common_projection = active ? 1 : 0;
-
-  if( rdpattern_view == NULL || structure_view == NULL )
-    return;
-
-  if( active )
-    view_share_master( rdpattern_view, structure_view );
-  else
-    view_unshare_master( rdpattern_view );
-}
-
 
 /* view_presets - indexed by preset id: 0=X axis, 1=Y axis, 2=Z axis, 3=default */
 static const struct { double wr; double wi; } view_presets[4] = {
@@ -1128,28 +853,6 @@ on_main_incline_spinbutton_value_changed(
 } /* on_main_incline_spinbutton_value_changed() */
 
 
-  void
-on_main_currents_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable calculation and rendering of structure curents */
-  Main_Currents_Togglebutton_Toggled(
-      gtk_toggle_button_get_active(togglebutton) );
-}
-
-
-  void
-on_main_charges_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable calculation and rendering of structure charge density */
-  Main_Charges_Togglebutton_Toggled(
-      gtk_toggle_button_get_active(togglebutton) );
-}
-
-
   gboolean
 on_main_colorcode_drawingarea_draw(
     GtkWidget       *widget,
@@ -1158,82 +861,6 @@ on_main_colorcode_drawingarea_draw(
 {
   Draw_Colorcode( cr );
   return( TRUE );
-}
-
-
-  void
-on_freq_spinbutton_value_changed(
-    GtkSpinButton   *spinbutton,
-    gpointer         user_data)
-{
-  /* Frequency spinbutton value changed by frequency loop via freq_step_update_ui;
-   * all redraws are already queued — guard against re-entrancy only. */
-  if( isFlagSet(FREQ_LOOP_RUNNING) )
-    return;
-
-  if( isFlagClear(FREQ_LOOP_INIT) )
-  {
-    gdouble fmhz = gtk_spin_button_get_value(spinbutton);
-
-    if( isFlagSet(FREQ_APPLY) )
-      user_set_frequency((double)fmhz);
-    else
-      freq_display_update((double)fmhz);
-
-    /* Sync the other window's frequency spinbutton without re-triggering */
-    if( spinbutton == mainwin_frequency )
-    {
-      if( isFlagSet(DRAW_ENABLED) && rdpattern_frequency != NULL )
-      {
-        SIGNAL_BLOCK(rdpattern_frequency, on_freq_spinbutton_value_changed);
-        gtk_spin_button_set_value(rdpattern_frequency, fmhz);
-        SIGNAL_UNBLOCK(rdpattern_frequency, on_freq_spinbutton_value_changed);
-      }
-    }
-    else
-    {
-      SIGNAL_BLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
-      gtk_spin_button_set_value(mainwin_frequency, fmhz);
-      SIGNAL_UNBLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
-    }
-  }
-
-  gtk_spin_button_update(spinbutton);
-}
-
-
-  void
-on_freq_apply_checkbutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  if( gtk_toggle_button_get_active(togglebutton) )
-    SetFlag(FREQ_APPLY);
-  else
-    ClearFlag(FREQ_APPLY);
-
-  /* Sync the other window's checkbox without re-triggering this handler */
-  if( window_type_from_widget(GTK_WIDGET(togglebutton)) == MAIN_WINDOW )
-  {
-    if( isFlagSet(DRAW_ENABLED) && rdpattern_window_builder )
-    {
-      GtkWidget *other = Builder_Get_Object(
-          rdpattern_window_builder, "rdpattern_freq_checkbutton");
-      SIGNAL_BLOCK(other, on_freq_apply_checkbutton_toggled);
-      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(other),
-          isFlagSet(FREQ_APPLY));
-      SIGNAL_UNBLOCK(other, on_freq_apply_checkbutton_toggled);
-    }
-  }
-  else
-  {
-    GtkWidget *other = Builder_Get_Object(
-        main_window_builder, "main_freq_checkbutton");
-    SIGNAL_BLOCK(other, on_freq_apply_checkbutton_toggled);
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(other),
-        isFlagSet(FREQ_APPLY));
-    SIGNAL_UNBLOCK(other, on_freq_apply_checkbutton_toggled);
-  }
 }
 
 
@@ -1487,46 +1114,6 @@ on_freqplots_save_as_csv_activate(
 }
 
   void
-on_freqplots_gmax_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable or not max gain plotting */
-  Plot_Select( togglebutton, PLOT_GMAX );
-}
-
-
-  void
-on_freqplots_gdir_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable or not gain direction plotting */
-  Plot_Select( togglebutton, PLOT_GAIN_DIR );
-}
-
-
-  void
-on_freqplots_gviewer_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable or not "gain toward user" plotting */
-  Plot_Select( togglebutton, PLOT_GVIEWER );
-}
-
-
-  void
-on_freqplots_vswr_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable or not VSWR plotting */
-  Plot_Select( togglebutton, PLOT_VSWR );
-}
-
-
-  void
 on_freqplots_zo_spinbutton_value_changed(
     GtkSpinButton   *spinbutton,
     gpointer         user_data)
@@ -1539,45 +1126,6 @@ on_freqplots_zo_spinbutton_value_changed(
   }
 
   gtk_spin_button_update( spinbutton );
-}
-
-
-  void
-on_freqplots_zrlzim_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable or not Z-real/Z-imag plotting */
-  Plot_Select( togglebutton, PLOT_ZREAL_ZIMAG );
-}
-
-  void
-on_freqplots_smith_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable or not smith chart plotting */
-  Plot_Select( togglebutton, PLOT_SMITH );
-}
-
-
-  void
-on_freqplots_ant_temp_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable or not antenna temperature plotting */
-  Plot_Select( togglebutton, PLOT_ANT_TEMP );
-}
-
-
-  void
-on_freqplots_zmgzph_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  /* Enable or not Z-mag/Z-phase plotting */
-  Plot_Select( togglebutton, PLOT_ZMAG_ZPHASE );
 }
 
 
@@ -2242,79 +1790,6 @@ on_rdpattern_elevation_spinbutton_value_changed(
 
 
   void
-on_rdpattern_e_field_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    SetFlag( DRAW_EFIELD );
-  else
-    ClearFlag( DRAW_EFIELD );
-  Set_Window_Labels();
-  if( isFlagSet(DRAW_EHFIELD) )
-    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-}
-
-
-  void
-on_rdpattern_h_field_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    SetFlag( DRAW_HFIELD );
-  else
-    ClearFlag( DRAW_HFIELD );
-  Set_Window_Labels();
-  if( isFlagSet(DRAW_EHFIELD) )
-    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-}
-
-
-  void
-on_rdpattern_poynting_vector_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    SetFlag( DRAW_POYNTING );
-  else
-    ClearFlag( DRAW_POYNTING );
-  Set_Window_Labels();
-  if( isFlagSet(DRAW_EHFIELD) )
-    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-}
-
-
-  void
-on_rdpattern_overlay_structure_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    SetFlag( OVERLAY_STRUCT );
-  else
-    ClearFlag( OVERLAY_STRUCT );
-
-  xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-}
-
-
-  void
-on_rdpattern_gradient_key_toggled(
-    GtkCheckMenuItem *menuitem,
-    gpointer          user_data)
-{
-  if( gtk_check_menu_item_get_active(menuitem) )
-    rc_config.rdpattern_gradient_key = 1;
-  else
-    rc_config.rdpattern_gradient_key = 0;
-
-  xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-}
-
-
-  void
 opengl_set_renderer(gboolean enable)
 {
 #ifdef HAVE_OPENGL
@@ -2462,26 +1937,6 @@ on_rdpattern_incline_spinbutton_value_changed(
 } /* on_rdpattern_incline_spinbutton_value_changed() */
 
 
-  void
-on_rdpattern_gain_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  Rdpattern_Gain_Togglebutton_Toggled(
-      gtk_toggle_button_get_active(togglebutton) );
-}
-
-
-  void
-on_rdpattern_eh_togglebutton_toggled(
-    GtkToggleButton *togglebutton,
-    gpointer         user_data)
-{
-  Rdpattern_EH_Togglebutton_Toggled(
-      gtk_toggle_button_get_active(togglebutton) );
-}
-
-
   gboolean
 on_rdpattern_colorcode_drawingarea_draw(
     GtkWidget       *widget,
@@ -2604,57 +2059,6 @@ on_quit_okbutton_clicked(
 }
 
 
-  void
-main_view_menuitem_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  /* Sync common projection checkbutton from the persisted preference
-   * so the visible state matches rc_config at menu-open time. */
-  gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-        Builder_Get_Object(main_window_builder, "main_common_projection")),
-      rc_config.main_common_projection ? TRUE : FALSE );
-}
-
-
-  void
-main_pol_menu_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  Set_Pol_Menuitem( MAIN_WINDOW );
-}
-
-
-  void
-freqplots_pol_menu_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  Set_Pol_Menuitem( FREQPLOTS_WINDOW );
-}
-
-
-  void
-rdpattern_pol_menu_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  Set_Pol_Menuitem( RDPATTERN_WINDOW );
-}
-
-
-  void
-rdpattern_view_menuitem_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-        Builder_Get_Object(rdpattern_window_builder, "rdpattern_common_projection")),
-      rc_config.main_common_projection ? TRUE : FALSE );
-}
-
-
   gboolean
 on_rdpattern_window_key_press_event(
     GtkWidget    *widget,
@@ -2722,205 +2126,58 @@ on_near_snapshot_activate(
 }
 
 
-/* Animation control panel mirror bindings.  Each row binds one panel control
- * in animate_dialog_builder to the canonical visualization widget that owns
- * the flag and redraw.  Builders are stored by address so a NULL window
- * builder (closed window) resolves at runtime, greying the control. */
-typedef struct
+/* Animation panel controls mirror visualization fields owned by the main and
+ * rdpattern windows.  Each control is meaningful only while its owning window
+ * is open; anim_panel_sensitivity greys those whose owner is closed.  The
+ * control values themselves are config_widget elements synced from their
+ * fields, so no value mirroring lives here. */
+static const struct
 {
-  const char  *panel_id;      /* GtkCheckButton in animate_dialog_builder */
-  GtkBuilder **canon_builder; /* &main_window_builder or &rdpattern_window_builder */
-  const char  *canon_on_id;   /* canonical widget set active from the panel control */
-} anim_mirror_t;
-
-static const anim_mirror_t anim_mirror_table[] =
+  const char  *panel_id;
+  GtkBuilder **owner_builder;
+} anim_panel_owners[] =
 {
-  { "anim_currents", &main_window_builder,      "main_currents_togglebutton" },
-  { "anim_efield",   &rdpattern_window_builder, "rdpattern_e_field"          },
-  { "anim_hfield",   &rdpattern_window_builder, "rdpattern_h_field"          },
-  { "anim_poynting", &rdpattern_window_builder, "rdpattern_poynting_vector"  },
+  { "anim_currents", &main_window_builder      },
+  { "anim_efield",   &rdpattern_window_builder },
+  { "anim_hfield",   &rdpattern_window_builder },
+  { "anim_poynting", &rdpattern_window_builder },
 };
 
-/* Flow-direction combo rows in GtkComboBoxText model order; this order must
- * match the anim_flow_dir items in xnec2c.glade.  Polarization tilt and peak
- * magnitude are excluded: they are phase invariant and do not animate from the
- * flow direction. */
-static const char * const anim_flow_dir_ids[] =
-{
-  "main_flow_dir_ref_phase",
-  "main_flow_dir_lic",
-  "main_flow_dir_wireframe",
-};
-
-/* Panel mirror canonical widgets are either toolbar toggle buttons or check
- * menu items; this closed set is resolved by widget type. */
-  static gboolean
-widget_get_active(GtkWidget *w)
-{
-  if( GTK_IS_TOGGLE_BUTTON(w) )
-    return( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)) );
-  else if( GTK_IS_CHECK_MENU_ITEM(w) )
-    return( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w)) );
-  else
-  {
-    BUG( "unexpected canonical widget type" );
-    return( FALSE );
-  }
-}
-
-  static void
-widget_set_active(GtkWidget *w, gboolean active)
-{
-  if( GTK_IS_TOGGLE_BUTTON(w) )
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(w), active );
-  else if( GTK_IS_CHECK_MENU_ITEM(w) )
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(w), active );
-  else
-    BUG( "unexpected canonical widget type" );
-}
-
-  static const anim_mirror_t *
-anim_mirror_row_for_panel(GtkWidget *panel)
-{
-  size_t i;
-
-  for( i = 0; i < G_N_ELEMENTS(anim_mirror_table); i++ )
-    if( Builder_Get_Object(animate_dialog_builder, anim_mirror_table[i].panel_id) == panel )
-      return( &anim_mirror_table[i] );
-
-  return( NULL );
-}
-
-/** on_anim_mirror_toggled() - Forward a panel checkbox to its canonical widget
- * @togglebutton: emitting panel GtkCheckButton
- * @user_data: unused
+/** anim_panel_sensitivity() - Grey animation panel controls by owner state
  *
- * Writing the canonical widget fires its existing handler, which performs the
- * real flag change and redraw.  A NULL canonical builder means the owning
- * window is closed and the control is insensitive, so nothing is forwarded.
- */
-  void
-on_anim_mirror_toggled(GtkToggleButton *togglebutton, gpointer user_data)
-{
-  const anim_mirror_t *row;
-  GtkBuilder *b;
-  gboolean on;
-
-  (void)user_data;
-
-  row = anim_mirror_row_for_panel( GTK_WIDGET(togglebutton) );
-  if( row == NULL )
-    return;
-
-  b = *row->canon_builder;
-  if( b == NULL )
-    return;
-
-  on = gtk_toggle_button_get_active( togglebutton );
-  widget_set_active( Builder_Get_Object(b, row->canon_on_id), on );
-}
-
-/** on_anim_flow_dir_changed() - Forward the panel flow-direction combo
- * @combo: emitting GtkComboBox
- * @user_data: unused
- *
- * Sets the canonical flow-direction radio menu item active for the selected
- * index; its activate handler applies the mode and redraws.
- */
-  void
-on_anim_flow_dir_changed(GtkComboBox *combo, gpointer user_data)
-{
-  int idx;
-  GtkWidget *radio;
-
-  (void)user_data;
-
-  if( main_window_builder == NULL )
-    return;
-
-  idx = gtk_combo_box_get_active( combo );
-  if( idx < 0 || idx >= (int)G_N_ELEMENTS(anim_flow_dir_ids) )
-    return;
-
-  radio = Builder_Get_Object( main_window_builder, anim_flow_dir_ids[idx] );
-  gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(radio), TRUE );
-}
-
-  static void
-anim_flow_dir_sync(void)
-{
-  GtkComboBox *combo =
-    GTK_COMBO_BOX( Builder_Get_Object(animate_dialog_builder, "anim_flow_dir") );
-  size_t i;
-  int active = -1;
-
-  if( main_window_builder == NULL )
-  {
-    gtk_widget_set_sensitive( GTK_WIDGET(combo), FALSE );
-    return;
-  }
-
-  gtk_widget_set_sensitive( GTK_WIDGET(combo), TRUE );
-
-  for( i = 0; i < G_N_ELEMENTS(anim_flow_dir_ids); i++ )
-  {
-    GtkWidget *radio = Builder_Get_Object( main_window_builder, anim_flow_dir_ids[i] );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(radio)) )
-      active = (int)i;
-  }
-
-  SIGNAL_BLOCK( combo, on_anim_flow_dir_changed );
-  gtk_combo_box_set_active( combo, active );
-  SIGNAL_UNBLOCK( combo, on_anim_flow_dir_changed );
-}
-
-/** anim_mirror_sync() - Reflect canonical visualization state into the panel
- *
- * For each mirror row, greys the panel control when its owning window is
- * closed, otherwise sets its sensitivity and active state from the canonical
- * widget with the forward handler signal-blocked to avoid a feedback loop.
+ * Greys each panel control whose owning window is closed, greys the
+ * flow-direction combo when the main window is closed, and greys the
+ * structure frame when the model carries no surface patches.
  */
   static void
-anim_mirror_sync(void)
+anim_panel_sensitivity(void)
 {
+  GtkWidget *widget;
+  gboolean has_patches;
   size_t i;
 
   if( animate_dialog == NULL )
     return;
 
-  for( i = 0; i < G_N_ELEMENTS(anim_mirror_table); i++ )
+  for( i = 0; i < G_N_ELEMENTS(anim_panel_owners); i++ )
   {
-    const anim_mirror_t *row = &anim_mirror_table[i];
-    GtkWidget *panel = Builder_Get_Object( animate_dialog_builder, row->panel_id );
-    GtkBuilder *b = *row->canon_builder;
-
-    if( b == NULL )
-    {
-      gtk_widget_set_sensitive( panel, FALSE );
-      continue;
-    }
-
-    gtk_widget_set_sensitive( panel, TRUE );
-    SIGNAL_BLOCK( panel, on_anim_mirror_toggled );
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(panel),
-        widget_get_active(Builder_Get_Object(b, row->canon_on_id)) );
-    SIGNAL_UNBLOCK( panel, on_anim_mirror_toggled );
+    widget = Builder_Get_Object( animate_dialog_builder,
+        anim_panel_owners[i].panel_id );
+    gtk_widget_set_sensitive( widget,
+        *anim_panel_owners[i].owner_builder != NULL );
   }
+
+  widget = Builder_Get_Object( animate_dialog_builder, "anim_flow_dir" );
+  gtk_widget_set_sensitive( widget, main_window_builder != NULL );
 
   /* Grey out Structure section when model has no surface patches */
-  {
-    GtkWidget *frame = Builder_Get_Object(
-        animate_dialog_builder, "anim_structure_frame");
-    gboolean has_patches = (data.m > 0);
-
-    gtk_widget_set_sensitive(frame, has_patches);
-    gtk_widget_set_tooltip_text(frame,
-        has_patches ? NULL
-        : _("Current flow animation requires surface patches"
-            " (SP/SM cards) in the model."));
-  }
-
-  anim_flow_dir_sync();
+  widget = Builder_Get_Object( animate_dialog_builder, "anim_structure_frame" );
+  has_patches = (data.m > 0);
+  gtk_widget_set_sensitive( widget, has_patches );
+  gtk_widget_set_tooltip_text( widget,
+      has_patches ? NULL
+      : _("Current flow animation requires surface patches"
+          " (SP/SM cards) in the model.") );
 }
 
 /* Wrap value into the half-open phase span [lower, lower+span). */
@@ -3052,7 +2309,9 @@ show_animate_dialog(void)
         G_CALLBACK(on_phase_slider_motion_notify), NULL );
   }
   gtk_widget_show( animate_dialog );
-  anim_mirror_sync();
+  config_widget_sync_builder( &animate_dialog_builder );
+  config_widget_run_hooks( &animate_dialog_builder );
+  anim_panel_sensitivity();
 }
 
 
@@ -3234,114 +2493,6 @@ on_animation_okbutton_clicked(
   gtk_widget_destroy( animate_dialog );
 }
 
-
-/** on_flow_direction_activate - Callback for flow direction radio menu items
- * @menuitem: activated radio menu item
- * @user_data: unused
- *
- * Determines mode from widget identity in main window builder.
- * Skips inactive radio emissions to avoid double-fire on group switches.
- */
-  void
-on_flow_direction_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  static const struct
-  {
-    gchar *id;
-    int mode;
-  } items[] = {
-    { "main_flow_dir_ref_phase", FLOW_DIR_REFERENCE_PHASE },
-    { "main_flow_dir_pol_axis",  FLOW_DIR_POLARIZATION_TILT },
-    { "main_flow_dir_peak_mag",  FLOW_DIR_PEAK_MAGNITUDE },
-    { "main_flow_dir_lic",       FLOW_DIR_LIC },
-    { "main_flow_dir_wireframe", FLOW_DIR_WIREFRAME },
-  };
-
-  int i;
-
-  (void)user_data;
-
-  if( GTK_IS_CHECK_MENU_ITEM(menuitem) &&
-      !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    return;
-
-  for( i = 0; i < (int)(sizeof(items) / sizeof(items[0])); i++ )
-  {
-    GtkWidget *w = Builder_Get_Object(main_window_builder, items[i].id);
-
-    if( GTK_WIDGET(menuitem) == w )
-    {
-      rc_config.current_flow_visualization_mode = items[i].mode;
-#ifdef HAVE_OPENGL
-      opengl_structure_invalidate();
-#endif
-      Queue_Structure_Redraw();
-      Queue_Radiation_Redraw();
-
-      /* Animation produces no visible change for phase-invariant modes.
-       * Grey out Animate menu item for Polarization Tilt and Peak Magnitude. */
-      {
-        gboolean animatable =
-          (items[i].mode == FLOW_DIR_REFERENCE_PHASE ||
-           items[i].mode == FLOW_DIR_LIC ||
-           items[i].mode == FLOW_DIR_WIREFRAME);
-
-        GtkWidget *anim_w = Builder_Get_Object(
-            main_window_builder, "main_structure_animate");
-        gtk_widget_set_sensitive(anim_w, animatable);
-      }
-
-      return;
-    }
-  }
-}
-
-
-/** on_rdpattern_draw_style_activate() - Callback for radiation pattern draw style radio menu items
- * @menuitem: activated radio menu item
- * @user_data: unused
- *
- * Determines style from widget identity in rdpattern window builder.
- * Skips inactive radio emissions to avoid double-fire on group switches.
- */
-  void
-on_rdpattern_draw_style_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  static const struct
-  {
-    gchar *id;
-    int style;
-  } items[] = {
-    { "rdpattern_style_surface",   RDPAT_STYLE_SURFACE },
-    { "rdpattern_style_wireframe", RDPAT_STYLE_WIREFRAME },
-    { "rdpattern_style_both",      RDPAT_STYLE_BOTH },
-  };
-
-  int i;
-
-  if( GTK_IS_CHECK_MENU_ITEM(menuitem) &&
-      !gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    return;
-
-  for( i = 0; i < (int)(sizeof(items) / sizeof(items[0])); i++ )
-  {
-    GtkWidget *w = Builder_Get_Object(
-        rdpattern_window_builder, items[i].id);
-
-    if( GTK_WIDGET(menuitem) == w )
-    {
-      rc_config.rdpattern_draw_style = items[i].style;
-      config_sync_tab(SETTINGS_TAB_OPENGL);
-
-      Queue_Radiation_Redraw();
-      return;
-    }
-  }
-}
 
 /*-----------------------------------------------------------------------*/
 
@@ -5918,129 +5069,6 @@ on_aboutdialog_response(
 }
 
 
-  void
-on_freqplots_min_max_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-
-  // No room for PLOT_ flags, so using rc_config:
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    rc_config.freqplots_min_max = 1;
-  else
-    rc_config.freqplots_min_max = 0;
-
-  /* Trigger a redraw of frequency plots drawingarea */
-  if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
-  {
-    freqplots_redraw_all(TRUE);
-  }
-}
-
-  void
-on_freqplots_s11_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-
-  // No room for PLOT_ flags, so using rc_config:
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    rc_config.freqplots_s11 = 1;
-  else
-    rc_config.freqplots_s11 = 0;
-
-  /* Trigger a redraw of frequency plots drawingarea */
-  if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
-  {
-    freqplots_redraw_all(TRUE);
-  }
-}
-
-  void
-on_freqplots_clamp_vswr_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-
-  // No room for PLOT_ flags, so using rc_config:
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    rc_config.freqplots_clamp_vswr = 1;
-  else
-    rc_config.freqplots_clamp_vswr = 0;
-
-  /* Trigger a redraw of frequency plots drawingarea */
-  if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
-  {
-    freqplots_redraw_all(TRUE);
-  }
-}
-
-  void
-on_freqplots_show_ant_temp_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  /* Toggle showing Ta instead of TA on right axis */
-  rc_config.freqplots_show_ant_temp =
-    gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem));
-
-  /* Trigger a redraw of frequency plots drawingarea */
-  if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
-  {
-    freqplots_redraw_all(TRUE);
-  }
-}
-
-  void
-on_freqplots_round_x_axis_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-
-  // No room for PLOT_ flags, so using rc_config:
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    rc_config.freqplots_round_x_axis = 1;
-  else
-    rc_config.freqplots_round_x_axis = 0;
-
-  /* Trigger a redraw of frequency plots drawingarea */
-  if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
-  {
-    freqplots_redraw_all(TRUE);
-  }
-}
-
-  void
-on_freqplots_swap_click_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  /* Swap left and right click frequency selection; affects only the
-   * interpretation of future clicks, so no redraw is required. */
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    rc_config.freqplots_swap_click = 1;
-  else
-    rc_config.freqplots_swap_click = 0;
-}
-
-  void
-on_freqplots_net_gain_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-    SetFlag( PLOT_NETGAIN );
-  else
-    ClearFlag( PLOT_NETGAIN );
-
-  /* Trigger a redraw of frequency plots drawingarea */
-  if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
-  {
-    freqplots_redraw_all(TRUE);
-  }
-}
-
-
 /* on_freqplots_theme_activate()
  *
  * Base color-theme radio selection.  Sets the active base theme name and
@@ -6346,90 +5374,4 @@ on_escape_key_press_event(
   }
   else return( FALSE );
 }
-
-/*------------------------------------------------------------------------*/
-
-/* Ortho toolbar button entries: builder pointer-to-pointer, button id, image id */
-static const struct
-{
-  GtkBuilder **builder;
-  const gchar  *btn_id;
-  const gchar  *img_id;
-} ortho_toolbars[] = {
-  { &main_window_builder,      "main_ortho_button",      "main_ortho_image"      },
-  { &rdpattern_window_builder,  "rdpattern_ortho_button", "rdpattern_ortho_image" },
-};
-
-/*------------------------------------------------------------------------*/
-
-/**
- * sync_ortho_toolbar_button - Set ortho toggle button state and image in all toolbars
- *
- * Reads rc_config.opengl_orthographic and updates the toggle button active
- * state and icon in both the main window and rdpattern window toolbars.
- * Blocks on_ortho_toggled during programmatic writes to prevent re-entrancy.
- */
-void
-sync_ortho_toolbar_button(void)
-{
-  const gchar *icon = rc_config.opengl_orthographic
-      ? "/ortho_cube.svg" : "/persp_cube.svg";
-  int i;
-
-  for( i = 0; i < (int)(sizeof(ortho_toolbars) / sizeof(ortho_toolbars[0])); i++ )
-  {
-    GtkWidget *btn, *img;
-
-    if( *ortho_toolbars[i].builder == NULL )
-      continue;
-
-    btn = GTK_WIDGET(gtk_builder_get_object(*ortho_toolbars[i].builder, ortho_toolbars[i].btn_id));
-    img = GTK_WIDGET(gtk_builder_get_object(*ortho_toolbars[i].builder, ortho_toolbars[i].img_id));
-    if( btn != NULL && img != NULL )
-    {
-      SIGNAL_BLOCK(btn, on_ortho_toggled);
-      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn),
-          rc_config.opengl_orthographic);
-      SIGNAL_UNBLOCK(btn, on_ortho_toggled);
-      gtk_image_set_from_resource(GTK_IMAGE(img), icon);
-    }
-  }
-}
-
-/*------------------------------------------------------------------------*/
-
-#ifdef HAVE_OPENGL
-
-/**
- * on_ortho_toggled - Toolbar toggle handler for orthographic projection
- *
- * Shared by both the main window and rdpattern window toolbar buttons.
- * Writes rc_config.opengl_orthographic, syncs all toolbar buttons and the
- * settings dialog checkbox, and queues redraws.
- */
-void
-on_ortho_toggled(GtkToggleButton *button, gpointer user_data)
-{
-  (void)user_data;
-
-  rc_config.opengl_orthographic = gtk_toggle_button_get_active(button) ? 1 : 0;
-  sync_ortho_toolbar_button();
-  render_settings_sync_from_config();
-  Queue_Structure_Redraw();
-  Queue_Radiation_Redraw();
-}
-
-#else /* !HAVE_OPENGL */
-
-/* Stub: glade binds on_ortho_toggled on toolbar buttons that are hidden
- * in non-OpenGL builds; provide the symbol so gtk_builder_connect_signals
- * resolves without warning. */
-void
-on_ortho_toggled(GtkToggleButton *button, gpointer user_data)
-{
-  (void)button;
-  (void)user_data;
-}
-
-#endif /* HAVE_OPENGL */
 

@@ -26,6 +26,8 @@
 #include "../shared.h"
 #include "../callbacks.h"
 #include "../rc_config.h"
+#include "../structure_ui.h"
+#include "render_settings.h"
 #include "render_settings_common.h"
 #include "render_settings_internal.h"
 
@@ -34,53 +36,63 @@
  * is the sole write site. */
 GtkWidget *render_settings_window = NULL;
 
-/* Top-level dispatch table indexed by settings_tab_t */
-const config_tab_defaults_t *render_tab_defaults[SETTINGS_TAB_COUNT] = {
-  [SETTINGS_TAB_GENERAL] = &general_tab_defaults,
-  [SETTINGS_TAB_OPENGL]  = &opengl_tab_defaults,
-  [SETTINGS_TAB_CAIRO]   = &cairo_tab_defaults,
+/* Top-level reset-field table indexed by settings_tab_t (pointer array
+ * because per-tab lists reside in separate translation units) */
+void *const *render_tab_fields[SETTINGS_TAB_COUNT] = {
+  [SETTINGS_TAB_GENERAL] = general_tab_fields,
+  [SETTINGS_TAB_OPENGL]  = opengl_tab_fields,
+  [SETTINGS_TAB_CAIRO]   = cairo_tab_fields,
 };
 
 /*------------------------------------------------------------------------*/
 
-/** config_reset_tab_user - Reset one tab and invoke post_apply hooks
+/** hook_render_redraw - Queue structure and radiation redraws
+ *
+ * Change-edge hook for settings fields whose only side effect is a redraw
+ * (brightness, transparency, cairo modes, transparent-on-click).
+ */
+void
+hook_render_redraw(void)
+{
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
+}
+
+/*------------------------------------------------------------------------*/
+
+/** config_reset_tab_user - Reset one tab's fields to compiled-in defaults
  * @tab: which tab to reset
  *
- * Joins each render row to its persistence row by field pointer, applies the
- * rc_config_vars default, and invokes post_apply when the value changed.
- * Radio siblings share one field; each field resets once through its first
- * occurrence in the tab.
+ * Walks the tab's field list, applies each rc_config_vars default, and on a
+ * changed value runs the field's change-edge hook and peer sync through
+ * config_widget_field_changed.
  */
 void
 config_reset_tab_user(settings_tab_t tab)
 {
-  const config_tab_defaults_t *td = render_tab_defaults[tab];
-  int i, j;
+  void *const *fields = render_tab_fields[tab];
+  int i;
 
-  for( i = 0; i < td->count; i++ )
+  for( i = 0; fields[i] != NULL; i++ )
   {
-    const config_default_t *e = &td->entries[i];
+    void *field = fields[i];
     rc_config_vars_t *v;
     char old_val[sizeof(double)];
+    size_t size;
 
-    /* Skip a field already reset by an earlier entry (radio siblings). */
-    for( j = 0; j < i && td->entries[j].field != e->field; j++ )
-      ;
-    if( j < i )
-      continue;
-
-    v = rc_config_find_by_field(e->field);
+    v = rc_config_find_by_field(field);
     if( v == NULL )
     {
       BUG("config_reset_tab_user: field has no rc_config_vars row\n");
       continue;
     }
 
-    memcpy(old_val, e->field, e->size);
+    size = rc_config_field_size(v);
+    memcpy(old_val, field, size);
     rc_config_set_default(v);
 
-    if( e->post_apply != NULL && memcmp(old_val, e->field, e->size) != 0 )
-      e->post_apply();
+    if( memcmp(old_val, field, size) != 0 )
+      config_widget_field_changed(field);
   }
 }
 

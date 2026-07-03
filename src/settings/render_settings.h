@@ -33,4 +33,13 @@ void render_settings_hide(void);
 
 /** render_settings_sync_from_config - Update all widgets from rc_config */
 void render_settings_sync_from_config(void);
+
+/* Change-edge hooks bound directly by rc_config_vars rows (config_widget
+ * post_apply); definitions live in the per-tab source files. */
+void hook_render_redraw(void);
+void hook_set_renderer(void);
+void hook_set_constrained(void);
+void hook_set_msaa(void);
+void hook_set_radius_scale(void);
+
 #endif /* RENDER_SETTINGS_H */

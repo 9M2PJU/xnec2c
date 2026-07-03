@@ -19,7 +19,8 @@
 
 /*
  * render_settings_stubs: non-OpenGL stubs for OpenGL-specific settings
- * symbols that the dispatch and common modules reference unconditionally.
+ * symbols that the rc_config_vars rows and reset path reference
+ * unconditionally.
  *
  * When HAVE_OPENGL is defined, the real implementations in
  * render_settings_opengl.c provide these symbols instead.
@@ -29,18 +30,31 @@
 
 #ifndef HAVE_OPENGL
 
+#include "render_settings.h"
 #include "render_settings_common.h"
 #include "render_settings_internal.h"
 
 /*------------------------------------------------------------------------*/
 
-/* Empty OpenGL tab: entire tab is OpenGL-specific */
-const config_tab_defaults_t opengl_tab_defaults = {
-  .entries       = NULL,
-  .count         = 0,
-  .session       = NULL,
-  .session_count = 0,
+/* Empty OpenGL tab: the entire tab is OpenGL-specific */
+void *const opengl_tab_fields[] = {
+  NULL,
 };
+
+/*------------------------------------------------------------------------*/
+
+/* OpenGL change-edge hooks bound by rc_config_vars rows: no-ops without
+ * OpenGL, so the rows link in a Cairo-only build. */
+
+void
+hook_set_msaa(void)
+{
+}
+
+void
+hook_set_radius_scale(void)
+{
+}
 
 /*------------------------------------------------------------------------*/
 

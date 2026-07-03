@@ -24,6 +24,7 @@
 #include "rc_config.h"
 #include "mathlib.h"
 #include "measurements.h"
+#include "config_hooks.h"
 
 #include "opengl/opengl_structure.h"
 #include "opengl/opengl_msaa.h"
@@ -35,6 +36,26 @@
  *    Set the format string
  *    Create references to the .vars structure to load/save values
  */
+
+/* OpenGL-tab widgets live in opengl_settings.glade, loaded only under
+ * HAVE_OPENGL.  A Cairo build still persists the underlying fields but binds
+ * no widget: GL_CONFIG_WIDGET_TREE/SINGLE resolve to the widget tree under
+ * HAVE_OPENGL and to NULL otherwise, so every row keeps a literal .widgets
+ * assignment and rc_config_register_widgets skips the NULL binding.
+ * GL_CONFIG_WIDGET_GROUP emits one render-settings group inside a multi-group
+ * tree, or nothing, so it needs no .widgets prefix. */
+#ifdef HAVE_OPENGL
+#define GL_CONFIG_WIDGET_TREE(...)   CONFIG_WIDGET_TREE(__VA_ARGS__)
+#define GL_CONFIG_WIDGET_SINGLE(...) CONFIG_WIDGET_SINGLE(__VA_ARGS__)
+#define GL_CONFIG_WIDGET_GROUP(...)  CONFIG_WIDGET_GROUP(__VA_ARGS__),
+#else
+#define GL_CONFIG_WIDGET_TREE(...)   NULL
+#define GL_CONFIG_WIDGET_SINGLE(...) NULL
+#define GL_CONFIG_WIDGET_GROUP(...)
+#endif
+
+/* polarization stores an int; the "%d"/sizeof(int) row accessor requires it */
+CONFIG_FIELD_INT_ASSERT(calc_data.pol_type);
 
 static void working_dir_set_default(rc_config_vars_t *v);
 
@@ -57,31 +78,71 @@ rc_config_vars_t rc_config_vars[] = {
 		.def = { { .i = 50 }, { .i = 50 } } },
 
 	{ .desc = "Main Window Currents toggle button state", .format = "%d",
-		.vars = { &rc_config.main_currents_togglebutton } },
+		.vars = { &rc_config.main_currents_togglebutton },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_main_currents,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "main_currents_togglebutton" ), NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_currents" ), NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Main Window Charges toggle button state", .format = "%d",
-		.vars = { &rc_config.main_charges_togglebutton } },
+		.vars = { &rc_config.main_charges_togglebutton },
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder,
+			"main_charges_togglebutton", hook_main_charges ) },
 
-	{ .desc = "Main Window Polarization menu total state", .format = "%d",
-		.vars = { &rc_config.main_total } },
-
-	{ .desc = "Main Window Polarization menu horizontal state", .format = "%d",
-		.vars = { &rc_config.main_horizontal } },
-
-	{ .desc = "Main Window Polarization menu vertical state", .format = "%d",
-		.vars = { &rc_config.main_vertical } },
-
-	{ .desc = "Main Window Polarization menu right hand state", .format = "%d",
-		.vars = { &rc_config.main_right_hand } },
-
-	{ .desc = "Main Window Polarization menu left hand state", .format = "%d",
-		.vars = { &rc_config.main_left_hand } },
+	{ .desc = "Polarization Type", .format = "%d",
+		.vars = { &calc_data.pol_type }, .def = { { .i = POL_TOTAL } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_polarization,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "main_total",
+							.values = CONFIG_WIDGET_VALUES(POL_TOTAL) ),
+						CONFIG_WIDGET( .widget_id = "main_horizontal",
+							.values = CONFIG_WIDGET_VALUES(POL_HORIZ) ),
+						CONFIG_WIDGET( .widget_id = "main_vertical",
+							.values = CONFIG_WIDGET_VALUES(POL_VERT) ),
+						CONFIG_WIDGET( .widget_id = "main_right_hand",
+							.values = CONFIG_WIDGET_VALUES(POL_RHCP) ),
+						CONFIG_WIDGET( .widget_id = "main_left_hand",
+							.values = CONFIG_WIDGET_VALUES(POL_LHCP) ),
+						NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_total",
+							.values = CONFIG_WIDGET_VALUES(POL_TOTAL) ),
+						CONFIG_WIDGET( .widget_id = "rdpattern_horizontal",
+							.values = CONFIG_WIDGET_VALUES(POL_HORIZ) ),
+						CONFIG_WIDGET( .widget_id = "rdpattern_vertical",
+							.values = CONFIG_WIDGET_VALUES(POL_VERT) ),
+						CONFIG_WIDGET( .widget_id = "rdpattern_right_hand",
+							.values = CONFIG_WIDGET_VALUES(POL_RHCP) ),
+						CONFIG_WIDGET( .widget_id = "rdpattern_left_hand",
+							.values = CONFIG_WIDGET_VALUES(POL_LHCP) ),
+						NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &freqplots_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "freqplots_total",
+							.values = CONFIG_WIDGET_VALUES(POL_TOTAL) ),
+						CONFIG_WIDGET( .widget_id = "freqplots_horizontal",
+							.values = CONFIG_WIDGET_VALUES(POL_HORIZ) ),
+						CONFIG_WIDGET( .widget_id = "freqplots_vertical",
+							.values = CONFIG_WIDGET_VALUES(POL_VERT) ),
+						CONFIG_WIDGET( .widget_id = "freqplots_right_hand",
+							.values = CONFIG_WIDGET_VALUES(POL_RHCP) ),
+						CONFIG_WIDGET( .widget_id = "freqplots_left_hand",
+							.values = CONFIG_WIDGET_VALUES(POL_LHCP) ),
+						NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Main Window Frequency loop start state", .format = "%d",
 		.vars = { &rc_config.main_loop_start }, .def = { { .i = 1 } },
-		.builder_window = &main_window_builder,
-		.builder_check_menu_item_id = "config_main_loop_start"
-		},
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder,
+			"config_main_loop_start", NULL ) },
 
 	{ .desc = "Main Window Rotate spinbutton state", .format = "%d",
 		.vars = { &rc_config.main_rotate_spinbutton }, .def = { { .i = 45 } } },
@@ -100,128 +161,310 @@ rc_config_vars_t rc_config_vars[] = {
 		.def = { { .i = -1 }, { .i = -1 } } },
 
 	{ .desc = "Radiation Pattern Window Gain toggle button state", .format = "%d",
-		.vars = { &rc_config.rdpattern_gain_togglebutton }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.rdpattern_gain_togglebutton }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &rdpattern_window_builder,
+			"rdpattern_gain_togglebutton", hook_rdpat_gain ) },
 
 	{ .desc = "Radiation Pattern Window EH toggle button state", .format = "%d",
-		.vars = { &rc_config.rdpattern_eh_togglebutton } },
+		.vars = { &rc_config.rdpattern_eh_togglebutton },
+		.widgets = CONFIG_WIDGET_SINGLE( &rdpattern_window_builder,
+			"rdpattern_eh_togglebutton", hook_rdpat_eh ) },
 
 	{ .desc = "Radiation Pattern Window Menu E-field state", .format = "%d",
-		.vars = { &rc_config.rdpattern_e_field }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.rdpattern_e_field }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_rdpat_e_field,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_e_field" ), NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_efield" ), NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Radiation Pattern Window Menu H-field state", .format = "%d",
-		.vars = { &rc_config.rdpattern_h_field }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.rdpattern_h_field }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_rdpat_h_field,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_h_field" ), NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_hfield" ), NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Radiation Pattern Window Menu Poynting vector state", .format = "%d",
-		.vars = { &rc_config.rdpattern_poynting_vector } },
+		.vars = { &rc_config.rdpattern_poynting_vector },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_rdpat_poynting,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_poynting_vector" ), NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_poynting" ), NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Radiation Pattern Window Gradient Key", .format = "%d",
 		.vars = { &rc_config.rdpattern_gradient_key }, .def = { { .i = 1 } },
-		.builder_window = &rdpattern_window_builder,
-		.builder_check_menu_item_id = "rdpattern_gradient_key" },
+		.widgets = CONFIG_WIDGET_SINGLE( &rdpattern_window_builder,
+			"rdpattern_gradient_key", hook_rdpat_gradient_key ) },
 
 	{ .desc = "Radiation Pattern Window Zoom spinbutton state", .format = "%d",
 		.vars = { &rc_config.rdpattern_zoom_spinbutton }, .def = { { .i = 100 } } },
 
 	{ .desc = "Use OpenGL Renderer for Radiation Patterns", .format = "%d",
 		.vars = { &rc_config.use_opengl_renderer },
-		.def = { { .i = RENDERER_RESET_DEFAULT } } },
+		.def = { { .i = RENDERER_RESET_DEFAULT } },
+		.widgets = CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"chk_opengl_renderer", hook_set_renderer ) },
 
 	{ .desc = "Use Constrained View Drag Rotation", .format = "%d",
-		.vars = { &rc_config.view_drag_constrained }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.view_drag_constrained }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"chk_constrained_rotation", hook_set_constrained ) },
 
 	{ .desc = "Main Window Common Projection", .format = "%d",
 		.vars = { &rc_config.main_common_projection }, .def = { { .i = 1 } },
-		.builder_window = &main_window_builder,
-		.builder_check_menu_item_id = "main_common_projection" },
-
-	{ .desc = "Radiation Pattern Window Common Projection", .format = "%d",
-		.vars = { &rc_config.main_common_projection },
-		.builder_window = &rdpattern_window_builder,
-		.builder_check_menu_item_id = "rdpattern_common_projection" },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_common_projection,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "main_common_projection" ), NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_common_projection" ), NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Radiation Pattern Window Overlay Structure", .format = "%d",
 		.vars = { &rc_config.rdpattern_overlay_structure },
-		.builder_window = &rdpattern_window_builder,
-		.builder_check_menu_item_id = "rdpattern_overlay_structure" },
+		.widgets = CONFIG_WIDGET_SINGLE( &rdpattern_window_builder,
+			"rdpattern_overlay_structure", hook_rdpat_overlay ) },
 
 	{ .desc = "Radiation Pattern Draw Style", .format = "%d",
 		.vars = { &rc_config.rdpattern_draw_style },
-		.def = { { .i = RDPAT_STYLE_BOTH } } },
+		.def = { { .i = RDPAT_STYLE_BOTH } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_rdpat_draw_style,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_style_surface",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_STYLE_SURFACE) ),
+						CONFIG_WIDGET( .widget_id = "rdpattern_style_wireframe",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_STYLE_WIREFRAME) ),
+						CONFIG_WIDGET( .widget_id = "rdpattern_style_both",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_STYLE_BOTH) ),
+						NULL ) ),
+				GL_CONFIG_WIDGET_GROUP( .builder = &render_settings_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "radio_style_surface",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_STYLE_SURFACE) ),
+						CONFIG_WIDGET( .widget_id = "radio_style_wireframe",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_STYLE_WIREFRAME) ),
+						CONFIG_WIDGET( .widget_id = "radio_style_both",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_STYLE_BOTH) ),
+						NULL ) )
+				NULL ) ) },
 
 	{ .desc = "OpenGL Transparent on Click", .format = "%d",
-		.vars = { &rc_config.opengl_transparent_on_click }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.opengl_transparent_on_click }, .def = { { .i = 1 } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"chk_only_on_click", hook_render_redraw ) },
 
 	{ .desc = "OpenGL Orthographic Projection", .format = "%d",
-		.vars = { &rc_config.opengl_orthographic }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.opengl_orthographic }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_orthographic,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "main_ortho_button" ), NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_ortho_button" ), NULL ) ),
+				GL_CONFIG_WIDGET_GROUP( .builder = &render_settings_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "chk_orthographic" ), NULL ) )
+				NULL ) ) },
 
 	{ .desc = "OpenGL Anti-Aliasing Samples", .format = "%d",
-		.vars = { &rc_config.opengl_msaa_samples }, .def = { { .i = MSAA_4X } } },
+		.vars = { &rc_config.opengl_msaa_samples }, .def = { { .i = MSAA_4X } },
+		.widgets = GL_CONFIG_WIDGET_TREE( .post_apply = hook_set_msaa,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &render_settings_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "radio_msaa_off",
+							.values = CONFIG_WIDGET_VALUES(MSAA_OFF) ),
+						CONFIG_WIDGET( .widget_id = "radio_msaa_2x",
+							.values = CONFIG_WIDGET_VALUES(MSAA_2X) ),
+						CONFIG_WIDGET( .widget_id = "radio_msaa_4x",
+							.values = CONFIG_WIDGET_VALUES(MSAA_4X) ),
+						CONFIG_WIDGET( .widget_id = "radio_msaa_8x",
+							.values = CONFIG_WIDGET_VALUES(MSAA_8X) ),
+						CONFIG_WIDGET( .widget_id = "radio_msaa_16x",
+							.values = CONFIG_WIDGET_VALUES(MSAA_16X) ),
+						NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "OpenGL Cylinder Radius Scale", .format = "%lf",
-		.vars = { &rc_config.opengl_cylinder_radius_scale }, .def = { { .d = 1.0 } } },
+		.vars = { &rc_config.opengl_cylinder_radius_scale }, .def = { { .d = 1.0 } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_cylinder_scale", hook_set_radius_scale ) },
 
 	{ .desc = "Rdpattern Overlay Scale Adjustment", .format = "%lf",
 		.vars = { &rc_config.rdpattern_overlay_scale_adj }, .def = { { .d = 1.0 } } },
 
 	{ .desc = "Cairo Anti-Aliasing Mode", .format = "%d",
 		.vars = { &rc_config.cairo_antialias },
-		.def = { { .i = CAIRO_ANTIALIAS_DEFAULT } } },
+		.def = { { .i = CAIRO_ANTIALIAS_DEFAULT } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_render_redraw,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &render_settings_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "radio_cairo_antialias_default",
+							.values = CONFIG_WIDGET_VALUES(CAIRO_ANTIALIAS_DEFAULT) ),
+						CONFIG_WIDGET( .widget_id = "radio_cairo_antialias_fast",
+							.values = CONFIG_WIDGET_VALUES(CAIRO_ANTIALIAS_FAST) ),
+						CONFIG_WIDGET( .widget_id = "radio_cairo_antialias_none",
+							.values = CONFIG_WIDGET_VALUES(CAIRO_ANTIALIAS_NONE) ),
+						NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Cairo Depth Bins", .format = "%d",
-		.vars = { &rc_config.cairo_depth_bins }, .def = { { .i = 16 } } },
+		.vars = { &rc_config.cairo_depth_bins }, .def = { { .i = 16 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"spin_cairo_depth_bins", hook_render_redraw ) },
 
 	{ .desc = "Cairo Color Quantization Levels", .format = "%d",
-		.vars = { &rc_config.cairo_color_quant } },
+		.vars = { &rc_config.cairo_color_quant },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_render_redraw,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &render_settings_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "radio_cairo_color_quant_off",
+							.values = CONFIG_WIDGET_VALUES(0) ),
+						CONFIG_WIDGET( .widget_id = "radio_cairo_color_quant_8",
+							.values = CONFIG_WIDGET_VALUES(8) ),
+						CONFIG_WIDGET( .widget_id = "radio_cairo_color_quant_64",
+							.values = CONFIG_WIDGET_VALUES(64) ),
+						CONFIG_WIDGET( .widget_id = "radio_cairo_color_quant_128",
+							.values = CONFIG_WIDGET_VALUES(128) ),
+						CONFIG_WIDGET( .widget_id = "radio_cairo_color_quant_256",
+							.values = CONFIG_WIDGET_VALUES(256) ),
+						NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Cairo Line Cap Style", .format = "%d",
 		.vars = { &rc_config.cairo_line_cap },
-		.def = { { .i = CAIRO_LINE_CAP_BUTT } } },
+		.def = { { .i = CAIRO_LINE_CAP_BUTT } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_render_redraw,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &render_settings_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "radio_cairo_line_cap_butt",
+							.values = CONFIG_WIDGET_VALUES(CAIRO_LINE_CAP_BUTT) ),
+						CONFIG_WIDGET( .widget_id = "radio_cairo_line_cap_round",
+							.values = CONFIG_WIDGET_VALUES(CAIRO_LINE_CAP_ROUND) ),
+						CONFIG_WIDGET( .widget_id = "radio_cairo_line_cap_square",
+							.values = CONFIG_WIDGET_VALUES(CAIRO_LINE_CAP_SQUARE) ),
+						NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Current Flow Visualization Mode", .format = "%d",
 		.vars = { &rc_config.current_flow_visualization_mode },
-		.def = { { .i = FLOW_DIR_REFERENCE_PHASE } } },
+		.def = { { .i = FLOW_DIR_REFERENCE_PHASE } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_flow_direction,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "main_flow_dir_ref_phase",
+							.values = CONFIG_WIDGET_VALUES(FLOW_DIR_REFERENCE_PHASE) ),
+						CONFIG_WIDGET( .widget_id = "main_flow_dir_pol_axis",
+							.values = CONFIG_WIDGET_VALUES(FLOW_DIR_POLARIZATION_TILT) ),
+						CONFIG_WIDGET( .widget_id = "main_flow_dir_peak_mag",
+							.values = CONFIG_WIDGET_VALUES(FLOW_DIR_PEAK_MAGNITUDE) ),
+						CONFIG_WIDGET( .widget_id = "main_flow_dir_lic",
+							.values = CONFIG_WIDGET_VALUES(FLOW_DIR_LIC) ),
+						CONFIG_WIDGET( .widget_id = "main_flow_dir_wireframe",
+							.values = CONFIG_WIDGET_VALUES(FLOW_DIR_WIREFRAME) ),
+						NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_flow_dir",
+							.values = CONFIG_WIDGET_VALUES(FLOW_DIR_REFERENCE_PHASE,
+								FLOW_DIR_LIC, FLOW_DIR_WIREFRAME) ),
+						NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Brightness Segments", .format = "%f",
-		.vars = { &rc_config.brightness_segments }, .def = { { .f = 0.47f } } },
+		.vars = { &rc_config.brightness_segments }, .def = { { .f = 0.47f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_bright_segments", hook_render_redraw ) },
 
 	{ .desc = "Brightness Patches", .format = "%f",
-		.vars = { &rc_config.brightness_patches }, .def = { { .f = 0.47f } } },
+		.vars = { &rc_config.brightness_patches }, .def = { { .f = 0.47f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_bright_patches", hook_render_redraw ) },
 
 	{ .desc = "Brightness Rdpat Surface", .format = "%f",
-		.vars = { &rc_config.brightness_rdpat_surface }, .def = { { .f = 0.47f } } },
+		.vars = { &rc_config.brightness_rdpat_surface }, .def = { { .f = 0.47f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_bright_rdpat_surface", hook_render_redraw ) },
 
 	{ .desc = "Brightness Rdpat Wire", .format = "%f",
-		.vars = { &rc_config.brightness_rdpat_wire }, .def = { { .f = 1.0f } } },
+		.vars = { &rc_config.brightness_rdpat_wire }, .def = { { .f = 1.0f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_bright_rdpat_wire", hook_render_redraw ) },
 
 	{ .desc = "Brightness Nearfield", .format = "%f",
-		.vars = { &rc_config.brightness_nearfield }, .def = { { .f = 1.0f } } },
+		.vars = { &rc_config.brightness_nearfield }, .def = { { .f = 1.0f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_bright_nearfield", hook_render_redraw ) },
 
 	{ .desc = "Brightness Ground Plane", .format = "%f",
-		.vars = { &rc_config.brightness_ground_plane }, .def = { { .f = 1.0f } } },
+		.vars = { &rc_config.brightness_ground_plane }, .def = { { .f = 1.0f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_bright_ground_plane", hook_render_redraw ) },
 
 	{ .desc = "Brightness Axes", .format = "%f",
-		.vars = { &rc_config.brightness_axes }, .def = { { .f = 1.0f } } },
+		.vars = { &rc_config.brightness_axes }, .def = { { .f = 1.0f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_bright_axes", hook_render_redraw ) },
 
 	{ .desc = "Transparency Segments", .format = "%f",
-		.vars = { &rc_config.transparency_segments }, .def = { { .f = 0.5f } } },
+		.vars = { &rc_config.transparency_segments }, .def = { { .f = 0.5f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_trans_segments", hook_render_redraw ) },
 
 	{ .desc = "Transparency Patches", .format = "%f",
-		.vars = { &rc_config.transparency_patches }, .def = { { .f = 0.5f } } },
+		.vars = { &rc_config.transparency_patches }, .def = { { .f = 0.5f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_trans_patches", hook_render_redraw ) },
 
 	{ .desc = "Transparency Rdpat Surface", .format = "%f",
-		.vars = { &rc_config.transparency_rdpat_surface }, .def = { { .f = 0.5f } } },
+		.vars = { &rc_config.transparency_rdpat_surface }, .def = { { .f = 0.5f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_trans_rdpat_surface", hook_render_redraw ) },
 
 	{ .desc = "Transparency Rdpat Wire", .format = "%f",
-		.vars = { &rc_config.transparency_rdpat_wire }, .def = { { .f = 0.5f } } },
+		.vars = { &rc_config.transparency_rdpat_wire }, .def = { { .f = 0.5f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_trans_rdpat_wire", hook_render_redraw ) },
 
 	{ .desc = "Transparency Nearfield", .format = "%f",
-		.vars = { &rc_config.transparency_nearfield } },
+		.vars = { &rc_config.transparency_nearfield },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_trans_nearfield", hook_render_redraw ) },
 
 	{ .desc = "Transparency Ground Plane", .format = "%f",
-		.vars = { &rc_config.transparency_ground_plane }, .def = { { .f = 0.5f } } },
+		.vars = { &rc_config.transparency_ground_plane }, .def = { { .f = 0.5f } },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_trans_ground_plane", hook_render_redraw ) },
 
 	{ .desc = "Transparency Axes", .format = "%f",
-		.vars = { &rc_config.transparency_axes } },
+		.vars = { &rc_config.transparency_axes },
+		.widgets = GL_CONFIG_WIDGET_SINGLE( &render_settings_builder,
+			"scale_trans_axes", hook_render_redraw ) },
 
 	{ .desc = "Frequency Plots Window Size, in pixels", .format = "%d,%d",
 		.vars = { &rc_config.freqplots_width, &rc_config.freqplots_height } },
@@ -231,37 +474,59 @@ rc_config_vars_t rc_config_vars[] = {
 		.def = { { .i = -1 }, { .i = -1 } } },
 
 	{ .desc = "Frequency Plots Window Max Gain toggle button state", .format = "%d",
-		.vars = { &rc_config.freqplots_gmax_togglebutton }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.freqplots_gmax_togglebutton }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_gmax_togglebutton", hook_freqplots_gmax ) },
 
 	{ .desc = "Frequency Plots Window Gain Direction toggle button state", .format = "%d",
-		.vars = { &rc_config.freqplots_gdir_togglebutton } },
+		.vars = { &rc_config.freqplots_gdir_togglebutton },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_gdir_togglebutton", hook_freqplots_gdir ) },
 
 	{ .desc = "Frequency Plots Window Viewer Direction Gain toggle button state", .format = "%d",
-		.vars = { &rc_config.freqplots_gviewer_togglebutton } },
+		.vars = { &rc_config.freqplots_gviewer_togglebutton },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_gviewer_togglebutton", hook_freqplots_gviewer ) },
 
 	{ .desc = "Frequency Plots Window VSWR toggle button state", .format = "%d",
-		.vars = { &rc_config.freqplots_vswr_togglebutton }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.freqplots_vswr_togglebutton }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_vswr_togglebutton", hook_freqplots_vswr ) },
 
 	{ .desc = "Frequency Plots Window Z-real/Z-imag toggle button state", .format = "%d",
-		.vars = { &rc_config.freqplots_zrlzim_togglebutton } },
+		.vars = { &rc_config.freqplots_zrlzim_togglebutton },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_zrlzim_togglebutton", hook_freqplots_zrlzim ) },
 
 	{ .desc = "Frequency Plots Window Z-mag/Z-phase toggle button state", .format = "%d",
-		.vars = { &rc_config.freqplots_zmgzph_togglebutton } },
+		.vars = { &rc_config.freqplots_zmgzph_togglebutton },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_zmgzph_togglebutton", hook_freqplots_zmgzph ) },
 
 	{ .desc = "Frequency Plots Window Smith toggle button state", .format = "%d",
-		.vars = { &rc_config.freqplots_smith_togglebutton } },
+		.vars = { &rc_config.freqplots_smith_togglebutton },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_smith_togglebutton", hook_freqplots_smith ) },
 
 	{ .desc = "Freqplots Ant Temp Toggle", .format = "%d",
-		.vars = { &rc_config.freqplots_ant_temp_togglebutton } },
+		.vars = { &rc_config.freqplots_ant_temp_togglebutton },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_ant_temp_togglebutton", hook_freqplots_ant_temp ) },
 
 	{ .desc = "Freqplots Show Ant Temp (Ta instead of TA)", .format = "%d",
-		.vars = { &rc_config.freqplots_show_ant_temp } },
+		.vars = { &rc_config.freqplots_show_ant_temp },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_show_ant_temp", hook_freqplots_show_ant_temp ) },
 
 	{ .desc = "Frequency Plots Window Net Gain checkbutton state", .format = "%d",
-		.vars = { &rc_config.freqplots_net_gain } },
+		.vars = { &rc_config.freqplots_net_gain },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_net_gain", hook_freqplots_net_gain ) },
 
 	{ .desc = "Frequency Plots Window Min/Max checkbutton state", .format = "%d",
-		.vars = { &rc_config.freqplots_min_max } },
+		.vars = { &rc_config.freqplots_min_max },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_min_max", hook_freqplots_min_max ) },
 
 	{ .desc = "NEC2 Editor Window Size, in pixels", .format = "%d,%d",
 		.vars = { &rc_config.nec2_edit_width, &rc_config.nec2_edit_height } },
@@ -270,7 +535,8 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.nec2_edit_x, &rc_config.nec2_edit_y } },
 
 	{ .desc = "Enable Confirm Quit Dialog", .format = "%d",
-		.vars = { &rc_config.confirm_quit }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.confirm_quit }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder, "confirm_quit", NULL ) },
 
 	{ .desc = "Selected Mathlib", .format = "%s",
 		.vars = { rc_config.mathlib_id }, .size = MATHLIB_ID_LEN, .init = mathlib_config_init },
@@ -283,54 +549,71 @@ rc_config_vars_t rc_config_vars[] = {
 		.save = mathlib_config_benchmark_save  },
 
 	{ .desc = "Selected fmhz_save Frequency", .format = "%lf",
-		.vars = { &calc_data.fmhz_save } },
+		.vars = { &calc_data.fmhz_save },
+		.widgets = CONFIG_WIDGET_TREE( .on_change = hook_frequency,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "main_freq_spinbutton" ), NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_freq_spinbutton" ), NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Frequency Plots Show S11 checkbutton state", .format = "%d",
-		.vars = { &rc_config.freqplots_s11 } },
+		.vars = { &rc_config.freqplots_s11 },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_s11", hook_freqplots_s11 ) },
 
 	{ .desc = "Frequency Plots Show Clamp VSWR checkbutton state", .format = "%d",
-		.vars = { &rc_config.freqplots_clamp_vswr }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.freqplots_clamp_vswr }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_clamp_vswr", hook_freqplots_clamp_vswr ) },
 
 	{ .desc = "Radiation Plots Gain Style", .format = "%d",
 		.vars = { &rc_config.gain_style }, .def = { { .i = GS_LINP } } },
 
 	{ .desc = "Round X Axis", .format = "%d",
-		.vars = { &rc_config.freqplots_round_x_axis } },
+		.vars = { &rc_config.freqplots_round_x_axis },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_round_x_axis", hook_freqplots_round_x_axis ) },
 
 	{ .desc = "Frequency Plots Swap Click", .format = "%d",
-		.vars = { &rc_config.freqplots_swap_click }, .def = { { .i = 1 } } },
+		.vars = { &rc_config.freqplots_swap_click }, .def = { { .i = 1 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &freqplots_window_builder,
+			"freqplots_swap_click", hook_freqplots_swap_click ) },
 
 	{ .desc = "Optimizer Write CSV", .format = "%d", .batch_mode_skip = TRUE,
-		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_csv",
-		.vars = { &rc_config.opt_write_csv } },
+		.vars = { &rc_config.opt_write_csv },
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder, "optimizer_write_csv", NULL ) },
 
 	{ .desc = "Optimizer Write S1P", .format = "%d", .batch_mode_skip = TRUE,
-		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_s1p",
-		.vars = { &rc_config.opt_write_s1p } },
+		.vars = { &rc_config.opt_write_s1p },
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder, "optimizer_write_s1p", NULL ) },
 
 	{ .desc = "Optimizer Write S2P Max Gain", .format = "%d", .batch_mode_skip = TRUE,
-		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_s2p_max_gain",
-		.vars = { &rc_config.opt_write_s2p_max_gain } },
+		.vars = { &rc_config.opt_write_s2p_max_gain },
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder, "optimizer_write_s2p_max_gain", NULL ) },
 
 	{ .desc = "Optimizer Write S2P Viewer Gain", .format = "%d", .batch_mode_skip = TRUE,
-		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_s2p_viewer_gain",
-		.vars = { &rc_config.opt_write_s2p_viewer_gain } },
+		.vars = { &rc_config.opt_write_s2p_viewer_gain },
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder, "optimizer_write_s2p_viewer_gain", NULL ) },
 
 	{ .desc = "Optimizer Write CSV Radiation Pattern", .format = "%d", .batch_mode_skip = TRUE,
-		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_rdpat",
-		.vars = { &rc_config.opt_write_rdpat } },
+		.vars = { &rc_config.opt_write_rdpat },
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder, "optimizer_write_rdpat", NULL ) },
 
 	{ .desc = "Optimizer Write CSV Currents/Charges", .format = "%d", .batch_mode_skip = TRUE,
-		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_currents",
-		.vars = { &rc_config.opt_write_currents} },
+		.vars = { &rc_config.opt_write_currents},
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder, "optimizer_write_currents", NULL ) },
 
 	{ .desc = "Optimizer Write Gnuplot Structure", .format = "%d", .batch_mode_skip = TRUE,
-		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_gnuplot_structure",
-		.vars = { &rc_config.opt_write_gnuplot_structure} },
+		.vars = { &rc_config.opt_write_gnuplot_structure},
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder, "optimizer_write_gnuplot_structure", NULL ) },
 
 	{ .desc = "Optimizer Write Patch Currents", .format = "%d", .batch_mode_skip = TRUE,
-		.builder_window = &main_window_builder, .builder_check_menu_item_id = "optimizer_write_patch_currents",
-		.vars = { &rc_config.opt_write_patch_currents} },
+		.vars = { &rc_config.opt_write_patch_currents},
+		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder, "optimizer_write_patch_currents", NULL ) },
 
 	// The *_is_open values below default to "1" for backward compatiblity.  It
 	// still does not open the window if width/height are undefined so defaults
@@ -638,40 +921,48 @@ void rc_config_apply_defaults(void)
 
 
 /*
- * rc_callback_check_menu_item()
+ * rc_config_field_size()
  *
- * Use as a callback in resources/xnec2c.glade for GtkCheckMenuItem to handle
- * the checkbox toggle and also set the referenced variable defined in
- * rc_config_vars.
- *
+ * Field storage width derived from a row's format string, matching the
+ * discriminant parse_var/fprint_var dispatch on.  Returns 0 on an
+ * unsupported format after raising a BUG.
  */
-void rc_callback_check_menu_item(GtkCheckMenuItem *menuitem, gpointer user_data)
+size_t rc_config_field_size(const rc_config_vars_t *v)
+{
+	if (strcmp(v->format, "%d") == 0)
+		return sizeof(int);
+	if (strcmp(v->format, "%f") == 0)
+		return sizeof(float);
+	if (strcmp(v->format, "%lf") == 0)
+		return sizeof(double);
+
+	BUG("rc_config_field_size: %s: unsupported format %s\n", v->desc, v->format);
+	return 0;
+}
+
+
+/*
+ * rc_config_register_widgets()
+ *
+ * Registers every row's .widgets tree with the config_widget engine,
+ * keyed by the row's primary field and width derived from its format
+ * string.  Called once from main.c startup, before Read_Config().
+ */
+void rc_config_register_widgets(void)
 {
 	for (int i = 0; i < num_rc_config_vars; i++)
 	{
-		if (rc_config_vars[i].builder_check_menu_item_id == NULL && rc_config_vars[i].builder_window != NULL)
-			BUG("rc_config: %s: builder_check_menu_item_id is NULL but builder_window is defined.\n",
-				rc_config_vars[i].desc);
-		else if (rc_config_vars[i].builder_check_menu_item_id != NULL && rc_config_vars[i].builder_window == NULL)
-			BUG("rc_config: %s: builder_window is NULL but builder_check_menu_item_id is defined.\n",
-				rc_config_vars[i].desc);
+		rc_config_vars_t *v = &rc_config_vars[i];
+		size_t size;
 
-		if (rc_config_vars[i].builder_check_menu_item_id == NULL || rc_config_vars[i].builder_window == NULL)
+		if (v->widgets == NULL)
 			continue;
 
-		GtkBuilder *bw = *rc_config_vars[i].builder_window;
-		if (bw == NULL)
+		size = rc_config_field_size(v);
+		if (size == 0)
 			continue;
 
-		GtkWidget *w = Builder_Get_Object(bw, rc_config_vars[i].builder_check_menu_item_id);
-		if (GTK_CHECK_MENU_ITEM(w) == menuitem)
-		{
-			pr_debug("match: %s\n", rc_config_vars[i].builder_check_menu_item_id);
-
-			// This is a toggle button, it will always be an int:
-			int *var = (int*)rc_config_vars[i].vars[0];
-			*var = gtk_check_menu_item_get_active(menuitem);
-		}
+		config_widget_register(v->vars[0], size, v->widgets);
 	}
 }
 
@@ -813,85 +1104,20 @@ Restore_Windows( gpointer dat )
   static void
 Restore_GUI_State( void )
 {
-  GtkWidget *widget;
-
-  /* Restore main (structure) window widgets state */
-  if( rc_config.main_currents_togglebutton )
-  {
-    widget = Builder_Get_Object( main_window_builder, "main_currents_togglebutton" );
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-  }
-
-  if( rc_config.main_charges_togglebutton )
-  {
-    widget = Builder_Get_Object( main_window_builder, "main_charges_togglebutton" );
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(widget), TRUE );
-  }
-
-  if( rc_config.main_total )
-  {
-    widget = Builder_Get_Object( main_window_builder, "main_total" );
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-  }
-
-  if( rc_config.main_horizontal )
-  {
-    widget = Builder_Get_Object( main_window_builder, "main_horizontal" );
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-  }
-
-  if( rc_config.main_vertical )
-  {
-    widget = Builder_Get_Object( main_window_builder, "main_vertical" );
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-  }
-
-  if( rc_config.main_right_hand )
-  {
-    widget = Builder_Get_Object( main_window_builder, "main_right_hand" );
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-  }
-
-  if( rc_config.main_left_hand )
-  {
-    widget = Builder_Get_Object( main_window_builder, "main_left_hand" );
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-  }
+  /* Write every registered field into its live widgets, then run the
+   * change-edge hooks of every tree bound to the main window so their
+   * derived state (flags, labels, menu-item sensitivity) matches the
+   * values just loaded from the config file. */
+  config_widget_sync_all();
+  config_widget_run_hooks( &main_window_builder );
 
 #ifdef HAVE_OPENGL
   /* Restore MSAA menu selection */
   Set_MSAA_Samples( rc_config.opengl_msaa_samples );
 
-  /* Restore flow direction radio selection in main window */
-  {
-    static const gchar *flow_dir_ids[] = {
-      "main_flow_dir_ref_phase",
-      "main_flow_dir_pol_axis",
-      "main_flow_dir_peak_mag",
-      "main_flow_dir_lic",
-      "main_flow_dir_wireframe"
-    };
-
-    int fmode = rc_config.current_flow_visualization_mode;
-
-    if( fmode >= 0 &&
-        fmode < (int)(sizeof(flow_dir_ids) / sizeof(flow_dir_ids[0])) )
-    {
-      widget = Builder_Get_Object( main_window_builder, (gchar *)flow_dir_ids[fmode] );
-      gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-    }
-  }
-
   /* Sync render settings dialog widgets from rc_config */
   render_settings_sync_from_config();
 #endif
-
-  /* Set the "Confirm Quit" menu item */
-  widget = Builder_Get_Object( main_window_builder, "confirm_quit" );
-  if( rc_config.confirm_quit )
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), TRUE );
-  else
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(widget), FALSE );
 
   /* Restore main (structure) window geometry after all widget state
    * restorations so layout-affecting changes precede sizing */
@@ -1006,17 +1232,8 @@ Read_Config( void )
 		  pr_err("%s:%d: parse error (%s): %s \n", rc_config.config_file, lnum, v->desc, line);
 	  else
 	  {
-		  if (v->builder_check_menu_item_id != NULL && v->builder_window != NULL
-				  && *v->builder_window != NULL)
-		  {
-			GtkWidget *w = Builder_Get_Object(*v->builder_window, v->builder_check_menu_item_id);
-			int *var = (int*)v->vars[0];
-			gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(w), (gboolean)*var );
-		  }
-
 		  if (v->init != NULL)
 			  v->init(v, line);
-
 	  }
   }
 
@@ -1071,33 +1288,6 @@ get_main_window_state( void )
       &(rc_config.main_x), &(rc_config.main_y),
       &(rc_config.main_width), &(rc_config.main_height) );
 
-  /* Get state of widgets in main (structure) window */
-  rc_config.main_currents_togglebutton = 0;
-  rc_config.main_charges_togglebutton  = 0;
-  rc_config.main_total = 0;
-  rc_config.main_horizontal = 0;
-  rc_config.main_vertical   = 0;
-  rc_config.main_right_hand = 0;
-  rc_config.main_left_hand  = 0;
-  widget = Builder_Get_Object( main_window_builder, "main_currents_togglebutton" );
-  if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-    rc_config.main_currents_togglebutton = 1;
-
-  widget = Builder_Get_Object( main_window_builder, "main_charges_togglebutton" );
-  if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-    rc_config.main_charges_togglebutton = 1;
-
-  if( calc_data.pol_type == POL_TOTAL )
-    rc_config.main_total = 1;
-  else if( calc_data.pol_type == POL_HORIZ )
-    rc_config.main_horizontal = 1;
-  else if( calc_data.pol_type == POL_VERT )
-    rc_config.main_vertical = 1;
-  else if( calc_data.pol_type == POL_RHCP )
-    rc_config.main_right_hand = 1;
-  else if( calc_data.pol_type == POL_LHCP )
-    rc_config.main_left_hand = 1;
-
   widget = Builder_Get_Object( main_window_builder, "main_rotate_spinbutton" );
   gtk_spin_button_update( GTK_SPIN_BUTTON(widget) );
   rc_config.main_rotate_spinbutton =
@@ -1134,36 +1324,6 @@ get_rdpattern_window_state( void )
   /* Get state of widgets in radiation patterns window */
   if( rdpattern_window )
   {
-    rc_config.rdpattern_gain_togglebutton = 0;
-    rc_config.rdpattern_eh_togglebutton = 0;
-    rc_config.rdpattern_e_field = 0;
-    rc_config.rdpattern_h_field = 0;
-    rc_config.rdpattern_poynting_vector = 0;
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_gain_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.rdpattern_gain_togglebutton = 1;
-
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_eh_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.rdpattern_eh_togglebutton = 1;
-
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_e_field" );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
-      rc_config.rdpattern_e_field = 1;
-
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_h_field" );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
-      rc_config.rdpattern_h_field = 1;
-
-    widget = Builder_Get_Object(
-        rdpattern_window_builder, "rdpattern_poynting_vector" );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
-      rc_config.rdpattern_poynting_vector = 1;
-
     widget = Builder_Get_Object(
         rdpattern_window_builder, "rdpattern_zoom_spinbutton" );
     gtk_spin_button_update( GTK_SPIN_BUTTON(widget) );
@@ -1193,101 +1353,10 @@ get_rdpattern_window_state( void )
   void
 get_freqplots_window_state( void )
 {
-  GtkWidget *widget;
-
   /* Get geometry of frequency plots window */
   rc_config.freqplots_is_open = Get_Window_Geometry( freqplots_window,
       &(rc_config.freqplots_x), &(rc_config.freqplots_y),
       &(rc_config.freqplots_width), &(rc_config.freqplots_height) );
-
-  /* Get state of widgets in frequency plots window */
-  if( freqplots_window )
-  {
-    rc_config.freqplots_gmax_togglebutton    = 0;
-    rc_config.freqplots_gdir_togglebutton    = 0;
-    rc_config.freqplots_gviewer_togglebutton = 0;
-    rc_config.freqplots_vswr_togglebutton    = 0;
-    rc_config.freqplots_zrlzim_togglebutton  = 0;
-    rc_config.freqplots_zmgzph_togglebutton  = 0;
-    rc_config.freqplots_smith_togglebutton   = 0;
-    rc_config.freqplots_ant_temp_togglebutton = 0;
-    rc_config.freqplots_net_gain = 0;
-    rc_config.freqplots_clamp_vswr = 0;
-    rc_config.freqplots_show_ant_temp = 0;
-    rc_config.freqplots_min_max = 0;
-    rc_config.freqplots_round_x_axis = 0;
-    rc_config.freqplots_swap_click = 0;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_gmax_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.freqplots_gmax_togglebutton = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_gdir_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.freqplots_gdir_togglebutton = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_gviewer_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.freqplots_gviewer_togglebutton = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_vswr_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.freqplots_vswr_togglebutton = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_zrlzim_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.freqplots_zrlzim_togglebutton = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_zmgzph_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.freqplots_zmgzph_togglebutton = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_net_gain" );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
-      rc_config.freqplots_net_gain = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_min_max" );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
-      rc_config.freqplots_min_max = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_clamp_vswr" );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
-      rc_config.freqplots_clamp_vswr = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_round_x_axis" );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
-      rc_config.freqplots_round_x_axis = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_swap_click" );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
-      rc_config.freqplots_swap_click = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_show_ant_temp" );
-    if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) )
-      rc_config.freqplots_show_ant_temp = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_smith_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.freqplots_smith_togglebutton = 1;
-
-    widget = Builder_Get_Object(
-        freqplots_window_builder, "freqplots_ant_temp_togglebutton" );
-    if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) )
-      rc_config.freqplots_ant_temp_togglebutton = 1;
-  }
 }
 
 /*------------------------------------------------------------------------*/

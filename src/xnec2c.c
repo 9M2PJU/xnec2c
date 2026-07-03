@@ -768,15 +768,15 @@ freq_step_update_ui( int new_step, gboolean force )
 
   /* Block value-changed callbacks during programmatic spinbutton updates;
    * only user interaction sets fmhz_save via those callbacks. */
-  SIGNAL_BLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
+  SIGNAL_BLOCK(mainwin_frequency, on_config_widget_changed);
   gtk_spin_button_set_value( mainwin_frequency, calc_data.freq_mhz );
-  SIGNAL_UNBLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
+  SIGNAL_UNBLOCK(mainwin_frequency, on_config_widget_changed);
 
   if( isFlagSet(DRAW_ENABLED) && rdpattern_frequency != NULL )
   {
-    SIGNAL_BLOCK(rdpattern_frequency, on_freq_spinbutton_value_changed);
+    SIGNAL_BLOCK(rdpattern_frequency, on_config_widget_changed);
     gtk_spin_button_set_value( rdpattern_frequency, calc_data.freq_mhz );
-    SIGNAL_UNBLOCK(rdpattern_frequency, on_freq_spinbutton_value_changed);
+    SIGNAL_UNBLOCK(rdpattern_frequency, on_config_widget_changed);
   }
 
   if( isFlagSet(PLOT_ENABLED) )

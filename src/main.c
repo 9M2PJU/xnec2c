@@ -24,6 +24,7 @@
 #include "structure_ui.h"
 #include "opengl/opengl_structure.h"
 #include "cairo/cairo_draw.h"
+#include "config_hooks.h"
 
 /* Forward declaration — full sy_overrides.h conflicts with openblas via gsl */
 extern void sy_overrides_close_if_empty(void);
@@ -534,6 +535,11 @@ main (int argc, char *argv[])
   calc_data.zo = 50.0;
   calc_data.freq_loop_data = NULL;
 
+  /* Register session-only and rc_config_vars-rooted widget bindings
+   * before any config value is loaded or restored. */
+  config_hooks_init();
+  rc_config_register_widgets();
+
   /* Read GUI state config file and reset geometry */
   Read_Config();
 
@@ -859,7 +865,7 @@ Open_Input_File( gpointer arg )
   } /* if( FORKED ) */
 
   /* Initialize xnec2c */
-  SetFlag( FREQ_APPLY );
+  rc_config.freq_apply = 1;
   if( isFlagSet(PLOT_ENABLED) ) SetFlag( FREQ_LOOP_INIT );
   floop_tag = 0;
 
@@ -891,13 +897,12 @@ Open_Input_File( gpointer arg )
   prev_input_file[PATH_MAX - 1] = '\0';
 
   /* Show current frequency; prefer fmhz_save (rc_config restored green-line
-   * frequency) so the saved position survives startup initialization.
-   * Block value-changed to prevent the callback from overwriting fmhz_save. */
-  double display_freq = (calc_data.fmhz_save > 0.0)
+   * frequency) so the saved position survives startup initialization.  Route
+   * through the field so both frequency spins sync and the frequency applies
+   * once via hook_frequency. */
+  calc_data.fmhz_save = (calc_data.fmhz_save > 0.0)
       ? calc_data.fmhz_save : calc_data.freq_mhz;
-  SIGNAL_BLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
-  gtk_spin_button_set_value( mainwin_frequency, display_freq );
-  SIGNAL_UNBLOCK(mainwin_frequency, on_freq_spinbutton_value_changed);
+  config_widget_field_changed( &calc_data.fmhz_save );
 
   /* Show main control buttons etc */
   gtk_widget_show( Builder_Get_Object(main_window_builder, "main_hbox1") );

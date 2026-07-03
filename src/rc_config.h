@@ -23,6 +23,7 @@
 #include "common.h"
 #include "utils.h"
 #include "shared.h"
+#include "config/config_widget.h"
 #include <sys/stat.h>
 
 #define DEFAULT_CONFIG_FILE     ".xnec2c/xnec2c.conf"
@@ -61,13 +62,9 @@ typedef struct rc_config_vars_t {
 	// True if the variable should not be set when rc_config.batch_mode is true.
 	int batch_mode_skip;
 
-	// GTK UI Integration:
-
-	// A pointer to the builder window, such as &main_window_builder.
-	GtkBuilder **builder_window;
-
-	// String id="<id>" name from resources/xnec2c.glade for GtkCheckMenuItem objects:
-	char *builder_check_menu_item_id;
+	// Row's complete widget projection tree, or NULL when the field has no
+	// widget binding.  Consumed by rc_config_register_widgets().
+	const config_widget_tree_t *widgets;
 } rc_config_vars_t;
 
 extern rc_config_vars_t rc_config_vars[];
@@ -79,5 +76,7 @@ void rc_config_set_default(rc_config_vars_t *v);
 void rc_config_apply_defaults(void);
 rc_config_vars_t *rc_config_find_by_field(void *f);
 int rc_config_default_int(void *f);
+void rc_config_register_widgets(void);
+size_t rc_config_field_size(const rc_config_vars_t *v);
 
 #endif

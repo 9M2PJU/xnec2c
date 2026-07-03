@@ -62,10 +62,11 @@ xnec2c_SOURCES = \
     sy_overrides.c  sy_overrides.h \
     settings/render_settings.c settings/render_settings.h \
     settings/render_settings_common.c settings/render_settings_common.h \
-    settings/render_settings_dispatch.c \
     settings/render_settings_internal.h \
     settings/render_settings_general.c \
     settings/render_settings_cairo.c \
+    config/config_widget.c config/config_widget.h \
+    config_hooks.c config_hooks.h \
     expr_edit.c     expr_edit.h \
     opt_ui.c        opt_ui.h \
     opt_ui_internal.h \

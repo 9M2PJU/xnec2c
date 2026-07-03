@@ -33,37 +33,11 @@
 
 /*------------------------------------------------------------------------*/
 
-/** on_render_settings_changed - Unified signal handler for all settings widgets
- *
- * Delegates to per-tab apply functions and queues redraws.
- * Suppressed during sync_from_config to prevent feedback loops.
- */
-void
-on_render_settings_changed(GtkWidget *widget, gpointer user_data)
-{
-  settings_tab_t tab;
-
-  (void)user_data;
-
-  tab = config_find_tab_for_widget(widget);
-  if( tab >= SETTINGS_TAB_COUNT )
-    return;
-
-  config_apply_tab(tab);
-
-  /* No invalidate needed for brightness/transparency since visual params
-   * are read from rc_config each frame.  Cylinder scale and draw style
-   * changes are detected by their own staleness checks. */
-  Queue_Structure_Redraw();
-  Queue_Radiation_Redraw();
-}
-
-/*------------------------------------------------------------------------*/
-
 /** general_tab_apply_gl_sensitivity - Disable renderer toggle when GL unavailable
  *
- * Called by general_tab_sync() after config_sync_tab(SETTINGS_TAB_GENERAL) to
- * apply hardware-availability constraints to the OpenGL renderer checkbox.
+ * Called by render_settings_sync_from_config() after the builder's widgets
+ * are populated, to apply hardware-availability constraints to the OpenGL
+ * renderer checkbox.
  */
 static void
 general_tab_apply_gl_sensitivity(void)
@@ -97,37 +71,20 @@ general_tab_apply_gl_sensitivity(void)
 
 /*------------------------------------------------------------------------*/
 
-/** general_tab_sync - Sync General tab widgets and apply GL-availability constraints
- *
- * Single entry point for General tab synchronisation.  Populates widgets
- * from rc_config via config_sync_tab then applies hardware-availability
- * sensitivity to the renderer toggle.
- */
-void
-general_tab_sync(void)
-{
-  config_sync_tab(SETTINGS_TAB_GENERAL);
-  general_tab_apply_gl_sensitivity();
-}
-
-/*------------------------------------------------------------------------*/
-
 /** render_settings_sync_from_config - Populate all widgets from rc_config
  *
  * Called after window creation and when external code changes rc_config
- * (e.g., menu item handlers).
+ * (e.g., menu item handlers).  Ortho toolbar buttons on other windows sync
+ * through the field-address peer broadcast, not from here.
  */
 void
 render_settings_sync_from_config(void)
 {
-  sync_ortho_toolbar_button();
-
   if( render_settings_builder == NULL )
     return;
 
-  general_tab_sync();
-  config_sync_tab(SETTINGS_TAB_OPENGL);
-  config_sync_tab(SETTINGS_TAB_CAIRO);
+  config_widget_sync_builder(&render_settings_builder);
+  general_tab_apply_gl_sensitivity();
 }
 
 /*------------------------------------------------------------------------*/
