@@ -546,18 +546,31 @@ Display_Frequency_Data( void )
   if (zimag > 1e6)
 	  zimag = 999999;
 
+  /* Feedpoint scalars are undefined without a driving segment; render an em
+   * dash for incident-field and elementary-current-source excitations. */
+  gboolean fed = fpat_has_feedpoint();
+
   /* Display VSWR */
-  snprintf( txt, sizeof(txt)-1, "%.2f", vswr );
+  if( fed )
+    snprintf( txt, sizeof(txt)-1, "%.2f", vswr );
+  else
+    snprintf( txt, sizeof(txt)-1, "—" );
   gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(
           freqplots_window_builder, "freqplots_vswr_entry")), txt );
 
   /* Display Z real */
-  snprintf( txt, sizeof(txt)-1, "%.1f", zreal);
+  if( fed )
+    snprintf( txt, sizeof(txt)-1, "%.1f", zreal);
+  else
+    snprintf( txt, sizeof(txt)-1, "—" );
   gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(
           freqplots_window_builder, "freqplots_zreal_entry")), txt );
 
   /* Display Z imaginary */
-  snprintf( txt, sizeof(txt)-1, "%.1f", zimag);
+  if( fed )
+    snprintf( txt, sizeof(txt)-1, "%.1f", zimag);
+  else
+    snprintf( txt, sizeof(txt)-1, "—" );
   gtk_entry_set_text( GTK_ENTRY(Builder_Get_Object(
           freqplots_window_builder, "freqplots_zimag_entry")), txt );
 

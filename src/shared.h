@@ -270,6 +270,16 @@ extern FILE *input_fp, *output_fp, *plot_fp;
 /* common  /fpat/ */
 extern fpat_t fpat;
 
+/* True when the excitation defines a feedpoint: applied-E voltage source or
+ * current-slope discontinuity.  False for incident-field and elementary-
+ * current-source excitations, which drive no segment and leave input
+ * impedance, VSWR, and feedpoint gain undefined. */
+  static inline gboolean
+fpat_has_feedpoint( void )
+{
+  return (fpat.ixtyp == 0) || (fpat.ixtyp == 5);
+}
+
 /*common  /ggrid/ */
 extern ggrid_t ggrid;
 

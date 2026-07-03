@@ -26,7 +26,7 @@
   int
 fp_vswr_enabled(void)
 {
-  return isFlagSet(PLOT_VSWR);
+  return isFlagSet(PLOT_VSWR) && fpat_has_feedpoint();
 }
 
 /* VSWR and S11 trace buffers, reused across fp_vswr_render() calls. */

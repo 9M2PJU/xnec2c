@@ -288,28 +288,13 @@ Main_Rdpattern_Activate( gboolean from_menu )
   gboolean
 Main_Freqplots_Activate( void )
 {
-  /* No plots for Incident Field and
-   * Elementary Current Source Excitation */
-  if( (fpat.ixtyp != 0) && (fpat.ixtyp != 5) )
-  {
-    /* If window is already open, close it automatically */
-    if( freqplots_window != NULL )
-    {
-      Gtk_Widget_Destroy( &freqplots_window );
-      Stop( ERR_OK, _("Frequency plots window closed: excitation type %d is incompatible.\n"
-            "Use type 0 (Applied E Field) or 5 (Current Discontinuity) instead."), fpat.ixtyp );
-    }
-    else
-    {
-      /* Window not open - show detailed error message */
-      Stop( ERR_OK, _("Frequency plots are not available with excitation type %d.\n"
-            "This model uses Incident Field or Elementary Current Source excitation.\n"
-            "Change the EX card to type 0 (Applied E Field) or 5 (Current Discontinuity)."), fpat.ixtyp );
-    }
-    return( FALSE );
-  }
+  /* Feedpoint-undefined excitations still plot the radiation-derived panels;
+   * notify the user that the VSWR and impedance panels are suppressed. */
+  if( !fpat_has_feedpoint() )
+    pr_notice(_("Excitation type %d has no feedpoint: VSWR and impedance plots are hidden.\n"), fpat.ixtyp);
 
-  /* Enable freq data graph plotting */
+  /* Enable freq data graph plotting; per-series predicates suppress the
+   * feedpoint-undefined panels while the radiation-derived panels render. */
   SetFlag( PLOT_ENABLED );
 
   return( TRUE );
