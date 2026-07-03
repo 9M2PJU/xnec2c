@@ -307,7 +307,8 @@ parse_field_with_expression(const char **line_ptr, char **endptr, double *result
   int field_len;
   const char *field_end;
 
-  while( *line_buf == ' ' || *line_buf == '\t' )
+  /* Skip leading field delimiters; NEC-2 separates fields with spaces, tabs, or commas. */
+  while( *line_buf == ' ' || *line_buf == '\t' || *line_buf == ',' )
     line_buf++;
 
   if( *line_buf == '\0' )
