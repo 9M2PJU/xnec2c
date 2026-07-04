@@ -14,7 +14,6 @@ EXTRA_DIST += .gitignore
 EXTRA_DIST += m4/.gitignore
 
 EXTRA_DIST += debian/upstream/metadata
-EXTRA_DIST += update-example-data.sh
 
 EXTRA_DIST += MAINTAINER
 EXTRA_DIST += README.md
