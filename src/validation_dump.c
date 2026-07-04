@@ -99,7 +99,7 @@ static void dump_rdpat(FILE *fp)
 		"gtot,tilt,axrt,gain_horiz,gain_vert,gain_rhcp,gain_lhcp,sens,"
 		"polarization_factor_total\n");
 
-	if (!isFlagSet(ENABLE_RDPAT) || calc_data.freq_step < 0)
+	if (!isFlagSet(ENABLE_RDPAT))
 		return;
 
 	double dth = (double)fpat.dth * (double)TORAD;
