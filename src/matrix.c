@@ -1042,17 +1042,18 @@ etmns( double p1, double p2, double p3, double p4,
   ds= p6*59.9580;
   dsh= p6/(2.0* M_2PI);
 
-  is= 0;
-  i1= data.n-2;
   for( i = 0; i < data.npm; i++ )
   {
+    /* patch index, valid only when i >= data.n */
+    int pi = i - data.n;
+
     if( i >= data.n )
     {
-      i1 += 2;
+      i1 = data.n + 2*pi;
       i2 = i1+1;
-      pxl= data.patches[is].px - p1;
-      pyl= data.patches[is].py - p2;
-      pzl= data.patches[is].pz - p3;
+      pxl= data.patches[pi].px - p1;
+      pyl= data.patches[pi].py - p2;
+      pzl= data.patches[pi].pz - p3;
     }
     else
     {
@@ -1112,15 +1113,14 @@ etmns( double p1, double p2, double p3, double p4,
       pyl= wz* qx- wx* qz;
       pzl= wx* qy- wy* qx;
       tt2= dsh* tt1* cmplx(1.0/ r, M_2PI) /
-        r* sth* data.patches[is].psalp;
+        r* sth* data.patches[pi].psalp;
       cx= tt2* pxl;
       cy= tt2* pyl;
       cz= tt2* pzl;
-      e[i2]= cx* data.patches[is].t1x +
-        cy* data.patches[is].t1y + cz* data.patches[is].t1z;
-      e[i1]= cx* data.patches[is].t2x +
-        cy* data.patches[is].t2y + cz* data.patches[is].t2z;
-      is++;
+      e[i2]= cx* data.patches[pi].t1x +
+        cy* data.patches[pi].t1y + cz* data.patches[pi].t1z;
+      e[i1]= cx* data.patches[pi].t2x +
+        cy* data.patches[pi].t2y + cz* data.patches[pi].t2z;
     } /* if( i < data.n) */
 
   } /* for( i = 0; i < npm; i++ ) */
