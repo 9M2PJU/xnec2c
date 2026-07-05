@@ -984,6 +984,28 @@ Read_Geometry( void )
 
 /*------------------------------------------------------------------------*/
 
+/* freq_card_is_duplicate()
+ *
+ * Reports whether a raw FR card matches an already-accepted card.  Compares
+ * the file-identical raw parameters so the parent and the fork child reject
+ * the same set of cards and keep calc_data.FR_cards aligned.
+ */
+  static gboolean
+freq_card_is_duplicate( int type, int nsteps, double flo, double fhi )
+{
+  for( int i = 0; i < calc_data.FR_cards; i++ )
+  {
+    fr_card_sig_t *s = &calc_data.freq_loop_data[i].sig;
+    if( s->type == type && s->nsteps == nsteps &&
+        FREQ_EQ(s->flo, flo) && FREQ_EQ(s->fhi, fhi) )
+      return( TRUE );
+  }
+
+  return( FALSE );
+}
+
+/*------------------------------------------------------------------------*/
+
 /* Read_Commands()
  *
  * Reads commands from input file and stores
@@ -1170,6 +1192,15 @@ Read_Commands( void )
         continue; /* continue card input loop */
 
       case FR: /* "fr" card, frequency parameters */
+        /* Skip an FR card whose raw parameters repeat an accepted card so a
+         * frequency region is not swept twice; both processes decide alike */
+        if( freq_card_is_duplicate( itmp1, itmp2, tmp1, tmp2 ) )
+        {
+          if( !CHILD )
+            pr_notice("Skipping duplicate FR card at %g MHz\n", tmp1);
+          continue;
+        }
+
         /* Count of FR cards encountered */
         calc_data.FR_cards++;
         mem_array_realloc(&calc_data.freq_loop_data, calc_data.FR_cards);
@@ -1181,6 +1212,11 @@ Read_Commands( void )
         /* Defaults */
         fld[card].freq_steps = 1;
         fld[card].max_freq   = 0.0;
+
+        /* Store raw card identity before the child skips per-card math so the
+         * duplicate scan sees identical signatures in both processes */
+        fld[card].sig = (fr_card_sig_t){ .type = itmp1, .nsteps = itmp2,
+                                         .flo = tmp1, .fhi = tmp2 };
 
         if( !CHILD )
         {

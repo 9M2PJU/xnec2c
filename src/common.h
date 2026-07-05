@@ -1023,6 +1023,17 @@ typedef struct
  * This is needed to implement multiple FR cards so
  * that a frequency sweep can be made in separate bands
  */
+/* Raw FR card parameters as read from the file, used to detect a duplicate
+ * FR card identically in the parent and the fork child before either derives
+ * the normalized frequency fields */
+typedef struct
+{
+  int    type;    /* raw FR frequency-spec flag (itmp1): 0,1,2,3 */
+  int    nsteps;  /* raw FR step count (itmp2) */
+  double flo;     /* raw first/low frequency (tmp1) */
+  double fhi;     /* raw delta-or-high frequency (tmp2) */
+} fr_card_sig_t;
+
 typedef struct
 {
   int
@@ -1033,6 +1044,8 @@ typedef struct
     delta_freq,  /* Frequency step in freq loop */
     min_freq,    /* Min frequency in an FR card */
     max_freq;    /* Max frequency in an FR card */
+
+  fr_card_sig_t sig;  /* raw card identity for duplicate detection */
 
 } freq_loop_data_t;
 
