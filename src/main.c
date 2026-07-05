@@ -1009,7 +1009,19 @@ Open_Input_File( gpointer arg )
   }
 
   if( rc_config.main_loop_start || isFlagSet(SUPPRESS_INTERMEDIATE_REDRAWS) )
-    Start_Frequency_Loop();
+  {
+    if( calc_data.steps_total >= 1 )
+      Start_Frequency_Loop();
+    else if( rc_config.batch_mode )
+      g_idle_add_once( (GSourceOnceFunc)batch_finish_no_steps, NULL );
+    else
+    {
+      /* Zero-step deck in a non-batch context (GUI auto-start or
+       * --optimize): no sweep to dispatch and no batch quit to schedule.
+       * The session stays interactive, matching a FALSE return from
+       * Start_Frequency_Loop for a deck carrying no FR card. */
+    }
+  }
 
   /* Open NEC2 editor if there is a saved geometry state */
   GtkMenuItem *menu_item;

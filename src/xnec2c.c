@@ -1242,6 +1242,31 @@ freq_loop_finalize( freq_loop_state_t *state )
 }
 
 /**
+ * batch_finish_no_steps - graceful batch completion for a zero-step deck
+ *
+ * Runs on the GTK main thread from a g_idle_add_once source scheduled by
+ * Open_Input_File when a batch deck carries no dispatchable frequency step
+ * (no FR card).  Mirrors the write-and-quit tail of freq_loop_finalize for a
+ * zero-step object: the write primitives are bounded by steps_total and
+ * yield header-only output at zero steps.  Deferral runs it after
+ * Open_Input_File returns, so no widget is touched after xnec2c_quit
+ * destroys main_window.
+ */
+void
+batch_finish_no_steps( void )
+{
+  /* Sweep is trivially complete; gates Save_Validation_Tree's dump. */
+  SetFlag( FREQ_LOOP_DONE );
+
+  Save_Validation_Tree();
+
+  if( opt_have_files_to_save() )
+    Write_Optimizer_Data();
+
+  xnec2c_quit( NULL );
+}
+
+/**
  * Frequency_Loop - single iteration of the frequency sweep state machine
  * @udata: per-sweep freq_loop_state_t* allocated by Start_Frequency_Loop()
  *
