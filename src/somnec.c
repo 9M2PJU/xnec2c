@@ -778,7 +778,7 @@ gshank( complex double start, complex double dela,
         if(den < denm)
           den=denm;
         a1=q1[idx]-a1;
-        amg=fabs(creal(a1)+fabs(cimag(a1)));
+        amg=fabs(creal(a1))+fabs(cimag(a1));
         if(amg > den)
         {
           brk = TRUE;
