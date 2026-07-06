@@ -1422,6 +1422,18 @@ Save_Config( void )
 {
   FILE *fp = NULL;  /* File pointer to write config file */
 
+  /* Batch runs must not persist configuration: validation_dump_force_config()
+   * forces a canonical mathlib, antenna-temperature models, polarization, and
+   * viewer orientation, and an OpenGL context that fails on a headless server
+   * falls back to Cairo (opengl_gl_init_failed).  Writing any of these transient
+   * values back would corrupt the host's saved configuration, so skip
+   * persistence entirely in batch mode. */
+  if( rc_config.batch_mode )
+  {
+    pr_notice("batch mode: skipping configuration save\n");
+    return( TRUE );
+  }
+
   /* Open config file for writing */
   if (!Open_File(&fp, rc_config.config_file, "w"))
   {
