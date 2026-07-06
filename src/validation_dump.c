@@ -65,6 +65,17 @@ void validation_dump_force_config(void)
 	 * default and the committed baseline's value. */
 	calc_data.pol_type = POL_TOTAL;
 	pr_notice("validation: forced polarization to total for reproducibility\n");
+
+	/* Pin the structure viewer to its default orientation, matching the reset
+	 * button (set_view_preset for the default preset).  Viewer_Gain() and
+	 * Viewer_Noise_Value() resolve the viewing direction from structure_view's
+	 * rotation, and _meas_calc() recomputes gain_viewer at dump time via
+	 * meas_calc(), so a host-restored rotation would make the viewer columns
+	 * host-dependent.  This runs after structure_view is created in main() so
+	 * the reset lands on the live view. */
+	view_set_angles(structure_view, VIEW_DEFAULT_WR, VIEW_DEFAULT_WI);
+	view_reset_pan(structure_view);
+	pr_notice("validation: reset structure viewer to default orientation for reproducibility\n");
 }
 
 /*

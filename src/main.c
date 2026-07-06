@@ -549,10 +549,6 @@ main (int argc, char *argv[])
   /* Read GUI state config file and reset geometry */
   Read_Config();
 
-  /* Force deterministic mathlib and elevation for reproducible validation dumps;
-   * after Read_Config() so it overrides rc-file mathlib and elevation. */
-  validation_dump_force_config();
-
   if (rc_config.batch_mode)
 	  rc_config.main_loop_start = 1;
 
@@ -601,6 +597,11 @@ main (int argc, char *argv[])
   view_set_drag_mode( structure_view,
       rc_config.view_drag_constrained
           ? VIEW_DRAG_CONSTRAINED : VIEW_DRAG_FREE );
+
+  /* Force deterministic config for reproducible validation dumps.  Runs after
+   * Read_Config() so it overrides rc-file settings, and after structure_view is
+   * created so it can reset the viewer to its default orientation. */
+  validation_dump_force_config();
 
   /* Create GL widget after the view is initialized */
 #ifdef HAVE_OPENGL
