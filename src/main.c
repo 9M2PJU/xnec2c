@@ -785,6 +785,11 @@ Open_Input_File( gpointer arg )
   gboolean ok, new;
   GtkWidget *widget;
 
+  /* Reject reentry while a load holds input_fp, so the Close_File below
+   * cannot null the handle mid-parse in a nested Stop() event loop. */
+  if( isFlagSet(INPUT_PENDING) )
+    return( FALSE );
+
   /* Suppress activity while input file opened.  Set this before calling
    * Stop_Frequency_Loop() so the Frequency_Loop_Thread() knows not to 
    * make any synchronous GTK calls which would hang waiting for

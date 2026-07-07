@@ -328,6 +328,10 @@ Load_Line( char *buff, FILE *pfile )
   /* clear buffer at start */
   buff[0] = '\0';
 
+  /* input_fp is owned elsewhere and may close mid-read via Stop() reentry */
+  if( pfile == NULL )
+    return( EOF );
+
   /* ignore commented lines, white spaces and eol/cr */
   if( (chr = fgetc(pfile)) == EOF )
     return( EOF );
