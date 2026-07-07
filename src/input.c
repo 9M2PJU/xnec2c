@@ -292,6 +292,21 @@ validate_card_characters(const char *line_buf, int start_idx, int len, const cha
 
 /*-----------------------------------------------------------------------*/
 
+/* strip_card_comment()
+ *
+ * Truncate a parsed card at the first '!', discarding the inline
+ * trailing comment before length, validation and field parsing
+ */
+static void
+strip_card_comment( char *line_buf )
+{
+  char *bang = strchr( line_buf, '!' );
+  if( bang != NULL )
+    *bang = '\0';
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* parse_field_with_expression()
  *
  * Parse a numeric field that can be a plain number or expression
@@ -1828,6 +1843,9 @@ readmn( char *mn, int *i1, int *i2, int *i3, int *i4,
     return( FALSE );
   }
 
+  /* drop inline '!' comment tail before parsing */
+  strip_card_comment( line_buf );
+
   /* get line length */
   len = (int)strlen( line_buf );
 
@@ -2036,6 +2054,9 @@ readgm( char *gm, int *i1, int *i2, double *x1,
     mem_free(&startptr);
     return( FALSE );
   }
+
+  /* drop inline '!' comment tail before parsing */
+  strip_card_comment( line_buf );
 
   /* get line length */
   len = (int)strlen( line_buf );
