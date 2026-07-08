@@ -25,12 +25,6 @@
 #include "expr_edit.h"
 #include <ctype.h>
 
-#define COMMANDS \
-  "CM", "CP", "EK", "EN", "EX", \
-  "FR", "GD", "GN", "KH", "LD", \
-  "NE", "NH", "NT", "PQ", "PT", \
-  "RP", "SY", "TL", "XQ", "ZO"
-
 /* Command Mnemonics */
 enum CMND_MNM
 {

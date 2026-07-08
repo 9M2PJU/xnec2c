@@ -460,18 +460,78 @@ parse_sy_card(const char *line_content)
 
 /*-----------------------------------------------------------------------*/
 
+/* Command card mnemonics indexed by enum CMND_MNM; the designated
+ * initializer binds each mnemonic to its enumerator so the table and the
+ * enum cannot drift apart. The NULL entry at NUM_CMNDS terminates the
+ * list for sentinel-bounded iteration. */
+static const char *const cmnd_mnemonics[] =
+{
+  [CM] = "CM", [CP] = "CP", [EK] = "EK", [EN] = "EN", [EX] = "EX",
+  [FR] = "FR", [GD] = "GD", [GN] = "GN", [KH] = "KH", [LD] = "LD",
+  [NE] = "NE", [NH] = "NH", [NT] = "NT", [PQ] = "PQ", [PT] = "PT",
+  [RP] = "RP", [SY] = "SY", [TL] = "TL", [XQ] = "XQ", [ZO] = "ZO",
+  [NUM_CMNDS] = NULL,
+};
+
+/* Geometry card mnemonics indexed by enum GEOM_MNM; the NULL entry at
+ * NUM_GEOMN terminates the list. */
+static const char *const geom_mnemonics[] =
+{
+  [GW] = "GW", [GX] = "GX", [GR] = "GR", [GS] = "GS", [GE] = "GE",
+  [GM] = "GM", [SP] = "SP", [SM] = "SM", [GA] = "GA", [SC] = "SC",
+  [GH] = "GH", [GF] = "GF", [CT] = "CT", [SY_GEOM] = "SY",
+  [NUM_GEOMN] = NULL,
+};
+
+/* mnemonic_in_list()
+ *
+ * Reports whether a two-character card mnemonic appears in a
+ * NULL-terminated mnemonic table, comparing only the two mnemonic
+ * characters.
+ */
+  static gboolean
+mnemonic_in_list( const char *mn, const char *const *list )
+{
+  int i;
+
+  for( i = 0; list[i] != NULL; i++ )
+    if( strncmp( mn, list[i], 2 ) == 0 )
+      return( TRUE );
+
+  return( FALSE );
+}
+
+/* is_geometry_mnemonic()
+ *
+ * Reports whether a mnemonic names a geometry card, letting the command
+ * reader tell a misplaced geometry card apart from a mnemonic that
+ * belongs to no section.
+ */
+  static gboolean
+is_geometry_mnemonic( const char *mn )
+{
+  return mnemonic_in_list( mn, geom_mnemonics );
+}
+
+/* is_command_mnemonic()
+ *
+ * Reports whether a mnemonic names a command card, letting the geometry
+ * reader tell a misplaced command card apart from a mnemonic that
+ * belongs to no section.
+ */
+  static gboolean
+is_command_mnemonic( const char *mn )
+{
+  return mnemonic_in_list( mn, cmnd_mnemonics );
+}
+
+/*-----------------------------------------------------------------------*/
+
 /* datagn is the main routine for input of geometry data. */
   static gboolean
 datagn( void )
 {
   char gm[3];
-
-  /* input card mnemonic list */
-  char *atst[] =
-  {
-    "GW", "GX", "GR", "GS", "GE","GM", "SP",\
-    "SM", "GA", "SC", "GH", "GF", "CT", "SY"
-  };
 
   int nwire, isct, itg, iy=0, iz;
   int ix, i, ns, gm_num; /* geometry card id as a number */
@@ -498,8 +558,8 @@ datagn( void )
       return( FALSE );
 
     /* identify card id mnemonic */
-    for( gm_num = 0; gm_num < NUM_GEOMN; gm_num++ )
-      if( strncmp( gm, atst[gm_num], 2) == 0 )
+    for( gm_num = 0; geom_mnemonics[gm_num] != NULL; gm_num++ )
+      if( strncmp( gm, geom_mnemonics[gm_num], 2) == 0 )
         break;
 
     if( gm_num != 9 ) isct=0;
@@ -893,7 +953,12 @@ datagn( void )
         pr_err("%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n",
 			gm, itg, ns, xw1, yw1, zw1, xw2, yw2, zw2, rad);
 
-        Stop( ERR_OK, _("Geometry data card error") );
+        /* separate a command card misplaced in the geometry section from
+         * a mnemonic recognized by neither section */
+        if( is_command_mnemonic( gm ) )
+          Stop( ERR_OK, _("Command card in geometry section") );
+        else
+          Stop( ERR_OK, _("Unrecognized geometry card") );
         return( FALSE );
 
     } /* switch( gm_num ) */
@@ -1029,9 +1094,6 @@ freq_card_is_duplicate( int type, int nsteps, double flo, double fhi )
   gboolean
 Read_Commands( void )
 {
-  /* input card mnemonic list */
-  char *atst[NUM_CMNDS] = { COMMANDS };
-
   char ain[3], notice[128];
   double tmp1, tmp2, tmp3, tmp4, tmp5, tmp6;
   int
@@ -1104,8 +1166,8 @@ Read_Commands( void )
     mpcnt++;
 
     /* identify command card id mnemonic */
-    for( ain_num = 0; ain_num < NUM_CMNDS; ain_num++ )
-      if( strncmp( ain, atst[ain_num], 2) == 0 )
+    for( ain_num = 0; cmnd_mnemonics[ain_num] != NULL; ain_num++ )
+      if( strncmp( ain, cmnd_mnemonics[ain_num], 2) == 0 )
         break;
 
     /* take action according to card id mnemonic */
@@ -1687,9 +1749,14 @@ Read_Commands( void )
         continue;
 
       default:
-        snprintf(notice, sizeof(notice)-1, "%s: %s (mpcnt=%d)\n",
-            _("Faulty data card"),
-            ain, mpcnt);
+        /* separate a geometry card misplaced in the command section from
+         * a mnemonic recognized by neither section */
+        if( is_geometry_mnemonic( ain ) )
+          snprintf(notice, sizeof(notice)-1, "%s: %s (mpcnt=%d)\n",
+              _("Geometry card in command section"), ain, mpcnt);
+        else
+          snprintf(notice, sizeof(notice)-1, "%s: %s (mpcnt=%d)\n",
+              _("Unrecognized command card"), ain, mpcnt);
         pr_err("%s", notice);
         Stop(ERR_OK, "%s", notice);
         return( FALSE );
