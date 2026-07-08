@@ -208,6 +208,8 @@ nobase_dist_pkgdata_DATA += examples/20m_dipole_NT_50ohm.nec
 
 nobase_dist_pkgdata_DATA += examples/2m-5el-rhcp-ARISS-KJ7NLL.nec
 
+nobase_dist_pkgdata_DATA += examples/ex2_current_slope_disc_dipole.nec
+
 nobase_dist_pkgdata_DATA += examples/2m_extended_yagi.nec
 
 nobase_dist_pkgdata_DATA += examples/2m_halo_stack.nec
