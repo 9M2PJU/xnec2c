@@ -259,6 +259,7 @@ static size_t size_npm_dbl(void)        { return (size_t)data.npm  * sizeof(doub
 static size_t size_np3m_cdbl(void)      { return (size_t)data.np3m * sizeof(complex double); }
 static size_t size_nphth_dbl(void)      { return (size_t)(fpat.nph * fpat.nth) * sizeof(double); }
 static size_t size_nphth_int(void)      { return (size_t)(fpat.nph * fpat.nth) * sizeof(int); }
+static size_t size_n_ports_dbl(void)    { return (size_t)Num_Feedpoint_Ports() * sizeof(double); }
 static size_t size_nf_points(void)      { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t); }
 static size_t size_nf_vectors(void)     { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(nf_vector_t); }
 static size_t size_seg_rgb(void)        { return (size_t)data.n  * sizeof(rgb_f_t); }
@@ -306,13 +307,12 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
     { crnt.cir,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
     { crnt.cii,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
     { crnt.cur,                        size_np3m_cdbl, 0,                        FREQ_COND_ALWAYS },
-    /* Impedance data (fstep=0 on child, fstep=N on parent) */
-    { &impedance_data.zreal[fstep],    NULL,           sizeof(double),           FREQ_COND_ALWAYS },
-    { &impedance_data.zimag[fstep],    NULL,           sizeof(double),           FREQ_COND_ALWAYS },
-    { &impedance_data.zmagn[fstep],    NULL,           sizeof(double),           FREQ_COND_ALWAYS },
-    { &impedance_data.zphase[fstep],   NULL,           sizeof(double),           FREQ_COND_ALWAYS },
-    /* Network data */
-    { &netcx.zped,                     NULL,           sizeof(complex double),   FREQ_COND_ALWAYS },
+    /* Per-port impedance data (fstep=0 on child, fstep=N on parent); each
+     * member spans Num_Feedpoint_Ports() doubles, identical parent and child. */
+    { impedance_data[fstep].zreal,     size_n_ports_dbl, 0,                      FREQ_COND_ALWAYS },
+    { impedance_data[fstep].zimag,     size_n_ports_dbl, 0,                      FREQ_COND_ALWAYS },
+    { impedance_data[fstep].zmagn,     size_n_ports_dbl, 0,                      FREQ_COND_ALWAYS },
+    { impedance_data[fstep].zphase,    size_n_ports_dbl, 0,                      FREQ_COND_ALWAYS },
     /* Radiation pattern data */
     { rad_pattern[fstep].gtot,         size_nphth_dbl, 0,                        FREQ_COND_RDPAT  },
     { rad_pattern[fstep].tilt,         size_nphth_dbl, 0,                        FREQ_COND_RDPAT  },

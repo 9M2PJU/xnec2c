@@ -110,11 +110,10 @@ input_data_free( void )
   mem_array_free( &vsorc.vqds );
   mem_array_free( &vsorc.vsant );
 
-  mem_array_free( &impedance_data.zreal );
-  mem_array_free( &impedance_data.zimag );
-  mem_array_free( &impedance_data.zmagn );
-  mem_array_free( &impedance_data.zphase );
+  /* Release each fstep's per-port sub-buffers and the outer impedance array. */
+  Free_Impedance_Buffers();
 
+  mem_array_free( &netcx.zped_port );
   mem_array_free( &netcx.iseg1 );
   mem_array_free( &netcx.iseg2 );
   mem_array_free( &netcx.ntyp );
@@ -1306,10 +1305,6 @@ Read_Commands( void )
         {
           calc_data.steps_total += fld[card].freq_steps;
           int nrec = (calc_data.steps_total + 1);
-          mem_array_realloc(&impedance_data.zreal, nrec);
-          mem_array_realloc(&impedance_data.zimag, nrec);
-          mem_array_realloc(&impedance_data.zmagn, nrec);
-          mem_array_realloc(&impedance_data.zphase, nrec);
           mem_array_realloc(&save.freq, nrec);
           mem_array_realloc(&save.fstep, (calc_data.steps_total + 1));
         }
@@ -1769,6 +1764,15 @@ Read_Commands( void )
     Alloc_Rdpattern_Buffers( calc_data.steps_total + 1, fpat.nth, fpat.nph );
     Alloc_Crnt_Fstep_Buffers( calc_data.steps_total + 1 );
     prerender_state_alloc( calc_data.steps_total + 1 );
+
+    /* Feedpoint-port count is known only after EX cards parse; size the
+     * per-port impedance array here rather than in the FR-card loop. */
+    Alloc_Impedance_Buffers( calc_data.steps_total + 1, Num_Feedpoint_Ports() );
+
+    /* Owned by the data model, not the freqplots UI: reset the selected
+     * excitation port to the first port so a stale index from a prior model
+     * cannot index past this model's port span. */
+    calc_data.ex_port = 0;
 
     /* Near-field storage and normalization track the NE/NH cards alone. */
     if( isFlagSet(ENABLE_NEAREH) )

@@ -281,8 +281,18 @@ create_freqplots_popup_window( freqplots_view_t *view, const char *graph_name )
    * popup shows its graph's metric values by name. */
   GtkWidget *vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
   gtk_container_add( GTK_CONTAINER(win), vbox );
-  gtk_box_pack_start( GTK_BOX(vbox),
-      freqplots_readout_bar_new( view ), FALSE, FALSE, 0 );
+
+  /* One top row gives the readout bar the leading width and pins an optional
+   * port selector at its minimum width against the right edge, matching the
+   * main window; a graph that never follows the port contributes no selector
+   * and the readout bar fills the row alone. */
+  GtkWidget *topbar = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
+  gtk_box_pack_start( GTK_BOX(topbar),
+      freqplots_readout_bar_new( view ), TRUE, TRUE, 0 );
+  GtkWidget *port_combo = freqplots_port_combo_new( view );
+  if( port_combo != NULL )
+    gtk_box_pack_end( GTK_BOX(topbar), port_combo, FALSE, FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX(vbox), topbar, FALSE, FALSE, 0 );
 
   da = gtk_drawing_area_new();
   gtk_box_pack_start( GTK_BOX(vbox), da, TRUE, TRUE, 0 );

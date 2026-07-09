@@ -286,30 +286,44 @@ static void dump_nearfield_points(FILE *fp)
 
 
 /* impedance.csv
- * mhz, fstep, zreal, zimag, zmagn, zphase, netcx_zped_real, netcx_zped_imag */
+ * Per-(fstep,port) nec2c ANTENNA INPUT PARAMETERS row.  V is the
+ * frequency-constant EX voltage; current I=V/Z, admittance Y=1/Z, and power
+ * P=0.5 Re(V conj(I)) derive from the stored port impedance Z and V.
+ * mhz, fstep, port, tag, seg,
+ * vreal, vimag, ireal, iimag, zreal, zimag, zmagn, zphase, yreal, yimag, power */
 static void dump_impedance(FILE *fp)
 {
-	fprintf(fp, "mhz,fstep,zreal,zimag,zmagn,zphase,"
-		"netcx_zped_real,netcx_zped_imag\n");
+	fprintf(fp, "mhz,fstep,port,tag,seg,"
+		"vreal,vimag,ireal,iimag,zreal,zimag,zmagn,zphase,"
+		"yreal,yimag,power\n");
+
+	int n_ports = Num_Feedpoint_Ports();
 
 	for (int fs = 0; fs < calc_data.steps_total; fs++)
 	{
 		if (!save.fstep[fs])
 			continue;
 
-		/* netcx.zped is a single global holding the last-computed value. */
-		double zped_r = (fs == calc_data.steps_total - 1)
-			? creal(netcx.zped) : 0.0;
-		double zped_i = (fs == calc_data.steps_total - 1)
-			? cimag(netcx.zped) : 0.0;
+		for (int p = 0; p < n_ports; p++)
+		{
+			int seg = Feedpoint_Port_Seg(p);
+			complex double V = Feedpoint_Port_Voltage(p);
+			complex double Z = impedance_data[fs].zreal[p] +
+				I * impedance_data[fs].zimag[p];
+			complex double Ic = V / Z;
+			complex double Y = 1.0 / Z;
+			double P = 0.5 * creal( V * conj(Ic) );
 
-		fprintf(fp, "%.6f,%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n",
-			save.freq[fs], fs,
-			impedance_data.zreal[fs],
-			impedance_data.zimag[fs],
-			impedance_data.zmagn[fs],
-			impedance_data.zphase[fs],
-			zped_r, zped_i);
+			fprintf(fp, "%.6f,%d,%d,%d,%d,"
+				"%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g\n",
+				save.freq[fs], fs, p, Feedpoint_Port_Tag(p), seg,
+				creal(V), cimag(V), creal(Ic), cimag(Ic),
+				impedance_data[fs].zreal[p], impedance_data[fs].zimag[p],
+				impedance_data[fs].zmagn[p], impedance_data[fs].zphase[p],
+				creal(Y), cimag(Y), P);
+		}
 	}
 }
 

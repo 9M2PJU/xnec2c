@@ -138,7 +138,7 @@ void Save_FreqPlots_Touchstone(char *filename, int type)
 	g_rec_mutex_lock(&freq_data_lock);
 	for (idx = 0; idx < calc_data.steps_total; idx++)
 	{
-		meas_calc(&meas, idx);
+		meas_calc(&meas, idx, calc_data.ex_port);
 		meas_write_format(&meas, format, fp);
 	}
 	g_rec_mutex_unlock(&freq_data_lock);

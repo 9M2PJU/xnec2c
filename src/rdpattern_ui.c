@@ -281,7 +281,7 @@ Update_Rdpattern_UI(void)
   /* Update TA readout in toolbar */
   {
     measurement_t meas = { .a = {0} };
-    meas_calc(&meas, fstep);
+    meas_calc(&meas, fstep, calc_data.ex_port);
     GtkWidget *temp_entry = Builder_Get_Object(
         rdpattern_window_builder, "rdpattern_ant_temp_entry");
     if (temp_entry)

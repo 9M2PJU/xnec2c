@@ -62,6 +62,13 @@ netwk( complex double *cmx, int *ip, complex double *einc )
 
   netcx.pin=0.0;
   netcx.pnls=0.0;
+
+  /* Self-size the per-port impedance scratch; index 0..nsant-1 = voltage
+   * sources, nsant..nsant+nvqd-1 = current-slope discontinuity sources. */
+  int n_ports = Num_Feedpoint_Ports();
+  if( n_ports > 0 )
+    mem_array_realloc(&netcx.zped_port, n_ports);
+
   neqt= netcx.neq+ netcx.neq2;
   ndimn = j = (2*netcx.nonet + vsorc.nsant);
 
@@ -551,6 +558,9 @@ netwk( complex double *cmx, int *ip, complex double *einc )
       pwr=.5* creal( vlt* conj( cux));
       netcx.pin= netcx.pin+ pwr;
 
+      /* Retain this voltage-source port; netcx.zped is overwritten next iter. */
+      netcx.zped_port[i] = netcx.zped;
+
       if( irow1 != 0)
         netcx.pnls= netcx.pnls+ pwr;
     } /* for( i = 0; i < vsorc.nsant; i++ ) */
@@ -571,6 +581,9 @@ netwk( complex double *cmx, int *ip, complex double *einc )
       netcx.zped= vlt/ cux;
       pwr=.5* creal( vlt* conj( cux));
       netcx.pin= netcx.pin+ pwr;
+
+      /* Retain this current-slope port after the voltage-source block. */
+      netcx.zped_port[vsorc.nsant + i] = netcx.zped;
     } /* for( i = 0; i < vsorc.nvqd; i++ ) */
 
   /* Free network buffers */

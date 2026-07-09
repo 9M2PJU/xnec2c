@@ -535,24 +535,27 @@ const char *meas_descriptions[] = {
 // idx: the index into the calculated data structures.
 //
 // Warning: idx is not checked to make sure it is valid.
-static void _meas_calc(measurement_t *m, int idx)
+static void _meas_calc(measurement_t *m, int idx, int port)
 {
 	int pol = calc_data.pol_type;
 	int mgidx;
 	int i;
 
+	/* Single-port consumers read the caller-selected excitation port. */
+	impedance_data_t *imp = &impedance_data[idx];
+
 	double Zr, Zi, Zo = calc_data.zo;
 
-	double zrpro2 = impedance_data.zreal[idx] + calc_data.zo;
+	double zrpro2 = imp->zreal[port] + calc_data.zo;
 	zrpro2 *= zrpro2;
 
-	double zrmro2 = impedance_data.zreal[idx] - calc_data.zo;
+	double zrmro2 = imp->zreal[port] - calc_data.zo;
 	zrmro2 *= zrmro2;
 
-	double zimag2 = impedance_data.zimag[idx] * impedance_data.zimag[idx];
+	double zimag2 = imp->zimag[port] * imp->zimag[port];
 	double gamma = sqrt( (zrmro2 + zimag2) / (zrpro2 + zimag2) );
 
-	double complex z_load = impedance_data.zreal[idx] + I*impedance_data.zimag[idx];
+	double complex z_load = imp->zreal[port] + I*imp->zimag[port];
 	double complex cgamma = (z_load-Zo) / (z_load+Zo);
 
 	double complex cs11 = 20*clog10( cgamma );
@@ -566,11 +569,11 @@ static void _meas_calc(measurement_t *m, int idx)
 
 	m->mhz = save.freq[idx];
 
-	Zr = m->zreal = impedance_data.zreal[idx];
-	Zi = m->zimag = impedance_data.zimag[idx];
+	Zr = m->zreal = imp->zreal[port];
+	Zi = m->zimag = imp->zimag[port];
 
-	m->zmag = impedance_data.zmagn[idx];
-	m->zphase = impedance_data.zphase[idx];
+	m->zmag = imp->zmagn[port];
+	m->zphase = imp->zphase[port];
 
 	m->vswr = (1 + gamma) / (1 - gamma);
 	m->s11 = 20*log10( gamma );
@@ -803,10 +806,10 @@ const char *ant_temp_earth_name(int idx)
 	return earth_models[idx].name;
 }
 
-void meas_calc(measurement_t *m, int idx)
+void meas_calc(measurement_t *m, int idx, int port)
 {
 	g_rec_mutex_lock(&freq_data_lock);
-	_meas_calc(m, idx);
+	_meas_calc(m, idx, port);
 	g_rec_mutex_unlock(&freq_data_lock);
 }
 
@@ -929,7 +932,7 @@ void meas_write_data_enc(FILE *fp, char *delim, char *left, char *right)
 
 	for (idx = 0; idx < calc_data.steps_total; idx++)
 	{
-		meas_calc(&meas, idx);
+		meas_calc(&meas, idx, calc_data.ex_port);
 		for (i = 0; i < MEAS_COUNT; i++)
 		{
 			fprintf(fp, "%s%.17g%s", left, meas.a[i], right);

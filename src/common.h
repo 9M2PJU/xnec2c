@@ -926,6 +926,8 @@ typedef struct
     pnls;   /* Power lost in networks */
 
   complex double zped;
+  complex double *zped_port; /* per-port scratch; index 0..nsant-1 = voltage
+                             * sources, nsant..nsant+nvqd-1 = current-slope */
 
 } netcx_t;
 
@@ -1140,6 +1142,14 @@ typedef struct {
 	GtkWidget   *readout_field[FP_READOUT_MAX];
 	GtkWidget   *readout_value[FP_READOUT_MAX];
 	int          readout_n;
+
+	// Popup excitation-port selection and its menu button; the primary view
+	// resolves its port from calc_data.ex_port and leaves ex_port unused.
+	// port_saved and port_committed carry this view's hover-preview state.
+	int        ex_port;
+	GtkWidget *port_button;
+	int        port_saved;
+	gboolean   port_committed;
 } freqplots_view_t;
 
 /* My addition, struct to hold data needed
@@ -1159,6 +1169,7 @@ typedef struct
     iped,
     ngraph,     /* Number of graphs to be plotted */
     pol_type,   /* User-specified Polarization type for plots and patterns */
+    ex_port,    /* Selected excitation port (0-based) for single-port consumers */
     num_jobs;   /* Number of child processes (jobs) to fork */
 
   double
@@ -1350,6 +1361,13 @@ void on_freqplots_save_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_save_as_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_save_as_gnuplot_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_zo_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
+void freqplots_populate_port_combo(void);
+GtkWidget *freqplots_port_combo_new(freqplots_view_t *view);
+void freqplots_refresh_port_combos(void);
+void freqplots_reload_port_combos(void);
+void Alloc_Impedance_Buffers(int nfrq, int n_ports);
+void Free_Impedance_Buffers(void);
+void Rescan_Zpnorm(void);
 gboolean on_freqplots_drawingarea_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
 gboolean on_freqplots_drawingarea_configure_event(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data);
 gboolean on_freqplots_drawingarea_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer user_data);

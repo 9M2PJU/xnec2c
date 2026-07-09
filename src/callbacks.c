@@ -683,6 +683,9 @@ on_main_freqplots_activate(
           freqplots_window_builder, "freqplots_zo_spinbutton" );
       gtk_spin_button_set_value( GTK_SPIN_BUTTON(spin), (gdouble)calc_data.zo );
 
+      /* Populate the excitation-port selector for the current model. */
+      freqplots_populate_port_combo();
+
       GtkAllocation alloc;
       gtk_widget_get_allocation( fp_da, &alloc );
       freqplots_main_view()->width  = alloc.width;

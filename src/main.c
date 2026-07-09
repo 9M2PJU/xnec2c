@@ -859,6 +859,12 @@ Open_Input_File( gpointer arg )
     return( FALSE );
   } /* if( !ok ) */
 
+  /* Populate the freqplots excitation-port selector for the loaded model. */
+  freqplots_populate_port_combo();
+
+  /* Rebuild open popup port selectors for the reloaded model's ports. */
+  freqplots_reload_port_combos();
+
   /* Serialization relies on GTK single-threadedness: inotify dispatches
    * Open_Input_File to the GTK thread via g_idle_add; Stop_Frequency_Loop
    * at entry joins any compute thread before proceeding. */

@@ -139,6 +139,7 @@ NULL
 "freqplots_ant_temp_entry", \
 "freqplots_gt_entry", \
 "freqplots_zo_spinbutton", \
+"freqplots_port_combo", \
 "freqplots_drawingarea", \
 "freqplots_label", \
 "freqplots_net_gain", \

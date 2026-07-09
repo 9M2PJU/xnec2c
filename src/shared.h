@@ -243,8 +243,9 @@ extern complex double *cm;
 /* Frequency step entry widget */
 extern GtkEntry *structure_fstep_entry;
 
-/* Needed data */
-extern impedance_data_t impedance_data;
+/* Needed data; array-of-structs indexed [fstep], each member sized to
+ * Num_Feedpoint_Ports() and indexed [port] within one fstep */
+extern impedance_data_t *impedance_data;
 
 /* Data for various calculations */
 extern calc_data_t calc_data;
@@ -315,6 +316,36 @@ extern smat_t smat;
 
 /* common  /vsorc/ */
 extern vsorc_t vsorc;
+
+/* Count of excitation feedpoint ports: applied-field voltage sources followed
+ * by current-slope discontinuity sources.  Single source of truth for the
+ * port axis, shared by allocation, IPC sizing, combo population, and dumps. */
+  static inline int
+Num_Feedpoint_Ports( void )
+{
+  return vsorc.nsant + vsorc.nvqd;
+}
+
+/* One-based segment number owning port p. */
+  static inline int
+Feedpoint_Port_Seg( int p )
+{
+  return (p < vsorc.nsant) ? vsorc.isant[p] : vsorc.ivqd[p - vsorc.nsant];
+}
+
+/* Frequency-constant EX voltage driving port p. */
+  static inline complex double
+Feedpoint_Port_Voltage( int p )
+{
+  return (p < vsorc.nsant) ? vsorc.vsant[p] : vsorc.vqd[p - vsorc.nsant];
+}
+
+/* NEC2 tag number of the segment owning port p. */
+  static inline int
+Feedpoint_Port_Tag( int p )
+{
+  return data.segments[Feedpoint_Port_Seg(p) - 1].itag;
+}
 
 /* common  /zload/ */
 extern zload_t zload;

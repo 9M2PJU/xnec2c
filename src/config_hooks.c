@@ -309,6 +309,10 @@ hook_freqplots_net_gain(void)
   else
     ClearFlag( PLOT_NETGAIN );
 
+  /* Net gain gates the gain and viewer popups' port pull-downs, so re-gate
+   * every open port-aware combo when the setting flips. */
+  freqplots_refresh_port_combos();
+
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
     freqplots_redraw_all(TRUE);
 }

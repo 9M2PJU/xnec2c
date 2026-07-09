@@ -64,22 +64,36 @@ static const char *fp_panel_names[FP_PANEL_COUNT] = {
 /* Per-panel selection and data-availability descriptor.  select_flag is the
  * main-window PLOT_* toggle that chooses the panel; require_flag is a data
  * precondition that must hold for the panel to carry meaningful values, or 0
- * when the panel has none. */
+ * when the panel has none.  port_aware marks a panel whose values ever track
+ * the excitation port; port_gate_flag names an extra PLOT_* flag that must
+ * also be set for the port pull-down to accept input, or 0 when the panel
+ * follows the port unconditionally.  Gain and viewer follow the port only
+ * through their net-gain trace, so they gate on PLOT_NETGAIN. */
 typedef struct {
   unsigned long long select_flag;
   unsigned long long require_flag;
+  gboolean           port_aware;
+  unsigned long long port_gate_flag;
 } fp_panel_desc_t;
 
 static const fp_panel_desc_t fp_panel_desc[FP_PANEL_COUNT] = {
-  [FP_PANEL_GAIN]     = { PLOT_GMAX,        ENABLE_RDPAT },
-  [FP_PANEL_GAIN_DIR] = { PLOT_GAIN_DIR,    ENABLE_RDPAT },
-  [FP_PANEL_VIEWER]   = { PLOT_GVIEWER,     ENABLE_RDPAT },
-  [FP_PANEL_VSWR]     = { PLOT_VSWR,        0 },
-  [FP_PANEL_ZRLZIM]   = { PLOT_ZREAL_ZIMAG, 0 },
-  [FP_PANEL_ZMGZPH]   = { PLOT_ZMAG_ZPHASE, 0 },
-  [FP_PANEL_SMITH]    = { PLOT_SMITH,       0 },
-  [FP_PANEL_ANT_TEMP] = { PLOT_ANT_TEMP,    ENABLE_RDPAT },
+  [FP_PANEL_GAIN]     = { PLOT_GMAX,        ENABLE_RDPAT, TRUE,  PLOT_NETGAIN },
+  [FP_PANEL_GAIN_DIR] = { PLOT_GAIN_DIR,    ENABLE_RDPAT, FALSE, 0            },
+  [FP_PANEL_VIEWER]   = { PLOT_GVIEWER,     ENABLE_RDPAT, TRUE,  PLOT_NETGAIN },
+  [FP_PANEL_VSWR]     = { PLOT_VSWR,        0,            TRUE,  0            },
+  [FP_PANEL_ZRLZIM]   = { PLOT_ZREAL_ZIMAG, 0,            TRUE,  0            },
+  [FP_PANEL_ZMGZPH]   = { PLOT_ZMAG_ZPHASE, 0,            TRUE,  0            },
+  [FP_PANEL_SMITH]    = { PLOT_SMITH,       0,            TRUE,  0            },
+  [FP_PANEL_ANT_TEMP] = { PLOT_ANT_TEMP,    ENABLE_RDPAT, FALSE, 0            },
 };
+
+/* Resolve the excitation port a view renders: the primary window follows the
+ * authoritative calc_data.ex_port; a popup carries its own selection. */
+  static int
+fp_view_port( freqplots_view_t *v )
+{
+  return (v->filter == FP_PANEL_ALL) ? calc_data.ex_port : v->ex_port;
+}
 
 /* Setting that gates one selected-frequency readout column.  Each value names
  * the same condition the matching graph renderer evaluates, so the popup bar
@@ -521,7 +535,7 @@ Display_Frequency_Data( void )
   if( fstep < 0 )
     return;
 
-  meas_calc(&meas, fstep);
+  meas_calc(&meas, fstep, calc_data.ex_port);
 
   /* Display max gain */
   snprintf( txt, sizeof(txt)-1, "%.2f", meas.gain_max );
@@ -597,6 +611,273 @@ Display_Frequency_Data( void )
           freqplots_window_builder, "freqplots_gt_entry")), txt );
 
 } /* Display_Frequency_Data() */
+
+/*-----------------------------------------------------------------------*/
+
+/* Return a newly allocated terse identity "P<n>: T<tag>/S<seg>" for port @p;
+ * the caller releases it with g_free. */
+  static char *
+fp_port_label( int p )
+{
+  return g_strdup_printf( "P%d: T%d/S%d",
+      p + 1, Feedpoint_Port_Tag(p), Feedpoint_Port_Seg(p) );
+}
+
+/* Recover the view a port menu belongs to from data stored on the menu. */
+  static freqplots_view_t *
+fp_menu_view( GtkWidget *item )
+{
+  GtkWidget *menu = gtk_widget_get_parent( item );
+  return g_object_get_data( G_OBJECT(menu), "fp_view" );
+}
+
+/* Show port @p's terse identity on view @v's port menu button. */
+  static void
+fp_port_button_label( freqplots_view_t *v, int p )
+{
+  char *label = fp_port_label( p );
+  gtk_button_set_label( GTK_BUTTON(v->port_button), label );
+  g_free( label );
+}
+
+/* Make port @p the live selection for view @v and refresh its output.  The
+ * primary window drives the authoritative calc_data.ex_port, rescans the
+ * impedance normalization, and redraws every view; a popup owns v->ex_port and
+ * redraws only its own window. */
+  static void
+fp_port_apply( freqplots_view_t *v, int p )
+{
+  if( v->filter == FP_PANEL_ALL )
+  {
+    calc_data.ex_port = p;
+
+    /* Impedance normalization tracks the authoritative port. */
+    if( calc_data.iped == 1 )
+      Rescan_Zpnorm();
+
+    freq_step_update_ui( calc_data.freq_step, TRUE );
+  }
+  else
+  {
+    v->ex_port = p;
+    xnec2_widget_queue_draw( v->drawingarea, TRUE );
+  }
+}
+
+/* Preview the hovered port without committing it. */
+  static void
+on_fp_port_item_select( GtkMenuItem *item, gpointer user_data )
+{
+  fp_port_apply( fp_menu_view( GTK_WIDGET(item) ),
+      GPOINTER_TO_INT(user_data) );
+}
+
+/* Commit the clicked port and show its terse identity on the button. */
+  static void
+on_fp_port_item_activate( GtkMenuItem *item, gpointer user_data )
+{
+  freqplots_view_t *v = fp_menu_view( GTK_WIDGET(item) );
+  int p = GPOINTER_TO_INT(user_data);
+  v->port_committed = TRUE;
+  fp_port_apply( v, p );
+  fp_port_button_label( v, p );
+}
+
+/* Snapshot the committed port as the menu opens. */
+  static void
+on_fp_port_menu_show( GtkWidget *menu, gpointer user_data )
+{
+  freqplots_view_t *v = g_object_get_data( G_OBJECT(menu), "fp_view" );
+  v->port_saved = fp_view_port( v );
+  v->port_committed = FALSE;
+}
+
+/* Revert to the snapshot when the menu closes without a click. */
+  static void
+on_fp_port_menu_done( GtkMenuShell *menu, gpointer user_data )
+{
+  freqplots_view_t *v = g_object_get_data( G_OBJECT(menu), "fp_view" );
+  if( !v->port_committed )
+    fp_port_apply( v, v->port_saved );
+}
+
+/* Resolve whether view @v's port pull-down accepts input.  A multiport model
+ * is required; a panel that follows the port only through its net-gain trace
+ * additionally requires that gate flag to be set. */
+  static gboolean
+fp_port_combo_sensitive( freqplots_view_t *v )
+{
+  unsigned long long gate =
+    (v->filter == FP_PANEL_ALL) ? 0 : fp_panel_desc[v->filter].port_gate_flag;
+
+  if( Num_Feedpoint_Ports() <= 1 )
+    return FALSE;
+
+  return (gate == 0) || isFlagSet( gate );
+}
+
+/* Descriptive help shown on an enabled port pull-down. */
+static const char *fp_port_combo_help = N_(
+"Excitation-port selector: models with more than one EX excitation list every port here.\n"
+"\n"
+"Entry P<n>: T<tag>/S<seg>\n"
+"    n = port number, tag = NEC tag, seg = segment.\n"
+"\n"
+"Hover an entry to preview that port, click to\n"
+"select it, or click away to keep the current one.\n"
+"\n"
+"Charts that follow the selected port:\n"
+"    • Z real / imag\n"
+"    • Z magnitude / phase\n"
+"    • Smith\n"
+"    • VSWR / S11\n"
+"    • Net-gain traces (Gain and Viewer gain)\n"
+"\n"
+"Whole-antenna charts, unaffected by the port:\n"
+"    • raw Max gain, Gain direction, F/B\n"
+"    • Antenna temperature, G/T");
+
+/* Apply view @v's port pull-down gate: set the button sensitivity and a
+ * tooltip that, when the control is disabled, states why it is unavailable so
+ * the reason is always discoverable. */
+  static void
+fp_port_combo_gate( freqplots_view_t *v )
+{
+  gboolean sensitive = fp_port_combo_sensitive( v );
+  const char *tip;
+
+  gtk_widget_set_sensitive( v->port_button, sensitive );
+
+  if( sensitive )
+    tip = _(fp_port_combo_help);
+  else if( Num_Feedpoint_Ports() <= 1 )
+    tip = _("Only one feedpoint port is defined. Define additional EX "
+        "excitation cards in the model to select among multiple ports here.");
+  else
+    tip = _("Enable the Net Gain plot setting to select a port; "
+        "without it this graph does not follow the port.");
+
+  gtk_widget_set_tooltip_text( v->port_button, tip );
+}
+
+/* Build view @v's excitation-port menu on @button from the current model's
+ * feedpoint ports and store the button on the view.  Hovering an entry
+ * previews its port, clicking commits it, and dismissing the menu without a
+ * click reverts to the port in effect when the menu opened. */
+  static void
+fp_build_port_combo( freqplots_view_t *v, GtkMenuButton *button )
+{
+  int n_ports = Num_Feedpoint_Ports();
+  GtkWidget *menu = gtk_menu_new();
+
+  for( int p = 0; p < n_ports; p++ )
+  {
+    char *label = fp_port_label( p );
+    GtkWidget *item = gtk_menu_item_new_with_label( label );
+    g_free( label );
+    g_signal_connect( item, "select",
+        G_CALLBACK(on_fp_port_item_select), GINT_TO_POINTER(p) );
+    g_signal_connect( item, "activate",
+        G_CALLBACK(on_fp_port_item_activate), GINT_TO_POINTER(p) );
+    gtk_widget_show( item );
+    gtk_menu_shell_append( GTK_MENU_SHELL(menu), item );
+  }
+
+  g_object_set_data( G_OBJECT(menu), "fp_view", v );
+  g_signal_connect( menu, "show",
+      G_CALLBACK(on_fp_port_menu_show), NULL );
+  g_signal_connect( menu, "selection-done",
+      G_CALLBACK(on_fp_port_menu_done), NULL );
+
+  /* GtkMenuButton sinks the floating menu and releases any prior popup. */
+  gtk_menu_button_set_popup( button, menu );
+
+  v->port_button = GTK_WIDGET( button );
+  if( n_ports > 0 )
+    fp_port_button_label( v, fp_view_port(v) );
+  fp_port_combo_gate( v );
+}
+
+/* freqplots_populate_port_combo()
+ *
+ * Binds the primary window's glade port button to the main view and seeds it
+ * to the authoritative selected port.  A no-op when the freqplots window is
+ * closed.  The button is insensitive for a single-port model.
+ */
+  void
+freqplots_populate_port_combo( void )
+{
+  if( !freqplots_window_builder )
+    return;
+
+  GtkMenuButton *button = GTK_MENU_BUTTON( Builder_Get_Object(
+        freqplots_window_builder, "freqplots_port_combo" ) );
+
+  fp_build_port_combo( freqplots_main_view(), button );
+
+} /* freqplots_populate_port_combo() */
+
+/* freqplots_port_combo_new()
+ *
+ * Build a popup view's excitation-port pull-down, or return NULL when the
+ * graph never follows the port or the model has a single port.  A port-aware
+ * panel gated only through net gain returns a grayed button rather than none,
+ * so the control appears the moment net gain turns on.
+ */
+  GtkWidget *
+freqplots_port_combo_new( freqplots_view_t *v )
+{
+  if( !fp_panel_desc[v->filter].port_aware || Num_Feedpoint_Ports() <= 1 )
+    return NULL;
+
+  GtkWidget *button = gtk_menu_button_new();
+  fp_build_port_combo( v, GTK_MENU_BUTTON(button) );
+  return button;
+
+} /* freqplots_port_combo_new() */
+
+/* Re-gate every open view's port pull-down after a global setting governing
+ * port dependence changes, so a net-gain toggle enables or grays the gain and
+ * viewer popup selectors. */
+  void
+freqplots_refresh_port_combos( void )
+{
+  int p;
+
+  if( fpv_main.port_button != NULL )
+    fp_port_combo_gate( &fpv_main );
+
+  for( p = 0; p < FP_PANEL_COUNT; p++ )
+    if( fpv_popups[p] != NULL && fpv_popups[p]->port_button != NULL )
+      fp_port_combo_gate( fpv_popups[p] );
+
+} /* freqplots_refresh_port_combos() */
+
+/*-----------------------------------------------------------------------*/
+
+/* freqplots_reload_port_combos()
+ *
+ * Rebuilds every open popup view's port pull-down after a model reload so each
+ * selector lists the reloaded model's ports and resets to the first port,
+ * keeping a popup from retaining a port index past the new model's port span.
+ * A popup with no selector under the prior model gains one only when reopened.
+ */
+  void
+freqplots_reload_port_combos( void )
+{
+  int p;
+
+  for( p = 0; p < FP_PANEL_COUNT; p++ )
+  {
+    freqplots_view_t *v = fpv_popups[p];
+    if( v == NULL || v->port_button == NULL )
+      continue;
+
+    v->ex_port = 0;
+    fp_build_port_combo( v, GTK_MENU_BUTTON(v->port_button) );
+  }
+
+} /* freqplots_reload_port_combos() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -684,7 +965,7 @@ freqplots_update_readout(freqplots_view_t *v)
   if( fstep < 0 )
     return;
 
-  meas_calc( &meas, fstep );
+  meas_calc( &meas, fstep, fp_view_port(v) );
 
   for( i = 0; i < v->readout_n; i++ )
   {
@@ -948,7 +1229,7 @@ _Plot_Frequency_Data( freqplots_view_t *v, cairo_t *cr )
   static measurement_t *meas_rows = NULL;
   mem_array_realloc(&meas_rows, num_fsteps);
   for( idx = 0; idx < num_fsteps; idx++ )
-    meas_calc( &meas_rows[idx], valid_steps_map[idx] );
+    meas_calc( &meas_rows[idx], valid_steps_map[idx], fp_view_port(v) );
 
   /* Resolve every enabled plot panel through the dispatch table; each
    * renderer deposits segments and defers its text.  posn advances across
@@ -1043,6 +1324,7 @@ void freqplots_open_panel(fp_panel_t panel)
 
 	v->filter = panel;
 	v->ngraph = 1;
+	v->ex_port = calc_data.ex_port;
 
 	create_freqplots_popup_window(v, _(fp_panel_names[panel]));
 	fpv_popups[panel] = v;
