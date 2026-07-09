@@ -26,7 +26,7 @@
   int
 fp_ant_temp_enabled(void)
 {
-  return isFlagSet(PLOT_ANT_TEMP) && isFlagSet(ENABLE_RDPAT);
+  return rc_config.freqplots_ant_temp_togglebutton && isFlagSet(ENABLE_RDPAT);
 }
 
 /* Antenna-temperature trace buffers, reused across fp_ant_temp_render() calls. */

@@ -26,7 +26,7 @@
   int
 fp_gain_enabled(void)
 {
-  return isFlagSet(PLOT_GMAX) && isFlagSet(ENABLE_RDPAT);
+  return rc_config.freqplots_gmax_togglebutton && isFlagSet(ENABLE_RDPAT);
 }
 
 /* Max-gain plot trace buffers, reused across fp_gain_render() calls. */
@@ -60,7 +60,7 @@ fp_gain_render(fp_plot_ctx_t *ctx)
   mem_array_realloc(&gdir_tht, ctx->num_fsteps);
   mem_array_realloc(&gdir_phi, ctx->num_fsteps);
   mem_array_realloc(&fbratio, ctx->num_fsteps);
-  if( isFlagSet(PLOT_NETGAIN) )
+  if( rc_config.freqplots_net_gain )
     mem_array_realloc(&netgain, ctx->num_fsteps);
 
   /* Gather max gain, direction, and F/B ratio in one measurement pass */
@@ -70,7 +70,7 @@ fp_gain_render(fp_plot_ctx_t *ctx)
   cols[ncols++] = (fp_meas_column_t){ gdir_tht, MEAS_GAIN_THETA };
   cols[ncols++] = (fp_meas_column_t){ gdir_phi, MEAS_GAIN_PHI   };
   cols[ncols++] = (fp_meas_column_t){ fbratio,  MEAS_FB_RATIO   };
-  if( isFlagSet(PLOT_NETGAIN) )
+  if( rc_config.freqplots_net_gain )
     cols[ncols++] = (fp_meas_column_t){ netgain, MEAS_GAIN_NET };
   fp_fill_meas_columns( ctx, cols, ncols );
 
@@ -81,9 +81,9 @@ fp_gain_render(fp_plot_ctx_t *ctx)
 
   /* Plot gain and f/b ratio (if possible) graph(s) */
   titles[0] = _("Raw Gain dBi");
-  if( no_fbr || isFlagSet(PLOT_NETGAIN) )
+  if( no_fbr || rc_config.freqplots_net_gain )
   {
-    if( isFlagSet(PLOT_NETGAIN) )
+    if( rc_config.freqplots_net_gain )
     {
       titles[1] = _("Max Gain & Net Gain vs Frequency");
       titles[2] = _("Net Gain dBi");

@@ -238,16 +238,6 @@ Card_Clicked(
   void
 Main_Rdpattern_Activate( gboolean from_menu )
 {
-  /* Set structure overlay in Rad Pattern window */
-  if( isFlagClear(OVERLAY_STRUCT) )
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-          Builder_Get_Object(rdpattern_window_builder,
-            "rdpattern_overlay_structure")), FALSE );
-  else
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-          Builder_Get_Object(rdpattern_window_builder,
-            "rdpattern_overlay_structure")), TRUE );
-
   /* Sync common projection spinbuttons from the master view. */
   if( rdpattern_view != NULL && rdpattern_view->rotation_master != NULL )
   {
@@ -462,7 +452,7 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
     if( fetch_freq_data() )
       xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
-    if( isFlagSet(OVERLAY_STRUCT) )
+    if( overlay_struct_active() )
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
   else
@@ -480,7 +470,7 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
       }
       Free_Crnt_Buffs();
     }
-    if( isFlagSet(OVERLAY_STRUCT) )
+    if( overlay_struct_active() )
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
 
@@ -512,7 +502,7 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
     if( fetch_freq_data() )
       xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
-    if( isFlagSet(OVERLAY_STRUCT) )
+    if( overlay_struct_active() )
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
   else
@@ -533,7 +523,7 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
       Free_Crnt_Buffs();
     }
 
-    if( isFlagSet(OVERLAY_STRUCT) )
+    if( overlay_struct_active() )
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
 

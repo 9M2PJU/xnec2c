@@ -148,10 +148,6 @@ hook_main_charges(void)
 void
 hook_rdpat_e_field(void)
 {
-  if( rc_config.rdpattern_e_field )
-    SetFlag( DRAW_EFIELD );
-  else
-    ClearFlag( DRAW_EFIELD );
   Set_Window_Labels();
   if( isFlagSet(DRAW_EHFIELD) )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
@@ -160,10 +156,6 @@ hook_rdpat_e_field(void)
 void
 hook_rdpat_h_field(void)
 {
-  if( rc_config.rdpattern_h_field )
-    SetFlag( DRAW_HFIELD );
-  else
-    ClearFlag( DRAW_HFIELD );
   Set_Window_Labels();
   if( isFlagSet(DRAW_EHFIELD) )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
@@ -172,10 +164,6 @@ hook_rdpat_h_field(void)
 void
 hook_rdpat_poynting(void)
 {
-  if( rc_config.rdpattern_poynting_vector )
-    SetFlag( DRAW_POYNTING );
-  else
-    ClearFlag( DRAW_POYNTING );
   Set_Window_Labels();
   if( isFlagSet(DRAW_EHFIELD) )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
@@ -184,10 +172,6 @@ hook_rdpat_poynting(void)
 void
 hook_rdpat_overlay(void)
 {
-  if( rc_config.rdpattern_overlay_structure )
-    SetFlag( OVERLAY_STRUCT );
-  else
-    ClearFlag( OVERLAY_STRUCT );
   xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
@@ -218,42 +202,31 @@ hook_rdpat_eh(void)
 /*------------------------------------------------------------------------*/
 
 /* freqplots_recount_ngraph - derive the active-plot count from the live
- * PLOT_* select flags.
+ * rc_config select fields.
  *
  * calc_data.ngraph is a derived value; each select hook is called at most
  * once per real change and unconditionally at window-creation time via
- * config_widget_run_hooks(), so recomputing from the flags (rather than
+ * config_widget_run_hooks(), so recomputing from the fields (rather than
  * incrementing/decrementing per call) keeps every hook idempotent.
  */
 static void
 freqplots_recount_ngraph(void)
 {
-  static const unsigned long long select_flags[] = {
-    PLOT_GMAX, PLOT_GAIN_DIR, PLOT_GVIEWER, PLOT_VSWR,
-    PLOT_ZREAL_ZIMAG, PLOT_ZMAG_ZPHASE, PLOT_SMITH, PLOT_ANT_TEMP,
-  };
-  int i, n = 0;
-
-  for( i = 0; i < (int)(sizeof(select_flags) / sizeof(select_flags[0])); i++ )
-    if( isFlagSet(select_flags[i]) )
-      n++;
-
-  calc_data.ngraph = n;
+  calc_data.ngraph = freqplots_count_selected();
 }
 
-/* freqplots_select_changed - apply one PLOT_* select flag from its field
+/* freqplots_select_changed - refresh derived plot state after a select toggle
  * @field_active: current rc_config toggle-button field value
- * @flag: the PLOT_* bit this field owns
  *
  * Shared body for the eight freqplots select-toggle hooks.
  */
 static void
-freqplots_select_changed(int field_active, unsigned long long int flag)
+freqplots_select_changed(int field_active)
 {
+  /* PLOT_SELECT latches on the first panel ever selected and gates the
+   * plot-save action; deselecting leaves it set, so no clear pairs here. */
   if( field_active )
-    SetFlag( flag | PLOT_SELECT );
-  else
-    ClearFlag( flag );
+    SetFlag( PLOT_SELECT );
 
   freqplots_recount_ngraph();
 
@@ -263,52 +236,47 @@ freqplots_select_changed(int field_active, unsigned long long int flag)
 
 void hook_freqplots_gmax(void)
 {
-  freqplots_select_changed(rc_config.freqplots_gmax_togglebutton, PLOT_GMAX);
+  freqplots_select_changed(rc_config.freqplots_gmax_togglebutton);
 }
 
 void hook_freqplots_gdir(void)
 {
-  freqplots_select_changed(rc_config.freqplots_gdir_togglebutton, PLOT_GAIN_DIR);
+  freqplots_select_changed(rc_config.freqplots_gdir_togglebutton);
 }
 
 void hook_freqplots_gviewer(void)
 {
-  freqplots_select_changed(rc_config.freqplots_gviewer_togglebutton, PLOT_GVIEWER);
+  freqplots_select_changed(rc_config.freqplots_gviewer_togglebutton);
 }
 
 void hook_freqplots_vswr(void)
 {
-  freqplots_select_changed(rc_config.freqplots_vswr_togglebutton, PLOT_VSWR);
+  freqplots_select_changed(rc_config.freqplots_vswr_togglebutton);
 }
 
 void hook_freqplots_zrlzim(void)
 {
-  freqplots_select_changed(rc_config.freqplots_zrlzim_togglebutton, PLOT_ZREAL_ZIMAG);
+  freqplots_select_changed(rc_config.freqplots_zrlzim_togglebutton);
 }
 
 void hook_freqplots_zmgzph(void)
 {
-  freqplots_select_changed(rc_config.freqplots_zmgzph_togglebutton, PLOT_ZMAG_ZPHASE);
+  freqplots_select_changed(rc_config.freqplots_zmgzph_togglebutton);
 }
 
 void hook_freqplots_smith(void)
 {
-  freqplots_select_changed(rc_config.freqplots_smith_togglebutton, PLOT_SMITH);
+  freqplots_select_changed(rc_config.freqplots_smith_togglebutton);
 }
 
 void hook_freqplots_ant_temp(void)
 {
-  freqplots_select_changed(rc_config.freqplots_ant_temp_togglebutton, PLOT_ANT_TEMP);
+  freqplots_select_changed(rc_config.freqplots_ant_temp_togglebutton);
 }
 
 void
 hook_freqplots_net_gain(void)
 {
-  if( rc_config.freqplots_net_gain )
-    SetFlag( PLOT_NETGAIN );
-  else
-    ClearFlag( PLOT_NETGAIN );
-
   /* Net gain gates the gain and viewer popups' port pull-downs, so re-gate
    * every open port-aware combo when the setting flips. */
   freqplots_refresh_port_combos();

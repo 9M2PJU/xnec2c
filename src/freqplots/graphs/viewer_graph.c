@@ -26,7 +26,7 @@
   int
 fp_viewer_enabled(void)
 {
-  return isFlagSet(PLOT_GVIEWER) && isFlagSet(ENABLE_RDPAT);
+  return rc_config.freqplots_gviewer_togglebutton && isFlagSet(ENABLE_RDPAT);
 }
 
 /* Viewer-direction gain trace buffers, reused across fp_viewer_render() calls. */
@@ -60,7 +60,7 @@ fp_viewer_render(fp_plot_ctx_t *ctx)
   fp_fill_meas_columns( ctx, &vcol, 1 );
 
   /* Plot net gain if selected */
-  if( isFlagSet(PLOT_NETGAIN) )
+  if( rc_config.freqplots_net_gain )
   {
     mem_array_realloc(&netgain, ctx->num_fsteps);
 

@@ -252,7 +252,7 @@ Save_RadPattern_Gnuplot_Data( char *filename )
     npts = fpat.nrx * fpat.nry * fpat.nrz;
 
     /*** Draw Near E Field ***/
-    if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
+    if( draw_efield_active() && (fpat.nfeh & NEAR_EFIELD) )
     {
       fprintf( fp, _("# Near E field\n") );
       /* Write e-field out to file [DJS] */
@@ -272,10 +272,10 @@ Save_RadPattern_Gnuplot_Data( char *filename )
             fy - nf->points[idx].py,
             fz - nf->points[idx].pz);
       }
-    } /* if( isFlagSet(DRAW_EFIELD) */
+    } /* if( draw_efield_active() */
 
     /*** Draw Near H Field ***/
-    if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
+    if( draw_hfield_active() && (fpat.nfeh & NEAR_HFIELD) )
     {
       fprintf( fp, _("# Near H field\n") );
       /* Write h-field out to file [DJS] */
@@ -295,10 +295,10 @@ Save_RadPattern_Gnuplot_Data( char *filename )
             fy - nf->points[idx].py,
             fz - nf->points[idx].pz);
       }
-    } /* if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) ) */
+    } /* if( draw_hfield_active() && (fpat.nfeh & NEAR_HFIELD) ) */
 
     /*** Draw Poynting Vector ***/
-    if( isFlagSet(DRAW_POYNTING)  &&
+    if( draw_poynting_active()  &&
         (fpat.nfeh & NEAR_EFIELD) &&
         (fpat.nfeh & NEAR_HFIELD) )
     {
@@ -364,7 +364,7 @@ Save_RadPattern_Gnuplot_Data( char *filename )
             fz - nf->points[idx].pz);
       } /* for( idx = 0; idx < npts; idx++ ) */
 
-    } /* if( isFlagSet(DRAW_POYNTING) ) */
+    } /* if( draw_poynting_active() ) */
   } /* if( isFlagSet(ENABLE_NEAREH) && NF_FSTEP_AVAILABLE(fstep) ) */
 
   /* Save radiation pattern data if possible */

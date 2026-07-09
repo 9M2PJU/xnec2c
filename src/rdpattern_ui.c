@@ -324,8 +324,8 @@ Update_Rdpattern_UI(void)
 gboolean
 Validate_Nearfield_Animation( void )
 {
-  if( ((isFlagSet(DRAW_EFIELD) || isFlagSet(DRAW_POYNTING)) && !(fpat.nfeh & NEAR_EFIELD)) ||
-      ((isFlagSet(DRAW_HFIELD) || isFlagSet(DRAW_POYNTING)) && !(fpat.nfeh & NEAR_HFIELD)) )
+  if( ((draw_efield_active() || draw_poynting_active()) && !(fpat.nfeh & NEAR_EFIELD)) ||
+      ((draw_hfield_active() || draw_poynting_active()) && !(fpat.nfeh & NEAR_HFIELD)) )
   {
     Notice( GTK_BUTTONS_OK, _("Near Field Animation"), "%s",
         _(nearfield_animation_error_msg) );
@@ -382,7 +382,7 @@ compute_near_field_frame(double wt)
   npts = fpat.nrx * fpat.nry * fpat.nrz;
   for( idx = 0; idx < npts; idx++ )
   {
-    if( isFlagSet(DRAW_EFIELD) || isFlagSet(DRAW_POYNTING) )
+    if( draw_efield_active() || draw_poynting_active() )
     {
       /* Real component of complex E field strength */
       nf->points[idx].erx = nf->points[idx].ex *
@@ -400,7 +400,7 @@ compute_near_field_frame(double wt)
         nf->max_er = nf->points[idx].er;
     }
 
-    if( isFlagSet(DRAW_HFIELD) || isFlagSet(DRAW_POYNTING) )
+    if( draw_hfield_active() || draw_poynting_active() )
     {
       /* Real component of complex H field strength */
       nf->points[idx].hrx = nf->points[idx].hx *
@@ -633,7 +633,7 @@ Queue_Radiation_Redraw(void)
   /* Trigger a redraw of plots drawingarea if doing "viewer" gain
    * or antenna temperature (noise env / elevation changes affect Ta) */
   if( isFlagSet(PLOT_ENABLED) &&
-      (isFlagSet(PLOT_GVIEWER) || isFlagSet(PLOT_ANT_TEMP) ||
+      (rc_config.freqplots_gviewer_togglebutton || rc_config.freqplots_ant_temp_togglebutton ||
        freqplots_popup_open(FP_PANEL_VIEWER) ||
        freqplots_popup_open(FP_PANEL_ANT_TEMP)) &&
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
@@ -1005,11 +1005,11 @@ Set_Window_Labels( void )
     else if( isFlagSet(DRAW_EHFIELD) )
     {
       Strlcpy( txt, _("Near Fields:"), s );
-      if( isFlagSet(DRAW_EFIELD) )
+      if( draw_efield_active() )
         Strlcat( txt, _(" - E Field"), s );
-      if( isFlagSet(DRAW_HFIELD) )
+      if( draw_hfield_active() )
         Strlcat( txt, _(" - H Field"), s );
-      if( isFlagSet(DRAW_POYNTING) )
+      if( draw_poynting_active() )
         Strlcat( txt, _(" - Poynting Vector"), s );
     }
 

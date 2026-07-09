@@ -190,44 +190,27 @@ static inline int dl_feq_eps(double a, double b, double eps) { return fabs(a - b
 #define MAIN_QUIT           0x0000000000000200ll
 
 /* Freq Plot Control flags */
-#define PLOT_ZREAL_ZIMAG    0x0000000000000400ll
-#define PLOT_VSWR           0x0000000000000800ll
-#define PLOT_ZMAG_ZPHASE    0x0000000000001000ll
-#define PLOT_GMAX           0x0000000000002000ll
-#define PLOT_GVIEWER        0x0000000000004000ll
-#define PLOT_NETGAIN        0x0000000000008000ll
-#define PLOT_GAIN_DIR       0x0000000000010000ll
 #define PLOT_SELECT         0x0000000000040000ll
 #define PLOT_ENABLED        0x0000000000080000ll
 #define PLOT_QUIT           0x0000000000100000ll
-#define PLOT_SMITH          0x0000000000200000ll
-#define PLOT_ANT_TEMP       0x0000000000020000ll
 
 /* Radiation Pattern Control flags */
 #define DRAW_GAIN           0x0000000000400000ll
-#define DRAW_EFIELD         0x0000000000800000ll
-#define DRAW_HFIELD         0x0000000001000000ll
 #define DRAW_EHFIELD        0x0000000002000000ll
-#define DRAW_POYNTING       0x0000000004000000ll
 #define DRAW_ENABLED        0x0000000008000000ll
 #define DRAW_QUIT           0x0000000010000000ll
 #define DRAW_NEW_RDPAT      0x0000000020000000ll
 #define DRAW_NEW_EHFIELD    0x0000000040000000ll
-#define OVERLAY_STRUCT      0x0000000080000000ll
 #define ANIMATE             0x0000000200000000ll
 #define ENABLE_RDPAT        0x0000000400000000ll
 #define ENABLE_NEAREH       0x0000000800000000ll
 #define DRAW_FLAGS ( \
   DRAW_GAIN         | \
-  DRAW_EFIELD       | \
-  DRAW_HFIELD       | \
   DRAW_EHFIELD      | \
-  DRAW_POYNTING     | \
   DRAW_ENABLED      | \
   DRAW_QUIT         | \
   DRAW_NEW_RDPAT    | \
   DRAW_NEW_EHFIELD  | \
-  OVERLAY_STRUCT    | \
   ANIMATE )
 
 /*** Filechooser response related flags ***/
@@ -1840,6 +1823,7 @@ void Set_Frequency_On_Click(freqplots_view_t *view, GdkEvent *event);
 fp_panel_t freqplots_panel_at(freqplots_view_t *view, double px, double py);
 freqplots_view_t *freqplots_main_view(void);
 void freqplots_redraw_all(gboolean force);
+int freqplots_count_selected(void);
 void freqplots_open_panel(fp_panel_t panel);
 void freqplots_close_panel(fp_panel_t panel);
 void freqplots_destroy_all_popups(void);

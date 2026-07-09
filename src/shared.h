@@ -29,6 +29,17 @@
 /* Runtime config file */
 extern rc_config_t rc_config;
 
+/* Rad-pattern content predicates.  Each field selects its overlay only while
+ * the rad-pattern window holds DRAW_ENABLED, so a closed window draws none. */
+static inline int draw_efield_active(void)
+  { return isFlagSet(DRAW_ENABLED) && rc_config.rdpattern_e_field; }
+static inline int draw_hfield_active(void)
+  { return isFlagSet(DRAW_ENABLED) && rc_config.rdpattern_h_field; }
+static inline int draw_poynting_active(void)
+  { return isFlagSet(DRAW_ENABLED) && rc_config.rdpattern_poynting_vector; }
+static inline int overlay_struct_active(void)
+  { return isFlagSet(DRAW_ENABLED) && rc_config.rdpattern_overlay_structure; }
+
 /* Flag to control verify_segments check */
 extern gboolean skip_verify_segments;
 

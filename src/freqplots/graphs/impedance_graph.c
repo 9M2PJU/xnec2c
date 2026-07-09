@@ -26,9 +26,9 @@
   int
 fp_impedance_enabled(void)
 {
-  return (isFlagSet(PLOT_ZREAL_ZIMAG) ||
-      isFlagSet(PLOT_ZMAG_ZPHASE) ||
-      isFlagSet(PLOT_SMITH)) && fpat_has_feedpoint();
+  return (rc_config.freqplots_zrlzim_togglebutton ||
+      rc_config.freqplots_zmgzph_togglebutton ||
+      rc_config.freqplots_smith_togglebutton) && fpat_has_feedpoint();
 }
 
 /* Impedance trace buffers, reused across fp_impedance_render() calls. */

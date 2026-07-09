@@ -441,7 +441,7 @@ rdpattern_on_shift_scroll(GtkWidget *_widget, GdkEventScroll *event, gpointer vi
  * @primary: primary scene content (rdpattern geometry)
  * @out: overlay scene content to populate
  *
- * Returns structure geometry for overlay when OVERLAY_STRUCT is set.
+ * Returns structure geometry for overlay when overlay_struct_active().
  * Derives model_scale from ratio of pattern extent to structure extent.
  */
   static gboolean

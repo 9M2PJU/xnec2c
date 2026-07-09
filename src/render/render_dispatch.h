@@ -90,7 +90,7 @@ typedef struct
   render_mode_t    mode;
   int              fstep;
   const char      *message;      /* STATUS_MSG_* pointer; NULL when RENDER_OK */
-  gboolean         overlay_active; /* resolved from OVERLAY_STRUCT */
+  gboolean         overlay_active; /* resolved from overlay_struct_active() */
 } render_check_result_t;
 
 /* Backend operations vtable — dispatch decides what to draw; backends draw it */

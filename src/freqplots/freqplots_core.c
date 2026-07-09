@@ -61,30 +61,30 @@ static const char *fp_panel_names[FP_PANEL_COUNT] = {
   [FP_PANEL_ANT_TEMP] = N_("Antenna Temperature"),
 };
 
-/* Per-panel selection and data-availability descriptor.  select_flag is the
- * main-window PLOT_* toggle that chooses the panel; require_flag is a data
+/* Per-panel selection and data-availability descriptor.  select_field points
+ * to the rc_config toggle that chooses the panel; require_flag is a data
  * precondition that must hold for the panel to carry meaningful values, or 0
  * when the panel has none.  port_aware marks a panel whose values ever track
- * the excitation port; port_gate_flag names an extra PLOT_* flag that must
- * also be set for the port pull-down to accept input, or 0 when the panel
+ * the excitation port; port_gate_field points to an rc_config toggle that must
+ * also be set for the port pull-down to accept input, or NULL when the panel
  * follows the port unconditionally.  Gain and viewer follow the port only
- * through their net-gain trace, so they gate on PLOT_NETGAIN. */
+ * through their net-gain trace, so they gate on the net-gain field. */
 typedef struct {
-  unsigned long long select_flag;
+  const int         *select_field;
   unsigned long long require_flag;
   gboolean           port_aware;
-  unsigned long long port_gate_flag;
+  const int         *port_gate_field;
 } fp_panel_desc_t;
 
 static const fp_panel_desc_t fp_panel_desc[FP_PANEL_COUNT] = {
-  [FP_PANEL_GAIN]     = { PLOT_GMAX,        ENABLE_RDPAT, TRUE,  PLOT_NETGAIN },
-  [FP_PANEL_GAIN_DIR] = { PLOT_GAIN_DIR,    ENABLE_RDPAT, FALSE, 0            },
-  [FP_PANEL_VIEWER]   = { PLOT_GVIEWER,     ENABLE_RDPAT, TRUE,  PLOT_NETGAIN },
-  [FP_PANEL_VSWR]     = { PLOT_VSWR,        0,            TRUE,  0            },
-  [FP_PANEL_ZRLZIM]   = { PLOT_ZREAL_ZIMAG, 0,            TRUE,  0            },
-  [FP_PANEL_ZMGZPH]   = { PLOT_ZMAG_ZPHASE, 0,            TRUE,  0            },
-  [FP_PANEL_SMITH]    = { PLOT_SMITH,       0,            TRUE,  0            },
-  [FP_PANEL_ANT_TEMP] = { PLOT_ANT_TEMP,    ENABLE_RDPAT, FALSE, 0            },
+  [FP_PANEL_GAIN]     = { &rc_config.freqplots_gmax_togglebutton,     ENABLE_RDPAT, TRUE,  &rc_config.freqplots_net_gain },
+  [FP_PANEL_GAIN_DIR] = { &rc_config.freqplots_gdir_togglebutton,     ENABLE_RDPAT, FALSE, NULL                         },
+  [FP_PANEL_VIEWER]   = { &rc_config.freqplots_gviewer_togglebutton,  ENABLE_RDPAT, TRUE,  &rc_config.freqplots_net_gain },
+  [FP_PANEL_VSWR]     = { &rc_config.freqplots_vswr_togglebutton,     0,            TRUE,  NULL                         },
+  [FP_PANEL_ZRLZIM]   = { &rc_config.freqplots_zrlzim_togglebutton,   0,            TRUE,  NULL                         },
+  [FP_PANEL_ZMGZPH]   = { &rc_config.freqplots_zmgzph_togglebutton,   0,            TRUE,  NULL                         },
+  [FP_PANEL_SMITH]    = { &rc_config.freqplots_smith_togglebutton,    0,            TRUE,  NULL                         },
+  [FP_PANEL_ANT_TEMP] = { &rc_config.freqplots_ant_temp_togglebutton, ENABLE_RDPAT, FALSE, NULL                         },
 };
 
 /* Resolve the excitation port a view renders: the primary window follows the
@@ -194,8 +194,8 @@ fp_field_cond_active(fp_field_cond_t cond)
   switch( cond )
   {
     case FP_FIELD_ALWAYS:              return TRUE;
-    case FP_FIELD_IF_NETGAIN:          return isFlagSet(PLOT_NETGAIN);
-    case FP_FIELD_IF_NO_NETGAIN:       return isFlagClear(PLOT_NETGAIN);
+    case FP_FIELD_IF_NETGAIN:          return rc_config.freqplots_net_gain != 0;
+    case FP_FIELD_IF_NO_NETGAIN:       return rc_config.freqplots_net_gain == 0;
     case FP_FIELD_IF_S11:              return rc_config.freqplots_s11 != 0;
     case FP_FIELD_IF_ANT_TEMP_VIEW:    return rc_config.freqplots_show_ant_temp != 0;
     case FP_FIELD_IF_NO_ANT_TEMP_VIEW: return rc_config.freqplots_show_ant_temp == 0;
@@ -250,7 +250,7 @@ fp_panel_active(freqplots_view_t *v, fp_panel_t panel)
   if( v->filter != FP_PANEL_ALL )
     return v->filter == panel;
 
-  return isFlagSet(d->select_flag) ? TRUE : FALSE;
+  return *d->select_field ? TRUE : FALSE;
 }
 
 /* True when @v has at least one panel its user wants drawn: any panel for a
@@ -258,16 +258,28 @@ fp_panel_active(freqplots_view_t *v, fp_panel_t panel)
   static gboolean
 fp_view_any_selected(freqplots_view_t *v)
 {
-  int p;
-
   if( v->filter != FP_PANEL_ALL )
     return TRUE;
 
-  for( p = 0; p < FP_PANEL_COUNT; p++ )
-    if( isFlagSet(fp_panel_desc[p].select_flag) )
-      return TRUE;
+  return (freqplots_count_selected() > 0) ? TRUE : FALSE;
+}
 
-  return FALSE;
+/**
+ * freqplots_count_selected() - count panels the user has toggled on.
+ *
+ * Iterates the panel descriptor table, the single source of truth for the
+ * panel select toggles, so callers never re-list the per-panel fields.
+ */
+  int
+freqplots_count_selected(void)
+{
+  int p, n = 0;
+
+  for( p = 0; p < FP_PANEL_COUNT; p++ )
+    if( *fp_panel_desc[p].select_field )
+      n++;
+
+  return n;
 }
 
 static void Display_Frequency_Data( void );
@@ -707,13 +719,13 @@ on_fp_port_menu_done( GtkMenuShell *menu, gpointer user_data )
   static gboolean
 fp_port_combo_sensitive( freqplots_view_t *v )
 {
-  unsigned long long gate =
-    (v->filter == FP_PANEL_ALL) ? 0 : fp_panel_desc[v->filter].port_gate_flag;
+  const int *gate =
+    (v->filter == FP_PANEL_ALL) ? NULL : fp_panel_desc[v->filter].port_gate_field;
 
   if( Num_Feedpoint_Ports() <= 1 )
     return FALSE;
 
-  return (gate == 0) || isFlagSet( gate );
+  return (gate == NULL) || (*gate != 0);
 }
 
 /* Descriptive help shown on an enabled port pull-down. */

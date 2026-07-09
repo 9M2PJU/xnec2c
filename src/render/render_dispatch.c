@@ -84,8 +84,8 @@ render_check_nearfield(render_check_result_t *r)
 {
   /* Near-field view needs at least one field component selected; with none
    * selected the draw yields nothing, so direct the user to enable one. */
-  if( isFlagClear(DRAW_EFIELD) && isFlagClear(DRAW_HFIELD) &&
-      isFlagClear(DRAW_POYNTING) )
+  if( !draw_efield_active() && !draw_hfield_active() &&
+      !draw_poynting_active() )
   {
     r->status = RENDER_NO_NF_FIELD;
     r->message = STATUS_MSG_SELECT_NF_FIELD;
@@ -163,7 +163,7 @@ render_check_rdpattern(render_check_result_t *r)
     r->message = render_rdpattern_mode_message();
   }
 
-  r->overlay_active = isFlagSet(OVERLAY_STRUCT);
+  r->overlay_active = overlay_struct_active();
 }
 
 /*-----------------------------------------------------------------------*/
@@ -355,19 +355,19 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
       int n_fields = 0;
       double dr = geom_pre.nf_dr_norm;
 
-      if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) && np->e_vecs )
+      if( draw_efield_active() && (fpat.nfeh & NEAR_EFIELD) && np->e_vecs )
       {
         fields[n_fields].vecs = np->e_vecs;
         n_fields++;
       }
 
-      if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) && np->h_vecs )
+      if( draw_hfield_active() && (fpat.nfeh & NEAR_HFIELD) && np->h_vecs )
       {
         fields[n_fields].vecs = np->h_vecs;
         n_fields++;
       }
 
-      if( isFlagSet(DRAW_POYNTING) &&
+      if( draw_poynting_active() &&
           (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) &&
           np->pov_vecs )
       {

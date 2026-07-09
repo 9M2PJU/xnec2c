@@ -211,7 +211,7 @@ Queue_Structure_Redraw(void)
 
   /* Trigger a redraw of plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) &&
-      (isFlagSet(PLOT_GVIEWER) || freqplots_popup_open(FP_PANEL_VIEWER)) &&
+      (rc_config.freqplots_gviewer_togglebutton || freqplots_popup_open(FP_PANEL_VIEWER)) &&
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
     freqplots_redraw_all(TRUE);
@@ -290,7 +290,7 @@ apply_animation_phase(void)
 
   /* Queue rdpattern for near-field visualization or patch arrow overlay */
   if( isFlagSet(DRAW_EHFIELD) ||
-      (isFlagSet(OVERLAY_STRUCT) && data.m > 0) )
+      (overlay_struct_active() && data.m > 0) )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 
   /* Update the phase readout from flow_phase without moving the slider, whose
