@@ -1348,6 +1348,8 @@ void freqplots_populate_port_combo(void);
 GtkWidget *freqplots_port_combo_new(freqplots_view_t *view);
 void freqplots_refresh_port_combos(void);
 void freqplots_reload_port_combos(void);
+void freqplots_gate_feedpoint_widgets(void);
+const char *freqplots_panel_select_id(fp_panel_t panel);
 void Alloc_Impedance_Buffers(int nfrq, int n_ports);
 void Free_Impedance_Buffers(void);
 void Rescan_Zpnorm(void);

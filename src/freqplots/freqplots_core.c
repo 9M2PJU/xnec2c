@@ -62,30 +62,57 @@ static const char *fp_panel_names[FP_PANEL_COUNT] = {
 };
 
 /* Per-panel selection and data-availability descriptor.  select_field points
- * to the rc_config toggle that chooses the panel; require_flag is a data
- * precondition that must hold for the panel to carry meaningful values, or 0
- * when the panel has none.  port_aware marks a panel whose values ever track
- * the excitation port; port_gate_field points to an rc_config toggle that must
- * also be set for the port pull-down to accept input, or NULL when the panel
- * follows the port unconditionally.  Gain and viewer follow the port only
- * through their net-gain trace, so they gate on the net-gain field. */
+ * to the rc_config toggle that chooses the panel and select_id names its
+ * plot-select button widget; require_flag is a data precondition that must
+ * hold for the panel to carry meaningful values, or 0 when the panel has
+ * none.  port_aware marks a panel whose values ever track the excitation
+ * port; port_gate_field points to an rc_config toggle that must also be set
+ * for the port pull-down to accept input, or NULL when the panel follows the
+ * port unconditionally.  Gain and viewer follow the port only through their
+ * net-gain trace, so they gate on the net-gain field.  needs_feedpoint marks
+ * a panel whose values are undefined for feedpoint-less excitations. */
 typedef struct {
   const int         *select_field;
+  const char        *select_id;
   unsigned long long require_flag;
   gboolean           port_aware;
+  gboolean           needs_feedpoint;
   const int         *port_gate_field;
 } fp_panel_desc_t;
 
 static const fp_panel_desc_t fp_panel_desc[FP_PANEL_COUNT] = {
-  [FP_PANEL_GAIN]     = { &rc_config.freqplots_gmax_togglebutton,     ENABLE_RDPAT, TRUE,  &rc_config.freqplots_net_gain },
-  [FP_PANEL_GAIN_DIR] = { &rc_config.freqplots_gdir_togglebutton,     ENABLE_RDPAT, FALSE, NULL                         },
-  [FP_PANEL_VIEWER]   = { &rc_config.freqplots_gviewer_togglebutton,  ENABLE_RDPAT, TRUE,  &rc_config.freqplots_net_gain },
-  [FP_PANEL_VSWR]     = { &rc_config.freqplots_vswr_togglebutton,     0,            TRUE,  NULL                         },
-  [FP_PANEL_ZRLZIM]   = { &rc_config.freqplots_zrlzim_togglebutton,   0,            TRUE,  NULL                         },
-  [FP_PANEL_ZMGZPH]   = { &rc_config.freqplots_zmgzph_togglebutton,   0,            TRUE,  NULL                         },
-  [FP_PANEL_SMITH]    = { &rc_config.freqplots_smith_togglebutton,    0,            TRUE,  NULL                         },
-  [FP_PANEL_ANT_TEMP] = { &rc_config.freqplots_ant_temp_togglebutton, ENABLE_RDPAT, FALSE, NULL                         },
+  [FP_PANEL_GAIN]     = { &rc_config.freqplots_gmax_togglebutton,     "freqplots_gmax_togglebutton",     ENABLE_RDPAT, TRUE,  FALSE, &rc_config.freqplots_net_gain },
+  [FP_PANEL_GAIN_DIR] = { &rc_config.freqplots_gdir_togglebutton,     "freqplots_gdir_togglebutton",     ENABLE_RDPAT, FALSE, FALSE, NULL                         },
+  [FP_PANEL_VIEWER]   = { &rc_config.freqplots_gviewer_togglebutton,  "freqplots_gviewer_togglebutton",  ENABLE_RDPAT, TRUE,  FALSE, &rc_config.freqplots_net_gain },
+  [FP_PANEL_VSWR]     = { &rc_config.freqplots_vswr_togglebutton,     "freqplots_vswr_togglebutton",     0,            TRUE,  TRUE,  NULL                         },
+  [FP_PANEL_ZRLZIM]   = { &rc_config.freqplots_zrlzim_togglebutton,   "freqplots_zrlzim_togglebutton",   0,            TRUE,  TRUE,  NULL                         },
+  [FP_PANEL_ZMGZPH]   = { &rc_config.freqplots_zmgzph_togglebutton,   "freqplots_zmgzph_togglebutton",   0,            TRUE,  TRUE,  NULL                         },
+  [FP_PANEL_SMITH]    = { &rc_config.freqplots_smith_togglebutton,    "freqplots_smith_togglebutton",    0,            TRUE,  TRUE,  NULL                         },
+  [FP_PANEL_ANT_TEMP] = { &rc_config.freqplots_ant_temp_togglebutton, "freqplots_ant_temp_togglebutton", ENABLE_RDPAT, FALSE, FALSE, NULL                         },
 };
+
+/* freqplots_panel_select_id()
+ *
+ * Glade widget id of @panel's plot-select toggle button.
+ */
+  const char *
+freqplots_panel_select_id( fp_panel_t panel )
+{
+  return fp_panel_desc[panel].select_id;
+
+} /* freqplots_panel_select_id() */
+
+/* fp_panel_available()
+ *
+ * True when @panel's values are defined for the loaded model; a
+ * feedpoint-dependent panel goes unavailable for feedpoint-less excitations.
+ */
+  int
+fp_panel_available( fp_panel_t panel )
+{
+  return !fp_panel_desc[panel].needs_feedpoint || fpat_has_feedpoint();
+
+} /* fp_panel_available() */
 
 /* Resolve the excitation port a view renders: the primary window follows the
  * authoritative calc_data.ex_port; a popup carries its own selection. */
@@ -265,7 +292,8 @@ fp_view_any_selected(freqplots_view_t *v)
 }
 
 /**
- * freqplots_count_selected() - count panels the user has toggled on.
+ * freqplots_count_selected() - count panels the user has toggled on and whose
+ * values are available, so unavailable panels claim no plot rows.
  *
  * Iterates the panel descriptor table, the single source of truth for the
  * panel select toggles, so callers never re-list the per-panel fields.
@@ -276,7 +304,7 @@ freqplots_count_selected(void)
   int p, n = 0;
 
   for( p = 0; p < FP_PANEL_COUNT; p++ )
-    if( *fp_panel_desc[p].select_field )
+    if( *fp_panel_desc[p].select_field && fp_panel_available( p ) )
       n++;
 
   return n;
@@ -864,6 +892,43 @@ freqplots_refresh_port_combos( void )
       fp_port_combo_gate( fpv_popups[p] );
 
 } /* freqplots_refresh_port_combos() */
+
+/*-----------------------------------------------------------------------*/
+
+/* freqplots_gate_feedpoint_widgets()
+ *
+ * Grays the net-gain menu item and every feedpoint-dependent plot-select
+ * button when the excitation defines no feedpoint, tooltipping the reason;
+ * selection state persists for the next model with a feedpoint.
+ */
+  void
+freqplots_gate_feedpoint_widgets( void )
+{
+  int p;
+
+  if( freqplots_window_builder == NULL )
+    return;
+
+  const char *reason = fpat_has_feedpoint() ? NULL :
+    _("Not available: excitation defines no feedpoint");
+
+  GtkWidget *item = Builder_Get_Object(
+      freqplots_window_builder, "freqplots_net_gain" );
+  gtk_widget_set_sensitive( item, fpat_has_feedpoint() );
+  gtk_widget_set_tooltip_text( item, reason );
+
+  for( p = 0; p < FP_PANEL_COUNT; p++ )
+  {
+    if( !fp_panel_desc[p].needs_feedpoint )
+      continue;
+
+    GtkWidget *btn = Builder_Get_Object(
+        freqplots_window_builder, fp_panel_desc[p].select_id );
+    gtk_widget_set_sensitive( btn, fp_panel_available( p ) );
+    gtk_widget_set_tooltip_text( btn, reason );
+  }
+
+} /* freqplots_gate_feedpoint_widgets() */
 
 /*-----------------------------------------------------------------------*/
 

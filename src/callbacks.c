@@ -594,25 +594,6 @@ on_main_rdpattern_activate(
 }
 
 
-/* One plot-select button bound to the graph type its detached popup shows. */
-typedef struct {
-  const char *id;     /* glade widget id of the plot-select toggle button */
-  fp_panel_t  panel;  /* graph type opened when the button is right-clicked */
-} freqplots_panel_button_t;
-
-/* Plot-select buttons paired with their popup graph types; the table is the
- * single source mapping a main-window button to the graph its popup renders. */
-static const freqplots_panel_button_t freqplots_panel_buttons[] = {
-  { "freqplots_gmax_togglebutton",     FP_PANEL_GAIN     },
-  { "freqplots_gdir_togglebutton",     FP_PANEL_GAIN_DIR },
-  { "freqplots_gviewer_togglebutton",  FP_PANEL_VIEWER   },
-  { "freqplots_vswr_togglebutton",     FP_PANEL_VSWR     },
-  { "freqplots_zrlzim_togglebutton",   FP_PANEL_ZRLZIM   },
-  { "freqplots_zmgzph_togglebutton",   FP_PANEL_ZMGZPH   },
-  { "freqplots_smith_togglebutton",    FP_PANEL_SMITH    },
-  { "freqplots_ant_temp_togglebutton", FP_PANEL_ANT_TEMP },
-};
-
 /* Right-click a plot-select button to open that graph's detached popup; the
  * panel travels as the connection's user data so one handler serves every
  * button.  A GtkButton toggles only on the primary button, so the button's
@@ -631,20 +612,21 @@ freqplots_panel_button_press_cb( GtkWidget *widget, GdkEventButton *event,
   return TRUE;
 }
 
-/* Wire each plot-select button's right-click to its popup opener. */
+/* Wire each plot-select button's right-click to its popup opener; the panel
+ * descriptor table names each panel's button widget. */
   static void
 freqplots_connect_panel_buttons( GtkBuilder *builder )
 {
-  size_t i;
+  int p;
 
-  for( i = 0; i < G_N_ELEMENTS(freqplots_panel_buttons); i++ )
+  for( p = 0; p < FP_PANEL_COUNT; p++ )
   {
     GtkWidget *btn = Builder_Get_Object( builder,
-        freqplots_panel_buttons[i].id );
+        freqplots_panel_select_id( p ) );
 
     g_signal_connect( btn, "button-press-event",
         G_CALLBACK(freqplots_panel_button_press_cb),
-        GINT_TO_POINTER(freqplots_panel_buttons[i].panel) );
+        GINT_TO_POINTER(p) );
   }
 }
 
@@ -696,6 +678,9 @@ on_main_freqplots_activate(
        * flags and recompute the active-plot count. */
       config_widget_sync_builder( &freqplots_window_builder );
       config_widget_run_hooks( &freqplots_window_builder );
+
+      /* Gray feedpoint-dependent widgets for feedpoint-less excitations. */
+      freqplots_gate_feedpoint_widgets();
 
       /* Request geometry and show after all widget state restorations
        * so sizing is the last layout operation */

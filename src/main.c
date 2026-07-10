@@ -865,6 +865,10 @@ Open_Input_File( gpointer arg )
   /* Rebuild open popup port selectors for the reloaded model's ports. */
   freqplots_reload_port_combos();
 
+  /* Gray feedpoint-dependent widgets when the reloaded model has no
+   * feedpoint. */
+  freqplots_gate_feedpoint_widgets();
+
   /* Serialization relies on GTK single-threadedness: inotify dispatches
    * Open_Input_File to the GTK thread via g_idle_add; Stop_Frequency_Loop
    * at entry joins any compute thread before proceeding. */

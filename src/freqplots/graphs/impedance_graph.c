@@ -26,9 +26,11 @@
   int
 fp_impedance_enabled(void)
 {
+  /* The three impedance panels share one feedpoint availability. */
   return (rc_config.freqplots_zrlzim_togglebutton ||
       rc_config.freqplots_zmgzph_togglebutton ||
-      rc_config.freqplots_smith_togglebutton) && fpat_has_feedpoint();
+      rc_config.freqplots_smith_togglebutton) &&
+    fp_panel_available( FP_PANEL_ZRLZIM );
 }
 
 /* Impedance trace buffers, reused across fp_impedance_render() calls. */

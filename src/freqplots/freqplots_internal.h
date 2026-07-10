@@ -148,6 +148,9 @@ void fp_plot_panel(fp_plot_ctx_t *ctx,
 void fp_plot_smith_panel(fp_plot_ctx_t *ctx,
     double *fa, double *fb, double *fc, int nc, fp_panel_t panel);
 
+/* True when the panel's values are defined for the loaded model. */
+int fp_panel_available(fp_panel_t panel);
+
 /* Per-type plot renderers; the enabled predicate gates the accumulating
  * render pass.  Defined one type per file (freqplots_<type>.c). */
 int      fp_gain_enabled(void);
