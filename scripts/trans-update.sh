@@ -6,6 +6,7 @@
 # Usage:
 #   ./scripts/trans-update.sh          # regenerate POTFILES.in, make update-po, show stats
 #   ./scripts/trans-update.sh --check  # report differences without modifying files
+#   ./scripts/trans-update.sh --sync   # regenerate POTFILES.in only when it drifted
 #
 
 set -euo pipefail
@@ -15,13 +16,16 @@ cd "$(dirname "$0")/.."
 POTFILES_IN="po/POTFILES.in"
 
 check_only=false
+sync_only=false
 case "${1:-}" in
     --check) check_only=true ;;
+    --sync)  sync_only=true ;;
     "")      ;;
     *)
-        echo "Usage: $(basename "$0") [--check]"
+        echo "Usage: $(basename "$0") [--check|--sync]"
         echo ""
         echo "  --check   Report differences without modifying files"
+        echo "  --sync    Regenerate POTFILES.in only when it drifted; skip update-po"
         echo "  (none)    Regenerate POTFILES.in, run make update-po, show stats"
         exit 1
         ;;
@@ -43,10 +47,10 @@ scan_source_files() {
 check_potfiles() {
     local scanned current stale missing
     scanned=$(scan_source_files)
-    current=$(grep -v '^#' "$POTFILES_IN" | grep -v '^[[:space:]]*$' | sort)
+    current=$(grep -v '^#' "$POTFILES_IN" | grep -v '^[[:space:]]*$')
 
-    stale=$(comm -23 <(echo "$current") <(echo "$scanned"))
-    missing=$(comm -13 <(echo "$current") <(echo "$scanned"))
+    stale=$(comm -23 <(echo "$current" | sort) <(echo "$scanned"))
+    missing=$(comm -13 <(echo "$current" | sort) <(echo "$scanned"))
 
     local rc=0
 
@@ -62,11 +66,34 @@ check_potfiles() {
         rc=1
     fi
 
+    # Same set but different byte order means the list is unsorted.
+    if [ "$rc" -eq 0 ] && [ "$current" != "$scanned" ]; then
+        echo "Entries in $POTFILES_IN are not sorted."
+        rc=1
+    fi
+
     if [ "$rc" -eq 0 ]; then
         echo "$POTFILES_IN is up to date."
     fi
 
     return $rc
+}
+
+# Point core.hooksPath at the tree-carried hooks in scripts/githooks;
+# preserve and report a foreign hooksPath instead of clobbering it.
+install_git_hooks() {
+    local hooks_path
+    hooks_path=$(git config --get core.hooksPath || true)
+    if [ -z "$hooks_path" ]; then
+        git config core.hooksPath scripts/githooks
+        echo "Installed git hooks: core.hooksPath=scripts/githooks"
+    elif [ "$hooks_path" = "scripts/githooks" ]; then
+        : # already installed
+    else
+        echo "Note: core.hooksPath=$hooks_path already set;" \
+             "tree hooks in scripts/githooks not installed." >&2
+    fi
+    return 0
 }
 
 # Regenerate POTFILES.in from git ls-files
@@ -84,6 +111,18 @@ if $check_only; then
     check_potfiles
     exit $?
 fi
+
+# Sync mode rewrites the list only on drift so the file's mtime stays
+# stable across clean builds and po/ sees no spurious rebuilds.
+if $sync_only; then
+    install_git_hooks
+    if ! check_potfiles > /dev/null; then
+        regenerate_potfiles
+    fi
+    exit 0
+fi
+
+install_git_hooks
 
 if ! check_potfiles; then
     echo ""

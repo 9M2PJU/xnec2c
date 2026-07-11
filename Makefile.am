@@ -1,5 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
+# The clean target below intentionally overrides automake's; silence
+# the override warning.
+AUTOMAKE_OPTIONS = -Wno-override
+
 CLEANFILES = .vscode/c_cpp_properties.json
 EXTRA_DIST =
 SUFFIXES =
@@ -7,6 +11,32 @@ man1_MANS =
 noinst_DATA =
 
 SUBDIRS = src po t
+
+# Quiet clean, kernel style: automake's generated rm rules echo every
+# command and its recursion prints "Making clean in ..." banners, so
+# walk SUBDIRS directly under make -s; make clean V=1 shows everything.
+clean:
+	@if $(AM_V_P); then \
+		$(MAKE) clean-recursive; \
+	else \
+		for d in $(SUBDIRS) .; do \
+			echo "  CLEAN    $$d"; \
+			if test "$$d" = .; then \
+				$(MAKE) -s --no-print-directory clean-am || exit 1; \
+			else \
+				$(MAKE) -s --no-print-directory -C $$d clean || exit 1; \
+			fi; \
+		done; \
+	fi
+
+# Keep po/POTFILES.in synced with git-tracked sources on every make in
+# git checkouts; tarball builds lack .git and skip silently.
+BUILT_SOURCES = potfiles-sync
+.PHONY: potfiles-sync
+potfiles-sync:
+	@if test -d $(top_srcdir)/.git; then \
+		$(top_srcdir)/scripts/trans-update.sh --sync; \
+	fi
 
 EXTRA_DIST += autogen.sh
 
@@ -43,12 +73,12 @@ applicationsdir        = $(datarootdir)/applications
 
 if HAVE_PROG_MSGFMT
 files/xnec2c.desktop: $(srcdir)/files/xnec2c.desktop.in
-	$(MSGFMT) --desktop --template=$(srcdir)/files/xnec2c.desktop.in \
+	$(AM_V_GEN)$(MSGFMT) --desktop --template=$(srcdir)/files/xnec2c.desktop.in \
 	  -d $(top_srcdir)/po \
 	  -o $@
 else
 files/xnec2c.desktop: $(srcdir)/files/xnec2c.desktop.in
-	cp $(srcdir)/files/xnec2c.desktop.in $@
+	$(AM_V_GEN)cp $(srcdir)/files/xnec2c.desktop.in $@
 endif
 
 dist_applications_DATA = files/xnec2c.desktop
@@ -84,7 +114,7 @@ man1_MANS     += doc/xnec2c.1
 SUFFIXES += .1.in .1
 .1.in.1:
 	@$(MKDIR_P) $(@D)
-	$(SED) $(SED_CMDS) < $< > $@
+	$(AM_V_GEN)$(SED) $(SED_CMDS) < $< > $@
 
 dist_doc_DATA  =
 dist_doc_DATA += doc/NEC2-bug.txt
@@ -313,14 +343,16 @@ noinst_DATA += xnec2c.spec
 SUFFIXES += .spec.in .spec
 .spec.in.spec:
 	@$(MKDIR_P) $(@D)
-	$(SED) $(SED_CMDS) < $< > $@
+	$(AM_V_GEN)$(SED) $(SED_CMDS) < $< > $@
 
 ########################################################################
 # Translation maintenance targets
 ########################################################################
 
+# Per-file quietness lives in po/Makefile.in.in; make update-po V=1
+# shows the full gettext commands.
 update-po:
-	$(MAKE) -C po update-po
+	@$(MAKE) -C po update-po
 
 .PHONY: update-po
 
