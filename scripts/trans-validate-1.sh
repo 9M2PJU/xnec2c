@@ -9,11 +9,15 @@
 l="$1"
 
 #MODEL=opus
-MODEL=sonnet
+MODEL=claude-sonnet-5[1m]
+export CLAUDE_HOOKS_KILL_ON_STOP=done
+
 export MAX_THINKING_TOKENS=2048
 
+lang=$(basename "$l" .po)
+
 # Build scope: untranslated + fuzzy entries with line numbers
-scope="po/.translate-scope-$(basename "$l" .po).txt"
+scope="po/.translate-scope-$lang.txt"
 
 printf '# Untranslated entries (line numbers in %s)\n' "$l" > "$scope"
 awk '/^msgstr ""$/ { n=NR; getline; if ($0 !~ /^"/) print "#   line " n }' "$l" >> "$scope"
@@ -35,14 +39,17 @@ fi
 
 echo "$l: $count_u untranslated, $count_f fuzzy"
 
-claude-raw --permission-mode acceptEdits --model "$MODEL" "@doc/TRANSLATING.md @$scope ; $l has $(wc -l < "$l") lines, $count_u untranslated and $count_f fuzzy entries to translate:
+claude-xraw --permission-mode acceptEdits --model "$MODEL" "@doc/TRANSLATING.md @po/rules/$lang.md @$scope ; $l has $(wc -l < "$l") lines, $count_u untranslated and $count_f fuzzy entries to translate:
 
 The scope file loaded above contains the specific entries requiring translation, annotated with their line numbers in $l.
 For each scoped entry, Read approximately 30 lines around its line number in $l using offset/limit. Do not read the entire file. Process entries in groups to maintain focus.
 
 NOTICE:
-- $l is the ONLY file you may Read/Edit.
-- You MUST ONLY Read/Edit $l because all other tools are forbidden.
+- these are the ONLY file you may Read/Edit:
+	- po/rules/$lang.md
+	- $l
+- You MUST ONLY Read/Edit $l because all other tools are forbidden, except the single self-check command named in Phase 5.
+- The one permitted command is the self-check: run exactly 'scripts/trans-check.sh $l' and no other command. It runs an existing sanctioned validator, so it is not auxiliary tooling and does not violate the prohibition below.
 - Evaluation tasks operate on $l only: Do not create auxiliary scripts, test harnesses, or tooling
 
 Before each response, before each file read, restate the requirements. Read only the relevant line ranges using offset/limit; do not load the entire file.
@@ -90,6 +97,7 @@ Your responses to each evaluation section must not duplicate any meaning from an
 2. List all standards of writing with respect to the language being translated for the purpose of a technical computer program interface ($l)
 3. List all informality/formality terms and how they map to the cultural expectation of the society that will be using a technical program interface
 4. Map these as appropriate to the specific NEC2 EM simulator domain for this language and culture
+5. Write po/rules/$lang.md if it does not exist.
 
 ## Phase 2: inspection
 
@@ -107,13 +115,13 @@ Your responses to each evaluation section must not duplicate any meaning from an
 	d. Appropriate disambiguation only as necessary if the program context (EM Simulator) is not sufficient.
 	e. Correct locale representations of data: decimal symbol (50.0 vs 50,0), etc.
 6. List all violations in #2-5
-7. Add all violations from #6 using TodoWrite - include line numbers or ranges as a reminder
+7. Add all violations from #6 using TaskCreate - include line numbers or ranges as a reminder
 8. Based on your findings, consider additional validation issues that are similar to the ones you discovered, because the similar errors may have happened multiple times. If any, goto #6
 9. Goto 1, process next scoped entry
 
 ## Phase 3: Update
 
-1. For each Todo item: MUST modify any violations using the Edit tool
+1. For each TaskCreate item: MUST modify any violations using the Edit tool
 
 ## Phase 4: QA/Validation
 
@@ -122,22 +130,28 @@ Your responses to each evaluation section must not duplicate any meaning from an
 	- The purpose of this is for you to think really hard about the file content that was loaded and the modifications you made and evaluate if there's anything else that should be considered to follow the required rule set and the phase procedures.
 	- Verify consistency: Perform searches to see if there are any common, similar, or repeating violations that were not detected based on the known violations from Phase 2. You MUST combine searches into one or more large regular expression unions to minimize the number of requests and reduce latency.
 2. List all violations in #1
-3. Add all violations from #2 using TodoWrite - include line numbers or ranges as a reminder
+3. Add all violations from #2 using TaskCreate - include line numbers or ranges as a reminder
 
 ## Phase 5: Fine tuning
 
 1. Apply the to-do items discovered in phase four.
 2. Think hard, exhaustively, to make sure all phases are complete.
 3. List all violations in #2
-4. Add all violations from #3 using TodoWrite - include line numbers or ranges as a reminder
+4. Add all violations from #3 using TaskCreate - include line numbers or ranges as a reminder
 5. Complete all items on the to-do list.
-6. When complete with ALL changes, you MUST issue Bash(kill -9 \$PPID). You MUST NOT run any other commands. The Todo item 'all requirements are complete' must be set to pending before invoking Bash.
+6. Final completion criteria: verify by searching $l that each holds; any failure is a violation returned to #4:
+	a. No format-specifier errors: every msgstr carries the same %s/%d/%f/%c/%% set as its msgid, in valid order including positional reordering where grammar requires.
+	b. Nothing untranslated: no non-header entry has an empty msgstr.
+	c. Nothing fuzzy: no '#, fuzzy' line and no ', fuzzy' within any flags line remains.
+7. Self-check: run exactly this command and read its output:
+	scripts/trans-check.sh $l
+	It exits 0 with 'OK complete and error-free' when 6a-6c all hold. On any FAIL line, correct the named entries (format-specifier, untranslated, or fuzzy), Add each as a TaskCreate item with its line number, then re-run the same command. Repeat until it exits 0. This is the only command you are permitted to run.
+8. When complete with ALL changes, you MUST stop. You MUST NOT run any other commands except the Phase 5 #7 self-check. The TaskCreate item 'all requirements are complete' must be set to pending before invoking stopping
 
 # Begin Phases
 
 - Provide a summary after each phase completion before proceeding to the next, and provide proof that the phase is complete before the next one is started.
-- TodoWrite - add each Phase major and minor section to the list in a structured form to minimize list size while capturing all meaning, now
-- TodoWrite - add Bash(kill -9 \$PPID) to the list, now
+- TaskCreate - add each Phase major and minor section to the list in a structured form to minimize list size while capturing all meaning, now
 
 ultrathink
 	"
@@ -148,4 +162,6 @@ msgattrib --no-obsolete -o "$l" "$l"
 
 rm -f "$scope"
 
-exit 0
+# Confirm the finished catalog parses, is fully translated, and carries no fuzzy entries.
+scripts/trans-check.sh "$l"
+exit $?
