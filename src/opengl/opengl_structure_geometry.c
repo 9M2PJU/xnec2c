@@ -800,6 +800,10 @@ opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *
    * to detect data changes in the extra slot. */
   static double last_freq_mhz = -1.0;
 
+  /* Baked projection colors reuse one scratch buffer, so pointer identity
+   * alone misses rebakes; the generation counter signals new content. */
+  static uint32_t last_color_generation = 0;
+
   double cylinder_radius_scale;
 
   cylinder_radius_scale = opengl_structure_get_radius_scale();
@@ -810,12 +814,14 @@ opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *
 
   /* Regenerate on color pointer change (mode/fstep change), empty buffer, new data, or scale change */
   if( params->wire_colors != last_wire_colors ||
+      params->color_generation != last_color_generation ||
       batch_count == 0 ||
       cylinder_radius_scale != structure_last_radius_scale ||
       (params->cmax > 0.0 && CRNT_FSTEP_AVAILABLE(params->fstep) &&
        (params->fstep != last_fstep || extra_slot_changed)) )
   {
     last_wire_colors = params->wire_colors;
+    last_color_generation = params->color_generation;
     opengl_structure_generate_geometry(params, cylinder_radius_scale);
 
     /* Prevent redundant regeneration on subsequent expose events */

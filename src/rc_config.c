@@ -25,6 +25,7 @@
 #include "mathlib.h"
 #include "measurements.h"
 #include "config_hooks.h"
+#include "prerender/prerender_color_proj.h"
 
 #include "opengl/opengl_structure.h"
 #include "opengl/opengl_msaa.h"
@@ -393,6 +394,43 @@ rc_config_vars_t rc_config_vars[] = {
 						CONFIG_WIDGET( .widget_id = "anim_flow_dir",
 							.values = CONFIG_WIDGET_VALUES(FLOW_DIR_REFERENCE_PHASE,
 								FLOW_DIR_LIC, FLOW_DIR_WIREFRAME) ),
+						NULL ) ),
+				NULL ) ) },
+
+	{ .desc = "Animate Color Projection", .format = "%d",
+		.vars = { &rc_config.anim_color_proj },
+		.def = { { .i = COLOR_PROJ_INSTANT } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_color_vis,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_color_proj",
+							.values = CONFIG_WIDGET_VALUES(COLOR_PROJ_INSTANT,
+								COLOR_PROJ_SIGNED, COLOR_PROJ_PHASE) ),
+						NULL ) ),
+				NULL ) ) },
+
+	{ .desc = "Color Scale", .format = "%d",
+		.vars = { &rc_config.color_scale },
+		.def = { { .i = COLOR_SCALE_LINEAR } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_color_vis,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "main_color_scale_linear",
+							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_LINEAR) ),
+						CONFIG_WIDGET( .widget_id = "main_color_scale_sqrt",
+							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_SQRT) ),
+						CONFIG_WIDGET( .widget_id = "main_color_scale_squared",
+							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_SQUARED) ),
+						CONFIG_WIDGET( .widget_id = "main_color_scale_db",
+							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_DB) ),
+						NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_color_scale",
+							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_LINEAR,
+								COLOR_SCALE_SQRT, COLOR_SCALE_SQUARED, COLOR_SCALE_DB) ),
 						NULL ) ),
 				NULL ) ) },
 

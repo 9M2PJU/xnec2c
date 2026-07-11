@@ -31,6 +31,7 @@
 #include "render_dispatch.h"
 #include "gradient_cache.h"
 #include "../shared.h"
+#include "../prerender/prerender_color_proj.h"
 #include "../prerender/prerender_farfield.h"
 #include "../rdpattern_ui.h"
 #include "../structure_ui.h"
@@ -217,22 +218,31 @@ build_struct_draw_params(int fstep)
   struct_draw_params_t params;
   int fs = fstep;
 
+  color_proj_t proj = color_proj_active();
+  color_scale_t scale = color_scale_sanitize(rc_config.color_scale);
+
   if( isFlagSet(DRAW_CURRENTS) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
   {
-    params.wire_colors  = struct_colors[fs].wire_crnt_rgb;
+    params.wire_colors  = color_proj_wire_current(fs, (double)flow_phase,
+        proj, scale);
     params.wire_widths  = seg_width;
-    params.patch_colors = struct_colors[fs].patch_crnt_rgb;
+    params.patch_colors = color_proj_patch(fs, (double)flow_phase,
+        proj, scale);
     params.cmax = fmax((double)struct_colors[fs].wire_crnt_cmax,
                        (double)struct_colors[fs].patch_crnt_cmax);
     params.show_flow = TRUE;
+    params.color_generation = color_proj_generation();
   }
   else if( isFlagSet(DRAW_CHARGES) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
   {
-    params.wire_colors  = struct_colors[fs].wire_chrg_rgb;
+    /* Patches carry no charge quantity; fill stays the static geometry color */
+    params.wire_colors  = color_proj_wire_charge(fs, (double)flow_phase,
+        proj, scale);
     params.wire_widths  = seg_width;
     params.patch_colors = patch_rgb;
     params.cmax = (double)struct_colors[fs].wire_chrg_cmax;
     params.show_flow = FALSE;
+    params.color_generation = color_proj_generation();
   }
   else
   {
@@ -241,6 +251,7 @@ build_struct_draw_params(int fstep)
     params.patch_colors = patch_rgb;
     params.cmax = 0.0;
     params.show_flow = FALSE;
+    params.color_generation = 0;
   }
 
   params.fstep = fs;

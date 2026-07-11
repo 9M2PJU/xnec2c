@@ -98,6 +98,7 @@ xnec2c_SOURCES = \
     prerender/prerender_aggregate.c prerender/prerender_aggregate.h \
     prerender/prerender_rdpattern.c prerender/prerender_rdpattern.h \
     prerender/prerender_color.c     prerender/prerender_color.h \
+    prerender/prerender_color_proj.c prerender/prerender_color_proj.h \
     prerender/prerender_farfield.c  prerender/prerender_farfield.h \
     prerender/presentation_cache_key.c prerender/presentation_cache_key.h \
     prerender/prerender_nearfield.c prerender/prerender_nearfield.h \

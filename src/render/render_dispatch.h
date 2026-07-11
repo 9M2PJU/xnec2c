@@ -62,6 +62,7 @@ typedef struct
   double         freq_mhz;      /* frequency for staleness detection */
   gboolean       show_flow;     /* TRUE only for DRAW_CURRENTS */
   int            fstep;         /* for crnt_fstep[] access */
+  uint32_t       color_generation; /* bumped whenever dispatch rebakes wire/patch color */
 } struct_draw_params_t;
 
 /* Dispatch-resolved far-field draw parameters — passed to draw_farfield backends.

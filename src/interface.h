@@ -40,6 +40,8 @@ NULL
 "anim_hfield", \
 "anim_poynting", \
 "anim_flow_dir", \
+"anim_color_proj", \
+"anim_color_scale", \
 "anim_structure_frame", \
 NULL
 
@@ -685,6 +687,10 @@ NULL
 "main_colorcode_zerolabel", \
 "main_colorcode_drawingarea", \
 "main_colorcode_maxlabel", \
+"main_color_scale_linear", \
+"main_color_scale_sqrt", \
+"main_color_scale_squared", \
+"main_color_scale_db", \
 "main_gain_entry", \
 "main_freq_spinbutton", \
 "main_freq_label", \

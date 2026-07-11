@@ -26,6 +26,7 @@
  */
 #include "structure_ui.h"
 #include "shared.h"
+#include "config_hooks.h"
 #include "callbacks.h"
 #include "cairo/cairo_draw.h"
 #include "prerender/prerender_aggregate.h"
@@ -52,32 +53,70 @@ Draw_Structure_UI(void)
   if( calc_data.freq_step >= 0 )
     Display_Fstep( structure_fstep_entry, calc_data.freq_step );
 
-  /* Update structure-window color code max label for current/charge display */
+  /* Update structure-window color code labels for current/charge display */
   int fstep = calc_data.freq_step;
   if( CRNT_FSTEP_AVAILABLE(fstep) && struct_colors )
   {
-    char label[16];
+    char maxlabel[16], zerolabel[16];
     gboolean do_update = FALSE;
+    double maxval = 0.0, cmin = 0.0, cmax = 0.0;
 
     if( isFlagSet(DRAW_CURRENTS) )
     {
-      snprintf( label, sizeof(label) - 1, "%8.2E",
-          (double)struct_colors[fstep].wire_crnt_cmax * (double)data.wlam );
+      maxval = (double)struct_colors[fstep].wire_crnt_cmax * (double)data.wlam;
+      cmin = (double)struct_colors[fstep].wire_crnt_cmin;
+      cmax = (double)struct_colors[fstep].wire_crnt_cmax;
       do_update = TRUE;
     }
     else if( isFlagSet(DRAW_CHARGES) )
     {
-      snprintf( label, sizeof(label) - 1, "%8.2E",
-          (double)struct_colors[fstep].wire_chrg_cmax * 1.0E-6 / (double)calc_data.freq_mhz );
+      maxval = (double)struct_colors[fstep].wire_chrg_cmax
+             * 1.0E-6 / (double)calc_data.freq_mhz;
+      cmin = (double)struct_colors[fstep].wire_chrg_cmin;
+      cmax = (double)struct_colors[fstep].wire_chrg_cmax;
       do_update = TRUE;
     }
-    /* else geometry mode: label retains previous value */
+    /* else geometry mode: labels retain previous values */
 
     if( do_update )
+    {
+      color_scale_t scale = color_scale_sanitize(rc_config.color_scale);
+
+      /* Label endpoints per the projection output kind */
+      switch( color_proj_out[color_proj_active()] )
+      {
+        case PROJ_OUT_DIVERGING:
+          snprintf( maxlabel, sizeof(maxlabel) - 1, "%8.2E", maxval );
+          snprintf( zerolabel, sizeof(zerolabel) - 1, "-%.1E", maxval );
+          break;
+
+        case PROJ_OUT_HSV:
+          snprintf( maxlabel, sizeof(maxlabel) - 1, "%s", "360°" );
+          snprintf( zerolabel, sizeof(zerolabel) - 1, "%s", "0°" );
+          break;
+
+        case PROJ_OUT_RAMP:
+          snprintf( maxlabel, sizeof(maxlabel) - 1, "%8.2E", maxval );
+          if( scale == COLOR_SCALE_DB )
+          {
+            /* The dB strip bottoms out at the auto-ranged floor, not zero */
+            color_ctx_t x;
+            color_ctx_init( &x, 0.0, cmin, cmax, scale );
+            snprintf( zerolabel, sizeof(zerolabel) - 1, "%8.2E",
+                maxval * x.floor_ratio );
+          }
+          else
+            snprintf( zerolabel, sizeof(zerolabel) - 1, "%s", "0" );
+          break;
+      }
+
       gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
-              main_window_builder, "main_colorcode_maxlabel")), label );
+              main_window_builder, "main_colorcode_maxlabel")), maxlabel );
+      gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
+              main_window_builder, "main_colorcode_zerolabel")), zerolabel );
+    }
   }
-  /* else no current data: label retains previous value */
+  /* else no current data: labels retain previous values */
 }
 
 /*-----------------------------------------------------------------------*/
@@ -288,9 +327,8 @@ apply_animation_phase(void)
 
   xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
-  /* Queue rdpattern for near-field visualization or patch arrow overlay */
-  if( isFlagSet(DRAW_EHFIELD) ||
-      (overlay_struct_active() && data.m > 0) )
+  /* Queue rdpattern for near-field visualization or structure overlay */
+  if( isFlagSet(DRAW_EHFIELD) || overlay_struct_active() )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 
   /* Update the phase readout from flow_phase without moving the slider, whose
@@ -310,14 +348,69 @@ apply_animation_phase(void)
 
 /*-----------------------------------------------------------------------*/
 
+/* Manual phase-slider interaction since the last reset; together with the
+ * ANIMATE timer flag this forms the playback-live state. */
+static gboolean animation_scrubbed = FALSE;
+
 /** reset_animation_phase() - Zero the shared animation phase
  *
- * Called when animation stops to return arrows to reference direction.
+ * Called when animation stops to return arrows to reference direction
+ * and end playback-liveness.
  */
   void
 reset_animation_phase(void)
 {
   flow_phase = 0.0f;
+  animation_scrubbed = FALSE;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** animation_set_scrubbed() - Mark manual phase scrubbing as playback
+ *
+ * Called by the phase-slider handlers; cleared by reset_animation_phase().
+ * The rising edge swaps in the animated projection, including the legend;
+ * later scrubs redraw through the phase change alone.
+ */
+  void
+animation_set_scrubbed(void)
+{
+  if( animation_scrubbed )
+    return;
+
+  animation_scrubbed = TRUE;
+  hook_color_vis();
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** animation_is_active() - Report whether the animated selection applies
+ *
+ * Playback-live boundary: the animate dialog is open and the phase is
+ * advancing (ANIMATE timer running or the slider scrubbed).  Opening the
+ * dialog alone leaves the static amplitude baseline in effect, so no
+ * color change precedes the user starting playback.
+ */
+  gboolean
+animation_is_active(void)
+{
+  return (animate_dialog != NULL)
+      && (isFlagSet(ANIMATE) || animation_scrubbed);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** color_proj_active() - Resolve the color projection now in effect
+ *
+ * Selects the animated projection while animation playback is live,
+ * else the static amplitude baseline.
+ */
+  color_proj_t
+color_proj_active(void)
+{
+  return animation_is_active()
+      ? color_proj_sanitize(rc_config.anim_color_proj)
+      : COLOR_PROJ_AMPLITUDE;
 }
 
 /*-----------------------------------------------------------------------*/

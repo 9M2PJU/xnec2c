@@ -26,6 +26,7 @@
 #include "themes/theme.h"
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
+#include "config_hooks.h"
 #include "cairo/cairo_draw.h"
 #include "cairo/cairo_frame.h"
 #include <pthread.h>
@@ -847,7 +848,7 @@ on_main_colorcode_drawingarea_draw(
     cairo_t         *cr,
     gpointer         user_data)
 {
-  Draw_Colorcode( cr );
+  draw_colorcode_projected( cr );
   return( TRUE );
 }
 
@@ -2134,8 +2135,9 @@ static const struct
 /** anim_panel_sensitivity() - Grey animation panel controls by owner state
  *
  * Greys each panel control whose owning window is closed, greys the
- * flow-direction combo when the main window is closed, and greys the
- * structure frame when the model carries no surface patches.
+ * flow-direction combo when the main window is closed or the model
+ * carries no surface patches, and greys the structure frame when the
+ * main window is closed.
  */
   static void
 anim_panel_sensitivity(void)
@@ -2155,17 +2157,21 @@ anim_panel_sensitivity(void)
         *anim_panel_owners[i].owner_builder != NULL );
   }
 
+  /* Flow direction styles patch arrows only; wire color animation and the
+   * color projection/scale combos stay usable for wire-only models. */
   widget = Builder_Get_Object( animate_dialog_builder, "anim_flow_dir" );
-  gtk_widget_set_sensitive( widget, main_window_builder != NULL );
-
-  /* Grey out Structure section when model has no surface patches */
-  widget = Builder_Get_Object( animate_dialog_builder, "anim_structure_frame" );
   has_patches = (data.m > 0);
-  gtk_widget_set_sensitive( widget, has_patches );
+  gtk_widget_set_sensitive( widget,
+      (main_window_builder != NULL) && has_patches );
   gtk_widget_set_tooltip_text( widget,
-      has_patches ? NULL
-      : _("Current flow animation requires surface patches"
+      has_patches
+      ? _("Select how the animated patch current flow is rendered.\n"
+          "Mirrors the Visualization menu setting in the main window.")
+      : _("Patch flow animation requires surface patches"
           " (SP/SM cards) in the model.") );
+
+  widget = Builder_Get_Object( animate_dialog_builder, "anim_structure_frame" );
+  gtk_widget_set_sensitive( widget, main_window_builder != NULL );
 }
 
 /* Wrap value into the half-open phase span [lower, lower+span). */
@@ -2212,6 +2218,7 @@ on_animate_phase_slider_change_value(GtkRange *range, GtkScrollType scroll,
   gtk_range_set_value( range, value );
 
   flow_phase = (float)( value * TORAD );
+  animation_set_scrubbed();
   apply_animation_phase();
 
   return( TRUE );
@@ -2276,6 +2283,7 @@ on_phase_slider_motion_notify(GtkWidget *widget, GdkEventMotion *event,
   SIGNAL_UNBLOCK( range, on_animate_phase_slider_change_value );
 
   flow_phase = (float)( new_val * TORAD );
+  animation_set_scrubbed();
   apply_animation_phase();
 
   return( FALSE );
@@ -2300,6 +2308,7 @@ show_animate_dialog(void)
   config_widget_sync_builder( &animate_dialog_builder );
   config_widget_run_hooks( &animate_dialog_builder );
   anim_panel_sensitivity();
+  update_color_scale_labels();
 }
 
 
@@ -2310,15 +2319,16 @@ on_rdpattern_animate_activate(
 {
   if( isFlagClear(DRAW_EHFIELD) )
   {
-    if( !fpat.nfeh )
+    if( fpat.nfeh )
     {
-      if( !Validate_Nearfield_Animation() )
-        return;
+      /* Near-field data validates; enable the EH display for animation */
+      gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(
+          Builder_Get_Object(rdpattern_window_builder, "rdpattern_eh_togglebutton")),
+        TRUE );
     }
-
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(
-        Builder_Get_Object(rdpattern_window_builder, "rdpattern_eh_togglebutton")),
-      TRUE );
+    else if( !(overlay_struct_active() && (data.n > 0 || data.m > 0))
+        && !Validate_Nearfield_Animation() )
+      return; /* no near-field data and no structure overlay to animate */
   }
 
   show_animate_dialog();
@@ -2428,21 +2438,26 @@ on_animation_applybutton_clicked(
     gpointer         user_data)
 {
   /* Reject when nothing can animate */
-  if( data.m == 0 && !(fpat.nfeh & (NEAR_EFIELD | NEAR_HFIELD)) )
+  if( data.n == 0 && data.m == 0 && !(fpat.nfeh & (NEAR_EFIELD | NEAR_HFIELD)) )
   {
     Notice( GTK_BUTTONS_OK, _("Animation"),
-        _("Animation requires surface patches (SP/SM NEC cards)"
-          " or near-field data (NE/NH NEC cards)") );
+        _("Animation requires wire currents or charges, surface patches"
+          " (SP/SM NEC cards), or near-field data (NE/NH NEC cards)") );
     return;
   }
 
-  /* Validate near-field setup only when no patches can animate */
-  if( data.m == 0 && isFlagSet(DRAW_EHFIELD) && !Validate_Nearfield_Animation() )
+  /* Validate near-field setup only when no structure content can animate */
+  if( data.n == 0 && data.m == 0 &&
+      isFlagSet(DRAW_EHFIELD) && !Validate_Nearfield_Animation() )
     return;
 
   SetFlag( ANIMATE );
   anim_phase_slider_sync_sensitivity();
   update_animation_parameters();
+
+  /* Playback goes live: swap in the animated projection before the
+   * first timer tick so the flip is immediate at any frame rate. */
+  hook_color_vis();
 }
 
 
@@ -2470,6 +2485,10 @@ on_animation_cancelbutton_clicked(
   }
   anim_phase_slider_sync_sensitivity();
   apply_animation_phase();
+
+  /* Playback ended: return to the static projection everywhere,
+   * including the legend strip. */
+  hook_color_vis();
 }
 
 
@@ -2500,6 +2519,11 @@ on_animate_dialog_destroy(
   animate_dialog = NULL;
   g_object_unref( animate_dialog_builder );
   animate_dialog_builder = NULL;
+
+  /* Playback ended with the dialog; rebake and redraw under the static
+   * selection now that it is gone. */
+  if( main_window_builder != NULL )
+    hook_color_vis();
 }
 
 

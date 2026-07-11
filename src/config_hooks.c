@@ -22,6 +22,7 @@
 #include "callbacks.h"
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
+#include "prerender/prerender_nearfield.h"
 
 #ifdef HAVE_OPENGL
 #include "opengl/opengl_structure.h"
@@ -56,9 +57,10 @@ hook_flow_direction(void)
   Queue_Structure_Redraw();
   Queue_Radiation_Redraw();
 
-  /* Animation produces no visible change for phase-invariant modes;
-   * grey out the Animate menu item for those modes. */
-  animatable =
+  /* Wire color animates in every flow mode; patch arrows animate only in
+   * the phase-variant modes, so grey the Animate menu item only for a
+   * patch-only model in a phase-invariant mode. */
+  animatable = (data.n > 0) ||
     (rc_config.current_flow_visualization_mode == FLOW_DIR_REFERENCE_PHASE ||
      rc_config.current_flow_visualization_mode == FLOW_DIR_LIC ||
      rc_config.current_flow_visualization_mode == FLOW_DIR_WIREFRAME);
@@ -66,6 +68,36 @@ hook_flow_direction(void)
   gtk_widget_set_sensitive(
       Builder_Get_Object(main_window_builder, "main_structure_animate"),
       animatable);
+}
+
+/*------------------------------------------------------------------------*/
+
+/** hook_color_vis() - Rebake baked colors and redraw after a
+ * color projection or scale change, including the legend strip.
+ */
+void
+hook_color_vis(void)
+{
+#ifdef HAVE_OPENGL
+  opengl_structure_invalidate();
+#endif
+
+  /* Near-field colors are baked at prerender time, so rebake the current
+   * step under the data lock before queueing the redraws. */
+  if( isFlagSet(DRAW_EHFIELD) && NF_FSTEP_AVAILABLE(calc_data.freq_step) )
+  {
+    g_rec_mutex_lock(&freq_data_lock);
+    Prerender_Near_Field(calc_data.freq_step);
+    g_rec_mutex_unlock(&freq_data_lock);
+  }
+
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
+
+  /* The legend strip lives outside the structure drawing area */
+  if( main_window_builder != NULL )
+    xnec2_widget_queue_draw( Builder_Get_Object(main_window_builder,
+        "main_colorcode_drawingarea"), TRUE );
 }
 
 /*------------------------------------------------------------------------*/

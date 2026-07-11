@@ -457,6 +457,12 @@ typedef struct
   /* Patch current flow visualization mode (View menu, not OpenGL settings) */
   int current_flow_visualization_mode;
 
+  /* Animated color projection (animate dialog, color_proj_t) */
+  int anim_color_proj;
+
+  /* Color scale (color_scale_t), shared by menu and animate dialog */
+  int color_scale;
+
   /* Whether transparency is triggered by click/drag (1) or always on (0) */
   int opengl_transparent_on_click;
 
@@ -1314,6 +1320,8 @@ void freqplots_cleanup(void);
 void Nf_Peak_Vector(double exm, double eym, double ezm, double fx, double fy, double fz, double *rx, double *ry, double *rz, double *r);
 void Recompute_Near_Field_Vectors(int fstep, gboolean snapshot);
 void Draw_Colorcode(cairo_t *cr);
+void draw_colorcode_projected(cairo_t *cr);
+void update_color_scale_labels(void);
 void Gtk_Widget_Destroy(GtkWidget **widget);
 /* callbacks.c */
 void on_main_window_destroy(GObject *object, gpointer user_data);

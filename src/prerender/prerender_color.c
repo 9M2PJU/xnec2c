@@ -23,6 +23,7 @@
  * No Cairo, no OpenGL, no GTK dependencies.
  */
 #include "prerender_color.h"
+#include "prerender_color_proj.h"
 #include "../shared.h"
 
 rgb_f_t *seg_rgb   = NULL;
@@ -259,6 +260,8 @@ alloc_struct_colors(int nfrq)
       mem_array_alloc(&struct_colors[i].patch_flow_data, data.m);
     }
   }
+
+  color_proj_alloc();
 }
 
 /*-----------------------------------------------------------------------*/
@@ -283,6 +286,8 @@ free_struct_colors(void)
   mem_array_free(&seg_rgb);
   mem_array_free(&seg_width);
   mem_array_free(&patch_rgb);
+
+  color_proj_free();
 }
 
 /*-----------------------------------------------------------------------*/

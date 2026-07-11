@@ -325,7 +325,7 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Flow direction:</property>
+                        <property name="label" translatable="yes">Color projection:</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -334,10 +334,72 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkComboBoxText" id="anim_color_proj">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="tooltip-text" translatable="yes">Select how wire and patch colors follow the excitation phase while animating.</property>
+                        <items>
+                          <item translatable="yes">Instantaneous Magnitude</item>
+                          <item translatable="yes">Instantaneous Polarity</item>
+                          <item translatable="yes">Phase Hue</item>
+                        </items>
+                        <signal name="changed" handler="on_config_widget_changed" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Color scale:</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="anim_color_scale">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="tooltip-text" translatable="yes">Select the magnitude-to-color transfer.&#10;Mirrors the Visualization menu setting in the main window.&#10;Squared is proportional to power for currents and to energy density for near fields; Sqrt and dB are contrast transfers relative to the step peak.</property>
+                        <items>
+                          <item translatable="yes">Linear</item>
+                          <item translatable="yes">Sqrt</item>
+                          <item translatable="yes">Squared</item>
+                          <item translatable="yes">dB</item>
+                        </items>
+                        <signal name="changed" handler="on_config_widget_changed" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Patch flow direction:</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">5</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkComboBoxText" id="anim_flow_dir">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="tooltip-text" translatable="yes">Select how the animated current flow is rendered.&#10;Mirrors the Flow direction setting in the main window.</property>
                         <items>
                           <item translatable="yes">Reference phase</item>
                           <item translatable="yes">LIC</item>
@@ -348,7 +410,7 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">2</property>
+                        <property name="position">6</property>
                       </packing>
                     </child>
                   </object>
@@ -11356,7 +11418,7 @@ Save NEC2 Editor data first?
                           <object class="GtkMenuItem" id="main_flow_dir_menu">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">Current _Visualization</property>
+                            <property name="label" translatable="yes">_Visualization</property>
                             <property name="use-underline">True</property>
                             <child type="submenu">
                               <object class="GtkMenu" id="main_flow_dir_menu_menu">
@@ -11372,7 +11434,69 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="sensitive">False</property>
-                                    <property name="label" translatable="yes">Animated</property>
+                                    <property name="label" translatable="yes">Color Scale</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_color_scale_linear">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="tooltip-text" translatable="yes">Color varies in direct proportion to magnitude, relative to this frequency step's peak.&#10;Reads the same for currents, charges, and near fields.</property>
+                                    <property name="label" translatable="yes">Li_near</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="active">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_color_scale_sqrt">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="tooltip-text" translatable="yes">Square-root transfer: expands weak regions and compresses peaks.&#10;A perceptual contrast choice; implies no physical quantity.</property>
+                                    <property name="label" translatable="yes">S_qrt</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_color_scale_linear</property>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_color_scale_squared">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="tooltip-text" translatable="yes">Squared transfer: concentrates the color range on the strongest regions.&#10;Proportional to dissipated power for currents and to energy density for near fields; for charges, contrast only.</property>
+                                    <property name="label" translatable="yes">Sq_uared</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_color_scale_linear</property>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_color_scale_db">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="tooltip-text" translatable="yes">Logarithmic scale relative to the peak; the floor auto-ranges 20–60 dB with the data.&#10;Reveals weak detail that linear display hides.</property>
+                                    <property name="label" translatable="yes">_dB</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_color_scale_linear</property>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkSeparatorMenuItem">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkMenuItem">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="sensitive">False</property>
+                                    <property name="label" translatable="yes">Patch Flow — Animated</property>
                                   </object>
                                 </child>
                                 <child>
@@ -11419,7 +11543,7 @@ Save NEC2 Editor data first?
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="sensitive">False</property>
-                                    <property name="label" translatable="yes">Static</property>
+                                    <property name="label" translatable="yes">Patch Flow — Static</property>
                                   </object>
                                 </child>
                                 <child>

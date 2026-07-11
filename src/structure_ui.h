@@ -21,6 +21,7 @@
 #define STRUCTURE_UI_H  1
 
 #include "common.h"
+#include "prerender/prerender_color_proj.h"
 
 void Draw_Structure_UI(void);
 void Show_Viewer_Gain(GtkBuilder *builder, gchar *widget, view_t *v);
@@ -32,5 +33,8 @@ void Init_Struct_Drawing(void);
 gboolean Animate_Phase(gpointer udata);
 void apply_animation_phase(void);
 void reset_animation_phase(void);
+void animation_set_scrubbed(void);
+gboolean animation_is_active(void);
+color_proj_t color_proj_active(void);
 
 #endif
