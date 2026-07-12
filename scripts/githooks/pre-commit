@@ -68,6 +68,23 @@ if [ "${FORCE_COMMIT:-}" != "true" ]; then
 		echo ""
 		exit 1
 	fi
+
+	# Gate 4: Makefile.am example list must match the examples/ directory tree.
+	if [ -f Makefile ]; then
+		if ! check_output=$(make -s check-local 2>&1); then
+			echo "$check_output"
+			echo ""
+			echo "❌ Pre-commit validation failed: make check-local"
+			echo ""
+			echo "If you have determined this commit must proceed anyway:"
+			echo ""
+			echo "  FORCE_COMMIT=true git commit"
+			echo ""
+			exit 1
+		fi
+	else
+		echo "pre-commit: Makefile missing (tree not configured); check-local skipped." >&2
+	fi
 fi
 
 exit 0
