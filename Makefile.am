@@ -299,6 +299,8 @@ nobase_dist_pkgdata_DATA += examples/buoy.nec
 
 nobase_dist_pkgdata_DATA += examples/ex2_current_slope_disc_dipole.nec
 
+nobase_dist_pkgdata_DATA += examples/ex4_current_source_sq_loop.nec
+
 nobase_dist_pkgdata_DATA += examples/gray_hoverman.nec
 
 nobase_dist_pkgdata_DATA += examples/k9ay_5b4az.nec
