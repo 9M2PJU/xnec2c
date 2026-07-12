@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-06-26 14:17-0700\n"
+"POT-Creation-Date: 2026-07-12 15:24-0700\n"
 "PO-Revision-Date: 2025-12-27 16:01-0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2194
+#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2842
 msgid "xnec2c"
 msgstr "xnec2c"
 
@@ -45,7 +45,7 @@ msgstr "डिफ़ॉल्ट"
 msgid "Fast"
 msgstr "तीव्र"
 
-#: resources/settings/cairo_settings.glade:56
+#: resources/settings/cairo_settings.glade:56 resources/xnec2c.glade:414
 msgid "None"
 msgstr "कोई नहीं"
 
@@ -57,7 +57,7 @@ msgstr "रंग परिमाणीकरण"
 msgid "Off"
 msgstr "बंद"
 
-#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4100
+#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4748
 msgid "8"
 msgstr "8"
 
@@ -171,12 +171,12 @@ msgstr ""
 msgid "translator-credits"
 msgstr "translator-credits"
 
-#: resources/xnec2c.glade:75 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
-#: src/rdpattern_ui.c:344
+#: resources/xnec2c.glade:114 src/rdpattern_ui.c:330 src/rdpattern_ui.c:338
+#: src/rdpattern_ui.c:345
 msgid "Near Field Animation"
 msgstr "निकट क्षेत्र एनिमेशन"
 
-#: resources/xnec2c.glade:167
+#: resources/xnec2c.glade:206
 msgid ""
 "Scrub the animation phase manually.\n"
 "Disabled while the animation is running."
@@ -184,27 +184,204 @@ msgstr ""
 "एनिमेशन फ़ेज को मैन्युअल रूप से स्क्रब करें।\n"
 "एनिमेशन चलते समय अक्षम।"
 
-#: resources/xnec2c.glade:184
+#: resources/xnec2c.glade:223
 msgid "φ 0°"
 msgstr "φ 0°"
 
-#: resources/xnec2c.glade:198
+#: resources/xnec2c.glade:237
 msgid "Phase"
 msgstr "फ़ेज"
 
-#: resources/xnec2c.glade:221
+#: resources/xnec2c.glade:260
 msgid "Frames/Sec"
 msgstr "फ्रेम/सेकंड"
 
-#: resources/xnec2c.glade:234
+#: resources/xnec2c.glade:273
 msgid "Animate Freq (Hz)"
 msgstr "एनिमेट आवृत्ति (Hz)"
 
-#: resources/xnec2c.glade:309
-msgid "Show currents"
-msgstr "धाराएँ दिखाएँ"
+#: resources/xnec2c.glade:348
+msgid "Color projection:"
+msgstr "रंग प्रक्षेपण:"
 
-#: resources/xnec2c.glade:313
+#: resources/xnec2c.glade:361
+msgid ""
+"Select how wire and patch colors follow the excitation phase while animating."
+msgstr "चुनें कि एनिमेशन के दौरान तार और patch के रंग उत्तेजन फ़ेज का अनुसरण कैसे करें।"
+
+#: resources/xnec2c.glade:363
+msgid "Instantaneous Magnitude"
+msgstr "तात्कालिक परिमाण"
+
+#: resources/xnec2c.glade:364
+msgid "Instantaneous Polarity"
+msgstr "तात्कालिक ध्रुवता"
+
+#: resources/xnec2c.glade:365
+msgid "Phase Hue"
+msgstr "फ़ेज ह्यू"
+
+#: resources/xnec2c.glade:393
+msgid "Scale family:"
+msgstr "स्केल परिवार:"
+
+#: resources/xnec2c.glade:406
+msgid ""
+"Select the magnitude-to-color transfer family.\n"
+"Mirrors the Visualization menu setting in the main window.\n"
+"Each family keeps its own brightness parameter on the slider below."
+msgstr ""
+"परिमाण-से-रंग ट्रांसफर परिवार चुनें।\n"
+"मुख्य विंडो में Visualization मेनू सेटिंग को दर्शाता है।\n"
+"प्रत्येक परिवार नीचे स्लाइडर पर अपना स्वयं का ब्राइटनेस पैरामीटर रखता है।"
+
+#: resources/xnec2c.glade:408
+msgid "Power"
+msgstr "पावर"
+
+#: resources/xnec2c.glade:409 resources/xnec2c.glade:12728
+#: resources/xnec2c.glade:14103
+msgid "dB"
+msgstr "dB"
+
+#: resources/xnec2c.glade:410
+msgid "Asinh"
+msgstr "Asinh"
+
+#: resources/xnec2c.glade:411
+msgid "μ-law"
+msgstr "μ-law"
+
+#: resources/xnec2c.glade:412
+msgid "Reinhard"
+msgstr "Reinhard"
+
+#: resources/xnec2c.glade:413
+msgid "Sigmoid"
+msgstr "सिग्मॉइड"
+
+#: resources/xnec2c.glade:454
+msgid "Gamma:"
+msgstr "गामा:"
+
+#: resources/xnec2c.glade:471
+msgid ""
+"Gamma exponent of the power transfer.\n"
+"γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
+"dissipated power for currents."
+msgstr ""
+"पावर ट्रांसफर का गामा घातांक।\n"
+"γ = 0.5 कमज़ोर क्षेत्रों को विस्तृत करता है, γ = 1 रैखिक है, γ = 2 धाराओं के लिए क्षयित "
+"पावर के समानुपाती है।"
+
+#: resources/xnec2c.glade:494
+msgid "Range (dB):"
+msgstr "रेंज (dB):"
+
+#: resources/xnec2c.glade:511
+msgid ""
+"Dynamic range R below the step peak mapped onto the color strip.\n"
+"The floor is 10^(−R/20) of the peak."
+msgstr ""
+"स्टेप शिखर के नीचे डायनामिक रेंज R को रंग स्ट्रिप पर मैप किया जाता है।\n"
+"फ़्लोर शिखर का 10^(−R/20) है।"
+
+#: resources/xnec2c.glade:534
+msgid "Softening:"
+msgstr "मृदुकरण:"
+
+#: resources/xnec2c.glade:551
+msgid "Softening knee k: linear below k, logarithmic above."
+msgstr "मृदुकरण नी k: k से नीचे रैखिक, ऊपर लघुगणकीय।"
+
+#: resources/xnec2c.glade:574
+msgid "Compression (dB):"
+msgstr "संपीड़न (dB):"
+
+#: resources/xnec2c.glade:591
+msgid "Compression strength in dB; higher values lift weak detail."
+msgstr "dB में संपीड़न शक्ति; अधिक मान कमज़ोर विवरण को उभारते हैं।"
+
+#: resources/xnec2c.glade:614
+msgid "Knee:"
+msgstr "नी:"
+
+#: resources/xnec2c.glade:631
+msgid "Knee k of the rational soft-compressor."
+msgstr "रेशनल सॉफ्ट-कंप्रेसर की नी k।"
+
+#: resources/xnec2c.glade:654
+msgid "Contrast:"
+msgstr "कंट्रास्ट:"
+
+#: resources/xnec2c.glade:671
+msgid "Contrast steepness a of the tanh transfer."
+msgstr "tanh ट्रांसफर की कंट्रास्ट प्रवणता a।"
+
+#: resources/xnec2c.glade:705
+msgid "Color gradient of the active projection and scale family."
+msgstr ""
+
+#: resources/xnec2c.glade:720
+#, fuzzy
+msgid "Color channel"
+msgstr "रंग स्केल"
+
+#: resources/xnec2c.glade:726
+msgid ""
+"Enable the projection’s hue/sign color encoding.\n"
+"Unchecked, colors desaturate to gray so only the brightness channel remains."
+msgstr ""
+
+#: resources/xnec2c.glade:737
+msgid "Brightness channel"
+msgstr ""
+
+#: resources/xnec2c.glade:743
+msgid ""
+"Enable the projection’s brightness modulation (cosine or magnitude factor).\n"
+"Unchecked, brightness stays at full and only the color encoding remains."
+msgstr ""
+
+#: resources/xnec2c.glade:754
+msgid "Swap channels"
+msgstr ""
+
+#: resources/xnec2c.glade:759
+msgid ""
+"Exchange the color and brightness carriers.\n"
+"The quantity that drove the hue rides brightness and vice versa."
+msgstr ""
+
+#: resources/xnec2c.glade:792
+msgid "Reset"
+msgstr "रीसेट"
+
+#: resources/xnec2c.glade:798
+msgid ""
+"Restore the color projection, scale family, and every family brightness "
+"parameter to their defaults."
+msgstr ""
+"रंग प्रक्षेपण, स्केल परिवार, और हर परिवार के ब्राइटनेस पैरामीटर को उनके डिफ़ॉल्ट पर "
+"पुनर्स्थापित करें।"
+
+#: resources/xnec2c.glade:812
+msgid "Color"
+msgstr "रंग"
+
+#: resources/xnec2c.glade:848
+msgid "None (geometry)"
+msgstr "कोई नहीं (ज्यामिति)"
+
+#: resources/xnec2c.glade:852
+msgid "Show the bare structure geometry with no quantity coloring."
+msgstr "बिना किसी परिमाण रंगाई के केवल संरचना ज्यामिति दिखाएँ।"
+
+#: resources/xnec2c.glade:865 resources/xnec2c.glade:12282
+msgid "Currents"
+msgstr "धाराएँ"
+
+#: resources/xnec2c.glade:869
 msgid ""
 "Animate current magnitude and direction along the wires.\n"
 "Mirrors the Currents button in the main window."
@@ -212,39 +389,55 @@ msgstr ""
 "तारों के साथ धारा परिमाण और दिशा को एनिमेट करें।\n"
 "मुख्य विंडो में Currents बटन को दर्शाता है।"
 
-#: resources/xnec2c.glade:328
+#: resources/xnec2c.glade:882 resources/xnec2c.glade:12297
+msgid "Charges"
+msgstr "आवेश"
+
+#: resources/xnec2c.glade:886
+msgid ""
+"Animate charge magnitude along the wires.\n"
+"Mirrors the Charges button in the main window."
+msgstr ""
+"तारों के साथ आवेश परिमाण को एनिमेट करें।\n"
+"मुख्य विंडो में Charges बटन को दर्शाता है।"
+
+#: resources/xnec2c.glade:903
+msgid "Display"
+msgstr "प्रदर्शन"
+
+#: resources/xnec2c.glade:936
 msgid "Flow direction:"
 msgstr "प्रवाह दिशा:"
 
-#: resources/xnec2c.glade:340
-msgid ""
-"Select how the animated current flow is rendered.\n"
-"Mirrors the Flow direction setting in the main window."
-msgstr ""
-"एनिमेटेड धारा प्रवाह कैसे प्रस्तुत किया जाए, चुनें।\n"
-"मुख्य विंडो में Flow direction सेटिंग को दर्शाता है।"
+#: resources/xnec2c.glade:949
+msgid "Reference phase (animated)"
+msgstr "संदर्भ फ़ेज (एनिमेटेड)"
 
-#: resources/xnec2c.glade:342
-msgid "Reference phase"
-msgstr "संदर्भ फ़ेज"
+#: resources/xnec2c.glade:950
+msgid "LIC texture (animated)"
+msgstr "LIC बनावट (एनिमेटेड)"
 
-#: resources/xnec2c.glade:343
-msgid "LIC"
-msgstr "LIC"
+#: resources/xnec2c.glade:951
+msgid "Wireframe (animated)"
+msgstr "वायरफ्रेम (एनिमेटेड)"
 
-#: resources/xnec2c.glade:344
-msgid "Wireframe"
-msgstr "वायरफ्रेम"
+#: resources/xnec2c.glade:952
+msgid "Polarization axis (static)"
+msgstr "ध्रुवीकरण अक्ष (स्थिर)"
 
-#: resources/xnec2c.glade:360
-msgid "Structure"
-msgstr "संरचना"
+#: resources/xnec2c.glade:953
+msgid "Peak magnitude (static)"
+msgstr "शिखर परिमाण (स्थिर)"
 
-#: resources/xnec2c.glade:384
+#: resources/xnec2c.glade:969
+msgid "Patches"
+msgstr "Patch"
+
+#: resources/xnec2c.glade:999
 msgid "Near E field"
 msgstr "निकट E क्षेत्र"
 
-#: resources/xnec2c.glade:388
+#: resources/xnec2c.glade:1003
 msgid ""
 "Show the near electric field vectors while animating.\n"
 "Enable by opening the radiation pattern window."
@@ -252,11 +445,11 @@ msgstr ""
 "एनिमेशन के दौरान निकट विद्युत क्षेत्र सदिश दिखाएँ।\n"
 "विकिरण प्रतिरूप विंडो खोलकर सक्षम करें।"
 
-#: resources/xnec2c.glade:400
+#: resources/xnec2c.glade:1015
 msgid "Near H field"
 msgstr "निकट H क्षेत्र"
 
-#: resources/xnec2c.glade:404
+#: resources/xnec2c.glade:1019
 msgid ""
 "Show the near magnetic field vectors while animating.\n"
 "Enable by opening the radiation pattern window."
@@ -264,11 +457,11 @@ msgstr ""
 "एनिमेशन के दौरान निकट चुंबकीय क्षेत्र सदिश दिखाएँ।\n"
 "विकिरण प्रतिरूप विंडो खोलकर सक्षम करें।"
 
-#: resources/xnec2c.glade:416
+#: resources/xnec2c.glade:1031
 msgid "Poynting vector"
 msgstr "Poynting सदिश"
 
-#: resources/xnec2c.glade:420
+#: resources/xnec2c.glade:1035
 msgid ""
 "Show the Poynting power-flow vectors while animating.\n"
 "Enable by opening the radiation pattern window."
@@ -276,693 +469,713 @@ msgstr ""
 "एनिमेशन के दौरान Poynting शक्ति-प्रवाह सदिश दिखाएँ।\n"
 "विकिरण प्रतिरूप विंडो खोलकर सक्षम करें।"
 
-#: resources/xnec2c.glade:436
+#: resources/xnec2c.glade:1050
+msgid "Total field:"
+msgstr "कुल क्षेत्र:"
+
+#: resources/xnec2c.glade:1062
+msgid ""
+"Choose peak-envelope or instantaneous (φ=0) near-field vectors.\n"
+"Mirrors the Total Field menu in the radiation pattern window."
+msgstr ""
+"शिखर-एनवलप या तात्कालिक (φ=0) निकट-क्षेत्र सदिश चुनें।\n"
+"विकिरण प्रतिरूप विंडो में Total Field मेनू को दर्शाता है।"
+
+#: resources/xnec2c.glade:1064
+msgid "Peak value"
+msgstr "शिखर मान"
+
+#: resources/xnec2c.glade:1065
+msgid "Instantaneous (φ=0)"
+msgstr "तात्कालिक (φ=0)"
+
+#: resources/xnec2c.glade:1081
 msgid "Near Field"
 msgstr "निकट क्षेत्र"
 
-#: resources/xnec2c.glade:516
+#: resources/xnec2c.glade:1164
 msgid "Arc Element (GA card)"
 msgstr "आर्क एलिमेंट (GA card)"
 
-#: resources/xnec2c.glade:544 resources/xnec2c.glade:1579
-#: resources/xnec2c.glade:4006 resources/xnec2c.glade:15064 src/cmnd_edit.c:488
+#: resources/xnec2c.glade:1192 resources/xnec2c.glade:2227
+#: resources/xnec2c.glade:4654 resources/xnec2c.glade:15821 src/cmnd_edit.c:488
 msgid "Tag Number"
 msgstr "Tag संख्या"
 
-#: resources/xnec2c.glade:557 resources/xnec2c.glade:15159
+#: resources/xnec2c.glade:1205 resources/xnec2c.glade:15916
 msgid "No. Segments"
 msgstr "Segment संख्या"
 
-#: resources/xnec2c.glade:570 resources/xnec2c.glade:4032
-#: resources/xnec2c.glade:15255
+#: resources/xnec2c.glade:1218 resources/xnec2c.glade:4680
+#: resources/xnec2c.glade:16012
 msgid "Segs % lambda"
 msgstr "Segs % lambda"
 
-#: resources/xnec2c.glade:583 resources/xnec2c.glade:4045
-#: resources/xnec2c.glade:15351
+#: resources/xnec2c.glade:1231 resources/xnec2c.glade:4693
+#: resources/xnec2c.glade:16108
 msgid "Wire Diameter"
 msgstr "तार व्यास"
 
-#: resources/xnec2c.glade:671
+#: resources/xnec2c.glade:1319
 msgid "Radius from Y"
 msgstr "Y से त्रिज्या"
 
-#: resources/xnec2c.glade:684
+#: resources/xnec2c.glade:1332
 msgid "End 1 Angle"
 msgstr "छोर 1 कोण"
 
-#: resources/xnec2c.glade:697
+#: resources/xnec2c.glade:1345
 msgid "End 2 Angle"
 msgstr "छोर 2 कोण"
 
-#: resources/xnec2c.glade:710 resources/xnec2c.glade:4242
-#: resources/xnec2c.glade:15416 src/cmnd_edit.c:2024
+#: resources/xnec2c.glade:1358 resources/xnec2c.glade:4890
+#: resources/xnec2c.glade:16173 src/cmnd_edit.c:2024
 msgid "Conductivity S/m"
 msgstr "चालकता S/m"
 
-#: resources/xnec2c.glade:808
+#: resources/xnec2c.glade:1456
 msgid "Wire Arc Data"
 msgstr "तार आर्क डेटा"
 
-#: resources/xnec2c.glade:870 resources/xnec2c.glade:1106
-#: resources/xnec2c.glade:1906 resources/xnec2c.glade:2129
-#: resources/xnec2c.glade:2587 resources/xnec2c.glade:2779
-#: resources/xnec2c.glade:3090 resources/xnec2c.glade:3776
-#: resources/xnec2c.glade:4576 resources/xnec2c.glade:4775
-#: resources/xnec2c.glade:4936 resources/xnec2c.glade:5468
-#: resources/xnec2c.glade:6104 resources/xnec2c.glade:7548
-#: resources/xnec2c.glade:8455 resources/xnec2c.glade:9461
-#: resources/xnec2c.glade:9741 resources/xnec2c.glade:13757
-#: resources/xnec2c.glade:14270 resources/xnec2c.glade:14869
-#: resources/xnec2c.glade:15705 resources/xnec2c.glade:15905
+#: resources/xnec2c.glade:1518 resources/xnec2c.glade:1754
+#: resources/xnec2c.glade:2554 resources/xnec2c.glade:2777
+#: resources/xnec2c.glade:3235 resources/xnec2c.glade:3427
+#: resources/xnec2c.glade:3738 resources/xnec2c.glade:4424
+#: resources/xnec2c.glade:5224 resources/xnec2c.glade:5423
+#: resources/xnec2c.glade:5584 resources/xnec2c.glade:6116
+#: resources/xnec2c.glade:6752 resources/xnec2c.glade:8196
+#: resources/xnec2c.glade:9103 resources/xnec2c.glade:10109
+#: resources/xnec2c.glade:10389 resources/xnec2c.glade:14514
+#: resources/xnec2c.glade:15027 resources/xnec2c.glade:15626
+#: resources/xnec2c.glade:16462 resources/xnec2c.glade:16662
 msgid "Delete Card"
 msgstr "कार्ड हटाएं"
 
-#: resources/xnec2c.glade:948
+#: resources/xnec2c.glade:1596
 msgid "Cylindrical Structure (GR card)"
 msgstr "बेलनाकार संरचना (GR card)"
 
-#: resources/xnec2c.glade:978 resources/xnec2c.glade:9641
+#: resources/xnec2c.glade:1626 resources/xnec2c.glade:10289
 msgid "Tag Number Increment"
 msgstr "Tag संख्या वृद्धि"
 
-#: resources/xnec2c.glade:991
+#: resources/xnec2c.glade:1639
 msgid "Number of Structures"
 msgstr "संरचनाओं की संख्या"
 
-#: resources/xnec2c.glade:1045
+#: resources/xnec2c.glade:1693
 msgid "Cylindrical Structure"
 msgstr "बेलनाकार संरचना"
 
-#: resources/xnec2c.glade:1171
+#: resources/xnec2c.glade:1819
 msgid "Xnec2c Error"
 msgstr "Xnec2c त्रुटि"
 
-#: resources/xnec2c.glade:1279
+#: resources/xnec2c.glade:1927
 msgid "Error"
 msgstr "त्रुटि"
 
-#: resources/xnec2c.glade:1358
+#: resources/xnec2c.glade:2006
 msgid "Excitation Command (EX Card)"
 msgstr "उत्तेजन कमांड (EX Card)"
 
-#: resources/xnec2c.glade:1384
+#: resources/xnec2c.glade:2032
 msgid "Incident LH Wave"
 msgstr "आपतित LH तरंग"
 
-#: resources/xnec2c.glade:1400
+#: resources/xnec2c.glade:2048
 msgid "Incident Linear Wave "
 msgstr "आपतित रैखिक तरंग "
 
-#: resources/xnec2c.glade:1416
+#: resources/xnec2c.glade:2064
 msgid "Current Source"
 msgstr "धारा स्रोत"
 
-#: resources/xnec2c.glade:1432
+#: resources/xnec2c.glade:2080
 msgid "Incident RH Wave"
 msgstr "आपतित RH तरंग"
 
-#: resources/xnec2c.glade:1448
+#: resources/xnec2c.glade:2096
 msgid "Current Slope Discontinuity"
 msgstr "धारा ढाल असंतता"
 
-#: resources/xnec2c.glade:1464
+#: resources/xnec2c.glade:2112
 msgid "Voltage Source"
 msgstr "वोल्टेज स्रोत"
 
-#: resources/xnec2c.glade:1486
+#: resources/xnec2c.glade:2134
 msgid "Excitation Type"
 msgstr "उत्तेजन प्रकार"
 
-#: resources/xnec2c.glade:1511
+#: resources/xnec2c.glade:2159
 msgid "Maximum Admittance Matrix Asymmetry"
 msgstr "अधिकतम एडमिटेंस मैट्रिक्स असममिति"
 
-#: resources/xnec2c.glade:1527
+#: resources/xnec2c.glade:2175
 msgid "Impedance of Source Segment"
 msgstr "स्रोत Segment की प्रतिबाधा"
 
-#: resources/xnec2c.glade:1549
+#: resources/xnec2c.glade:2197
 msgid "Print Control"
 msgstr "प्रिंट नियंत्रण"
 
-#: resources/xnec2c.glade:1592 src/cmnd_edit.c:489
+#: resources/xnec2c.glade:2240 src/cmnd_edit.c:489
 msgid "Segment Number"
 msgstr "Segment संख्या"
 
-#: resources/xnec2c.glade:1641
+#: resources/xnec2c.glade:2289
 msgid "Voltage - Real Part"
 msgstr "वोल्टेज - वास्तविक भाग"
 
-#: resources/xnec2c.glade:1654
+#: resources/xnec2c.glade:2302
 msgid "Voltage - Imaginary Part"
 msgstr "वोल्टेज - काल्पनिक भाग"
 
-#: resources/xnec2c.glade:1667
+#: resources/xnec2c.glade:2315
 msgid "Eta"
 msgstr "Eta"
 
-#: resources/xnec2c.glade:1737
+#: resources/xnec2c.glade:2385
 msgid "Theta"
 msgstr "Theta"
 
-#: resources/xnec2c.glade:1750
+#: resources/xnec2c.glade:2398
 msgid "Phi"
 msgstr "Phi"
 
-#: resources/xnec2c.glade:1763
+#: resources/xnec2c.glade:2411
 msgid "Ratio"
 msgstr "अनुपात"
 
-#: resources/xnec2c.glade:1844
+#: resources/xnec2c.glade:2492
 msgid "Excitation Parameters"
 msgstr "उत्तेजन पैरामीटर"
 
-#: resources/xnec2c.glade:1971
+#: resources/xnec2c.glade:2619
 msgid "Execute Command (XQ Card)"
 msgstr "निष्पादन कमांड (XQ Card)"
 
-#: resources/xnec2c.glade:1998
+#: resources/xnec2c.glade:2646
 msgid "No Pattern Cuts"
 msgstr "कोई पैटर्न कट नहीं"
 
-#: resources/xnec2c.glade:2014
+#: resources/xnec2c.glade:2662
 msgid "Pattern in XZ Plane"
 msgstr "XZ तल में पैटर्न"
 
-#: resources/xnec2c.glade:2030
+#: resources/xnec2c.glade:2678
 msgid "Pattern in YZ Plane"
 msgstr "YZ तल में पैटर्न"
 
-#: resources/xnec2c.glade:2046
+#: resources/xnec2c.glade:2694
 msgid "Both XZ/YZ Patterns"
 msgstr "दोनों XZ/YZ पैटर्न"
 
-#: resources/xnec2c.glade:2068
+#: resources/xnec2c.glade:2716
 msgid "Execute Command"
 msgstr "निष्पादन कमांड"
 
-#: resources/xnec2c.glade:2299
+#: resources/xnec2c.glade:2947
 msgid "Frequency Command (FR Card)"
 msgstr "आवृत्ति कमांड (FR Card)"
 
-#: resources/xnec2c.glade:2324
+#: resources/xnec2c.glade:2972
 msgid "Additive Stepping"
 msgstr "योगात्मक स्टेपिंग"
 
-#: resources/xnec2c.glade:2341
+#: resources/xnec2c.glade:2989
 msgid "Multiplicative Stepping"
 msgstr "गुणात्मक स्टेपिंग"
 
-#: resources/xnec2c.glade:2364
+#: resources/xnec2c.glade:3012
 msgid "Frequency Stepping"
 msgstr "आवृत्ति स्टेपिंग"
 
-#: resources/xnec2c.glade:2394
+#: resources/xnec2c.glade:3042
 msgid "No. Frequency Points"
 msgstr "आवृत्ति बिंदुओं की संख्या"
 
-#: resources/xnec2c.glade:2425
+#: resources/xnec2c.glade:3073
 msgid "Start Frequency (MHz)"
 msgstr "प्रारंभ आवृत्ति (MHz)"
 
-#: resources/xnec2c.glade:2457
+#: resources/xnec2c.glade:3105
 msgid "Frequency Step (MHz)"
 msgstr "आवृत्ति चरण (MHz)"
 
-#: resources/xnec2c.glade:2490
+#: resources/xnec2c.glade:3138
 msgid "End Frequency (MHz)"
 msgstr "अंतिम आवृत्ति (MHz)"
 
-#: resources/xnec2c.glade:2526
+#: resources/xnec2c.glade:3174
 msgid "Frequency Stepping Parameters"
 msgstr "आवृत्ति स्टेपिंग पैरामीटर"
 
-#: resources/xnec2c.glade:2652
+#: resources/xnec2c.glade:3300
 msgid "Geometry End (GE Card)"
 msgstr "ज्यामिति समाप्त (GE Card)"
 
-#: resources/xnec2c.glade:2677
+#: resources/xnec2c.glade:3325
 msgid "No Ground, Free Space condition"
 msgstr "कोई ग्राउंड नहीं, मुक्त स्थान स्थिति"
 
-#: resources/xnec2c.glade:2694
+#: resources/xnec2c.glade:3342
 msgid "Ground present, Structure reflection"
 msgstr "ग्राउंड मौजूद, संरचना परावर्तन"
 
-#: resources/xnec2c.glade:2711
+#: resources/xnec2c.glade:3359
 msgid "Ground present, no Structure reflection"
 msgstr "ग्राउंड मौजूद, कोई संरचना परावर्तन नहीं"
 
-#: resources/xnec2c.glade:2734
+#: resources/xnec2c.glade:3382
 msgid "Ground Plane type"
 msgstr "ग्राउंड प्लेन प्रकार"
 
-#: resources/xnec2c.glade:2868
+#: resources/xnec2c.glade:3516
 msgid "Ground Parameters (GD Card)"
 msgstr "ग्राउंड पैरामीटर (GD Card)"
 
-#: resources/xnec2c.glade:2897 resources/xnec2c.glade:3366
-#: resources/xnec2c.glade:3452
+#: resources/xnec2c.glade:3545 resources/xnec2c.glade:4014
+#: resources/xnec2c.glade:4100
 msgid "Relative Dielectric Const."
 msgstr "सापेक्ष परावैद्युत स्थिरांक"
 
-#: resources/xnec2c.glade:2929 resources/xnec2c.glade:3485
+#: resources/xnec2c.glade:3577 resources/xnec2c.glade:4133
 msgid "Distance to 2nd Medium"
 msgstr "दूसरे माध्यम की दूरी"
 
-#: resources/xnec2c.glade:2961 resources/xnec2c.glade:3398
-#: resources/xnec2c.glade:3517
+#: resources/xnec2c.glade:3609 resources/xnec2c.glade:4046
+#: resources/xnec2c.glade:4165
 msgid "Ground Conductivity S/m"
 msgstr "ग्राउंड चालकता S/m"
 
-#: resources/xnec2c.glade:2993 resources/xnec2c.glade:3549
+#: resources/xnec2c.glade:3641 resources/xnec2c.glade:4197
 msgid "Dist. below 1st Medium"
 msgstr "पहले माध्यम से नीचे दूरी"
 
-#: resources/xnec2c.glade:3029 resources/xnec2c.glade:3585
+#: resources/xnec2c.glade:3677 resources/xnec2c.glade:4233
 msgid "2nd Medium Parameters"
 msgstr "दूसरे माध्यम के पैरामीटर"
 
-#: resources/xnec2c.glade:3210
+#: resources/xnec2c.glade:3858
 msgid "Ground Parameters (GN & GD Cards)"
 msgstr "ग्राउंड पैरामीटर (GN & GD Cards)"
 
-#: resources/xnec2c.glade:3237
+#: resources/xnec2c.glade:3885
 msgid "Perfect Ground"
 msgstr "परिपूर्ण ग्राउंड"
 
-#: resources/xnec2c.glade:3253
+#: resources/xnec2c.glade:3901
 msgid "Sommerfeld/Norton"
 msgstr "Sommerfeld/Norton"
 
-#: resources/xnec2c.glade:3269
+#: resources/xnec2c.glade:3917
 msgid "Radial Ground Screen"
 msgstr "रेडियल ग्राउंड स्क्रीन"
 
-#: resources/xnec2c.glade:3284
+#: resources/xnec2c.glade:3932
 msgid "Reflection Coeff. Approx"
 msgstr "परावर्तन गुणांक सन्निकटन"
 
-#: resources/xnec2c.glade:3300
+#: resources/xnec2c.glade:3948
 msgid "Nullify Previous Params"
 msgstr "पिछले पैरामीटर निरस्त करें"
 
-#: resources/xnec2c.glade:3316
+#: resources/xnec2c.glade:3964
 msgid "Second Medium (Cliff)"
 msgstr "दूसरा माध्यम (क्लिफ)"
 
-#: resources/xnec2c.glade:3337
+#: resources/xnec2c.glade:3985
 msgid "Ground Type"
 msgstr "ग्राउंड प्रकार"
 
-#: resources/xnec2c.glade:3465
+#: resources/xnec2c.glade:4113
 msgid "0.00000"
 msgstr "0.00000"
 
-#: resources/xnec2c.glade:3616
+#: resources/xnec2c.glade:4264
 msgid "Number of Radials"
 msgstr "रेडियल की संख्या"
 
-#: resources/xnec2c.glade:3629
+#: resources/xnec2c.glade:4277
 msgid "Radial Screen Radius"
 msgstr "रेडियल स्क्रीन त्रिज्या"
 
-#: resources/xnec2c.glade:3679
+#: resources/xnec2c.glade:4327
 msgid "Radial Wire Diameter"
 msgstr "रेडियल तार व्यास"
 
-#: resources/xnec2c.glade:3715
+#: resources/xnec2c.glade:4363
 msgid "Radial Screen Parameters"
 msgstr "रेडियल स्क्रीन पैरामीटर"
 
-#: resources/xnec2c.glade:3915
+#: resources/xnec2c.glade:4563
 msgid "Helical Element (GA card)"
 msgstr "हेलिकल एलीमेंट (GA card)"
 
-#: resources/xnec2c.glade:3940
+#: resources/xnec2c.glade:4588
 msgid "Right Hand Helix"
 msgstr "दायां हेलिक्स"
 
-#: resources/xnec2c.glade:3956
+#: resources/xnec2c.glade:4604
 msgid "Left Hand Helix"
 msgstr "बायां हेलिक्स"
 
-#: resources/xnec2c.glade:3972
+#: resources/xnec2c.glade:4620
 msgid "Right Hand Spiral"
 msgstr "दायां स्पाइरल"
 
-#: resources/xnec2c.glade:3988
+#: resources/xnec2c.glade:4636
 msgid "Left Hand Spiral"
 msgstr "बायां स्पाइरल"
 
-#: resources/xnec2c.glade:4019
+#: resources/xnec2c.glade:4667
 msgid "Segments/Turn"
 msgstr "Segment/घुमाव"
 
-#: resources/xnec2c.glade:4058
+#: resources/xnec2c.glade:4706
 msgid "0.0100"
 msgstr "0.0100"
 
-#: resources/xnec2c.glade:4079
+#: resources/xnec2c.glade:4727
 msgid "5.00"
 msgstr "5.00"
 
-#: resources/xnec2c.glade:4120 resources/xnec2c.glade:11998
-#: resources/xnec2c.glade:13222
+#: resources/xnec2c.glade:4768 resources/xnec2c.glade:12761
+#: resources/xnec2c.glade:13979
 msgid "1"
 msgstr "1"
 
-#: resources/xnec2c.glade:4140
+#: resources/xnec2c.glade:4788
 msgid "Number of Turns"
 msgstr "घुमावों की संख्या"
 
-#: resources/xnec2c.glade:4153
+#: resources/xnec2c.glade:4801
 msgid "8.0000"
 msgstr "8.0000"
 
-#: resources/xnec2c.glade:4174
+#: resources/xnec2c.glade:4822
 msgid "Helix Length (HL)"
 msgstr "हेलिक्स लंबाई (HL)"
 
-#: resources/xnec2c.glade:4187
+#: resources/xnec2c.glade:4835
 msgid "5.0000"
 msgstr "5.0000"
 
-#: resources/xnec2c.glade:4208
+#: resources/xnec2c.glade:4856
 msgid "Turns Spacing"
 msgstr "घुमाव अंतराल"
 
-#: resources/xnec2c.glade:4221 resources/xnec2c.glade:4333
-#: resources/xnec2c.glade:4386 resources/xnec2c.glade:4439
-#: resources/xnec2c.glade:4487
+#: resources/xnec2c.glade:4869 resources/xnec2c.glade:4981
+#: resources/xnec2c.glade:5034 resources/xnec2c.glade:5087
+#: resources/xnec2c.glade:5135
 msgid "1.0000"
 msgstr "1.0000"
 
-#: resources/xnec2c.glade:4255
+#: resources/xnec2c.glade:4903
 msgid "0.0000"
 msgstr "0.0000"
 
-#: resources/xnec2c.glade:4275
+#: resources/xnec2c.glade:4923
 msgid "Radius in X (A1)"
 msgstr "X में त्रिज्या (A1)"
 
-#: resources/xnec2c.glade:4288
+#: resources/xnec2c.glade:4936
 msgid "Radius in Y (B1)"
 msgstr "Y में त्रिज्या (B1)"
 
-#: resources/xnec2c.glade:4301
+#: resources/xnec2c.glade:4949
 msgid "Radius in X (A2)"
 msgstr "X में त्रिज्या (A2)"
 
-#: resources/xnec2c.glade:4314
+#: resources/xnec2c.glade:4962
 msgid "Radius in Y (B2)"
 msgstr "Y में त्रिज्या (B2)"
 
-#: resources/xnec2c.glade:4512
+#: resources/xnec2c.glade:5160
 msgid "GH Card"
 msgstr "GH Card"
 
-#: resources/xnec2c.glade:4649 resources/xnec2c.glade:15779
+#: resources/xnec2c.glade:5297 resources/xnec2c.glade:16536
 msgid "Interaction Approx Range (KH Card)"
 msgstr "इंटरैक्शन सन्निकटन सीमा (KH Card)"
 
-#: resources/xnec2c.glade:4676
+#: resources/xnec2c.glade:5324
 msgid "Approximation Range (W/lengths)"
 msgstr "सन्निकटन सीमा (W/lengths)"
 
-#: resources/xnec2c.glade:4714
+#: resources/xnec2c.glade:5362
 msgid "Interaction Approximation Range"
 msgstr "इंटरैक्शन सन्निकटन सीमा"
 
-#: resources/xnec2c.glade:4840
+#: resources/xnec2c.glade:5488
 msgid "Thin Wire Kernel (EK Card)"
 msgstr "पतला तार कर्नेल (EK Card)"
 
-#: resources/xnec2c.glade:4858
+#: resources/xnec2c.glade:5506
 msgid "Extended Thin Wire Kernel"
 msgstr "विस्तारित पतला तार कर्नेल"
 
-#: resources/xnec2c.glade:4875
+#: resources/xnec2c.glade:5523
 msgid "Thin Wire Kernel"
 msgstr "पतला तार कर्नेल"
 
-#: resources/xnec2c.glade:5038
+#: resources/xnec2c.glade:5686
 msgid "Loading Command (LD Card)"
 msgstr "लोडिंग कमांड (LD Card)"
 
-#: resources/xnec2c.glade:5064
+#: resources/xnec2c.glade:5712
 msgid "Short all Loads (Nulls previous Loading Cards)"
 msgstr "सभी लोड शॉर्ट करें (पिछले लोड कार्ड निरस्त करें)"
 
-#: resources/xnec2c.glade:5081
+#: resources/xnec2c.glade:5729
 msgid "Series, Lumped"
 msgstr "श्रेणी, संकेंद्रित"
 
-#: resources/xnec2c.glade:5097
+#: resources/xnec2c.glade:5745
 msgid "Parallel, Distributed"
 msgstr "समांतर, वितरित"
 
-#: resources/xnec2c.glade:5113
+#: resources/xnec2c.glade:5761
 msgid "Parallel, Lumped"
 msgstr "समांतर, संकेंद्रित"
 
-#: resources/xnec2c.glade:5129
+#: resources/xnec2c.glade:5777
 msgid "Resistance & Reactance"
 msgstr "प्रतिरोध और प्रतिघात"
 
-#: resources/xnec2c.glade:5145
+#: resources/xnec2c.glade:5793
 msgid "Series, Distributed"
 msgstr "श्रेणी, वितरित"
 
-#: resources/xnec2c.glade:5161
+#: resources/xnec2c.glade:5809
 msgid "Wire Conductivity"
 msgstr "तार चालकता"
 
-#: resources/xnec2c.glade:5183
+#: resources/xnec2c.glade:5831
 msgid "Loading Type"
 msgstr "लोडिंग प्रकार"
 
-#: resources/xnec2c.glade:5213
+#: resources/xnec2c.glade:5861
 msgid "Load Tag Number"
 msgstr "लोड Tag संख्या"
 
-#: resources/xnec2c.glade:5244
+#: resources/xnec2c.glade:5892
 msgid "Resistance"
 msgstr "प्रतिरोध"
 
-#: resources/xnec2c.glade:5276
+#: resources/xnec2c.glade:5924
 msgid "From Segment #"
 msgstr "Segment # से"
 
-#: resources/xnec2c.glade:5307
+#: resources/xnec2c.glade:5955
 msgid "Inductance"
 msgstr "प्रेरकत्व"
 
-#: resources/xnec2c.glade:5339
+#: resources/xnec2c.glade:5987
 msgid "To Segment #"
 msgstr "Segment # तक"
 
-#: resources/xnec2c.glade:5370
+#: resources/xnec2c.glade:6018
 msgid "Capacitance"
 msgstr "धारिता"
 
-#: resources/xnec2c.glade:5406
+#: resources/xnec2c.glade:6054
 msgid "Loading Parameters"
 msgstr "लोडिंग पैरामीटर"
 
-#: resources/xnec2c.glade:5621
+#: resources/xnec2c.glade:6269
 msgid "Near Fields Command (NE/NH Cards)"
 msgstr "निकट क्षेत्र कमांड (NE/NH Cards)"
 
-#: resources/xnec2c.glade:5648
+#: resources/xnec2c.glade:6296
 msgid "Near Electric Field"
 msgstr "निकट विद्युत क्षेत्र"
 
-#: resources/xnec2c.glade:5664
+#: resources/xnec2c.glade:6312
 msgid "Rectangular Co-ordinates"
 msgstr "आयताकार निर्देशांक"
 
-#: resources/xnec2c.glade:5680
+#: resources/xnec2c.glade:6328
 msgid "Near Magnetic Field"
 msgstr "निकट चुंबकीय क्षेत्र"
 
-#: resources/xnec2c.glade:5695
+#: resources/xnec2c.glade:6343
 msgid "Spherical Co-ordinates"
 msgstr "गोलीय निर्देशांक"
 
-#: resources/xnec2c.glade:5723
+#: resources/xnec2c.glade:6371
 msgid "Field Type & Co-ordinates"
 msgstr "क्षेत्र प्रकार और निर्देशांक"
 
-#: resources/xnec2c.glade:5753
+#: resources/xnec2c.glade:6401
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:5784 resources/xnec2c.glade:11549
-#: resources/xnec2c.glade:12758
+#: resources/xnec2c.glade:6432 resources/xnec2c.glade:12312
+#: resources/xnec2c.glade:13515
 msgid "X"
 msgstr "X"
 
-#: resources/xnec2c.glade:5816
+#: resources/xnec2c.glade:6464
 msgid "DX"
 msgstr "DX"
 
-#: resources/xnec2c.glade:5848
+#: resources/xnec2c.glade:6496
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:5879 resources/xnec2c.glade:11564
-#: resources/xnec2c.glade:12773
+#: resources/xnec2c.glade:6527 resources/xnec2c.glade:12327
+#: resources/xnec2c.glade:13530
 msgid "Y"
 msgstr "Y"
 
-#: resources/xnec2c.glade:5911
+#: resources/xnec2c.glade:6559
 msgid "DY"
 msgstr "DY"
 
-#: resources/xnec2c.glade:5943
+#: resources/xnec2c.glade:6591
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:5974 resources/xnec2c.glade:11579
-#: resources/xnec2c.glade:12788
+#: resources/xnec2c.glade:6622 resources/xnec2c.glade:12342
+#: resources/xnec2c.glade:13545
 msgid "Z"
 msgstr "Z"
 
-#: resources/xnec2c.glade:6006
+#: resources/xnec2c.glade:6654
 msgid "DZ"
 msgstr "DZ"
 
-#: resources/xnec2c.glade:6042
+#: resources/xnec2c.glade:6690
 msgid "Field Pattern Parameters"
 msgstr "क्षेत्र पैटर्न पैरामीटर"
 
-#: resources/xnec2c.glade:6169
+#: resources/xnec2c.glade:6817
 msgid "Xnec2c: NEC2 Input File Editor"
 msgstr "Xnec2c: NEC2 इनपुट फ़ाइल संपादक"
 
-#: resources/xnec2c.glade:6256
+#: resources/xnec2c.glade:6904
 msgid "Manage Cards"
 msgstr "Cards प्रबंधित करें"
 
-#: resources/xnec2c.glade:6353
+#: resources/xnec2c.glade:7001
 msgid "File Save"
 msgstr "फ़ाइल सहेजें"
 
-#: resources/xnec2c.glade:6413 src/nec2_model.c:278
+#: resources/xnec2c.glade:7061 src/nec2_model.c:278
 msgid "Comments"
 msgstr "टिप्पणियाँ"
 
-#: resources/xnec2c.glade:6440
+#: resources/xnec2c.glade:7088
 msgid "Wire"
 msgstr "तार"
 
-#: resources/xnec2c.glade:6454
+#: resources/xnec2c.glade:7102
 msgid "Arc"
 msgstr "चाप"
 
-#: resources/xnec2c.glade:6468
+#: resources/xnec2c.glade:7116
 msgid "Helix"
 msgstr "हेलिक्स"
 
-#: resources/xnec2c.glade:6482
+#: resources/xnec2c.glade:7130
 msgid "Patch"
 msgstr "Patch"
 
-#: resources/xnec2c.glade:6496
+#: resources/xnec2c.glade:7144
 msgid "Cylinder"
 msgstr "सिलेंडर"
 
-#: resources/xnec2c.glade:6510
+#: resources/xnec2c.glade:7158
 msgid "Move"
 msgstr "स्थानांतरित करें"
 
-#: resources/xnec2c.glade:6524
+#: resources/xnec2c.glade:7172
 msgid "Reflect"
 msgstr "प्रतिबिंबित करें"
 
-#: resources/xnec2c.glade:6538
+#: resources/xnec2c.glade:7186
 msgid "Scale"
 msgstr "स्केल"
 
-#: resources/xnec2c.glade:6552 resources/xnec2c.glade:6836
+#: resources/xnec2c.glade:7200 resources/xnec2c.glade:7484
 msgid "Add Var (SY)"
 msgstr "चर जोड़ें (SY)"
 
-#: resources/xnec2c.glade:6572
+#: resources/xnec2c.glade:7220
 msgid "Edit Geometry Data"
 msgstr "ज्यामिति डेटा संपादित करें"
 
-#: resources/xnec2c.glade:6626
+#: resources/xnec2c.glade:7274
 msgid "Geometry"
 msgstr "ज्यामिति"
 
-#: resources/xnec2c.glade:6653
+#: resources/xnec2c.glade:7301
 msgid "Excitation"
 msgstr "उत्तेजन"
 
-#: resources/xnec2c.glade:6667
+#: resources/xnec2c.glade:7315
 msgid "Radiation"
 msgstr "विकिरण"
 
-#: resources/xnec2c.glade:6681
+#: resources/xnec2c.glade:7329
 msgid "Frequency"
 msgstr "आवृत्ति"
 
-#: resources/xnec2c.glade:6695
+#: resources/xnec2c.glade:7343
 msgid "Near Fields"
 msgstr "निकट क्षेत्र"
 
-#: resources/xnec2c.glade:6709
+#: resources/xnec2c.glade:7357
 msgid "Ground (GN)"
 msgstr "ग्राउंड (GN)"
 
-#: resources/xnec2c.glade:6723
+#: resources/xnec2c.glade:7371
 msgid "Ground (GD)"
 msgstr "ग्राउंड (GD)"
 
-#: resources/xnec2c.glade:6737
+#: resources/xnec2c.glade:7385
 msgid "Loading"
 msgstr "लोडिंग"
 
-#: resources/xnec2c.glade:6751
+#: resources/xnec2c.glade:7399
 msgid "Kernel"
 msgstr "कर्नेल"
 
-#: resources/xnec2c.glade:6765
+#: resources/xnec2c.glade:7413
 msgid "Network"
 msgstr "नेटवर्क"
 
-#: resources/xnec2c.glade:6779
+#: resources/xnec2c.glade:7427
 msgid "Interaction"
 msgstr "इंटरैक्शन"
 
-#: resources/xnec2c.glade:6793
+#: resources/xnec2c.glade:7441
 msgid "Transm. Line"
 msgstr "ट्रांसमिशन लाइन"
 
-#: resources/xnec2c.glade:6808
+#: resources/xnec2c.glade:7456
 msgid "Execute"
 msgstr "निष्पादित करें"
 
-#: resources/xnec2c.glade:6822
+#: resources/xnec2c.glade:7470
 msgid "Zo"
 msgstr "Zo"
 
-#: resources/xnec2c.glade:6856
+#: resources/xnec2c.glade:7504
 msgid "Edit Control Commands"
 msgstr "नियंत्रण कमांड संपादित करें"
 
-#: resources/xnec2c.glade:6910
+#: resources/xnec2c.glade:7558
 msgid "Commands"
 msgstr "कमांड"
 
-#: resources/xnec2c.glade:6929
+#: resources/xnec2c.glade:7577
 msgid "Unsaved Data"
 msgstr "असहेजा डेटा"
 
-#: resources/xnec2c.glade:7005
+#: resources/xnec2c.glade:7653
 msgid ""
 "Unsaved data in NEC2 Editor.\n"
 "Save NEC2 Editor data first?\n"
@@ -970,1024 +1183,1109 @@ msgstr ""
 "NEC2 संपादक में असहेजा डेटा।\n"
 "पहले NEC2 संपादक डेटा सहेजें?\n"
 
-#: resources/xnec2c.glade:7104
+#: resources/xnec2c.glade:7752
 msgid "Network Command (NT Card)"
 msgstr "नेटवर्क कमांड (NT Card)"
 
-#: resources/xnec2c.glade:7133
+#: resources/xnec2c.glade:7781
 msgid "Tag Number, Port 1  "
 msgstr "Tag संख्या, पोर्ट 1  "
 
-#: resources/xnec2c.glade:7164
+#: resources/xnec2c.glade:7812
 msgid "Tag Number, Port 2  "
 msgstr "Tag संख्या, पोर्ट 2  "
 
-#: resources/xnec2c.glade:7195
+#: resources/xnec2c.glade:7843
 msgid "Segment Num, Port 1"
 msgstr "Segment संख्या, पोर्ट 1"
 
-#: resources/xnec2c.glade:7226
+#: resources/xnec2c.glade:7874
 msgid "Segment Num, Port 2"
 msgstr "Segment संख्या, पोर्ट 2"
 
-#: resources/xnec2c.glade:7261 resources/xnec2c.glade:14565
+#: resources/xnec2c.glade:7909 resources/xnec2c.glade:15322
 msgid "Segment Identity"
 msgstr "Segment पहचान"
 
-#: resources/xnec2c.glade:7291
+#: resources/xnec2c.glade:7939
 msgid "Element 1,1 Real Part"
 msgstr "अवयव 1,1 वास्तविक भाग"
 
-#: resources/xnec2c.glade:7323
+#: resources/xnec2c.glade:7971
 msgid "Element 1,2 Real Part"
 msgstr "अवयव 1,2 वास्तविक भाग"
 
-#: resources/xnec2c.glade:7355
+#: resources/xnec2c.glade:8003
 msgid "Element 2,2 Real Part"
 msgstr "अवयव 2,2 वास्तविक भाग"
 
-#: resources/xnec2c.glade:7387
+#: resources/xnec2c.glade:8035
 msgid "Element 1,1 Imag Part"
 msgstr "अवयव 1,1 काल्पनिक भाग"
 
-#: resources/xnec2c.glade:7419
+#: resources/xnec2c.glade:8067
 msgid "Element 1,2 Imag Part"
 msgstr "अवयव 1,2 काल्पनिक भाग"
 
-#: resources/xnec2c.glade:7451
+#: resources/xnec2c.glade:8099
 msgid "Element 2,2 Imag Part"
 msgstr "अवयव 2,2 काल्पनिक भाग"
 
-#: resources/xnec2c.glade:7487
+#: resources/xnec2c.glade:8135
 msgid "Admittance Matrix Elements"
 msgstr "एडमिटेंस मैट्रिक्स अवयव"
 
-#: resources/xnec2c.glade:7702
+#: resources/xnec2c.glade:8350
 msgid "Patch Element (SP & SC Cards)"
 msgstr "Patch अवयव (SP & SC Cards)"
 
-#: resources/xnec2c.glade:7726
+#: resources/xnec2c.glade:8374
 msgid "Arbitrary"
 msgstr "मनमाना"
 
-#: resources/xnec2c.glade:7743
+#: resources/xnec2c.glade:8391
 msgid "Rectangle"
 msgstr "आयत"
 
-#: resources/xnec2c.glade:7760
+#: resources/xnec2c.glade:8408
 msgid "Triangle"
 msgstr "त्रिभुज"
 
-#: resources/xnec2c.glade:7777
+#: resources/xnec2c.glade:8425
 msgid "Quadrilateral"
 msgstr "चतुर्भुज"
 
-#: resources/xnec2c.glade:7794
+#: resources/xnec2c.glade:8442
 msgid "Surface"
 msgstr "सतह"
 
-#: resources/xnec2c.glade:7817
+#: resources/xnec2c.glade:8465
 msgid "Patch Type"
 msgstr "Patch प्रकार"
 
-#: resources/xnec2c.glade:7847
+#: resources/xnec2c.glade:8495
 msgid "Corners 1-2 sub-division (NX)"
 msgstr "कोने 1-2 उप-विभाजन (NX)"
 
-#: resources/xnec2c.glade:7878
+#: resources/xnec2c.glade:8526
 msgid "Corners 2-3 sub-division (NY)"
 msgstr "कोने 2-3 उप-विभाजन (NY)"
 
-#: resources/xnec2c.glade:7913
+#: resources/xnec2c.glade:8561
 msgid "Surface Sub-division"
 msgstr "सतह उप-विभाजन"
 
-#: resources/xnec2c.glade:7943 src/geom_edit.c:1157
+#: resources/xnec2c.glade:8591 src/geom_edit.c:1157
 msgid "Center - X"
 msgstr "केंद्र - X"
 
-#: resources/xnec2c.glade:7975 src/geom_edit.c:1163
+#: resources/xnec2c.glade:8623 src/geom_edit.c:1163
 msgid "Normal - Elev."
 msgstr "लंब - उन्नयन"
 
-#: resources/xnec2c.glade:8007 src/geom_edit.c:1159
+#: resources/xnec2c.glade:8655 src/geom_edit.c:1159
 msgid "Center - Y"
 msgstr "केंद्र - Y"
 
-#: resources/xnec2c.glade:8039 src/geom_edit.c:1165
+#: resources/xnec2c.glade:8687 src/geom_edit.c:1165
 msgid "Normal - Azim."
 msgstr "लंब - दिगंश"
 
-#: resources/xnec2c.glade:8071 src/geom_edit.c:1161
+#: resources/xnec2c.glade:8719 src/geom_edit.c:1161
 msgid "Center - Z"
 msgstr "केंद्र - Z"
 
-#: resources/xnec2c.glade:8103 src/geom_edit.c:1167
+#: resources/xnec2c.glade:8751 src/geom_edit.c:1167
 msgid "Patch Area"
 msgstr "Patch क्षेत्रफल"
 
-#: resources/xnec2c.glade:8139
+#: resources/xnec2c.glade:8787
 msgid "SP/SM Cards"
 msgstr "SP/SM Cards"
 
-#: resources/xnec2c.glade:8175
+#: resources/xnec2c.glade:8823
 msgid "Corner 3 - X"
 msgstr "कोना 3 - X"
 
-#: resources/xnec2c.glade:8207
+#: resources/xnec2c.glade:8855
 msgid "Corner 3 - Y"
 msgstr "कोना 3 - Y"
 
-#: resources/xnec2c.glade:8239
+#: resources/xnec2c.glade:8887
 msgid "Corner 3 - Z"
 msgstr "कोना 3 - Z"
 
-#: resources/xnec2c.glade:8287
+#: resources/xnec2c.glade:8935
 msgid "Corner 4 - X"
 msgstr "कोना 4 - X"
 
-#: resources/xnec2c.glade:8319
+#: resources/xnec2c.glade:8967
 msgid "Corner 4 - Y"
 msgstr "कोना 4 - Y"
 
-#: resources/xnec2c.glade:8351
+#: resources/xnec2c.glade:8999
 msgid "Corner 4 - Z"
 msgstr "कोना 4 - Z"
 
-#: resources/xnec2c.glade:8394
+#: resources/xnec2c.glade:9042
 msgid "SC Card"
 msgstr "SC Card"
 
-#: resources/xnec2c.glade:8610
+#: resources/xnec2c.glade:9258
 msgid "Quit xnec2c?"
 msgstr "xnec2c से बाहर निकलें?"
 
-#: resources/xnec2c.glade:8689
+#: resources/xnec2c.glade:9337
 msgid "Radiation Pattern (RP Card)"
 msgstr "विकिरण प्रतिरूप (RP Card)"
 
-#: resources/xnec2c.glade:8716
+#: resources/xnec2c.glade:9364
 msgid "Normal (Space) Wave"
 msgstr "सामान्य (स्पेस) तरंग"
 
-#: resources/xnec2c.glade:8732
+#: resources/xnec2c.glade:9380
 msgid "Space + Ground Wave"
 msgstr "स्पेस + ग्राउंड तरंग"
 
-#: resources/xnec2c.glade:8748
+#: resources/xnec2c.glade:9396
 msgid "Linear Cliff"
 msgstr "रैखिक क्लिफ"
 
-#: resources/xnec2c.glade:8764
+#: resources/xnec2c.glade:9412
 msgid "Radial wire screen"
 msgstr "रेडियल तार स्क्रीन"
 
-#: resources/xnec2c.glade:8780
+#: resources/xnec2c.glade:9428
 msgid "Circular Cliff + Radials"
 msgstr "वृत्ताकार क्लिफ + रेडियल"
 
-#: resources/xnec2c.glade:8796
+#: resources/xnec2c.glade:9444
 msgid "Circular Cliff"
 msgstr "वृत्ताकार क्लिफ"
 
-#: resources/xnec2c.glade:8812
+#: resources/xnec2c.glade:9460
 msgid "Linear Cliff + Radials"
 msgstr "रैखिक क्लिफ + रेडियल"
 
-#: resources/xnec2c.glade:8830
+#: resources/xnec2c.glade:9478
 msgid "<b>See GN/GD Card Documentation</b>"
 msgstr "<b>GN/GD Card दस्तावेज़ देखें</b>"
 
-#: resources/xnec2c.glade:8848
+#: resources/xnec2c.glade:9496
 msgid "Wave Type and Ground (I1)"
 msgstr "तरंग प्रकार और ग्राउंड (I1)"
 
-#: resources/xnec2c.glade:8876
+#: resources/xnec2c.glade:9524
 msgid "Major & Minor Axis & Total Gain"
 msgstr "मुख्य और लघु अक्ष और कुल लाभ"
 
-#: resources/xnec2c.glade:8892
+#: resources/xnec2c.glade:9540
 msgid "Vertical, Horizontal & Total Gain"
 msgstr "ऊर्ध्वाधर, क्षैतिज और कुल लाभ"
 
-#: resources/xnec2c.glade:8908
+#: resources/xnec2c.glade:9556
 msgid "Major Axis Gain Normalized"
 msgstr "मुख्य अक्ष लाभ सामान्यीकृत"
 
-#: resources/xnec2c.glade:8924
+#: resources/xnec2c.glade:9572
 msgid "Vertical Axis Gain Normalized"
 msgstr "ऊर्ध्वाधर अक्ष लाभ सामान्यीकृत"
 
-#: resources/xnec2c.glade:8940
+#: resources/xnec2c.glade:9588
 msgid "Total Gain Normalized"
 msgstr "कुल लाभ सामान्यीकृत"
 
-#: resources/xnec2c.glade:8956
+#: resources/xnec2c.glade:9604
 msgid "Print/Normalize Directive Gain"
 msgstr "प्रिंट/नॉर्मलाइज़ डायरेक्टिव लाभ"
 
-#: resources/xnec2c.glade:8972
+#: resources/xnec2c.glade:9620
 msgid "No Normalized Gain"
 msgstr "कोई नॉर्मलाइज़्ड लाभ नहीं"
 
-#: resources/xnec2c.glade:8988
+#: resources/xnec2c.glade:9636
 msgid "Minor Axis Gain Normalized"
 msgstr "माइनर अक्ष लाभ नॉर्मलाइज़्ड"
 
-#: resources/xnec2c.glade:9004
+#: resources/xnec2c.glade:9652
 msgid "Horizontal Axis Gain Normalized"
 msgstr "क्षैतिज अक्ष लाभ नॉर्मलाइज़्ड"
 
-#: resources/xnec2c.glade:9020
+#: resources/xnec2c.glade:9668
 msgid "Print/Normalize Power Gain"
 msgstr "प्रिंट/नॉर्मलाइज़ पावर लाभ"
 
-#: resources/xnec2c.glade:9036
+#: resources/xnec2c.glade:9684
 msgid "No Gain Averaging"
 msgstr "कोई लाभ औसत नहीं"
 
-#: resources/xnec2c.glade:9052
+#: resources/xnec2c.glade:9700
 msgid "Points in Average Not Printed"
 msgstr "औसत में बिंदु प्रिंट नहीं हुए"
 
-#: resources/xnec2c.glade:9068
+#: resources/xnec2c.glade:9716
 msgid "Average Gain Computed"
 msgstr "औसत लाभ गणना की गई"
 
-#: resources/xnec2c.glade:9086
+#: resources/xnec2c.glade:9734
 msgid "<b>See RP Card Documentation</b>"
 msgstr "<b>RP Card दस्तावेज़ देखें</b>"
 
-#: resources/xnec2c.glade:9104
+#: resources/xnec2c.glade:9752
 msgid "Data Output Control (XNDA)"
 msgstr "डेटा आउटपुट नियंत्रण (XNDA)"
 
-#: resources/xnec2c.glade:9134
+#: resources/xnec2c.glade:9782
 msgid "Points in Theta"
 msgstr "Theta में बिंदु"
 
-#: resources/xnec2c.glade:9148 src/cmnd_edit.c:1763
+#: resources/xnec2c.glade:9796 src/cmnd_edit.c:1763
 msgid "Initial Theta (deg)"
 msgstr "प्रारंभिक Theta (deg)"
 
-#: resources/xnec2c.glade:9161 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
+#: resources/xnec2c.glade:9809 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
 msgid "Increment in Theta"
 msgstr "Theta में वृद्धि"
 
-#: resources/xnec2c.glade:9230 src/cmnd_edit.c:1762
+#: resources/xnec2c.glade:9878 src/cmnd_edit.c:1762
 msgid "Points in Phi"
 msgstr "Phi में बिंदु"
 
-#: resources/xnec2c.glade:9243
+#: resources/xnec2c.glade:9891
 msgid "Initial Phi (deg)"
 msgstr "प्रारंभिक Phi (deg)"
 
-#: resources/xnec2c.glade:9256 src/cmnd_edit.c:2708
+#: resources/xnec2c.glade:9904 src/cmnd_edit.c:2708
 msgid "Increment in Phi"
 msgstr "Phi में वृद्धि"
 
-#: resources/xnec2c.glade:9325
+#: resources/xnec2c.glade:9973
 msgid "Field Point Distance"
 msgstr "फ़ील्ड बिंदु दूरी"
 
-#: resources/xnec2c.glade:9357
+#: resources/xnec2c.glade:10005
 msgid "Gain Normalization"
 msgstr "लाभ नॉर्मलाइज़ेशन"
 
-#: resources/xnec2c.glade:9399
+#: resources/xnec2c.glade:10047
 msgid "Radiation Pattern Parameters"
 msgstr "विकिरण प्रतिरूप पैरामीटर"
 
-#: resources/xnec2c.glade:9566
+#: resources/xnec2c.glade:10214
 msgid "Reflect Structure (GX card)"
 msgstr "संरचना परावर्तित करें (GX card)"
 
-#: resources/xnec2c.glade:9594
+#: resources/xnec2c.glade:10242
 msgid "Reflect in YZ plane"
 msgstr "YZ तल में परावर्तित करें"
 
-#: resources/xnec2c.glade:9609
+#: resources/xnec2c.glade:10257
 msgid "Reflect in XY plane"
 msgstr "XY तल में परावर्तित करें"
 
-#: resources/xnec2c.glade:9624
+#: resources/xnec2c.glade:10272
 msgid "Reflect in XZ plane"
 msgstr "XZ तल में परावर्तित करें"
 
-#: resources/xnec2c.glade:9680
+#: resources/xnec2c.glade:10328
 msgid "Reflect Options"
 msgstr "परावर्तन विकल्प"
 
-#: resources/xnec2c.glade:9811
+#: resources/xnec2c.glade:10459
 msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: आवृत्ति डेटा प्लॉट"
 
-#: resources/xnec2c.glade:9836 resources/xnec2c.glade:10807
-#: resources/xnec2c.glade:12252
+#: resources/xnec2c.glade:10484 resources/xnec2c.glade:11478
+#: resources/xnec2c.glade:13015
 msgid "_File"
 msgstr "_फ़ाइल"
 
-#: resources/xnec2c.glade:9898 resources/xnec2c.glade:10869
-#: resources/xnec2c.glade:12314
+#: resources/xnec2c.glade:10546 resources/xnec2c.glade:11540
+#: resources/xnec2c.glade:13077
 msgid "Save as _gnuplot"
 msgstr "_gnuplot के रूप में सहेजें"
 
-#: resources/xnec2c.glade:9909 resources/xnec2c.glade:12324
+#: resources/xnec2c.glade:10557 resources/xnec2c.glade:13087
 msgid "Save as _CSV"
 msgstr "_CSV के रूप में सहेजें"
 
-#: resources/xnec2c.glade:9921
+#: resources/xnec2c.glade:10569
 msgid "Save as _Touchstone (.SnP)"
 msgstr "_Touchstone (.SnP) के रूप में सहेजें"
 
-#: resources/xnec2c.glade:9928
+#: resources/xnec2c.glade:10576
 msgid "Save as S_1P: Reflection Only"
 msgstr "S_1P के रूप में सहेजें: केवल परावर्तन"
 
-#: resources/xnec2c.glade:9938
+#: resources/xnec2c.glade:10586
 msgid "Save as S2P: _Max Gain (S21)"
 msgstr "S2P के रूप में सहेजें: _अधिकतम लाभ (S21)"
 
-#: resources/xnec2c.glade:9948
+#: resources/xnec2c.glade:10596
 msgid "Save as S2P: _Viewer Gain (S21)"
 msgstr "S2P के रूप में सहेजें: _व्यूअर लाभ (S21)"
 
-#: resources/xnec2c.glade:9985 resources/xnec2c.glade:11235
-#: resources/xnec2c.glade:12358
+#: resources/xnec2c.glade:10633 resources/xnec2c.glade:11906
+#: resources/xnec2c.glade:13121
 msgid "_View"
 msgstr "_दृश्य"
 
-#: resources/xnec2c.glade:9994 resources/xnec2c.glade:11265
-#: resources/xnec2c.glade:12368
+#: resources/xnec2c.glade:10642 resources/xnec2c.glade:11934
+#: resources/xnec2c.glade:13129
 msgid "_Polarization"
 msgstr "_ध्रुवीकरण"
 
-#: resources/xnec2c.glade:10010 resources/xnec2c.glade:11281
-#: resources/xnec2c.glade:12384
+#: resources/xnec2c.glade:10656 resources/xnec2c.glade:11948
+#: resources/xnec2c.glade:13143
 msgid "_Total"
 msgstr "_कुल"
 
-#: resources/xnec2c.glade:10021 resources/xnec2c.glade:11292
-#: resources/xnec2c.glade:12395
+#: resources/xnec2c.glade:10667 resources/xnec2c.glade:11959
+#: resources/xnec2c.glade:13154
 msgid "_Horizontal"
 msgstr "_क्षैतिज"
 
-#: resources/xnec2c.glade:10032 resources/xnec2c.glade:11303
-#: resources/xnec2c.glade:12406
+#: resources/xnec2c.glade:10678 resources/xnec2c.glade:11970
+#: resources/xnec2c.glade:13165
 msgid "_Vertical"
 msgstr "_ऊर्ध्वाधर"
 
-#: resources/xnec2c.glade:10043 resources/xnec2c.glade:11314
-#: resources/xnec2c.glade:12417
+#: resources/xnec2c.glade:10689 resources/xnec2c.glade:11981
+#: resources/xnec2c.glade:13176
 msgid "_Right Hand"
 msgstr "_दायाँ हाथ"
 
-#: resources/xnec2c.glade:10054 resources/xnec2c.glade:11325
-#: resources/xnec2c.glade:12428
+#: resources/xnec2c.glade:10700 resources/xnec2c.glade:11992
+#: resources/xnec2c.glade:13187
 msgid "_Left Hand"
 msgstr "_बायाँ हाथ"
 
-#: resources/xnec2c.glade:10069
+#: resources/xnec2c.glade:10715
 msgid "_Color Theme"
 msgstr "_रंग थीम"
 
-#: resources/xnec2c.glade:10088
+#: resources/xnec2c.glade:10734
 msgid "_Net Gain"
 msgstr "_शुद्ध लाभ"
 
-#: resources/xnec2c.glade:10097
+#: resources/xnec2c.glade:10743
 msgid "Show _Min/Max Values"
 msgstr "_न्यूनतम/अधिकतम मान दिखाएँ"
 
-#: resources/xnec2c.glade:10106
+#: resources/xnec2c.glade:10752
 msgid "Show _S11 (dB) Values"
 msgstr "_S11 (dB) मान दिखाएँ"
 
-#: resources/xnec2c.glade:10115
+#: resources/xnec2c.glade:10761
 msgid "Clamp _VSWR Graph to 10"
 msgstr "_VSWR ग्राफ़ को 10 पर क्लैंप करें"
 
-#: resources/xnec2c.glade:10124
+#: resources/xnec2c.glade:10770
 msgid "Show Ta instead of TA"
 msgstr "TA के बजाय Ta दिखाएँ"
 
-#: resources/xnec2c.glade:10133
+#: resources/xnec2c.glade:10779
 msgid "Round _X Axis Frequency Values"
 msgstr "_X अक्ष आवृत्ति मान राउंड करें"
 
-#: resources/xnec2c.glade:10142
+#: resources/xnec2c.glade:10788
 msgid "S_wap Left/Right Click Frequency Selection"
 msgstr "बाएँ/दाएँ क्लिक आवृत्ति चयन _अदला-बदली करें"
 
-#: resources/xnec2c.glade:10166 resources/xnec2c.glade:10330
+#: resources/xnec2c.glade:10812 resources/xnec2c.glade:10976
 msgid "Max Gain"
 msgstr "अधिकतम लाभ"
 
-#: resources/xnec2c.glade:10181
+#: resources/xnec2c.glade:10827
 msgid "Direction"
 msgstr "दिशा"
 
-#: resources/xnec2c.glade:10196
+#: resources/xnec2c.glade:10842
 msgid "Viewer"
 msgstr "व्यूअर"
 
-#: resources/xnec2c.glade:10211 resources/xnec2c.glade:10435
-#: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:40
+#: resources/xnec2c.glade:10857 resources/xnec2c.glade:11081
+#: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:55
 msgid "VSWR"
 msgstr "VSWR"
 
-#: resources/xnec2c.glade:10226
+#: resources/xnec2c.glade:10872
 msgid "Zr/Zi"
 msgstr "Zr/Zi"
 
-#: resources/xnec2c.glade:10241
+#: resources/xnec2c.glade:10887
 msgid "Zm/Zph"
 msgstr "Zm/Zph"
 
-#: resources/xnec2c.glade:10256
+#: resources/xnec2c.glade:10902
 msgid "Smith"
 msgstr "Smith"
 
-#: resources/xnec2c.glade:10271
+#: resources/xnec2c.glade:10917
 msgid "G/Ta"
 msgstr "G/Ta"
 
-#: resources/xnec2c.glade:10314 resources/xnec2c.glade:10349
-#: resources/xnec2c.glade:10384 resources/xnec2c.glade:10419
-#: resources/xnec2c.glade:10638 resources/xnec2c.glade:10673
-#: resources/xnec2c.glade:10708 resources/xnec2c.glade:13481
+#: resources/xnec2c.glade:10960 resources/xnec2c.glade:10995
+#: resources/xnec2c.glade:11030 resources/xnec2c.glade:11065
+#: resources/xnec2c.glade:11309 resources/xnec2c.glade:11344
+#: resources/xnec2c.glade:11379 resources/xnec2c.glade:14238
 msgid " - - -"
 msgstr " - - -"
 
-#: resources/xnec2c.glade:10365 src/freqplots/graphs/impedance_graph.c:58
+#: resources/xnec2c.glade:11011 src/freqplots/graphs/impedance_graph.c:76
 msgid "Z-imag"
 msgstr "Z-imag"
 
-#: resources/xnec2c.glade:10400 src/freqplots/graphs/impedance_graph.c:56
+#: resources/xnec2c.glade:11046 src/freqplots/graphs/impedance_graph.c:74
 msgid "Z-real"
 msgstr "Z-real"
 
-#: resources/xnec2c.glade:10455
+#: resources/xnec2c.glade:11101
 msgid " - - - - "
 msgstr " - - - - "
 
-#: resources/xnec2c.glade:10471
+#: resources/xnec2c.glade:11117
 msgid "Freq MHz"
 msgstr "आवृत्ति MHz"
 
-#: resources/xnec2c.glade:10510
+#: resources/xnec2c.glade:11156 resources/xnec2c.glade:11169
+msgid "Port"
+msgstr "पोर्ट"
+
+#: resources/xnec2c.glade:11181
 msgid "Tx Line Zo"
 msgstr "Tx Line Zo"
 
-#: resources/xnec2c.glade:10524 resources/xnec2c.glade:12013
-#: resources/xnec2c.glade:13253
+#: resources/xnec2c.glade:11195 resources/xnec2c.glade:12776
+#: resources/xnec2c.glade:14010
 msgid "Freq Loop"
 msgstr "आवृत्ति लूप"
 
-#: resources/xnec2c.glade:10619 resources/xnec2c.glade:13359
+#: resources/xnec2c.glade:11290 resources/xnec2c.glade:14116
 msgid "T<sub>A</sub>(Elev.°)"
 msgstr "T<sub>A</sub>(Elev.°)"
 
-#: resources/xnec2c.glade:10654
+#: resources/xnec2c.glade:11325
 msgid "T<sub>a</sub>"
 msgstr "T<sub>a</sub>"
 
-#: resources/xnec2c.glade:10689
+#: resources/xnec2c.glade:11360
 msgid "G/T<sub>a</sub>"
 msgstr "G/T<sub>a</sub>"
 
-#: resources/xnec2c.glade:10763
+#: resources/xnec2c.glade:11434
 msgid "Frequency Data Plots"
 msgstr "आवृत्ति डेटा प्लॉट"
 
-#: resources/xnec2c.glade:10880
+#: resources/xnec2c.glade:11551
 msgid "Save _Currents/Charges as CSV"
 msgstr "_धारा/आवेश CSV के रूप में सहेजें"
 
-#: resources/xnec2c.glade:10899
+#: resources/xnec2c.glade:11570
 msgid "Optimization Settings"
 msgstr "अनुकूलन सेटिंग्स"
 
-#: resources/xnec2c.glade:10914
+#: resources/xnec2c.glade:11585
 msgid "Reload and write data on .NEC file changes"
 msgstr ".NEC फ़ाइल परिवर्तनों पर डेटा पुनः लोड करें और लिखें"
 
-#: resources/xnec2c.glade:10921
+#: resources/xnec2c.glade:11592
 msgid "_Write files selected below, now."
 msgstr "नीचे चयनित फ़ाइलें, अभी _लिखें।"
 
-#: resources/xnec2c.glade:10936
+#: resources/xnec2c.glade:11607
 msgid "After calculation, write <file>.csv"
 msgstr "गणना के बाद, <file>.csv लिखें"
 
-#: resources/xnec2c.glade:10945
+#: resources/xnec2c.glade:11616
 msgid "After calculation, write <file>.s_1p"
 msgstr "गणना के बाद, <file>.s_1p लिखें"
 
-#: resources/xnec2c.glade:10954
+#: resources/xnec2c.glade:11625
 msgid "After calculation, write <file>-_maxgain.s2p"
 msgstr "गणना के बाद, <file>-_maxgain.s2p लिखें"
 
-#: resources/xnec2c.glade:10963
+#: resources/xnec2c.glade:11634
 msgid "After calculation, write <file>-_viewergain.s2p"
 msgstr "गणना के बाद, <file>-_viewergain.s2p लिखें"
 
-#: resources/xnec2c.glade:10972
+#: resources/xnec2c.glade:11643
 msgid "After calculation, write <file>-_radpattern.csv"
 msgstr "गणना के बाद, <file>-_radpattern.csv लिखें"
 
-#: resources/xnec2c.glade:10981
+#: resources/xnec2c.glade:11652
 msgid "After calculation, write <file>-_currents.csv"
 msgstr "गणना के बाद, <file>-_currents.csv लिखें"
 
-#: resources/xnec2c.glade:10990
+#: resources/xnec2c.glade:11661
 msgid "After calculation, write <file>-_structure.gplot"
 msgstr "गणना के बाद, <file>-_structure.gplot लिखें"
 
-#: resources/xnec2c.glade:10999
+#: resources/xnec2c.glade:11670
 msgid "After calculation, write <file>-_patch-currents.csv"
 msgstr "गणना के बाद, <file>-_patch-currents.csv लिखें"
 
-#: resources/xnec2c.glade:11014
+#: resources/xnec2c.glade:11685
 msgid "_Math Libraries"
 msgstr "_गणित लाइब्रेरी"
 
-#: resources/xnec2c.glade:11023
+#: resources/xnec2c.glade:11694
 msgid "_Interactive"
 msgstr "_इंटरैक्टिव"
 
-#: resources/xnec2c.glade:11043
+#: resources/xnec2c.glade:11714
 msgid "_Batch"
 msgstr "_बैच"
 
-#: resources/xnec2c.glade:11069
+#: resources/xnec2c.glade:11740
 msgid "Mathlib _Help"
 msgstr "Mathlib _सहायता"
 
-#: resources/xnec2c.glade:11082
+#: resources/xnec2c.glade:11753
 msgid "Mathlib _Benchmarks"
 msgstr "Mathlib _बेंचमार्क"
 
-#: resources/xnec2c.glade:11093
+#: resources/xnec2c.glade:11764
 msgid "_Selected Mathlibs"
 msgstr "_चयनित Mathlibs"
 
-#: resources/xnec2c.glade:11107
+#: resources/xnec2c.glade:11778
 msgid "Select All/None"
 msgstr "सभी/कोई नहीं चुनें"
 
-#: resources/xnec2c.glade:11132
+#: resources/xnec2c.glade:11803
 msgid "_Parallel (-j N):\t\tO(N/J)"
 msgstr "_समानांतर (-j N):\t\tO(N/J)"
 
-#: resources/xnec2c.glade:11141
+#: resources/xnec2c.glade:11812
 msgid "_Single Job (-j 1):\tO(N)"
 msgstr "_एकल जॉब (-j 1):\tO(N)"
 
-#: resources/xnec2c.glade:11150
+#: resources/xnec2c.glade:11821
 msgid "_Iterate -j N/=2:\tO(N*log2(J))"
 msgstr "_Iterate -j N/=2:\tO(N*log2(J))"
 
-#: resources/xnec2c.glade:11159
+#: resources/xnec2c.glade:11830
 msgid "_Iterate -j N-=1:\tO(N*J)"
 msgstr "_Iterate -j N-=1:\tO(N*J)"
 
-#: resources/xnec2c.glade:11174
+#: resources/xnec2c.glade:11845
 msgid "Benchmark _Help"
 msgstr "बेंचमार्क _सहायता"
 
-#: resources/xnec2c.glade:11193
+#: resources/xnec2c.glade:11864
 msgid "Begin Frequency Loop at Startup"
 msgstr "स्टार्टअप पर आवृत्ति लूप शुरू करें"
 
-#: resources/xnec2c.glade:11204
+#: resources/xnec2c.glade:11875
 msgid "Confirm Quit"
 msgstr "बाहर निकलने की पुष्टि करें"
 
-#: resources/xnec2c.glade:11245
+#: resources/xnec2c.glade:11914
 msgid "_Radiation Pattern"
 msgstr "_विकिरण प्रतिरूप"
 
-#: resources/xnec2c.glade:11255
+#: resources/xnec2c.glade:11924
 msgid "_Frequency Plots"
 msgstr "_आवृत्ति प्लॉट"
 
-#: resources/xnec2c.glade:11340
-msgid "Current _Visualization"
-msgstr "धारा _दृश्यीकरण"
+#: resources/xnec2c.glade:12007
+msgid "_Visualization"
+msgstr "_दृश्यीकरण"
 
-#: resources/xnec2c.glade:11356
-msgid "Animated"
-msgstr "सजीव"
+#: resources/xnec2c.glade:12023
+msgid "Color Scale"
+msgstr "रंग स्केल"
 
-#: resources/xnec2c.glade:11363
+#: resources/xnec2c.glade:12030
+msgid ""
+"Power transfer n^γ relative to this frequency step's peak.\n"
+"γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
+"dissipated power for currents.\n"
+"Adjust γ in the animate dialog."
+msgstr ""
+"इस आवृत्ति स्टेप के शिखर के सापेक्ष n^γ पावर ट्रांसफर।\n"
+"γ = 0.5 कमज़ोर क्षेत्रों को विस्तृत करता है, γ = 1 रैखिक है, γ = 2 धाराओं के लिए क्षयित "
+"पावर के समानुपाती है।\n"
+"एनिमेट डायलॉग में γ समायोजित करें।"
+
+#: resources/xnec2c.glade:12031
+msgid "_Power"
+msgstr "_पावर"
+
+#: resources/xnec2c.glade:12042
+msgid ""
+"Logarithmic scale over a user-set range R below the peak.\n"
+"Reveals weak detail that linear display hides; adjust R in the animate "
+"dialog."
+msgstr ""
+"शिखर के नीचे उपयोगकर्ता-निर्धारित रेंज R पर लघुगणकीय स्केल।\n"
+"रैखिक प्रदर्शन जिस कमज़ोर विवरण को छुपाता है उसे उजागर करता है; एनिमेट डायलॉग में R "
+"समायोजित करें।"
+
+#: resources/xnec2c.glade:12043
+msgid "_dB"
+msgstr "_dB"
+
+#: resources/xnec2c.glade:12054
+msgid ""
+"Inverse hyperbolic sine transfer: linear below the softening knee k, "
+"logarithmic above.\n"
+"Adjust k in the animate dialog."
+msgstr ""
+"इनवर्स हाइपरबॉलिक साइन ट्रांसफर: मृदुकरण नी k से नीचे रैखिक, ऊपर लघुगणकीय।\n"
+"एनिमेट डायलॉग में k समायोजित करें।"
+
+#: resources/xnec2c.glade:12055
+msgid "_Asinh"
+msgstr "_Asinh"
+
+#: resources/xnec2c.glade:12066
+msgid ""
+"μ-law companding transfer: lifts weak detail with bounded compression.\n"
+"Adjust the compression in the animate dialog."
+msgstr ""
+"μ-law कम्पैंडिंग ट्रांसफर: सीमित संपीड़न के साथ कमज़ोर विवरण को उभारता है।\n"
+"एनिमेट डायलॉग में संपीड़न समायोजित करें।"
+
+#: resources/xnec2c.glade:12067
+msgid "μ-_law"
+msgstr "μ-_law"
+
+#: resources/xnec2c.glade:12078
+msgid ""
+"Reinhard rational soft-compressor with knee k.\n"
+"Adjust k in the animate dialog."
+msgstr ""
+"नी k के साथ Reinhard रेशनल सॉफ्ट-कंप्रेसर।\n"
+"एनिमेट डायलॉग में k समायोजित करें।"
+
+#: resources/xnec2c.glade:12079
+msgid "_Reinhard"
+msgstr "_Reinhard"
+
+#: resources/xnec2c.glade:12090
+msgid ""
+"Hyperbolic tangent transfer with contrast steepness a.\n"
+"Adjust a in the animate dialog."
+msgstr ""
+"कंट्रास्ट प्रवणता a के साथ हाइपरबॉलिक टैंजेंट ट्रांसफर।\n"
+"एनिमेट डायलॉग में a समायोजित करें।"
+
+#: resources/xnec2c.glade:12091
+msgid "_Sigmoid"
+msgstr "_सिग्मॉइड"
+
+#: resources/xnec2c.glade:12102
+msgid ""
+"Full brightness for every magnitude; the color projection alone sets the "
+"rendering."
+msgstr "हर परिमाण के लिए पूर्ण ब्राइटनेस; केवल रंग प्रक्षेपण ही रेंडरिंग तय करता है।"
+
+#: resources/xnec2c.glade:12103
+msgid "_None"
+msgstr "_कोई नहीं"
+
+#: resources/xnec2c.glade:12121
+msgid "Patch Flow — Animated"
+msgstr "Patch प्रवाह — एनिमेटेड"
+
+#: resources/xnec2c.glade:12128
 msgid "_Reference Phase"
 msgstr "_संदर्भ फ़ेज"
 
-#: resources/xnec2c.glade:11374
+#: resources/xnec2c.glade:12139
 msgid "_LIC Texture"
 msgstr "_LIC बनावट"
 
-#: resources/xnec2c.glade:11385 resources/xnec2c.glade:12575
+#: resources/xnec2c.glade:12150 resources/xnec2c.glade:13334
 msgid "_Wireframe"
 msgstr "_वायरफ्रेम"
 
-#: resources/xnec2c.glade:11403
-msgid "Static"
-msgstr "स्थैतिक"
+#: resources/xnec2c.glade:12168
+msgid "Patch Flow — Static"
+msgstr "Patch प्रवाह — स्थिर"
 
-#: resources/xnec2c.glade:11410
+#: resources/xnec2c.glade:12175
 msgid "Polarization _Axis"
 msgstr "ध्रुवीकरण _अक्ष"
 
-#: resources/xnec2c.glade:11421
+#: resources/xnec2c.glade:12186
 msgid "Peak _Magnitude"
 msgstr "_शिखर परिमाण"
 
-#: resources/xnec2c.glade:11436
+#: resources/xnec2c.glade:12201
 msgid "A_nimate"
 msgstr "एनि_मेट"
 
-#: resources/xnec2c.glade:11445 resources/xnec2c.glade:12692
+#: resources/xnec2c.glade:12210 resources/xnec2c.glade:13451
 msgid "Common _Projection"
 msgstr "सामान्य _प्रक्षेपण"
 
-#: resources/xnec2c.glade:11462
+#: resources/xnec2c.glade:12226
 msgid "_Symbol Overrides"
 msgstr "_प्रतीक ओवरराइड"
 
-#: resources/xnec2c.glade:11472
+#: resources/xnec2c.glade:12235
 msgid "Rendering _Settings..."
 msgstr "रेंडरिंग _सेटिंग्स..."
 
-#: resources/xnec2c.glade:11483
+#: resources/xnec2c.glade:12246
 msgid "_Help"
 msgstr "_सहायता"
 
-#: resources/xnec2c.glade:11492
+#: resources/xnec2c.glade:12255
 msgid "_About"
 msgstr "_के बारे में"
 
-#: resources/xnec2c.glade:11519
-msgid "Currents"
-msgstr "धाराएँ"
-
-#: resources/xnec2c.glade:11534
-msgid "Charges"
-msgstr "आवेश"
-
-#: resources/xnec2c.glade:11715
+#: resources/xnec2c.glade:12478
 msgid " Zoom"
 msgstr " ज़ूम"
 
-#: resources/xnec2c.glade:11858 resources/xnec2c.glade:13189
+#: resources/xnec2c.glade:12621 resources/xnec2c.glade:13946
 #: src/freqplots/freqplots_core.c:54
 msgid "Gain"
 msgstr "लाभ"
 
-#: resources/xnec2c.glade:11873 resources/xnec2c.glade:11889
-#: resources/xnec2c.glade:13202 resources/xnec2c.glade:13463
+#: resources/xnec2c.glade:12636 resources/xnec2c.glade:12652
+#: resources/xnec2c.glade:13959 resources/xnec2c.glade:14220
 msgid "0.0"
 msgstr "0.0"
 
-#: resources/xnec2c.glade:11923
+#: resources/xnec2c.glade:12686
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:11965 resources/xnec2c.glade:13346
-msgid "dB"
-msgstr "dB"
-
-#: resources/xnec2c.glade:11979 resources/xnec2c.glade:13238
+#: resources/xnec2c.glade:12742 resources/xnec2c.glade:13995
 msgid "Step"
 msgstr "स्टेप"
 
-#: resources/xnec2c.glade:12126 resources/xnec2c.glade:13286
+#: resources/xnec2c.glade:12889 resources/xnec2c.glade:14043
 msgid "Apply Freq"
 msgstr "आवृत्ति लागू करें"
 
-#: resources/xnec2c.glade:12146
+#: resources/xnec2c.glade:12909
 msgid "Frequency Mhz"
 msgstr "आवृत्ति MHz"
 
-#: resources/xnec2c.glade:12207
+#: resources/xnec2c.glade:12970
 msgid "Structure Geometry"
 msgstr "संरचना ज्यामिति"
 
-#: resources/xnec2c.glade:12226
+#: resources/xnec2c.glade:12989
 msgid "Xnec2c: Radiation Patterns"
 msgstr "Xnec2c: विकिरण प्रतिरूप"
 
-#: resources/xnec2c.glade:12443
+#: resources/xnec2c.glade:13202
 msgid "_Gain Scaling"
 msgstr "_लाभ स्केलिंग"
 
-#: resources/xnec2c.glade:12458
+#: resources/xnec2c.glade:13217
 msgid "Linear _Power"
 msgstr "रैखिक _पावर"
 
-#: resources/xnec2c.glade:12469
+#: resources/xnec2c.glade:13228
 msgid "Linear _Voltage"
 msgstr "रैखिक _वोल्टेज"
 
-#: resources/xnec2c.glade:12480
+#: resources/xnec2c.glade:13239
 msgid "_ARRL Style"
 msgstr "_ARRL शैली"
 
-#: resources/xnec2c.glade:12491
+#: resources/xnec2c.glade:13250
 msgid "_Logarithmic"
 msgstr "_लघुगणकीय"
 
-#: resources/xnec2c.glade:12502
+#: resources/xnec2c.glade:13261
 msgid "_Noise Temperature"
 msgstr "_शोर तापमान"
 
-#: resources/xnec2c.glade:12513
+#: resources/xnec2c.glade:13272
 msgid "Noise Temp (_log scale)"
 msgstr "शोर तापमान (_लघुगणकीय स्केल)"
 
-#: resources/xnec2c.glade:12528
+#: resources/xnec2c.glade:13287
 msgid "Noise _Models"
 msgstr "शोर _मॉडल"
 
-#: resources/xnec2c.glade:12547
+#: resources/xnec2c.glade:13306
 msgid "_Gradient Key"
 msgstr "_प्रवणता कुंजी"
 
-#: resources/xnec2c.glade:12557
+#: resources/xnec2c.glade:13316
 msgid "Draw St_yle"
 msgstr "रेखाचित्र _शैली"
 
-#: resources/xnec2c.glade:12566
+#: resources/xnec2c.glade:13325
 msgid "S_urface"
 msgstr "_सतह"
 
-#: resources/xnec2c.glade:12585
+#: resources/xnec2c.glade:13344
 msgid "_Both"
 msgstr "_दोनों"
 
-#: resources/xnec2c.glade:12600
+#: resources/xnec2c.glade:13359
 msgid "_Near Field"
 msgstr "_निकट क्षेत्र"
 
-#: resources/xnec2c.glade:12615
+#: resources/xnec2c.glade:13374
 msgid "Near _E Field"
 msgstr "निकट _E क्षेत्र"
 
-#: resources/xnec2c.glade:12625
+#: resources/xnec2c.glade:13384
 msgid "Near _H Field"
 msgstr "निकट _H क्षेत्र"
 
-#: resources/xnec2c.glade:12635
+#: resources/xnec2c.glade:13394
 msgid "_Poynting Vector"
 msgstr "_Poynting सदिश"
 
-#: resources/xnec2c.glade:12644
+#: resources/xnec2c.glade:13403
 msgid "_Animate Dialog"
 msgstr "_एनिमेट संवाद"
 
-#: resources/xnec2c.glade:12653
+#: resources/xnec2c.glade:13412
 msgid "_Total Field"
 msgstr "_कुल क्षेत्र"
 
-#: resources/xnec2c.glade:12662
+#: resources/xnec2c.glade:13421
 msgid "_Peak Value"
 msgstr "_शिखर मान"
 
-#: resources/xnec2c.glade:12673
+#: resources/xnec2c.glade:13432
 msgid "_Instantaneous (φ=0)"
 msgstr "_तात्कालिक (φ=0)"
 
-#: resources/xnec2c.glade:12703
+#: resources/xnec2c.glade:13461
 msgid "_Overlay Structure"
 msgstr "_संरचना आच्छादन"
 
-#: resources/xnec2c.glade:12728
+#: resources/xnec2c.glade:13485
 msgid "Gain Pattern"
 msgstr "लाभ पैटर्न"
 
-#: resources/xnec2c.glade:12743
+#: resources/xnec2c.glade:13500
 msgid "E/H Fields"
 msgstr "E/H क्षेत्र"
 
-#: resources/xnec2c.glade:12926
+#: resources/xnec2c.glade:13683
 msgid "Zoom % "
 msgstr "ज़ूम % "
 
-#: resources/xnec2c.glade:12965
+#: resources/xnec2c.glade:13722
 msgid "Elev.°"
 msgstr "उन्नयन°"
 
-#: resources/xnec2c.glade:13306
+#: resources/xnec2c.glade:14063
 msgid "Frequency MHz"
 msgstr "आवृत्ति MHz"
 
-#: resources/xnec2c.glade:13323
+#: resources/xnec2c.glade:14080
 msgid "0.010"
 msgstr "0.010"
 
-#: resources/xnec2c.glade:13377 resources/xnec2c.glade:13410
-#: resources/xnec2c.glade:13445
+#: resources/xnec2c.glade:14134 resources/xnec2c.glade:14167
+#: resources/xnec2c.glade:14202
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:13392
+#: resources/xnec2c.glade:14149
 msgid "T<sub>earth</sub>"
 msgstr "T<sub>earth</sub>"
 
-#: resources/xnec2c.glade:13427
+#: resources/xnec2c.glade:14184
 msgid "T<sub>sky</sub>"
 msgstr "T<sub>sky</sub>"
 
-#: resources/xnec2c.glade:13548 src/rdpattern_ui.c:999
+#: resources/xnec2c.glade:14305 src/rdpattern_ui.c:984
 msgid "Radiation Patterns"
 msgstr "विकिरण प्रतिरूप"
 
-#: resources/xnec2c.glade:13583
+#: resources/xnec2c.glade:14340
 msgid "Scale Structure (GS card)"
 msgstr "संरचना स्केल (GS कार्ड)"
 
-#: resources/xnec2c.glade:13614
+#: resources/xnec2c.glade:14371
 msgid "Structure Scale Factor"
 msgstr "संरचना स्केल गुणांक"
 
-#: resources/xnec2c.glade:13627
+#: resources/xnec2c.glade:14384
 msgid "From Tag No."
 msgstr "Tag संख्या से"
 
-#: resources/xnec2c.glade:13677
+#: resources/xnec2c.glade:14434
 msgid "To Tag No."
 msgstr "Tag संख्या तक"
 
-#: resources/xnec2c.glade:13712
+#: resources/xnec2c.glade:14469
 msgid "Scale Structure"
 msgstr "संरचना स्केल करें"
 
-#: resources/xnec2c.glade:13889
+#: resources/xnec2c.glade:14646
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "निर्देशांक रूपांतरण (GM कार्ड)"
 
-#: resources/xnec2c.glade:13919
+#: resources/xnec2c.glade:14676
 msgid "Tag Increment"
 msgstr "Tag वृद्धि"
 
-#: resources/xnec2c.glade:13950
+#: resources/xnec2c.glade:14707
 msgid "Rotate about X"
 msgstr "X के परितः घुमाएँ"
 
-#: resources/xnec2c.glade:13982
+#: resources/xnec2c.glade:14739
 msgid "Move along X"
 msgstr "X के अनुदिश स्थानांतरित करें"
 
-#: resources/xnec2c.glade:14014
+#: resources/xnec2c.glade:14771
 msgid "New Structures"
 msgstr "नई संरचनाएँ"
 
-#: resources/xnec2c.glade:14045
+#: resources/xnec2c.glade:14802
 msgid "Rotate about Y"
 msgstr "Y के परितः घुमाएँ"
 
-#: resources/xnec2c.glade:14077
+#: resources/xnec2c.glade:14834
 msgid "Move along Y"
 msgstr "Y के अनुदिश स्थानांतरित करें"
 
-#: resources/xnec2c.glade:14109
+#: resources/xnec2c.glade:14866
 msgid "Start From Tag"
 msgstr "Tag से प्रारंभ करें"
 
-#: resources/xnec2c.glade:14141
+#: resources/xnec2c.glade:14898
 msgid "Rotate about Z"
 msgstr "Z के परितः घुमाएँ"
 
-#: resources/xnec2c.glade:14173
+#: resources/xnec2c.glade:14930
 msgid "Move along Z"
 msgstr "Z के अनुदिश स्थानांतरित करें"
 
-#: resources/xnec2c.glade:14209
+#: resources/xnec2c.glade:14966
 msgid "Co-ordinate Transformation Data"
 msgstr "निर्देशांक रूपांतरण डेटा"
 
-#: resources/xnec2c.glade:14405
+#: resources/xnec2c.glade:15162
 msgid "Trans. Line Command (TL Card)"
 msgstr "ट्रांस. लाइन कमांड (TL कार्ड)"
 
-#: resources/xnec2c.glade:14435
+#: resources/xnec2c.glade:15192
 msgid "Tag Number, End 1  "
 msgstr "Tag संख्या, सिरा 1  "
 
-#: resources/xnec2c.glade:14467
+#: resources/xnec2c.glade:15224
 msgid "Tag Number, End 2  "
 msgstr "Tag संख्या, सिरा 2  "
 
-#: resources/xnec2c.glade:14498
+#: resources/xnec2c.glade:15255
 msgid "Segment Num, End 1"
 msgstr "Segment संख्या, सिरा 1"
 
-#: resources/xnec2c.glade:14530
+#: resources/xnec2c.glade:15287
 msgid "Segment Num, End 2"
 msgstr "Segment संख्या, सिरा 2"
 
-#: resources/xnec2c.glade:14594
+#: resources/xnec2c.glade:15351
 msgid "Crossed Transmission Line"
 msgstr "क्रॉस्ड ट्रांसमिशन लाइन"
 
-#: resources/xnec2c.glade:14612
+#: resources/xnec2c.glade:15369
 msgid "Characteristic Impedance"
 msgstr "अभिलाक्षणिक प्रतिबाधा"
 
-#: resources/xnec2c.glade:14644
+#: resources/xnec2c.glade:15401
 msgid "End 1 Y Real Part (S)"
 msgstr "सिरा 1 Y वास्तविक भाग (S)"
 
-#: resources/xnec2c.glade:14676
+#: resources/xnec2c.glade:15433
 msgid "End 2 Y Real Part (S)"
 msgstr "सिरा 2 Y वास्तविक भाग (S)"
 
-#: resources/xnec2c.glade:14708
+#: resources/xnec2c.glade:15465
 msgid "Length of Tx Line (m)"
 msgstr "Tx लाइन की लंबाई (m)"
 
-#: resources/xnec2c.glade:14740
+#: resources/xnec2c.glade:15497
 msgid "End 1 Y Imag Part (S)"
 msgstr "सिरा 1 Y काल्पनिक भाग (S)"
 
-#: resources/xnec2c.glade:14772
+#: resources/xnec2c.glade:15529
 msgid "End 2 Y Imag Part (S)"
 msgstr "सिरा 2 Y काल्पनिक भाग (S)"
 
-#: resources/xnec2c.glade:14808
+#: resources/xnec2c.glade:15565
 msgid "Transmission Line"
 msgstr "ट्रांसमिशन लाइन"
 
-#: resources/xnec2c.glade:15035
+#: resources/xnec2c.glade:15792
 msgid "Wire Element (GW & GC cards)"
 msgstr "तार तत्व (GW & GC कार्ड)"
 
-#: resources/xnec2c.glade:15095
+#: resources/xnec2c.glade:15852
 msgid "Wire X1"
 msgstr "तार X1"
 
-#: resources/xnec2c.glade:15127
+#: resources/xnec2c.glade:15884
 msgid "Wire X2"
 msgstr "तार X2"
 
-#: resources/xnec2c.glade:15190
+#: resources/xnec2c.glade:15947
 msgid "Wire Y1"
 msgstr "तार Y1"
 
-#: resources/xnec2c.glade:15223
+#: resources/xnec2c.glade:15980
 msgid "Wire Y2"
 msgstr "तार Y2"
 
-#: resources/xnec2c.glade:15287
+#: resources/xnec2c.glade:16044
 msgid "Wire Z1"
 msgstr "तार Z1"
 
-#: resources/xnec2c.glade:15319
+#: resources/xnec2c.glade:16076
 msgid "Wire Z2"
 msgstr "तार Z2"
 
-#: resources/xnec2c.glade:15384
+#: resources/xnec2c.glade:16141
 msgid "Wire Length"
 msgstr "तार की लंबाई"
 
-#: resources/xnec2c.glade:15455
+#: resources/xnec2c.glade:16212
 msgid "Wire Data"
 msgstr "तार डेटा"
 
-#: resources/xnec2c.glade:15467
+#: resources/xnec2c.glade:16224
 msgid "Tapered Wire"
 msgstr "टेपर्ड तार"
 
-#: resources/xnec2c.glade:15509
+#: resources/xnec2c.glade:16266
 msgid "Length Taper"
 msgstr "लंबाई टेपर"
 
-#: resources/xnec2c.glade:15541
+#: resources/xnec2c.glade:16298
 msgid "Diameter Seg 1"
 msgstr "व्यास Segment 1"
 
-#: resources/xnec2c.glade:15573
+#: resources/xnec2c.glade:16330
 msgid "Diameter Seg N"
 msgstr "व्यास Segment N"
 
-#: resources/xnec2c.glade:15605
+#: resources/xnec2c.glade:16362
 msgid "Diam. Taper"
 msgstr "व्यास टेपर"
 
-#: resources/xnec2c.glade:15641
+#: resources/xnec2c.glade:16398
 msgid "Wire Taper Data"
 msgstr "तार टेपर डेटा"
 
-#: resources/xnec2c.glade:15806
+#: resources/xnec2c.glade:16563
 msgid "Impedance (Zo) Ohm"
 msgstr "प्रतिबाधा (Zo) Ohm"
 
-#: resources/xnec2c.glade:15821
+#: resources/xnec2c.glade:16578
 msgid "50.00"
 msgstr "50.00"
 
-#: resources/xnec2c.glade:15844
+#: resources/xnec2c.glade:16601
 msgid "Transmission Line Impedance (Zo)"
 msgstr "ट्रांसमिशन लाइन प्रतिबाधा (Zo)"
 
@@ -2032,7 +2330,7 @@ msgstr "draw_wire_segments: wire_widths is NULL\n"
 msgid "draw_wire_segments: unknown ntyp=%d\n"
 msgstr "draw_wire_segments: unknown ntyp=%d\n"
 
-#: src/calculations.c:117 src/calculations.c:1272
+#: src/calculations.c:117 src/calculations.c:1288
 #, c-format
 msgid "segment connection error for segment %5d\n"
 msgstr "segment %5d के लिए segment connection त्रुटि\n"
@@ -2041,25 +2339,25 @@ msgstr "segment %5d के लिए segment connection त्रुटि\n"
 msgid "Segment connection error in tbf()"
 msgstr "tbf() में Segment connection त्रुटि"
 
-#: src/calculations.c:890
+#: src/calculations.c:906
 #, c-format
 msgid "step size limited at z= %10.5f\n"
-msgstr "Z= %10.5f पर चरण आकार सीमित\n"
+msgstr "z= %10.5f पर चरण आकार सीमित\n"
 
-#: src/calculations.c:1054
+#: src/calculations.c:1070
 #, c-format
 msgid "segment connection error for segment %d\n"
 msgstr "segment %d के लिए segment connection त्रुटि\n"
 
-#: src/calculations.c:1055
+#: src/calculations.c:1071
 msgid "Segment connection error in sbf()"
 msgstr "sbf() में Segment connection त्रुटि"
 
-#: src/calculations.c:1273
+#: src/calculations.c:1289
 msgid "Segment connection error in trio()"
 msgstr "trio() में Segment connection त्रुटि"
 
-#: src/callback_func.c:145
+#: src/callback_func.c:121
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
@@ -2067,7 +2365,7 @@ msgstr ""
 "आवृत्ति लूप चल रहा है\n"
 "क्या आप वाकई गणना समाप्त करना चाहते हैं?"
 
-#: src/callback_func.c:149
+#: src/callback_func.c:125
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
@@ -2075,67 +2373,58 @@ msgstr ""
 "आवृत्ति लूप चल रहा है\n"
 "क्या आप वाकई इस विंडो को बंद करना चाहते हैं?"
 
-#: src/callback_func.c:384
+#: src/callback_func.c:286
 #, c-format
 msgid ""
-"Frequency plots window closed: excitation type %d is incompatible.\n"
-"Use type 0 (Applied E Field) or 5 (Current Discontinuity) instead."
-msgstr ""
-"आवृत्ति प्लॉट विंडो बंद: उत्तेजन प्रकार %d असंगत है।\n"
-"इसके बजाय प्रकार 0 (Applied E Field) या 5 (Current Discontinuity) का उपयोग करें।"
+"Excitation type %d has no feedpoint: VSWR and impedance plots are hidden.\n"
+msgstr "उत्तेजन प्रकार %d में कोई फ़ीडपॉइंट नहीं है: VSWR और प्रतिबाधा प्लॉट छुपाए गए हैं।\n"
 
-#: src/callback_func.c:390
-#, c-format
-msgid ""
-"Frequency plots are not available with excitation type %d.\n"
-"This model uses Incident Field or Elementary Current Source excitation.\n"
-"Change the EX card to type 0 (Applied E Field) or 5 (Current Discontinuity)."
-msgstr ""
-"उत्तेजन प्रकार %d के साथ आवृत्ति प्लॉट उपलब्ध नहीं हैं।\n"
-"यह मॉडल Incident Field या Elementary Current Source उत्तेजन का उपयोग करता है।\n"
-"EX कार्ड को प्रकार 0 (Applied E Field) या 5 (Current Discontinuity) में बदलें।"
-
-#: src/callback_func.c:560
-msgid "View Currents"
-msgstr "धाराएँ देखें"
-
-#: src/callback_func.c:576 src/callback_func.c:626
+#: src/callback_func.c:442
 msgid "View Geometry"
 msgstr "ज्यामिति देखें"
 
-#: src/callback_func.c:610
+#: src/callback_func.c:443
+msgid "View Currents"
+msgstr "धाराएँ देखें"
+
+#: src/callback_func.c:444
 msgid "View Charges"
 msgstr "आवेश देखें"
 
-#: src/callback_func.c:667
+#: src/callback_func.c:458
+#, c-format
+msgid "invalid display quantity %d, using off\n"
+msgstr "invalid display quantity %d, using off\n"
+
+#: src/callback_func.c:529
 msgid "PNG images (*.png)"
 msgstr "PNG छवियाँ (*.png)"
 
-#: src/callback_func.c:669
+#: src/callback_func.c:531
 msgid "GNUplot files (*.gplot)"
 msgstr "GNUplot फ़ाइलें (*.gplot)"
 
-#: src/callback_func.c:671
+#: src/callback_func.c:533
 msgid "NEC2 files (*.nec)"
 msgstr "NEC2 फ़ाइलें (*.nec)"
 
-#: src/callback_func.c:673
+#: src/callback_func.c:535
 msgid "Touchstone 1-port files (*.s1p)"
 msgstr "Touchstone 1-पोर्ट फ़ाइलें (*.s1p)"
 
-#: src/callback_func.c:675
+#: src/callback_func.c:537
 msgid "Touchstone 2-port files (*.s2p)"
 msgstr "Touchstone 2-पोर्ट फ़ाइलें (*.s2p)"
 
-#: src/callback_func.c:677
+#: src/callback_func.c:539
 msgid "Comma-separated CSV files (*.csv)"
 msgstr "कॉमा-पृथक CSV फ़ाइलें (*.csv)"
 
-#: src/callbacks.c:99 src/callbacks.c:115 src/freqplots/freqplots_core.c:61
+#: src/callbacks.c:102 src/callbacks.c:118 src/freqplots/freqplots_core.c:61
 msgid "Antenna Temperature"
 msgstr "एंटीना तापमान"
 
-#: src/callbacks.c:100
+#: src/callbacks.c:103
 msgid ""
 "Ground plane detected in model. Ta results will overcount ground effects. "
 "Free-space models are standard for antenna temperature evaluation."
@@ -2143,7 +2432,7 @@ msgstr ""
 "मॉडल में ग्राउंड प्लेन पाया गया। Ta परिणाम ग्राउंड प्रभावों की अधिक गणना करेंगे। एंटीना "
 "तापमान मूल्यांकन के लिए मुक्त-आकाश मॉडल मानक हैं।"
 
-#: src/callbacks.c:116
+#: src/callbacks.c:119
 #, c-format
 msgid ""
 "Max gain at θ=%.0f° (%.0f° from XY plane). Convention assumes beam in XY "
@@ -2152,12 +2441,12 @@ msgstr ""
 "θ=%.0f° पर अधिकतम लाभ (XY समतल से %.0f°)। परिपाटी मानती है कि बीम XY समतल में है "
 "और प्रेक्षण उन्नयन स्पिनबटन द्वारा निर्धारित है।"
 
-#: src/callbacks.c:186 src/callbacks.c:483 src/callbacks.c:2584
-#: src/callbacks.c:3437
+#: src/callbacks.c:191 src/callbacks.c:468 src/callbacks.c:2034
+#: src/callbacks.c:2713
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "क्या आप वाकई xnec2c छोड़ना चाहते हैं?"
 
-#: src/callbacks.c:229
+#: src/callbacks.c:234
 msgid ""
 "A new NEC2 input file may not be created\n"
 "while the Frequency Loop is running"
@@ -2165,7 +2454,7 @@ msgstr ""
 "आवृत्ति लूप चलने के दौरान\n"
 "नई NEC2 इनपुट फ़ाइल नहीं बनाई जा सकती"
 
-#: src/callbacks.c:266
+#: src/callbacks.c:271
 msgid ""
 "A new NEC2 input file may not be opened\n"
 "while the Frequency Loop is running"
@@ -2173,20 +2462,20 @@ msgstr ""
 "आवृत्ति लूप चलने के दौरान\n"
 "नई NEC2 इनपुट फ़ाइल नहीं खोली जा सकती"
 
-#: src/callbacks.c:385
+#: src/callbacks.c:390
 msgid "xnec2c geometry optimizer"
 msgstr "xnec2c ज्यामिति अनुकूलक"
 
-#: src/callbacks.c:386
+#: src/callbacks.c:391
 msgid ""
 "xnec2c was built without inotify support: the optimizer cannot be enabled."
 msgstr "xnec2c बिना inotify समर्थन के बनाया गया था: अनुकूलक सक्षम नहीं किया जा सकता।"
 
-#: src/callbacks.c:410
+#: src/callbacks.c:412
 msgid "Xnec2c Optimizer"
 msgstr "Xnec2c अनुकूलक"
 
-#: src/callbacks.c:410
+#: src/callbacks.c:412
 msgid ""
 "No files are selected for writing. However, xnec2c will still reload and "
 "recalculate the input file on modification when triggered by inotify.Select "
@@ -2196,44 +2485,48 @@ msgstr ""
 "संशोधन पर इनपुट फ़ाइल को पुनः लोड और पुनर्गणना करेगा। \"File->Optimization Settings"
 "\" में लिखने के लिए फ़ाइलें चुनें।"
 
-#: src/callbacks.c:421
-msgid "failed to create Optimizer Output thread\n"
-msgstr "अनुकूलक आउटपुट थ्रेड बनाने में विफल\n"
-
-#: src/callbacks.c:1356 src/callbacks.c:1750 src/callbacks.c:3463
+#: src/callbacks.c:968 src/callbacks.c:1283 src/callbacks.c:2739
 msgid "Are you sure you wish to close this window?"
 msgstr "क्या आप वाकई इस विंडो को बंद करना चाहते हैं?"
 
-#: src/callbacks.c:2331
+#: src/callbacks.c:1791
 msgid "OpenGL is not available on this display; cannot enable renderer.\n"
 msgstr "इस डिस्प्ले पर OpenGL उपलब्ध नहीं है; रेंडरर सक्षम नहीं किया जा सकता।\n"
 
-#: src/callbacks.c:2761 src/callbacks.c:2774
-msgid "unexpected canonical widget type"
-msgstr "unexpected canonical widget type"
+#: src/callbacks.c:2108
+msgid "on_color_fam_format_value: unknown scale widget\n"
+msgstr "on_color_fam_format_value: unknown scale widget\n"
 
-#: src/callbacks.c:2914
+#: src/callbacks.c:2263
 msgid ""
-"Current flow animation requires surface patches (SP/SM cards) in the model."
-msgstr "धारा प्रवाह एनिमेशन के लिए मॉडल में सतह पैच (SP/SM कार्ड) आवश्यक हैं।"
+"Select how the animated patch current flow is rendered.\n"
+"Mirrors the Visualization menu setting in the main window."
+msgstr ""
+"एनिमेटेड patch धारा प्रवाह कैसे प्रस्तुत किया जाए, चुनें।\n"
+"मुख्य विंडो में Visualization मेनू सेटिंग को दर्शाता है।"
 
-#: src/callbacks.c:3181
+#: src/callbacks.c:2265
+msgid ""
+"Patch flow animation requires surface patches (SP/SM cards) in the model."
+msgstr "Patch प्रवाह एनिमेशन के लिए मॉडल में सरफेस patch (SP/SM कार्ड) आवश्यक हैं।"
+
+#: src/callbacks.c:2549
 msgid "Animation"
 msgstr "एनिमेशन"
 
-#: src/callbacks.c:3182
+#: src/callbacks.c:2550
 msgid ""
-"Animation requires surface patches (SP/SM NEC cards) or near-field data (NE/"
-"NH NEC cards)"
+"Animation requires wire currents or charges, surface patches (SP/SM NEC "
+"cards), or near-field data (NE/NH NEC cards)"
 msgstr ""
-"एनिमेशन के लिए सतह पैच (SP/SM NEC कार्ड) या निकट-क्षेत्र डेटा (NE/NH NEC कार्ड) आवश्यक "
-"हैं"
+"एनिमेशन के लिए तार धारा या आवेश, सरफेस patch (SP/SM NEC कार्ड), या निकट-क्षेत्र डेटा "
+"(NE/NH NEC कार्ड) आवश्यक हैं"
 
-#: src/callbacks.c:3401
+#: src/callbacks.c:2675
 msgid "No open NEC2 input file"
 msgstr "कोई NEC2 इनपुट फ़ाइल खुली नहीं है"
 
-#: src/callbacks.c:3494 src/callbacks.c:3524
+#: src/callbacks.c:2770 src/callbacks.c:2800
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -2241,11 +2534,11 @@ msgstr ""
 "आवृत्ति लूप चलने के दौरान\n"
 "NEC2 संपादक का डेटा सहेजा नहीं जा सकता"
 
-#: src/callbacks.c:3506 src/callbacks.c:3532
+#: src/callbacks.c:2782 src/callbacks.c:2808
 msgid "untitled.nec"
 msgstr "untitled.nec"
 
-#: src/callbacks.c:3997 src/callbacks.c:4017 src/callbacks.c:4037
+#: src/callbacks.c:3273 src/callbacks.c:3293 src/callbacks.c:3313
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
@@ -2460,6 +2753,64 @@ msgstr "प्रथम बिंदु Theta"
 msgid "Increment in R (m)"
 msgstr "R में वृद्धि (m)"
 
+#: src/config/config_widget.c:129
+#, c-format
+msgid "config_widget_lookup: missing widget '%s'\n"
+msgstr "config_widget_lookup: missing widget '%s'\n"
+
+#: src/config/config_widget.c:151
+#, c-format
+msgid "config_widget_values_at: index %d exceeds values list\n"
+msgstr "config_widget_values_at: index %d exceeds values list\n"
+
+#: src/config/config_widget.c:178
+#, c-format
+msgid "config_widget_apply_element: radio menu item '%s' has no values\n"
+msgstr "config_widget_apply_element: radio menu item '%s' has no values\n"
+
+#: src/config/config_widget.c:191
+#, c-format
+msgid "config_widget_apply_element: radio button '%s' has no values\n"
+msgstr "config_widget_apply_element: radio button '%s' has no values\n"
+
+#: src/config/config_widget.c:201
+#, c-format
+msgid "config_widget_apply_element: combo '%s' has no values\n"
+msgstr "config_widget_apply_element: combo '%s' has no values\n"
+
+#: src/config/config_widget.c:234
+#, c-format
+msgid "config_widget_apply_element: unknown widget type for '%s'\n"
+msgstr "config_widget_apply_element: unknown widget type for '%s'\n"
+
+#: src/config/config_widget.c:255
+#, c-format
+msgid "config_widget_sync_element: radio menu item '%s' has no values\n"
+msgstr "config_widget_sync_element: radio menu item '%s' has no values\n"
+
+#: src/config/config_widget.c:268
+#, c-format
+msgid "config_widget_sync_element: radio button '%s' has no values\n"
+msgstr "config_widget_sync_element: radio button '%s' has no values\n"
+
+#: src/config/config_widget.c:276
+#, c-format
+msgid "config_widget_sync_element: combo '%s' has no values\n"
+msgstr "config_widget_sync_element: combo '%s' has no values\n"
+
+#: src/config/config_widget.c:319
+#, c-format
+msgid "config_widget_sync_element: unknown widget type for '%s'\n"
+msgstr "config_widget_sync_element: unknown widget type for '%s'\n"
+
+#: src/config/config_widget.c:375
+msgid "config_widget_sync_field: field is not registered\n"
+msgstr "config_widget_sync_field: field is not registered\n"
+
+#: src/config/config_widget.c:399
+msgid "config_widget_field_changed: field is not registered\n"
+msgstr "config_widget_field_changed: field is not registered\n"
+
 #: src/expr_edit.h:34
 msgid ""
 "Value is controlled by an SY expression.\n"
@@ -2468,20 +2819,279 @@ msgstr ""
 "यह मान एक SY व्यंजक द्वारा नियंत्रित है।\n"
 "इस मान को बदलने के लिए SY card संपादित करें।"
 
-#: src/fields.c:923
+#: src/fields.c:938
 #, c-format
 msgid "step size limited at z= %10.5f"
 msgstr "z= %10.5f पर चरण आकार सीमित"
 
-#: src/fork.c:164 src/fork.c:452
+#: src/fork.c:230 src/fork.c:518
 #, c-format
 msgid "child %d  length %d  return %d\n"
 msgstr "चाइल्ड %d  लंबाई %d  रिटर्न %d\n"
 
-#: src/fork.c:458
+#: src/fork.c:524
 #, c-format
 msgid "early EOF?, child %d  length %d  return %d\n"
 msgstr "असामयिक EOF?, चाइल्ड %d  लंबाई %d  रिटर्न %d\n"
+
+#: src/freqplots/freqplots_core.c:55
+msgid "Gain Direction"
+msgstr "लाभ दिशा"
+
+#: src/freqplots/freqplots_core.c:56
+msgid "Viewer Gain"
+msgstr "व्यूअर लाभ"
+
+#: src/freqplots/freqplots_core.c:58
+msgid "Impedance (real/imag)"
+msgstr "प्रतिबाधा (real/imag)"
+
+#: src/freqplots/freqplots_core.c:59
+msgid "Impedance (mag/phase)"
+msgstr "प्रतिबाधा (mag/phase)"
+
+#: src/freqplots/freqplots_core.c:60 src/freqplots/graphs/smith_graph.c:476
+msgid "Smith Chart"
+msgstr "स्मिथ चार्ट"
+
+#: src/freqplots/freqplots_core.c:231
+#, c-format
+msgid "fp_field_cond_active: unhandled cond %d\n"
+msgstr "fp_field_cond_active: unhandled cond %d\n"
+
+#: src/freqplots/freqplots_core.c:247
+msgid "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
+msgstr "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
+
+#: src/freqplots/freqplots_core.c:447
+#, c-format
+msgid ""
+"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
+"%d posn=%d valid=%d\n"
+msgstr ""
+"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
+"%d posn=%d valid=%d\n"
+
+#: src/freqplots/freqplots_core.c:463
+#, c-format
+msgid ""
+"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
+"%d]\n"
+msgstr ""
+"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
+"%d]\n"
+
+#: src/freqplots/freqplots_core.c:761
+msgid ""
+"Excitation-port selector: models with more than one EX excitation list every "
+"port here.\n"
+"\n"
+"Entry P<n>: T<tag>/S<seg>\n"
+"    n = port number, tag = NEC tag, seg = segment.\n"
+"\n"
+"Hover an entry to preview that port, click to\n"
+"select it, or click away to keep the current one.\n"
+"\n"
+"Charts that follow the selected port:\n"
+"    • Z real / imag\n"
+"    • Z magnitude / phase\n"
+"    • Smith\n"
+"    • VSWR / S11\n"
+"    • Net-gain traces (Gain and Viewer gain)\n"
+"\n"
+"Whole-antenna charts, unaffected by the port:\n"
+"    • raw Max gain, Gain direction, F/B\n"
+"    • Antenna temperature, G/T"
+msgstr ""
+"उत्तेजन-पोर्ट चयनकर्ता: एक से अधिक EX उत्तेजना वाले मॉडल यहाँ हर पोर्ट सूचीबद्ध करते हैं।\n"
+"\n"
+"प्रविष्टि P<n>: T<tag>/S<seg>\n"
+"    n = पोर्ट संख्या, tag = NEC tag, seg = segment.\n"
+"\n"
+"किसी प्रविष्टि पर पूर्वावलोकन के लिए होवर करें, चुनने के लिए\n"
+"क्लिक करें, या वर्तमान को बनाए रखने के लिए कहीं और क्लिक करें।\n"
+"\n"
+"चयनित पोर्ट का अनुसरण करने वाले चार्ट:\n"
+"    • Z real / imag\n"
+"    • Z magnitude / phase\n"
+"    • Smith\n"
+"    • VSWR / S11\n"
+"    • नेट-लाभ ट्रेस (Gain और Viewer gain)\n"
+"\n"
+"संपूर्ण-एंटीना चार्ट, पोर्ट से अप्रभावित:\n"
+"    • raw Max gain, Gain direction, F/B\n"
+"    • एंटीना तापमान, G/T"
+
+#: src/freqplots/freqplots_core.c:794
+msgid ""
+"Only one feedpoint port is defined. Define additional EX excitation cards in "
+"the model to select among multiple ports here."
+msgstr ""
+"केवल एक फ़ीडपॉइंट पोर्ट परिभाषित है। कई पोर्ट में से चुनने के लिए मॉडल में अतिरिक्त EX "
+"उत्तेजना कार्ड परिभाषित करें।"
+
+#: src/freqplots/freqplots_core.c:797
+msgid ""
+"Enable the Net Gain plot setting to select a port; without it this graph "
+"does not follow the port."
+msgstr ""
+"पोर्ट चुनने के लिए Net Gain प्लॉट सेटिंग सक्षम करें; इसके बिना यह ग्राफ़ पोर्ट का अनुसरण "
+"नहीं करता।"
+
+#: src/freqplots/freqplots_core.c:913
+msgid "Not available: excitation defines no feedpoint"
+msgstr "उपलब्ध नहीं: उत्तेजन कोई फ़ीडपॉइंट परिभाषित नहीं करता"
+
+#: src/freqplots/freqplots_graph.c:137 src/freqplots/graphs/smith_graph.c:529
+msgid "memory allocation for points failed\n"
+msgstr "पॉइंट्स के लिए मेमोरी आवंटन विफल\n"
+
+#: src/freqplots/freqplots_graph.c:138 src/freqplots/graphs/smith_graph.c:530
+msgid "Draw_Graph():Memory allocation for points failed"
+msgstr "Draw_Graph(): पॉइंट्स के लिए मेमोरी आवंटन विफल"
+
+#: src/freqplots/freqplots_theme_menu.c:42
+msgid "This theme has no inverted variant"
+msgstr "इस थीम का कोई इनवर्टेड वेरिएंट नहीं है"
+
+#: src/freqplots/freqplots_theme_menu.c:95
+msgid "_Invert"
+msgstr "_इनवर्ट करें"
+
+#: src/freqplots/graphs/anttemp_graph.c:68
+msgid "G/Ta (dB)"
+msgstr "G/Ta (dB)"
+
+#: src/freqplots/graphs/anttemp_graph.c:69
+msgid "G/Ta & TA - Antenna noise temperature"
+msgstr "G/Ta और TA - एंटीना शोर तापमान"
+
+#: src/freqplots/graphs/anttemp_graph.c:71
+msgid "Ta (K)"
+msgstr "Ta (K)"
+
+#: src/freqplots/graphs/anttemp_graph.c:73
+msgid "TA (K)"
+msgstr "TA (K)"
+
+#: src/freqplots/graphs/gain_graph.c:86 src/freqplots/graphs/viewer_graph.c:53
+msgid "Raw Gain dBi"
+msgstr "कच्चा लाभ dBi"
+
+#: src/freqplots/graphs/gain_graph.c:91
+msgid "Max Gain & Net Gain vs Frequency"
+msgstr "अधिकतम लाभ और शुद्ध लाभ बनाम आवृत्ति"
+
+#: src/freqplots/graphs/gain_graph.c:92
+msgid "Net Gain dBi"
+msgstr "शुद्ध लाभ dBi"
+
+#: src/freqplots/graphs/gain_graph.c:97 src/freqplots/graphs/gain_graph.c:104
+msgid "Max Gain & F/B Ratio vs Frequency"
+msgstr "अधिकतम लाभ और F/B अनुपात बनाम आवृत्ति"
+
+#: src/freqplots/graphs/gain_graph.c:105
+msgid "F/B Ratio dB"
+msgstr "F/B अनुपात dB"
+
+#: src/freqplots/graphs/gain_graph.c:111
+msgid "Rad Angle - deg"
+msgstr "विकिरण कोण - deg"
+
+#: src/freqplots/graphs/gain_graph.c:112
+msgid "Max Gain Direction vs Frequency"
+msgstr "अधिकतम लाभ दिशा बनाम आवृत्ति"
+
+#: src/freqplots/graphs/gain_graph.c:113
+msgid "Phi - deg"
+msgstr "Phi - deg"
+
+#: src/freqplots/graphs/impedance_graph.c:75
+#: src/freqplots/graphs/impedance_graph.c:80
+msgid "Impedance vs Frequency"
+msgstr "प्रतिबाधा बनाम आवृत्ति"
+
+#: src/freqplots/graphs/impedance_graph.c:79
+msgid "Z-magn"
+msgstr "Z-magn"
+
+#: src/freqplots/graphs/impedance_graph.c:81
+msgid "Z-phase"
+msgstr "Z-phase"
+
+#: src/freqplots/graphs/smith_graph.c:384
+msgid "0 Ω"
+msgstr "0 Ω"
+
+#: src/freqplots/graphs/smith_graph.c:387
+#: src/freqplots/graphs/smith_graph.c:462
+msgid "∞ Ω"
+msgstr "∞ Ω"
+
+#: src/freqplots/graphs/smith_graph.c:407
+msgid "constant R"
+msgstr "स्थिर R"
+
+#: src/freqplots/graphs/smith_graph.c:408
+msgid "constant X"
+msgstr "स्थिर X"
+
+#: src/freqplots/graphs/smith_graph.c:409
+msgid "unity R, X"
+msgstr "एकक R, X"
+
+#: src/freqplots/graphs/smith_graph.c:410
+msgid "match (z = 1)"
+msgstr "सुमेल (z = 1)"
+
+#: src/freqplots/graphs/smith_graph.c:411
+msgid "impedance vs freq"
+msgstr "प्रतिबाधा बनाम आवृत्ति"
+
+#: src/freqplots/graphs/smith_graph.c:412
+msgid "selected frequency"
+msgstr "चयनित आवृत्ति"
+
+#: src/freqplots/graphs/smith_graph.c:413
+msgid "reflection angle (°)"
+msgstr "परावर्तन कोण (°)"
+
+#: src/freqplots/graphs/smith_graph.c:414
+msgid "wavelengths → gen"
+msgstr "तरंगदैर्घ्य → gen"
+
+#: src/freqplots/graphs/smith_graph.c:507
+#, c-format
+msgid "Z0 = %g Ω"
+msgstr "Z0 = %g Ω"
+
+#: src/freqplots/graphs/smith_graph.c:514
+msgid "INDUCTIVE (+jX)"
+msgstr "प्रेरणात्मक (+jX)"
+
+#: src/freqplots/graphs/smith_graph.c:517
+msgid "CAPACITIVE (-jX)"
+msgstr "धारित्रीय (-jX)"
+
+#: src/freqplots/graphs/viewer_graph.c:54
+msgid "Gain in Viewer Direction vs Frequency"
+msgstr "दर्शक दिशा में लाभ बनाम आवृत्ति"
+
+#: src/freqplots/graphs/viewer_graph.c:70
+msgid "Net gain dBi"
+msgstr "शुद्ध लाभ dBi"
+
+#: src/freqplots/graphs/vswr_graph.c:58
+msgid "VSWR & S11 vs Frequency"
+msgstr "VSWR और S11 बनाम आवृत्ति"
+
+#: src/freqplots/graphs/vswr_graph.c:59
+msgid "S11 dB"
+msgstr "S11 dB"
+
+#: src/freqplots/graphs/vswr_graph.c:63
+msgid "VSWR vs Frequency"
+msgstr "VSWR बनाम आवृत्ति"
 
 #: src/geom_edit.c:108 src/geom_edit.c:2000 src/geom_edit.c:2272
 #: src/geom_edit.c:2703
@@ -2659,7 +3269,7 @@ msgstr ""
 "Segment connection गणना पूर्ण मेश से अधिक है, जो असंभव है!\n"
 "ओवरलैपिंग या लगभग-जुड़े segment की जाँच करें\n"
 
-#: src/geometry.c:704
+#: src/geometry.c:723
 msgid ""
 "check data, parameter specifying segment: position in a group of equal tags "
 "must not be zero\n"
@@ -2667,7 +3277,7 @@ msgstr ""
 "डेटा जाँचें, segment निर्दिष्ट करने वाला पैरामीटर: समान tag के समूह में स्थिति शून्य नहीं "
 "होनी चाहिए\n"
 
-#: src/geometry.c:705
+#: src/geometry.c:724
 msgid ""
 "Parameter specifying segment\n"
 "position in a group of equal tags is zero"
@@ -2675,12 +3285,12 @@ msgstr ""
 "Segment निर्दिष्ट करने वाला पैरामीटर\n"
 "समान tag के समूह में स्थिति शून्य है"
 
-#: src/geometry.c:737
+#: src/geometry.c:756
 #, c-format
 msgid "no segment has an itag of %d\n"
 msgstr "किसी segment का itag %d नहीं है\n"
 
-#: src/geometry.c:741
+#: src/geometry.c:760
 msgid ""
 "Segment tag number error: Tag 0 is reserved and cannot be used.\n"
 "Check your geometry cards (especially GM cards) to ensure tag values are "
@@ -2692,7 +3302,7 @@ msgstr ""
 "GM कार्ड के लिए: सत्यापित करें कि 'start from tag' और 'tag increment' tag 0 नहीं "
 "बनाते।"
 
-#: src/geometry.c:749
+#: src/geometry.c:768
 #, c-format
 msgid ""
 "Segment tag number error: No segment found with tag %d.\n"
@@ -2703,19 +3313,19 @@ msgstr ""
 "आप नियंत्रण कार्ड में अज्ञात tag या segment का संदर्भ दे रहे हैं।\n"
 "आपकी ज्यामिति में मान्य tag वे हैं जो GW/GA/GH/SP कार्ड को असाइन किए गए हैं।"
 
-#: src/geometry.c:752 src/input.c:1576 src/input.c:1577 src/mathlib.c:752
-#: src/mathlib.c:989 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
-#: src/rdpattern_ui.c:344 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:133
-#: src/utils.c:444
+#: src/geometry.c:771 src/input.c:1755 src/input.c:1756 src/mathlib.c:752
+#: src/mathlib.c:989 src/rdpattern_ui.c:330 src/rdpattern_ui.c:338
+#: src/rdpattern_ui.c:345 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:134
+#: src/utils.c:452
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: src/geometry.c:1024
+#: src/geometry.c:1043
 msgid "corners of quadrilateral: patch do not lie in a plane\n"
 msgstr "चतुर्भुज के कोने: patch एक समतल में नहीं हैं\n"
 
-#: src/geometry.c:1025
+#: src/geometry.c:1044
 msgid ""
 "Corners of quadrilateral\n"
 "patch do not lie in a plane"
@@ -2723,12 +3333,12 @@ msgstr ""
 "चतुर्भुज patch के कोने\n"
 "एक समतल में नहीं हैं"
 
-#: src/geometry.c:1130 src/geometry.c:1207 src/geometry.c:1285
+#: src/geometry.c:1149 src/geometry.c:1226 src/geometry.c:1304
 #, c-format
 msgid "geometry data error: segment %d lies in plane of symmetry\n"
 msgstr "ज्यामिति डेटा त्रुटि: segment %d समरूपता के समतल में है\n"
 
-#: src/geometry.c:1131 src/geometry.c:1208 src/geometry.c:1286
+#: src/geometry.c:1150 src/geometry.c:1227 src/geometry.c:1305
 msgid ""
 "Geometry data error\n"
 "Segment lies in plane of symmetry"
@@ -2736,12 +3346,12 @@ msgstr ""
 "ज्यामिति डेटा त्रुटि\n"
 "Segment समरूपता के समतल में है"
 
-#: src/geometry.c:1167 src/geometry.c:1244 src/geometry.c:1319
+#: src/geometry.c:1186 src/geometry.c:1263 src/geometry.c:1338
 #, c-format
 msgid "geometry data error: patch %d lies in plane of symmetry\n"
 msgstr "ज्यामिति डेटा त्रुटि: patch %d समरूपता के समतल में है\n"
 
-#: src/geometry.c:1168 src/geometry.c:1245 src/geometry.c:1320
+#: src/geometry.c:1187 src/geometry.c:1264 src/geometry.c:1339
 msgid ""
 "Geometry data error\n"
 "Patch lies in plane of symmetry"
@@ -2749,7 +3359,7 @@ msgstr ""
 "ज्यामिति डेटा त्रुटि\n"
 "Patch समरूपता के समतल में है"
 
-#: src/geometry.c:1440
+#: src/geometry.c:1459
 #, c-format
 msgid ""
 "tag=%d/seg=%d: endpoint distance=%.3e is too close (below connection "
@@ -2758,12 +3368,12 @@ msgstr ""
 "tag=%d/seg=%d: अंतिम बिंदु दूरी=%.3e बहुत निकट है (कनेक्शन थ्रेशोल्ड=%.3e से नीचे); "
 "segment स्वयं से जुड़ जाएगा\n"
 
-#: src/geometry.c:1445
+#: src/geometry.c:1464
 #, c-format
 msgid "tag=%d: suppressing additional self-connection warnings\n"
 msgstr "tag=%d: अतिरिक्त स्व-कनेक्शन चेतावनियाँ दबाई जा रही हैं\n"
 
-#: src/geometry.c:1495
+#: src/geometry.c:1514
 #, c-format
 msgid ""
 "tag=%d/seg=%d: distance=%.3e to tag=%d/seg=%d closer than 2x connection "
@@ -2772,12 +3382,12 @@ msgstr ""
 "tag=%d/seg=%d: दूरी=%.3e से tag=%d/seg=%d 2x कनेक्शन थ्रेशोल्ड %.3e से निकट है; "
 "अनपेक्षित connection संभव\n"
 
-#: src/geometry.c:1501
+#: src/geometry.c:1520
 #, c-format
 msgid "tag=%d: suppressing additional overlap warnings\n"
 msgstr "tag=%d: अतिरिक्त ओवरलैप चेतावनियाँ दबाई जा रही हैं\n"
 
-#: src/geometry.c:1570
+#: src/geometry.c:1589
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length=%.3e is too short (and close enough) to tag=%d/seg=%d "
@@ -2786,7 +3396,7 @@ msgstr ""
 "tag=%d/seg=%d: लंबाई=%.3e बहुत छोटी है (और पर्याप्त निकट) tag=%d/seg=%d लंबाई=%.3e "
 "के लिए कि connection पहचान विफल या short हो सकती है\n"
 
-#: src/geometry.c:1576
+#: src/geometry.c:1595
 #, c-format
 msgid ""
 "tag=%d: suppressing additional connection detection may fail or short "
@@ -2794,7 +3404,7 @@ msgid ""
 msgstr ""
 "tag=%d: अतिरिक्त connection पहचान विफल या short चेतावनियाँ दबाई जा रही हैं\n"
 
-#: src/geometry.c:1609
+#: src/geometry.c:1628
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f < 0.001; similarity of "
@@ -2804,12 +3414,12 @@ msgstr ""
 "tag=%d/seg=%d: लंबाई/तरंगदैर्घ्य अनुपात %.3f < 0.001; धारा घटकों की समानता संख्यात्मक "
 "अशुद्धियों का कारण बनती है (न्यूनतम=0.001, उत्तम=0.05, अनुशंसित <= 0.1)\n"
 
-#: src/geometry.c:1614
+#: src/geometry.c:1633
 #, c-format
 msgid "tag=%d: suppressing additional short wavelength ratio errors\n"
 msgstr "tag=%d: अतिरिक्त लघु तरंगदैर्घ्य अनुपात त्रुटियाँ दबाई जा रही हैं\n"
 
-#: src/geometry.c:1628
+#: src/geometry.c:1647
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.1; current sampling "
@@ -2819,12 +3429,12 @@ msgstr ""
 "tag=%d/seg=%d: लंबाई/तरंगदैर्घ्य अनुपात %.3f > 0.1; धारा सैंपलिंग रिज़ॉल्यूशन segment "
 "अंतराल द्वारा सीमित (न्यूनतम=0.001, उत्तम=0.05, अनुशंसित <= 0.1)\n"
 
-#: src/geometry.c:1633
+#: src/geometry.c:1652
 #, c-format
 msgid "tag=%d: suppressing additional long wavelength ratio warnings\n"
 msgstr "tag=%d: अतिरिक्त दीर्घ तरंगदैर्घ्य अनुपात चेतावनियाँ दबाई जा रही हैं\n"
 
-#: src/geometry.c:1647
+#: src/geometry.c:1666
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.05; shorter segments "
@@ -2834,12 +3444,12 @@ msgstr ""
 "tag=%d/seg=%d: लंबाई/तरंगदैर्घ्य अनुपात %.3f > 0.05; तीव्र धारा परिवर्तन क्षेत्रों में छोटे "
 "segment सटीकता बढ़ाते हैं (न्यूनतम=0.001, उत्तम=0.05, अनुशंसित <=0.1)\n"
 
-#: src/geometry.c:1652
+#: src/geometry.c:1671
 #, c-format
 msgid "tag=%d: suppressing additional accuracy improvement suggestions\n"
 msgstr "tag=%d: अतिरिक्त सटीकता सुधार सुझाव दबाए जा रहे हैं\n"
 
-#: src/geometry.c:1683
+#: src/geometry.c:1702
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; standard thin-wire kernel "
@@ -2848,12 +3458,12 @@ msgstr ""
 "tag=%d/seg=%d: लंबाई/त्रिज्या अनुपात %.1f < 2.0; मानक पतले-तार कर्नेल क्षेत्र त्रुटि 1%% "
 "से बहुत अधिक है (न्यूनतम=2.0, 1%%सटीक=8.0)\n"
 
-#: src/geometry.c:1688
+#: src/geometry.c:1707
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio errors\n"
 msgstr "tag=%d: अतिरिक्त मानक कर्नेल अनुपात त्रुटियाँ दबाई जा रही हैं\n"
 
-#: src/geometry.c:1702
+#: src/geometry.c:1721
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 8.0; standard thin-wire kernel "
@@ -2862,12 +3472,12 @@ msgstr ""
 "tag=%d/seg=%d: लंबाई/त्रिज्या अनुपात %.1f < 8.0; मानक पतले-तार कर्नेल क्षेत्र त्रुटि 1%% "
 "से अधिक है (न्यूनतम=2.0, 1%%सटीक=8.0)\n"
 
-#: src/geometry.c:1707
+#: src/geometry.c:1726
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio warnings\n"
 msgstr "tag=%d: अतिरिक्त मानक कर्नेल अनुपात चेतावनियाँ दबाई जा रही हैं\n"
 
-#: src/geometry.c:1723
+#: src/geometry.c:1742
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 0.5; extended thin-wire kernel "
@@ -2876,12 +3486,12 @@ msgstr ""
 "tag=%d/seg=%d: लंबाई/त्रिज्या अनुपात %.1f < 0.5; विस्तारित पतले-तार कर्नेल क्षेत्र त्रुटि "
 "1%% से बहुत अधिक है (न्यूनतम=0.5, 1%%सटीक=2.0)\n"
 
-#: src/geometry.c:1728
+#: src/geometry.c:1747
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio errors\n"
 msgstr "tag=%d: अतिरिक्त विस्तारित कर्नेल अनुपात त्रुटियाँ दबाई जा रही हैं\n"
 
-#: src/geometry.c:1742
+#: src/geometry.c:1761
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; extended thin-wire kernel "
@@ -2890,24 +3500,24 @@ msgstr ""
 "tag=%d/seg=%d: लंबाई/त्रिज्या अनुपात %.1f < 2.0; विस्तारित पतले-तार कर्नेल क्षेत्र त्रुटि "
 "1%% से अधिक है (न्यूनतम=0.5, 1%%सटीक=2.0)\n"
 
-#: src/geometry.c:1747
+#: src/geometry.c:1766
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio warnings\n"
 msgstr "tag=%d: अतिरिक्त विस्तारित कर्नेल अनुपात चेतावनियाँ दबाई जा रही हैं\n"
 
-#: src/geometry.c:1764
+#: src/geometry.c:1783
 #, c-format
 msgid "Skipping overlap check for %d segments (use --force-verify to enable)\n"
 msgstr ""
 "%d segment के लिए ओवरलैप जाँच छोड़ी जा रही है (सक्षम करने के लिए --force-verify "
 "उपयोग करें)\n"
 
-#: src/geometry.c:1768
+#: src/geometry.c:1787
 #, c-format
 msgid "Forcing overlap check for %d segments\n"
 msgstr "%d segment के लिए ओवरलैप जाँच बाध्य की जा रही है\n"
 
-#: src/geometry.c:1779
+#: src/geometry.c:1798
 msgid ""
 "verify_segments() skipping frequency-dependent checks - no frequency data\n"
 msgstr "verify_segments() आवृत्ति-निर्भर जाँचें छोड़ रहा है - कोई आवृत्ति डेटा नहीं\n"
@@ -2957,37 +3567,37 @@ msgstr "! संदर्भ प्रतिबाधा Z0 = %.2f Ohm\n"
 msgid "This should never happen. touchstone type=%d\n"
 msgstr "यह कभी नहीं होना चाहिए। touchstone type=%d\n"
 
-#: src/gnuplot.c:237
+#: src/gnuplot.c:257
 #, c-format
 msgid "# Near E field\n"
 msgstr "# निकट E क्षेत्र\n"
 
-#: src/gnuplot.c:260
+#: src/gnuplot.c:280
 #, c-format
 msgid "# Near H field\n"
 msgstr "# निकट H क्षेत्र\n"
 
-#: src/gnuplot.c:306
+#: src/gnuplot.c:322
 #, c-format
 msgid "# Poynting Vector\n"
 msgstr "# Poynting सदिश\n"
 
-#: src/gnuplot.c:378
+#: src/gnuplot.c:394
 #, c-format
 msgid "# Radiation Pattern\n"
 msgstr "# विकिरण प्रतिरूप\n"
 
-#: src/gnuplot.c:516
+#: src/gnuplot.c:532
 #, c-format
 msgid "# structure patch segments\n"
 msgstr "# संरचना patch segment\n"
 
-#: src/gnuplot.c:551
+#: src/gnuplot.c:567
 #, c-format
 msgid "# structure wire segments\n"
 msgstr "# संरचना wire segment\n"
 
-#: src/gnuplot.c:581
+#: src/gnuplot.c:597
 #, c-format
 msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
@@ -2996,11 +3606,11 @@ msgstr ""
 "इसके साथ देखें: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
 "close\"\n"
 
-#: src/gnuplot.c:593
+#: src/gnuplot.c:609
 msgid "Save Currents and Charges to CSV"
 msgstr "धाराओं और आवेशों को CSV में सहेजें"
 
-#: src/gnuplot.c:594
+#: src/gnuplot.c:610
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
@@ -3008,11 +3618,11 @@ msgstr ""
 "आपको मुख्य xnec2c विंडो में \"Currents\" या \"Charges\" पर क्लिक करके धारा डेटा सक्षम "
 "करना होगा।"
 
-#: src/gnuplot.c:659 src/gnuplot.c:669
+#: src/gnuplot.c:675 src/gnuplot.c:685
 msgid "Save Patch Currents to CSV"
 msgstr "Patch धाराओं को CSV में सहेजें"
 
-#: src/gnuplot.c:660
+#: src/gnuplot.c:676
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
@@ -3020,20 +3630,20 @@ msgstr ""
 "आपको मुख्य xnec2c विंडो में \"Currents\" या \"Charges\" पर क्लिक करके धारा डेटा सक्षम "
 "करना होगा।"
 
-#: src/gnuplot.c:670
+#: src/gnuplot.c:686
 msgid "No surface patches in this model."
 msgstr "इस मॉडल में कोई सरफेस patch नहीं हैं।"
 
-#: src/ground.c:90
+#: src/ground.c:110
 msgid "b less than a"
 msgstr "b, a से कम है"
 
-#: src/ground.c:215
+#: src/ground.c:235
 #, c-format
 msgid "step size limited at z = %12.5E\n"
-msgstr "Z = %12.5E पर चरण आकार सीमित\n"
+msgstr "z = %12.5E पर चरण आकार सीमित\n"
 
-#: src/input.c:92
+#: src/input.c:156
 msgid ""
 "Error reading Comments\n"
 "Unexpected EOF (End of File)"
@@ -3041,7 +3651,7 @@ msgstr ""
 "टिप्पणियाँ पढ़ने में त्रुटि\n"
 "अप्रत्याशित EOF (फ़ाइल का अंत)"
 
-#: src/input.c:106
+#: src/input.c:170
 msgid ""
 "Error reading Comments\n"
 "Comment mnemonic short or missing"
@@ -3049,7 +3659,7 @@ msgstr ""
 "टिप्पणियाँ पढ़ने में त्रुटि\n"
 "टिप्पणी स्मरक छोटा या अनुपस्थित"
 
-#: src/input.c:117
+#: src/input.c:181
 msgid ""
 "Read_Comments():\n"
 " Error reading input file\n"
@@ -3059,7 +3669,7 @@ msgstr ""
 " इनपुट फ़ाइल पढ़ने में त्रुटि\n"
 "टिप्पणी स्मरक गलत है"
 
-#: src/input.c:155
+#: src/input.c:219
 msgid ""
 "Geometry data error\n"
 "Tag number is less than 1"
@@ -3067,7 +3677,7 @@ msgstr ""
 "ज्यामिति डेटा त्रुटि\n"
 "Tag संख्या 1 से कम है"
 
-#: src/input.c:162
+#: src/input.c:226
 msgid ""
 "Geometry data error\n"
 "Number of segments is less than 1"
@@ -3075,16 +3685,16 @@ msgstr ""
 "ज्यामिति डेटा त्रुटि\n"
 "Segment की संख्या 1 से कम है"
 
-#: src/input.c:169
+#: src/input.c:233
 msgid "warning - number of segments is greater than 1000000\n"
 msgstr "चेतावनी - segment की संख्या 1000000 से अधिक है\n"
 
-#: src/input.c:217
+#: src/input.c:281
 #, c-format
 msgid "%s data card error: Spurious character '%c' at column %d\n"
 msgstr "%s डेटा कार्ड त्रुटि: अनावश्यक वर्ण '%c' कॉलम %d पर\n"
 
-#: src/input.c:219
+#: src/input.c:283
 msgid ""
 "Data card error\n"
 "Spurious character in card"
@@ -3092,33 +3702,33 @@ msgstr ""
 "डेटा कार्ड त्रुटि\n"
 "कार्ड में अनावश्यक वर्ण"
 
-#: src/input.c:274
+#: src/input.c:354
 #, c-format
 msgid "%s: expression evaluation failed for \"%s\"\n"
 msgstr "%s: \"%s\" के लिए व्यंजक मूल्यांकन विफल\n"
 
-#: src/input.c:315
+#: src/input.c:395
 msgid "SY card: no line content available\n"
 msgstr "SY कार्ड: कोई लाइन सामग्री उपलब्ध नहीं\n"
 
-#: src/input.c:316
+#: src/input.c:396
 msgid "SY card: no line content available"
 msgstr "SY कार्ड: कोई लाइन सामग्री उपलब्ध नहीं"
 
-#: src/input.c:333
+#: src/input.c:413
 msgid "SY card: missing '=' in definition\n"
 msgstr "SY कार्ड: परिभाषा में '=' गायब है\n"
 
-#: src/input.c:334
+#: src/input.c:414
 msgid "SY card: missing '=' in definition"
 msgstr "SY कार्ड: परिभाषा में '=' गायब है"
 
-#: src/input.c:367
+#: src/input.c:447
 #, c-format
 msgid "SY card: symbol definition failed for %s=%s\n"
 msgstr "SY कार्ड: %s=%s के लिए प्रतीक परिभाषा विफल\n"
 
-#: src/input.c:445
+#: src/input.c:585
 msgid ""
 "Geometry data error\n"
 "No GC card for tapered wire"
@@ -3126,27 +3736,27 @@ msgstr ""
 "ज्यामिति डेटा त्रुटि\n"
 "टेपर्ड वायर के लिए GC कार्ड नहीं है"
 
-#: src/input.c:452
+#: src/input.c:592
 msgid "Geometry GC data card error"
 msgstr "ज्यामिति GC डेटा कार्ड त्रुटि"
 
-#: src/input.c:468
+#: src/input.c:608
 msgid "Geometry GX data card error"
 msgstr "ज्यामिति GX डेटा कार्ड त्रुटि"
 
-#: src/input.c:491
+#: src/input.c:631
 msgid "Geometry GR data card error"
 msgstr "ज्यामिति GR डेटा कार्ड त्रुटि"
 
-#: src/input.c:545
+#: src/input.c:685
 msgid "No geometry data cards"
 msgstr "कोई ज्यामिति डेटा कार्ड नहीं"
 
-#: src/input.c:556
+#: src/input.c:696
 msgid "Probable invalid segment geometry.\n"
 msgstr "संभावित अमान्य segment ज्यामिति।\n"
 
-#: src/input.c:557
+#: src/input.c:697
 msgid ""
 "Invalid segment geometry.\n"
 "See warnings in the console for detail.\n"
@@ -3156,37 +3766,37 @@ msgstr ""
 "विवरण के लिए कंसोल में चेतावनियाँ देखें।\n"
 "जारी रखने का प्रयास..."
 
-#: src/input.c:563
+#: src/input.c:703
 msgid "Probable invalid segment geometry (see above)\n"
 msgstr "संभावित अमान्य segment ज्यामिति (ऊपर देखें)\n"
 
-#: src/input.c:567
+#: src/input.c:707
 msgid "Read_Geometry: verify_segments() passed\n"
 msgstr "Read_Geometry: verify_segments() पास हुआ\n"
 
-#: src/input.c:604
+#: src/input.c:744
 #, c-format
 msgid "segment data error: tag=%d si=%lf, bi=%lf\n"
 msgstr "Segment डेटा त्रुटि: tag=%d si=%lf, bi=%lf\n"
 
-#: src/input.c:606
+#: src/input.c:746
 msgid "Segment data error, zero-length line?  See console."
 msgstr "Segment डेटा त्रुटि, शून्य-लंबाई वाली लाइन? कंसोल देखें।"
 
-#: src/input.c:646
+#: src/input.c:786
 msgid "Move GM data card error"
 msgstr "Move GM डेटा कार्ड त्रुटि"
 
-#: src/input.c:662 src/input.c:703 src/input.c:720 src/input.c:738
-#: src/input.c:746
+#: src/input.c:802 src/input.c:843 src/input.c:860 src/input.c:878
+#: src/input.c:886
 msgid "Patch data card error"
 msgstr "Patch डेटा कार्ड त्रुटि"
 
-#: src/input.c:684
+#: src/input.c:824
 msgid "Patch data error"
 msgstr "Patch डेटा त्रुटि"
 
-#: src/input.c:793
+#: src/input.c:933
 msgid ""
 "\"GF\" card (NGF solution)\n"
 "is not supported"
@@ -3194,41 +3804,45 @@ msgstr ""
 "\"GF\" कार्ड (NGF समाधान)\n"
 "समर्थित नहीं है"
 
-#: src/input.c:798
+#: src/input.c:938
 msgid "Ignoring CM card in geometry"
 msgstr "ज्यामिति में CM कार्ड को अनदेखा किया जा रहा है"
 
-#: src/input.c:811
+#: src/input.c:951
 #, c-format
 msgid "geometry data card error (nwire=%d)\n"
 msgstr "ज्यामिति डेटा कार्ड त्रुटि (nwire=%d)\n"
 
-#: src/input.c:812
+#: src/input.c:952
 #, c-format
 msgid "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
 msgstr "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
 
-#: src/input.c:815
-msgid "Geometry data card error"
-msgstr "ज्यामिति डेटा कार्ड त्रुटि"
+#: src/input.c:958
+msgid "Command card in geometry section"
+msgstr "ज्यामिति सेक्शन में कमांड कार्ड"
 
-#: src/input.c:839
+#: src/input.c:960
+msgid "Unrecognized geometry card"
+msgstr "अपरिचित ज्यामिति कार्ड"
+
+#: src/input.c:984
 msgid "Failed to initialize symbol table\n"
 msgstr "प्रतीक तालिका को आरंभ करने में विफल\n"
 
-#: src/input.c:840
+#: src/input.c:985
 msgid "Failed to initialize symbol table"
 msgstr "प्रतीक तालिका को आरंभ करने में विफल"
 
-#: src/input.c:1012
+#: src/input.c:1176
 msgid "ignoring CM card in commands\n"
 msgstr "कमांड में CM कार्ड को अनदेखा किया जा रहा है\n"
 
-#: src/input.c:1013
+#: src/input.c:1177
 msgid "Ignoring CM card in commands"
 msgstr "कमांड में CM कार्ड को अनदेखा किया जा रहा है"
 
-#: src/input.c:1017
+#: src/input.c:1181
 msgid ""
 "CP card is ignored\n"
 "Coupling calculation not implemented"
@@ -3236,11 +3850,16 @@ msgstr ""
 "CP कार्ड को अनदेखा किया गया\n"
 "कपलिंग गणना लागू नहीं है"
 
-#: src/input.c:1184
+#: src/input.c:1276
+#, c-format
+msgid "Skipping duplicate FR card at %g MHz\n"
+msgstr "%g MHz पर डुप्लिकेट FR कार्ड छोड़ा जा रहा है\n"
+
+#: src/input.c:1358
 msgid "Max frequency <= Min frequency in FR card\n"
 msgstr "FR कार्ड में अधिकतम आवृत्ति <= न्यूनतम आवृत्ति\n"
 
-#: src/input.c:1185
+#: src/input.c:1359
 msgid ""
 "Max frequency <= Min frequency in FR card\n"
 "Please check FR card data and correct"
@@ -3248,7 +3867,7 @@ msgstr ""
 "FR कार्ड में अधिकतम आवृत्ति <= न्यूनतम आवृत्ति\n"
 "कृपया FR कार्ड डेटा की जाँच करें और सही करें"
 
-#: src/input.c:1208
+#: src/input.c:1382
 msgid ""
 "Fix the GE/GN cards:\n"
 "The GE card specifies that a ground is present, but the GN indicates "
@@ -3257,11 +3876,11 @@ msgstr ""
 "GE/GN कार्ड को ठीक करें:\n"
 "GE कार्ड इंगित करता है कि ग्राउंड मौजूद है, लेकिन GN अन्यथा इंगित करता है।"
 
-#: src/input.c:1222
+#: src/input.c:1396
 msgid "theta > 90 deg. with ground specified\n"
 msgstr "ग्राउंड निर्दिष्ट होने पर theta > 90 डिग्री\n"
 
-#: src/input.c:1223 src/radiation.c:663
+#: src/input.c:1397 src/radiation.c:704
 msgid ""
 "Theta > 90 deg with ground specified\n"
 "Please check RP card data and correct"
@@ -3269,7 +3888,7 @@ msgstr ""
 "ग्राउंड निर्दिष्ट होने पर Theta > 90 डिग्री\n"
 "कृपया RP कार्ड डेटा की जाँच करें और सही करें"
 
-#: src/input.c:1232
+#: src/input.c:1406
 msgid ""
 "radial wire g.s. approximation: may not be used with Sommerfeld ground "
 "option\n"
@@ -3277,7 +3896,7 @@ msgstr ""
 "रेडियल वायर g.s. सन्निकटन: Sommerfeld ग्राउंड विकल्प के साथ उपयोग नहीं किया जा "
 "सकता\n"
 
-#: src/input.c:1233
+#: src/input.c:1407
 msgid ""
 "radial wire g.s. approximation\n"
 "may not be used with Sommerfeld ground option"
@@ -3285,14 +3904,14 @@ msgstr ""
 "रेडियल वायर g.s. सन्निकटन\n"
 "Sommerfeld ग्राउंड विकल्प के साथ उपयोग नहीं किया जा सकता"
 
-#: src/input.c:1281
+#: src/input.c:1455
 #, c-format
 msgid ""
 "data fault on loading card no %d: itag step1 %d is greater than itag step2 "
 "%d\n"
 msgstr "लोडिंग कार्ड संख्या %d पर डेटा दोष: itag step1 %d, itag step2 %d से अधिक है\n"
 
-#: src/input.c:1283
+#: src/input.c:1457
 msgid ""
 "Data fault on loading card\n"
 "itag step1 is greater than itag step2"
@@ -3300,12 +3919,12 @@ msgstr ""
 "लोडिंग कार्ड पर डेटा दोष\n"
 "itag step1, itag step2 से अधिक है"
 
-#: src/input.c:1412
+#: src/input.c:1586
 msgid ""
 "Transmission Line impedance = 0: is not valid. Please correct NT or TL card\n"
 msgstr "ट्रांसमिशन लाइन प्रतिबाधा = 0: मान्य नहीं है। कृपया NT या TL कार्ड सही करें\n"
 
-#: src/input.c:1413
+#: src/input.c:1587
 msgid ""
 "Transmission Line impedance = 0\n"
 "is not valid. Please correct NT or TL card"
@@ -3313,11 +3932,11 @@ msgstr ""
 "ट्रांसमिशन लाइन प्रतिबाधा = 0\n"
 "मान्य नहीं है। कृपया NT या TL कार्ड सही करें"
 
-#: src/input.c:1422
+#: src/input.c:1596
 msgid "Segment number error in TL or NT card\n"
 msgstr "TL या NT कार्ड में Segment संख्या त्रुटि\n"
 
-#: src/input.c:1423
+#: src/input.c:1597
 msgid ""
 "Segment number\n"
 "error in NT or TL card"
@@ -3325,11 +3944,11 @@ msgstr ""
 "NT या TL कार्ड में\n"
 "Segment संख्या त्रुटि"
 
-#: src/input.c:1444
+#: src/input.c:1618
 msgid "PQ and PT cards are ignored: Printing to file not implemented\n"
 msgstr "PQ और PT कार्ड को अनदेखा किया गया: फ़ाइल में प्रिंट करना लागू नहीं है\n"
 
-#: src/input.c:1445
+#: src/input.c:1619
 msgid ""
 "PQ and PT cards are ignored\n"
 "Printing to file not implemented"
@@ -3337,11 +3956,11 @@ msgstr ""
 "PQ और PT कार्ड को अनदेखा किया गया\n"
 "फ़ाइल में प्रिंट करना लागू नहीं है"
 
-#: src/input.c:1452
+#: src/input.c:1626
 msgid "Surface wave option (I1=1): of RP command not implemented\n"
 msgstr "सरफेस वेव विकल्प (I1=1): RP कमांड का लागू नहीं है\n"
 
-#: src/input.c:1453
+#: src/input.c:1627
 msgid ""
 "Surface wave option (I1=1)\n"
 "of RP command not implemented"
@@ -3349,28 +3968,28 @@ msgstr ""
 "सरफेस वेव विकल्प (I1=1)\n"
 "RP कमांड का लागू नहीं है"
 
-#: src/input.c:1478
+#: src/input.c:1652
 msgid "Average gain diagnostic enabled (use --skip-verify to disable)\n"
 msgstr "औसत लाभ निदान सक्षम (अक्षम करने के लिए --skip-verify उपयोग करें)\n"
 
-#: src/input.c:1487
+#: src/input.c:1661
 #, c-format
 msgid "Average power gain disabled: nth=%d nph=%d (both must be >= 2)\n"
 msgstr "औसत शक्ति लाभ अक्षम: nth=%d nph=%d (दोनों >= 2 होने चाहिए)\n"
 
-#: src/input.c:1492
+#: src/input.c:1666
 #, c-format
 msgid "Average power gain calculation enabled (XNDA A=%d)\n"
 msgstr "औसत शक्ति लाभ गणना सक्षम (XNDA A=%d)\n"
 
-#: src/input.c:1508
+#: src/input.c:1682
 msgid ""
 "Theta > 90 deg. with ground specified: Please check RP card data and "
 "correct\n"
 msgstr ""
 "ग्राउंड निर्दिष्ट होने पर Theta > 90 डिग्री: कृपया RP कार्ड डेटा की जाँच करें और सही करें\n"
 
-#: src/input.c:1509
+#: src/input.c:1683
 msgid ""
 "Theta > 90 deg. with ground specified\n"
 "Please check RP card data and correct"
@@ -3378,28 +3997,32 @@ msgstr ""
 "ग्राउंड निर्दिष्ट होने पर Theta > 90 डिग्री\n"
 "कृपया RP कार्ड डेटा की जाँच करें और सही करें"
 
-#: src/input.c:1574
-msgid "Faulty data card"
-msgstr "दोषपूर्ण डेटा कार्ड"
+#: src/input.c:1751
+msgid "Geometry card in command section"
+msgstr "कमांड सेक्शन में ज्यामिति कार्ड"
 
-#: src/input.c:1603
+#: src/input.c:1754
+msgid "Unrecognized command card"
+msgstr "अपरिचित कमांड कार्ड"
+
+#: src/input.c:1791
 msgid ""
 "Missing or surface-wave RP card: Radiation pattern and gain calculations "
 "disabled\n"
 msgstr "गायब या सरफेस-वेव RP कार्ड: विकिरण प्रतिरूप और लाभ गणनाएँ अक्षम\n"
 
-#: src/input.c:1630
+#: src/input.c:1818
 msgid "Unexpected exit from while loop"
 msgstr "while लूप से अप्रत्याशित निकास"
 
-#: src/input.c:1721
+#: src/input.c:1909
 msgid ""
 "command data card error: Unexpected EOF while reading input file - appending "
 "EN card\n"
 msgstr ""
 "कमांड डेटा कार्ड त्रुटि: इनपुट फ़ाइल पढ़ते समय अप्रत्याशित EOF - EN कार्ड जोड़ा जा रहा है\n"
 
-#: src/input.c:1722
+#: src/input.c:1910
 msgid ""
 "Command data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -3409,11 +4032,11 @@ msgstr ""
 "इनपुट फ़ाइल पढ़ते समय अप्रत्याशित EOF\n"
 "डिफ़ॉल्ट EN कार्ड जोड़ा जा रहा है"
 
-#: src/input.c:1736
+#: src/input.c:1927
 msgid "command data card error: card's mnemonic code too short or missing\n"
 msgstr "कमांड डेटा कार्ड त्रुटि: कार्ड का निमोनिक कोड बहुत छोटा है या गायब है\n"
 
-#: src/input.c:1737
+#: src/input.c:1928
 msgid ""
 "Command data card error\n"
 "Mnemonic code too short or missing"
@@ -3421,7 +4044,7 @@ msgstr ""
 "कमांड डेटा कार्ड त्रुटि\n"
 "निमोनिक कोड बहुत छोटा है या गायब है"
 
-#: src/input.c:1930
+#: src/input.c:2121
 msgid ""
 "geometry data card error: Unexpected EOF while reading input file - "
 "appending GE card\n"
@@ -3429,7 +4052,7 @@ msgstr ""
 "ज्यामिति डेटा कार्ड त्रुटि: इनपुट फ़ाइल पढ़ते समय अप्रत्याशित EOF - GE कार्ड जोड़ा जा रहा "
 "है\n"
 
-#: src/input.c:1931
+#: src/input.c:2122
 msgid ""
 "Geometry data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -3439,11 +4062,11 @@ msgstr ""
 "इनपुट फ़ाइल पढ़ते समय अप्रत्याशित EOF\n"
 "डिफ़ॉल्ट GE कार्ड जोड़ा जा रहा है"
 
-#: src/input.c:1945
+#: src/input.c:2139
 msgid "geometry data card error: card's mnemonic code too short or missing\n"
 msgstr "ज्यामिति डेटा कार्ड त्रुटि: कार्ड का निमोनिक कोड बहुत छोटा है या गायब है\n"
 
-#: src/input.c:1946
+#: src/input.c:2140
 msgid ""
 "Geometry data card error\n"
 "Card's mnemonic code too short or missing"
@@ -3485,8 +4108,8 @@ msgstr "builder में ऑब्जेक्ट जोड़ने में 
 msgid "Listing Object Ids:\n"
 msgstr "ऑब्जेक्ट ID सूचीबद्ध कर रहा है:\n"
 
-#: src/interface.c:199 src/utils.c:191 src/utils.c:195 src/utils.c:205
-#: src/utils.c:207
+#: src/interface.c:199 src/utils.c:192 src/utils.c:196 src/utils.c:206
+#: src/utils.c:208
 #, c-format
 msgid "%s\n"
 msgstr "%s\n"
@@ -3502,135 +4125,135 @@ msgstr "libgmodule समर्थित नहीं: इस प्लेटफ
 msgid "xnec2c %s: %s"
 msgstr "xnec2c %s: %s"
 
-#: src/main.c:138
+#: src/main.c:144
 #, c-format
 msgid "%s requires a positive integer argument\n"
 msgstr "%s के लिए एक सकारात्मक पूर्णांक तर्क आवश्यक है\n"
 
-#: src/main.c:201
+#: src/main.c:207
 #, c-format
 msgid "Detected %d CPUs\n"
 msgstr "%d CPUs पाए गए\n"
 
-#: src/main.c:220
+#: src/main.c:226
 #, c-format
 msgid "Detected %s windowing backend\n"
 msgstr "विंडोइंग बैकएंड पाया गया: %s\n"
 
-#: src/main.c:230
+#: src/main.c:236
 msgid "config file path too long\n"
 msgstr "कॉन्फ़िग फ़ाइल पथ बहुत लंबा है\n"
 
-#: src/main.c:248
+#: src/main.c:254
 #, c-format
 msgid "config file does not exist or is not readable: %s\n"
 msgstr "कॉन्फ़िग फ़ाइल मौजूद नहीं है या पढ़ने योग्य नहीं है: %s\n"
 
-#: src/main.c:257
+#: src/main.c:263
 #, c-format
 msgid "config file path too long ( > %d char )\n"
 msgstr "कॉन्फ़िग फ़ाइल पथ बहुत लंबा है ( > %d वर्ण )\n"
 
-#: src/main.c:269
+#: src/main.c:275
 #, c-format
 msgid "input file name too long ( > %d char )\n"
 msgstr "इनपुट फ़ाइल नाम बहुत लंबा है ( > %d वर्ण )\n"
 
-#: src/main.c:296
+#: src/main.c:302
 msgid "Forking disabled!\n"
 msgstr "फोर्किंग अक्षम!\n"
 
-#: src/main.c:304
+#: src/main.c:310
 msgid "pthread freqloop disabled!\n"
 msgstr "pthread freqloop अक्षम!\n"
 
-#: src/main.c:308
+#: src/main.c:314
 msgid "batch mode enabled, will exit after first loop\n"
 msgstr "बैच मोड सक्षम, पहले लूप के बाद बाहर निकलेगा\n"
 
-#: src/main.c:374
+#: src/main.c:380
 msgid "verify segments check disabled\n"
 msgstr "Segment सत्यापन जाँच अक्षम\n"
 
-#: src/main.c:379
+#: src/main.c:385
 msgid "forcing overlap check on large models\n"
 msgstr "बड़े मॉडल पर ओवरलैप जाँच बाध्य की जा रही है\n"
 
-#: src/main.c:384
+#: src/main.c:393
 msgid "managed allocator leak report enabled\n"
 msgstr "managed allocator leak report enabled\n"
 
-#: src/main.c:398
+#: src/main.c:407
 msgid "--batch and --optimize are mutual exclusive.\n"
 msgstr "--batch और --optimize परस्पर अनन्य हैं।\n"
 
-#: src/main.c:414
+#: src/main.c:423
 #, c-format
 msgid "input file path name too long ( > %d char )\n"
 msgstr "इनपुट फ़ाइल पथ नाम बहुत लंबा है ( > %d वर्ण )\n"
 
-#: src/main.c:421
+#: src/main.c:430
 #, c-format
 msgid "unexpected argument '%s' does not appear to be a .nec file\n"
 msgstr "अप्रत्याशित तर्क '%s' एक .nec फ़ाइल प्रतीत नहीं होती\n"
 
-#: src/main.c:428
+#: src/main.c:437
 #, c-format
 msgid "unexpected argument: %s\n"
 msgstr "अप्रत्याशित तर्क: %s\n"
 
-#: src/main.c:434
+#: src/main.c:443
 msgid "batch mode requires an input file\n"
 msgstr "बैच मोड के लिए एक इनपुट फ़ाइल आवश्यक है\n"
 
-#: src/main.c:444
+#: src/main.c:453
 msgid "cannot open display: a running X11 or Wayland session is required\n"
 msgstr "डिस्प्ले नहीं खोला जा सकता: एक चालू X11 या Wayland सत्र आवश्यक है\n"
 
-#: src/main.c:463
+#: src/main.c:472
 #, c-format
 msgid "Forking %d jobs.\n"
 msgstr "%d कार्य फोर्क किए जा रहे हैं।\n"
 
-#: src/main.c:475 src/main.c:483
+#: src/main.c:484 src/main.c:492
 msgid "exiting after fatal error: pipe() failed"
 msgstr "घातक त्रुटि के बाद बाहर निकल रहा है: pipe() विफल"
 
-#: src/main.c:492
+#: src/main.c:501
 msgid "exiting after fatal error: fork() failed"
 msgstr "घातक त्रुटि के बाद बाहर निकल रहा है: fork() विफल"
 
-#: src/main.c:907
+#: src/main.c:1082
 msgid "exiting via user interrupt\n"
 msgstr "उपयोगकर्ता इंटरप्ट द्वारा बाहर निकल रहा है\n"
 
-#: src/main.c:911
+#: src/main.c:1086
 msgid "segmentation fault, exiting\n"
 msgstr "सेगमेंटेशन फॉल्ट, बाहर निकल रहा है\n"
 
-#: src/main.c:915
+#: src/main.c:1090
 msgid "floating point exception, exiting\n"
 msgstr "फ्लोटिंग पॉइंट अपवाद, बाहर निकल रहा है\n"
 
-#: src/main.c:919
+#: src/main.c:1094
 msgid "abort signal received, exiting\n"
 msgstr "एबॉर्ट सिग्नल प्राप्त हुआ, बाहर निकल रहा है\n"
 
-#: src/main.c:923
+#: src/main.c:1098
 msgid "termination request received, exiting\n"
 msgstr "समाप्ति अनुरोध प्राप्त हुआ, बाहर निकल रहा है\n"
 
-#: src/main.c:933
+#: src/main.c:1108
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
 msgstr "फोर्क नहीं हुआ, pid %d से SIGCHLD को अनदेखा कर रहा है\n"
 
-#: src/main.c:941
+#: src/main.c:1116
 #, c-format
 msgid "child process pid %d exited\n"
 msgstr "चाइल्ड प्रोसेस pid %d बाहर निकला\n"
 
-#: src/main.c:950
+#: src/main.c:1125
 #, c-format
 msgid "default exit with signal: %d\n"
 msgstr "सिग्नल के साथ डिफ़ॉल्ट निकास: %d\n"
@@ -3652,7 +4275,7 @@ msgstr "open_mathlib: lib NULL है\n"
 msgid "setenv(%s, %s): %s\n"
 msgstr "setenv(%s, %s): %s\n"
 
-#: src/mathlib.c:320 src/utils.c:448
+#: src/mathlib.c:320 src/utils.c:456
 #, c-format
 msgid "%s: %s\n"
 msgstr "%s: %s\n"
@@ -3718,7 +4341,7 @@ msgstr "set_mathlib_batch: lib == NULL\n"
 
 #: src/mathlib.c:641
 msgid "Batch Math Library"
-msgstr "_बैच गणित लाइब्रेरी"
+msgstr "बैच गणित लाइब्रेरी"
 
 #: src/mathlib.c:642
 msgid ""
@@ -3736,11 +4359,11 @@ msgstr "%s: benchmark=%d\n"
 
 #: src/mathlib.c:752
 msgid "Mathlib Help"
-msgstr "Mathlib _सहायता"
+msgstr "Mathlib सहायता"
 
 #: src/mathlib.c:788
 msgid "Mathlib Benchmark Help"
-msgstr "Mathlib बेंचमार्क _सहायता"
+msgstr "Mathlib बेंचमार्क सहायता"
 
 #: src/mathlib.c:790
 msgid ""
@@ -3818,7 +4441,7 @@ msgstr ""
 #: src/mathlib.c:839 src/mathlib.c:846 src/mathlib.c:852 src/mathlib.c:869
 #: src/mathlib.c:874 src/mathlib.c:989
 msgid "Mathlib Benchmark"
-msgstr "Mathlib _बेंचमार्क"
+msgstr "Mathlib बेंचमार्क"
 
 #: src/mathlib.c:840
 msgid "Benchmarks are disabled while optimization is activated."
@@ -3946,26 +4569,26 @@ msgstr "zgetrs warning: lda(%d) != ldb(%d)\n"
 msgid "dlsym(mkl_set_threading_layer): %s\n"
 msgstr "dlsym(mkl_set_threading_layer): %s\n"
 
-#: src/matrix.c:1208
+#: src/matrix.c:1223
 #, c-format
 msgid "pivot(%d)= %16.8E\n"
 msgstr "pivot(%d)= %16.8E\n"
 
-#: src/matrix.c:1242
+#: src/matrix.c:1257
 #, c-format
 msgid "LU Decomposition Failed: %d\n"
 msgstr "LU विघटन विफल: %d\n"
 
-#: src/matrix.c:1298
+#: src/matrix.c:1313
 #, c-format
 msgid "symmetry error - nrow:%d ncol:%d\n"
 msgstr "सममिति त्रुटि - nrow:%d ncol:%d\n"
 
-#: src/matrix.c:1299
+#: src/matrix.c:1314
 msgid "Symmetry error"
 msgstr "सममिति त्रुटि"
 
-#: src/matrix.c:1403
+#: src/matrix.c:1418
 #, c-format
 msgid "Solving Failed: %d\n"
 msgstr "हल करना विफल: %d\n"
@@ -3978,47 +4601,38 @@ msgstr ""
 "noise_temp_resolve: noise_temp table not allocated; t_sky/t_earth defaulting "
 "to 0\n"
 
-#: src/measurements.c:596
+#: src/measurements.c:606
 #, c-format
 msgid "BUG: pol=%d out of range [0,%d): idx=%d freq_step=%d thr=%lu\n"
 msgstr "BUG: pol=%d out of range [0,%d): idx=%d freq_step=%d thr=%lu\n"
 
-#: src/measurements.c:610
+#: src/measurements.c:620
 #, c-format
 msgid "BUG: mgidx=%d out of range [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n"
 msgstr ""
 "BUG: mgidx=%d out of range [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n"
 
-#: src/measurements.c:613
+#: src/measurements.c:623
 #, c-format
 msgid "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
 msgstr "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
 
-#: src/measurements.c:616
+#: src/measurements.c:626
 #, c-format
 msgid "BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n"
 msgstr "BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n"
 
-#: src/measurements.c:620
+#: src/measurements.c:630
 #, c-format
 msgid "BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
 msgstr "BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
 
-#: src/measurements.c:751
-#, c-format
-msgid ""
-"BUG: F/B nth=%d out of [0,%d) after over-ground recalc: idx=%d pol=%d "
-"max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n"
-msgstr ""
-"BUG: F/B nth=%d out of [0,%d) after over-ground recalc: idx=%d pol=%d "
-"max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n"
-
-#: src/measurements.c:798
+#: src/measurements.c:785
 #, c-format
 msgid "meas_name_idx: Invalid name with length=%d: %s\n"
 msgstr "meas_name_idx: Invalid name with length=%d: %s\n"
 
-#: src/measurements.c:859
+#: src/measurements.c:846
 msgid "meas_format: output overflow\n"
 msgstr "meas_format: output overflow\n"
 
@@ -4032,34 +4646,64 @@ msgstr "mem_obj_from_ptr: ptr %p does not match m->ptr %p (base %p)\n"
 msgid "Memory allocation denied %s: requested %lu bytes\n"
 msgstr "मेमोरी आवंटन अस्वीकृत %s: %lu बाइट अनुरोधित\n"
 
-#: src/mem/mem.c:225
+#: src/mem/mem.c:219
+#, c-format
+msgid "mem_free at %s: array block element size %lu; use mem_array_free\n"
+msgstr "mem_free at %s: array block element size %lu; use mem_array_free\n"
+
+#: src/mem/mem.c:238
 #, c-format
 msgid "mem_obj_t at %p: size=%lu used=%lu addr=%p\n"
 msgstr "mem_obj_t at %p: size=%lu used=%lu addr=%p\n"
 
-#: src/mem/mem.c:246
+#: src/mem/mem.c:259
 #, c-format
 msgid "mem_backtrace(%p):\n"
 msgstr "mem_backtrace(%p):\n"
 
-#: src/mem/mem.c:249
+#: src/mem/mem.c:262
 msgid "  m->backtrace is null, no backtrace data\n"
 msgstr "  m->backtrace शून्य है, कोई backtrace डेटा नहीं\n"
 
-#: src/mem/mem.c:275
+#: src/mem/mem.c:288
 #, c-format
 msgid "mem_clone: allocation failed for %lu bytes\n"
 msgstr "mem_clone: %lu बाइट के लिए आवंटन विफल\n"
 
-#: src/mem/mem.c:332
+#: src/mem/mem.c:345
 #, c-format
 msgid "mem_array verb: element size %lu does not match header %lu\n"
 msgstr "mem_array verb: element size %lu does not match header %lu\n"
 
-#: src/mem/mem.c:424
+#: src/mem/mem.c:437
 #, c-format
 msgid "mem_zero: array block element size %lu; use mem_array_zero\n"
 msgstr "mem_zero: array block element size %lu; use mem_array_zero\n"
+
+#: src/mem/mem_track.c:156
+#, c-format
+msgid "mem_report: snapshot allocation of %llu records failed\n"
+msgstr "mem_report: snapshot allocation of %llu records failed\n"
+
+#: src/mem/mem_track.c:204
+#, c-format
+msgid "mem-report %s: site=%s count=%llu bytes=%llu serial=[%llu..%llu]\n"
+msgstr "mem-report %s: site=%s count=%llu bytes=%llu serial=[%llu..%llu]\n"
+
+#: src/mem/mem_track.c:209
+#, c-format
+msgid "mem-report %s: live_blocks=%llu live_bytes=%llu distinct_sites=%llu\n"
+msgstr "mem-report %s: live_blocks=%llu live_bytes=%llu distinct_sites=%llu\n"
+
+#: src/mem/mem_track.c:215
+#, c-format
+msgid "mem-report %s: serial=%llu site=%s size=%lu used=%lu\n"
+msgstr "mem-report %s: serial=%llu site=%s size=%lu used=%lu\n"
+
+#: src/mem/mem_track.c:223
+#, c-format
+msgid "mem-report %s:   frame %d %s\n"
+msgstr "mem-report %s:   frame %d %s\n"
 
 #: src/nec2_model.c:278 src/nec2_model.c:282 src/nec2_model.c:286
 msgid "Card"
@@ -4107,21 +4751,21 @@ msgstr ""
 "कृपया फ़ाइल पथ निर्दिष्ट करने के लिए\n"
 "सहेजें बटन का उपयोग करें"
 
-#: src/network.c:637
+#: src/network.c:650
 #, c-format
 msgid "improper load type chosen, requested type is %d\n"
 msgstr "अनुचित लोड प्रकार चुना गया, अनुरोधित प्रकार %d है\n"
 
-#: src/network.c:638
+#: src/network.c:651
 msgid "Improper load type chose"
 msgstr "अनुचित लोड प्रकार चुना गया"
 
-#: src/network.c:726
+#: src/network.c:739
 #, c-format
 msgid "loading data card error, no segment has an itag = %d\n"
 msgstr "डेटा कार्ड लोड करने में त्रुटि, किसी भी segment में itag = %d नहीं है\n"
 
-#: src/network.c:727
+#: src/network.c:740
 msgid ""
 "Loading data card\n"
 "Tag number mismatch error"
@@ -4289,35 +4933,40 @@ msgstr "सहेजा जा रहा है %s: %s\n"
 msgid "xnec2c was built without inotify.\n"
 msgstr "xnec2c को inotify के बिना बनाया गया था।\n"
 
-#: src/optimize.c:157
+#: src/optimize.c:188
 #, c-format
 msgid "inotify: matched companion file: %s\n"
 msgstr "inotify: matched companion file: %s\n"
 
-#: src/optimize.c:198
+#: src/optimize.c:229
 #, c-format
 msgid "Unable to configure file modification detection to %s: %s\n"
 msgstr "Unable to configure file modification detection to %s: %s\n"
 
-#: src/optimize.c:203
+#: src/optimize.c:234
 #, c-format
 msgid "Monitoring directory for %s: %s\n"
 msgstr "Monitoring directory for %s: %s\n"
 
-#: src/optimize.c:301
+#: src/optimize.c:256
+#, c-format
+msgid "inotify: file stat failed or zero bytes (errno=%s), retrying\n"
+msgstr "inotify: file stat failed or zero bytes (errno=%s), retrying\n"
+
+#: src/optimize.c:360
 msgid "Exited optimizer thread.\n"
 msgstr "अनुकूलक थ्रेड से बाहर निकला।\n"
 
-#: src/optimize.c:307
+#: src/optimize.c:366
 msgid "optimize.c: exit because this is a child process.\n"
 msgstr "optimize.c: exit because this is a child process.\n"
 
-#: src/optimize.c:333
+#: src/optimize.c:402
 #, c-format
 msgid "inotify: read %zd bytes from inotify fd\n"
 msgstr "inotify: read %zd bytes from inotify fd\n"
 
-#: src/optimize.c:337
+#: src/optimize.c:406
 #, c-format
 msgid ""
 "inotify: SKIP all events (flags) - FREQ_LOOP_RUNNING=%d FREQ_LOOP_INIT=%d "
@@ -4326,12 +4975,12 @@ msgstr ""
 "inotify: SKIP all events (flags) - FREQ_LOOP_RUNNING=%d FREQ_LOOP_INIT=%d "
 "INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n"
 
-#: src/optimize.c:356
+#: src/optimize.c:424
 #, c-format
 msgid "inotify: EVENT @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
 msgstr "inotify: EVENT @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
 
-#: src/optimize.c:360
+#: src/optimize.c:428
 #, c-format
 msgid ""
 "inotify: EVENT flags: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
@@ -4340,59 +4989,53 @@ msgstr ""
 "inotify: EVENT flags: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
 "IN_CREATE=%d IN_DELETE=%d IN_MODIFY=%d\n"
 
-#: src/optimize.c:368
+#: src/optimize.c:436
 #, c-format
 msgid "inotify: FILTER: target='%s' event_name='%s' match=%d\n"
 msgstr "inotify: FILTER: target='%s' event_name='%s' match=%d\n"
 
-#: src/optimize.c:375
+#: src/optimize.c:443
 msgid "inotify: SKIP event (filename mismatch)\n"
 msgstr "inotify: SKIP event (filename mismatch)\n"
 
-#: src/optimize.c:382
+#: src/optimize.c:450
 msgid "inotify: IN_MODIFY on target, setting modify_seen=TRUE\n"
 msgstr "inotify: IN_MODIFY on target, setting modify_seen=TRUE\n"
 
-#: src/optimize.c:390
-msgid ""
-"inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n"
-msgstr ""
-"inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n"
-
-#: src/optimize.c:401 src/optimize.c:434
-#, c-format
-msgid ""
-"inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), "
-"retrying\n"
-msgstr ""
-"inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), "
-"retrying\n"
-
-#: src/optimize.c:407 src/optimize.c:440
-#, c-format
-msgid "inotify: file stat OK - size=%ld bytes\n"
-msgstr "inotify: file stat OK - size=%ld bytes\n"
-
-#: src/optimize.c:423
-msgid ""
-"inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
-"triggering reload\n"
-msgstr ""
-"inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
-"triggering reload\n"
-
-#: src/optimize.c:451
-msgid ""
-"inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
-"skipping\n"
-msgstr ""
-"inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
-"skipping\n"
-
 #: src/optimize.c:458
+msgid ""
+"inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n"
+msgstr ""
+"inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n"
+
+#: src/optimize.c:475
+msgid ""
+"inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
+"triggering reload\n"
+msgstr ""
+"inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
+"triggering reload\n"
+
+#: src/optimize.c:487
+msgid ""
+"inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
+"skipping\n"
+msgstr ""
+"inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
+"skipping\n"
+
+#: src/optimize.c:494
 #, c-format
 msgid "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 msgstr "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
+
+#: src/optimize.c:527
+msgid "failed to create optimizer wake eventfd\n"
+msgstr "अनुकूलक wake eventfd बनाने में विफल\n"
+
+#: src/optimize.c:538
+msgid "failed to create Optimizer Output thread\n"
+msgstr "अनुकूलक आउटपुट थ्रेड बनाने में विफल\n"
 
 #: src/optimizers/opt_fitness.c:345
 #, c-format
@@ -4409,12 +5052,12 @@ msgstr "fitness_transform: unknown direction %d\n"
 msgid "reduce_values: unknown reduction method %d\n"
 msgstr "reduce_values: unknown reduction method %d\n"
 
-#: src/optimizers/opt_nec2_eval.c:81
+#: src/optimizers/opt_nec2_eval.c:80
 #, c-format
 msgid "nec2_eval_signal: eval_mutex contention, blocking (thr=%lu)\n"
 msgstr "nec2_eval_signal: eval_mutex contention, blocking (thr=%lu)\n"
 
-#: src/optimizers/opt_nec2_eval.c:195
+#: src/optimizers/opt_nec2_eval.c:194
 msgid "nec2_eval_run: not initialized\n"
 msgstr "nec2_eval_run: not initialized\n"
 
@@ -4432,15 +5075,19 @@ msgstr ""
 msgid "opt: optimization complete, best fitness: %.6g\n"
 msgstr "opt: अनुकूलन पूर्ण, सर्वश्रेष्ठ फिटनेस: %.6g\n"
 
-#: src/optimizers/opt_session.c:158
+#: src/optimizers/opt_session.c:194
 msgid "opt_start: optimizer already running\n"
 msgstr "opt_start: optimizer already running\n"
 
-#: src/optimizers/opt_session.c:224
+#: src/optimizers/opt_session.c:202
+msgid "opt_start: on_complete notifier is NULL\n"
+msgstr "opt_start: on_complete notifier is NULL\n"
+
+#: src/optimizers/opt_session.c:258
 msgid "opt_start: simple_new failed\n"
 msgstr "opt_start: simple_new failed\n"
 
-#: src/optimizers/opt_session.c:233
+#: src/optimizers/opt_session.c:267
 #, c-format
 msgid "opt_start: pthread_create failed: %d\n"
 msgstr "opt_start: pthread_create failed: %d\n"
@@ -4520,289 +5167,96 @@ msgstr "var '%s' round_result size mismatch\n"
 msgid "var '%s' round_result has element <= 0\n"
 msgstr "var '%s' round_result has element <= 0\n"
 
-#: src/opt_ui_session.c:76
+#: src/opt_ui_session.c:99
 #, c-format
 msgid "opt_ui: optimization finished, best fitness: %.6g\n"
 msgstr "opt_ui: अनुकूलन पूर्ण, सर्वश्रेष्ठ फिटनेस: %.6g\n"
 
-#: src/opt_ui_session.c:112 src/opt_ui_session.c:145 src/opt_ui_session.c:175
-#: src/opt_ui_session.c:277
+#: src/opt_ui_session.c:133 src/opt_ui_session.c:166 src/opt_ui_session.c:196
+#: src/opt_ui_session.c:299
 msgid "Optimization"
 msgstr "अनुकूलन"
 
-#: src/freqplots/freqplots_core.c:55
-msgid "Gain Direction"
-msgstr "लाभ दिशा"
-
-#: src/freqplots/freqplots_core.c:56
-msgid "Viewer Gain"
-msgstr "व्यूअर लाभ"
-
-#: src/freqplots/freqplots_core.c:58
-msgid "Impedance (real/imag)"
-msgstr "प्रतिबाधा (real/imag)"
-
-#: src/freqplots/freqplots_core.c:59
-msgid "Impedance (mag/phase)"
-msgstr "प्रतिबाधा (mag/phase)"
-
-#: src/freqplots/freqplots_core.c:60 src/freqplots/graphs/smith_graph.c:476
-msgid "Smith Chart"
-msgstr "स्मिथ चार्ट"
-
-#: src/freqplots/freqplots_core.c:190
-#, c-format
-msgid "fp_field_cond_active: unhandled cond %d\n"
-msgstr "fp_field_cond_active: unhandled cond %d\n"
-
-#: src/freqplots/freqplots_core.c:206
-msgid "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
-msgstr "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
-
-#: src/freqplots/freqplots_core.c:393
-#, c-format
-msgid ""
-"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
-"%d posn=%d valid=%d\n"
-msgstr ""
-"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
-"%d posn=%d valid=%d\n"
-
-#: src/freqplots/freqplots_core.c:409
-#, c-format
-msgid ""
-"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
-"%d]\n"
-msgstr ""
-"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
-"%d]\n"
-
-#: src/freqplots/freqplots_graph.c:137 src/freqplots/graphs/smith_graph.c:529
-msgid "memory allocation for points failed\n"
-msgstr "पॉइंट्स के लिए मेमोरी आवंटन विफल\n"
-
-#: src/freqplots/freqplots_graph.c:138 src/freqplots/graphs/smith_graph.c:530
-msgid "Draw_Graph():Memory allocation for points failed"
-msgstr "Draw_Graph(): पॉइंट्स के लिए मेमोरी आवंटन विफल"
-
-#: src/freqplots/graphs/smith_graph.c:384
-msgid "0 Ω"
-msgstr "0 Ω"
-
-#: src/freqplots/graphs/smith_graph.c:387
-#: src/freqplots/graphs/smith_graph.c:462
-msgid "∞ Ω"
-msgstr "∞ Ω"
-
-#: src/freqplots/graphs/smith_graph.c:407
-msgid "constant R"
-msgstr "स्थिर R"
-
-#: src/freqplots/graphs/smith_graph.c:408
-msgid "constant X"
-msgstr "स्थिर X"
-
-#: src/freqplots/graphs/smith_graph.c:409
-msgid "unity R, X"
-msgstr "एकक R, X"
-
-#: src/freqplots/graphs/smith_graph.c:410
-msgid "match (z = 1)"
-msgstr "सुमेल (z = 1)"
-
-#: src/freqplots/graphs/smith_graph.c:411
-msgid "impedance vs freq"
-msgstr "प्रतिबाधा बनाम आवृत्ति"
-
-#: src/freqplots/graphs/smith_graph.c:412
-msgid "selected frequency"
-msgstr "चयनित आवृत्ति"
-
-#: src/freqplots/graphs/smith_graph.c:413
-msgid "reflection angle (°)"
-msgstr "परावर्तन कोण (°)"
-
-#: src/freqplots/graphs/smith_graph.c:414
-msgid "wavelengths → gen"
-msgstr "तरंगदैर्ध्य → gen"
-
-#: src/freqplots/graphs/smith_graph.c:507
-#, c-format
-msgid "Z0 = %g Ω"
-msgstr "Z0 = %g Ω"
-
-#: src/freqplots/graphs/smith_graph.c:514
-msgid "INDUCTIVE (+jX)"
-msgstr "प्रेरणात्मक (+jX)"
-
-#: src/freqplots/graphs/smith_graph.c:517
-msgid "CAPACITIVE (-jX)"
-msgstr "धारित्रीय (-jX)"
-
-#: src/freqplots/graphs/gain_graph.c:66 src/freqplots/graphs/viewer_graph.c:39
-msgid "Raw Gain dBi"
-msgstr "कच्चा लाभ dBi"
-
-#: src/freqplots/graphs/gain_graph.c:71
-msgid "Max Gain & Net Gain vs Frequency"
-msgstr "अधिकतम लाभ और शुद्ध लाभ बनाम आवृत्ति"
-
-#: src/freqplots/graphs/gain_graph.c:72
-msgid "Net Gain dBi"
-msgstr "शुद्ध लाभ dBi"
-
-#: src/freqplots/graphs/gain_graph.c:77 src/freqplots/graphs/gain_graph.c:84
-msgid "Max Gain & F/B Ratio vs Frequency"
-msgstr "अधिकतम लाभ और F/B अनुपात बनाम आवृत्ति"
-
-#: src/freqplots/graphs/gain_graph.c:85
-msgid "F/B Ratio dB"
-msgstr "F/B अनुपात dB"
-
-#: src/freqplots/graphs/gain_graph.c:91
-msgid "Rad Angle - deg"
-msgstr "विकिरण कोण - deg"
-
-#: src/freqplots/graphs/gain_graph.c:92
-msgid "Max Gain Direction vs Frequency"
-msgstr "अधिकतम लाभ दिशा बनाम आवृत्ति"
-
-#: src/freqplots/graphs/gain_graph.c:93
-msgid "Phi - deg"
-msgstr "Phi - deg"
-
-#: src/freqplots/graphs/viewer_graph.c:40
-msgid "Gain in Viewer Direction vs Frequency"
-msgstr "दर्शक दिशा में लाभ बनाम आवृत्ति"
-
-#: src/freqplots/graphs/viewer_graph.c:56
-msgid "Net gain dBi"
-msgstr "शुद्ध लाभ dBi"
-
-#: src/freqplots/graphs/vswr_graph.c:43
-msgid "VSWR & S11 vs Frequency"
-msgstr "VSWR और S11 बनाम आवृत्ति"
-
-#: src/freqplots/graphs/vswr_graph.c:44
-msgid "S11 dB"
-msgstr "S11 dB"
-
-#: src/freqplots/graphs/vswr_graph.c:48
-msgid "VSWR vs Frequency"
-msgstr "VSWR बनाम आवृत्ति"
-
-#: src/freqplots/graphs/impedance_graph.c:57
-#: src/freqplots/graphs/impedance_graph.c:62
-msgid "Impedance vs Frequency"
-msgstr "प्रतिबाधा बनाम आवृत्ति"
-
-#: src/freqplots/graphs/impedance_graph.c:61
-msgid "Z-magn"
-msgstr "Z-magn"
-
-#: src/freqplots/graphs/impedance_graph.c:63
-msgid "Z-phase"
-msgstr "Z-phase"
-
-#: src/freqplots/graphs/anttemp_graph.c:54
-msgid "G/Ta (dB)"
-msgstr "G/Ta (dB)"
-
-#: src/freqplots/graphs/anttemp_graph.c:55
-msgid "G/Ta & TA - Antenna noise temperature"
-msgstr "G/Ta और TA - एंटीना शोर तापमान"
-
-#: src/freqplots/graphs/anttemp_graph.c:57
-msgid "Ta (K)"
-msgstr "Ta (K)"
-
-#: src/freqplots/graphs/anttemp_graph.c:59
-msgid "TA (K)"
-msgstr "TA (K)"
-
-#: src/prerender/prerender_color.c:107
+#: src/prerender/prerender_color.c:108
 #, c-format
 msgid "segment_type_to_rgb: unknown type %d\n"
 msgstr "segment_type_to_rgb: unknown type %d\n"
 
-#: src/prerender/prerender_color.c:134
+#: src/prerender/prerender_color.c:135
 #, c-format
 msgid "segment_type_to_width: unknown type %d\n"
 msgstr "segment_type_to_width: unknown type %d\n"
 
-#: src/radiation.c:838
+#: src/prerender/prerender_color_proj.c:299
+#: src/prerender/prerender_color_proj.c:326
+#, c-format
+msgid "unhandled color projection %d\n"
+msgstr "unhandled color projection %d\n"
+
+#: src/prerender/prerender_color_proj.c:337
+#, c-format
+msgid "invalid color projection %d, using amplitude\n"
+msgstr "invalid color projection %d, using amplitude\n"
+
+#: src/radiation.c:879
 #, c-format
 msgid "Average gain %.4f exceeds expected %.4f; check RP theta/phi ranges\n"
 msgstr "औसत लाभ %.4f अपेक्षित %.4f से अधिक है; RP theta/phi सीमाएँ जाँचें\n"
 
-#: src/radiation.c:842
+#: src/radiation.c:883
 #, c-format
 msgid ""
 "Average gain: %.4f (%.2f dBi), efficiency: %.1f%%, solid angle: %.4f * pi "
 "sr\n"
 msgstr "औसत लाभ: %.4f (%.2f dBi), दक्षता: %.1f%%, ठोस कोण: %.4f * pi sr\n"
 
-#: src/rc_config.c:376
+#: src/rc_config.c:808
 #, c-format
 msgid "unable to getcwd(): %s\n"
 msgstr "unable to getcwd(): %s\n"
 
-#: src/rc_config.c:380
+#: src/rc_config.c:812
 #, c-format
 msgid "environment variable HOME is undefined, using %s\n"
 msgstr "environment variable HOME is undefined, using %s\n"
 
-#: src/rc_config.c:465
+#: src/rc_config.c:897
 #, c-format
 msgid ""
 "%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
 msgstr ""
 "%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
 
-#: src/rc_config.c:526
-#, c-format
-msgid ""
-"rc_config: %s: builder_check_menu_item_id is NULL but builder_window is "
-"defined.\n"
-msgstr ""
-"rc_config: %s: builder_check_menu_item_id is NULL but builder_window is "
-"defined.\n"
+#: src/rc_config.c:977
+msgid "rc_config_default_int: no integer default for field\n"
+msgstr "rc_config_default_int: no integer default for field\n"
 
-#: src/rc_config.c:529
+#: src/rc_config.c:1066
 #, c-format
-msgid ""
-"rc_config: %s: builder_window is NULL but builder_check_menu_item_id is "
-"defined.\n"
-msgstr ""
-"rc_config: %s: builder_window is NULL but builder_check_menu_item_id is "
-"defined.\n"
+msgid "rc_config_field_size: %s: unsupported format %s\n"
+msgstr "rc_config_field_size: %s: unsupported format %s\n"
 
-#: src/rc_config.c:542
-#, c-format
-msgid "match: %s\n"
-msgstr "मिलान: %s\n"
-
-#: src/rc_config.c:567
+#: src/rc_config.c:1112
 #, c-format
 msgid "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
 msgstr "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
 
-#: src/rc_config.c:615
+#: src/rc_config.c:1146
 #, c-format
 msgid "%s: EOF reading application version.\n"
 msgstr "%s: EOF reading application version.\n"
 
-#: src/rc_config.c:621
+#: src/rc_config.c:1152
 #, c-format
 msgid "existing config file version differs: %s != %s\n"
 msgstr "existing config file version differs: %s != %s\n"
 
-#: src/rc_config.c:920
+#: src/rc_config.c:1291
 #, c-format
 msgid "stat failed for %s: %s\n"
 msgstr "stat failed for %s: %s\n"
 
-#: src/rc_config.c:926
+#: src/rc_config.c:1297
 #, c-format
 msgid ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
@@ -4811,42 +5265,46 @@ msgstr ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
 "4e62893b.\n"
 
-#: src/rc_config.c:957
+#: src/rc_config.c:1328
 #, c-format
 msgid "%s:%d: Line not parsed: %s\n"
 msgstr "%s:%d: Line not parsed: %s\n"
 
-#: src/rc_config.c:963
+#: src/rc_config.c:1334
 #, c-format
 msgid "%s:%d: Early end of file for %s: %s \n"
 msgstr "%s:%d: Early end of file for %s: %s \n"
 
-#: src/rc_config.c:988
+#: src/rc_config.c:1359
 #, c-format
 msgid "%s:%d: parse error (%s): %s \n"
 msgstr "%s:%d: parse error (%s): %s \n"
 
-#: src/rc_config.c:1011
+#: src/rc_config.c:1373
 #, c-format
 msgid "Invalid sky model index %d in config, resetting to default\n"
 msgstr "कॉन्फ़िग में अमान्य sky मॉडल इंडेक्स %d, डिफ़ॉल्ट पर रीसेट हो रहा है\n"
 
-#: src/rc_config.c:1017
+#: src/rc_config.c:1379
 #, c-format
 msgid "Invalid earth model index %d in config, resetting to default\n"
 msgstr "कॉन्फ़िग में अमान्य earth मॉडल इंडेक्स %d, डिफ़ॉल्ट पर रीसेट हो रहा है\n"
 
-#: src/rc_config.c:1023
+#: src/rc_config.c:1385
 #, c-format
 msgid "Invalid interp method %d in config, resetting to default\n"
 msgstr "कॉन्फ़िग में अमान्य interp विधि %d, डिफ़ॉल्ट पर रीसेट हो रहा है\n"
 
-#: src/rc_config.c:1341
+#: src/rc_config.c:1560
+msgid "batch mode: skipping configuration save\n"
+msgstr "बैच मोड: कॉन्फ़िगरेशन सहेजना छोड़ा जा रहा है\n"
+
+#: src/rc_config.c:1567
 #, c-format
 msgid "cannot open xnec2c's config file %s: %s\n"
 msgstr "xnec2c की कॉन्फ़िग फ़ाइल %s नहीं खोली जा सकती: %s\n"
 
-#: src/rdpattern_ui.c:36
+#: src/rdpattern_ui.c:37
 msgid ""
 "Animation requires near field data.\n"
 "\n"
@@ -4860,7 +5318,7 @@ msgstr ""
 "H-क्षेत्र एनिमेशन: NEC फ़ाइल में NH कार्ड जोड़ें\n"
 "Poynting सदिश: NE और NH दोनों कार्ड जोड़ें"
 
-#: src/rdpattern_ui.c:92
+#: src/rdpattern_ui.c:93
 #, c-format
 msgid ""
 "Scale_Gain_Resolved: gain_style %d out of range [0..%d], defaulting to "
@@ -4868,7 +5326,7 @@ msgid ""
 msgstr ""
 "Scale_Gain_Resolved: gain_style %d सीमा से बाहर [0..%d], GS_LINP पर डिफ़ॉल्ट\n"
 
-#: src/rdpattern_ui.c:561 src/rdpattern_ui.c:567
+#: src/rdpattern_ui.c:562 src/rdpattern_ui.c:568
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
@@ -4876,7 +5334,7 @@ msgstr ""
 "प्रेक्षण उन्नयन कोण। एंटीना तापमान मूल्यांकन के लिए आकाश/पृथ्वी सीमा स्थानांतरित करता है। "
 "0° = क्षितिज।"
 
-#: src/rdpattern_ui.c:564 src/rdpattern_ui.c:570
+#: src/rdpattern_ui.c:565 src/rdpattern_ui.c:571
 msgid ""
 "Observation elevation for antenna temperature.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -4884,13 +5342,13 @@ msgstr ""
 "एंटीना तापमान के लिए प्रेक्षण उन्नयन।\n"
 "सक्षम करने के लिए Gain Style → Noise Temperature चुनें।"
 
-#: src/rdpattern_ui.c:573
+#: src/rdpattern_ui.c:574
 msgid ""
 "Independent sky, earth, and interpolation selectors for noise temperature "
 "models."
 msgstr "शोर तापमान मॉडल के लिए स्वतंत्र sky, earth और interpolation चयनकर्ता।"
 
-#: src/rdpattern_ui.c:575
+#: src/rdpattern_ui.c:576
 msgid ""
 "Sky and earth noise temperature models.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -4898,71 +5356,71 @@ msgstr ""
 "आकाश और पृथ्वी शोर तापमान मॉडल।\n"
 "सक्षम करने के लिए Gain Style → Noise Temperature चुनें।"
 
-#: src/rdpattern_ui.c:976
+#: src/rdpattern_ui.c:961
 msgid "Total Gain"
 msgstr "कुल लाभ"
 
-#: src/rdpattern_ui.c:977
+#: src/rdpattern_ui.c:962
 msgid "Horizontal Polarization"
 msgstr "क्षैतिज ध्रुवण"
 
-#: src/rdpattern_ui.c:978
+#: src/rdpattern_ui.c:963
 msgid "Vertical Polarization"
 msgstr "ऊर्ध्वाधर ध्रुवण"
 
-#: src/rdpattern_ui.c:979
+#: src/rdpattern_ui.c:964
 msgid "RH Circular Polarization"
 msgstr "RH वृत्तीय ध्रुवण"
 
-#: src/rdpattern_ui.c:980
+#: src/rdpattern_ui.c:965
 msgid "LH Circular Polarization"
 msgstr "LH वृत्तीय ध्रुवण"
 
-#: src/rdpattern_ui.c:985
+#: src/rdpattern_ui.c:970
 msgid "Linear Power"
 msgstr "रैखिक शक्ति"
 
-#: src/rdpattern_ui.c:986
+#: src/rdpattern_ui.c:971
 msgid "Linear Voltage"
 msgstr "रैखिक वोल्टेज"
 
-#: src/rdpattern_ui.c:987
+#: src/rdpattern_ui.c:972
 msgid "ARRL Scale"
 msgstr "ARRL स्केल"
 
-#: src/rdpattern_ui.c:988
+#: src/rdpattern_ui.c:973
 msgid "Logarithmic Scale"
 msgstr "लघुगणकीय स्केल"
 
-#: src/rdpattern_ui.c:989
+#: src/rdpattern_ui.c:974
 msgid "Noise Temperature"
 msgstr "शोर तापमान"
 
-#: src/rdpattern_ui.c:990
+#: src/rdpattern_ui.c:975
 msgid "Noise Temp (log scale)"
 msgstr "शोर तापमान (लघुगणकीय स्केल)"
 
-#: src/rdpattern_ui.c:1002
+#: src/rdpattern_ui.c:987
 msgid "Radiation Pattern: - "
 msgstr "विकिरण प्रतिरूप: - "
 
-#: src/rdpattern_ui.c:1022
+#: src/rdpattern_ui.c:1007
 msgid "Near Fields:"
 msgstr "निकट क्षेत्र:"
 
-#: src/rdpattern_ui.c:1024
+#: src/rdpattern_ui.c:1009
 msgid " - E Field"
 msgstr " - E क्षेत्र"
 
-#: src/rdpattern_ui.c:1026
+#: src/rdpattern_ui.c:1011
 msgid " - H Field"
 msgstr " - H क्षेत्र"
 
-#: src/rdpattern_ui.c:1028
+#: src/rdpattern_ui.c:1013
 msgid " - Poynting Vector"
 msgstr " - Poynting सदिश"
 
-#: src/rdpattern_ui.c:1038
+#: src/rdpattern_ui.c:1023
 msgid "Frequency Data Plots - "
 msgstr "आवृत्ति डेटा प्लॉट - "
 
@@ -4976,56 +5434,40 @@ msgstr "fstep=%d सीमा से बाहर है। calc_data.steps_tota
 msgid "gradient_cache_update: surface creation failed (%dx%d)\n"
 msgstr "gradient_cache_update: surface creation failed (%dx%d)\n"
 
-#: src/render/render_dispatch.c:413
+#: src/render/render_dispatch.c:474
 #, c-format
 msgid "render: unhandled mode %d\n"
 msgstr "render: unhandled mode %d\n"
 
-#: src/settings/render_settings_common.c:124
+#: src/settings/render_settings_common.c:86
+msgid "config_reset_tab_user: field has no rc_config_vars row\n"
+msgstr "config_reset_tab_user: field has no rc_config_vars row\n"
+
+#: src/settings/render_settings_common.c:116
 #, c-format
 msgid "render_settings_init: failed to load glade: %s\n"
 msgstr "render_settings_init: failed to load glade: %s\n"
 
-#: src/settings/render_settings_common.c:134
+#: src/settings/render_settings_common.c:126
 #, c-format
 msgid "render_settings_init: failed to load opengl glade: %s\n"
 msgstr "render_settings_init: failed to load opengl glade: %s\n"
 
-#: src/settings/render_settings_common.c:144
+#: src/settings/render_settings_common.c:136
 #, c-format
 msgid "render_settings_init: failed to load cairo glade: %s\n"
 msgstr "render_settings_init: failed to load cairo glade: %s\n"
 
-#: src/settings/render_settings_common.c:157
+#: src/settings/render_settings_common.c:149
 msgid "render_settings_init: failed to get render_settings_window from glade\n"
 msgstr ""
 "render_settings_init: failed to get render_settings_window from glade\n"
 
-#: src/settings/render_settings_dispatch.c:104
-#, c-format
-msgid "config_apply_entry: missing widget '%s'\n"
-msgstr "config_apply_entry: missing widget '%s'\n"
-
-#: src/settings/render_settings_dispatch.c:136
-#, c-format
-msgid "config_apply_entry: unknown widget type for '%s'\n"
-msgstr "config_apply_entry: unknown widget type for '%s'\n"
-
-#: src/settings/render_settings_dispatch.c:164
-#, c-format
-msgid "config_sync_entry: missing widget '%s'\n"
-msgstr "config_sync_entry: missing widget '%s'\n"
-
-#: src/settings/render_settings_dispatch.c:193
-#, c-format
-msgid "config_sync_entry: unknown widget type for '%s'\n"
-msgstr "config_sync_entry: unknown widget type for '%s'\n"
-
-#: src/somnec.c:237
+#: src/somnec.c:302
 msgid "Hankel not valid for z = 0"
-msgstr "Hankel Z = 0 के लिए मान्य नहीं है"
+msgstr "Hankel z = 0 के लिए मान्य नहीं है"
 
-#: src/somnec.c:748
+#: src/somnec.c:807
 msgid "No convergence"
 msgstr "अभिसरण नहीं हुआ"
 
@@ -5124,6 +5566,41 @@ msgstr ""
 "यह नियंत्रण करता है कि क्या यह पैरामीटर NEC मॉडल मान को ओवरराइड करता है।\n"
 "स्वतंत्र रूप से नियंत्रित करने के लिए Opt अनचेक करें।"
 
+#: src/themes/theme.c:129
+#, c-format
+msgid "theme '%s' role '%s' invalid color, using legacy default\n"
+msgstr "theme '%s' role '%s' invalid color, using legacy default\n"
+
+#: src/themes/theme.c:212
+#, c-format
+msgid "theme: cannot load resource %s: %s\n"
+msgstr "theme: cannot load resource %s: %s\n"
+
+#: src/themes/theme.c:222
+#, c-format
+msgid "theme: cannot parse resource %s: %s\n"
+msgstr "theme: cannot parse resource %s: %s\n"
+
+#: src/themes/theme.c:248
+#, c-format
+msgid "theme: cannot parse %s, using built-in defaults\n"
+msgstr "theme: cannot parse %s, using built-in defaults\n"
+
+#: src/themes/theme.c:377
+#, c-format
+msgid "theme '%s' has no inverted variant, using base\n"
+msgstr "theme '%s' has no inverted variant, using base\n"
+
+#: src/themes/theme.c:385
+#, c-format
+msgid "theme '%s' not found, using legacy\n"
+msgstr "theme '%s' not found, using legacy\n"
+
+#: src/themes/theme.c:457
+#, c-format
+msgid "width '%s' invalid, keeping current value\n"
+msgstr "width '%s' invalid, keeping current value\n"
+
 #: src/utils.c:42
 #, c-format
 msgid ""
@@ -5162,6 +5639,7 @@ msgid ""
 "  --write-currents        <filename>  - write CSV of currents and charges\n"
 "  --write-gnuplot-structure <filename> - write gnuplot structure file\n"
 "  --write-patch-currents  <filename>  - write CSV of patch surface currents\n"
+"  --write-validation-dir <directory> - write full validation data tree\n"
 msgstr ""
 "उपयोग: xnec2c [विकल्प] [<input-file-name>]\n"
 "  -i|--input         <input-file-name>\n"
@@ -5197,8 +5675,9 @@ msgstr ""
 "  --write-currents        <filename>  - धाराओं और आवेशों की CSV लिखें\n"
 "  --write-gnuplot-structure <filename> - gnuplot संरचना फ़ाइल लिखें\n"
 "  --write-patch-currents  <filename>  - patch सरफेस धाराओं की CSV लिखें\n"
+"  --write-validation-dir <directory> - संपूर्ण सत्यापन डेटा ट्री लिखें\n"
 
-#: src/utils.c:98 src/utils.c:103
+#: src/utils.c:99 src/utils.c:104
 #, c-format
 msgid ""
 "\n"
@@ -5211,98 +5690,149 @@ msgstr ""
 "%s\n"
 "\n"
 
-#: src/utils.c:184
+#: src/utils.c:185
 #, c-format
 msgid "Stop: %s\n"
 msgstr "रोकें: %s\n"
 
-#: src/utils.c:220 src/utils.c:222
+#: src/utils.c:224 src/utils.c:226
 #, c-format
 msgid "Stop during freq loop, deadlock prevented: %s\n"
 msgstr "आवृत्ति लूप के दौरान रोकें, डेडलॉक रोका गया: %s\n"
 
-#: src/utils.c:402
+#: src/utils.c:410
 #, c-format
 msgid "using %d OpenMP threads per job (%d/%d CPUs)\n"
 msgstr "%d OpenMP थ्रेड प्रति जॉब का उपयोग कर रहा है (%d/%d CPUs)\n"
 
-#: src/utils.c:418
+#: src/utils.c:426
 #, c-format
 msgid "%s[%d]: %f seconds\n"
 msgstr "%s[%d]: %f सेकंड\n"
 
-#: src/utils.c:443
+#: src/utils.c:451
 #, c-format
 msgid "xnec2c[%d]: %s: Failed to open file: %s\n"
 msgstr "xnec2c[%d]: %s: फ़ाइल खोलने में विफल: %s\n"
 
-#: src/utils.c:833
+#: src/utils.c:850
 msgid "Optimizer loop incomplete, suppressing intermediate redraw.\n"
 msgstr "ऑप्टिमाइज़र लूप अपूर्ण, मध्यवर्ती पुनः चित्रण दबा रहा है।\n"
 
-#: src/utils.c:849
+#: src/utils.c:866
 msgid "  Backtrace:\n"
 msgstr "  Backtrace:\n"
 
-#: src/utils.c:851
+#: src/utils.c:868
 #, c-format
 msgid "    %d. %s\n"
 msgstr "    %d. %s\n"
 
-#: src/utils.c:878
+#: src/utils.c:895
 #, c-format
 msgid "%s:\n"
 msgstr "%s:\n"
 
-#: src/xnec2c.c:281
+#: src/validation_dump.c:33
+msgid ""
+"validation: nec2-builtin mathlib not available; numeric results may differ "
+"from reference\n"
+msgstr ""
+"validation: nec2-builtin mathlib not available; numeric results may differ "
+"from reference\n"
+
+#: src/validation_dump.c:38
+msgid "validation: forced mathlib to nec2-builtin for reproducibility\n"
+msgstr "validation: forced mathlib to nec2-builtin for reproducibility\n"
+
+#: src/validation_dump.c:57
+msgid ""
+"validation: forced antenna-temp models and elevation for reproducibility\n"
+msgstr ""
+"validation: forced antenna-temp models and elevation for reproducibility\n"
+
+#: src/validation_dump.c:67
+msgid "validation: forced polarization to total for reproducibility\n"
+msgstr "validation: forced polarization to total for reproducibility\n"
+
+#: src/validation_dump.c:78
+msgid ""
+"validation: reset structure viewer to default orientation for "
+"reproducibility\n"
+msgstr ""
+"validation: reset structure viewer to default orientation for "
+"reproducibility\n"
+
+#: src/validation_dump.c:568 src/validation_dump.c:574
+msgid "Validation Tree"
+msgstr "सत्यापन ट्री"
+
+#: src/validation_dump.c:568
+msgid "Cannot save: frequency loop not done"
+msgstr "सहेजा नहीं जा सकता: आवृत्ति लूप पूर्ण नहीं हुआ है"
+
+#: src/validation_dump.c:574
+msgid "Cannot create output directory"
+msgstr "आउटपुट डायरेक्टरी नहीं बनाई जा सकती"
+
+#: src/validation_dump.c:606
+#, c-format
+msgid "validation tree written to: %s\n"
+msgstr "सत्यापन ट्री यहाँ लिखी गई: %s\n"
+
+#: src/xnec2c.c:282
 #, c-format
 msgid ""
 "complex dielectric constant from file: %12.5E%+12.5Ej, requested: %12.5E"
 "%+12.5Ej\n"
 msgstr "फ़ाइल से जटिल परावैद्युत स्थिरांक: %12.5E%+12.5Ej, अनुरोधित: %12.5E%+12.5Ej\n"
 
-#: src/xnec2c.c:284
+#: src/xnec2c.c:285
 msgid "Ground_Parameters():Error in ground parameters"
 msgstr "Ground_Parameters(): ग्राउंड पैरामीटर में त्रुटि"
 
-#: src/xnec2c.c:611
+#: src/xnec2c.c:708
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
 msgstr "%.6f MHz: %f सेकंड। (%s)\n"
 
-#: src/xnec2c.c:865
+#: src/xnec2c.c:962
 #, c-format
 msgid "green_line_eval returned unknown class %d\n"
 msgstr "green_line_eval returned unknown class %d\n"
 
-#: src/xnec2c.c:946
+#: src/xnec2c.c:1043
 #, c-format
 msgid ""
 "step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
 msgstr ""
 "step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
 
-#: src/xnec2c.c:1042
+#: src/xnec2c.c:1139
 #, c-format
 msgid "child %d has invalid pipe fd during forked collect\n"
 msgstr "child %d का forked collect के दौरान अमान्य pipe fd है\n"
 
-#: src/xnec2c.c:1097
+#: src/xnec2c.c:1194
 msgid "Failed to read data from forked child\n"
 msgstr "फोर्क किए गए चाइल्ड से डेटा पढ़ने में विफल\n"
 
-#: src/xnec2c.c:1174
+#: src/xnec2c.c:1271
 #, c-format
 msgid ""
 "fmhz_save %.4f MHz outside FR card ranges; reset to %.4f MHz (VSWR %.2f)\n"
 msgstr ""
 "fmhz_save %.4f MHz FR कार्ड सीमाओं के बाहर; %.4f MHz पर रीसेट (VSWR %.2f)\n"
 
-#: src/xnec2c.c:1199
+#: src/xnec2c.c:1300
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
 msgstr "आवृत्ति लूप बीता समय: %f सेकंड। (%s)\n"
 
-#: src/xnec2c.c:1438
+#: src/xnec2c.c:1567
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "Frequency_Loop_Thread प्रारंभ करने में विफल\n"
+
+#, c-format
+#~ msgid "invalid color family %d, using power\n"
+#~ msgstr "invalid color family %d, using power\n"

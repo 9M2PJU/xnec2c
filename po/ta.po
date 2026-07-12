@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-07-11 14:02-0700\n"
+"POT-Creation-Date: 2026-07-12 15:24-0700\n"
 "PO-Revision-Date: 2026-07-11 10:31-0700\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2748
+#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2842
 msgid "xnec2c"
 msgstr "xnec2c"
 
@@ -44,7 +44,7 @@ msgstr "இயல்பிருப்பு"
 msgid "Fast"
 msgstr "வேகமான"
 
-#: resources/settings/cairo_settings.glade:56 resources/xnec2c.glade:406
+#: resources/settings/cairo_settings.glade:56 resources/xnec2c.glade:414
 msgid "None"
 msgstr "ஏதுமில்லை"
 
@@ -56,7 +56,7 @@ msgstr "நிற அளவுப்படுத்தல்"
 msgid "Off"
 msgstr "அணை"
 
-#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4654
+#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4748
 msgid "8"
 msgstr "8"
 
@@ -202,34 +202,34 @@ msgstr "சட்டங்கள்/வினாடி"
 msgid "Animate Freq (Hz)"
 msgstr "அசைவூட்ட அதிர்வெண் (Hz)"
 
-#: resources/xnec2c.glade:345
+#: resources/xnec2c.glade:348
 msgid "Color projection:"
 msgstr "நிற ப்ரொஜெக்ஷன்:"
 
-#: resources/xnec2c.glade:356
+#: resources/xnec2c.glade:361
 msgid ""
 "Select how wire and patch colors follow the excitation phase while animating."
 msgstr ""
 "அசைவூட்டும்போது கம்பி மற்றும் தொகுதி நிறங்கள் தூண்டல் கட்டத்தை எவ்வாறு பின்பற்றும் என்பதைத் "
 "தேர்ந்தெடுக்கவும்."
 
-#: resources/xnec2c.glade:358
+#: resources/xnec2c.glade:363
 msgid "Instantaneous Magnitude"
 msgstr "உடனடி அளவு"
 
-#: resources/xnec2c.glade:359
+#: resources/xnec2c.glade:364
 msgid "Instantaneous Polarity"
 msgstr "உடனடி முனைவு"
 
-#: resources/xnec2c.glade:360
+#: resources/xnec2c.glade:365
 msgid "Phase Hue"
 msgstr "கட்ட நிறமி"
 
-#: resources/xnec2c.glade:387
+#: resources/xnec2c.glade:393
 msgid "Scale family:"
 msgstr "அளவீட்டு குடும்பம்:"
 
-#: resources/xnec2c.glade:398
+#: resources/xnec2c.glade:406
 msgid ""
 "Select the magnitude-to-color transfer family.\n"
 "Mirrors the Visualization menu setting in the main window.\n"
@@ -239,36 +239,36 @@ msgstr ""
 "முதன்மைச் சாளரத்தில் உள்ள காட்சிப்படுத்தல் மெனு அமைப்பைப் பிரதிபலிக்கிறது.\n"
 "ஒவ்வொரு குடும்பமும் கீழேயுள்ள சருக்கியில் தனது சொந்த ஒளிர்வு அளவுருவை வைத்திருக்கும்."
 
-#: resources/xnec2c.glade:400
+#: resources/xnec2c.glade:408
 msgid "Power"
 msgstr "திறன்"
 
-#: resources/xnec2c.glade:401 resources/xnec2c.glade:12634
-#: resources/xnec2c.glade:14009
+#: resources/xnec2c.glade:409 resources/xnec2c.glade:12728
+#: resources/xnec2c.glade:14103
 msgid "dB"
 msgstr "dB"
 
-#: resources/xnec2c.glade:402
+#: resources/xnec2c.glade:410
 msgid "Asinh"
 msgstr "Asinh"
 
-#: resources/xnec2c.glade:403
+#: resources/xnec2c.glade:411
 msgid "μ-law"
 msgstr "μ-law"
 
-#: resources/xnec2c.glade:404
+#: resources/xnec2c.glade:412
 msgid "Reinhard"
 msgstr "Reinhard"
 
-#: resources/xnec2c.glade:405
+#: resources/xnec2c.glade:413
 msgid "Sigmoid"
 msgstr "Sigmoid"
 
-#: resources/xnec2c.glade:438
+#: resources/xnec2c.glade:454
 msgid "Gamma:"
 msgstr "காமா:"
 
-#: resources/xnec2c.glade:455
+#: resources/xnec2c.glade:471
 msgid ""
 "Gamma exponent of the power transfer.\n"
 "γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
@@ -278,11 +278,11 @@ msgstr ""
 "γ = 0.5 பலவீனமான பகுதிகளை விரிவாக்கும், γ = 1 நேரியல், γ = 2 மின்னோட்டங்களுக்கு "
 "விரயமாகும் திறனுக்கு விகிதாசாரமாகும்."
 
-#: resources/xnec2c.glade:482
+#: resources/xnec2c.glade:494
 msgid "Range (dB):"
 msgstr "வீச்சு (dB):"
 
-#: resources/xnec2c.glade:499
+#: resources/xnec2c.glade:511
 msgid ""
 "Dynamic range R below the step peak mapped onto the color strip.\n"
 "The floor is 10^(−R/20) of the peak."
@@ -290,19 +290,19 @@ msgstr ""
 "படி உச்சத்திற்குக் கீழே நிறப் பட்டையில் பதிக்கப்படும் மாறும் வீச்சு R.\n"
 "தளம் என்பது உச்சத்தின் 10^(−R/20) ஆகும்."
 
-#: resources/xnec2c.glade:526
+#: resources/xnec2c.glade:534
 msgid "Softening:"
 msgstr "மென்மையாக்கல்:"
 
-#: resources/xnec2c.glade:543
+#: resources/xnec2c.glade:551
 msgid "Softening knee k: linear below k, logarithmic above."
 msgstr "மென்மையாக்கும் வளைவுப் புள்ளி k: k க்குக் கீழே நேரியல், மேலே மடக்கை."
 
-#: resources/xnec2c.glade:570
+#: resources/xnec2c.glade:574
 msgid "Compression (dB):"
 msgstr "சுருக்கம் (dB):"
 
-#: resources/xnec2c.glade:587
+#: resources/xnec2c.glade:591
 msgid "Compression strength in dB; higher values lift weak detail."
 msgstr "dB இல் சுருக்க வலிமை; அதிக மதிப்புகள் பலவீனமான விவரங்களை உயர்த்தும்."
 
@@ -314,19 +314,54 @@ msgstr "வளைவுப் புள்ளி:"
 msgid "Knee k of the rational soft-compressor."
 msgstr "விகிதமுறு மென்-சுருக்கியின் வளைவுப் புள்ளி k."
 
-#: resources/xnec2c.glade:658
+#: resources/xnec2c.glade:654
 msgid "Contrast:"
 msgstr "மாறுபாடு:"
 
-#: resources/xnec2c.glade:675
+#: resources/xnec2c.glade:671
 msgid "Contrast steepness a of the tanh transfer."
 msgstr "tanh மாற்றத்தின் மாறுபாட்டு செங்குத்துத்தன்மை a."
 
+#: resources/xnec2c.glade:705
+msgid "Color gradient of the active projection and scale family."
+msgstr ""
+
 #: resources/xnec2c.glade:720
+#, fuzzy
+msgid "Color channel"
+msgstr "நிற அளவீடு"
+
+#: resources/xnec2c.glade:726
+msgid ""
+"Enable the projection’s hue/sign color encoding.\n"
+"Unchecked, colors desaturate to gray so only the brightness channel remains."
+msgstr ""
+
+#: resources/xnec2c.glade:737
+msgid "Brightness channel"
+msgstr ""
+
+#: resources/xnec2c.glade:743
+msgid ""
+"Enable the projection’s brightness modulation (cosine or magnitude factor).\n"
+"Unchecked, brightness stays at full and only the color encoding remains."
+msgstr ""
+
+#: resources/xnec2c.glade:754
+msgid "Swap channels"
+msgstr ""
+
+#: resources/xnec2c.glade:759
+msgid ""
+"Exchange the color and brightness carriers.\n"
+"The quantity that drove the hue rides brightness and vice versa."
+msgstr ""
+
+#: resources/xnec2c.glade:792
 msgid "Reset"
 msgstr "மீட்டமை"
 
-#: resources/xnec2c.glade:725
+#: resources/xnec2c.glade:798
 msgid ""
 "Restore the color projection, scale family, and every family brightness "
 "parameter to their defaults."
@@ -334,23 +369,23 @@ msgstr ""
 "நிற ப்ரொஜெக்ஷன், அளவீட்டு குடும்பம் மற்றும் ஒவ்வொரு குடும்பத்தின் ஒளிர்வு அளவுருவையும் "
 "அவற்றின் இயல்பிருப்புகளுக்கு மீட்டமைக்கிறது."
 
-#: resources/xnec2c.glade:739
+#: resources/xnec2c.glade:812
 msgid "Color"
 msgstr "நிறம்"
 
-#: resources/xnec2c.glade:769
+#: resources/xnec2c.glade:848
 msgid "None (geometry)"
 msgstr "ஏதுமில்லை (வடிவியல்)"
 
-#: resources/xnec2c.glade:773
+#: resources/xnec2c.glade:852
 msgid "Show the bare structure geometry with no quantity coloring."
 msgstr "அளவு நிறமூட்டல் இல்லாமல் வெறும் கட்டமைப்பு வடிவியலைக் காட்டுகிறது."
 
-#: resources/xnec2c.glade:786 resources/xnec2c.glade:12188
+#: resources/xnec2c.glade:865 resources/xnec2c.glade:12282
 msgid "Currents"
 msgstr "மின்னோட்டங்கள்"
 
-#: resources/xnec2c.glade:790
+#: resources/xnec2c.glade:869
 msgid ""
 "Animate current magnitude and direction along the wires.\n"
 "Mirrors the Currents button in the main window."
@@ -358,11 +393,11 @@ msgstr ""
 "கம்பிகள் வழியே மின்னோட்ட அளவையும் திசையையும் அசைவூட்டவும்.\n"
 "முதன்மைச் சாளரத்தில் உள்ள மின்னோட்டங்கள் பொத்தானைப் பிரதிபலிக்கிறது."
 
-#: resources/xnec2c.glade:803 resources/xnec2c.glade:12203
+#: resources/xnec2c.glade:882 resources/xnec2c.glade:12297
 msgid "Charges"
 msgstr "மின்னூட்டங்கள்"
 
-#: resources/xnec2c.glade:807
+#: resources/xnec2c.glade:886
 msgid ""
 "Animate charge magnitude along the wires.\n"
 "Mirrors the Charges button in the main window."
@@ -370,43 +405,43 @@ msgstr ""
 "கம்பிகள் வழியே மின்னூட்ட அளவை அசைவூட்டவும்.\n"
 "முதன்மைச் சாளரத்தில் உள்ள மின்னூட்டங்கள் பொத்தானைப் பிரதிபலிக்கிறது."
 
-#: resources/xnec2c.glade:824
+#: resources/xnec2c.glade:903
 msgid "Display"
 msgstr "காட்சி"
 
-#: resources/xnec2c.glade:851
+#: resources/xnec2c.glade:936
 msgid "Flow direction:"
 msgstr "ஓட்டத் திசை:"
 
-#: resources/xnec2c.glade:864
+#: resources/xnec2c.glade:949
 msgid "Reference phase (animated)"
 msgstr "குறிப்புக் கட்டம் (அசைவூட்டப்பட்டது)"
 
-#: resources/xnec2c.glade:865
+#: resources/xnec2c.glade:950
 msgid "LIC texture (animated)"
 msgstr "LIC அமைப்பு (அசைவூட்டப்பட்டது)"
 
-#: resources/xnec2c.glade:866
+#: resources/xnec2c.glade:951
 msgid "Wireframe (animated)"
 msgstr "கம்பி வலை வடிவம் (அசைவூட்டப்பட்டது)"
 
-#: resources/xnec2c.glade:867
+#: resources/xnec2c.glade:952
 msgid "Polarization axis (static)"
 msgstr "முனைவு அச்சு (நிலையான)"
 
-#: resources/xnec2c.glade:868
+#: resources/xnec2c.glade:953
 msgid "Peak magnitude (static)"
 msgstr "உச்ச அளவு (நிலையான)"
 
-#: resources/xnec2c.glade:884
+#: resources/xnec2c.glade:969
 msgid "Patches"
 msgstr "தொகுதிகள்"
 
-#: resources/xnec2c.glade:908
+#: resources/xnec2c.glade:999
 msgid "Near E field"
 msgstr "அண்மை மின்புலம்"
 
-#: resources/xnec2c.glade:912
+#: resources/xnec2c.glade:1003
 msgid ""
 "Show the near electric field vectors while animating.\n"
 "Enable by opening the radiation pattern window."
@@ -414,11 +449,11 @@ msgstr ""
 "அசைவூட்டும்போது அண்மை மின்புல வெக்டர்களைக் காட்டவும்.\n"
 "கதிர்வீச்சு வடிவச் சாளரத்தைத் திறந்து இயக்கவும்."
 
-#: resources/xnec2c.glade:924
+#: resources/xnec2c.glade:1015
 msgid "Near H field"
 msgstr "அண்மை காந்தப்புலம்"
 
-#: resources/xnec2c.glade:928
+#: resources/xnec2c.glade:1019
 msgid ""
 "Show the near magnetic field vectors while animating.\n"
 "Enable by opening the radiation pattern window."
@@ -426,11 +461,11 @@ msgstr ""
 "அசைவூட்டும்போது அண்மை காந்தப்புல வெக்டர்களைக் காட்டவும்.\n"
 "கதிர்வீச்சு வடிவச் சாளரத்தைத் திறந்து இயக்கவும்."
 
-#: resources/xnec2c.glade:940
+#: resources/xnec2c.glade:1031
 msgid "Poynting vector"
 msgstr "பாய்ண்டிங் வெக்டர்"
 
-#: resources/xnec2c.glade:944
+#: resources/xnec2c.glade:1035
 msgid ""
 "Show the Poynting power-flow vectors while animating.\n"
 "Enable by opening the radiation pattern window."
@@ -438,11 +473,11 @@ msgstr ""
 "அசைவூட்டும்போது பாய்ண்டிங் திறன்-ஓட்ட வெக்டர்களைக் காட்டவும்.\n"
 "கதிர்வீச்சு வடிவச் சாளரத்தைத் திறந்து இயக்கவும்."
 
-#: resources/xnec2c.glade:959
+#: resources/xnec2c.glade:1050
 msgid "Total field:"
 msgstr "மொத்தப் புலம்:"
 
-#: resources/xnec2c.glade:971
+#: resources/xnec2c.glade:1062
 msgid ""
 "Choose peak-envelope or instantaneous (φ=0) near-field vectors.\n"
 "Mirrors the Total Field menu in the radiation pattern window."
@@ -450,701 +485,701 @@ msgstr ""
 "உச்ச-உறை அல்லது உடனடி (φ=0) அண்மைப் புல வெக்டர்களைத் தேர்ந்தெடுக்கவும்.\n"
 "கதிர்வீச்சு வடிவச் சாளரத்தில் உள்ள மொத்தப் புலம் மெனுவைப் பிரதிபலிக்கிறது."
 
-#: resources/xnec2c.glade:973
+#: resources/xnec2c.glade:1064
 msgid "Peak value"
 msgstr "உச்ச மதிப்பு"
 
-#: resources/xnec2c.glade:974
+#: resources/xnec2c.glade:1065
 msgid "Instantaneous (φ=0)"
 msgstr "உடனடி (φ=0)"
 
-#: resources/xnec2c.glade:990
+#: resources/xnec2c.glade:1081
 msgid "Near Field"
 msgstr "அண்மைப் புலம்"
 
-#: resources/xnec2c.glade:1070
+#: resources/xnec2c.glade:1164
 msgid "Arc Element (GA card)"
 msgstr "வளைவு உறுப்பு (GA அட்டை)"
 
-#: resources/xnec2c.glade:1098 resources/xnec2c.glade:2133
-#: resources/xnec2c.glade:4560 resources/xnec2c.glade:15727 src/cmnd_edit.c:488
+#: resources/xnec2c.glade:1192 resources/xnec2c.glade:2227
+#: resources/xnec2c.glade:4654 resources/xnec2c.glade:15821 src/cmnd_edit.c:488
 msgid "Tag Number"
 msgstr "குறிச்சொல் எண்"
 
-#: resources/xnec2c.glade:1111 resources/xnec2c.glade:15822
+#: resources/xnec2c.glade:1205 resources/xnec2c.glade:15916
 msgid "No. Segments"
 msgstr "பிரிவு எண்ணிக்கை"
 
-#: resources/xnec2c.glade:1124 resources/xnec2c.glade:4586
-#: resources/xnec2c.glade:15918
+#: resources/xnec2c.glade:1218 resources/xnec2c.glade:4680
+#: resources/xnec2c.glade:16012
 msgid "Segs % lambda"
 msgstr "பிரிவு % லாம்டா"
 
-#: resources/xnec2c.glade:1137 resources/xnec2c.glade:4599
-#: resources/xnec2c.glade:16014
+#: resources/xnec2c.glade:1231 resources/xnec2c.glade:4693
+#: resources/xnec2c.glade:16108
 msgid "Wire Diameter"
 msgstr "கம்பி விட்டம்"
 
-#: resources/xnec2c.glade:1225
+#: resources/xnec2c.glade:1319
 msgid "Radius from Y"
 msgstr "Y இலிருந்து ஆரம்"
 
-#: resources/xnec2c.glade:1238
+#: resources/xnec2c.glade:1332
 msgid "End 1 Angle"
 msgstr "முனை 1 கோணம்"
 
-#: resources/xnec2c.glade:1251
+#: resources/xnec2c.glade:1345
 msgid "End 2 Angle"
 msgstr "முனை 2 கோணம்"
 
-#: resources/xnec2c.glade:1264 resources/xnec2c.glade:4796
-#: resources/xnec2c.glade:16079 src/cmnd_edit.c:2024
+#: resources/xnec2c.glade:1358 resources/xnec2c.glade:4890
+#: resources/xnec2c.glade:16173 src/cmnd_edit.c:2024
 msgid "Conductivity S/m"
 msgstr "கடத்துத்திறன் S/m"
 
-#: resources/xnec2c.glade:1362
+#: resources/xnec2c.glade:1456
 msgid "Wire Arc Data"
 msgstr "கம்பி வளைவு தரவு"
 
-#: resources/xnec2c.glade:1424 resources/xnec2c.glade:1660
-#: resources/xnec2c.glade:2460 resources/xnec2c.glade:2683
-#: resources/xnec2c.glade:3141 resources/xnec2c.glade:3333
-#: resources/xnec2c.glade:3644 resources/xnec2c.glade:4330
-#: resources/xnec2c.glade:5130 resources/xnec2c.glade:5329
-#: resources/xnec2c.glade:5490 resources/xnec2c.glade:6022
-#: resources/xnec2c.glade:6658 resources/xnec2c.glade:8102
-#: resources/xnec2c.glade:9009 resources/xnec2c.glade:10015
-#: resources/xnec2c.glade:10295 resources/xnec2c.glade:14420
-#: resources/xnec2c.glade:14933 resources/xnec2c.glade:15532
-#: resources/xnec2c.glade:16368 resources/xnec2c.glade:16568
+#: resources/xnec2c.glade:1518 resources/xnec2c.glade:1754
+#: resources/xnec2c.glade:2554 resources/xnec2c.glade:2777
+#: resources/xnec2c.glade:3235 resources/xnec2c.glade:3427
+#: resources/xnec2c.glade:3738 resources/xnec2c.glade:4424
+#: resources/xnec2c.glade:5224 resources/xnec2c.glade:5423
+#: resources/xnec2c.glade:5584 resources/xnec2c.glade:6116
+#: resources/xnec2c.glade:6752 resources/xnec2c.glade:8196
+#: resources/xnec2c.glade:9103 resources/xnec2c.glade:10109
+#: resources/xnec2c.glade:10389 resources/xnec2c.glade:14514
+#: resources/xnec2c.glade:15027 resources/xnec2c.glade:15626
+#: resources/xnec2c.glade:16462 resources/xnec2c.glade:16662
 msgid "Delete Card"
 msgstr "அட்டையை நீக்கு"
 
-#: resources/xnec2c.glade:1502
+#: resources/xnec2c.glade:1596
 msgid "Cylindrical Structure (GR card)"
 msgstr "உருளை கட்டமைப்பு (GR அட்டை)"
 
-#: resources/xnec2c.glade:1532 resources/xnec2c.glade:10195
+#: resources/xnec2c.glade:1626 resources/xnec2c.glade:10289
 msgid "Tag Number Increment"
 msgstr "குறிச்சொல் எண் அதிகரிப்பு"
 
-#: resources/xnec2c.glade:1545
+#: resources/xnec2c.glade:1639
 msgid "Number of Structures"
 msgstr "கட்டமைப்புகளின் எண்ணிக்கை"
 
-#: resources/xnec2c.glade:1599
+#: resources/xnec2c.glade:1693
 msgid "Cylindrical Structure"
 msgstr "உருளை கட்டமைப்பு"
 
-#: resources/xnec2c.glade:1725
+#: resources/xnec2c.glade:1819
 msgid "Xnec2c Error"
 msgstr "Xnec2c பிழை"
 
-#: resources/xnec2c.glade:1833
+#: resources/xnec2c.glade:1927
 msgid "Error"
 msgstr "பிழை"
 
-#: resources/xnec2c.glade:1912
+#: resources/xnec2c.glade:2006
 msgid "Excitation Command (EX Card)"
 msgstr "தூண்டல் கட்டளை (EX அட்டை)"
 
-#: resources/xnec2c.glade:1938
+#: resources/xnec2c.glade:2032
 msgid "Incident LH Wave"
 msgstr "படும் இடதுகை அலை"
 
-#: resources/xnec2c.glade:1954
+#: resources/xnec2c.glade:2048
 msgid "Incident Linear Wave "
 msgstr "படும் நேரியல் அலை "
 
-#: resources/xnec2c.glade:1970
+#: resources/xnec2c.glade:2064
 msgid "Current Source"
 msgstr "மின்னோட்ட மூலம்"
 
-#: resources/xnec2c.glade:1986
+#: resources/xnec2c.glade:2080
 msgid "Incident RH Wave"
 msgstr "படும் வலதுகை அலை"
 
-#: resources/xnec2c.glade:2002
+#: resources/xnec2c.glade:2096
 msgid "Current Slope Discontinuity"
 msgstr "மின்னோட்ட சரிவு முறிவு"
 
-#: resources/xnec2c.glade:2018
+#: resources/xnec2c.glade:2112
 msgid "Voltage Source"
 msgstr "மின்னழுத்த மூலம்"
 
-#: resources/xnec2c.glade:2040
+#: resources/xnec2c.glade:2134
 msgid "Excitation Type"
 msgstr "தூண்டல் வகை"
 
-#: resources/xnec2c.glade:2065
+#: resources/xnec2c.glade:2159
 msgid "Maximum Admittance Matrix Asymmetry"
 msgstr "அதிகபட்ச அட்மிட்டன்ஸ் அணி சமச்சீரின்மை"
 
-#: resources/xnec2c.glade:2081
+#: resources/xnec2c.glade:2175
 msgid "Impedance of Source Segment"
 msgstr "மூலப் பிரிவின் இம்பீடன்ஸ்"
 
-#: resources/xnec2c.glade:2103
+#: resources/xnec2c.glade:2197
 msgid "Print Control"
 msgstr "அச்சிடல் கட்டுப்பாடு"
 
-#: resources/xnec2c.glade:2146 src/cmnd_edit.c:489
+#: resources/xnec2c.glade:2240 src/cmnd_edit.c:489
 msgid "Segment Number"
 msgstr "பிரிவு எண்"
 
-#: resources/xnec2c.glade:2195
+#: resources/xnec2c.glade:2289
 msgid "Voltage - Real Part"
 msgstr "மின்னழுத்தம் - மெய் பகுதி"
 
-#: resources/xnec2c.glade:2208
+#: resources/xnec2c.glade:2302
 msgid "Voltage - Imaginary Part"
 msgstr "மின்னழுத்தம் - கற்பனை பகுதி"
 
-#: resources/xnec2c.glade:2221
+#: resources/xnec2c.glade:2315
 msgid "Eta"
 msgstr "ஈட்டா"
 
-#: resources/xnec2c.glade:2291
+#: resources/xnec2c.glade:2385
 msgid "Theta"
 msgstr "தீட்டா"
 
-#: resources/xnec2c.glade:2304
+#: resources/xnec2c.glade:2398
 msgid "Phi"
 msgstr "ஃபை"
 
-#: resources/xnec2c.glade:2317
+#: resources/xnec2c.glade:2411
 msgid "Ratio"
 msgstr "விகிதம்"
 
-#: resources/xnec2c.glade:2398
+#: resources/xnec2c.glade:2492
 msgid "Excitation Parameters"
 msgstr "தூண்டல் அளவுருக்கள்"
 
-#: resources/xnec2c.glade:2525
+#: resources/xnec2c.glade:2619
 msgid "Execute Command (XQ Card)"
 msgstr "இயக்கு கட்டளை (XQ அட்டை)"
 
-#: resources/xnec2c.glade:2552
+#: resources/xnec2c.glade:2646
 msgid "No Pattern Cuts"
 msgstr "வடிவ வெட்டுகள் இல்லை"
 
-#: resources/xnec2c.glade:2568
+#: resources/xnec2c.glade:2662
 msgid "Pattern in XZ Plane"
 msgstr "XZ தளத்தில் வடிவம்"
 
-#: resources/xnec2c.glade:2584
+#: resources/xnec2c.glade:2678
 msgid "Pattern in YZ Plane"
 msgstr "YZ தளத்தில் வடிவம்"
 
-#: resources/xnec2c.glade:2600
+#: resources/xnec2c.glade:2694
 msgid "Both XZ/YZ Patterns"
 msgstr "XZ/YZ இரு வடிவங்களும்"
 
-#: resources/xnec2c.glade:2622
+#: resources/xnec2c.glade:2716
 msgid "Execute Command"
 msgstr "கட்டளையை இயக்கு"
 
-#: resources/xnec2c.glade:2853
+#: resources/xnec2c.glade:2947
 msgid "Frequency Command (FR Card)"
 msgstr "அதிர்வெண் கட்டளை (FR அட்டை)"
 
-#: resources/xnec2c.glade:2878
+#: resources/xnec2c.glade:2972
 msgid "Additive Stepping"
 msgstr "கூட்டல் படிநிலை"
 
-#: resources/xnec2c.glade:2895
+#: resources/xnec2c.glade:2989
 msgid "Multiplicative Stepping"
 msgstr "பெருக்கல் படிநிலை"
 
-#: resources/xnec2c.glade:2918
+#: resources/xnec2c.glade:3012
 msgid "Frequency Stepping"
 msgstr "அதிர்வெண் படிநிலை"
 
-#: resources/xnec2c.glade:2948
+#: resources/xnec2c.glade:3042
 msgid "No. Frequency Points"
 msgstr "அதிர்வெண் புள்ளிகள் எண்ணிக்கை"
 
-#: resources/xnec2c.glade:2979
+#: resources/xnec2c.glade:3073
 msgid "Start Frequency (MHz)"
 msgstr "தொடக்க அதிர்வெண் (MHz)"
 
-#: resources/xnec2c.glade:3011
+#: resources/xnec2c.glade:3105
 msgid "Frequency Step (MHz)"
 msgstr "அதிர்வெண் படி (MHz)"
 
-#: resources/xnec2c.glade:3044
+#: resources/xnec2c.glade:3138
 msgid "End Frequency (MHz)"
 msgstr "இறுதி அதிர்வெண் (MHz)"
 
-#: resources/xnec2c.glade:3080
+#: resources/xnec2c.glade:3174
 msgid "Frequency Stepping Parameters"
 msgstr "அதிர்வெண் படிநிலை அளவுருக்கள்"
 
-#: resources/xnec2c.glade:3206
+#: resources/xnec2c.glade:3300
 msgid "Geometry End (GE Card)"
 msgstr "வடிவியல் முடிவு (GE அட்டை)"
 
-#: resources/xnec2c.glade:3231
+#: resources/xnec2c.glade:3325
 msgid "No Ground, Free Space condition"
 msgstr "தரை இல்லை, தடையற்ற வெளி நிலை"
 
-#: resources/xnec2c.glade:3248
+#: resources/xnec2c.glade:3342
 msgid "Ground present, Structure reflection"
 msgstr "தரை உள்ளது, கட்டமைப்பு பிரதிபலிப்பு"
 
-#: resources/xnec2c.glade:3265
+#: resources/xnec2c.glade:3359
 msgid "Ground present, no Structure reflection"
 msgstr "தரை உள்ளது, கட்டமைப்பு பிரதிபலிப்பு இல்லை"
 
-#: resources/xnec2c.glade:3288
+#: resources/xnec2c.glade:3382
 msgid "Ground Plane type"
 msgstr "தரை-தள வகை"
 
-#: resources/xnec2c.glade:3422
+#: resources/xnec2c.glade:3516
 msgid "Ground Parameters (GD Card)"
 msgstr "தரை அளவுருக்கள் (GD அட்டை)"
 
-#: resources/xnec2c.glade:3451 resources/xnec2c.glade:3920
-#: resources/xnec2c.glade:4006
+#: resources/xnec2c.glade:3545 resources/xnec2c.glade:4014
+#: resources/xnec2c.glade:4100
 msgid "Relative Dielectric Const."
 msgstr "சார்பு டையிலெக்ட்ரிக் மாறிலி"
 
-#: resources/xnec2c.glade:3483 resources/xnec2c.glade:4039
+#: resources/xnec2c.glade:3577 resources/xnec2c.glade:4133
 msgid "Distance to 2nd Medium"
 msgstr "2வது ஊடகத்திற்கான தூரம்"
 
-#: resources/xnec2c.glade:3515 resources/xnec2c.glade:3952
-#: resources/xnec2c.glade:4071
+#: resources/xnec2c.glade:3609 resources/xnec2c.glade:4046
+#: resources/xnec2c.glade:4165
 msgid "Ground Conductivity S/m"
 msgstr "தரை கடத்துத்திறன் S/m"
 
-#: resources/xnec2c.glade:3547 resources/xnec2c.glade:4103
+#: resources/xnec2c.glade:3641 resources/xnec2c.glade:4197
 msgid "Dist. below 1st Medium"
 msgstr "1வது ஊடகத்திற்குக் கீழ் தூரம்"
 
-#: resources/xnec2c.glade:3583 resources/xnec2c.glade:4139
+#: resources/xnec2c.glade:3677 resources/xnec2c.glade:4233
 msgid "2nd Medium Parameters"
 msgstr "2வது ஊடக அளவுருக்கள்"
 
-#: resources/xnec2c.glade:3764
+#: resources/xnec2c.glade:3858
 msgid "Ground Parameters (GN & GD Cards)"
 msgstr "தரை அளவுருக்கள் (GN & GD அட்டைகள்)"
 
-#: resources/xnec2c.glade:3791
+#: resources/xnec2c.glade:3885
 msgid "Perfect Ground"
 msgstr "முழுமையான தரை"
 
-#: resources/xnec2c.glade:3807
+#: resources/xnec2c.glade:3901
 msgid "Sommerfeld/Norton"
 msgstr "Sommerfeld/Norton"
 
-#: resources/xnec2c.glade:3823
+#: resources/xnec2c.glade:3917
 msgid "Radial Ground Screen"
 msgstr "ஆரக்கம்பி தரைத் திரை"
 
-#: resources/xnec2c.glade:3838
+#: resources/xnec2c.glade:3932
 msgid "Reflection Coeff. Approx"
 msgstr "பிரதிபலிப்பு குணக தோராயம்"
 
-#: resources/xnec2c.glade:3854
+#: resources/xnec2c.glade:3948
 msgid "Nullify Previous Params"
 msgstr "முந்தைய அளவுருக்களை செல்லாதாக்கு"
 
-#: resources/xnec2c.glade:3870
+#: resources/xnec2c.glade:3964
 msgid "Second Medium (Cliff)"
 msgstr "இரண்டாம் ஊடகம் (செங்குத்துப் பாறை)"
 
-#: resources/xnec2c.glade:3891
+#: resources/xnec2c.glade:3985
 msgid "Ground Type"
 msgstr "தரை வகை"
 
-#: resources/xnec2c.glade:4019
+#: resources/xnec2c.glade:4113
 msgid "0.00000"
 msgstr "0.00000"
 
-#: resources/xnec2c.glade:4170
+#: resources/xnec2c.glade:4264
 msgid "Number of Radials"
 msgstr "ஆரக்கம்பிகளின் எண்ணிக்கை"
 
-#: resources/xnec2c.glade:4183
+#: resources/xnec2c.glade:4277
 msgid "Radial Screen Radius"
 msgstr "ஆரத் திரையின் ஆரம்"
 
-#: resources/xnec2c.glade:4233
+#: resources/xnec2c.glade:4327
 msgid "Radial Wire Diameter"
 msgstr "ஆரக்கம்பி விட்டம்"
 
-#: resources/xnec2c.glade:4269
+#: resources/xnec2c.glade:4363
 msgid "Radial Screen Parameters"
 msgstr "ஆரத் திரை அளவுருக்கள்"
 
-#: resources/xnec2c.glade:4469
+#: resources/xnec2c.glade:4563
 msgid "Helical Element (GA card)"
 msgstr "சுருள் உறுப்பு (GA அட்டை)"
 
-#: resources/xnec2c.glade:4494
+#: resources/xnec2c.glade:4588
 msgid "Right Hand Helix"
 msgstr "வலது கை சுருள்"
 
-#: resources/xnec2c.glade:4510
+#: resources/xnec2c.glade:4604
 msgid "Left Hand Helix"
 msgstr "இடது கை சுருள்"
 
-#: resources/xnec2c.glade:4526
+#: resources/xnec2c.glade:4620
 msgid "Right Hand Spiral"
 msgstr "வலது கை சுழல்"
 
-#: resources/xnec2c.glade:4542
+#: resources/xnec2c.glade:4636
 msgid "Left Hand Spiral"
 msgstr "இடது கை சுழல்"
 
-#: resources/xnec2c.glade:4573
+#: resources/xnec2c.glade:4667
 msgid "Segments/Turn"
 msgstr "பிரிவுகள்/சுற்று"
 
-#: resources/xnec2c.glade:4612
+#: resources/xnec2c.glade:4706
 msgid "0.0100"
 msgstr "0.0100"
 
-#: resources/xnec2c.glade:4633
+#: resources/xnec2c.glade:4727
 msgid "5.00"
 msgstr "5.00"
 
-#: resources/xnec2c.glade:4674 resources/xnec2c.glade:12667
-#: resources/xnec2c.glade:13885
+#: resources/xnec2c.glade:4768 resources/xnec2c.glade:12761
+#: resources/xnec2c.glade:13979
 msgid "1"
 msgstr "1"
 
-#: resources/xnec2c.glade:4694
+#: resources/xnec2c.glade:4788
 msgid "Number of Turns"
 msgstr "சுற்றுகளின் எண்ணிக்கை"
 
-#: resources/xnec2c.glade:4707
+#: resources/xnec2c.glade:4801
 msgid "8.0000"
 msgstr "8.0000"
 
-#: resources/xnec2c.glade:4728
+#: resources/xnec2c.glade:4822
 msgid "Helix Length (HL)"
 msgstr "சுருள் நீளம் (HL)"
 
-#: resources/xnec2c.glade:4741
+#: resources/xnec2c.glade:4835
 msgid "5.0000"
 msgstr "5.0000"
 
-#: resources/xnec2c.glade:4762
+#: resources/xnec2c.glade:4856
 msgid "Turns Spacing"
 msgstr "சுற்று இடைவெளி"
 
-#: resources/xnec2c.glade:4775 resources/xnec2c.glade:4887
-#: resources/xnec2c.glade:4940 resources/xnec2c.glade:4993
-#: resources/xnec2c.glade:5041
+#: resources/xnec2c.glade:4869 resources/xnec2c.glade:4981
+#: resources/xnec2c.glade:5034 resources/xnec2c.glade:5087
+#: resources/xnec2c.glade:5135
 msgid "1.0000"
 msgstr "1.0000"
 
-#: resources/xnec2c.glade:4809
+#: resources/xnec2c.glade:4903
 msgid "0.0000"
 msgstr "0.0000"
 
-#: resources/xnec2c.glade:4829
+#: resources/xnec2c.glade:4923
 msgid "Radius in X (A1)"
 msgstr "X இல் ஆரம் (A1)"
 
-#: resources/xnec2c.glade:4842
+#: resources/xnec2c.glade:4936
 msgid "Radius in Y (B1)"
 msgstr "Y இல் ஆரம் (B1)"
 
-#: resources/xnec2c.glade:4855
+#: resources/xnec2c.glade:4949
 msgid "Radius in X (A2)"
 msgstr "X இல் ஆரம் (A2)"
 
-#: resources/xnec2c.glade:4868
+#: resources/xnec2c.glade:4962
 msgid "Radius in Y (B2)"
 msgstr "Y இல் ஆரம் (B2)"
 
-#: resources/xnec2c.glade:5066
+#: resources/xnec2c.glade:5160
 msgid "GH Card"
 msgstr "GH அட்டை"
 
-#: resources/xnec2c.glade:5203 resources/xnec2c.glade:16442
+#: resources/xnec2c.glade:5297 resources/xnec2c.glade:16536
 msgid "Interaction Approx Range (KH Card)"
 msgstr "இடைவினை தோராய வீச்சு (KH அட்டை)"
 
-#: resources/xnec2c.glade:5230
+#: resources/xnec2c.glade:5324
 msgid "Approximation Range (W/lengths)"
 msgstr "தோராய வீச்சு (அலைநீளங்களில்)"
 
-#: resources/xnec2c.glade:5268
+#: resources/xnec2c.glade:5362
 msgid "Interaction Approximation Range"
 msgstr "இடைவினை தோராய வீச்சு"
 
-#: resources/xnec2c.glade:5394
+#: resources/xnec2c.glade:5488
 msgid "Thin Wire Kernel (EK Card)"
 msgstr "மெல்லிய கம்பி கர்னல் (EK அட்டை)"
 
-#: resources/xnec2c.glade:5412
+#: resources/xnec2c.glade:5506
 msgid "Extended Thin Wire Kernel"
 msgstr "விரிவாக்கப்பட்ட மெல்லிய கம்பி கர்னல்"
 
-#: resources/xnec2c.glade:5429
+#: resources/xnec2c.glade:5523
 msgid "Thin Wire Kernel"
 msgstr "மெல்லிய கம்பி கர்னல்"
 
-#: resources/xnec2c.glade:5592
+#: resources/xnec2c.glade:5686
 msgid "Loading Command (LD Card)"
 msgstr "சுமை கட்டளை (LD அட்டை)"
 
-#: resources/xnec2c.glade:5618
+#: resources/xnec2c.glade:5712
 msgid "Short all Loads (Nulls previous Loading Cards)"
 msgstr "அனைத்து சுமைகளையும் குறுக்கு (முந்தைய சுமை அட்டைகளைச் செல்லாதாக்கும்)"
 
-#: resources/xnec2c.glade:5635
+#: resources/xnec2c.glade:5729
 msgid "Series, Lumped"
 msgstr "தொடர், குவிந்த"
 
-#: resources/xnec2c.glade:5651
+#: resources/xnec2c.glade:5745
 msgid "Parallel, Distributed"
 msgstr "இணை, பரவிய"
 
-#: resources/xnec2c.glade:5667
+#: resources/xnec2c.glade:5761
 msgid "Parallel, Lumped"
 msgstr "இணை, குவிந்த"
 
-#: resources/xnec2c.glade:5683
+#: resources/xnec2c.glade:5777
 msgid "Resistance & Reactance"
 msgstr "மின்தடை & ரியாக்டன்ஸ்"
 
-#: resources/xnec2c.glade:5699
+#: resources/xnec2c.glade:5793
 msgid "Series, Distributed"
 msgstr "தொடர், பரவிய"
 
-#: resources/xnec2c.glade:5715
+#: resources/xnec2c.glade:5809
 msgid "Wire Conductivity"
 msgstr "கம்பி கடத்துத்திறன்"
 
-#: resources/xnec2c.glade:5737
+#: resources/xnec2c.glade:5831
 msgid "Loading Type"
 msgstr "சுமை வகை"
 
-#: resources/xnec2c.glade:5767
+#: resources/xnec2c.glade:5861
 msgid "Load Tag Number"
 msgstr "சுமை குறிச்சொல் எண்"
 
-#: resources/xnec2c.glade:5798
+#: resources/xnec2c.glade:5892
 msgid "Resistance"
 msgstr "மின்தடை"
 
-#: resources/xnec2c.glade:5830
+#: resources/xnec2c.glade:5924
 msgid "From Segment #"
 msgstr "பிரிவு # இலிருந்து"
 
-#: resources/xnec2c.glade:5861
+#: resources/xnec2c.glade:5955
 msgid "Inductance"
 msgstr "இண்டக்டன்ஸ்"
 
-#: resources/xnec2c.glade:5893
+#: resources/xnec2c.glade:5987
 msgid "To Segment #"
 msgstr "பிரிவு # வரை"
 
-#: resources/xnec2c.glade:5924
+#: resources/xnec2c.glade:6018
 msgid "Capacitance"
 msgstr "கெப்பாசிட்டன்ஸ்"
 
-#: resources/xnec2c.glade:5960
+#: resources/xnec2c.glade:6054
 msgid "Loading Parameters"
 msgstr "சுமை அளவுருக்கள்"
 
-#: resources/xnec2c.glade:6175
+#: resources/xnec2c.glade:6269
 msgid "Near Fields Command (NE/NH Cards)"
 msgstr "அண்மைப் புலக் கட்டளை (NE/NH அட்டைகள்)"
 
-#: resources/xnec2c.glade:6202
+#: resources/xnec2c.glade:6296
 msgid "Near Electric Field"
 msgstr "அண்மை மின்புலம்"
 
-#: resources/xnec2c.glade:6218
+#: resources/xnec2c.glade:6312
 msgid "Rectangular Co-ordinates"
 msgstr "செவ்வக ஆயத்தொலைவுகள்"
 
-#: resources/xnec2c.glade:6234
+#: resources/xnec2c.glade:6328
 msgid "Near Magnetic Field"
 msgstr "அண்மை காந்தப்புலம்"
 
-#: resources/xnec2c.glade:6249
+#: resources/xnec2c.glade:6343
 msgid "Spherical Co-ordinates"
 msgstr "கோள ஆயத்தொலைவுகள்"
 
-#: resources/xnec2c.glade:6277
+#: resources/xnec2c.glade:6371
 msgid "Field Type & Co-ordinates"
 msgstr "புல வகை & ஆயத்தொலைவுகள்"
 
-#: resources/xnec2c.glade:6307
+#: resources/xnec2c.glade:6401
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:6338 resources/xnec2c.glade:12218
-#: resources/xnec2c.glade:13421
+#: resources/xnec2c.glade:6432 resources/xnec2c.glade:12312
+#: resources/xnec2c.glade:13515
 msgid "X"
 msgstr "X"
 
-#: resources/xnec2c.glade:6370
+#: resources/xnec2c.glade:6464
 msgid "DX"
 msgstr "DX"
 
-#: resources/xnec2c.glade:6402
+#: resources/xnec2c.glade:6496
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:6433 resources/xnec2c.glade:12233
-#: resources/xnec2c.glade:13436
+#: resources/xnec2c.glade:6527 resources/xnec2c.glade:12327
+#: resources/xnec2c.glade:13530
 msgid "Y"
 msgstr "Y"
 
-#: resources/xnec2c.glade:6465
+#: resources/xnec2c.glade:6559
 msgid "DY"
 msgstr "DY"
 
-#: resources/xnec2c.glade:6497
+#: resources/xnec2c.glade:6591
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:6528 resources/xnec2c.glade:12248
-#: resources/xnec2c.glade:13451
+#: resources/xnec2c.glade:6622 resources/xnec2c.glade:12342
+#: resources/xnec2c.glade:13545
 msgid "Z"
 msgstr "Z"
 
-#: resources/xnec2c.glade:6560
+#: resources/xnec2c.glade:6654
 msgid "DZ"
 msgstr "DZ"
 
-#: resources/xnec2c.glade:6596
+#: resources/xnec2c.glade:6690
 msgid "Field Pattern Parameters"
 msgstr "புல வடிவ அளவுருக்கள்"
 
-#: resources/xnec2c.glade:6723
+#: resources/xnec2c.glade:6817
 msgid "Xnec2c: NEC2 Input File Editor"
 msgstr "Xnec2c: NEC2 உள்ளீட்டுக் கோப்பு திருத்தி"
 
-#: resources/xnec2c.glade:6810
+#: resources/xnec2c.glade:6904
 msgid "Manage Cards"
 msgstr "அட்டைகளை நிர்வகி"
 
-#: resources/xnec2c.glade:6907
+#: resources/xnec2c.glade:7001
 msgid "File Save"
 msgstr "கோப்பைச் சேமி"
 
-#: resources/xnec2c.glade:6967 src/nec2_model.c:278
+#: resources/xnec2c.glade:7061 src/nec2_model.c:278
 msgid "Comments"
 msgstr "குறிப்புகள்"
 
-#: resources/xnec2c.glade:6994
+#: resources/xnec2c.glade:7088
 msgid "Wire"
 msgstr "கம்பி"
 
-#: resources/xnec2c.glade:7008
+#: resources/xnec2c.glade:7102
 msgid "Arc"
 msgstr "வளைவு"
 
-#: resources/xnec2c.glade:7022
+#: resources/xnec2c.glade:7116
 msgid "Helix"
 msgstr "சுருள்"
 
-#: resources/xnec2c.glade:7036
+#: resources/xnec2c.glade:7130
 msgid "Patch"
 msgstr "தொகுதி"
 
-#: resources/xnec2c.glade:7050
+#: resources/xnec2c.glade:7144
 msgid "Cylinder"
 msgstr "உருளை"
 
-#: resources/xnec2c.glade:7064
+#: resources/xnec2c.glade:7158
 msgid "Move"
 msgstr "நகர்த்து"
 
-#: resources/xnec2c.glade:7078
+#: resources/xnec2c.glade:7172
 msgid "Reflect"
 msgstr "பிரதிபலி"
 
-#: resources/xnec2c.glade:7092
+#: resources/xnec2c.glade:7186
 msgid "Scale"
 msgstr "அளவை மாற்று"
 
-#: resources/xnec2c.glade:7106 resources/xnec2c.glade:7390
+#: resources/xnec2c.glade:7200 resources/xnec2c.glade:7484
 msgid "Add Var (SY)"
 msgstr "மாறியைச் சேர் (SY)"
 
-#: resources/xnec2c.glade:7126
+#: resources/xnec2c.glade:7220
 msgid "Edit Geometry Data"
 msgstr "வடிவியல் தரவைத் திருத்து"
 
-#: resources/xnec2c.glade:7180
+#: resources/xnec2c.glade:7274
 msgid "Geometry"
 msgstr "வடிவியல்"
 
-#: resources/xnec2c.glade:7207
+#: resources/xnec2c.glade:7301
 msgid "Excitation"
 msgstr "தூண்டல்"
 
-#: resources/xnec2c.glade:7221
+#: resources/xnec2c.glade:7315
 msgid "Radiation"
 msgstr "கதிர்வீச்சு"
 
-#: resources/xnec2c.glade:7235
+#: resources/xnec2c.glade:7329
 msgid "Frequency"
 msgstr "அதிர்வெண்"
 
-#: resources/xnec2c.glade:7249
+#: resources/xnec2c.glade:7343
 msgid "Near Fields"
 msgstr "அண்மைப் புலங்கள்"
 
-#: resources/xnec2c.glade:7263
+#: resources/xnec2c.glade:7357
 msgid "Ground (GN)"
 msgstr "தரை (GN)"
 
-#: resources/xnec2c.glade:7277
+#: resources/xnec2c.glade:7371
 msgid "Ground (GD)"
 msgstr "தரை (GD)"
 
-#: resources/xnec2c.glade:7291
+#: resources/xnec2c.glade:7385
 msgid "Loading"
 msgstr "சுமை"
 
-#: resources/xnec2c.glade:7305
+#: resources/xnec2c.glade:7399
 msgid "Kernel"
 msgstr "கர்னல்"
 
-#: resources/xnec2c.glade:7319
+#: resources/xnec2c.glade:7413
 msgid "Network"
 msgstr "பிணையம்"
 
-#: resources/xnec2c.glade:7333
+#: resources/xnec2c.glade:7427
 msgid "Interaction"
 msgstr "இடைவினை"
 
-#: resources/xnec2c.glade:7347
+#: resources/xnec2c.glade:7441
 msgid "Transm. Line"
 msgstr "பரப்புக் கோடு"
 
-#: resources/xnec2c.glade:7362
+#: resources/xnec2c.glade:7456
 msgid "Execute"
 msgstr "இயக்கு"
 
-#: resources/xnec2c.glade:7376
+#: resources/xnec2c.glade:7470
 msgid "Zo"
 msgstr "Zo"
 
-#: resources/xnec2c.glade:7410
+#: resources/xnec2c.glade:7504
 msgid "Edit Control Commands"
 msgstr "கட்டுப்பாட்டுக் கட்டளைகளைத் திருத்து"
 
-#: resources/xnec2c.glade:7464
+#: resources/xnec2c.glade:7558
 msgid "Commands"
 msgstr "கட்டளைகள்"
 
-#: resources/xnec2c.glade:7483
+#: resources/xnec2c.glade:7577
 msgid "Unsaved Data"
 msgstr "சேமிக்கப்படாத தரவு"
 
-#: resources/xnec2c.glade:7559
+#: resources/xnec2c.glade:7653
 msgid ""
 "Unsaved data in NEC2 Editor.\n"
 "Save NEC2 Editor data first?\n"
@@ -1152,621 +1187,621 @@ msgstr ""
 "NEC2 திருத்தியில் சேமிக்கப்படாத தரவு உள்ளது.\n"
 "முதலில் NEC2 திருத்தியின் தரவைச் சேமிக்கவா?\n"
 
-#: resources/xnec2c.glade:7658
+#: resources/xnec2c.glade:7752
 msgid "Network Command (NT Card)"
 msgstr "பிணையக் கட்டளை (NT அட்டை)"
 
-#: resources/xnec2c.glade:7687
+#: resources/xnec2c.glade:7781
 msgid "Tag Number, Port 1  "
 msgstr "குறிச்சொல் எண், போர்ட் 1  "
 
-#: resources/xnec2c.glade:7718
+#: resources/xnec2c.glade:7812
 msgid "Tag Number, Port 2  "
 msgstr "குறிச்சொல் எண், போர்ட் 2  "
 
-#: resources/xnec2c.glade:7749
+#: resources/xnec2c.glade:7843
 msgid "Segment Num, Port 1"
 msgstr "பிரிவு எண், போர்ட் 1"
 
-#: resources/xnec2c.glade:7780
+#: resources/xnec2c.glade:7874
 msgid "Segment Num, Port 2"
 msgstr "பிரிவு எண், போர்ட் 2"
 
-#: resources/xnec2c.glade:7815 resources/xnec2c.glade:15228
+#: resources/xnec2c.glade:7909 resources/xnec2c.glade:15322
 msgid "Segment Identity"
 msgstr "பிரிவு அடையாளம்"
 
-#: resources/xnec2c.glade:7845
+#: resources/xnec2c.glade:7939
 msgid "Element 1,1 Real Part"
 msgstr "உறுப்பு 1,1 மெய் பகுதி"
 
-#: resources/xnec2c.glade:7877
+#: resources/xnec2c.glade:7971
 msgid "Element 1,2 Real Part"
 msgstr "உறுப்பு 1,2 மெய் பகுதி"
 
-#: resources/xnec2c.glade:7909
+#: resources/xnec2c.glade:8003
 msgid "Element 2,2 Real Part"
 msgstr "உறுப்பு 2,2 மெய் பகுதி"
 
-#: resources/xnec2c.glade:7941
+#: resources/xnec2c.glade:8035
 msgid "Element 1,1 Imag Part"
 msgstr "உறுப்பு 1,1 கற்பனை பகுதி"
 
-#: resources/xnec2c.glade:7973
+#: resources/xnec2c.glade:8067
 msgid "Element 1,2 Imag Part"
 msgstr "உறுப்பு 1,2 கற்பனை பகுதி"
 
-#: resources/xnec2c.glade:8005
+#: resources/xnec2c.glade:8099
 msgid "Element 2,2 Imag Part"
 msgstr "உறுப்பு 2,2 கற்பனை பகுதி"
 
-#: resources/xnec2c.glade:8041
+#: resources/xnec2c.glade:8135
 msgid "Admittance Matrix Elements"
 msgstr "அட்மிட்டன்ஸ் அணி உறுப்புகள்"
 
-#: resources/xnec2c.glade:8256
+#: resources/xnec2c.glade:8350
 msgid "Patch Element (SP & SC Cards)"
 msgstr "தொகுதி உறுப்பு (SP & SC அட்டைகள்)"
 
-#: resources/xnec2c.glade:8280
+#: resources/xnec2c.glade:8374
 msgid "Arbitrary"
 msgstr "தன்னிச்சையான"
 
-#: resources/xnec2c.glade:8297
+#: resources/xnec2c.glade:8391
 msgid "Rectangle"
 msgstr "செவ்வகம்"
 
-#: resources/xnec2c.glade:8314
+#: resources/xnec2c.glade:8408
 msgid "Triangle"
 msgstr "முக்கோணம்"
 
-#: resources/xnec2c.glade:8331
+#: resources/xnec2c.glade:8425
 msgid "Quadrilateral"
 msgstr "நாற்கரம்"
 
-#: resources/xnec2c.glade:8348
+#: resources/xnec2c.glade:8442
 msgid "Surface"
 msgstr "மேற்பரப்பு"
 
-#: resources/xnec2c.glade:8371
+#: resources/xnec2c.glade:8465
 msgid "Patch Type"
 msgstr "தொகுதி வகை"
 
-#: resources/xnec2c.glade:8401
+#: resources/xnec2c.glade:8495
 msgid "Corners 1-2 sub-division (NX)"
 msgstr "மூலைகள் 1-2 உட்பிரிவு (NX)"
 
-#: resources/xnec2c.glade:8432
+#: resources/xnec2c.glade:8526
 msgid "Corners 2-3 sub-division (NY)"
 msgstr "மூலைகள் 2-3 உட்பிரிவு (NY)"
 
-#: resources/xnec2c.glade:8467
+#: resources/xnec2c.glade:8561
 msgid "Surface Sub-division"
 msgstr "மேற்பரப்பு உட்பிரிவு"
 
-#: resources/xnec2c.glade:8497 src/geom_edit.c:1157
+#: resources/xnec2c.glade:8591 src/geom_edit.c:1157
 msgid "Center - X"
 msgstr "மையம் - X"
 
-#: resources/xnec2c.glade:8529 src/geom_edit.c:1163
+#: resources/xnec2c.glade:8623 src/geom_edit.c:1163
 msgid "Normal - Elev."
 msgstr "நார்மல் - உயர்வு"
 
-#: resources/xnec2c.glade:8561 src/geom_edit.c:1159
+#: resources/xnec2c.glade:8655 src/geom_edit.c:1159
 msgid "Center - Y"
 msgstr "மையம் - Y"
 
-#: resources/xnec2c.glade:8593 src/geom_edit.c:1165
+#: resources/xnec2c.glade:8687 src/geom_edit.c:1165
 msgid "Normal - Azim."
 msgstr "நார்மல் - திசைக்கோணம்"
 
-#: resources/xnec2c.glade:8625 src/geom_edit.c:1161
+#: resources/xnec2c.glade:8719 src/geom_edit.c:1161
 msgid "Center - Z"
 msgstr "மையம் - Z"
 
-#: resources/xnec2c.glade:8657 src/geom_edit.c:1167
+#: resources/xnec2c.glade:8751 src/geom_edit.c:1167
 msgid "Patch Area"
 msgstr "தொகுதி பரப்பளவு"
 
-#: resources/xnec2c.glade:8693
+#: resources/xnec2c.glade:8787
 msgid "SP/SM Cards"
 msgstr "SP/SM அட்டைகள்"
 
-#: resources/xnec2c.glade:8729
+#: resources/xnec2c.glade:8823
 msgid "Corner 3 - X"
 msgstr "மூலை 3 - X"
 
-#: resources/xnec2c.glade:8761
+#: resources/xnec2c.glade:8855
 msgid "Corner 3 - Y"
 msgstr "மூலை 3 - Y"
 
-#: resources/xnec2c.glade:8793
+#: resources/xnec2c.glade:8887
 msgid "Corner 3 - Z"
 msgstr "மூலை 3 - Z"
 
-#: resources/xnec2c.glade:8841
+#: resources/xnec2c.glade:8935
 msgid "Corner 4 - X"
 msgstr "மூலை 4 - X"
 
-#: resources/xnec2c.glade:8873
+#: resources/xnec2c.glade:8967
 msgid "Corner 4 - Y"
 msgstr "மூலை 4 - Y"
 
-#: resources/xnec2c.glade:8905
+#: resources/xnec2c.glade:8999
 msgid "Corner 4 - Z"
 msgstr "மூலை 4 - Z"
 
-#: resources/xnec2c.glade:8948
+#: resources/xnec2c.glade:9042
 msgid "SC Card"
 msgstr "SC அட்டை"
 
-#: resources/xnec2c.glade:9164
+#: resources/xnec2c.glade:9258
 msgid "Quit xnec2c?"
 msgstr "xnec2c-ஐ வெளியேறவா?"
 
-#: resources/xnec2c.glade:9243
+#: resources/xnec2c.glade:9337
 msgid "Radiation Pattern (RP Card)"
 msgstr "கதிர்வீச்சு வடிவம் (RP அட்டை)"
 
-#: resources/xnec2c.glade:9270
+#: resources/xnec2c.glade:9364
 msgid "Normal (Space) Wave"
 msgstr "இயல்பான (வெளி) அலை"
 
-#: resources/xnec2c.glade:9286
+#: resources/xnec2c.glade:9380
 msgid "Space + Ground Wave"
 msgstr "வெளி + தரை அலை"
 
-#: resources/xnec2c.glade:9302
+#: resources/xnec2c.glade:9396
 msgid "Linear Cliff"
 msgstr "நேரியல் பாறை"
 
-#: resources/xnec2c.glade:9318
+#: resources/xnec2c.glade:9412
 msgid "Radial wire screen"
 msgstr "ஆரக்கம்பி திரை"
 
-#: resources/xnec2c.glade:9334
+#: resources/xnec2c.glade:9428
 msgid "Circular Cliff + Radials"
 msgstr "வட்ட பாறை + ஆரக்கம்பிகள்"
 
-#: resources/xnec2c.glade:9350
+#: resources/xnec2c.glade:9444
 msgid "Circular Cliff"
 msgstr "வட்ட பாறை"
 
-#: resources/xnec2c.glade:9366
+#: resources/xnec2c.glade:9460
 msgid "Linear Cliff + Radials"
 msgstr "நேரியல் பாறை + ஆரக்கம்பிகள்"
 
-#: resources/xnec2c.glade:9384
+#: resources/xnec2c.glade:9478
 msgid "<b>See GN/GD Card Documentation</b>"
 msgstr "<b>GN/GD அட்டை ஆவணத்தைப் பார்க்கவும்</b>"
 
-#: resources/xnec2c.glade:9402
+#: resources/xnec2c.glade:9496
 msgid "Wave Type and Ground (I1)"
 msgstr "அலை வகை மற்றும் தரை (I1)"
 
-#: resources/xnec2c.glade:9430
+#: resources/xnec2c.glade:9524
 msgid "Major & Minor Axis & Total Gain"
 msgstr "பெரு & சிறு அச்சு & மொத்த ஆதாயம்"
 
-#: resources/xnec2c.glade:9446
+#: resources/xnec2c.glade:9540
 msgid "Vertical, Horizontal & Total Gain"
 msgstr "செங்குத்து, கிடைமட்டம் & மொத்த ஆதாயம்"
 
-#: resources/xnec2c.glade:9462
+#: resources/xnec2c.glade:9556
 msgid "Major Axis Gain Normalized"
 msgstr "பெரு அச்சு ஆதாயம் இயல்நிலைப்படுத்தப்பட்டது"
 
-#: resources/xnec2c.glade:9478
+#: resources/xnec2c.glade:9572
 msgid "Vertical Axis Gain Normalized"
 msgstr "செங்குத்து அச்சு ஆதாயம் இயல்நிலைப்படுத்தப்பட்டது"
 
-#: resources/xnec2c.glade:9494
+#: resources/xnec2c.glade:9588
 msgid "Total Gain Normalized"
 msgstr "மொத்த ஆதாயம் இயல்நிலைப்படுத்தப்பட்டது"
 
-#: resources/xnec2c.glade:9510
+#: resources/xnec2c.glade:9604
 msgid "Print/Normalize Directive Gain"
 msgstr "டைரக்டிவ் ஆதாயத்தை அச்சிடு/இயல்நிலைப்படுத்து"
 
-#: resources/xnec2c.glade:9526
+#: resources/xnec2c.glade:9620
 msgid "No Normalized Gain"
 msgstr "இயல்நிலைப்படுத்தப்பட்ட ஆதாயம் இல்லை"
 
-#: resources/xnec2c.glade:9542
+#: resources/xnec2c.glade:9636
 msgid "Minor Axis Gain Normalized"
 msgstr "சிறு அச்சு ஆதாயம் இயல்நிலைப்படுத்தப்பட்டது"
 
-#: resources/xnec2c.glade:9558
+#: resources/xnec2c.glade:9652
 msgid "Horizontal Axis Gain Normalized"
 msgstr "கிடைமட்ட அச்சு ஆதாயம் இயல்நிலைப்படுத்தப்பட்டது"
 
-#: resources/xnec2c.glade:9574
+#: resources/xnec2c.glade:9668
 msgid "Print/Normalize Power Gain"
 msgstr "திறன் ஆதாயத்தை அச்சிடு/இயல்நிலைப்படுத்து"
 
-#: resources/xnec2c.glade:9590
+#: resources/xnec2c.glade:9684
 msgid "No Gain Averaging"
 msgstr "ஆதாயம் சராசரியிடல் இல்லை"
 
-#: resources/xnec2c.glade:9606
+#: resources/xnec2c.glade:9700
 msgid "Points in Average Not Printed"
 msgstr "சராசரியில் உள்ள புள்ளிகள் அச்சிடப்படவில்லை"
 
-#: resources/xnec2c.glade:9622
+#: resources/xnec2c.glade:9716
 msgid "Average Gain Computed"
 msgstr "சராசரி ஆதாயம் கணக்கிடப்பட்டது"
 
-#: resources/xnec2c.glade:9640
+#: resources/xnec2c.glade:9734
 msgid "<b>See RP Card Documentation</b>"
 msgstr "<b>RP அட்டை ஆவணத்தைப் பார்க்கவும்</b>"
 
-#: resources/xnec2c.glade:9658
+#: resources/xnec2c.glade:9752
 msgid "Data Output Control (XNDA)"
 msgstr "தரவு வெளியீட்டுக் கட்டுப்பாடு (XNDA)"
 
-#: resources/xnec2c.glade:9688
+#: resources/xnec2c.glade:9782
 msgid "Points in Theta"
 msgstr "தீட்டாவில் புள்ளிகள்"
 
-#: resources/xnec2c.glade:9702 src/cmnd_edit.c:1763
+#: resources/xnec2c.glade:9796 src/cmnd_edit.c:1763
 msgid "Initial Theta (deg)"
 msgstr "ஆரம்ப தீட்டா (deg)"
 
-#: resources/xnec2c.glade:9715 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
+#: resources/xnec2c.glade:9809 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
 msgid "Increment in Theta"
 msgstr "தீட்டாவில் அதிகரிப்பு"
 
-#: resources/xnec2c.glade:9784 src/cmnd_edit.c:1762
+#: resources/xnec2c.glade:9878 src/cmnd_edit.c:1762
 msgid "Points in Phi"
 msgstr "ஃபையில் புள்ளிகள்"
 
-#: resources/xnec2c.glade:9797
+#: resources/xnec2c.glade:9891
 msgid "Initial Phi (deg)"
 msgstr "ஆரம்ப ஃபை (deg)"
 
-#: resources/xnec2c.glade:9810 src/cmnd_edit.c:2708
+#: resources/xnec2c.glade:9904 src/cmnd_edit.c:2708
 msgid "Increment in Phi"
 msgstr "ஃபையில் அதிகரிப்பு"
 
-#: resources/xnec2c.glade:9879
+#: resources/xnec2c.glade:9973
 msgid "Field Point Distance"
 msgstr "புள்ளித் தூரம்"
 
-#: resources/xnec2c.glade:9911
+#: resources/xnec2c.glade:10005
 msgid "Gain Normalization"
 msgstr "ஆதாய இயல்நிலைப்படுத்தல்"
 
-#: resources/xnec2c.glade:9953
+#: resources/xnec2c.glade:10047
 msgid "Radiation Pattern Parameters"
 msgstr "கதிர்வீச்சு வடிவ அளவுருக்கள்"
 
-#: resources/xnec2c.glade:10120
+#: resources/xnec2c.glade:10214
 msgid "Reflect Structure (GX card)"
 msgstr "கட்டமைப்பைப் பிரதிபலி (GX அட்டை)"
 
-#: resources/xnec2c.glade:10148
+#: resources/xnec2c.glade:10242
 msgid "Reflect in YZ plane"
 msgstr "YZ தளத்தில் பிரதிபலி"
 
-#: resources/xnec2c.glade:10163
+#: resources/xnec2c.glade:10257
 msgid "Reflect in XY plane"
 msgstr "XY தளத்தில் பிரதிபலி"
 
-#: resources/xnec2c.glade:10178
+#: resources/xnec2c.glade:10272
 msgid "Reflect in XZ plane"
 msgstr "XZ தளத்தில் பிரதிபலி"
 
-#: resources/xnec2c.glade:10234
+#: resources/xnec2c.glade:10328
 msgid "Reflect Options"
 msgstr "பிரதிபலிப்பு விருப்பங்கள்"
 
-#: resources/xnec2c.glade:10365
+#: resources/xnec2c.glade:10459
 msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: அதிர்வெண் தரவு வரைபடங்கள்"
 
-#: resources/xnec2c.glade:10390 resources/xnec2c.glade:11384
-#: resources/xnec2c.glade:12921
+#: resources/xnec2c.glade:10484 resources/xnec2c.glade:11478
+#: resources/xnec2c.glade:13015
 msgid "_File"
 msgstr "கோப்பு (_F)"
 
-#: resources/xnec2c.glade:10452 resources/xnec2c.glade:11446
-#: resources/xnec2c.glade:12983
+#: resources/xnec2c.glade:10546 resources/xnec2c.glade:11540
+#: resources/xnec2c.glade:13077
 msgid "Save as _gnuplot"
 msgstr "gnuplot ஆக சேமி (_G)"
 
-#: resources/xnec2c.glade:10463 resources/xnec2c.glade:12993
+#: resources/xnec2c.glade:10557 resources/xnec2c.glade:13087
 msgid "Save as _CSV"
 msgstr "CSV ஆக சேமி (_C)"
 
-#: resources/xnec2c.glade:10475
+#: resources/xnec2c.glade:10569
 msgid "Save as _Touchstone (.SnP)"
 msgstr "Touchstone ஆக சேமி (.SnP) (_T)"
 
-#: resources/xnec2c.glade:10482
+#: resources/xnec2c.glade:10576
 msgid "Save as S_1P: Reflection Only"
 msgstr "S1P ஆக சேமி: பிரதிபலிப்பு மட்டும் (_1)"
 
-#: resources/xnec2c.glade:10492
+#: resources/xnec2c.glade:10586
 msgid "Save as S2P: _Max Gain (S21)"
 msgstr "S2P ஆக சேமி: அதிகபட்ச ஆதாயம் (S21) (_M)"
 
-#: resources/xnec2c.glade:10502
+#: resources/xnec2c.glade:10596
 msgid "Save as S2P: _Viewer Gain (S21)"
 msgstr "S2P ஆக சேமி: பார்வையாளர் ஆதாயம் (S21) (_V)"
 
-#: resources/xnec2c.glade:10539 resources/xnec2c.glade:11812
-#: resources/xnec2c.glade:13027
+#: resources/xnec2c.glade:10633 resources/xnec2c.glade:11906
+#: resources/xnec2c.glade:13121
 msgid "_View"
 msgstr "காட்சி (_V)"
 
-#: resources/xnec2c.glade:10548 resources/xnec2c.glade:11840
-#: resources/xnec2c.glade:13035
+#: resources/xnec2c.glade:10642 resources/xnec2c.glade:11934
+#: resources/xnec2c.glade:13129
 msgid "_Polarization"
 msgstr "முனைவு (_P)"
 
-#: resources/xnec2c.glade:10562 resources/xnec2c.glade:11854
-#: resources/xnec2c.glade:13049
+#: resources/xnec2c.glade:10656 resources/xnec2c.glade:11948
+#: resources/xnec2c.glade:13143
 msgid "_Total"
 msgstr "மொத்தம் (_T)"
 
-#: resources/xnec2c.glade:10573 resources/xnec2c.glade:11865
-#: resources/xnec2c.glade:13060
+#: resources/xnec2c.glade:10667 resources/xnec2c.glade:11959
+#: resources/xnec2c.glade:13154
 msgid "_Horizontal"
 msgstr "கிடைமட்டம் (_H)"
 
-#: resources/xnec2c.glade:10584 resources/xnec2c.glade:11876
-#: resources/xnec2c.glade:13071
+#: resources/xnec2c.glade:10678 resources/xnec2c.glade:11970
+#: resources/xnec2c.glade:13165
 msgid "_Vertical"
 msgstr "செங்குத்து (_V)"
 
-#: resources/xnec2c.glade:10595 resources/xnec2c.glade:11887
-#: resources/xnec2c.glade:13082
+#: resources/xnec2c.glade:10689 resources/xnec2c.glade:11981
+#: resources/xnec2c.glade:13176
 msgid "_Right Hand"
 msgstr "வலது கை (_R)"
 
-#: resources/xnec2c.glade:10606 resources/xnec2c.glade:11898
-#: resources/xnec2c.glade:13093
+#: resources/xnec2c.glade:10700 resources/xnec2c.glade:11992
+#: resources/xnec2c.glade:13187
 msgid "_Left Hand"
 msgstr "இடது கை (_L)"
 
-#: resources/xnec2c.glade:10621
+#: resources/xnec2c.glade:10715
 msgid "_Color Theme"
 msgstr "நிற தீம் (_C)"
 
-#: resources/xnec2c.glade:10640
+#: resources/xnec2c.glade:10734
 msgid "_Net Gain"
 msgstr "நிகர ஆதாயம் (_N)"
 
-#: resources/xnec2c.glade:10649
+#: resources/xnec2c.glade:10743
 msgid "Show _Min/Max Values"
 msgstr "குறைந்த/அதிக மதிப்புகளைக் காட்டு (_M)"
 
-#: resources/xnec2c.glade:10658
+#: resources/xnec2c.glade:10752
 msgid "Show _S11 (dB) Values"
 msgstr "S11 (dB) மதிப்புகளைக் காட்டு (_S)"
 
-#: resources/xnec2c.glade:10667
+#: resources/xnec2c.glade:10761
 msgid "Clamp _VSWR Graph to 10"
 msgstr "VSWR வரைபடத்தை 10 ஆக கட்டுப்படுத்து (_V)"
 
-#: resources/xnec2c.glade:10676
+#: resources/xnec2c.glade:10770
 msgid "Show Ta instead of TA"
 msgstr "TA க்குப் பதிலாக Ta ஐக் காட்டு"
 
-#: resources/xnec2c.glade:10685
+#: resources/xnec2c.glade:10779
 msgid "Round _X Axis Frequency Values"
 msgstr "X அச்சு அதிர்வெண் மதிப்புகளை வட்டமாக்கு (_X)"
 
-#: resources/xnec2c.glade:10694
+#: resources/xnec2c.glade:10788
 msgid "S_wap Left/Right Click Frequency Selection"
 msgstr "இடது/வலது கிளிக் அதிர்வெண் தேர்வை மாற்று (_W)"
 
-#: resources/xnec2c.glade:10718 resources/xnec2c.glade:10882
+#: resources/xnec2c.glade:10812 resources/xnec2c.glade:10976
 msgid "Max Gain"
 msgstr "அதிகபட்ச ஆதாயம்"
 
-#: resources/xnec2c.glade:10733
+#: resources/xnec2c.glade:10827
 msgid "Direction"
 msgstr "திசை"
 
-#: resources/xnec2c.glade:10748
+#: resources/xnec2c.glade:10842
 msgid "Viewer"
 msgstr "பார்வையாளர்"
 
-#: resources/xnec2c.glade:10763 resources/xnec2c.glade:10987
+#: resources/xnec2c.glade:10857 resources/xnec2c.glade:11081
 #: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:55
 msgid "VSWR"
 msgstr "VSWR"
 
-#: resources/xnec2c.glade:10778
+#: resources/xnec2c.glade:10872
 msgid "Zr/Zi"
 msgstr "Zr/Zi"
 
-#: resources/xnec2c.glade:10793
+#: resources/xnec2c.glade:10887
 msgid "Zm/Zph"
 msgstr "Zm/Zph"
 
-#: resources/xnec2c.glade:10808
+#: resources/xnec2c.glade:10902
 msgid "Smith"
 msgstr "ஸ்மித்"
 
-#: resources/xnec2c.glade:10823
+#: resources/xnec2c.glade:10917
 msgid "G/Ta"
 msgstr "G/Ta"
 
-#: resources/xnec2c.glade:10866 resources/xnec2c.glade:10901
-#: resources/xnec2c.glade:10936 resources/xnec2c.glade:10971
-#: resources/xnec2c.glade:11215 resources/xnec2c.glade:11250
-#: resources/xnec2c.glade:11285 resources/xnec2c.glade:14144
+#: resources/xnec2c.glade:10960 resources/xnec2c.glade:10995
+#: resources/xnec2c.glade:11030 resources/xnec2c.glade:11065
+#: resources/xnec2c.glade:11309 resources/xnec2c.glade:11344
+#: resources/xnec2c.glade:11379 resources/xnec2c.glade:14238
 msgid " - - -"
 msgstr " - - -"
 
-#: resources/xnec2c.glade:10917 src/freqplots/graphs/impedance_graph.c:76
+#: resources/xnec2c.glade:11011 src/freqplots/graphs/impedance_graph.c:76
 msgid "Z-imag"
 msgstr "Z-கற்பனை"
 
-#: resources/xnec2c.glade:10952 src/freqplots/graphs/impedance_graph.c:74
+#: resources/xnec2c.glade:11046 src/freqplots/graphs/impedance_graph.c:74
 msgid "Z-real"
 msgstr "Z-மெய்"
 
-#: resources/xnec2c.glade:11007
+#: resources/xnec2c.glade:11101
 msgid " - - - - "
 msgstr " - - - - "
 
-#: resources/xnec2c.glade:11023
+#: resources/xnec2c.glade:11117
 msgid "Freq MHz"
 msgstr "அதிர்வெண் MHz"
 
-#: resources/xnec2c.glade:11062 resources/xnec2c.glade:11075
+#: resources/xnec2c.glade:11156 resources/xnec2c.glade:11169
 msgid "Port"
 msgstr "போர்ட்"
 
-#: resources/xnec2c.glade:11087
+#: resources/xnec2c.glade:11181
 msgid "Tx Line Zo"
 msgstr "Tx கோடு Zo"
 
-#: resources/xnec2c.glade:11101 resources/xnec2c.glade:12682
-#: resources/xnec2c.glade:13916
+#: resources/xnec2c.glade:11195 resources/xnec2c.glade:12776
+#: resources/xnec2c.glade:14010
 msgid "Freq Loop"
 msgstr "அதிர்வெண் சுழற்சி"
 
-#: resources/xnec2c.glade:11196 resources/xnec2c.glade:14022
+#: resources/xnec2c.glade:11290 resources/xnec2c.glade:14116
 msgid "T<sub>A</sub>(Elev.°)"
 msgstr "T<sub>A</sub>(உயர்வு°)"
 
-#: resources/xnec2c.glade:11231
+#: resources/xnec2c.glade:11325
 msgid "T<sub>a</sub>"
 msgstr "T<sub>a</sub>"
 
-#: resources/xnec2c.glade:11266
+#: resources/xnec2c.glade:11360
 msgid "G/T<sub>a</sub>"
 msgstr "G/T<sub>a</sub>"
 
-#: resources/xnec2c.glade:11340
+#: resources/xnec2c.glade:11434
 msgid "Frequency Data Plots"
 msgstr "அதிர்வெண் தரவு வரைபடங்கள்"
 
-#: resources/xnec2c.glade:11457
+#: resources/xnec2c.glade:11551
 msgid "Save _Currents/Charges as CSV"
 msgstr "மின்னோட்டங்கள்/மின்னூட்டங்களை CSV ஆக சேமி (_C)"
 
-#: resources/xnec2c.glade:11476
+#: resources/xnec2c.glade:11570
 msgid "Optimization Settings"
 msgstr "உகப்பாக்க அமைவுகள்"
 
-#: resources/xnec2c.glade:11491
+#: resources/xnec2c.glade:11585
 msgid "Reload and write data on .NEC file changes"
 msgstr ".NEC கோப்பு மாற்றங்களின்போது தரவை மீளேற்றி எழுது"
 
-#: resources/xnec2c.glade:11498
+#: resources/xnec2c.glade:11592
 msgid "_Write files selected below, now."
 msgstr "கீழே தேர்ந்தெடுக்கப்பட்ட கோப்புகளை இப்போது எழுது (_W)."
 
-#: resources/xnec2c.glade:11513
+#: resources/xnec2c.glade:11607
 msgid "After calculation, write <file>.csv"
 msgstr "கணக்கீட்டிற்குப் பிறகு, <file>.csv ஐ எழுது"
 
-#: resources/xnec2c.glade:11522
+#: resources/xnec2c.glade:11616
 msgid "After calculation, write <file>.s_1p"
 msgstr "கணக்கீட்டிற்குப் பிறகு, <file>.s_1p ஐ எழுது"
 
-#: resources/xnec2c.glade:11531
+#: resources/xnec2c.glade:11625
 msgid "After calculation, write <file>-_maxgain.s2p"
 msgstr "கணக்கீட்டிற்குப் பிறகு, <file>-_maxgain.s2p ஐ எழுது"
 
-#: resources/xnec2c.glade:11540
+#: resources/xnec2c.glade:11634
 msgid "After calculation, write <file>-_viewergain.s2p"
 msgstr "கணக்கீட்டிற்குப் பிறகு, <file>-_viewergain.s2p ஐ எழுது"
 
-#: resources/xnec2c.glade:11549
+#: resources/xnec2c.glade:11643
 msgid "After calculation, write <file>-_radpattern.csv"
 msgstr "கணக்கீட்டிற்குப் பிறகு, <file>-_radpattern.csv ஐ எழுது"
 
-#: resources/xnec2c.glade:11558
+#: resources/xnec2c.glade:11652
 msgid "After calculation, write <file>-_currents.csv"
 msgstr "கணக்கீட்டிற்குப் பிறகு, <file>-_currents.csv ஐ எழுது"
 
-#: resources/xnec2c.glade:11567
+#: resources/xnec2c.glade:11661
 msgid "After calculation, write <file>-_structure.gplot"
 msgstr "கணக்கீட்டிற்குப் பிறகு, <file>-_structure.gplot ஐ எழுது"
 
-#: resources/xnec2c.glade:11576
+#: resources/xnec2c.glade:11670
 msgid "After calculation, write <file>-_patch-currents.csv"
 msgstr "கணக்கீட்டிற்குப் பிறகு, <file>-_patch-currents.csv ஐ எழுது"
 
-#: resources/xnec2c.glade:11591
+#: resources/xnec2c.glade:11685
 msgid "_Math Libraries"
 msgstr "கணித நூலகங்கள் (_M)"
 
-#: resources/xnec2c.glade:11600
+#: resources/xnec2c.glade:11694
 msgid "_Interactive"
 msgstr "ஊடாடும் (_I)"
 
-#: resources/xnec2c.glade:11620
+#: resources/xnec2c.glade:11714
 msgid "_Batch"
 msgstr "தொகுதி (_B)"
 
-#: resources/xnec2c.glade:11646
+#: resources/xnec2c.glade:11740
 msgid "Mathlib _Help"
 msgstr "Mathlib உதவி (_H)"
 
-#: resources/xnec2c.glade:11659
+#: resources/xnec2c.glade:11753
 msgid "Mathlib _Benchmarks"
 msgstr "Mathlib பெஞ்ச்மார்க்குகள் (_B)"
 
-#: resources/xnec2c.glade:11670
+#: resources/xnec2c.glade:11764
 msgid "_Selected Mathlibs"
 msgstr "தேர்ந்தெடுத்த Mathlib-கள் (_S)"
 
-#: resources/xnec2c.glade:11684
+#: resources/xnec2c.glade:11778
 msgid "Select All/None"
 msgstr "அனைத்தையும்/ஒன்றுமில்லை தேர்ந்தெடு"
 
-#: resources/xnec2c.glade:11709
+#: resources/xnec2c.glade:11803
 msgid "_Parallel (-j N):\t\tO(N/J)"
 msgstr "இணை (-j N):\t\tO(N/J) (_P)"
 
-#: resources/xnec2c.glade:11718
+#: resources/xnec2c.glade:11812
 msgid "_Single Job (-j 1):\tO(N)"
 msgstr "ஒற்றை பணி (-j 1):\tO(N) (_S)"
 
-#: resources/xnec2c.glade:11727
+#: resources/xnec2c.glade:11821
 msgid "_Iterate -j N/=2:\tO(N*log2(J))"
 msgstr "படிப்படியாகப் பாதியாக்கு -j N/=2:\tO(N*log2(J)) (_H)"
 
-#: resources/xnec2c.glade:11736
+#: resources/xnec2c.glade:11830
 msgid "_Iterate -j N-=1:\tO(N*J)"
 msgstr "படிப்படியாகக் குறை -j N-=1:\tO(N*J) (_D)"
 
-#: resources/xnec2c.glade:11751
+#: resources/xnec2c.glade:11845
 msgid "Benchmark _Help"
 msgstr "பெஞ்ச்மார்க் உதவி (_B)"
 
-#: resources/xnec2c.glade:11770
+#: resources/xnec2c.glade:11864
 msgid "Begin Frequency Loop at Startup"
 msgstr "தொடக்கத்தில் அதிர்வெண் சுழற்சியைத் தொடங்கு"
 
-#: resources/xnec2c.glade:11781
+#: resources/xnec2c.glade:11875
 msgid "Confirm Quit"
 msgstr "வெளியேறலை உறுதிப்படுத்து"
 
-#: resources/xnec2c.glade:11820
+#: resources/xnec2c.glade:11914
 msgid "_Radiation Pattern"
 msgstr "கதிர்வீச்சு வடிவம் (_R)"
 
-#: resources/xnec2c.glade:11830
+#: resources/xnec2c.glade:11924
 msgid "_Frequency Plots"
 msgstr "அதிர்வெண் வரைபடங்கள் (_F)"
 
-#: resources/xnec2c.glade:11913
+#: resources/xnec2c.glade:12007
 msgid "_Visualization"
 msgstr "காட்சிப்படுத்தல் (_V)"
 
-#: resources/xnec2c.glade:11929
+#: resources/xnec2c.glade:12023
 msgid "Color Scale"
 msgstr "நிற அளவீடு"
 
-#: resources/xnec2c.glade:11936
+#: resources/xnec2c.glade:12030
 msgid ""
 "Power transfer n^γ relative to this frequency step's peak.\n"
 "γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
@@ -1778,11 +1813,11 @@ msgstr ""
 "விரயமாகும் திறனுக்கு விகிதாசாரமாகும்.\n"
 "அசைவூட்டல் உரையாடலில் γ ஐ சரிசெய்யவும்."
 
-#: resources/xnec2c.glade:11937
+#: resources/xnec2c.glade:12031
 msgid "_Power"
 msgstr "திறன் (_P)"
 
-#: resources/xnec2c.glade:11948
+#: resources/xnec2c.glade:12042
 msgid ""
 "Logarithmic scale over a user-set range R below the peak.\n"
 "Reveals weak detail that linear display hides; adjust R in the animate "
@@ -1792,11 +1827,11 @@ msgstr ""
 "நேரியல் காட்சி மறைக்கும் பலவீனமான விவரங்களை வெளிப்படுத்தும்; அசைவூட்டல் உரையாடலில் R ஐ "
 "சரிசெய்யவும்."
 
-#: resources/xnec2c.glade:11949
+#: resources/xnec2c.glade:12043
 msgid "_dB"
 msgstr "dB (_D)"
 
-#: resources/xnec2c.glade:11960
+#: resources/xnec2c.glade:12054
 msgid ""
 "Inverse hyperbolic sine transfer: linear below the softening knee k, "
 "logarithmic above.\n"
@@ -1806,11 +1841,11 @@ msgstr ""
 "மேலே மடக்கை.\n"
 "அசைவூட்டல் உரையாடலில் k ஐ சரிசெய்யவும்."
 
-#: resources/xnec2c.glade:11961
+#: resources/xnec2c.glade:12055
 msgid "_Asinh"
 msgstr "Asinh (_A)"
 
-#: resources/xnec2c.glade:11972
+#: resources/xnec2c.glade:12066
 msgid ""
 "μ-law companding transfer: lifts weak detail with bounded compression.\n"
 "Adjust the compression in the animate dialog."
@@ -1818,11 +1853,11 @@ msgstr ""
 "μ-law காம்பாண்டிங் மாற்றம்: வரம்புக்குட்பட்ட சுருக்கத்துடன் பலவீனமான விவரங்களை உயர்த்தும்.\n"
 "அசைவூட்டல் உரையாடலில் சுருக்கத்தை சரிசெய்யவும்."
 
-#: resources/xnec2c.glade:11973
+#: resources/xnec2c.glade:12067
 msgid "μ-_law"
 msgstr "μ-law (_L)"
 
-#: resources/xnec2c.glade:11984
+#: resources/xnec2c.glade:12078
 msgid ""
 "Reinhard rational soft-compressor with knee k.\n"
 "Adjust k in the animate dialog."
@@ -1830,11 +1865,11 @@ msgstr ""
 "வளைவுப் புள்ளி k உடன் Reinhard விகிதமுறு மென்-சுருக்கி.\n"
 "அசைவூட்டல் உரையாடலில் k ஐ சரிசெய்யவும்."
 
-#: resources/xnec2c.glade:11985
+#: resources/xnec2c.glade:12079
 msgid "_Reinhard"
 msgstr "Reinhard (_R)"
 
-#: resources/xnec2c.glade:11996
+#: resources/xnec2c.glade:12090
 msgid ""
 "Hyperbolic tangent transfer with contrast steepness a.\n"
 "Adjust a in the animate dialog."
@@ -1842,420 +1877,420 @@ msgstr ""
 "மாறுபாட்டு செங்குத்துத்தன்மை a உடன் அதிபரவளைய தான்ஜென்ட் மாற்றம்.\n"
 "அசைவூட்டல் உரையாடலில் a ஐ சரிசெய்யவும்."
 
-#: resources/xnec2c.glade:11997
+#: resources/xnec2c.glade:12091
 msgid "_Sigmoid"
 msgstr "Sigmoid (_S)"
 
-#: resources/xnec2c.glade:12008
+#: resources/xnec2c.glade:12102
 msgid ""
 "Full brightness for every magnitude; the color projection alone sets the "
 "rendering."
 msgstr "ஒவ்வொரு அளவுக்கும் முழு ஒளிர்வு; நிற ப்ரொஜெக்ஷன் மட்டுமே வரைதலை அமைக்கிறது."
 
-#: resources/xnec2c.glade:12009
+#: resources/xnec2c.glade:12103
 msgid "_None"
 msgstr "ஏதுமில்லை (_N)"
 
-#: resources/xnec2c.glade:12027
+#: resources/xnec2c.glade:12121
 msgid "Patch Flow — Animated"
 msgstr "தொகுதி ஓட்டம் — அசைவூட்டப்பட்டது"
 
-#: resources/xnec2c.glade:12034
+#: resources/xnec2c.glade:12128
 msgid "_Reference Phase"
 msgstr "குறிப்புக் கட்டம் (_R)"
 
-#: resources/xnec2c.glade:12045
+#: resources/xnec2c.glade:12139
 msgid "_LIC Texture"
 msgstr "LIC அமைப்பு (_L)"
 
-#: resources/xnec2c.glade:12056 resources/xnec2c.glade:13240
+#: resources/xnec2c.glade:12150 resources/xnec2c.glade:13334
 msgid "_Wireframe"
 msgstr "கம்பி வலை வடிவம் (_W)"
 
-#: resources/xnec2c.glade:12074
+#: resources/xnec2c.glade:12168
 msgid "Patch Flow — Static"
 msgstr "தொகுதி ஓட்டம் — நிலையான"
 
-#: resources/xnec2c.glade:12081
+#: resources/xnec2c.glade:12175
 msgid "Polarization _Axis"
 msgstr "முனைவு அச்சு (_A)"
 
-#: resources/xnec2c.glade:12092
+#: resources/xnec2c.glade:12186
 msgid "Peak _Magnitude"
 msgstr "உச்ச அளவு (_M)"
 
-#: resources/xnec2c.glade:12107
+#: resources/xnec2c.glade:12201
 msgid "A_nimate"
 msgstr "அசைவூட்டு (_N)"
 
-#: resources/xnec2c.glade:12116 resources/xnec2c.glade:13357
+#: resources/xnec2c.glade:12210 resources/xnec2c.glade:13451
 msgid "Common _Projection"
 msgstr "பொதுவான ப்ரொஜெக்ஷன் (_P)"
 
-#: resources/xnec2c.glade:12132
+#: resources/xnec2c.glade:12226
 msgid "_Symbol Overrides"
 msgstr "குறியீடு மேலெழுதல்கள் (_S)"
 
-#: resources/xnec2c.glade:12141
+#: resources/xnec2c.glade:12235
 msgid "Rendering _Settings..."
 msgstr "வரைதல் அமைவுகள்... (_R)"
 
-#: resources/xnec2c.glade:12152
+#: resources/xnec2c.glade:12246
 msgid "_Help"
 msgstr "உதவி (_H)"
 
-#: resources/xnec2c.glade:12161
+#: resources/xnec2c.glade:12255
 msgid "_About"
 msgstr "பற்றி (_A)"
 
-#: resources/xnec2c.glade:12384
+#: resources/xnec2c.glade:12478
 msgid " Zoom"
 msgstr " பெரிதாக்கு"
 
-#: resources/xnec2c.glade:12527 resources/xnec2c.glade:13852
+#: resources/xnec2c.glade:12621 resources/xnec2c.glade:13946
 #: src/freqplots/freqplots_core.c:54
 msgid "Gain"
 msgstr "ஆதாயம்"
 
-#: resources/xnec2c.glade:12542 resources/xnec2c.glade:12558
-#: resources/xnec2c.glade:13865 resources/xnec2c.glade:14126
+#: resources/xnec2c.glade:12636 resources/xnec2c.glade:12652
+#: resources/xnec2c.glade:13959 resources/xnec2c.glade:14220
 msgid "0.0"
 msgstr "0.0"
 
-#: resources/xnec2c.glade:12592
+#: resources/xnec2c.glade:12686
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:12648 resources/xnec2c.glade:13901
+#: resources/xnec2c.glade:12742 resources/xnec2c.glade:13995
 msgid "Step"
 msgstr "படி"
 
-#: resources/xnec2c.glade:12795 resources/xnec2c.glade:13949
+#: resources/xnec2c.glade:12889 resources/xnec2c.glade:14043
 msgid "Apply Freq"
 msgstr "அதிர்வெண்ணைப் பயன்படுத்து"
 
-#: resources/xnec2c.glade:12815
+#: resources/xnec2c.glade:12909
 msgid "Frequency Mhz"
 msgstr "அதிர்வெண் Mhz"
 
-#: resources/xnec2c.glade:12876
+#: resources/xnec2c.glade:12970
 msgid "Structure Geometry"
 msgstr "கட்டமைப்பு வடிவியல்"
 
-#: resources/xnec2c.glade:12895
+#: resources/xnec2c.glade:12989
 msgid "Xnec2c: Radiation Patterns"
 msgstr "Xnec2c: கதிர்வீச்சு வடிவங்கள்"
 
-#: resources/xnec2c.glade:13108
+#: resources/xnec2c.glade:13202
 msgid "_Gain Scaling"
 msgstr "ஆதாய அளவீடு (_G)"
 
-#: resources/xnec2c.glade:13123
+#: resources/xnec2c.glade:13217
 msgid "Linear _Power"
 msgstr "நேரியல் திறன் (_P)"
 
-#: resources/xnec2c.glade:13134
+#: resources/xnec2c.glade:13228
 msgid "Linear _Voltage"
 msgstr "நேரியல் மின்னழுத்தம் (_V)"
 
-#: resources/xnec2c.glade:13145
+#: resources/xnec2c.glade:13239
 msgid "_ARRL Style"
 msgstr "ARRL பாணி (_A)"
 
-#: resources/xnec2c.glade:13156
+#: resources/xnec2c.glade:13250
 msgid "_Logarithmic"
 msgstr "மடக்கை (_L)"
 
-#: resources/xnec2c.glade:13167
+#: resources/xnec2c.glade:13261
 msgid "_Noise Temperature"
 msgstr "இரைச்சல் வெப்பநிலை (_N)"
 
-#: resources/xnec2c.glade:13178
+#: resources/xnec2c.glade:13272
 msgid "Noise Temp (_log scale)"
 msgstr "இரைச்சல் வெப்பநிலை (மடக்கை அளவீடு) (_C)"
 
-#: resources/xnec2c.glade:13193
+#: resources/xnec2c.glade:13287
 msgid "Noise _Models"
 msgstr "இரைச்சல் மாதிரிகள் (_M)"
 
-#: resources/xnec2c.glade:13212
+#: resources/xnec2c.glade:13306
 msgid "_Gradient Key"
 msgstr "சாய்வு விளக்கக்குறி (_G)"
 
-#: resources/xnec2c.glade:13222
+#: resources/xnec2c.glade:13316
 msgid "Draw St_yle"
 msgstr "வரைதல் பாணி (_Y)"
 
-#: resources/xnec2c.glade:13231
+#: resources/xnec2c.glade:13325
 msgid "S_urface"
 msgstr "மேற்பரப்பு (_S)"
 
-#: resources/xnec2c.glade:13250
+#: resources/xnec2c.glade:13344
 msgid "_Both"
 msgstr "இரண்டும் (_B)"
 
-#: resources/xnec2c.glade:13265
+#: resources/xnec2c.glade:13359
 msgid "_Near Field"
 msgstr "அண்மைப் புலம் (_N)"
 
-#: resources/xnec2c.glade:13280
+#: resources/xnec2c.glade:13374
 msgid "Near _E Field"
 msgstr "அண்மை மின்புலம் (_E)"
 
-#: resources/xnec2c.glade:13290
+#: resources/xnec2c.glade:13384
 msgid "Near _H Field"
 msgstr "அண்மை காந்தப்புலம் (_H)"
 
-#: resources/xnec2c.glade:13300
+#: resources/xnec2c.glade:13394
 msgid "_Poynting Vector"
 msgstr "பாய்ண்டிங் வெக்டர் (_P)"
 
-#: resources/xnec2c.glade:13309
+#: resources/xnec2c.glade:13403
 msgid "_Animate Dialog"
 msgstr "அசைவூட்டல் உரையாடல் (_A)"
 
-#: resources/xnec2c.glade:13318
+#: resources/xnec2c.glade:13412
 msgid "_Total Field"
 msgstr "மொத்தப் புலம் (_T)"
 
-#: resources/xnec2c.glade:13327
+#: resources/xnec2c.glade:13421
 msgid "_Peak Value"
 msgstr "உச்ச மதிப்பு (_V)"
 
-#: resources/xnec2c.glade:13338
+#: resources/xnec2c.glade:13432
 msgid "_Instantaneous (φ=0)"
 msgstr "உடனடி (φ=0) (_I)"
 
-#: resources/xnec2c.glade:13367
+#: resources/xnec2c.glade:13461
 msgid "_Overlay Structure"
 msgstr "கட்டமைப்பு மேலொட்டு (_O)"
 
-#: resources/xnec2c.glade:13391
+#: resources/xnec2c.glade:13485
 msgid "Gain Pattern"
 msgstr "ஆதாய வடிவம்"
 
-#: resources/xnec2c.glade:13406
+#: resources/xnec2c.glade:13500
 msgid "E/H Fields"
 msgstr "E/H புலங்கள்"
 
-#: resources/xnec2c.glade:13589
+#: resources/xnec2c.glade:13683
 msgid "Zoom % "
 msgstr "பெரிதாக்கல் % "
 
-#: resources/xnec2c.glade:13628
+#: resources/xnec2c.glade:13722
 msgid "Elev.°"
 msgstr "உயர்வு°"
 
-#: resources/xnec2c.glade:13969
+#: resources/xnec2c.glade:14063
 msgid "Frequency MHz"
 msgstr "அதிர்வெண் MHz"
 
-#: resources/xnec2c.glade:13986
+#: resources/xnec2c.glade:14080
 msgid "0.010"
 msgstr "0.010"
 
-#: resources/xnec2c.glade:14040 resources/xnec2c.glade:14073
-#: resources/xnec2c.glade:14108
+#: resources/xnec2c.glade:14134 resources/xnec2c.glade:14167
+#: resources/xnec2c.glade:14202
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:14055
+#: resources/xnec2c.glade:14149
 msgid "T<sub>earth</sub>"
 msgstr "T<sub>earth</sub>"
 
-#: resources/xnec2c.glade:14090
+#: resources/xnec2c.glade:14184
 msgid "T<sub>sky</sub>"
 msgstr "T<sub>sky</sub>"
 
-#: resources/xnec2c.glade:14211 src/rdpattern_ui.c:984
+#: resources/xnec2c.glade:14305 src/rdpattern_ui.c:984
 msgid "Radiation Patterns"
 msgstr "கதிர்வீச்சு வடிவங்கள்"
 
-#: resources/xnec2c.glade:14246
+#: resources/xnec2c.glade:14340
 msgid "Scale Structure (GS card)"
 msgstr "கட்டமைப்பை அளவை மாற்று (GS அட்டை)"
 
-#: resources/xnec2c.glade:14277
+#: resources/xnec2c.glade:14371
 msgid "Structure Scale Factor"
 msgstr "கட்டமைப்பு அளவு காரணி"
 
-#: resources/xnec2c.glade:14290
+#: resources/xnec2c.glade:14384
 msgid "From Tag No."
 msgstr "குறிச்சொல் எண்ணிலிருந்து"
 
-#: resources/xnec2c.glade:14340
+#: resources/xnec2c.glade:14434
 msgid "To Tag No."
 msgstr "குறிச்சொல் எண் வரை"
 
-#: resources/xnec2c.glade:14375
+#: resources/xnec2c.glade:14469
 msgid "Scale Structure"
 msgstr "கட்டமைப்பை அளவை மாற்று"
 
-#: resources/xnec2c.glade:14552
+#: resources/xnec2c.glade:14646
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "ஆயத்தொலைவு உருமாற்றம் (GM அட்டை)"
 
-#: resources/xnec2c.glade:14582
+#: resources/xnec2c.glade:14676
 msgid "Tag Increment"
 msgstr "குறிச்சொல் அதிகரிப்பு"
 
-#: resources/xnec2c.glade:14613
+#: resources/xnec2c.glade:14707
 msgid "Rotate about X"
 msgstr "X ஐச் சுற்றி சுழற்று"
 
-#: resources/xnec2c.glade:14645
+#: resources/xnec2c.glade:14739
 msgid "Move along X"
 msgstr "X வழியே நகர்த்து"
 
-#: resources/xnec2c.glade:14677
+#: resources/xnec2c.glade:14771
 msgid "New Structures"
 msgstr "புதிய கட்டமைப்புகள்"
 
-#: resources/xnec2c.glade:14708
+#: resources/xnec2c.glade:14802
 msgid "Rotate about Y"
 msgstr "Y ஐச் சுற்றி சுழற்று"
 
-#: resources/xnec2c.glade:14740
+#: resources/xnec2c.glade:14834
 msgid "Move along Y"
 msgstr "Y வழியே நகர்த்து"
 
-#: resources/xnec2c.glade:14772
+#: resources/xnec2c.glade:14866
 msgid "Start From Tag"
 msgstr "குறிச்சொல்லிலிருந்து தொடங்கு"
 
-#: resources/xnec2c.glade:14804
+#: resources/xnec2c.glade:14898
 msgid "Rotate about Z"
 msgstr "Z ஐச் சுற்றி சுழற்று"
 
-#: resources/xnec2c.glade:14836
+#: resources/xnec2c.glade:14930
 msgid "Move along Z"
 msgstr "Z வழியே நகர்த்து"
 
-#: resources/xnec2c.glade:14872
+#: resources/xnec2c.glade:14966
 msgid "Co-ordinate Transformation Data"
 msgstr "ஆயத்தொலைவு உருமாற்றத் தரவு"
 
-#: resources/xnec2c.glade:15068
+#: resources/xnec2c.glade:15162
 msgid "Trans. Line Command (TL Card)"
 msgstr "பரப்புக் கோடு கட்டளை (TL அட்டை)"
 
-#: resources/xnec2c.glade:15098
+#: resources/xnec2c.glade:15192
 msgid "Tag Number, End 1  "
 msgstr "குறிச்சொல் எண், முனை 1  "
 
-#: resources/xnec2c.glade:15130
+#: resources/xnec2c.glade:15224
 msgid "Tag Number, End 2  "
 msgstr "குறிச்சொல் எண், முனை 2  "
 
-#: resources/xnec2c.glade:15161
+#: resources/xnec2c.glade:15255
 msgid "Segment Num, End 1"
 msgstr "பிரிவு எண், முனை 1"
 
-#: resources/xnec2c.glade:15193
+#: resources/xnec2c.glade:15287
 msgid "Segment Num, End 2"
 msgstr "பிரிவு எண், முனை 2"
 
-#: resources/xnec2c.glade:15257
+#: resources/xnec2c.glade:15351
 msgid "Crossed Transmission Line"
 msgstr "குறுக்கிடப்பட்ட பரப்புக் கோடு"
 
-#: resources/xnec2c.glade:15275
+#: resources/xnec2c.glade:15369
 msgid "Characteristic Impedance"
 msgstr "சிறப்பியல்பு இம்பீடன்ஸ்"
 
-#: resources/xnec2c.glade:15307
+#: resources/xnec2c.glade:15401
 msgid "End 1 Y Real Part (S)"
 msgstr "முனை 1 Y மெய் பகுதி (S)"
 
-#: resources/xnec2c.glade:15339
+#: resources/xnec2c.glade:15433
 msgid "End 2 Y Real Part (S)"
 msgstr "முனை 2 Y மெய் பகுதி (S)"
 
-#: resources/xnec2c.glade:15371
+#: resources/xnec2c.glade:15465
 msgid "Length of Tx Line (m)"
 msgstr "Tx கோட்டின் நீளம் (m)"
 
-#: resources/xnec2c.glade:15403
+#: resources/xnec2c.glade:15497
 msgid "End 1 Y Imag Part (S)"
 msgstr "முனை 1 Y கற்பனை பகுதி (S)"
 
-#: resources/xnec2c.glade:15435
+#: resources/xnec2c.glade:15529
 msgid "End 2 Y Imag Part (S)"
 msgstr "முனை 2 Y கற்பனை பகுதி (S)"
 
-#: resources/xnec2c.glade:15471
+#: resources/xnec2c.glade:15565
 msgid "Transmission Line"
 msgstr "பரப்புக் கோடு"
 
-#: resources/xnec2c.glade:15698
+#: resources/xnec2c.glade:15792
 msgid "Wire Element (GW & GC cards)"
 msgstr "கம்பி உறுப்பு (GW & GC அட்டைகள்)"
 
-#: resources/xnec2c.glade:15758
+#: resources/xnec2c.glade:15852
 msgid "Wire X1"
 msgstr "கம்பி X1"
 
-#: resources/xnec2c.glade:15790
+#: resources/xnec2c.glade:15884
 msgid "Wire X2"
 msgstr "கம்பி X2"
 
-#: resources/xnec2c.glade:15853
+#: resources/xnec2c.glade:15947
 msgid "Wire Y1"
 msgstr "கம்பி Y1"
 
-#: resources/xnec2c.glade:15886
+#: resources/xnec2c.glade:15980
 msgid "Wire Y2"
 msgstr "கம்பி Y2"
 
-#: resources/xnec2c.glade:15950
+#: resources/xnec2c.glade:16044
 msgid "Wire Z1"
 msgstr "கம்பி Z1"
 
-#: resources/xnec2c.glade:15982
+#: resources/xnec2c.glade:16076
 msgid "Wire Z2"
 msgstr "கம்பி Z2"
 
-#: resources/xnec2c.glade:16047
+#: resources/xnec2c.glade:16141
 msgid "Wire Length"
 msgstr "கம்பி நீளம்"
 
-#: resources/xnec2c.glade:16118
+#: resources/xnec2c.glade:16212
 msgid "Wire Data"
 msgstr "கம்பி தரவு"
 
-#: resources/xnec2c.glade:16130
+#: resources/xnec2c.glade:16224
 msgid "Tapered Wire"
 msgstr "விட்டம் மாறும் கம்பி"
 
-#: resources/xnec2c.glade:16172
+#: resources/xnec2c.glade:16266
 msgid "Length Taper"
 msgstr "நீள மாறுபாடு"
 
-#: resources/xnec2c.glade:16204
+#: resources/xnec2c.glade:16298
 msgid "Diameter Seg 1"
 msgstr "விட்டம் பிரிவு 1"
 
-#: resources/xnec2c.glade:16236
+#: resources/xnec2c.glade:16330
 msgid "Diameter Seg N"
 msgstr "விட்டம் பிரிவு N"
 
-#: resources/xnec2c.glade:16268
+#: resources/xnec2c.glade:16362
 msgid "Diam. Taper"
 msgstr "விட்ட மாறுபாடு"
 
-#: resources/xnec2c.glade:16304
+#: resources/xnec2c.glade:16398
 msgid "Wire Taper Data"
 msgstr "கம்பி மாறுபாடு தரவு"
 
-#: resources/xnec2c.glade:16469
+#: resources/xnec2c.glade:16563
 msgid "Impedance (Zo) Ohm"
 msgstr "இம்பீடன்ஸ் (Zo) Ohm"
 
-#: resources/xnec2c.glade:16484
+#: resources/xnec2c.glade:16578
 msgid "50.00"
 msgstr "50.00"
 
-#: resources/xnec2c.glade:16507
+#: resources/xnec2c.glade:16601
 msgid "Transmission Line Impedance (Zo)"
 msgstr "பரப்புக் கோடு இம்பீடன்ஸ் (Zo)"
 
@@ -2413,7 +2448,7 @@ msgstr ""
 "வழக்கம் கருதுகிறது; கண்காணிப்பு உயர்வு ஸ்பின்பட்டனால் அமைக்கப்படுகிறது."
 
 #: src/callbacks.c:191 src/callbacks.c:468 src/callbacks.c:2034
-#: src/callbacks.c:2703
+#: src/callbacks.c:2713
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "xnec2c-ஐ வெளியேற விரும்புகிறீர்களா?"
 
@@ -2456,7 +2491,7 @@ msgstr ""
 "உள்ளீட்டுக் கோப்பை மீளேற்றி மறுகணக்கிடும். \"File->Optimization Settings\" இல் எழுத "
 "வேண்டிய கோப்புகளைத் தேர்ந்தெடுக்கவும்."
 
-#: src/callbacks.c:968 src/callbacks.c:1283 src/callbacks.c:2729
+#: src/callbacks.c:968 src/callbacks.c:1283 src/callbacks.c:2739
 msgid "Are you sure you wish to close this window?"
 msgstr "இந்தச் சாளரத்தை மூட விரும்புகிறீர்களா?"
 
@@ -2468,7 +2503,7 @@ msgstr "இந்தக் காட்சியில் OpenGL கிடைக
 msgid "on_color_fam_format_value: unknown scale widget\n"
 msgstr "on_color_fam_format_value: தெரியாத அளவீட்டுக் கட்டுப்பாடு\n"
 
-#: src/callbacks.c:2260
+#: src/callbacks.c:2263
 msgid ""
 "Select how the animated patch current flow is rendered.\n"
 "Mirrors the Visualization menu setting in the main window."
@@ -2476,17 +2511,17 @@ msgstr ""
 "அசைவூட்டப்பட்ட தொகுதி மின்னோட்ட ஓட்டம் எவ்வாறு வரையப்படுகிறது என்பதைத் தேர்ந்தெடுக்கவும்.\n"
 "முதன்மைச் சாளரத்தில் உள்ள காட்சிப்படுத்தல் மெனு அமைப்பைப் பிரதிபலிக்கிறது."
 
-#: src/callbacks.c:2262
+#: src/callbacks.c:2265
 msgid ""
 "Patch flow animation requires surface patches (SP/SM cards) in the model."
 msgstr ""
 "தொகுதி ஓட்ட அசைவூட்டத்திற்கு மாதிரியில் மேற்பரப்புத் தொகுதிகள் (SP/SM அட்டைகள்) தேவை."
 
-#: src/callbacks.c:2539
+#: src/callbacks.c:2549
 msgid "Animation"
 msgstr "அசைவூட்டம்"
 
-#: src/callbacks.c:2540
+#: src/callbacks.c:2550
 msgid ""
 "Animation requires wire currents or charges, surface patches (SP/SM NEC "
 "cards), or near-field data (NE/NH NEC cards)"
@@ -2494,11 +2529,11 @@ msgstr ""
 "அசைவூட்டத்திற்குக் கம்பி மின்னோட்டங்கள் அல்லது மின்னூட்டங்கள், மேற்பரப்புத் தொகுதிகள் (SP/SM "
 "NEC அட்டைகள்), அல்லது அண்மைப் புலத் தரவு (NE/NH NEC அட்டைகள்) தேவை"
 
-#: src/callbacks.c:2665
+#: src/callbacks.c:2675
 msgid "No open NEC2 input file"
 msgstr "திறந்த NEC2 உள்ளீட்டுக் கோப்பு இல்லை"
 
-#: src/callbacks.c:2760 src/callbacks.c:2790
+#: src/callbacks.c:2770 src/callbacks.c:2800
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -2506,11 +2541,11 @@ msgstr ""
 "அதிர்வெண் சுழற்சி இயங்கும்போது\n"
 "NEC2 திருத்தியின் தரவைச் சேமிக்க முடியாது"
 
-#: src/callbacks.c:2772 src/callbacks.c:2798
+#: src/callbacks.c:2782 src/callbacks.c:2808
 msgid "untitled.nec"
 msgstr "untitled.nec"
 
-#: src/callbacks.c:3263 src/callbacks.c:3283 src/callbacks.c:3303
+#: src/callbacks.c:3273 src/callbacks.c:3293 src/callbacks.c:3313
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
@@ -5204,18 +5239,13 @@ msgstr "segment_type_to_rgb: தெரியாத வகை %d\n"
 msgid "segment_type_to_width: unknown type %d\n"
 msgstr "segment_type_to_width: தெரியாத வகை %d\n"
 
-#: src/prerender/prerender_color_family.c:108
-#, c-format
-msgid "invalid color family %d, using power\n"
-msgstr "தவறான நிற குடும்பம் %d, திறனைப் பயன்படுத்துகிறது\n"
-
-#: src/prerender/prerender_color_proj.c:218
-#: src/prerender/prerender_color_proj.c:245
+#: src/prerender/prerender_color_proj.c:299
+#: src/prerender/prerender_color_proj.c:326
 #, c-format
 msgid "unhandled color projection %d\n"
 msgstr "கையாளப்படாத நிற ப்ரொஜெக்ஷன் %d\n"
 
-#: src/prerender/prerender_color_proj.c:256
+#: src/prerender/prerender_color_proj.c:337
 #, c-format
 msgid "invalid color projection %d, using amplitude\n"
 msgstr "தவறான நிற ப்ரொஜெக்ஷன் %d, அலைவீச்சைப் பயன்படுத்துகிறது\n"
@@ -5234,17 +5264,17 @@ msgid ""
 "sr\n"
 msgstr "சராசரி ஆதாயம்: %.4f (%.2f dBi), திறன்: %.1f%%, திண்ம கோணம்: %.4f * pi sr\n"
 
-#: src/rc_config.c:790
+#: src/rc_config.c:808
 #, c-format
 msgid "unable to getcwd(): %s\n"
 msgstr "getcwd() ஐ செயல்படுத்த முடியவில்லை: %s\n"
 
-#: src/rc_config.c:794
+#: src/rc_config.c:812
 #, c-format
 msgid "environment variable HOME is undefined, using %s\n"
 msgstr "சூழல் மாறி HOME வரையறுக்கப்படவில்லை, %s ஐப் பயன்படுத்துகிறது\n"
 
-#: src/rc_config.c:879
+#: src/rc_config.c:897
 #, c-format
 msgid ""
 "%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
@@ -5252,36 +5282,36 @@ msgstr ""
 "%s (locale=%s): %d எழுத்துகள் மட்டுமே பொருந்தின, மொத்தம் %lu இல், மற்றொரு locale ஐ "
 "முயற்சிக்கிறது: %s\n"
 
-#: src/rc_config.c:959
+#: src/rc_config.c:977
 msgid "rc_config_default_int: no integer default for field\n"
 msgstr "rc_config_default_int: புலத்திற்கு இயல்பான முழு எண் இல்லை\n"
 
-#: src/rc_config.c:1048
+#: src/rc_config.c:1066
 #, c-format
 msgid "rc_config_field_size: %s: unsupported format %s\n"
 msgstr "rc_config_field_size: %s: ஆதரிக்கப்படாத வடிவமைப்பு %s\n"
 
-#: src/rc_config.c:1094
+#: src/rc_config.c:1112
 #, c-format
 msgid "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
 msgstr "சாளரம்: x=%-5d y=%-5d w=%-5d h=%-5d  தலைப்பு: \"%s\"\n"
 
-#: src/rc_config.c:1128
+#: src/rc_config.c:1146
 #, c-format
 msgid "%s: EOF reading application version.\n"
 msgstr "%s: பயன்பாட்டு பதிப்பைப் படிக்கும்போது EOF.\n"
 
-#: src/rc_config.c:1134
+#: src/rc_config.c:1152
 #, c-format
 msgid "existing config file version differs: %s != %s\n"
 msgstr "இருக்கும் கட்டமைப்புக் கோப்பு பதிப்பு வேறுபடுகிறது: %s != %s\n"
 
-#: src/rc_config.c:1273
+#: src/rc_config.c:1291
 #, c-format
 msgid "stat failed for %s: %s\n"
 msgstr "%s க்கான stat தோல்வியடைந்தது: %s\n"
 
-#: src/rc_config.c:1279
+#: src/rc_config.c:1297
 #, c-format
 msgid ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
@@ -5290,41 +5320,41 @@ msgstr ""
 "4e62893b இல் அறிமுகப்படுத்தப்பட்ட பிழையிலிருந்து %s அடைவு அனுமதிகள் 0%o இலிருந்து "
 "0%o ஆக சரிசெய்யப்பட்டன.\n"
 
-#: src/rc_config.c:1310
+#: src/rc_config.c:1328
 #, c-format
 msgid "%s:%d: Line not parsed: %s\n"
 msgstr "%s:%d: வரி பாகுபடுத்தப்படவில்லை: %s\n"
 
-#: src/rc_config.c:1316
+#: src/rc_config.c:1334
 #, c-format
 msgid "%s:%d: Early end of file for %s: %s \n"
 msgstr "%s:%d: %s க்கான கோப்பு முன்கூட்டியே முடிந்தது: %s \n"
 
-#: src/rc_config.c:1341
+#: src/rc_config.c:1359
 #, c-format
 msgid "%s:%d: parse error (%s): %s \n"
 msgstr "%s:%d: பாகுபடுத்தல் பிழை (%s): %s \n"
 
-#: src/rc_config.c:1355
+#: src/rc_config.c:1373
 #, c-format
 msgid "Invalid sky model index %d in config, resetting to default\n"
 msgstr "கட்டமைப்பில் தவறான வான் மாதிரி குறியீடு %d, இயல்புநிலைக்கு மீட்டமைக்கிறது\n"
 
-#: src/rc_config.c:1361
+#: src/rc_config.c:1379
 #, c-format
 msgid "Invalid earth model index %d in config, resetting to default\n"
 msgstr "கட்டமைப்பில் தவறான பூமி மாதிரி குறியீடு %d, இயல்புநிலைக்கு மீட்டமைக்கிறது\n"
 
-#: src/rc_config.c:1367
+#: src/rc_config.c:1385
 #, c-format
 msgid "Invalid interp method %d in config, resetting to default\n"
 msgstr "கட்டமைப்பில் தவறான இடைச்செருகல் முறை %d, இயல்புநிலைக்கு மீட்டமைக்கிறது\n"
 
-#: src/rc_config.c:1542
+#: src/rc_config.c:1560
 msgid "batch mode: skipping configuration save\n"
 msgstr "தொகுதி பயன்முறை: கட்டமைப்பு சேமிப்பைத் தவிர்க்கிறது\n"
 
-#: src/rc_config.c:1549
+#: src/rc_config.c:1567
 #, c-format
 msgid "cannot open xnec2c's config file %s: %s\n"
 msgstr "xnec2c இன் கட்டமைப்புக் கோப்பு %s ஐத் திறக்க முடியவில்லை: %s\n"
@@ -5876,3 +5906,7 @@ msgstr "அதிர்வெண் சுழற்சி கடந்த நே
 #: src/xnec2c.c:1567
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "Frequency_Loop_Thread ஐத் தொடங்க முடியவில்லை\n"
+
+#, c-format
+#~ msgid "invalid color family %d, using power\n"
+#~ msgstr "தவறான நிற குடும்பம் %d, திறனைப் பயன்படுத்துகிறது\n"

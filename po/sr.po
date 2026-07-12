@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-06-26 14:17-0700\n"
+"POT-Creation-Date: 2026-07-12 15:24-0700\n"
 "PO-Revision-Date: 2025-12-28 20:37-0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2194
+#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2842
 msgid "xnec2c"
 msgstr "xnec2c"
 
@@ -46,7 +46,7 @@ msgstr "Подразумевано"
 msgid "Fast"
 msgstr "Брзо"
 
-#: resources/settings/cairo_settings.glade:56
+#: resources/settings/cairo_settings.glade:56 resources/xnec2c.glade:414
 msgid "None"
 msgstr "Нема"
 
@@ -58,7 +58,7 @@ msgstr "Квантизација боје"
 msgid "Off"
 msgstr "Искључено"
 
-#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4100
+#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4748
 msgid "8"
 msgstr "8"
 
@@ -159,10 +159,10 @@ msgstr ""
 "је сам по себи превод на C оригиналног FORTRAN NEC2 кода за нумеричку "
 "електромагнетику.\n"
 "\n"
-"xnec2c може приказати податке зависне од фреквенције (појачање, улазна "
-"импеданса, VSWR итд.) у графичком формату. Такође може приказати податке "
-"дијаграма зрачења у ротирајућем жичаном оквиру и блиско поље (E, H, S "
-"вектори) у формату мреже.\n"
+"xnec2c може приказати податке зависне од фреквенције (добитак, "
+"улазнаимпеданса, VSWR итд.) у графичком формату. Такође може приказати "
+"податке дијаграма зрачења у ротирајућем жичаном оквиру и блиско поље (E, H, "
+"S вектори) у формату мреже.\n"
 "\n"
 "xnec2c има уграђени уређивач NEC2 улазних датотека који олакшава креирање "
 "или уређивање датотека описа антена и спецификацију NEC2 команди.\n"
@@ -175,12 +175,12 @@ msgstr ""
 msgid "translator-credits"
 msgstr "translator-credits"
 
-#: resources/xnec2c.glade:75 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
-#: src/rdpattern_ui.c:344
+#: resources/xnec2c.glade:114 src/rdpattern_ui.c:330 src/rdpattern_ui.c:338
+#: src/rdpattern_ui.c:345
 msgid "Near Field Animation"
 msgstr "Анимација блиског поља"
 
-#: resources/xnec2c.glade:167
+#: resources/xnec2c.glade:206
 msgid ""
 "Scrub the animation phase manually.\n"
 "Disabled while the animation is running."
@@ -188,27 +188,205 @@ msgstr ""
 "Ручно подесите фазу анимације.\n"
 "Онемогућено током покренуте анимације."
 
-#: resources/xnec2c.glade:184
+#: resources/xnec2c.glade:223
 msgid "φ 0°"
 msgstr "φ 0°"
 
-#: resources/xnec2c.glade:198
+#: resources/xnec2c.glade:237
 msgid "Phase"
 msgstr "Фаза"
 
-#: resources/xnec2c.glade:221
+#: resources/xnec2c.glade:260
 msgid "Frames/Sec"
 msgstr "Слике/сек"
 
-#: resources/xnec2c.glade:234
+#: resources/xnec2c.glade:273
 msgid "Animate Freq (Hz)"
 msgstr "Фреквенција анимације (Hz)"
 
-#: resources/xnec2c.glade:309
-msgid "Show currents"
-msgstr "Прикажи струје"
+#: resources/xnec2c.glade:348
+msgid "Color projection:"
+msgstr "Пројекција боје:"
 
-#: resources/xnec2c.glade:313
+#: resources/xnec2c.glade:361
+msgid ""
+"Select how wire and patch colors follow the excitation phase while animating."
+msgstr ""
+"Изаберите начин на који боје жица и патча прате фазу побуде током анимације."
+
+#: resources/xnec2c.glade:363
+msgid "Instantaneous Magnitude"
+msgstr "Тренутна амплитуда"
+
+#: resources/xnec2c.glade:364
+msgid "Instantaneous Polarity"
+msgstr "Тренутни поларитет"
+
+#: resources/xnec2c.glade:365
+msgid "Phase Hue"
+msgstr "Нијанса фазе"
+
+#: resources/xnec2c.glade:393
+msgid "Scale family:"
+msgstr "Породица скале:"
+
+#: resources/xnec2c.glade:406
+msgid ""
+"Select the magnitude-to-color transfer family.\n"
+"Mirrors the Visualization menu setting in the main window.\n"
+"Each family keeps its own brightness parameter on the slider below."
+msgstr ""
+"Изаберите породицу преноса амплитуде у боју.\n"
+"Одражава подешавање менија Визуелизација у главном прозору.\n"
+"Свака породица чува сопствени параметар осветљености на клизачу испод."
+
+#: resources/xnec2c.glade:408
+msgid "Power"
+msgstr "Снага"
+
+#: resources/xnec2c.glade:409 resources/xnec2c.glade:12728
+#: resources/xnec2c.glade:14103
+msgid "dB"
+msgstr "dB"
+
+#: resources/xnec2c.glade:410
+msgid "Asinh"
+msgstr "Asinh"
+
+#: resources/xnec2c.glade:411
+msgid "μ-law"
+msgstr "μ-law"
+
+#: resources/xnec2c.glade:412
+msgid "Reinhard"
+msgstr "Reinhard"
+
+#: resources/xnec2c.glade:413
+msgid "Sigmoid"
+msgstr "Сигмоид"
+
+#: resources/xnec2c.glade:454
+msgid "Gamma:"
+msgstr "Гама:"
+
+#: resources/xnec2c.glade:471
+msgid ""
+"Gamma exponent of the power transfer.\n"
+"γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
+"dissipated power for currents."
+msgstr ""
+"Гама експонент степеног преноса.\n"
+"γ = 0,5 шири слабе области, γ = 1 је линеарно, γ = 2 је пропорционално "
+"дисипираној снази за струје."
+
+#: resources/xnec2c.glade:494
+msgid "Range (dB):"
+msgstr "Опсег (dB):"
+
+#: resources/xnec2c.glade:511
+msgid ""
+"Dynamic range R below the step peak mapped onto the color strip.\n"
+"The floor is 10^(−R/20) of the peak."
+msgstr ""
+"Динамички опсег R испод врха корака мапиран на траку боја.\n"
+"Под износи 10^(−R/20) врха."
+
+#: resources/xnec2c.glade:534
+msgid "Softening:"
+msgstr "Омекшавање:"
+
+#: resources/xnec2c.glade:551
+msgid "Softening knee k: linear below k, logarithmic above."
+msgstr "Колено омекшавања k: линеарно испод k, логаритамско изнад."
+
+#: resources/xnec2c.glade:574
+msgid "Compression (dB):"
+msgstr "Компресија (dB):"
+
+#: resources/xnec2c.glade:591
+msgid "Compression strength in dB; higher values lift weak detail."
+msgstr "Јачина компресије у dB; веће вредности истичу слаб детаљ."
+
+#: resources/xnec2c.glade:614
+msgid "Knee:"
+msgstr "Колено:"
+
+#: resources/xnec2c.glade:631
+msgid "Knee k of the rational soft-compressor."
+msgstr "Колено k рационалног меког компресора."
+
+#: resources/xnec2c.glade:654
+msgid "Contrast:"
+msgstr "Контраст:"
+
+#: resources/xnec2c.glade:671
+msgid "Contrast steepness a of the tanh transfer."
+msgstr "Нагиб контраста a tanh преноса."
+
+#: resources/xnec2c.glade:705
+msgid "Color gradient of the active projection and scale family."
+msgstr ""
+
+#: resources/xnec2c.glade:720
+#, fuzzy
+msgid "Color channel"
+msgstr "Скала боје"
+
+#: resources/xnec2c.glade:726
+msgid ""
+"Enable the projection’s hue/sign color encoding.\n"
+"Unchecked, colors desaturate to gray so only the brightness channel remains."
+msgstr ""
+
+#: resources/xnec2c.glade:737
+msgid "Brightness channel"
+msgstr ""
+
+#: resources/xnec2c.glade:743
+msgid ""
+"Enable the projection’s brightness modulation (cosine or magnitude factor).\n"
+"Unchecked, brightness stays at full and only the color encoding remains."
+msgstr ""
+
+#: resources/xnec2c.glade:754
+msgid "Swap channels"
+msgstr ""
+
+#: resources/xnec2c.glade:759
+msgid ""
+"Exchange the color and brightness carriers.\n"
+"The quantity that drove the hue rides brightness and vice versa."
+msgstr ""
+
+#: resources/xnec2c.glade:792
+msgid "Reset"
+msgstr "Ресетуј"
+
+#: resources/xnec2c.glade:798
+msgid ""
+"Restore the color projection, scale family, and every family brightness "
+"parameter to their defaults."
+msgstr ""
+"Врати пројекцију боје, породицу скале и сваки параметар осветљености "
+"породице на подразумеване вредности."
+
+#: resources/xnec2c.glade:812
+msgid "Color"
+msgstr "Боја"
+
+#: resources/xnec2c.glade:848
+msgid "None (geometry)"
+msgstr "Ниједна (геометрија)"
+
+#: resources/xnec2c.glade:852
+msgid "Show the bare structure geometry with no quantity coloring."
+msgstr "Прикажи чисту геометрију структуре без бојења по величини."
+
+#: resources/xnec2c.glade:865 resources/xnec2c.glade:12282
+msgid "Currents"
+msgstr "Струје"
+
+#: resources/xnec2c.glade:869
 msgid ""
 "Animate current magnitude and direction along the wires.\n"
 "Mirrors the Currents button in the main window."
@@ -216,39 +394,55 @@ msgstr ""
 "Анимирај величину и смер струје дуж жица.\n"
 "Одражава дугме Струје у главном прозору."
 
-#: resources/xnec2c.glade:328
+#: resources/xnec2c.glade:882 resources/xnec2c.glade:12297
+msgid "Charges"
+msgstr "Наелектрисања"
+
+#: resources/xnec2c.glade:886
+msgid ""
+"Animate charge magnitude along the wires.\n"
+"Mirrors the Charges button in the main window."
+msgstr ""
+"Анимирај величину наелектрисања дуж жица.\n"
+"Одражава дугме Наелектрисања у главном прозору."
+
+#: resources/xnec2c.glade:903
+msgid "Display"
+msgstr "Приказ"
+
+#: resources/xnec2c.glade:936
 msgid "Flow direction:"
 msgstr "Смер тока:"
 
-#: resources/xnec2c.glade:340
-msgid ""
-"Select how the animated current flow is rendered.\n"
-"Mirrors the Flow direction setting in the main window."
-msgstr ""
-"Изаберите начин приказа анимираног тока струје.\n"
-"Одражава подешавање Смера тока у главном прозору."
+#: resources/xnec2c.glade:949
+msgid "Reference phase (animated)"
+msgstr "Референтна фаза (анимирано)"
 
-#: resources/xnec2c.glade:342
-msgid "Reference phase"
-msgstr "Референтна фаза"
+#: resources/xnec2c.glade:950
+msgid "LIC texture (animated)"
+msgstr "LIC текстура (анимирано)"
 
-#: resources/xnec2c.glade:343
-msgid "LIC"
-msgstr "LIC"
+#: resources/xnec2c.glade:951
+msgid "Wireframe (animated)"
+msgstr "Жичани приказ (анимирано)"
 
-#: resources/xnec2c.glade:344
-msgid "Wireframe"
-msgstr "Жичани приказ"
+#: resources/xnec2c.glade:952
+msgid "Polarization axis (static)"
+msgstr "Оса поларизације (статично)"
 
-#: resources/xnec2c.glade:360
-msgid "Structure"
-msgstr "Структура"
+#: resources/xnec2c.glade:953
+msgid "Peak magnitude (static)"
+msgstr "Вршна амплитуда (статично)"
 
-#: resources/xnec2c.glade:384
+#: resources/xnec2c.glade:969
+msgid "Patches"
+msgstr "Патчеви"
+
+#: resources/xnec2c.glade:999
 msgid "Near E field"
 msgstr "Блиско E поље"
 
-#: resources/xnec2c.glade:388
+#: resources/xnec2c.glade:1003
 msgid ""
 "Show the near electric field vectors while animating.\n"
 "Enable by opening the radiation pattern window."
@@ -256,11 +450,11 @@ msgstr ""
 "Прикажи векторе блиског електричног поља током анимације.\n"
 "Омогући отварањем прозора дијаграма зрачења."
 
-#: resources/xnec2c.glade:400
+#: resources/xnec2c.glade:1015
 msgid "Near H field"
 msgstr "Блиско H поље"
 
-#: resources/xnec2c.glade:404
+#: resources/xnec2c.glade:1019
 msgid ""
 "Show the near magnetic field vectors while animating.\n"
 "Enable by opening the radiation pattern window."
@@ -268,11 +462,11 @@ msgstr ""
 "Прикажи векторе блиског магнетног поља током анимације.\n"
 "Омогући отварањем прозора дијаграма зрачења."
 
-#: resources/xnec2c.glade:416
+#: resources/xnec2c.glade:1031
 msgid "Poynting vector"
 msgstr "Појнтингов вектор"
 
-#: resources/xnec2c.glade:420
+#: resources/xnec2c.glade:1035
 msgid ""
 "Show the Poynting power-flow vectors while animating.\n"
 "Enable by opening the radiation pattern window."
@@ -280,693 +474,713 @@ msgstr ""
 "Прикажи Појнтингове векторе тока снаге током анимације.\n"
 "Омогући отварањем прозора дијаграма зрачења."
 
-#: resources/xnec2c.glade:436
+#: resources/xnec2c.glade:1050
+msgid "Total field:"
+msgstr "Укупно поље:"
+
+#: resources/xnec2c.glade:1062
+msgid ""
+"Choose peak-envelope or instantaneous (φ=0) near-field vectors.\n"
+"Mirrors the Total Field menu in the radiation pattern window."
+msgstr ""
+"Изаберите векторе блиског поља: вршна вредност или тренутно (φ=0).\n"
+"Одражава мени Укупно поље у прозору дијаграма зрачења."
+
+#: resources/xnec2c.glade:1064
+msgid "Peak value"
+msgstr "Вршна вредност"
+
+#: resources/xnec2c.glade:1065
+msgid "Instantaneous (φ=0)"
+msgstr "Тренутно (φ=0)"
+
+#: resources/xnec2c.glade:1081
 msgid "Near Field"
 msgstr "Блиско поље"
 
-#: resources/xnec2c.glade:516
+#: resources/xnec2c.glade:1164
 msgid "Arc Element (GA card)"
 msgstr "Елемент лука (GA картица)"
 
-#: resources/xnec2c.glade:544 resources/xnec2c.glade:1579
-#: resources/xnec2c.glade:4006 resources/xnec2c.glade:15064 src/cmnd_edit.c:488
+#: resources/xnec2c.glade:1192 resources/xnec2c.glade:2227
+#: resources/xnec2c.glade:4654 resources/xnec2c.glade:15821 src/cmnd_edit.c:488
 msgid "Tag Number"
 msgstr "Број ознаке"
 
-#: resources/xnec2c.glade:557 resources/xnec2c.glade:15159
+#: resources/xnec2c.glade:1205 resources/xnec2c.glade:15916
 msgid "No. Segments"
 msgstr "Број сегмената"
 
-#: resources/xnec2c.glade:570 resources/xnec2c.glade:4032
-#: resources/xnec2c.glade:15255
+#: resources/xnec2c.glade:1218 resources/xnec2c.glade:4680
+#: resources/xnec2c.glade:16012
 msgid "Segs % lambda"
 msgstr "Сегменти % таласне дужине"
 
-#: resources/xnec2c.glade:583 resources/xnec2c.glade:4045
-#: resources/xnec2c.glade:15351
+#: resources/xnec2c.glade:1231 resources/xnec2c.glade:4693
+#: resources/xnec2c.glade:16108
 msgid "Wire Diameter"
 msgstr "Пречник жице"
 
-#: resources/xnec2c.glade:671
+#: resources/xnec2c.glade:1319
 msgid "Radius from Y"
 msgstr "Полупречник од Y"
 
-#: resources/xnec2c.glade:684
+#: resources/xnec2c.glade:1332
 msgid "End 1 Angle"
 msgstr "Угао краја 1"
 
-#: resources/xnec2c.glade:697
+#: resources/xnec2c.glade:1345
 msgid "End 2 Angle"
 msgstr "Угао краја 2"
 
-#: resources/xnec2c.glade:710 resources/xnec2c.glade:4242
-#: resources/xnec2c.glade:15416 src/cmnd_edit.c:2024
+#: resources/xnec2c.glade:1358 resources/xnec2c.glade:4890
+#: resources/xnec2c.glade:16173 src/cmnd_edit.c:2024
 msgid "Conductivity S/m"
 msgstr "Проводност S/m"
 
-#: resources/xnec2c.glade:808
+#: resources/xnec2c.glade:1456
 msgid "Wire Arc Data"
 msgstr "Подаци лука жице"
 
-#: resources/xnec2c.glade:870 resources/xnec2c.glade:1106
-#: resources/xnec2c.glade:1906 resources/xnec2c.glade:2129
-#: resources/xnec2c.glade:2587 resources/xnec2c.glade:2779
-#: resources/xnec2c.glade:3090 resources/xnec2c.glade:3776
-#: resources/xnec2c.glade:4576 resources/xnec2c.glade:4775
-#: resources/xnec2c.glade:4936 resources/xnec2c.glade:5468
-#: resources/xnec2c.glade:6104 resources/xnec2c.glade:7548
-#: resources/xnec2c.glade:8455 resources/xnec2c.glade:9461
-#: resources/xnec2c.glade:9741 resources/xnec2c.glade:13757
-#: resources/xnec2c.glade:14270 resources/xnec2c.glade:14869
-#: resources/xnec2c.glade:15705 resources/xnec2c.glade:15905
+#: resources/xnec2c.glade:1518 resources/xnec2c.glade:1754
+#: resources/xnec2c.glade:2554 resources/xnec2c.glade:2777
+#: resources/xnec2c.glade:3235 resources/xnec2c.glade:3427
+#: resources/xnec2c.glade:3738 resources/xnec2c.glade:4424
+#: resources/xnec2c.glade:5224 resources/xnec2c.glade:5423
+#: resources/xnec2c.glade:5584 resources/xnec2c.glade:6116
+#: resources/xnec2c.glade:6752 resources/xnec2c.glade:8196
+#: resources/xnec2c.glade:9103 resources/xnec2c.glade:10109
+#: resources/xnec2c.glade:10389 resources/xnec2c.glade:14514
+#: resources/xnec2c.glade:15027 resources/xnec2c.glade:15626
+#: resources/xnec2c.glade:16462 resources/xnec2c.glade:16662
 msgid "Delete Card"
 msgstr "Обриши картицу"
 
-#: resources/xnec2c.glade:948
+#: resources/xnec2c.glade:1596
 msgid "Cylindrical Structure (GR card)"
 msgstr "Цилиндрична структура (GR картица)"
 
-#: resources/xnec2c.glade:978 resources/xnec2c.glade:9641
+#: resources/xnec2c.glade:1626 resources/xnec2c.glade:10289
 msgid "Tag Number Increment"
 msgstr "Инкремент броја ознаке"
 
-#: resources/xnec2c.glade:991
+#: resources/xnec2c.glade:1639
 msgid "Number of Structures"
 msgstr "Број структура"
 
-#: resources/xnec2c.glade:1045
+#: resources/xnec2c.glade:1693
 msgid "Cylindrical Structure"
 msgstr "Цилиндрична структура"
 
-#: resources/xnec2c.glade:1171
+#: resources/xnec2c.glade:1819
 msgid "Xnec2c Error"
 msgstr "Xnec2c грешка"
 
-#: resources/xnec2c.glade:1279
+#: resources/xnec2c.glade:1927
 msgid "Error"
 msgstr "Грешка"
 
-#: resources/xnec2c.glade:1358
+#: resources/xnec2c.glade:2006
 msgid "Excitation Command (EX Card)"
 msgstr "Команда побуде (EX картица)"
 
-#: resources/xnec2c.glade:1384
+#: resources/xnec2c.glade:2032
 msgid "Incident LH Wave"
 msgstr "Упадни леворуки талас"
 
-#: resources/xnec2c.glade:1400
+#: resources/xnec2c.glade:2048
 msgid "Incident Linear Wave "
 msgstr "Упадни линеарни талас "
 
-#: resources/xnec2c.glade:1416
+#: resources/xnec2c.glade:2064
 msgid "Current Source"
 msgstr "Извор струје"
 
-#: resources/xnec2c.glade:1432
+#: resources/xnec2c.glade:2080
 msgid "Incident RH Wave"
 msgstr "Упадни десноруки талас"
 
-#: resources/xnec2c.glade:1448
+#: resources/xnec2c.glade:2096
 msgid "Current Slope Discontinuity"
 msgstr "Дисконтинуитет нагиба струје"
 
-#: resources/xnec2c.glade:1464
+#: resources/xnec2c.glade:2112
 msgid "Voltage Source"
 msgstr "Извор напона"
 
-#: resources/xnec2c.glade:1486
+#: resources/xnec2c.glade:2134
 msgid "Excitation Type"
 msgstr "Тип побуде"
 
-#: resources/xnec2c.glade:1511
+#: resources/xnec2c.glade:2159
 msgid "Maximum Admittance Matrix Asymmetry"
 msgstr "Максимална асиметрија матрице адмитансе"
 
-#: resources/xnec2c.glade:1527
+#: resources/xnec2c.glade:2175
 msgid "Impedance of Source Segment"
 msgstr "Импеданса изворног сегмента"
 
-#: resources/xnec2c.glade:1549
+#: resources/xnec2c.glade:2197
 msgid "Print Control"
 msgstr "Контрола штампе"
 
-#: resources/xnec2c.glade:1592 src/cmnd_edit.c:489
+#: resources/xnec2c.glade:2240 src/cmnd_edit.c:489
 msgid "Segment Number"
 msgstr "Број сегмента"
 
-#: resources/xnec2c.glade:1641
+#: resources/xnec2c.glade:2289
 msgid "Voltage - Real Part"
 msgstr "Напон - реални део"
 
-#: resources/xnec2c.glade:1654
+#: resources/xnec2c.glade:2302
 msgid "Voltage - Imaginary Part"
 msgstr "Напон - имагинарни део"
 
-#: resources/xnec2c.glade:1667
+#: resources/xnec2c.glade:2315
 msgid "Eta"
 msgstr "Ета"
 
-#: resources/xnec2c.glade:1737
+#: resources/xnec2c.glade:2385
 msgid "Theta"
 msgstr "Тета"
 
-#: resources/xnec2c.glade:1750
+#: resources/xnec2c.glade:2398
 msgid "Phi"
 msgstr "Фи"
 
-#: resources/xnec2c.glade:1763
+#: resources/xnec2c.glade:2411
 msgid "Ratio"
 msgstr "Однос"
 
-#: resources/xnec2c.glade:1844
+#: resources/xnec2c.glade:2492
 msgid "Excitation Parameters"
 msgstr "Параметри побуде"
 
-#: resources/xnec2c.glade:1971
+#: resources/xnec2c.glade:2619
 msgid "Execute Command (XQ Card)"
 msgstr "Команда извршења (XQ картица)"
 
-#: resources/xnec2c.glade:1998
+#: resources/xnec2c.glade:2646
 msgid "No Pattern Cuts"
 msgstr "Без пресека дијаграма"
 
-#: resources/xnec2c.glade:2014
+#: resources/xnec2c.glade:2662
 msgid "Pattern in XZ Plane"
 msgstr "Дијаграм у XZ равни"
 
-#: resources/xnec2c.glade:2030
+#: resources/xnec2c.glade:2678
 msgid "Pattern in YZ Plane"
 msgstr "Дијаграм у YZ равни"
 
-#: resources/xnec2c.glade:2046
+#: resources/xnec2c.glade:2694
 msgid "Both XZ/YZ Patterns"
 msgstr "Оба XZ/YZ дијаграма"
 
-#: resources/xnec2c.glade:2068
+#: resources/xnec2c.glade:2716
 msgid "Execute Command"
 msgstr "Команда извршења"
 
-#: resources/xnec2c.glade:2299
+#: resources/xnec2c.glade:2947
 msgid "Frequency Command (FR Card)"
 msgstr "Команда фреквенције (FR картица)"
 
-#: resources/xnec2c.glade:2324
+#: resources/xnec2c.glade:2972
 msgid "Additive Stepping"
 msgstr "Адитивни корак"
 
-#: resources/xnec2c.glade:2341
+#: resources/xnec2c.glade:2989
 msgid "Multiplicative Stepping"
 msgstr "Мултипликативни корак"
 
-#: resources/xnec2c.glade:2364
+#: resources/xnec2c.glade:3012
 msgid "Frequency Stepping"
 msgstr "Корак фреквенције"
 
-#: resources/xnec2c.glade:2394
+#: resources/xnec2c.glade:3042
 msgid "No. Frequency Points"
 msgstr "Број тачака фреквенције"
 
-#: resources/xnec2c.glade:2425
+#: resources/xnec2c.glade:3073
 msgid "Start Frequency (MHz)"
 msgstr "Почетна фреквенција (MHz)"
 
-#: resources/xnec2c.glade:2457
+#: resources/xnec2c.glade:3105
 msgid "Frequency Step (MHz)"
 msgstr "Корак фреквенције (MHz)"
 
-#: resources/xnec2c.glade:2490
+#: resources/xnec2c.glade:3138
 msgid "End Frequency (MHz)"
 msgstr "Крајња фреквенција (MHz)"
 
-#: resources/xnec2c.glade:2526
+#: resources/xnec2c.glade:3174
 msgid "Frequency Stepping Parameters"
 msgstr "Параметри корака фреквенције"
 
-#: resources/xnec2c.glade:2652
+#: resources/xnec2c.glade:3300
 msgid "Geometry End (GE Card)"
 msgstr "Крај геометрије (GE картица)"
 
-#: resources/xnec2c.glade:2677
+#: resources/xnec2c.glade:3325
 msgid "No Ground, Free Space condition"
 msgstr "Без уземљења, услови слободног простора"
 
-#: resources/xnec2c.glade:2694
+#: resources/xnec2c.glade:3342
 msgid "Ground present, Structure reflection"
 msgstr "Уземљење присутно, рефлексија структуре"
 
-#: resources/xnec2c.glade:2711
+#: resources/xnec2c.glade:3359
 msgid "Ground present, no Structure reflection"
 msgstr "Уземљење присутно, без рефлексије структуре"
 
-#: resources/xnec2c.glade:2734
+#: resources/xnec2c.glade:3382
 msgid "Ground Plane type"
 msgstr "Тип равни уземљења"
 
-#: resources/xnec2c.glade:2868
+#: resources/xnec2c.glade:3516
 msgid "Ground Parameters (GD Card)"
 msgstr "Параметри уземљења (GD картица)"
 
-#: resources/xnec2c.glade:2897 resources/xnec2c.glade:3366
-#: resources/xnec2c.glade:3452
+#: resources/xnec2c.glade:3545 resources/xnec2c.glade:4014
+#: resources/xnec2c.glade:4100
 msgid "Relative Dielectric Const."
 msgstr "Релативна диелектрична конст."
 
-#: resources/xnec2c.glade:2929 resources/xnec2c.glade:3485
+#: resources/xnec2c.glade:3577 resources/xnec2c.glade:4133
 msgid "Distance to 2nd Medium"
 msgstr "Растојање до 2. медијума"
 
-#: resources/xnec2c.glade:2961 resources/xnec2c.glade:3398
-#: resources/xnec2c.glade:3517
+#: resources/xnec2c.glade:3609 resources/xnec2c.glade:4046
+#: resources/xnec2c.glade:4165
 msgid "Ground Conductivity S/m"
 msgstr "Проводност тла S/m"
 
-#: resources/xnec2c.glade:2993 resources/xnec2c.glade:3549
+#: resources/xnec2c.glade:3641 resources/xnec2c.glade:4197
 msgid "Dist. below 1st Medium"
 msgstr "Раст. испод 1. медијума"
 
-#: resources/xnec2c.glade:3029 resources/xnec2c.glade:3585
+#: resources/xnec2c.glade:3677 resources/xnec2c.glade:4233
 msgid "2nd Medium Parameters"
 msgstr "Параметри 2. медијума"
 
-#: resources/xnec2c.glade:3210
+#: resources/xnec2c.glade:3858
 msgid "Ground Parameters (GN & GD Cards)"
 msgstr "Параметри уземљења (GN и GD картице)"
 
-#: resources/xnec2c.glade:3237
+#: resources/xnec2c.glade:3885
 msgid "Perfect Ground"
 msgstr "Савршено уземљење"
 
-#: resources/xnec2c.glade:3253
+#: resources/xnec2c.glade:3901
 msgid "Sommerfeld/Norton"
 msgstr "Sommerfeld/Norton"
 
-#: resources/xnec2c.glade:3269
+#: resources/xnec2c.glade:3917
 msgid "Radial Ground Screen"
 msgstr "Радијални екран уземљења"
 
-#: resources/xnec2c.glade:3284
+#: resources/xnec2c.glade:3932
 msgid "Reflection Coeff. Approx"
 msgstr "Апрокс. коеф. рефлексије"
 
-#: resources/xnec2c.glade:3300
+#: resources/xnec2c.glade:3948
 msgid "Nullify Previous Params"
 msgstr "Поништи претходне парам."
 
-#: resources/xnec2c.glade:3316
+#: resources/xnec2c.glade:3964
 msgid "Second Medium (Cliff)"
 msgstr "Други медијум (литица)"
 
-#: resources/xnec2c.glade:3337
+#: resources/xnec2c.glade:3985
 msgid "Ground Type"
 msgstr "Тип уземљења"
 
-#: resources/xnec2c.glade:3465
+#: resources/xnec2c.glade:4113
 msgid "0.00000"
 msgstr "0.00000"
 
-#: resources/xnec2c.glade:3616
+#: resources/xnec2c.glade:4264
 msgid "Number of Radials"
 msgstr "Број радијала"
 
-#: resources/xnec2c.glade:3629
+#: resources/xnec2c.glade:4277
 msgid "Radial Screen Radius"
 msgstr "Полупречник радијалног екрана"
 
-#: resources/xnec2c.glade:3679
+#: resources/xnec2c.glade:4327
 msgid "Radial Wire Diameter"
 msgstr "Пречник радијалне жице"
 
-#: resources/xnec2c.glade:3715
+#: resources/xnec2c.glade:4363
 msgid "Radial Screen Parameters"
 msgstr "Параметри радијалног екрана"
 
-#: resources/xnec2c.glade:3915
+#: resources/xnec2c.glade:4563
 msgid "Helical Element (GA card)"
 msgstr "Хеликални елемент (GA картица)"
 
-#: resources/xnec2c.glade:3940
+#: resources/xnec2c.glade:4588
 msgid "Right Hand Helix"
 msgstr "Десноруки хеликс"
 
-#: resources/xnec2c.glade:3956
+#: resources/xnec2c.glade:4604
 msgid "Left Hand Helix"
 msgstr "Леворуки хеликс"
 
-#: resources/xnec2c.glade:3972
+#: resources/xnec2c.glade:4620
 msgid "Right Hand Spiral"
 msgstr "Десна спирала"
 
-#: resources/xnec2c.glade:3988
+#: resources/xnec2c.glade:4636
 msgid "Left Hand Spiral"
 msgstr "Лева спирала"
 
-#: resources/xnec2c.glade:4019
+#: resources/xnec2c.glade:4667
 msgid "Segments/Turn"
 msgstr "Сегменти/навој"
 
-#: resources/xnec2c.glade:4058
+#: resources/xnec2c.glade:4706
 msgid "0.0100"
 msgstr "0.0100"
 
-#: resources/xnec2c.glade:4079
+#: resources/xnec2c.glade:4727
 msgid "5.00"
 msgstr "5.00"
 
-#: resources/xnec2c.glade:4120 resources/xnec2c.glade:11998
-#: resources/xnec2c.glade:13222
+#: resources/xnec2c.glade:4768 resources/xnec2c.glade:12761
+#: resources/xnec2c.glade:13979
 msgid "1"
 msgstr "1"
 
-#: resources/xnec2c.glade:4140
+#: resources/xnec2c.glade:4788
 msgid "Number of Turns"
 msgstr "Број навоја"
 
-#: resources/xnec2c.glade:4153
+#: resources/xnec2c.glade:4801
 msgid "8.0000"
 msgstr "8.0000"
 
-#: resources/xnec2c.glade:4174
+#: resources/xnec2c.glade:4822
 msgid "Helix Length (HL)"
 msgstr "Дужина хеликса (HL)"
 
-#: resources/xnec2c.glade:4187
+#: resources/xnec2c.glade:4835
 msgid "5.0000"
 msgstr "5.0000"
 
-#: resources/xnec2c.glade:4208
+#: resources/xnec2c.glade:4856
 msgid "Turns Spacing"
 msgstr "Размак навоја"
 
-#: resources/xnec2c.glade:4221 resources/xnec2c.glade:4333
-#: resources/xnec2c.glade:4386 resources/xnec2c.glade:4439
-#: resources/xnec2c.glade:4487
+#: resources/xnec2c.glade:4869 resources/xnec2c.glade:4981
+#: resources/xnec2c.glade:5034 resources/xnec2c.glade:5087
+#: resources/xnec2c.glade:5135
 msgid "1.0000"
 msgstr "1.0000"
 
-#: resources/xnec2c.glade:4255
+#: resources/xnec2c.glade:4903
 msgid "0.0000"
 msgstr "0.0000"
 
-#: resources/xnec2c.glade:4275
+#: resources/xnec2c.glade:4923
 msgid "Radius in X (A1)"
 msgstr "Полупречник у X (A1)"
 
-#: resources/xnec2c.glade:4288
+#: resources/xnec2c.glade:4936
 msgid "Radius in Y (B1)"
 msgstr "Полупречник у Y (B1)"
 
-#: resources/xnec2c.glade:4301
+#: resources/xnec2c.glade:4949
 msgid "Radius in X (A2)"
 msgstr "Полупречник у X (A2)"
 
-#: resources/xnec2c.glade:4314
+#: resources/xnec2c.glade:4962
 msgid "Radius in Y (B2)"
 msgstr "Полупречник у Y (B2)"
 
-#: resources/xnec2c.glade:4512
+#: resources/xnec2c.glade:5160
 msgid "GH Card"
 msgstr "GH картица"
 
-#: resources/xnec2c.glade:4649 resources/xnec2c.glade:15779
+#: resources/xnec2c.glade:5297 resources/xnec2c.glade:16536
 msgid "Interaction Approx Range (KH Card)"
 msgstr "Опсег апроксимације интеракције (KH картица)"
 
-#: resources/xnec2c.glade:4676
+#: resources/xnec2c.glade:5324
 msgid "Approximation Range (W/lengths)"
 msgstr "Опсег апроксимације (таласних дужина)"
 
-#: resources/xnec2c.glade:4714
+#: resources/xnec2c.glade:5362
 msgid "Interaction Approximation Range"
 msgstr "Опсег апроксимације интеракције"
 
-#: resources/xnec2c.glade:4840
+#: resources/xnec2c.glade:5488
 msgid "Thin Wire Kernel (EK Card)"
 msgstr "Кернел танке жице (EK картица)"
 
-#: resources/xnec2c.glade:4858
+#: resources/xnec2c.glade:5506
 msgid "Extended Thin Wire Kernel"
 msgstr "Проширени кернел танке жице"
 
-#: resources/xnec2c.glade:4875
+#: resources/xnec2c.glade:5523
 msgid "Thin Wire Kernel"
 msgstr "Кернел танке жице"
 
-#: resources/xnec2c.glade:5038
+#: resources/xnec2c.glade:5686
 msgid "Loading Command (LD Card)"
 msgstr "Команда оптерећења (LD картица)"
 
-#: resources/xnec2c.glade:5064
+#: resources/xnec2c.glade:5712
 msgid "Short all Loads (Nulls previous Loading Cards)"
 msgstr "Краткоспој свих оптерећења (поништава претходне картице оптерећења)"
 
-#: resources/xnec2c.glade:5081
+#: resources/xnec2c.glade:5729
 msgid "Series, Lumped"
 msgstr "Редно, концентрисано"
 
-#: resources/xnec2c.glade:5097
+#: resources/xnec2c.glade:5745
 msgid "Parallel, Distributed"
 msgstr "Паралелно, распоређено"
 
-#: resources/xnec2c.glade:5113
+#: resources/xnec2c.glade:5761
 msgid "Parallel, Lumped"
 msgstr "Паралелно, концентрисано"
 
-#: resources/xnec2c.glade:5129
+#: resources/xnec2c.glade:5777
 msgid "Resistance & Reactance"
 msgstr "Отпорност и реактанса"
 
-#: resources/xnec2c.glade:5145
+#: resources/xnec2c.glade:5793
 msgid "Series, Distributed"
 msgstr "Редно, распоређено"
 
-#: resources/xnec2c.glade:5161
+#: resources/xnec2c.glade:5809
 msgid "Wire Conductivity"
 msgstr "Проводност жице"
 
-#: resources/xnec2c.glade:5183
+#: resources/xnec2c.glade:5831
 msgid "Loading Type"
 msgstr "Тип оптерећења"
 
-#: resources/xnec2c.glade:5213
+#: resources/xnec2c.glade:5861
 msgid "Load Tag Number"
 msgstr "Број ознаке оптерећења"
 
-#: resources/xnec2c.glade:5244
+#: resources/xnec2c.glade:5892
 msgid "Resistance"
 msgstr "Отпорност"
 
-#: resources/xnec2c.glade:5276
+#: resources/xnec2c.glade:5924
 msgid "From Segment #"
 msgstr "Од сегмента #"
 
-#: resources/xnec2c.glade:5307
+#: resources/xnec2c.glade:5955
 msgid "Inductance"
 msgstr "Индуктивност"
 
-#: resources/xnec2c.glade:5339
+#: resources/xnec2c.glade:5987
 msgid "To Segment #"
 msgstr "До сегмента #"
 
-#: resources/xnec2c.glade:5370
+#: resources/xnec2c.glade:6018
 msgid "Capacitance"
 msgstr "Капацитивност"
 
-#: resources/xnec2c.glade:5406
+#: resources/xnec2c.glade:6054
 msgid "Loading Parameters"
 msgstr "Параметри оптерећења"
 
-#: resources/xnec2c.glade:5621
+#: resources/xnec2c.glade:6269
 msgid "Near Fields Command (NE/NH Cards)"
 msgstr "Команда блиског поља (NE/NH картице)"
 
-#: resources/xnec2c.glade:5648
+#: resources/xnec2c.glade:6296
 msgid "Near Electric Field"
 msgstr "Блиско електрично поље"
 
-#: resources/xnec2c.glade:5664
+#: resources/xnec2c.glade:6312
 msgid "Rectangular Co-ordinates"
 msgstr "Правоугаоне координате"
 
-#: resources/xnec2c.glade:5680
+#: resources/xnec2c.glade:6328
 msgid "Near Magnetic Field"
 msgstr "Блиско магнетно поље"
 
-#: resources/xnec2c.glade:5695
+#: resources/xnec2c.glade:6343
 msgid "Spherical Co-ordinates"
 msgstr "Сферне координате"
 
-#: resources/xnec2c.glade:5723
+#: resources/xnec2c.glade:6371
 msgid "Field Type & Co-ordinates"
 msgstr "Тип поља и координате"
 
-#: resources/xnec2c.glade:5753
+#: resources/xnec2c.glade:6401
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:5784 resources/xnec2c.glade:11549
-#: resources/xnec2c.glade:12758
+#: resources/xnec2c.glade:6432 resources/xnec2c.glade:12312
+#: resources/xnec2c.glade:13515
 msgid "X"
 msgstr "X"
 
-#: resources/xnec2c.glade:5816
+#: resources/xnec2c.glade:6464
 msgid "DX"
 msgstr "DX"
 
-#: resources/xnec2c.glade:5848
+#: resources/xnec2c.glade:6496
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:5879 resources/xnec2c.glade:11564
-#: resources/xnec2c.glade:12773
+#: resources/xnec2c.glade:6527 resources/xnec2c.glade:12327
+#: resources/xnec2c.glade:13530
 msgid "Y"
 msgstr "Y"
 
-#: resources/xnec2c.glade:5911
+#: resources/xnec2c.glade:6559
 msgid "DY"
 msgstr "DY"
 
-#: resources/xnec2c.glade:5943
+#: resources/xnec2c.glade:6591
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:5974 resources/xnec2c.glade:11579
-#: resources/xnec2c.glade:12788
+#: resources/xnec2c.glade:6622 resources/xnec2c.glade:12342
+#: resources/xnec2c.glade:13545
 msgid "Z"
 msgstr "Z"
 
-#: resources/xnec2c.glade:6006
+#: resources/xnec2c.glade:6654
 msgid "DZ"
 msgstr "DZ"
 
-#: resources/xnec2c.glade:6042
+#: resources/xnec2c.glade:6690
 msgid "Field Pattern Parameters"
 msgstr "Параметри дијаграма поља"
 
-#: resources/xnec2c.glade:6169
+#: resources/xnec2c.glade:6817
 msgid "Xnec2c: NEC2 Input File Editor"
 msgstr "Xnec2c: Уређивач NEC2 улазне датотеке"
 
-#: resources/xnec2c.glade:6256
+#: resources/xnec2c.glade:6904
 msgid "Manage Cards"
 msgstr "Управљање картицама"
 
-#: resources/xnec2c.glade:6353
+#: resources/xnec2c.glade:7001
 msgid "File Save"
 msgstr "Сачувај датотеку"
 
-#: resources/xnec2c.glade:6413 src/nec2_model.c:278
+#: resources/xnec2c.glade:7061 src/nec2_model.c:278
 msgid "Comments"
 msgstr "Коментари"
 
-#: resources/xnec2c.glade:6440
+#: resources/xnec2c.glade:7088
 msgid "Wire"
 msgstr "Жица"
 
-#: resources/xnec2c.glade:6454
+#: resources/xnec2c.glade:7102
 msgid "Arc"
 msgstr "Лук"
 
-#: resources/xnec2c.glade:6468
+#: resources/xnec2c.glade:7116
 msgid "Helix"
 msgstr "Хеликс"
 
-#: resources/xnec2c.glade:6482
+#: resources/xnec2c.glade:7130
 msgid "Patch"
 msgstr "Патч"
 
-#: resources/xnec2c.glade:6496
+#: resources/xnec2c.glade:7144
 msgid "Cylinder"
 msgstr "Цилиндар"
 
-#: resources/xnec2c.glade:6510
+#: resources/xnec2c.glade:7158
 msgid "Move"
 msgstr "Помери"
 
-#: resources/xnec2c.glade:6524
+#: resources/xnec2c.glade:7172
 msgid "Reflect"
 msgstr "Одрази"
 
-#: resources/xnec2c.glade:6538
+#: resources/xnec2c.glade:7186
 msgid "Scale"
 msgstr "Скалирај"
 
-#: resources/xnec2c.glade:6552 resources/xnec2c.glade:6836
+#: resources/xnec2c.glade:7200 resources/xnec2c.glade:7484
 msgid "Add Var (SY)"
 msgstr "Додај вар. (SY)"
 
-#: resources/xnec2c.glade:6572
+#: resources/xnec2c.glade:7220
 msgid "Edit Geometry Data"
 msgstr "Уреди податке геометрије"
 
-#: resources/xnec2c.glade:6626
+#: resources/xnec2c.glade:7274
 msgid "Geometry"
 msgstr "Геометрија"
 
-#: resources/xnec2c.glade:6653
+#: resources/xnec2c.glade:7301
 msgid "Excitation"
 msgstr "Побуда"
 
-#: resources/xnec2c.glade:6667
+#: resources/xnec2c.glade:7315
 msgid "Radiation"
 msgstr "Зрачење"
 
-#: resources/xnec2c.glade:6681
+#: resources/xnec2c.glade:7329
 msgid "Frequency"
 msgstr "Фреквенција"
 
-#: resources/xnec2c.glade:6695
+#: resources/xnec2c.glade:7343
 msgid "Near Fields"
 msgstr "Блиска поља"
 
-#: resources/xnec2c.glade:6709
+#: resources/xnec2c.glade:7357
 msgid "Ground (GN)"
 msgstr "Уземљење (GN)"
 
-#: resources/xnec2c.glade:6723
+#: resources/xnec2c.glade:7371
 msgid "Ground (GD)"
 msgstr "Уземљење (GD)"
 
-#: resources/xnec2c.glade:6737
+#: resources/xnec2c.glade:7385
 msgid "Loading"
 msgstr "Оптерећење"
 
-#: resources/xnec2c.glade:6751
+#: resources/xnec2c.glade:7399
 msgid "Kernel"
 msgstr "Кернел"
 
-#: resources/xnec2c.glade:6765
+#: resources/xnec2c.glade:7413
 msgid "Network"
 msgstr "Мрежа"
 
-#: resources/xnec2c.glade:6779
+#: resources/xnec2c.glade:7427
 msgid "Interaction"
 msgstr "Интеракција"
 
-#: resources/xnec2c.glade:6793
+#: resources/xnec2c.glade:7441
 msgid "Transm. Line"
 msgstr "Преносна линија"
 
-#: resources/xnec2c.glade:6808
+#: resources/xnec2c.glade:7456
 msgid "Execute"
 msgstr "Изврши"
 
-#: resources/xnec2c.glade:6822
+#: resources/xnec2c.glade:7470
 msgid "Zo"
 msgstr "Zo"
 
-#: resources/xnec2c.glade:6856
+#: resources/xnec2c.glade:7504
 msgid "Edit Control Commands"
 msgstr "Уреди контролне команде"
 
-#: resources/xnec2c.glade:6910
+#: resources/xnec2c.glade:7558
 msgid "Commands"
 msgstr "Команде"
 
-#: resources/xnec2c.glade:6929
+#: resources/xnec2c.glade:7577
 msgid "Unsaved Data"
 msgstr "Несачувани подаци"
 
-#: resources/xnec2c.glade:7005
+#: resources/xnec2c.glade:7653
 msgid ""
 "Unsaved data in NEC2 Editor.\n"
 "Save NEC2 Editor data first?\n"
@@ -974,1024 +1188,1112 @@ msgstr ""
 "Несачувани подаци у NEC2 уређивачу.\n"
 "Да ли прво сачувати податке NEC2 уређивача?\n"
 
-#: resources/xnec2c.glade:7104
+#: resources/xnec2c.glade:7752
 msgid "Network Command (NT Card)"
 msgstr "Команда мреже (NT картица)"
 
-#: resources/xnec2c.glade:7133
+#: resources/xnec2c.glade:7781
 msgid "Tag Number, Port 1  "
 msgstr "Број ознаке, порт 1  "
 
-#: resources/xnec2c.glade:7164
+#: resources/xnec2c.glade:7812
 msgid "Tag Number, Port 2  "
 msgstr "Број ознаке, порт 2  "
 
-#: resources/xnec2c.glade:7195
+#: resources/xnec2c.glade:7843
 msgid "Segment Num, Port 1"
 msgstr "Број сегмента, порт 1"
 
-#: resources/xnec2c.glade:7226
+#: resources/xnec2c.glade:7874
 msgid "Segment Num, Port 2"
 msgstr "Број сегмента, порт 2"
 
-#: resources/xnec2c.glade:7261 resources/xnec2c.glade:14565
+#: resources/xnec2c.glade:7909 resources/xnec2c.glade:15322
 msgid "Segment Identity"
 msgstr "Идентитет сегмента"
 
-#: resources/xnec2c.glade:7291
+#: resources/xnec2c.glade:7939
 msgid "Element 1,1 Real Part"
 msgstr "Елемент 1,1 реални део"
 
-#: resources/xnec2c.glade:7323
+#: resources/xnec2c.glade:7971
 msgid "Element 1,2 Real Part"
 msgstr "Елемент 1,2 реални део"
 
-#: resources/xnec2c.glade:7355
+#: resources/xnec2c.glade:8003
 msgid "Element 2,2 Real Part"
 msgstr "Елемент 2,2 реални део"
 
-#: resources/xnec2c.glade:7387
+#: resources/xnec2c.glade:8035
 msgid "Element 1,1 Imag Part"
 msgstr "Елемент 1,1 имагинарни део"
 
-#: resources/xnec2c.glade:7419
+#: resources/xnec2c.glade:8067
 msgid "Element 1,2 Imag Part"
 msgstr "Елемент 1,2 имагинарни део"
 
-#: resources/xnec2c.glade:7451
+#: resources/xnec2c.glade:8099
 msgid "Element 2,2 Imag Part"
 msgstr "Елемент 2,2 имагинарни део"
 
-#: resources/xnec2c.glade:7487
+#: resources/xnec2c.glade:8135
 msgid "Admittance Matrix Elements"
 msgstr "Елементи матрице адмитансе"
 
-#: resources/xnec2c.glade:7702
+#: resources/xnec2c.glade:8350
 msgid "Patch Element (SP & SC Cards)"
 msgstr "Патч елемент (SP и SC картице)"
 
-#: resources/xnec2c.glade:7726
+#: resources/xnec2c.glade:8374
 msgid "Arbitrary"
 msgstr "Произвољно"
 
-#: resources/xnec2c.glade:7743
+#: resources/xnec2c.glade:8391
 msgid "Rectangle"
 msgstr "Правоугаоник"
 
-#: resources/xnec2c.glade:7760
+#: resources/xnec2c.glade:8408
 msgid "Triangle"
 msgstr "Троугао"
 
-#: resources/xnec2c.glade:7777
+#: resources/xnec2c.glade:8425
 msgid "Quadrilateral"
 msgstr "Четвороугао"
 
-#: resources/xnec2c.glade:7794
+#: resources/xnec2c.glade:8442
 msgid "Surface"
 msgstr "Површина"
 
-#: resources/xnec2c.glade:7817
+#: resources/xnec2c.glade:8465
 msgid "Patch Type"
 msgstr "Тип патча"
 
-#: resources/xnec2c.glade:7847
+#: resources/xnec2c.glade:8495
 msgid "Corners 1-2 sub-division (NX)"
 msgstr "Подела углова 1-2 (NX)"
 
-#: resources/xnec2c.glade:7878
+#: resources/xnec2c.glade:8526
 msgid "Corners 2-3 sub-division (NY)"
 msgstr "Подела углова 2-3 (NY)"
 
-#: resources/xnec2c.glade:7913
+#: resources/xnec2c.glade:8561
 msgid "Surface Sub-division"
 msgstr "Подела површине"
 
-#: resources/xnec2c.glade:7943 src/geom_edit.c:1157
+#: resources/xnec2c.glade:8591 src/geom_edit.c:1157
 msgid "Center - X"
 msgstr "Центар - X"
 
-#: resources/xnec2c.glade:7975 src/geom_edit.c:1163
+#: resources/xnec2c.glade:8623 src/geom_edit.c:1163
 msgid "Normal - Elev."
 msgstr "Нормала - Елевација"
 
-#: resources/xnec2c.glade:8007 src/geom_edit.c:1159
+#: resources/xnec2c.glade:8655 src/geom_edit.c:1159
 msgid "Center - Y"
 msgstr "Центар - Y"
 
-#: resources/xnec2c.glade:8039 src/geom_edit.c:1165
+#: resources/xnec2c.glade:8687 src/geom_edit.c:1165
 msgid "Normal - Azim."
 msgstr "Нормала - Азимут"
 
-#: resources/xnec2c.glade:8071 src/geom_edit.c:1161
+#: resources/xnec2c.glade:8719 src/geom_edit.c:1161
 msgid "Center - Z"
 msgstr "Центар - Z"
 
-#: resources/xnec2c.glade:8103 src/geom_edit.c:1167
+#: resources/xnec2c.glade:8751 src/geom_edit.c:1167
 msgid "Patch Area"
 msgstr "Површина патча"
 
-#: resources/xnec2c.glade:8139
+#: resources/xnec2c.glade:8787
 msgid "SP/SM Cards"
 msgstr "SP/SM картице"
 
-#: resources/xnec2c.glade:8175
+#: resources/xnec2c.glade:8823
 msgid "Corner 3 - X"
 msgstr "Угао 3 - X"
 
-#: resources/xnec2c.glade:8207
+#: resources/xnec2c.glade:8855
 msgid "Corner 3 - Y"
 msgstr "Угао 3 - Y"
 
-#: resources/xnec2c.glade:8239
+#: resources/xnec2c.glade:8887
 msgid "Corner 3 - Z"
 msgstr "Угао 3 - Z"
 
-#: resources/xnec2c.glade:8287
+#: resources/xnec2c.glade:8935
 msgid "Corner 4 - X"
 msgstr "Угао 4 - X"
 
-#: resources/xnec2c.glade:8319
+#: resources/xnec2c.glade:8967
 msgid "Corner 4 - Y"
 msgstr "Угао 4 - Y"
 
-#: resources/xnec2c.glade:8351
+#: resources/xnec2c.glade:8999
 msgid "Corner 4 - Z"
 msgstr "Угао 4 - Z"
 
-#: resources/xnec2c.glade:8394
+#: resources/xnec2c.glade:9042
 msgid "SC Card"
 msgstr "SC картица"
 
-#: resources/xnec2c.glade:8610
+#: resources/xnec2c.glade:9258
 msgid "Quit xnec2c?"
 msgstr "Изаћи из xnec2c?"
 
-#: resources/xnec2c.glade:8689
+#: resources/xnec2c.glade:9337
 msgid "Radiation Pattern (RP Card)"
 msgstr "Дијаграм зрачења (RP картица)"
 
-#: resources/xnec2c.glade:8716
+#: resources/xnec2c.glade:9364
 msgid "Normal (Space) Wave"
 msgstr "Нормални (просторни) талас"
 
-#: resources/xnec2c.glade:8732
+#: resources/xnec2c.glade:9380
 msgid "Space + Ground Wave"
 msgstr "Просторни + приземни талас"
 
-#: resources/xnec2c.glade:8748
+#: resources/xnec2c.glade:9396
 msgid "Linear Cliff"
 msgstr "Линеарни прелом"
 
-#: resources/xnec2c.glade:8764
+#: resources/xnec2c.glade:9412
 msgid "Radial wire screen"
 msgstr "Радијална жичана мрежа"
 
-#: resources/xnec2c.glade:8780
+#: resources/xnec2c.glade:9428
 msgid "Circular Cliff + Radials"
 msgstr "Кружни прелом + радијали"
 
-#: resources/xnec2c.glade:8796
+#: resources/xnec2c.glade:9444
 msgid "Circular Cliff"
 msgstr "Кружни прелом"
 
-#: resources/xnec2c.glade:8812
+#: resources/xnec2c.glade:9460
 msgid "Linear Cliff + Radials"
 msgstr "Линеарни прелом + радијали"
 
-#: resources/xnec2c.glade:8830
+#: resources/xnec2c.glade:9478
 msgid "<b>See GN/GD Card Documentation</b>"
 msgstr "<b>Погледајте документацију GN/GD картица</b>"
 
-#: resources/xnec2c.glade:8848
+#: resources/xnec2c.glade:9496
 msgid "Wave Type and Ground (I1)"
 msgstr "Тип таласа и уземљење (I1)"
 
-#: resources/xnec2c.glade:8876
+#: resources/xnec2c.glade:9524
 msgid "Major & Minor Axis & Total Gain"
-msgstr "Главна и споредна оса и укупно појачање"
+msgstr "Главна и споредна оса и укупан добитак"
 
-#: resources/xnec2c.glade:8892
+#: resources/xnec2c.glade:9540
 msgid "Vertical, Horizontal & Total Gain"
-msgstr "Вертикално, хоризонтално и укупно појачање"
+msgstr "Вертикално, хоризонтално и укупан добитак"
 
-#: resources/xnec2c.glade:8908
+#: resources/xnec2c.glade:9556
 msgid "Major Axis Gain Normalized"
-msgstr "Нормализовано појачање главне осе"
+msgstr "Нормализован добитак главне осе"
 
-#: resources/xnec2c.glade:8924
+#: resources/xnec2c.glade:9572
 msgid "Vertical Axis Gain Normalized"
-msgstr "Нормализовано појачање вертикалне осе"
+msgstr "Нормализован добитак вертикалне осе"
 
-#: resources/xnec2c.glade:8940
+#: resources/xnec2c.glade:9588
 msgid "Total Gain Normalized"
-msgstr "Нормализовано укупно појачање"
+msgstr "Нормализован укупан добитак"
 
-#: resources/xnec2c.glade:8956
+#: resources/xnec2c.glade:9604
 msgid "Print/Normalize Directive Gain"
-msgstr "Штампај/нормализуј усмерено појачање"
+msgstr "Штампај/нормализуј усмерен добитак"
 
-#: resources/xnec2c.glade:8972
+#: resources/xnec2c.glade:9620
 msgid "No Normalized Gain"
-msgstr "Без нормализованог појачања"
+msgstr "Без нормализованог добитка"
 
-#: resources/xnec2c.glade:8988
+#: resources/xnec2c.glade:9636
 msgid "Minor Axis Gain Normalized"
-msgstr "Нормализовано појачање мање осе"
+msgstr "Нормализован добитак мање осе"
 
-#: resources/xnec2c.glade:9004
+#: resources/xnec2c.glade:9652
 msgid "Horizontal Axis Gain Normalized"
-msgstr "Нормализовано појачање хоризонталне осе"
+msgstr "Нормализован добитак хоризонталне осе"
 
-#: resources/xnec2c.glade:9020
+#: resources/xnec2c.glade:9668
 msgid "Print/Normalize Power Gain"
-msgstr "Штампај/Нормализуј појачање снаге"
+msgstr "Штампај/Нормализуј добитак снаге"
 
-#: resources/xnec2c.glade:9036
+#: resources/xnec2c.glade:9684
 msgid "No Gain Averaging"
-msgstr "Без усредњавања појачања"
+msgstr "Без усредњавања добитка"
 
-#: resources/xnec2c.glade:9052
+#: resources/xnec2c.glade:9700
 msgid "Points in Average Not Printed"
 msgstr "Тачке у просеку нису штампане"
 
-#: resources/xnec2c.glade:9068
+#: resources/xnec2c.glade:9716
 msgid "Average Gain Computed"
-msgstr "Израчунато просечно појачање"
+msgstr "Израчунат просечан добитак"
 
-#: resources/xnec2c.glade:9086
+#: resources/xnec2c.glade:9734
 msgid "<b>See RP Card Documentation</b>"
 msgstr "<b>Погледајте документацију RP картице</b>"
 
-#: resources/xnec2c.glade:9104
+#: resources/xnec2c.glade:9752
 msgid "Data Output Control (XNDA)"
 msgstr "Контрола излаза података (XNDA)"
 
-#: resources/xnec2c.glade:9134
+#: resources/xnec2c.glade:9782
 msgid "Points in Theta"
 msgstr "Тачке по Theta"
 
-#: resources/xnec2c.glade:9148 src/cmnd_edit.c:1763
+#: resources/xnec2c.glade:9796 src/cmnd_edit.c:1763
 msgid "Initial Theta (deg)"
 msgstr "Почетна Theta (deg)"
 
-#: resources/xnec2c.glade:9161 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
+#: resources/xnec2c.glade:9809 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
 msgid "Increment in Theta"
 msgstr "Прираштај по Theta"
 
-#: resources/xnec2c.glade:9230 src/cmnd_edit.c:1762
+#: resources/xnec2c.glade:9878 src/cmnd_edit.c:1762
 msgid "Points in Phi"
 msgstr "Тачке по Phi"
 
-#: resources/xnec2c.glade:9243
+#: resources/xnec2c.glade:9891
 msgid "Initial Phi (deg)"
 msgstr "Почетни Phi (deg)"
 
-#: resources/xnec2c.glade:9256 src/cmnd_edit.c:2708
+#: resources/xnec2c.glade:9904 src/cmnd_edit.c:2708
 msgid "Increment in Phi"
 msgstr "Прираштај по Phi"
 
-#: resources/xnec2c.glade:9325
+#: resources/xnec2c.glade:9973
 msgid "Field Point Distance"
 msgstr "Растојање тачке поља"
 
-#: resources/xnec2c.glade:9357
+#: resources/xnec2c.glade:10005
 msgid "Gain Normalization"
-msgstr "Нормализација појачања"
+msgstr "Нормализација добитка"
 
-#: resources/xnec2c.glade:9399
+#: resources/xnec2c.glade:10047
 msgid "Radiation Pattern Parameters"
 msgstr "Параметри дијаграма зрачења"
 
-#: resources/xnec2c.glade:9566
+#: resources/xnec2c.glade:10214
 msgid "Reflect Structure (GX card)"
 msgstr "Рефлектуј структуру (GX картица)"
 
-#: resources/xnec2c.glade:9594
+#: resources/xnec2c.glade:10242
 msgid "Reflect in YZ plane"
 msgstr "Рефлектуј у YZ равни"
 
-#: resources/xnec2c.glade:9609
+#: resources/xnec2c.glade:10257
 msgid "Reflect in XY plane"
 msgstr "Рефлектуј у XY равни"
 
-#: resources/xnec2c.glade:9624
+#: resources/xnec2c.glade:10272
 msgid "Reflect in XZ plane"
 msgstr "Рефлектуј у XZ равни"
 
-#: resources/xnec2c.glade:9680
+#: resources/xnec2c.glade:10328
 msgid "Reflect Options"
 msgstr "Опције рефлексије"
 
-#: resources/xnec2c.glade:9811
+#: resources/xnec2c.glade:10459
 msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: Графикони фреквенцијских података"
 
-#: resources/xnec2c.glade:9836 resources/xnec2c.glade:10807
-#: resources/xnec2c.glade:12252
+#: resources/xnec2c.glade:10484 resources/xnec2c.glade:11478
+#: resources/xnec2c.glade:13015
 msgid "_File"
 msgstr "_Датотека"
 
-#: resources/xnec2c.glade:9898 resources/xnec2c.glade:10869
-#: resources/xnec2c.glade:12314
+#: resources/xnec2c.glade:10546 resources/xnec2c.glade:11540
+#: resources/xnec2c.glade:13077
 msgid "Save as _gnuplot"
 msgstr "Сачувај као _gnuplot"
 
-#: resources/xnec2c.glade:9909 resources/xnec2c.glade:12324
+#: resources/xnec2c.glade:10557 resources/xnec2c.glade:13087
 msgid "Save as _CSV"
 msgstr "Сачувај као _CSV"
 
-#: resources/xnec2c.glade:9921
+#: resources/xnec2c.glade:10569
 msgid "Save as _Touchstone (.SnP)"
 msgstr "Сачувај као _Touchstone (.SnP)"
 
-#: resources/xnec2c.glade:9928
+#: resources/xnec2c.glade:10576
 msgid "Save as S_1P: Reflection Only"
 msgstr "Сачувај као S_1P: Само рефлексија"
 
-#: resources/xnec2c.glade:9938
+#: resources/xnec2c.glade:10586
 msgid "Save as S2P: _Max Gain (S21)"
-msgstr "Сачувај као S2P: _Макс појачање (S21)"
+msgstr "Сачувај као S2P: _Макс добитак (S21)"
 
-#: resources/xnec2c.glade:9948
+#: resources/xnec2c.glade:10596
 msgid "Save as S2P: _Viewer Gain (S21)"
-msgstr "Сачувај као S2P: Појачање _прегледача (S21)"
+msgstr "Сачувај као S2P: Добитак _посматрача (S21)"
 
-#: resources/xnec2c.glade:9985 resources/xnec2c.glade:11235
-#: resources/xnec2c.glade:12358
+#: resources/xnec2c.glade:10633 resources/xnec2c.glade:11906
+#: resources/xnec2c.glade:13121
 msgid "_View"
 msgstr "_Преглед"
 
-#: resources/xnec2c.glade:9994 resources/xnec2c.glade:11265
-#: resources/xnec2c.glade:12368
+#: resources/xnec2c.glade:10642 resources/xnec2c.glade:11934
+#: resources/xnec2c.glade:13129
 msgid "_Polarization"
 msgstr "_Поларизација"
 
-#: resources/xnec2c.glade:10010 resources/xnec2c.glade:11281
-#: resources/xnec2c.glade:12384
+#: resources/xnec2c.glade:10656 resources/xnec2c.glade:11948
+#: resources/xnec2c.glade:13143
 msgid "_Total"
 msgstr "_Укупна"
 
-#: resources/xnec2c.glade:10021 resources/xnec2c.glade:11292
-#: resources/xnec2c.glade:12395
+#: resources/xnec2c.glade:10667 resources/xnec2c.glade:11959
+#: resources/xnec2c.glade:13154
 msgid "_Horizontal"
 msgstr "_Хоризонтална"
 
-#: resources/xnec2c.glade:10032 resources/xnec2c.glade:11303
-#: resources/xnec2c.glade:12406
+#: resources/xnec2c.glade:10678 resources/xnec2c.glade:11970
+#: resources/xnec2c.glade:13165
 msgid "_Vertical"
 msgstr "_Вертикална"
 
-#: resources/xnec2c.glade:10043 resources/xnec2c.glade:11314
-#: resources/xnec2c.glade:12417
+#: resources/xnec2c.glade:10689 resources/xnec2c.glade:11981
+#: resources/xnec2c.glade:13176
 msgid "_Right Hand"
 msgstr "_Десноручна"
 
-#: resources/xnec2c.glade:10054 resources/xnec2c.glade:11325
-#: resources/xnec2c.glade:12428
+#: resources/xnec2c.glade:10700 resources/xnec2c.glade:11992
+#: resources/xnec2c.glade:13187
 msgid "_Left Hand"
 msgstr "_Леворучна"
 
-#: resources/xnec2c.glade:10069
+#: resources/xnec2c.glade:10715
 msgid "_Color Theme"
 msgstr "_Боје теме"
 
-#: resources/xnec2c.glade:10088
+#: resources/xnec2c.glade:10734
 msgid "_Net Gain"
-msgstr "_Нето појачање"
+msgstr "_Нето добитак"
 
-#: resources/xnec2c.glade:10097
+#: resources/xnec2c.glade:10743
 msgid "Show _Min/Max Values"
 msgstr "Прикажи _мин/макс вредности"
 
-#: resources/xnec2c.glade:10106
+#: resources/xnec2c.glade:10752
 msgid "Show _S11 (dB) Values"
 msgstr "Прикажи _S11 (dB) вредности"
 
-#: resources/xnec2c.glade:10115
+#: resources/xnec2c.glade:10761
 msgid "Clamp _VSWR Graph to 10"
 msgstr "Ограничи _VSWR график на 10"
 
-#: resources/xnec2c.glade:10124
+#: resources/xnec2c.glade:10770
 msgid "Show Ta instead of TA"
 msgstr "Прикажи Ta уместо TA"
 
-#: resources/xnec2c.glade:10133
+#: resources/xnec2c.glade:10779
 msgid "Round _X Axis Frequency Values"
 msgstr "Заокружи вредности фреквенције _X осе"
 
-#: resources/xnec2c.glade:10142
+#: resources/xnec2c.glade:10788
 msgid "S_wap Left/Right Click Frequency Selection"
 msgstr "_Замени избор фреквенције левим/десним кликом"
 
-#: resources/xnec2c.glade:10166 resources/xnec2c.glade:10330
+#: resources/xnec2c.glade:10812 resources/xnec2c.glade:10976
 msgid "Max Gain"
-msgstr "Макс појачање"
+msgstr "Макс добитак"
 
-#: resources/xnec2c.glade:10181
+#: resources/xnec2c.glade:10827
 msgid "Direction"
 msgstr "Смер"
 
-#: resources/xnec2c.glade:10196
+#: resources/xnec2c.glade:10842
 msgid "Viewer"
-msgstr "Прегледач"
+msgstr "Посматрач"
 
-#: resources/xnec2c.glade:10211 resources/xnec2c.glade:10435
-#: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:40
+#: resources/xnec2c.glade:10857 resources/xnec2c.glade:11081
+#: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:55
 msgid "VSWR"
 msgstr "VSWR"
 
-#: resources/xnec2c.glade:10226
+#: resources/xnec2c.glade:10872
 msgid "Zr/Zi"
 msgstr "Zr/Zi"
 
-#: resources/xnec2c.glade:10241
+#: resources/xnec2c.glade:10887
 msgid "Zm/Zph"
 msgstr "Zm/Zph"
 
-#: resources/xnec2c.glade:10256
+#: resources/xnec2c.glade:10902
 msgid "Smith"
 msgstr "Smith"
 
-#: resources/xnec2c.glade:10271
+#: resources/xnec2c.glade:10917
 msgid "G/Ta"
 msgstr "G/Ta"
 
-#: resources/xnec2c.glade:10314 resources/xnec2c.glade:10349
-#: resources/xnec2c.glade:10384 resources/xnec2c.glade:10419
-#: resources/xnec2c.glade:10638 resources/xnec2c.glade:10673
-#: resources/xnec2c.glade:10708 resources/xnec2c.glade:13481
+#: resources/xnec2c.glade:10960 resources/xnec2c.glade:10995
+#: resources/xnec2c.glade:11030 resources/xnec2c.glade:11065
+#: resources/xnec2c.glade:11309 resources/xnec2c.glade:11344
+#: resources/xnec2c.glade:11379 resources/xnec2c.glade:14238
 msgid " - - -"
 msgstr " - - -"
 
-#: resources/xnec2c.glade:10365 src/freqplots/graphs/impedance_graph.c:58
+#: resources/xnec2c.glade:11011 src/freqplots/graphs/impedance_graph.c:76
 msgid "Z-imag"
 msgstr "Z-имагинарни"
 
-#: resources/xnec2c.glade:10400 src/freqplots/graphs/impedance_graph.c:56
+#: resources/xnec2c.glade:11046 src/freqplots/graphs/impedance_graph.c:74
 msgid "Z-real"
 msgstr "Z-реални"
 
-#: resources/xnec2c.glade:10455
+#: resources/xnec2c.glade:11101
 msgid " - - - - "
 msgstr " - - - - "
 
-#: resources/xnec2c.glade:10471
+#: resources/xnec2c.glade:11117
 msgid "Freq MHz"
 msgstr "Фрекв MHz"
 
-#: resources/xnec2c.glade:10510
+#: resources/xnec2c.glade:11156 resources/xnec2c.glade:11169
+msgid "Port"
+msgstr "Порт"
+
+#: resources/xnec2c.glade:11181
 msgid "Tx Line Zo"
 msgstr "Zo преносне линије"
 
-#: resources/xnec2c.glade:10524 resources/xnec2c.glade:12013
-#: resources/xnec2c.glade:13253
+#: resources/xnec2c.glade:11195 resources/xnec2c.glade:12776
+#: resources/xnec2c.glade:14010
 msgid "Freq Loop"
 msgstr "Фрекв петља"
 
-#: resources/xnec2c.glade:10619 resources/xnec2c.glade:13359
+#: resources/xnec2c.glade:11290 resources/xnec2c.glade:14116
 msgid "T<sub>A</sub>(Elev.°)"
 msgstr "T<sub>A</sub>(Елев.°)"
 
-#: resources/xnec2c.glade:10654
+#: resources/xnec2c.glade:11325
 msgid "T<sub>a</sub>"
 msgstr "T<sub>a</sub>"
 
-#: resources/xnec2c.glade:10689
+#: resources/xnec2c.glade:11360
 msgid "G/T<sub>a</sub>"
 msgstr "G/T<sub>a</sub>"
 
-#: resources/xnec2c.glade:10763
+#: resources/xnec2c.glade:11434
 msgid "Frequency Data Plots"
 msgstr "Графикони фреквенцијских података"
 
-#: resources/xnec2c.glade:10880
+#: resources/xnec2c.glade:11551
 msgid "Save _Currents/Charges as CSV"
 msgstr "Сачувај _струје/наелектрисања као CSV"
 
-#: resources/xnec2c.glade:10899
+#: resources/xnec2c.glade:11570
 msgid "Optimization Settings"
 msgstr "Подешавања оптимизације"
 
-#: resources/xnec2c.glade:10914
+#: resources/xnec2c.glade:11585
 msgid "Reload and write data on .NEC file changes"
 msgstr "Поново учитај и упиши податке при промени .NEC датотеке"
 
-#: resources/xnec2c.glade:10921
+#: resources/xnec2c.glade:11592
 msgid "_Write files selected below, now."
 msgstr "_Упиши доле одабране датотеке, сада."
 
-#: resources/xnec2c.glade:10936
+#: resources/xnec2c.glade:11607
 msgid "After calculation, write <file>.csv"
 msgstr "После прорачуна, упиши <file>.csv"
 
-#: resources/xnec2c.glade:10945
+#: resources/xnec2c.glade:11616
 msgid "After calculation, write <file>.s_1p"
 msgstr "После прорачуна, упиши <file>.s_1p"
 
-#: resources/xnec2c.glade:10954
+#: resources/xnec2c.glade:11625
 msgid "After calculation, write <file>-_maxgain.s2p"
 msgstr "После прорачуна, упиши <file>-_maxgain.s2p"
 
-#: resources/xnec2c.glade:10963
+#: resources/xnec2c.glade:11634
 msgid "After calculation, write <file>-_viewergain.s2p"
 msgstr "После прорачуна, упиши <file>-_viewergain.s2p"
 
-#: resources/xnec2c.glade:10972
+#: resources/xnec2c.glade:11643
 msgid "After calculation, write <file>-_radpattern.csv"
 msgstr "После прорачуна, упиши <file>-_radpattern.csv"
 
-#: resources/xnec2c.glade:10981
+#: resources/xnec2c.glade:11652
 msgid "After calculation, write <file>-_currents.csv"
 msgstr "После прорачуна, упиши <file>-_currents.csv"
 
-#: resources/xnec2c.glade:10990
+#: resources/xnec2c.glade:11661
 msgid "After calculation, write <file>-_structure.gplot"
 msgstr "После прорачуна, упиши <file>-_structure.gplot"
 
-#: resources/xnec2c.glade:10999
+#: resources/xnec2c.glade:11670
 msgid "After calculation, write <file>-_patch-currents.csv"
 msgstr "После прорачуна, упиши <file>-_patch-currents.csv"
 
-#: resources/xnec2c.glade:11014
+#: resources/xnec2c.glade:11685
 msgid "_Math Libraries"
 msgstr "_Математичке библиотеке"
 
-#: resources/xnec2c.glade:11023
+#: resources/xnec2c.glade:11694
 msgid "_Interactive"
 msgstr "_Интерактивно"
 
-#: resources/xnec2c.glade:11043
+#: resources/xnec2c.glade:11714
 msgid "_Batch"
 msgstr "_Групно"
 
-#: resources/xnec2c.glade:11069
+#: resources/xnec2c.glade:11740
 msgid "Mathlib _Help"
 msgstr "Mathlib _помоћ"
 
-#: resources/xnec2c.glade:11082
+#: resources/xnec2c.glade:11753
 msgid "Mathlib _Benchmarks"
 msgstr "Mathlib _тестови перформанси"
 
-#: resources/xnec2c.glade:11093
+#: resources/xnec2c.glade:11764
 msgid "_Selected Mathlibs"
 msgstr "_Одабране Mathlib библиотеке"
 
-#: resources/xnec2c.glade:11107
+#: resources/xnec2c.glade:11778
 msgid "Select All/None"
 msgstr "Одабери све/ништа"
 
-#: resources/xnec2c.glade:11132
+#: resources/xnec2c.glade:11803
 msgid "_Parallel (-j N):\t\tO(N/J)"
 msgstr "_Паралелно (-j N):\t\tO(N/J)"
 
-#: resources/xnec2c.glade:11141
+#: resources/xnec2c.glade:11812
 msgid "_Single Job (-j 1):\tO(N)"
 msgstr "_Један посао (-j 1):\tO(N)"
 
-#: resources/xnec2c.glade:11150
+#: resources/xnec2c.glade:11821
 msgid "_Iterate -j N/=2:\tO(N*log2(J))"
 msgstr "_Итерирај -j N/=2:\tO(N*log2(J))"
 
-#: resources/xnec2c.glade:11159
+#: resources/xnec2c.glade:11830
 msgid "_Iterate -j N-=1:\tO(N*J)"
 msgstr "_Итерирај -j N-=1:\tO(N*J)"
 
-#: resources/xnec2c.glade:11174
+#: resources/xnec2c.glade:11845
 msgid "Benchmark _Help"
 msgstr "Помоћ за _тестове перформанси"
 
-#: resources/xnec2c.glade:11193
+#: resources/xnec2c.glade:11864
 msgid "Begin Frequency Loop at Startup"
 msgstr "Покрени фреквенцијску петљу при покретању"
 
-#: resources/xnec2c.glade:11204
+#: resources/xnec2c.glade:11875
 msgid "Confirm Quit"
 msgstr "Потврди излазак"
 
-#: resources/xnec2c.glade:11245
+#: resources/xnec2c.glade:11914
 msgid "_Radiation Pattern"
 msgstr "_Дијаграм зрачења"
 
-#: resources/xnec2c.glade:11255
+#: resources/xnec2c.glade:11924
 msgid "_Frequency Plots"
 msgstr "_Фреквентни графикони"
 
-#: resources/xnec2c.glade:11340
-msgid "Current _Visualization"
-msgstr "_Визуелизација струје"
+#: resources/xnec2c.glade:12007
+msgid "_Visualization"
+msgstr "_Визуелизација"
 
-#: resources/xnec2c.glade:11356
-msgid "Animated"
-msgstr "Анимирано"
+#: resources/xnec2c.glade:12023
+msgid "Color Scale"
+msgstr "Скала боје"
 
-#: resources/xnec2c.glade:11363
+#: resources/xnec2c.glade:12030
+msgid ""
+"Power transfer n^γ relative to this frequency step's peak.\n"
+"γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
+"dissipated power for currents.\n"
+"Adjust γ in the animate dialog."
+msgstr ""
+"Степени пренос n^γ у односу на врх овог фреквенцијског корака.\n"
+"γ = 0,5 шири слабе области, γ = 1 је линеарно, γ = 2 је пропорционално "
+"дисипираној снази за струје.\n"
+"Прилагодите γ у дијалогу анимације."
+
+#: resources/xnec2c.glade:12031
+msgid "_Power"
+msgstr "_Снага"
+
+#: resources/xnec2c.glade:12042
+msgid ""
+"Logarithmic scale over a user-set range R below the peak.\n"
+"Reveals weak detail that linear display hides; adjust R in the animate "
+"dialog."
+msgstr ""
+"Логаритамска скала преко кориснички задатог опсега R испод врха.\n"
+"Открива слаб детаљ који линеарни приказ сакрива; прилагодите R у дијалогу "
+"анимације."
+
+#: resources/xnec2c.glade:12043
+msgid "_dB"
+msgstr "_dB"
+
+#: resources/xnec2c.glade:12054
+msgid ""
+"Inverse hyperbolic sine transfer: linear below the softening knee k, "
+"logarithmic above.\n"
+"Adjust k in the animate dialog."
+msgstr ""
+"Пренос инверзног хиперболичног синуса: линеарно испод колена омекшавања k, "
+"логаритамско изнад.\n"
+"Прилагодите k у дијалогу анимације."
+
+#: resources/xnec2c.glade:12055
+msgid "_Asinh"
+msgstr "_Asinh"
+
+#: resources/xnec2c.glade:12066
+msgid ""
+"μ-law companding transfer: lifts weak detail with bounded compression.\n"
+"Adjust the compression in the animate dialog."
+msgstr ""
+"μ-law компандинг пренос: истиче слаб детаљ ограниченом компресијом.\n"
+"Прилагодите компресију у дијалогу анимације."
+
+#: resources/xnec2c.glade:12067
+msgid "μ-_law"
+msgstr "μ-_law"
+
+#: resources/xnec2c.glade:12078
+msgid ""
+"Reinhard rational soft-compressor with knee k.\n"
+"Adjust k in the animate dialog."
+msgstr ""
+"Reinhard рационални меки компресор са коленом k.\n"
+"Прилагодите k у дијалогу анимације."
+
+#: resources/xnec2c.glade:12079
+msgid "_Reinhard"
+msgstr "_Reinhard"
+
+#: resources/xnec2c.glade:12090
+msgid ""
+"Hyperbolic tangent transfer with contrast steepness a.\n"
+"Adjust a in the animate dialog."
+msgstr ""
+"Пренос хиперболичног тангенса са нагибом контраста a.\n"
+"Прилагодите a у дијалогу анимације."
+
+#: resources/xnec2c.glade:12091
+msgid "_Sigmoid"
+msgstr "_Сигмоид"
+
+#: resources/xnec2c.glade:12102
+msgid ""
+"Full brightness for every magnitude; the color projection alone sets the "
+"rendering."
+msgstr ""
+"Потпуна осветљеност за сваку амплитуду; само пројекција боје одређује "
+"рендеровање."
+
+#: resources/xnec2c.glade:12103
+msgid "_None"
+msgstr "_Нема"
+
+#: resources/xnec2c.glade:12121
+msgid "Patch Flow — Animated"
+msgstr "Ток патча — анимирано"
+
+#: resources/xnec2c.glade:12128
 msgid "_Reference Phase"
 msgstr "_Референтна фаза"
 
-#: resources/xnec2c.glade:11374
+#: resources/xnec2c.glade:12139
 msgid "_LIC Texture"
 msgstr "_LIC текстура"
 
-#: resources/xnec2c.glade:11385 resources/xnec2c.glade:12575
+#: resources/xnec2c.glade:12150 resources/xnec2c.glade:13334
 msgid "_Wireframe"
 msgstr "_Жичани приказ"
 
-#: resources/xnec2c.glade:11403
-msgid "Static"
-msgstr "Статично"
+#: resources/xnec2c.glade:12168
+msgid "Patch Flow — Static"
+msgstr "Ток патча — статично"
 
-#: resources/xnec2c.glade:11410
+#: resources/xnec2c.glade:12175
 msgid "Polarization _Axis"
 msgstr "Оса _поларизације"
 
-#: resources/xnec2c.glade:11421
+#: resources/xnec2c.glade:12186
 msgid "Peak _Magnitude"
 msgstr "Вршна _амплитуда"
 
-#: resources/xnec2c.glade:11436
+#: resources/xnec2c.glade:12201
 msgid "A_nimate"
 msgstr "A_нимирај"
 
-#: resources/xnec2c.glade:11445 resources/xnec2c.glade:12692
+#: resources/xnec2c.glade:12210 resources/xnec2c.glade:13451
 msgid "Common _Projection"
 msgstr "Заједничка _пројекција"
 
-#: resources/xnec2c.glade:11462
+#: resources/xnec2c.glade:12226
 msgid "_Symbol Overrides"
 msgstr "_Замене симбола"
 
-#: resources/xnec2c.glade:11472
+#: resources/xnec2c.glade:12235
 msgid "Rendering _Settings..."
 msgstr "Подешавања _рендеровања..."
 
-#: resources/xnec2c.glade:11483
+#: resources/xnec2c.glade:12246
 msgid "_Help"
 msgstr "_Помоћ"
 
-#: resources/xnec2c.glade:11492
+#: resources/xnec2c.glade:12255
 msgid "_About"
 msgstr "_О програму"
 
-#: resources/xnec2c.glade:11519
-msgid "Currents"
-msgstr "Струје"
-
-#: resources/xnec2c.glade:11534
-msgid "Charges"
-msgstr "Наелектрисања"
-
-#: resources/xnec2c.glade:11715
+#: resources/xnec2c.glade:12478
 msgid " Zoom"
 msgstr " Увеличање"
 
-#: resources/xnec2c.glade:11858 resources/xnec2c.glade:13189
+#: resources/xnec2c.glade:12621 resources/xnec2c.glade:13946
 #: src/freqplots/freqplots_core.c:54
 msgid "Gain"
-msgstr "Појачање"
+msgstr "Добитак"
 
-#: resources/xnec2c.glade:11873 resources/xnec2c.glade:11889
-#: resources/xnec2c.glade:13202 resources/xnec2c.glade:13463
+#: resources/xnec2c.glade:12636 resources/xnec2c.glade:12652
+#: resources/xnec2c.glade:13959 resources/xnec2c.glade:14220
 msgid "0.0"
 msgstr "0.0"
 
-#: resources/xnec2c.glade:11923
+#: resources/xnec2c.glade:12686
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:11965 resources/xnec2c.glade:13346
-msgid "dB"
-msgstr "dB"
-
-#: resources/xnec2c.glade:11979 resources/xnec2c.glade:13238
+#: resources/xnec2c.glade:12742 resources/xnec2c.glade:13995
 msgid "Step"
 msgstr "Корак"
 
-#: resources/xnec2c.glade:12126 resources/xnec2c.glade:13286
+#: resources/xnec2c.glade:12889 resources/xnec2c.glade:14043
 msgid "Apply Freq"
 msgstr "Примени фрек."
 
-#: resources/xnec2c.glade:12146
+#: resources/xnec2c.glade:12909
 msgid "Frequency Mhz"
 msgstr "Фреквенција MHz"
 
-#: resources/xnec2c.glade:12207
+#: resources/xnec2c.glade:12970
 msgid "Structure Geometry"
 msgstr "Геометрија структуре"
 
-#: resources/xnec2c.glade:12226
+#: resources/xnec2c.glade:12989
 msgid "Xnec2c: Radiation Patterns"
 msgstr "Xnec2c: Дијаграми зрачења"
 
-#: resources/xnec2c.glade:12443
+#: resources/xnec2c.glade:13202
 msgid "_Gain Scaling"
-msgstr "_Скалирање појачања"
+msgstr "_Скалирање добитка"
 
-#: resources/xnec2c.glade:12458
+#: resources/xnec2c.glade:13217
 msgid "Linear _Power"
 msgstr "Линеарна _снага"
 
-#: resources/xnec2c.glade:12469
+#: resources/xnec2c.glade:13228
 msgid "Linear _Voltage"
 msgstr "Линеарни _напон"
 
-#: resources/xnec2c.glade:12480
+#: resources/xnec2c.glade:13239
 msgid "_ARRL Style"
 msgstr "_ARRL стил"
 
-#: resources/xnec2c.glade:12491
+#: resources/xnec2c.glade:13250
 msgid "_Logarithmic"
 msgstr "_Логаритамски"
 
-#: resources/xnec2c.glade:12502
+#: resources/xnec2c.glade:13261
 msgid "_Noise Temperature"
 msgstr "Температура _шума"
 
-#: resources/xnec2c.glade:12513
+#: resources/xnec2c.glade:13272
 msgid "Noise Temp (_log scale)"
 msgstr "Темп. шума (_лог. скала)"
 
-#: resources/xnec2c.glade:12528
+#: resources/xnec2c.glade:13287
 msgid "Noise _Models"
 msgstr "_Модели шума"
 
-#: resources/xnec2c.glade:12547
+#: resources/xnec2c.glade:13306
 msgid "_Gradient Key"
 msgstr "_Легенда градијента"
 
-#: resources/xnec2c.glade:12557
+#: resources/xnec2c.glade:13316
 msgid "Draw St_yle"
 msgstr "Стил _цртања"
 
-#: resources/xnec2c.glade:12566
+#: resources/xnec2c.glade:13325
 msgid "S_urface"
 msgstr "П_овршина"
 
-#: resources/xnec2c.glade:12585
+#: resources/xnec2c.glade:13344
 msgid "_Both"
 msgstr "_Оба"
 
-#: resources/xnec2c.glade:12600
+#: resources/xnec2c.glade:13359
 msgid "_Near Field"
 msgstr "_Блиско поље"
 
-#: resources/xnec2c.glade:12615
+#: resources/xnec2c.glade:13374
 msgid "Near _E Field"
 msgstr "Блиско _E поље"
 
-#: resources/xnec2c.glade:12625
+#: resources/xnec2c.glade:13384
 msgid "Near _H Field"
 msgstr "Блиско _H поље"
 
-#: resources/xnec2c.glade:12635
+#: resources/xnec2c.glade:13394
 msgid "_Poynting Vector"
 msgstr "_Појнтингов вектор"
 
-#: resources/xnec2c.glade:12644
+#: resources/xnec2c.glade:13403
 msgid "_Animate Dialog"
 msgstr "_Дијалог анимације"
 
-#: resources/xnec2c.glade:12653
+#: resources/xnec2c.glade:13412
 msgid "_Total Field"
 msgstr "_Укупно поље"
 
-#: resources/xnec2c.glade:12662
+#: resources/xnec2c.glade:13421
 msgid "_Peak Value"
 msgstr "_Вршна вредност"
 
-#: resources/xnec2c.glade:12673
+#: resources/xnec2c.glade:13432
 msgid "_Instantaneous (φ=0)"
 msgstr "_Тренутно (φ=0)"
 
-#: resources/xnec2c.glade:12703
+#: resources/xnec2c.glade:13461
 msgid "_Overlay Structure"
 msgstr "_Прекриј структуру"
 
-#: resources/xnec2c.glade:12728
+#: resources/xnec2c.glade:13485
 msgid "Gain Pattern"
-msgstr "Дијаграм појачања"
+msgstr "Дијаграм добитка"
 
-#: resources/xnec2c.glade:12743
+#: resources/xnec2c.glade:13500
 msgid "E/H Fields"
 msgstr "E/H поља"
 
-#: resources/xnec2c.glade:12926
+#: resources/xnec2c.glade:13683
 msgid "Zoom % "
 msgstr "Увећање % "
 
-#: resources/xnec2c.glade:12965
+#: resources/xnec2c.glade:13722
 msgid "Elev.°"
 msgstr "Елев.°"
 
-#: resources/xnec2c.glade:13306
+#: resources/xnec2c.glade:14063
 msgid "Frequency MHz"
 msgstr "Фреквенција MHz"
 
-#: resources/xnec2c.glade:13323
+#: resources/xnec2c.glade:14080
 msgid "0.010"
 msgstr "0.010"
 
-#: resources/xnec2c.glade:13377 resources/xnec2c.glade:13410
-#: resources/xnec2c.glade:13445
+#: resources/xnec2c.glade:14134 resources/xnec2c.glade:14167
+#: resources/xnec2c.glade:14202
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:13392
+#: resources/xnec2c.glade:14149
 msgid "T<sub>earth</sub>"
 msgstr "T<sub>earth</sub>"
 
-#: resources/xnec2c.glade:13427
+#: resources/xnec2c.glade:14184
 msgid "T<sub>sky</sub>"
 msgstr "T<sub>sky</sub>"
 
-#: resources/xnec2c.glade:13548 src/rdpattern_ui.c:999
+#: resources/xnec2c.glade:14305 src/rdpattern_ui.c:984
 msgid "Radiation Patterns"
 msgstr "Дијаграми зрачења"
 
-#: resources/xnec2c.glade:13583
+#: resources/xnec2c.glade:14340
 msgid "Scale Structure (GS card)"
 msgstr "Скалирање структуре (GS картица)"
 
-#: resources/xnec2c.glade:13614
+#: resources/xnec2c.glade:14371
 msgid "Structure Scale Factor"
 msgstr "Фактор скалирања структуре"
 
-#: resources/xnec2c.glade:13627
+#: resources/xnec2c.glade:14384
 msgid "From Tag No."
 msgstr "Од ознаке бр."
 
-#: resources/xnec2c.glade:13677
+#: resources/xnec2c.glade:14434
 msgid "To Tag No."
 msgstr "До ознаке бр."
 
-#: resources/xnec2c.glade:13712
+#: resources/xnec2c.glade:14469
 msgid "Scale Structure"
 msgstr "Скалирај структуру"
 
-#: resources/xnec2c.glade:13889
+#: resources/xnec2c.glade:14646
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "Трансформација координата (GM картица)"
 
-#: resources/xnec2c.glade:13919
+#: resources/xnec2c.glade:14676
 msgid "Tag Increment"
 msgstr "Инкремент ознаке"
 
-#: resources/xnec2c.glade:13950
+#: resources/xnec2c.glade:14707
 msgid "Rotate about X"
 msgstr "Ротирај око X"
 
-#: resources/xnec2c.glade:13982
+#: resources/xnec2c.glade:14739
 msgid "Move along X"
 msgstr "Помери дуж X"
 
-#: resources/xnec2c.glade:14014
+#: resources/xnec2c.glade:14771
 msgid "New Structures"
 msgstr "Нове структуре"
 
-#: resources/xnec2c.glade:14045
+#: resources/xnec2c.glade:14802
 msgid "Rotate about Y"
 msgstr "Ротирај око Y"
 
-#: resources/xnec2c.glade:14077
+#: resources/xnec2c.glade:14834
 msgid "Move along Y"
 msgstr "Помери дуж Y"
 
-#: resources/xnec2c.glade:14109
+#: resources/xnec2c.glade:14866
 msgid "Start From Tag"
 msgstr "Почни од ознаке"
 
-#: resources/xnec2c.glade:14141
+#: resources/xnec2c.glade:14898
 msgid "Rotate about Z"
 msgstr "Ротирај око Z"
 
-#: resources/xnec2c.glade:14173
+#: resources/xnec2c.glade:14930
 msgid "Move along Z"
 msgstr "Помери дуж Z"
 
-#: resources/xnec2c.glade:14209
+#: resources/xnec2c.glade:14966
 msgid "Co-ordinate Transformation Data"
 msgstr "Подаци трансформације координата"
 
-#: resources/xnec2c.glade:14405
+#: resources/xnec2c.glade:15162
 msgid "Trans. Line Command (TL Card)"
 msgstr "Команда преносне линије (TL картица)"
 
-#: resources/xnec2c.glade:14435
+#: resources/xnec2c.glade:15192
 msgid "Tag Number, End 1  "
 msgstr "Број ознаке, крај 1  "
 
-#: resources/xnec2c.glade:14467
+#: resources/xnec2c.glade:15224
 msgid "Tag Number, End 2  "
 msgstr "Број ознаке, крај 2  "
 
-#: resources/xnec2c.glade:14498
+#: resources/xnec2c.glade:15255
 msgid "Segment Num, End 1"
 msgstr "Број сегмента, крај 1"
 
-#: resources/xnec2c.glade:14530
+#: resources/xnec2c.glade:15287
 msgid "Segment Num, End 2"
 msgstr "Број сегмента, крај 2"
 
-#: resources/xnec2c.glade:14594
+#: resources/xnec2c.glade:15351
 msgid "Crossed Transmission Line"
 msgstr "Укрштена преносна линија"
 
-#: resources/xnec2c.glade:14612
+#: resources/xnec2c.glade:15369
 msgid "Characteristic Impedance"
 msgstr "Карактеристична импеданса"
 
-#: resources/xnec2c.glade:14644
+#: resources/xnec2c.glade:15401
 msgid "End 1 Y Real Part (S)"
 msgstr "Крај 1 Y реални део (S)"
 
-#: resources/xnec2c.glade:14676
+#: resources/xnec2c.glade:15433
 msgid "End 2 Y Real Part (S)"
 msgstr "Крај 2 Y реални део (S)"
 
-#: resources/xnec2c.glade:14708
+#: resources/xnec2c.glade:15465
 msgid "Length of Tx Line (m)"
 msgstr "Дужина Tx линије (m)"
 
-#: resources/xnec2c.glade:14740
+#: resources/xnec2c.glade:15497
 msgid "End 1 Y Imag Part (S)"
 msgstr "Крај 1 Y имагинарни део (S)"
 
-#: resources/xnec2c.glade:14772
+#: resources/xnec2c.glade:15529
 msgid "End 2 Y Imag Part (S)"
 msgstr "Крај 2 Y имагинарни део (S)"
 
-#: resources/xnec2c.glade:14808
+#: resources/xnec2c.glade:15565
 msgid "Transmission Line"
 msgstr "Преносна линија"
 
-#: resources/xnec2c.glade:15035
+#: resources/xnec2c.glade:15792
 msgid "Wire Element (GW & GC cards)"
 msgstr "Елемент жице (GW и GC картице)"
 
-#: resources/xnec2c.glade:15095
+#: resources/xnec2c.glade:15852
 msgid "Wire X1"
 msgstr "Жица X1"
 
-#: resources/xnec2c.glade:15127
+#: resources/xnec2c.glade:15884
 msgid "Wire X2"
 msgstr "Жица X2"
 
-#: resources/xnec2c.glade:15190
+#: resources/xnec2c.glade:15947
 msgid "Wire Y1"
 msgstr "Жица Y1"
 
-#: resources/xnec2c.glade:15223
+#: resources/xnec2c.glade:15980
 msgid "Wire Y2"
 msgstr "Жица Y2"
 
-#: resources/xnec2c.glade:15287
+#: resources/xnec2c.glade:16044
 msgid "Wire Z1"
 msgstr "Жица Z1"
 
-#: resources/xnec2c.glade:15319
+#: resources/xnec2c.glade:16076
 msgid "Wire Z2"
 msgstr "Жица Z2"
 
-#: resources/xnec2c.glade:15384
+#: resources/xnec2c.glade:16141
 msgid "Wire Length"
 msgstr "Дужина жице"
 
-#: resources/xnec2c.glade:15455
+#: resources/xnec2c.glade:16212
 msgid "Wire Data"
 msgstr "Подаци жице"
 
-#: resources/xnec2c.glade:15467
+#: resources/xnec2c.glade:16224
 msgid "Tapered Wire"
 msgstr "Конусна жица"
 
-#: resources/xnec2c.glade:15509
+#: resources/xnec2c.glade:16266
 msgid "Length Taper"
 msgstr "Конусност дужине"
 
-#: resources/xnec2c.glade:15541
+#: resources/xnec2c.glade:16298
 msgid "Diameter Seg 1"
 msgstr "Пречник сег. 1"
 
-#: resources/xnec2c.glade:15573
+#: resources/xnec2c.glade:16330
 msgid "Diameter Seg N"
 msgstr "Пречник сег. N"
 
-#: resources/xnec2c.glade:15605
+#: resources/xnec2c.glade:16362
 msgid "Diam. Taper"
 msgstr "Конусност преч."
 
-#: resources/xnec2c.glade:15641
+#: resources/xnec2c.glade:16398
 msgid "Wire Taper Data"
 msgstr "Подаци конусности жице"
 
-#: resources/xnec2c.glade:15806
+#: resources/xnec2c.glade:16563
 msgid "Impedance (Zo) Ohm"
 msgstr "Импеданса (Zo) Ohm"
 
-#: resources/xnec2c.glade:15821
+#: resources/xnec2c.glade:16578
 msgid "50.00"
 msgstr "50.00"
 
-#: resources/xnec2c.glade:15844
+#: resources/xnec2c.glade:16601
 msgid "Transmission Line Impedance (Zo)"
 msgstr "Импеданса преносне линије (Zo)"
 
@@ -2036,7 +2338,7 @@ msgstr "draw_wire_segments: wire_widths је NULL\n"
 msgid "draw_wire_segments: unknown ntyp=%d\n"
 msgstr "draw_wire_segments: непознати ntyp=%d\n"
 
-#: src/calculations.c:117 src/calculations.c:1272
+#: src/calculations.c:117 src/calculations.c:1288
 #, c-format
 msgid "segment connection error for segment %5d\n"
 msgstr "грешка повезивања сегмента за сегмент %5d\n"
@@ -2045,25 +2347,25 @@ msgstr "грешка повезивања сегмента за сегмент %
 msgid "Segment connection error in tbf()"
 msgstr "Грешка повезивања сегмента у tbf()"
 
-#: src/calculations.c:890
+#: src/calculations.c:906
 #, c-format
 msgid "step size limited at z= %10.5f\n"
 msgstr "величина корака ограничена на Z= %10.5f\n"
 
-#: src/calculations.c:1054
+#: src/calculations.c:1070
 #, c-format
 msgid "segment connection error for segment %d\n"
 msgstr "грешка повезивања сегмента за сегмент %d\n"
 
-#: src/calculations.c:1055
+#: src/calculations.c:1071
 msgid "Segment connection error in sbf()"
 msgstr "Грешка повезивања сегмента у sbf()"
 
-#: src/calculations.c:1273
+#: src/calculations.c:1289
 msgid "Segment connection error in trio()"
 msgstr "Грешка повезивања сегмента у trio()"
 
-#: src/callback_func.c:145
+#: src/callback_func.c:121
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
@@ -2071,7 +2373,7 @@ msgstr ""
 "Фреквенцијска петља је покренута\n"
 "Да ли сте сигурни да желите да прекинете прорачун?"
 
-#: src/callback_func.c:149
+#: src/callback_func.c:125
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
@@ -2079,68 +2381,60 @@ msgstr ""
 "Фреквенцијска петља је покренута\n"
 "Да ли сте сигурни да желите да затворите овај прозор?"
 
-#: src/callback_func.c:384
+#: src/callback_func.c:286
 #, c-format
 msgid ""
-"Frequency plots window closed: excitation type %d is incompatible.\n"
-"Use type 0 (Applied E Field) or 5 (Current Discontinuity) instead."
+"Excitation type %d has no feedpoint: VSWR and impedance plots are hidden.\n"
 msgstr ""
-"Прозор фреквенцијских графикона затворен: тип побуде %d није компатибилан.\n"
-"Уместо тога користите тип 0 (примењено E поље) или 5 (дисконтинуитет струје)."
+"Тип побуде %d нема тачку напајања: VSWR и импедансни графикони су "
+"сакривени.\n"
 
-#: src/callback_func.c:390
-#, c-format
-msgid ""
-"Frequency plots are not available with excitation type %d.\n"
-"This model uses Incident Field or Elementary Current Source excitation.\n"
-"Change the EX card to type 0 (Applied E Field) or 5 (Current Discontinuity)."
-msgstr ""
-"Фреквенцијски графикони нису доступни са типом побуде %d.\n"
-"Овај модел користи побуду упадног поља или елементарног извора струје.\n"
-"Промените EX картицу на тип 0 (примењено E поље) или 5 (дисконтинуитет "
-"струје)."
-
-#: src/callback_func.c:560
-msgid "View Currents"
-msgstr "Прикажи струје"
-
-#: src/callback_func.c:576 src/callback_func.c:626
+#: src/callback_func.c:442
 msgid "View Geometry"
 msgstr "Прикажи геометрију"
 
-#: src/callback_func.c:610
+#: src/callback_func.c:443
+msgid "View Currents"
+msgstr "Прикажи струје"
+
+#: src/callback_func.c:444
 msgid "View Charges"
 msgstr "Прикажи наелектрисања"
 
-#: src/callback_func.c:667
+#: src/callback_func.c:458
+#, c-format
+msgid "invalid display quantity %d, using off\n"
+msgstr "неважећи квантитет приказа %d, користим искључено\n"
+
+#: src/callback_func.c:529
 msgid "PNG images (*.png)"
 msgstr "PNG слике (*.png)"
 
-#: src/callback_func.c:669
+#: src/callback_func.c:531
 msgid "GNUplot files (*.gplot)"
 msgstr "GNUplot датотеке (*.gplot)"
 
-#: src/callback_func.c:671
+#: src/callback_func.c:533
 msgid "NEC2 files (*.nec)"
 msgstr "NEC2 датотеке (*.nec)"
 
-#: src/callback_func.c:673
+#: src/callback_func.c:535
 msgid "Touchstone 1-port files (*.s1p)"
 msgstr "Touchstone 1-port датотеке (*.s1p)"
 
-#: src/callback_func.c:675
+#: src/callback_func.c:537
 msgid "Touchstone 2-port files (*.s2p)"
 msgstr "Touchstone 2-port датотеке (*.s2p)"
 
-#: src/callback_func.c:677
+#: src/callback_func.c:539
 msgid "Comma-separated CSV files (*.csv)"
 msgstr "CSV датотеке раздвојене зарезима (*.csv)"
 
-#: src/callbacks.c:99 src/callbacks.c:115 src/freqplots/freqplots_core.c:61
+#: src/callbacks.c:102 src/callbacks.c:118 src/freqplots/freqplots_core.c:61
 msgid "Antenna Temperature"
 msgstr "Температура антене"
 
-#: src/callbacks.c:100
+#: src/callbacks.c:103
 msgid ""
 "Ground plane detected in model. Ta results will overcount ground effects. "
 "Free-space models are standard for antenna temperature evaluation."
@@ -2149,21 +2443,21 @@ msgstr ""
 "ефекте уземљења. Модели слободног простора су стандардни за евалуацију "
 "температуре антене."
 
-#: src/callbacks.c:116
+#: src/callbacks.c:119
 #, c-format
 msgid ""
 "Max gain at θ=%.0f° (%.0f° from XY plane). Convention assumes beam in XY "
 "plane with observation elevation set by spinbutton."
 msgstr ""
-"Максимално појачање при θ=%.0f° (%.0f° од XY равни). Конвенција претпоставља "
+"Максималан добитак при θ=%.0f° (%.0f° од XY равни). Конвенција претпоставља "
 "сноп у XY равни са елевацијом посматрања подешеном помоћу spinbutton-а."
 
-#: src/callbacks.c:186 src/callbacks.c:483 src/callbacks.c:2584
-#: src/callbacks.c:3437
+#: src/callbacks.c:191 src/callbacks.c:468 src/callbacks.c:2034
+#: src/callbacks.c:2713
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "Да ли сте сигурни да желите да затворите xnec2c?"
 
-#: src/callbacks.c:229
+#: src/callbacks.c:234
 msgid ""
 "A new NEC2 input file may not be created\n"
 "while the Frequency Loop is running"
@@ -2171,7 +2465,7 @@ msgstr ""
 "Нова NEC2 улазна датотека не може бити креирана\n"
 "док је фреквенцијска петља покренута"
 
-#: src/callbacks.c:266
+#: src/callbacks.c:271
 msgid ""
 "A new NEC2 input file may not be opened\n"
 "while the Frequency Loop is running"
@@ -2179,21 +2473,21 @@ msgstr ""
 "Нова NEC2 улазна датотека не може бити отворена\n"
 "док је фреквенцијска петља покренута"
 
-#: src/callbacks.c:385
+#: src/callbacks.c:390
 msgid "xnec2c geometry optimizer"
 msgstr "xnec2c оптимизатор геометрије"
 
-#: src/callbacks.c:386
+#: src/callbacks.c:391
 msgid ""
 "xnec2c was built without inotify support: the optimizer cannot be enabled."
 msgstr ""
 "xnec2c је изграђен без подршке за inotify: оптимизатор не може бити омогућен."
 
-#: src/callbacks.c:410
+#: src/callbacks.c:412
 msgid "Xnec2c Optimizer"
 msgstr "Xnec2c оптимизатор"
 
-#: src/callbacks.c:410
+#: src/callbacks.c:412
 msgid ""
 "No files are selected for writing. However, xnec2c will still reload and "
 "recalculate the input file on modification when triggered by inotify.Select "
@@ -2203,45 +2497,49 @@ msgstr ""
 "прерачунати улазну датотеку при измени када је покренуто од стране inotify."
 "Изаберите датотеке за писање у \"Датотека->Подешавања оптимизације\"."
 
-#: src/callbacks.c:421
-msgid "failed to create Optimizer Output thread\n"
-msgstr "неуспешно креирање нити за излаз оптимизатора\n"
-
-#: src/callbacks.c:1356 src/callbacks.c:1750 src/callbacks.c:3463
+#: src/callbacks.c:968 src/callbacks.c:1283 src/callbacks.c:2739
 msgid "Are you sure you wish to close this window?"
 msgstr "Да ли сте сигурни да желите да затворите овај прозор?"
 
-#: src/callbacks.c:2331
+#: src/callbacks.c:1791
 msgid "OpenGL is not available on this display; cannot enable renderer.\n"
 msgstr "OpenGL није доступан на овом екрану; рендерер не може бити омогућен.\n"
 
-#: src/callbacks.c:2761 src/callbacks.c:2774
-msgid "unexpected canonical widget type"
-msgstr "unexpected canonical widget type"
+#: src/callbacks.c:2108
+msgid "on_color_fam_format_value: unknown scale widget\n"
+msgstr "on_color_fam_format_value: непознат виџет скале\n"
 
-#: src/callbacks.c:2914
+#: src/callbacks.c:2263
 msgid ""
-"Current flow animation requires surface patches (SP/SM cards) in the model."
+"Select how the animated patch current flow is rendered.\n"
+"Mirrors the Visualization menu setting in the main window."
 msgstr ""
-"Анимација тока струје захтева површинске закрпе (SP/SM картице) у моделу."
+"Изаберите начин приказа анимираног тока струје патча.\n"
+"Одражава подешавање менија Визуелизација у главном прозору."
 
-#: src/callbacks.c:3181
+#: src/callbacks.c:2265
+msgid ""
+"Patch flow animation requires surface patches (SP/SM cards) in the model."
+msgstr ""
+"Анимација тока патча захтева површинске закрпе (SP/SM картице) у моделу."
+
+#: src/callbacks.c:2549
 msgid "Animation"
 msgstr "Анимација"
 
-#: src/callbacks.c:3182
+#: src/callbacks.c:2550
 msgid ""
-"Animation requires surface patches (SP/SM NEC cards) or near-field data (NE/"
-"NH NEC cards)"
+"Animation requires wire currents or charges, surface patches (SP/SM NEC "
+"cards), or near-field data (NE/NH NEC cards)"
 msgstr ""
-"Анимација захтева површинске закрпе (SP/SM NEC картице) или податке блиског "
-"поља (NE/NH NEC картице)"
+"Анимација захтева струје или наелектрисања жица, површинске закрпе (SP/SM "
+"NEC картице) или податке блиског поља (NE/NH NEC картице)"
 
-#: src/callbacks.c:3401
+#: src/callbacks.c:2675
 msgid "No open NEC2 input file"
 msgstr "Нема отворене NEC2 улазне датотеке"
 
-#: src/callbacks.c:3494 src/callbacks.c:3524
+#: src/callbacks.c:2770 src/callbacks.c:2800
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -2249,11 +2547,11 @@ msgstr ""
 "Подаци NEC2 уређивача не могу бити сачувани\n"
 "док је фреквенцијска петља покренута"
 
-#: src/callbacks.c:3506 src/callbacks.c:3532
+#: src/callbacks.c:2782 src/callbacks.c:2808
 msgid "untitled.nec"
 msgstr "untitled.nec"
 
-#: src/callbacks.c:3997 src/callbacks.c:4017 src/callbacks.c:4037
+#: src/callbacks.c:3273 src/callbacks.c:3293 src/callbacks.c:3313
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
@@ -2468,6 +2766,64 @@ msgstr "Прва тачка Theta"
 msgid "Increment in R (m)"
 msgstr "Прираштај по R (m)"
 
+#: src/config/config_widget.c:129
+#, c-format
+msgid "config_widget_lookup: missing widget '%s'\n"
+msgstr "config_widget_lookup: недостаје виџет '%s'\n"
+
+#: src/config/config_widget.c:151
+#, c-format
+msgid "config_widget_values_at: index %d exceeds values list\n"
+msgstr "config_widget_values_at: индекс %d прекорачује листу вредности\n"
+
+#: src/config/config_widget.c:178
+#, c-format
+msgid "config_widget_apply_element: radio menu item '%s' has no values\n"
+msgstr "config_widget_apply_element: радио ставка менија '%s' нема вредности\n"
+
+#: src/config/config_widget.c:191
+#, c-format
+msgid "config_widget_apply_element: radio button '%s' has no values\n"
+msgstr "config_widget_apply_element: радио дугме '%s' нема вредности\n"
+
+#: src/config/config_widget.c:201
+#, c-format
+msgid "config_widget_apply_element: combo '%s' has no values\n"
+msgstr "config_widget_apply_element: combo '%s' нема вредности\n"
+
+#: src/config/config_widget.c:234
+#, c-format
+msgid "config_widget_apply_element: unknown widget type for '%s'\n"
+msgstr "config_widget_apply_element: непознати тип виџета за '%s'\n"
+
+#: src/config/config_widget.c:255
+#, c-format
+msgid "config_widget_sync_element: radio menu item '%s' has no values\n"
+msgstr "config_widget_sync_element: радио ставка менија '%s' нема вредности\n"
+
+#: src/config/config_widget.c:268
+#, c-format
+msgid "config_widget_sync_element: radio button '%s' has no values\n"
+msgstr "config_widget_sync_element: радио дугме '%s' нема вредности\n"
+
+#: src/config/config_widget.c:276
+#, c-format
+msgid "config_widget_sync_element: combo '%s' has no values\n"
+msgstr "config_widget_sync_element: combo '%s' нема вредности\n"
+
+#: src/config/config_widget.c:319
+#, c-format
+msgid "config_widget_sync_element: unknown widget type for '%s'\n"
+msgstr "config_widget_sync_element: непознати тип виџета за '%s'\n"
+
+#: src/config/config_widget.c:375
+msgid "config_widget_sync_field: field is not registered\n"
+msgstr "config_widget_sync_field: поље није регистровано\n"
+
+#: src/config/config_widget.c:399
+msgid "config_widget_field_changed: field is not registered\n"
+msgstr "config_widget_field_changed: поље није регистровано\n"
+
 #: src/expr_edit.h:34
 msgid ""
 "Value is controlled by an SY expression.\n"
@@ -2476,20 +2832,280 @@ msgstr ""
 "Вредност је под контролом SY израза.\n"
 "Уредите SY картицу да бисте променили ову вредност."
 
-#: src/fields.c:923
+#: src/fields.c:938
 #, c-format
 msgid "step size limited at z= %10.5f"
 msgstr "величина корака ограничена на z= %10.5f"
 
-#: src/fork.c:164 src/fork.c:452
+#: src/fork.c:230 src/fork.c:518
 #, c-format
 msgid "child %d  length %d  return %d\n"
 msgstr "подређени %d  дужина %d  повраћај %d\n"
 
-#: src/fork.c:458
+#: src/fork.c:524
 #, c-format
 msgid "early EOF?, child %d  length %d  return %d\n"
 msgstr "рани EOF?, подређени %d  дужина %d  повраћај %d\n"
+
+#: src/freqplots/freqplots_core.c:55
+msgid "Gain Direction"
+msgstr "Смер добитка"
+
+#: src/freqplots/freqplots_core.c:56
+msgid "Viewer Gain"
+msgstr "Добитак посматрача"
+
+#: src/freqplots/freqplots_core.c:58
+msgid "Impedance (real/imag)"
+msgstr "Импеданса (реал/имаг)"
+
+#: src/freqplots/freqplots_core.c:59
+msgid "Impedance (mag/phase)"
+msgstr "Импеданса (маг/фаза)"
+
+#: src/freqplots/freqplots_core.c:60 src/freqplots/graphs/smith_graph.c:476
+msgid "Smith Chart"
+msgstr "Смитов дијаграм"
+
+#: src/freqplots/freqplots_core.c:231
+#, c-format
+msgid "fp_field_cond_active: unhandled cond %d\n"
+msgstr "fp_field_cond_active: необрађени услов %d\n"
+
+#: src/freqplots/freqplots_core.c:247
+msgid "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
+msgstr "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
+
+#: src/freqplots/freqplots_core.c:447
+#, c-format
+msgid ""
+"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
+"%d posn=%d valid=%d\n"
+msgstr ""
+"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
+"%d posn=%d valid=%d\n"
+
+#: src/freqplots/freqplots_core.c:463
+#, c-format
+msgid ""
+"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
+"%d]\n"
+msgstr ""
+"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
+"%d]\n"
+
+#: src/freqplots/freqplots_core.c:761
+msgid ""
+"Excitation-port selector: models with more than one EX excitation list every "
+"port here.\n"
+"\n"
+"Entry P<n>: T<tag>/S<seg>\n"
+"    n = port number, tag = NEC tag, seg = segment.\n"
+"\n"
+"Hover an entry to preview that port, click to\n"
+"select it, or click away to keep the current one.\n"
+"\n"
+"Charts that follow the selected port:\n"
+"    • Z real / imag\n"
+"    • Z magnitude / phase\n"
+"    • Smith\n"
+"    • VSWR / S11\n"
+"    • Net-gain traces (Gain and Viewer gain)\n"
+"\n"
+"Whole-antenna charts, unaffected by the port:\n"
+"    • raw Max gain, Gain direction, F/B\n"
+"    • Antenna temperature, G/T"
+msgstr ""
+"Бирач порта побуде: модели са више од једне EX побуде наводе сваки порт "
+"овде.\n"
+"\n"
+"Унос P<n>: T<tag>/S<seg>\n"
+"    n = број порта, tag = NEC ознака, seg = сегмент.\n"
+"\n"
+"Пређите мишем преко уноса да прегледате тај порт, кликните да\n"
+"га изаберете, или кликните ван да задржите тренутни.\n"
+"\n"
+"Графикони који прате изабрани порт:\n"
+"    • Z реални / имагинарни\n"
+"    • Z амплитуда / фаза\n"
+"    • Smith\n"
+"    • VSWR / S11\n"
+"    • Трагови нето добитка (добитак и добитак посматрача)\n"
+"\n"
+"Графикони целе антене, независни од порта:\n"
+"    • сирови Max добитак, смер добитка, F/B\n"
+"    • Температура антене, G/T"
+
+#: src/freqplots/freqplots_core.c:794
+msgid ""
+"Only one feedpoint port is defined. Define additional EX excitation cards in "
+"the model to select among multiple ports here."
+msgstr ""
+"Дефинисан је само један порт напајања. Додајте још EX картица побуде у модел "
+"да бисте овде бирали између више портова."
+
+#: src/freqplots/freqplots_core.c:797
+msgid ""
+"Enable the Net Gain plot setting to select a port; without it this graph "
+"does not follow the port."
+msgstr ""
+"Омогућите подешавање графикона Нето добитак да бисте изабрали порт; без тога "
+"овај графикон не прати порт."
+
+#: src/freqplots/freqplots_core.c:913
+msgid "Not available: excitation defines no feedpoint"
+msgstr "Није доступно: побуда не дефинише тачку напајања"
+
+#: src/freqplots/freqplots_graph.c:137 src/freqplots/graphs/smith_graph.c:529
+msgid "memory allocation for points failed\n"
+msgstr "алокација меморије за тачке није успела\n"
+
+#: src/freqplots/freqplots_graph.c:138 src/freqplots/graphs/smith_graph.c:530
+msgid "Draw_Graph():Memory allocation for points failed"
+msgstr "Draw_Graph(): Алокација меморије за тачке није успела"
+
+#: src/freqplots/freqplots_theme_menu.c:42
+msgid "This theme has no inverted variant"
+msgstr "Ова тема нема инверзну варијанту"
+
+#: src/freqplots/freqplots_theme_menu.c:95
+msgid "_Invert"
+msgstr "_Инвертуј"
+
+#: src/freqplots/graphs/anttemp_graph.c:68
+msgid "G/Ta (dB)"
+msgstr "G/Ta (dB)"
+
+#: src/freqplots/graphs/anttemp_graph.c:69
+msgid "G/Ta & TA - Antenna noise temperature"
+msgstr "G/Ta и TA — Температура шума антене"
+
+#: src/freqplots/graphs/anttemp_graph.c:71
+msgid "Ta (K)"
+msgstr "Ta (K)"
+
+#: src/freqplots/graphs/anttemp_graph.c:73
+msgid "TA (K)"
+msgstr "TA (K)"
+
+#: src/freqplots/graphs/gain_graph.c:86 src/freqplots/graphs/viewer_graph.c:53
+msgid "Raw Gain dBi"
+msgstr "Сиров добитак dBi"
+
+#: src/freqplots/graphs/gain_graph.c:91
+msgid "Max Gain & Net Gain vs Frequency"
+msgstr "Макс. добитак и нето добитак у односу на фреквенцију"
+
+#: src/freqplots/graphs/gain_graph.c:92
+msgid "Net Gain dBi"
+msgstr "Нето добитак dBi"
+
+#: src/freqplots/graphs/gain_graph.c:97 src/freqplots/graphs/gain_graph.c:104
+msgid "Max Gain & F/B Ratio vs Frequency"
+msgstr "Макс. добитак и однос F/B у односу на фреквенцију"
+
+#: src/freqplots/graphs/gain_graph.c:105
+msgid "F/B Ratio dB"
+msgstr "Однос F/B dB"
+
+#: src/freqplots/graphs/gain_graph.c:111
+msgid "Rad Angle - deg"
+msgstr "Угао зрачења - deg"
+
+#: src/freqplots/graphs/gain_graph.c:112
+msgid "Max Gain Direction vs Frequency"
+msgstr "Правац макс. добитка у односу на фреквенцију"
+
+#: src/freqplots/graphs/gain_graph.c:113
+msgid "Phi - deg"
+msgstr "Phi - deg"
+
+#: src/freqplots/graphs/impedance_graph.c:75
+#: src/freqplots/graphs/impedance_graph.c:80
+msgid "Impedance vs Frequency"
+msgstr "Импеданса у односу на фреквенцију"
+
+#: src/freqplots/graphs/impedance_graph.c:79
+msgid "Z-magn"
+msgstr "Z-магнитуда"
+
+#: src/freqplots/graphs/impedance_graph.c:81
+msgid "Z-phase"
+msgstr "Z-фаза"
+
+#: src/freqplots/graphs/smith_graph.c:384
+msgid "0 Ω"
+msgstr "0 Ω"
+
+#: src/freqplots/graphs/smith_graph.c:387
+#: src/freqplots/graphs/smith_graph.c:462
+msgid "∞ Ω"
+msgstr "∞ Ω"
+
+#: src/freqplots/graphs/smith_graph.c:407
+msgid "constant R"
+msgstr "константно R"
+
+#: src/freqplots/graphs/smith_graph.c:408
+msgid "constant X"
+msgstr "константно X"
+
+#: src/freqplots/graphs/smith_graph.c:409
+msgid "unity R, X"
+msgstr "јединично R, X"
+
+#: src/freqplots/graphs/smith_graph.c:410
+msgid "match (z = 1)"
+msgstr "поклапање (z = 1)"
+
+#: src/freqplots/graphs/smith_graph.c:411
+msgid "impedance vs freq"
+msgstr "импеданса у односу на фреквенцију"
+
+#: src/freqplots/graphs/smith_graph.c:412
+msgid "selected frequency"
+msgstr "изабрана фреквенција"
+
+#: src/freqplots/graphs/smith_graph.c:413
+msgid "reflection angle (°)"
+msgstr "угао рефлексије (°)"
+
+#: src/freqplots/graphs/smith_graph.c:414
+msgid "wavelengths → gen"
+msgstr "таласне дужине → ген"
+
+#: src/freqplots/graphs/smith_graph.c:507
+#, c-format
+msgid "Z0 = %g Ω"
+msgstr "Z0 = %g Ω"
+
+#: src/freqplots/graphs/smith_graph.c:514
+msgid "INDUCTIVE (+jX)"
+msgstr "ИНДУКТИВНО (+jX)"
+
+#: src/freqplots/graphs/smith_graph.c:517
+msgid "CAPACITIVE (-jX)"
+msgstr "КАПАЦИТИВНО (-jX)"
+
+#: src/freqplots/graphs/viewer_graph.c:54
+msgid "Gain in Viewer Direction vs Frequency"
+msgstr "Добитак у смеру посматрача у односу на фреквенцију"
+
+#: src/freqplots/graphs/viewer_graph.c:70
+msgid "Net gain dBi"
+msgstr "Нето добитак dBi"
+
+#: src/freqplots/graphs/vswr_graph.c:58
+msgid "VSWR & S11 vs Frequency"
+msgstr "VSWR и S11 у односу на фреквенцију"
+
+#: src/freqplots/graphs/vswr_graph.c:59
+msgid "S11 dB"
+msgstr "S11 dB"
+
+#: src/freqplots/graphs/vswr_graph.c:63
+msgid "VSWR vs Frequency"
+msgstr "VSWR у односу на фреквенцију"
 
 #: src/geom_edit.c:108 src/geom_edit.c:2000 src/geom_edit.c:2272
 #: src/geom_edit.c:2703
@@ -2667,7 +3283,7 @@ msgstr ""
 "Број веза сегмената премашује пуну мрежу, што је мало вероватно!\n"
 "Проверите да ли има преклапајућих или скоро спојених сегмената\n"
 
-#: src/geometry.c:704
+#: src/geometry.c:723
 msgid ""
 "check data, parameter specifying segment: position in a group of equal tags "
 "must not be zero\n"
@@ -2675,7 +3291,7 @@ msgstr ""
 "проверите податке, параметар који одређује сегмент: позиција у групи "
 "једнаких ознака не сме бити нула\n"
 
-#: src/geometry.c:705
+#: src/geometry.c:724
 msgid ""
 "Parameter specifying segment\n"
 "position in a group of equal tags is zero"
@@ -2683,12 +3299,12 @@ msgstr ""
 "Параметар који одређује позицију сегмента\n"
 "у групи једнаких ознака је нула"
 
-#: src/geometry.c:737
+#: src/geometry.c:756
 #, c-format
 msgid "no segment has an itag of %d\n"
 msgstr "ниједан сегмент нема itag од %d\n"
 
-#: src/geometry.c:741
+#: src/geometry.c:760
 msgid ""
 "Segment tag number error: Tag 0 is reserved and cannot be used.\n"
 "Check your geometry cards (especially GM cards) to ensure tag values are "
@@ -2702,7 +3318,7 @@ msgstr ""
 "За GM картице: проверите да 'почетна ознака' и 'инкремент ознаке' не "
 "стварају ознаку 0."
 
-#: src/geometry.c:749
+#: src/geometry.c:768
 #, c-format
 msgid ""
 "Segment tag number error: No segment found with tag %d.\n"
@@ -2713,19 +3329,19 @@ msgstr ""
 "Референцирате непознату ознаку или сегмент у контролној картици.\n"
 "Важеће ознаке у вашој геометрији су оне додељене GW/GA/GH/SP картицама."
 
-#: src/geometry.c:752 src/input.c:1576 src/input.c:1577 src/mathlib.c:752
-#: src/mathlib.c:989 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
-#: src/rdpattern_ui.c:344 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:133
-#: src/utils.c:444
+#: src/geometry.c:771 src/input.c:1755 src/input.c:1756 src/mathlib.c:752
+#: src/mathlib.c:989 src/rdpattern_ui.c:330 src/rdpattern_ui.c:338
+#: src/rdpattern_ui.c:345 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:134
+#: src/utils.c:452
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: src/geometry.c:1024
+#: src/geometry.c:1043
 msgid "corners of quadrilateral: patch do not lie in a plane\n"
 msgstr "углови четвороугаоног патча не леже у равни\n"
 
-#: src/geometry.c:1025
+#: src/geometry.c:1044
 msgid ""
 "Corners of quadrilateral\n"
 "patch do not lie in a plane"
@@ -2733,12 +3349,12 @@ msgstr ""
 "Углови четвороугаоног\n"
 "патча не леже у равни"
 
-#: src/geometry.c:1130 src/geometry.c:1207 src/geometry.c:1285
+#: src/geometry.c:1149 src/geometry.c:1226 src/geometry.c:1304
 #, c-format
 msgid "geometry data error: segment %d lies in plane of symmetry\n"
 msgstr "грешка у геометријским подацима: сегмент %d лежи у равни симетрије\n"
 
-#: src/geometry.c:1131 src/geometry.c:1208 src/geometry.c:1286
+#: src/geometry.c:1150 src/geometry.c:1227 src/geometry.c:1305
 msgid ""
 "Geometry data error\n"
 "Segment lies in plane of symmetry"
@@ -2746,12 +3362,12 @@ msgstr ""
 "Грешка у геометријским подацима\n"
 "Сегмент лежи у равни симетрије"
 
-#: src/geometry.c:1167 src/geometry.c:1244 src/geometry.c:1319
+#: src/geometry.c:1186 src/geometry.c:1263 src/geometry.c:1338
 #, c-format
 msgid "geometry data error: patch %d lies in plane of symmetry\n"
 msgstr "грешка у геометријским подацима: патч %d лежи у равни симетрије\n"
 
-#: src/geometry.c:1168 src/geometry.c:1245 src/geometry.c:1320
+#: src/geometry.c:1187 src/geometry.c:1264 src/geometry.c:1339
 msgid ""
 "Geometry data error\n"
 "Patch lies in plane of symmetry"
@@ -2759,7 +3375,7 @@ msgstr ""
 "Грешка у геометријским подацима\n"
 "Патч лежи у равни симетрије"
 
-#: src/geometry.c:1440
+#: src/geometry.c:1459
 #, c-format
 msgid ""
 "tag=%d/seg=%d: endpoint distance=%.3e is too close (below connection "
@@ -2768,12 +3384,12 @@ msgstr ""
 "tag=%d/seg=%d: растојање крајње тачке=%.3e је превише близу (испод прага "
 "повезивања=%.3e); сегмент ће се повезати сам са собом\n"
 
-#: src/geometry.c:1445
+#: src/geometry.c:1464
 #, c-format
 msgid "tag=%d: suppressing additional self-connection warnings\n"
 msgstr "tag=%d: потискивање додатних упозорења о само-повезивању\n"
 
-#: src/geometry.c:1495
+#: src/geometry.c:1514
 #, c-format
 msgid ""
 "tag=%d/seg=%d: distance=%.3e to tag=%d/seg=%d closer than 2x connection "
@@ -2782,12 +3398,12 @@ msgstr ""
 "tag=%d/seg=%d: растојање=%.3e до tag=%d/seg=%d ближе од 2x прага повезивања "
 "%.3e; могуће ненамерне везе\n"
 
-#: src/geometry.c:1501
+#: src/geometry.c:1520
 #, c-format
 msgid "tag=%d: suppressing additional overlap warnings\n"
 msgstr "tag=%d: потискивање додатних упозорења о преклапању\n"
 
-#: src/geometry.c:1570
+#: src/geometry.c:1589
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length=%.3e is too short (and close enough) to tag=%d/seg=%d "
@@ -2796,7 +3412,7 @@ msgstr ""
 "tag=%d/seg=%d: дужина=%.3e је прекратка (и довољно близу) до tag=%d/seg=%d "
 "дужине=%.3e да детекција повезивања може да не успе или скрати\n"
 
-#: src/geometry.c:1576
+#: src/geometry.c:1595
 #, c-format
 msgid ""
 "tag=%d: suppressing additional connection detection may fail or short "
@@ -2805,7 +3421,7 @@ msgstr ""
 "tag=%d: потискивање додатних упозорења да детекција повезивања може да не "
 "успе или скрати\n"
 
-#: src/geometry.c:1609
+#: src/geometry.c:1628
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f < 0.001; similarity of "
@@ -2816,12 +3432,12 @@ msgstr ""
 "компоненти струје доводи до нумеричких нетачности (мин=0.001, добро=0.05, "
 "препоручено <= 0.1)\n"
 
-#: src/geometry.c:1614
+#: src/geometry.c:1633
 #, c-format
 msgid "tag=%d: suppressing additional short wavelength ratio errors\n"
 msgstr "tag=%d: потискивање додатних грешака кратког односа таласне дужине\n"
 
-#: src/geometry.c:1628
+#: src/geometry.c:1647
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.1; current sampling "
@@ -2832,12 +3448,12 @@ msgstr ""
 "узорковања струје ограничена размаком сегмената (мин=0.001, добро=0.05, "
 "препоручено <= 0.1)\n"
 
-#: src/geometry.c:1633
+#: src/geometry.c:1652
 #, c-format
 msgid "tag=%d: suppressing additional long wavelength ratio warnings\n"
 msgstr "tag=%d: потискивање додатних упозорења дугог односа таласне дужине\n"
 
-#: src/geometry.c:1647
+#: src/geometry.c:1666
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.05; shorter segments "
@@ -2848,12 +3464,12 @@ msgstr ""
 "повећавају тачност у областима брзе промене струје (мин=0.001, добро=0.05, "
 "препоручено <=0.1)\n"
 
-#: src/geometry.c:1652
+#: src/geometry.c:1671
 #, c-format
 msgid "tag=%d: suppressing additional accuracy improvement suggestions\n"
 msgstr "tag=%d: потискивање додатних предлога за побољшање тачности\n"
 
-#: src/geometry.c:1683
+#: src/geometry.c:1702
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; standard thin-wire kernel "
@@ -2862,12 +3478,12 @@ msgstr ""
 "tag=%d/seg=%d: однос дужина/радијус од %.1f < 2.0; грешка поља стандардног "
 "језгра танке жице премашује 1%% за велику маргину (мин=2.0, 1%% тачно=8.0)\n"
 
-#: src/geometry.c:1688
+#: src/geometry.c:1707
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio errors\n"
 msgstr "tag=%d: потискивање додатних грешака односа стандардног језгра\n"
 
-#: src/geometry.c:1702
+#: src/geometry.c:1721
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 8.0; standard thin-wire kernel "
@@ -2876,12 +3492,12 @@ msgstr ""
 "tag=%d/seg=%d: однос дужина/радијус од %.1f < 8.0; грешка поља стандардног "
 "језгра танке жице премашује 1%% (мин=2.0, 1%% тачно=8.0)\n"
 
-#: src/geometry.c:1707
+#: src/geometry.c:1726
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio warnings\n"
 msgstr "tag=%d: потискивање додатних упозорења односа стандардног језгра\n"
 
-#: src/geometry.c:1723
+#: src/geometry.c:1742
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 0.5; extended thin-wire kernel "
@@ -2890,12 +3506,12 @@ msgstr ""
 "tag=%d/seg=%d: однос дужина/радијус од %.1f < 0.5; грешка поља проширеног "
 "језгра танке жице премашује 1%% за велику маргину (мин=0.5, 1%% тачно=2.0)\n"
 
-#: src/geometry.c:1728
+#: src/geometry.c:1747
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio errors\n"
 msgstr "tag=%d: потискивање додатних грешака односа проширеног језгра\n"
 
-#: src/geometry.c:1742
+#: src/geometry.c:1761
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; extended thin-wire kernel "
@@ -2904,24 +3520,24 @@ msgstr ""
 "tag=%d/seg=%d: однос дужина/радијус од %.1f < 2.0; грешка поља проширеног "
 "језгра танке жице премашује 1%% (мин=0.5, 1%% тачно=2.0)\n"
 
-#: src/geometry.c:1747
+#: src/geometry.c:1766
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio warnings\n"
 msgstr "tag=%d: потискивање додатних упозорења односа проширеног језгра\n"
 
-#: src/geometry.c:1764
+#: src/geometry.c:1783
 #, c-format
 msgid "Skipping overlap check for %d segments (use --force-verify to enable)\n"
 msgstr ""
 "Прескакање провере преклапања за %d сегмената (користите --force-verify да "
 "омогућите)\n"
 
-#: src/geometry.c:1768
+#: src/geometry.c:1787
 #, c-format
 msgid "Forcing overlap check for %d segments\n"
 msgstr "Принудна провера преклапања за %d сегмената\n"
 
-#: src/geometry.c:1779
+#: src/geometry.c:1798
 msgid ""
 "verify_segments() skipping frequency-dependent checks - no frequency data\n"
 msgstr ""
@@ -2973,37 +3589,37 @@ msgstr "! Референтна импеданса Z0 = %.2f Ohm\n"
 msgid "This should never happen. touchstone type=%d\n"
 msgstr "Ово никада не би требало да се деси. touchstone type=%d\n"
 
-#: src/gnuplot.c:237
+#: src/gnuplot.c:257
 #, c-format
 msgid "# Near E field\n"
 msgstr "# Блиско E поље\n"
 
-#: src/gnuplot.c:260
+#: src/gnuplot.c:280
 #, c-format
 msgid "# Near H field\n"
 msgstr "# Блиско H поље\n"
 
-#: src/gnuplot.c:306
+#: src/gnuplot.c:322
 #, c-format
 msgid "# Poynting Vector\n"
 msgstr "# Појнтингов вектор\n"
 
-#: src/gnuplot.c:378
+#: src/gnuplot.c:394
 #, c-format
 msgid "# Radiation Pattern\n"
 msgstr "# Дијаграм зрачења\n"
 
-#: src/gnuplot.c:516
+#: src/gnuplot.c:532
 #, c-format
 msgid "# structure patch segments\n"
 msgstr "# патч сегменти структуре\n"
 
-#: src/gnuplot.c:551
+#: src/gnuplot.c:567
 #, c-format
 msgid "# structure wire segments\n"
 msgstr "# сегменти жице структуре\n"
 
-#: src/gnuplot.c:581
+#: src/gnuplot.c:597
 #, c-format
 msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
@@ -3012,11 +3628,11 @@ msgstr ""
 "Прикажи са: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
 "close\"\n"
 
-#: src/gnuplot.c:593
+#: src/gnuplot.c:609
 msgid "Save Currents and Charges to CSV"
 msgstr "Сачувај струје и наелектрисања у CSV"
 
-#: src/gnuplot.c:594
+#: src/gnuplot.c:610
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
@@ -3024,11 +3640,11 @@ msgstr ""
 "Морате омогућити податке о струјама кликом на \"Струје\" или \"Наелектрисања"
 "\" у главном xnec2c прозору."
 
-#: src/gnuplot.c:659 src/gnuplot.c:669
+#: src/gnuplot.c:675 src/gnuplot.c:685
 msgid "Save Patch Currents to CSV"
 msgstr "Сачувај патч струје у CSV"
 
-#: src/gnuplot.c:660
+#: src/gnuplot.c:676
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
@@ -3036,20 +3652,20 @@ msgstr ""
 "Морате омогућити податке о струјама кликом на \"Струје\" или \"Наелектрисања"
 "\" у главном xnec2c прозору."
 
-#: src/gnuplot.c:670
+#: src/gnuplot.c:686
 msgid "No surface patches in this model."
 msgstr "Нема површинских патчева у овом моделу."
 
-#: src/ground.c:90
+#: src/ground.c:110
 msgid "b less than a"
 msgstr "b мање од a"
 
-#: src/ground.c:215
+#: src/ground.c:235
 #, c-format
 msgid "step size limited at z = %12.5E\n"
 msgstr "величина корака ограничена на Z = %12.5E\n"
 
-#: src/input.c:92
+#: src/input.c:156
 msgid ""
 "Error reading Comments\n"
 "Unexpected EOF (End of File)"
@@ -3057,7 +3673,7 @@ msgstr ""
 "Грешка при читању коментара\n"
 "Неочекивани EOF (крај датотеке)"
 
-#: src/input.c:106
+#: src/input.c:170
 msgid ""
 "Error reading Comments\n"
 "Comment mnemonic short or missing"
@@ -3065,7 +3681,7 @@ msgstr ""
 "Грешка при читању коментара\n"
 "Мнемоника коментара кратка или недостаје"
 
-#: src/input.c:117
+#: src/input.c:181
 msgid ""
 "Read_Comments():\n"
 " Error reading input file\n"
@@ -3075,7 +3691,7 @@ msgstr ""
 " Грешка при читању улазне датотеке\n"
 "Мнемоника коментара нетачна"
 
-#: src/input.c:155
+#: src/input.c:219
 msgid ""
 "Geometry data error\n"
 "Tag number is less than 1"
@@ -3083,7 +3699,7 @@ msgstr ""
 "Грешка геометријских података\n"
 "Број ознаке је мањи од 1"
 
-#: src/input.c:162
+#: src/input.c:226
 msgid ""
 "Geometry data error\n"
 "Number of segments is less than 1"
@@ -3091,16 +3707,16 @@ msgstr ""
 "Грешка геометријских података\n"
 "Број сегмената је мањи од 1"
 
-#: src/input.c:169
+#: src/input.c:233
 msgid "warning - number of segments is greater than 1000000\n"
 msgstr "упозорење - број сегмената је већи од 1000000\n"
 
-#: src/input.c:217
+#: src/input.c:281
 #, c-format
 msgid "%s data card error: Spurious character '%c' at column %d\n"
 msgstr "грешка %s картице података: Неисправан знак '%c' на колони %d\n"
 
-#: src/input.c:219
+#: src/input.c:283
 msgid ""
 "Data card error\n"
 "Spurious character in card"
@@ -3108,33 +3724,33 @@ msgstr ""
 "Грешка картице података\n"
 "Неисправан знак у картици"
 
-#: src/input.c:274
+#: src/input.c:354
 #, c-format
 msgid "%s: expression evaluation failed for \"%s\"\n"
 msgstr "%s: процена израза није успела за \"%s\"\n"
 
-#: src/input.c:315
+#: src/input.c:395
 msgid "SY card: no line content available\n"
 msgstr "SY картица: садржај линије није доступан\n"
 
-#: src/input.c:316
+#: src/input.c:396
 msgid "SY card: no line content available"
 msgstr "SY картица: садржај линије није доступан"
 
-#: src/input.c:333
+#: src/input.c:413
 msgid "SY card: missing '=' in definition\n"
 msgstr "SY картица: недостаје '=' у дефиницији\n"
 
-#: src/input.c:334
+#: src/input.c:414
 msgid "SY card: missing '=' in definition"
 msgstr "SY картица: недостаје '=' у дефиницији"
 
-#: src/input.c:367
+#: src/input.c:447
 #, c-format
 msgid "SY card: symbol definition failed for %s=%s\n"
 msgstr "SY картица: дефиниција симбола није успела за %s=%s\n"
 
-#: src/input.c:445
+#: src/input.c:585
 msgid ""
 "Geometry data error\n"
 "No GC card for tapered wire"
@@ -3142,27 +3758,27 @@ msgstr ""
 "Грешка геометријских података\n"
 "Нема GC картице за конусну жицу"
 
-#: src/input.c:452
+#: src/input.c:592
 msgid "Geometry GC data card error"
 msgstr "Грешка GC картице геометријских података"
 
-#: src/input.c:468
+#: src/input.c:608
 msgid "Geometry GX data card error"
 msgstr "Грешка GX картице геометријских података"
 
-#: src/input.c:491
+#: src/input.c:631
 msgid "Geometry GR data card error"
 msgstr "Грешка GR картице геометријских података"
 
-#: src/input.c:545
+#: src/input.c:685
 msgid "No geometry data cards"
 msgstr "Нема картица геометријских података"
 
-#: src/input.c:556
+#: src/input.c:696
 msgid "Probable invalid segment geometry.\n"
 msgstr "Вероватно неисправна геометрија сегмента.\n"
 
-#: src/input.c:557
+#: src/input.c:697
 msgid ""
 "Invalid segment geometry.\n"
 "See warnings in the console for detail.\n"
@@ -3172,37 +3788,37 @@ msgstr ""
 "Погледајте упозорења у конзоли за детаље.\n"
 "Покушавам да наставим..."
 
-#: src/input.c:563
+#: src/input.c:703
 msgid "Probable invalid segment geometry (see above)\n"
 msgstr "Вероватно неисправна геометрија сегмента (погледајте горе)\n"
 
-#: src/input.c:567
+#: src/input.c:707
 msgid "Read_Geometry: verify_segments() passed\n"
 msgstr "Read_Geometry: verify_segments() прошла\n"
 
-#: src/input.c:604
+#: src/input.c:744
 #, c-format
 msgid "segment data error: tag=%d si=%lf, bi=%lf\n"
 msgstr "грешка података сегмента: tag=%d si=%lf, bi=%lf\n"
 
-#: src/input.c:606
+#: src/input.c:746
 msgid "Segment data error, zero-length line?  See console."
 msgstr "Грешка података сегмента, линија нулте дужине?  Погледајте конзолу."
 
-#: src/input.c:646
+#: src/input.c:786
 msgid "Move GM data card error"
 msgstr "Грешка GM картице података за померање"
 
-#: src/input.c:662 src/input.c:703 src/input.c:720 src/input.c:738
-#: src/input.c:746
+#: src/input.c:802 src/input.c:843 src/input.c:860 src/input.c:878
+#: src/input.c:886
 msgid "Patch data card error"
 msgstr "Грешка картице података патча"
 
-#: src/input.c:684
+#: src/input.c:824
 msgid "Patch data error"
 msgstr "Грешка података патча"
 
-#: src/input.c:793
+#: src/input.c:933
 msgid ""
 "\"GF\" card (NGF solution)\n"
 "is not supported"
@@ -3210,41 +3826,45 @@ msgstr ""
 "\"GF\" картица (NGF решење)\n"
 "није подржана"
 
-#: src/input.c:798
+#: src/input.c:938
 msgid "Ignoring CM card in geometry"
 msgstr "Игнорисање CM картице у геометрији"
 
-#: src/input.c:811
+#: src/input.c:951
 #, c-format
 msgid "geometry data card error (nwire=%d)\n"
 msgstr "грешка картице геометријских података (nwire=%d)\n"
 
-#: src/input.c:812
+#: src/input.c:952
 #, c-format
 msgid "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
 msgstr "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
 
-#: src/input.c:815
-msgid "Geometry data card error"
-msgstr "Грешка картице геометријских података"
+#: src/input.c:958
+msgid "Command card in geometry section"
+msgstr "Командна картица у одељку геометрије"
 
-#: src/input.c:839
+#: src/input.c:960
+msgid "Unrecognized geometry card"
+msgstr "Непозната картица геометрије"
+
+#: src/input.c:984
 msgid "Failed to initialize symbol table\n"
 msgstr "Иницијализација табеле симбола није успела\n"
 
-#: src/input.c:840
+#: src/input.c:985
 msgid "Failed to initialize symbol table"
 msgstr "Иницијализација табеле симбола није успела"
 
-#: src/input.c:1012
+#: src/input.c:1176
 msgid "ignoring CM card in commands\n"
 msgstr "игнорисање CM картице у командама\n"
 
-#: src/input.c:1013
+#: src/input.c:1177
 msgid "Ignoring CM card in commands"
 msgstr "Игнорисање CM картице у командама"
 
-#: src/input.c:1017
+#: src/input.c:1181
 msgid ""
 "CP card is ignored\n"
 "Coupling calculation not implemented"
@@ -3252,11 +3872,16 @@ msgstr ""
 "CP картица је игнорисана\n"
 "Прорачун спрезања није имплементиран"
 
-#: src/input.c:1184
+#: src/input.c:1276
+#, c-format
+msgid "Skipping duplicate FR card at %g MHz\n"
+msgstr "Прескачем дуплирану FR картицу на %g MHz\n"
+
+#: src/input.c:1358
 msgid "Max frequency <= Min frequency in FR card\n"
 msgstr "Максимална фреквенција <= Минимална фреквенција у FR картици\n"
 
-#: src/input.c:1185
+#: src/input.c:1359
 msgid ""
 "Max frequency <= Min frequency in FR card\n"
 "Please check FR card data and correct"
@@ -3264,7 +3889,7 @@ msgstr ""
 "Максимална фреквенција <= Минимална фреквенција у FR картици\n"
 "Молимо проверите податке FR картице и исправите"
 
-#: src/input.c:1208
+#: src/input.c:1382
 msgid ""
 "Fix the GE/GN cards:\n"
 "The GE card specifies that a ground is present, but the GN indicates "
@@ -3273,11 +3898,11 @@ msgstr ""
 "Исправите GE/GN картице:\n"
 "GE картица наводи да је присутно уземљење, али GN показује супротно."
 
-#: src/input.c:1222
+#: src/input.c:1396
 msgid "theta > 90 deg. with ground specified\n"
 msgstr "theta > 90 степени са наведеним уземљењем\n"
 
-#: src/input.c:1223 src/radiation.c:663
+#: src/input.c:1397 src/radiation.c:704
 msgid ""
 "Theta > 90 deg with ground specified\n"
 "Please check RP card data and correct"
@@ -3285,7 +3910,7 @@ msgstr ""
 "Theta > 90 степени са наведеним уземљењем\n"
 "Молимо проверите податке RP картице и исправите"
 
-#: src/input.c:1232
+#: src/input.c:1406
 msgid ""
 "radial wire g.s. approximation: may not be used with Sommerfeld ground "
 "option\n"
@@ -3293,7 +3918,7 @@ msgstr ""
 "апроксимација радијалних жица: не може се користити са Sommerfeld опцијом "
 "уземљења\n"
 
-#: src/input.c:1233
+#: src/input.c:1407
 msgid ""
 "radial wire g.s. approximation\n"
 "may not be used with Sommerfeld ground option"
@@ -3301,7 +3926,7 @@ msgstr ""
 "апроксимација радијалних жица\n"
 "не може се користити са Sommerfeld опцијом уземљења"
 
-#: src/input.c:1281
+#: src/input.c:1455
 #, c-format
 msgid ""
 "data fault on loading card no %d: itag step1 %d is greater than itag step2 "
@@ -3310,7 +3935,7 @@ msgstr ""
 "грешка података на картици оптерећења бр. %d: itag step1 %d је већи од itag "
 "step2 %d\n"
 
-#: src/input.c:1283
+#: src/input.c:1457
 msgid ""
 "Data fault on loading card\n"
 "itag step1 is greater than itag step2"
@@ -3318,14 +3943,14 @@ msgstr ""
 "Грешка података на картици оптерећења\n"
 "itag step1 је већи од itag step2"
 
-#: src/input.c:1412
+#: src/input.c:1586
 msgid ""
 "Transmission Line impedance = 0: is not valid. Please correct NT or TL card\n"
 msgstr ""
 "Импеданса преносне линије = 0: није исправно. Молимо исправите NT или TL "
 "картицу\n"
 
-#: src/input.c:1413
+#: src/input.c:1587
 msgid ""
 "Transmission Line impedance = 0\n"
 "is not valid. Please correct NT or TL card"
@@ -3333,11 +3958,11 @@ msgstr ""
 "Импеданса преносне линије = 0\n"
 "није исправно. Молимо исправите NT или TL картицу"
 
-#: src/input.c:1422
+#: src/input.c:1596
 msgid "Segment number error in TL or NT card\n"
 msgstr "Грешка броја сегмента у TL или NT картици\n"
 
-#: src/input.c:1423
+#: src/input.c:1597
 msgid ""
 "Segment number\n"
 "error in NT or TL card"
@@ -3345,12 +3970,12 @@ msgstr ""
 "Грешка броја сегмента\n"
 "у NT или TL картици"
 
-#: src/input.c:1444
+#: src/input.c:1618
 msgid "PQ and PT cards are ignored: Printing to file not implemented\n"
 msgstr ""
 "PQ и PT картице су игнорисане: Штампање у датотеку није имплементирано\n"
 
-#: src/input.c:1445
+#: src/input.c:1619
 msgid ""
 "PQ and PT cards are ignored\n"
 "Printing to file not implemented"
@@ -3358,11 +3983,11 @@ msgstr ""
 "PQ и PT картице су игнорисане\n"
 "Штампање у датотеку није имплементирано"
 
-#: src/input.c:1452
+#: src/input.c:1626
 msgid "Surface wave option (I1=1): of RP command not implemented\n"
 msgstr "Опција површинског таласа (I1=1): RP команде није имплементирана\n"
 
-#: src/input.c:1453
+#: src/input.c:1627
 msgid ""
 "Surface wave option (I1=1)\n"
 "of RP command not implemented"
@@ -3370,24 +3995,24 @@ msgstr ""
 "Опција површинског таласа (I1=1)\n"
 "RP команде није имплементирана"
 
-#: src/input.c:1478
+#: src/input.c:1652
 msgid "Average gain diagnostic enabled (use --skip-verify to disable)\n"
 msgstr ""
-"Дијагностика просечног појачања омогућена (користите --skip-verify за "
+"Дијагностика просечног добитка омогућена (користите --skip-verify за "
 "искључивање)\n"
 
-#: src/input.c:1487
+#: src/input.c:1661
 #, c-format
 msgid "Average power gain disabled: nth=%d nph=%d (both must be >= 2)\n"
 msgstr ""
-"Просечно појачање снаге онемогућено: nth=%d nph=%d (оба морају бити >= 2)\n"
+"Просечан добитак снаге онемогућен: nth=%d nph=%d (оба морају бити >= 2)\n"
 
-#: src/input.c:1492
+#: src/input.c:1666
 #, c-format
 msgid "Average power gain calculation enabled (XNDA A=%d)\n"
-msgstr "Прорачун просечног појачања снаге омогућен (XNDA A=%d)\n"
+msgstr "Прорачун просечног добитка снаге омогућен (XNDA A=%d)\n"
 
-#: src/input.c:1508
+#: src/input.c:1682
 msgid ""
 "Theta > 90 deg. with ground specified: Please check RP card data and "
 "correct\n"
@@ -3395,7 +4020,7 @@ msgstr ""
 "Theta > 90 степени са наведеним уземљењем: Молимо проверите податке RP "
 "картице и исправите\n"
 
-#: src/input.c:1509
+#: src/input.c:1683
 msgid ""
 "Theta > 90 deg. with ground specified\n"
 "Please check RP card data and correct"
@@ -3403,23 +4028,27 @@ msgstr ""
 "Theta > 90 степени са наведеним уземљењем\n"
 "Молимо проверите податке RP картице и исправите"
 
-#: src/input.c:1574
-msgid "Faulty data card"
-msgstr "Неисправна картица података"
+#: src/input.c:1751
+msgid "Geometry card in command section"
+msgstr "Картица геометрије у одељку команди"
 
-#: src/input.c:1603
+#: src/input.c:1754
+msgid "Unrecognized command card"
+msgstr "Непозната командна картица"
+
+#: src/input.c:1791
 msgid ""
 "Missing or surface-wave RP card: Radiation pattern and gain calculations "
 "disabled\n"
 msgstr ""
 "Недостаје или површински-таласна RP картица: Прорачуни дијаграма зрачења и "
-"појачања су онемогућени\n"
+"добитка су онемогућени\n"
 
-#: src/input.c:1630
+#: src/input.c:1818
 msgid "Unexpected exit from while loop"
 msgstr "Неочекивани излазак из while петље"
 
-#: src/input.c:1721
+#: src/input.c:1909
 msgid ""
 "command data card error: Unexpected EOF while reading input file - appending "
 "EN card\n"
@@ -3427,7 +4056,7 @@ msgstr ""
 "грешка картице командних података: Неочекивани EOF при читању улазне "
 "датотеке - додавање EN картице\n"
 
-#: src/input.c:1722
+#: src/input.c:1910
 msgid ""
 "Command data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -3437,13 +4066,13 @@ msgstr ""
 "Неочекивани EOF при читању улазне датотеке\n"
 "Додавање подразумеване EN картице"
 
-#: src/input.c:1736
+#: src/input.c:1927
 msgid "command data card error: card's mnemonic code too short or missing\n"
 msgstr ""
 "грешка картице командних података: мнемонички код картице је прекратак или "
 "недостаје\n"
 
-#: src/input.c:1737
+#: src/input.c:1928
 msgid ""
 "Command data card error\n"
 "Mnemonic code too short or missing"
@@ -3451,7 +4080,7 @@ msgstr ""
 "Грешка картице командних података\n"
 "Мнемонички код је прекратак или недостаје"
 
-#: src/input.c:1930
+#: src/input.c:2121
 msgid ""
 "geometry data card error: Unexpected EOF while reading input file - "
 "appending GE card\n"
@@ -3459,7 +4088,7 @@ msgstr ""
 "грешка картице геометријских података: Неочекивани EOF при читању улазне "
 "датотеке - додавање GE картице\n"
 
-#: src/input.c:1931
+#: src/input.c:2122
 msgid ""
 "Geometry data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -3469,13 +4098,13 @@ msgstr ""
 "Неочекивани EOF при читању улазне датотеке\n"
 "Додавање подразумеване GE картице"
 
-#: src/input.c:1945
+#: src/input.c:2139
 msgid "geometry data card error: card's mnemonic code too short or missing\n"
 msgstr ""
 "грешка картице геометријских података: мнемонички код картице је прекратак "
 "или недостаје\n"
 
-#: src/input.c:1946
+#: src/input.c:2140
 msgid ""
 "Geometry data card error\n"
 "Card's mnemonic code too short or missing"
@@ -3517,8 +4146,8 @@ msgstr "Није успело додавање objеката у builder: %s\n"
 msgid "Listing Object Ids:\n"
 msgstr "Списак ID-ова objеката:\n"
 
-#: src/interface.c:199 src/utils.c:191 src/utils.c:195 src/utils.c:205
-#: src/utils.c:207
+#: src/interface.c:199 src/utils.c:192 src/utils.c:196 src/utils.c:206
+#: src/utils.c:208
 #, c-format
 msgid "%s\n"
 msgstr "%s\n"
@@ -3536,136 +4165,136 @@ msgstr ""
 msgid "xnec2c %s: %s"
 msgstr "xnec2c %s: %s"
 
-#: src/main.c:138
+#: src/main.c:144
 #, c-format
 msgid "%s requires a positive integer argument\n"
 msgstr "%s захтева позитиван целобројни аргумент\n"
 
-#: src/main.c:201
+#: src/main.c:207
 #, c-format
 msgid "Detected %d CPUs\n"
 msgstr "Детектовано %d процесора\n"
 
-#: src/main.c:220
+#: src/main.c:226
 #, c-format
 msgid "Detected %s windowing backend\n"
 msgstr "Детектовано %s позадинско окружење прозора\n"
 
-#: src/main.c:230
+#: src/main.c:236
 msgid "config file path too long\n"
 msgstr "путања конфигурационе датотеке је предугачка\n"
 
-#: src/main.c:248
+#: src/main.c:254
 #, c-format
 msgid "config file does not exist or is not readable: %s\n"
 msgstr "конфигурациона датотека не постоји или није читљива: %s\n"
 
-#: src/main.c:257
+#: src/main.c:263
 #, c-format
 msgid "config file path too long ( > %d char )\n"
 msgstr "путања конфигурационе датотеке је предугачка ( > %d знакова )\n"
 
-#: src/main.c:269
+#: src/main.c:275
 #, c-format
 msgid "input file name too long ( > %d char )\n"
 msgstr "име улазне датотеке је предугачко ( > %d знакова )\n"
 
-#: src/main.c:296
+#: src/main.c:302
 msgid "Forking disabled!\n"
 msgstr "Форковање онемогућено\n"
 
-#: src/main.c:304
+#: src/main.c:310
 msgid "pthread freqloop disabled!\n"
 msgstr "pthread freqloop онемогућен\n"
 
-#: src/main.c:308
+#: src/main.c:314
 msgid "batch mode enabled, will exit after first loop\n"
 msgstr "batch режим омогућен, излаз након прве петље\n"
 
-#: src/main.c:374
+#: src/main.c:380
 msgid "verify segments check disabled\n"
 msgstr "провера сегмената онемогућена\n"
 
-#: src/main.c:379
+#: src/main.c:385
 msgid "forcing overlap check on large models\n"
 msgstr "форсирање провере преклапања на великим моделима\n"
 
-#: src/main.c:384
+#: src/main.c:393
 msgid "managed allocator leak report enabled\n"
 msgstr "managed allocator leak report enabled\n"
 
-#: src/main.c:398
+#: src/main.c:407
 msgid "--batch and --optimize are mutual exclusive.\n"
 msgstr "--batch и --optimize су међусобно искључиви.\n"
 
-#: src/main.c:414
+#: src/main.c:423
 #, c-format
 msgid "input file path name too long ( > %d char )\n"
 msgstr "путања улазне датотеке је предугачка ( > %d знакова )\n"
 
-#: src/main.c:421
+#: src/main.c:430
 #, c-format
 msgid "unexpected argument '%s' does not appear to be a .nec file\n"
 msgstr "неочекивани аргумент '%s' не изгледа као .nec датотека\n"
 
-#: src/main.c:428
+#: src/main.c:437
 #, c-format
 msgid "unexpected argument: %s\n"
 msgstr "неочекивани аргумент: %s\n"
 
-#: src/main.c:434
+#: src/main.c:443
 msgid "batch mode requires an input file\n"
 msgstr "batch режим захтева улазну датотеку\n"
 
-#: src/main.c:444
+#: src/main.c:453
 msgid "cannot open display: a running X11 or Wayland session is required\n"
 msgstr ""
 "Није могуће отворити екран: потребна је активна X11 или Wayland сесија\n"
 
-#: src/main.c:463
+#: src/main.c:472
 #, c-format
 msgid "Forking %d jobs.\n"
 msgstr "Форковање %d послова.\n"
 
-#: src/main.c:475 src/main.c:483
+#: src/main.c:484 src/main.c:492
 msgid "exiting after fatal error: pipe() failed"
 msgstr "излазак након фаталне грешке: pipe() није успео"
 
-#: src/main.c:492
+#: src/main.c:501
 msgid "exiting after fatal error: fork() failed"
 msgstr "излазак након фаталне грешке: fork() није успео"
 
-#: src/main.c:907
+#: src/main.c:1082
 msgid "exiting via user interrupt\n"
 msgstr "излазак прекидом корисника\n"
 
-#: src/main.c:911
+#: src/main.c:1086
 msgid "segmentation fault, exiting\n"
 msgstr "грешка сегментације, излазак\n"
 
-#: src/main.c:915
+#: src/main.c:1090
 msgid "floating point exception, exiting\n"
 msgstr "грешка са покретним зарезом, излазак\n"
 
-#: src/main.c:919
+#: src/main.c:1094
 msgid "abort signal received, exiting\n"
 msgstr "примљен сигнал за прекид, излазак\n"
 
-#: src/main.c:923
+#: src/main.c:1098
 msgid "termination request received, exiting\n"
 msgstr "примљен захтев за завршетак, излазак\n"
 
-#: src/main.c:933
+#: src/main.c:1108
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
 msgstr "није форковано, игноришем SIGCHLD од pid %d\n"
 
-#: src/main.c:941
+#: src/main.c:1116
 #, c-format
 msgid "child process pid %d exited\n"
 msgstr "подређени процес pid %d је завршен\n"
 
-#: src/main.c:950
+#: src/main.c:1125
 #, c-format
 msgid "default exit with signal: %d\n"
 msgstr "подразумевани излаз са сигналом: %d\n"
@@ -3687,7 +4316,7 @@ msgstr "open_mathlib: lib је NULL\n"
 msgid "setenv(%s, %s): %s\n"
 msgstr "setenv(%s, %s): %s\n"
 
-#: src/mathlib.c:320 src/utils.c:448
+#: src/mathlib.c:320 src/utils.c:456
 #, c-format
 msgid "%s: %s\n"
 msgstr "%s: %s\n"
@@ -3996,26 +4625,26 @@ msgstr "zgetrs упозорење: lda(%d) != ldb(%d)\n"
 msgid "dlsym(mkl_set_threading_layer): %s\n"
 msgstr "dlsym(mkl_set_threading_layer): %s\n"
 
-#: src/matrix.c:1208
+#: src/matrix.c:1223
 #, c-format
 msgid "pivot(%d)= %16.8E\n"
 msgstr "pivot(%d)= %16.8E\n"
 
-#: src/matrix.c:1242
+#: src/matrix.c:1257
 #, c-format
 msgid "LU Decomposition Failed: %d\n"
 msgstr "LU декомпозиција није успела: %d\n"
 
-#: src/matrix.c:1298
+#: src/matrix.c:1313
 #, c-format
 msgid "symmetry error - nrow:%d ncol:%d\n"
 msgstr "грешка симетрије - nrow:%d ncol:%d\n"
 
-#: src/matrix.c:1299
+#: src/matrix.c:1314
 msgid "Symmetry error"
 msgstr "Грешка симетрије"
 
-#: src/matrix.c:1403
+#: src/matrix.c:1418
 #, c-format
 msgid "Solving Failed: %d\n"
 msgstr "Решавање није успело: %d\n"
@@ -4028,47 +4657,38 @@ msgstr ""
 "noise_temp_resolve: табела noise_temp није додељена; t_sky/t_earth "
 "подразумевано 0\n"
 
-#: src/measurements.c:596
+#: src/measurements.c:606
 #, c-format
 msgid "BUG: pol=%d out of range [0,%d): idx=%d freq_step=%d thr=%lu\n"
 msgstr "ГРЕШКА: pol=%d ван опсега [0,%d): idx=%d freq_step=%d thr=%lu\n"
 
-#: src/measurements.c:610
+#: src/measurements.c:620
 #, c-format
 msgid "BUG: mgidx=%d out of range [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n"
 msgstr ""
 "ГРЕШКА: mgidx=%d ван опсега [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n"
 
-#: src/measurements.c:613
+#: src/measurements.c:623
 #, c-format
 msgid "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
 msgstr "ГРЕШКА: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
 
-#: src/measurements.c:616
+#: src/measurements.c:626
 #, c-format
 msgid "BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n"
 msgstr "ГРЕШКА: rad_pattern[%d]: ефикасност=%.6e gtot=%p max_gain_idx=%p\n"
 
-#: src/measurements.c:620
+#: src/measurements.c:630
 #, c-format
 msgid "BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
 msgstr "ГРЕШКА: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
 
-#: src/measurements.c:751
-#, c-format
-msgid ""
-"BUG: F/B nth=%d out of [0,%d) after over-ground recalc: idx=%d pol=%d "
-"max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n"
-msgstr ""
-"ГРЕШКА: F/B nth=%d ван [0,%d) после поновног прорачуна изнад земље: idx=%d "
-"pol=%d max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n"
-
-#: src/measurements.c:798
+#: src/measurements.c:785
 #, c-format
 msgid "meas_name_idx: Invalid name with length=%d: %s\n"
 msgstr "meas_name_idx: Неважеће иmе са дужином=%d: %s\n"
 
-#: src/measurements.c:859
+#: src/measurements.c:846
 msgid "meas_format: output overflow\n"
 msgstr "meas_format: прекорачење излаза\n"
 
@@ -4082,34 +4702,64 @@ msgstr "mem_obj_from_ptr: ptr %p не одговара m->ptr %p (база %p)\n
 msgid "Memory allocation denied %s: requested %lu bytes\n"
 msgstr "Додела меморије одбијена %s: затражено %lu бајтова\n"
 
-#: src/mem/mem.c:225
+#: src/mem/mem.c:219
+#, c-format
+msgid "mem_free at %s: array block element size %lu; use mem_array_free\n"
+msgstr "mem_free at %s: array block element size %lu; use mem_array_free\n"
+
+#: src/mem/mem.c:238
 #, c-format
 msgid "mem_obj_t at %p: size=%lu used=%lu addr=%p\n"
 msgstr "mem_obj_t на %p: величина=%lu коришћено=%lu адреса=%p\n"
 
-#: src/mem/mem.c:246
+#: src/mem/mem.c:259
 #, c-format
 msgid "mem_backtrace(%p):\n"
 msgstr "mem_backtrace(%p):\n"
 
-#: src/mem/mem.c:249
+#: src/mem/mem.c:262
 msgid "  m->backtrace is null, no backtrace data\n"
 msgstr "  m->backtrace је null, нема података о повратном трагу\n"
 
-#: src/mem/mem.c:275
+#: src/mem/mem.c:288
 #, c-format
 msgid "mem_clone: allocation failed for %lu bytes\n"
 msgstr "mem_clone: додела меморије није успела за %lu бајтова\n"
 
-#: src/mem/mem.c:332
+#: src/mem/mem.c:345
 #, c-format
 msgid "mem_array verb: element size %lu does not match header %lu\n"
 msgstr "mem_array verb: element size %lu does not match header %lu\n"
 
-#: src/mem/mem.c:424
+#: src/mem/mem.c:437
 #, c-format
 msgid "mem_zero: array block element size %lu; use mem_array_zero\n"
 msgstr "mem_zero: array block element size %lu; use mem_array_zero\n"
+
+#: src/mem/mem_track.c:156
+#, c-format
+msgid "mem_report: snapshot allocation of %llu records failed\n"
+msgstr "mem_report: снимак алокације %llu записа није успео\n"
+
+#: src/mem/mem_track.c:204
+#, c-format
+msgid "mem-report %s: site=%s count=%llu bytes=%llu serial=[%llu..%llu]\n"
+msgstr "mem-report %s: site=%s count=%llu bytes=%llu serial=[%llu..%llu]\n"
+
+#: src/mem/mem_track.c:209
+#, c-format
+msgid "mem-report %s: live_blocks=%llu live_bytes=%llu distinct_sites=%llu\n"
+msgstr "mem-report %s: live_blocks=%llu live_bytes=%llu distinct_sites=%llu\n"
+
+#: src/mem/mem_track.c:215
+#, c-format
+msgid "mem-report %s: serial=%llu site=%s size=%lu used=%lu\n"
+msgstr "mem-report %s: serial=%llu site=%s size=%lu used=%lu\n"
+
+#: src/mem/mem_track.c:223
+#, c-format
+msgid "mem-report %s:   frame %d %s\n"
+msgstr "mem-report %s:   frame %d %s\n"
 
 #: src/nec2_model.c:278 src/nec2_model.c:282 src/nec2_model.c:286
 msgid "Card"
@@ -4157,21 +4807,21 @@ msgstr ""
 "Молимо користите дугме Сачувај\n"
 "да бисте навели путању датотеке"
 
-#: src/network.c:637
+#: src/network.c:650
 #, c-format
 msgid "improper load type chosen, requested type is %d\n"
 msgstr "изабран неисправан тип оптерећења, захтевани тип је %d\n"
 
-#: src/network.c:638
+#: src/network.c:651
 msgid "Improper load type chose"
 msgstr "Изабран неисправан тип оптерећења"
 
-#: src/network.c:726
+#: src/network.c:739
 #, c-format
 msgid "loading data card error, no segment has an itag = %d\n"
 msgstr "грешка картице података оптерећења, ниједан сегмент нема itag = %d\n"
 
-#: src/network.c:727
+#: src/network.c:740
 msgid ""
 "Loading data card\n"
 "Tag number mismatch error"
@@ -4340,35 +4990,41 @@ msgstr "чувам %s: %s\n"
 msgid "xnec2c was built without inotify.\n"
 msgstr "xnec2c је изграђен без inotify подршке.\n"
 
-#: src/optimize.c:157
+#: src/optimize.c:188
 #, c-format
 msgid "inotify: matched companion file: %s\n"
 msgstr "inotify: пронађена пратећа датотека: %s\n"
 
-#: src/optimize.c:198
+#: src/optimize.c:229
 #, c-format
 msgid "Unable to configure file modification detection to %s: %s\n"
 msgstr "Није могуће конфигурисати детекцију измена датотеке за %s: %s\n"
 
-#: src/optimize.c:203
+#: src/optimize.c:234
 #, c-format
 msgid "Monitoring directory for %s: %s\n"
 msgstr "Надгледам директоријум за %s: %s\n"
 
-#: src/optimize.c:301
+#: src/optimize.c:256
+#, c-format
+msgid "inotify: file stat failed or zero bytes (errno=%s), retrying\n"
+msgstr ""
+"inotify: провера датотеке неуспела или нула бајтова (errno=%s), понављам\n"
+
+#: src/optimize.c:360
 msgid "Exited optimizer thread.\n"
 msgstr "Нит оптимизатора је завршена.\n"
 
-#: src/optimize.c:307
+#: src/optimize.c:366
 msgid "optimize.c: exit because this is a child process.\n"
 msgstr "optimize.c: излаз jep је ово подређени процес.\n"
 
-#: src/optimize.c:333
+#: src/optimize.c:402
 #, c-format
 msgid "inotify: read %zd bytes from inotify fd\n"
 msgstr "inotify: прочитано %zd bytes sa inotify fd\n"
 
-#: src/optimize.c:337
+#: src/optimize.c:406
 #, c-format
 msgid ""
 "inotify: SKIP all events (flags) - FREQ_LOOP_RUNNING=%d FREQ_LOOP_INIT=%d "
@@ -4377,12 +5033,12 @@ msgstr ""
 "inotify: ПРЕСКОЧИ sve događaje (zastavice) - FREQ_LOOP_RUNNING=%d "
 "FREQ_LOOP_INIT=%d INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n"
 
-#: src/optimize.c:356
+#: src/optimize.c:424
 #, c-format
 msgid "inotify: EVENT @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
 msgstr "inotify: DOGAĐAJ @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
 
-#: src/optimize.c:360
+#: src/optimize.c:428
 #, c-format
 msgid ""
 "inotify: EVENT flags: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
@@ -4391,41 +5047,27 @@ msgstr ""
 "inotify: zastavice DOGAĐAJA: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM="
 "%d IN_CREATE=%d IN_DELETE=%d IN_MODIFY=%d\n"
 
-#: src/optimize.c:368
+#: src/optimize.c:436
 #, c-format
 msgid "inotify: FILTER: target='%s' event_name='%s' match=%d\n"
 msgstr "inotify: FILTER: target='%s' event_name='%s' match=%d\n"
 
-#: src/optimize.c:375
+#: src/optimize.c:443
 msgid "inotify: SKIP event (filename mismatch)\n"
 msgstr "inotify: ПРЕСКОЧИ događaj (несклaдање имена датотеке)\n"
 
-#: src/optimize.c:382
+#: src/optimize.c:450
 msgid "inotify: IN_MODIFY on target, setting modify_seen=TRUE\n"
 msgstr "inotify: IN_MODIFY на циљу, постављам modify_seen=TRUE\n"
 
-#: src/optimize.c:390
+#: src/optimize.c:458
 msgid ""
 "inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n"
 msgstr ""
 "inotify: IN_MOVED_TO на циљу (атомско писање завршено), покрећем поновно "
 "учитавање\n"
 
-#: src/optimize.c:401 src/optimize.c:434
-#, c-format
-msgid ""
-"inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), "
-"retrying\n"
-msgstr ""
-"inotify: stat датотеке неуспешан или нула bytes (ret=%d size=%ld errno=%s), "
-"понављам\n"
-
-#: src/optimize.c:407 src/optimize.c:440
-#, c-format
-msgid "inotify: file stat OK - size=%ld bytes\n"
-msgstr "inotify: stat датотеке OK - size=%ld bytes\n"
-
-#: src/optimize.c:423
+#: src/optimize.c:475
 msgid ""
 "inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
 "triggering reload\n"
@@ -4433,7 +5075,7 @@ msgstr ""
 "inotify: IN_CLOSE_WRITE nakon modify_seen=TRUE (директно писање завршено), "
 "покрећем поновно учитавање\n"
 
-#: src/optimize.c:451
+#: src/optimize.c:487
 msgid ""
 "inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
 "skipping\n"
@@ -4441,11 +5083,19 @@ msgstr ""
 "inotify: IN_CLOSE_WRITE без modify_seen (лажно затварање, stari inode), "
 "прескачем\n"
 
-#: src/optimize.c:458
+#: src/optimize.c:494
 #, c-format
 msgid "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 msgstr ""
 "inotify: ПРЕСКОЧИ догађај (није MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
+
+#: src/optimize.c:527
+msgid "failed to create optimizer wake eventfd\n"
+msgstr "неуспешно креирање eventfd-a за буђење оптимизатора\n"
+
+#: src/optimize.c:538
+msgid "failed to create Optimizer Output thread\n"
+msgstr "неуспешно креирање нити за излаз оптимизатора\n"
 
 #: src/optimizers/opt_fitness.c:345
 #, c-format
@@ -4462,12 +5112,12 @@ msgstr "fitness_transform: nepознати pravac %d\n"
 msgid "reduce_values: unknown reduction method %d\n"
 msgstr "reduce_values: непозната метода редукције %d\n"
 
-#: src/optimizers/opt_nec2_eval.c:81
+#: src/optimizers/opt_nec2_eval.c:80
 #, c-format
 msgid "nec2_eval_signal: eval_mutex contention, blocking (thr=%lu)\n"
 msgstr "nec2_eval_signal: заузетост eval_mutex, блокирање (thr=%lu)\n"
 
-#: src/optimizers/opt_nec2_eval.c:195
+#: src/optimizers/opt_nec2_eval.c:194
 msgid "nec2_eval_run: not initialized\n"
 msgstr "nec2_eval_run: није иницијализовано\n"
 
@@ -4485,15 +5135,19 @@ msgstr ""
 msgid "opt: optimization complete, best fitness: %.6g\n"
 msgstr "opt: оптимизација завршена, најбољи фитнес: %.6g\n"
 
-#: src/optimizers/opt_session.c:158
+#: src/optimizers/opt_session.c:194
 msgid "opt_start: optimizer already running\n"
 msgstr "opt_start: оптимизатор већ ради\n"
 
-#: src/optimizers/opt_session.c:224
+#: src/optimizers/opt_session.c:202
+msgid "opt_start: on_complete notifier is NULL\n"
+msgstr "opt_start: on_complete нотификатор је NULL\n"
+
+#: src/optimizers/opt_session.c:258
 msgid "opt_start: simple_new failed\n"
 msgstr "opt_start: simple_new није успело\n"
 
-#: src/optimizers/opt_session.c:233
+#: src/optimizers/opt_session.c:267
 #, c-format
 msgid "opt_start: pthread_create failed: %d\n"
 msgstr "opt_start: pthread_create није успело: %d\n"
@@ -4573,243 +5227,64 @@ msgstr "var '%s' неслагање величине round_result\n"
 msgid "var '%s' round_result has element <= 0\n"
 msgstr "var '%s' round_result има елемент <= 0\n"
 
-#: src/opt_ui_session.c:76
+#: src/opt_ui_session.c:99
 #, c-format
 msgid "opt_ui: optimization finished, best fitness: %.6g\n"
 msgstr "opt_ui: оптимизација завршена, најбољи фитнес: %.6g\n"
 
-#: src/opt_ui_session.c:112 src/opt_ui_session.c:145 src/opt_ui_session.c:175
-#: src/opt_ui_session.c:277
+#: src/opt_ui_session.c:133 src/opt_ui_session.c:166 src/opt_ui_session.c:196
+#: src/opt_ui_session.c:299
 msgid "Optimization"
 msgstr "Оптимизација"
 
-#: src/freqplots/freqplots_core.c:55
-msgid "Gain Direction"
-msgstr "Смер појачања"
-
-#: src/freqplots/freqplots_core.c:56
-msgid "Viewer Gain"
-msgstr "Појачање прегледача"
-
-#: src/freqplots/freqplots_core.c:58
-msgid "Impedance (real/imag)"
-msgstr "Импеданса (реал/имаг)"
-
-#: src/freqplots/freqplots_core.c:59
-msgid "Impedance (mag/phase)"
-msgstr "Импеданса (маг/фаза)"
-
-#: src/freqplots/freqplots_core.c:60 src/freqplots/graphs/smith_graph.c:476
-msgid "Smith Chart"
-msgstr "Смитов дијаграм"
-
-#: src/freqplots/freqplots_core.c:190
-#, c-format
-msgid "fp_field_cond_active: unhandled cond %d\n"
-msgstr "fp_field_cond_active: необрађени услов %d\n"
-
-#: src/freqplots/freqplots_core.c:206
-msgid "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
-msgstr "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
-
-#: src/freqplots/freqplots_core.c:393
-#, c-format
-msgid ""
-"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
-"%d posn=%d valid=%d\n"
-msgstr ""
-"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
-"%d posn=%d valid=%d\n"
-
-#: src/freqplots/freqplots_core.c:409
-#, c-format
-msgid ""
-"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
-"%d]\n"
-msgstr ""
-"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
-"%d]\n"
-
-#: src/freqplots/freqplots_graph.c:137 src/freqplots/graphs/smith_graph.c:529
-msgid "memory allocation for points failed\n"
-msgstr "алокација меморије за тачке није успела\n"
-
-#: src/freqplots/freqplots_graph.c:138 src/freqplots/graphs/smith_graph.c:530
-msgid "Draw_Graph():Memory allocation for points failed"
-msgstr "Draw_Graph(): Алокација меморије за тачке није успела"
-
-#: src/freqplots/graphs/smith_graph.c:384
-msgid "0 Ω"
-msgstr "0 Ω"
-
-#: src/freqplots/graphs/smith_graph.c:387
-#: src/freqplots/graphs/smith_graph.c:462
-msgid "∞ Ω"
-msgstr "∞ Ω"
-
-#: src/freqplots/graphs/smith_graph.c:407
-msgid "constant R"
-msgstr "константно R"
-
-#: src/freqplots/graphs/smith_graph.c:408
-msgid "constant X"
-msgstr "константно X"
-
-#: src/freqplots/graphs/smith_graph.c:409
-msgid "unity R, X"
-msgstr "јединично R, X"
-
-#: src/freqplots/graphs/smith_graph.c:410
-msgid "match (z = 1)"
-msgstr "поклапање (z = 1)"
-
-#: src/freqplots/graphs/smith_graph.c:411
-msgid "impedance vs freq"
-msgstr "импеданса у односу на фреквенцију"
-
-#: src/freqplots/graphs/smith_graph.c:412
-msgid "selected frequency"
-msgstr "изабрана фреквенција"
-
-#: src/freqplots/graphs/smith_graph.c:413
-msgid "reflection angle (°)"
-msgstr "угао рефлексије (°)"
-
-#: src/freqplots/graphs/smith_graph.c:414
-msgid "wavelengths → gen"
-msgstr "таласне дужине → ген"
-
-#: src/freqplots/graphs/smith_graph.c:507
-#, c-format
-msgid "Z0 = %g Ω"
-msgstr "Z0 = %g Ω"
-
-#: src/freqplots/graphs/smith_graph.c:514
-msgid "INDUCTIVE (+jX)"
-msgstr "ИНДУКТИВНО (+jX)"
-
-#: src/freqplots/graphs/smith_graph.c:517
-msgid "CAPACITIVE (-jX)"
-msgstr "КАПАЦИТИВНО (-jX)"
-
-#: src/freqplots/graphs/gain_graph.c:66 src/freqplots/graphs/viewer_graph.c:39
-msgid "Raw Gain dBi"
-msgstr "Сирово појачање dBi"
-
-#: src/freqplots/graphs/gain_graph.c:71
-msgid "Max Gain & Net Gain vs Frequency"
-msgstr "Макс. појачање и нето појачање у односу на фреквенцију"
-
-#: src/freqplots/graphs/gain_graph.c:72
-msgid "Net Gain dBi"
-msgstr "Нето појачање dBi"
-
-#: src/freqplots/graphs/gain_graph.c:77 src/freqplots/graphs/gain_graph.c:84
-msgid "Max Gain & F/B Ratio vs Frequency"
-msgstr "Макс. појачање и однос F/B у односу на фреквенцију"
-
-#: src/freqplots/graphs/gain_graph.c:85
-msgid "F/B Ratio dB"
-msgstr "Однос F/B dB"
-
-#: src/freqplots/graphs/gain_graph.c:91
-msgid "Rad Angle - deg"
-msgstr "Угао зрачења - deg"
-
-#: src/freqplots/graphs/gain_graph.c:92
-msgid "Max Gain Direction vs Frequency"
-msgstr "Правац макс. појачања у односу на фреквенцију"
-
-#: src/freqplots/graphs/gain_graph.c:93
-msgid "Phi - deg"
-msgstr "Phi - deg"
-
-#: src/freqplots/graphs/viewer_graph.c:40
-msgid "Gain in Viewer Direction vs Frequency"
-msgstr "Појачање у смеру посматрача у односу на фреквенцију"
-
-#: src/freqplots/graphs/viewer_graph.c:56
-msgid "Net gain dBi"
-msgstr "Нето појачање dBi"
-
-#: src/freqplots/graphs/vswr_graph.c:43
-msgid "VSWR & S11 vs Frequency"
-msgstr "VSWR и S11 у односу на фреквенцију"
-
-#: src/freqplots/graphs/vswr_graph.c:44
-msgid "S11 dB"
-msgstr "S11 dB"
-
-#: src/freqplots/graphs/vswr_graph.c:48
-msgid "VSWR vs Frequency"
-msgstr "VSWR у односу на фреквенцију"
-
-#: src/freqplots/graphs/impedance_graph.c:57
-#: src/freqplots/graphs/impedance_graph.c:62
-msgid "Impedance vs Frequency"
-msgstr "Импеданса у односу на фреквенцију"
-
-#: src/freqplots/graphs/impedance_graph.c:61
-msgid "Z-magn"
-msgstr "Z-магнитуда"
-
-#: src/freqplots/graphs/impedance_graph.c:63
-msgid "Z-phase"
-msgstr "Z-фаза"
-
-#: src/freqplots/graphs/anttemp_graph.c:54
-msgid "G/Ta (dB)"
-msgstr "G/Ta (dB)"
-
-#: src/freqplots/graphs/anttemp_graph.c:55
-msgid "G/Ta & TA - Antenna noise temperature"
-msgstr "G/Ta и TA — Температура шума антене"
-
-#: src/freqplots/graphs/anttemp_graph.c:57
-msgid "Ta (K)"
-msgstr "Ta (K)"
-
-#: src/freqplots/graphs/anttemp_graph.c:59
-msgid "TA (K)"
-msgstr "TA (K)"
-
-#: src/prerender/prerender_color.c:107
+#: src/prerender/prerender_color.c:108
 #, c-format
 msgid "segment_type_to_rgb: unknown type %d\n"
 msgstr "segment_type_to_rgb: непознати тип %d\n"
 
-#: src/prerender/prerender_color.c:134
+#: src/prerender/prerender_color.c:135
 #, c-format
 msgid "segment_type_to_width: unknown type %d\n"
 msgstr "segment_type_to_width: непознати тип %d\n"
 
-#: src/radiation.c:838
+#: src/prerender/prerender_color_proj.c:299
+#: src/prerender/prerender_color_proj.c:326
+#, c-format
+msgid "unhandled color projection %d\n"
+msgstr "необрађена пројекција боје %d\n"
+
+#: src/prerender/prerender_color_proj.c:337
+#, c-format
+msgid "invalid color projection %d, using amplitude\n"
+msgstr "неважећа пројекција боје %d, користим амплитуду\n"
+
+#: src/radiation.c:879
 #, c-format
 msgid "Average gain %.4f exceeds expected %.4f; check RP theta/phi ranges\n"
 msgstr ""
-"Просечно појачање %.4f премашује очекивано %.4f; проверите RP theta/phi "
+"Просечан добитак %.4f премашује очекивани %.4f; проверите RP theta/phi "
 "опсеге\n"
 
-#: src/radiation.c:842
+#: src/radiation.c:883
 #, c-format
 msgid ""
 "Average gain: %.4f (%.2f dBi), efficiency: %.1f%%, solid angle: %.4f * pi "
 "sr\n"
 msgstr ""
-"Просечно појачање: %.4f (%.2f dBi), ефикасност: %.1f%%, просторни угао: %.4f "
+"Просечан добитак: %.4f (%.2f dBi), ефикасност: %.1f%%, просторни угао: %.4f "
 "* pi sr\n"
 
-#: src/rc_config.c:376
+#: src/rc_config.c:808
 #, c-format
 msgid "unable to getcwd(): %s\n"
 msgstr "није могуће извршити getcwd(): %s\n"
 
-#: src/rc_config.c:380
+#: src/rc_config.c:812
 #, c-format
 msgid "environment variable HOME is undefined, using %s\n"
 msgstr "Променљива окружења HOME није дефинисана, користим %s\n"
 
-#: src/rc_config.c:465
+#: src/rc_config.c:897
 #, c-format
 msgid ""
 "%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
@@ -4817,50 +5292,37 @@ msgstr ""
 "%s (locale=%s): поклопило се само %d од %lu знакова, пробавам другу "
 "локализацију: %s\n"
 
-#: src/rc_config.c:526
-#, c-format
-msgid ""
-"rc_config: %s: builder_check_menu_item_id is NULL but builder_window is "
-"defined.\n"
+#: src/rc_config.c:977
+msgid "rc_config_default_int: no integer default for field\n"
 msgstr ""
-"rc_config: %s: builder_check_menu_item_id је NULL ali builder_window је "
-"definisan.\n"
+"rc_config_default_int: нема подразумеване целобројне вредности за поље\n"
 
-#: src/rc_config.c:529
+#: src/rc_config.c:1066
 #, c-format
-msgid ""
-"rc_config: %s: builder_window is NULL but builder_check_menu_item_id is "
-"defined.\n"
-msgstr ""
-"rc_config: %s: builder_window је NULL ali builder_check_menu_item_id је "
-"definisan.\n"
+msgid "rc_config_field_size: %s: unsupported format %s\n"
+msgstr "rc_config_field_size: %s: неподржан формат %s\n"
 
-#: src/rc_config.c:542
-#, c-format
-msgid "match: %s\n"
-msgstr "подударање: %s\n"
-
-#: src/rc_config.c:567
+#: src/rc_config.c:1112
 #, c-format
 msgid "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
 msgstr "прозор: x=%-5d y=%-5d w=%-5d h=%-5d  наслов: \"%s\"\n"
 
-#: src/rc_config.c:615
+#: src/rc_config.c:1146
 #, c-format
 msgid "%s: EOF reading application version.\n"
 msgstr "%s: EOF pri čitanju verzije aplikacije.\n"
 
-#: src/rc_config.c:621
+#: src/rc_config.c:1152
 #, c-format
 msgid "existing config file version differs: %s != %s\n"
 msgstr "Верзија постојеће конфигурационе датотеке се разликује: %s != %s\n"
 
-#: src/rc_config.c:920
+#: src/rc_config.c:1291
 #, c-format
 msgid "stat failed for %s: %s\n"
 msgstr "stat није успео за %s: %s\n"
 
-#: src/rc_config.c:926
+#: src/rc_config.c:1297
 #, c-format
 msgid ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
@@ -4869,47 +5331,51 @@ msgstr ""
 "Исправљена дозвола директоријума %s са 0%o na 0%o zbog greške unesene u "
 "4e62893b.\n"
 
-#: src/rc_config.c:957
+#: src/rc_config.c:1328
 #, c-format
 msgid "%s:%d: Line not parsed: %s\n"
 msgstr "%s:%d: Линија није парсирана: %s\n"
 
-#: src/rc_config.c:963
+#: src/rc_config.c:1334
 #, c-format
 msgid "%s:%d: Early end of file for %s: %s \n"
 msgstr "%s:%d: Превремени крај датотеке за %s: %s \n"
 
-#: src/rc_config.c:988
+#: src/rc_config.c:1359
 #, c-format
 msgid "%s:%d: parse error (%s): %s \n"
 msgstr "%s:%d: грешка парсирања (%s): %s \n"
 
-#: src/rc_config.c:1011
+#: src/rc_config.c:1373
 #, c-format
 msgid "Invalid sky model index %d in config, resetting to default\n"
 msgstr ""
 "Неважећи индекс модела неба %d у конфигурацији, ресетовање на подразумевано\n"
 
-#: src/rc_config.c:1017
+#: src/rc_config.c:1379
 #, c-format
 msgid "Invalid earth model index %d in config, resetting to default\n"
 msgstr ""
 "Неважећи индекс модела земље %d у конфигурацији, ресетовање на "
 "подразумевано\n"
 
-#: src/rc_config.c:1023
+#: src/rc_config.c:1385
 #, c-format
 msgid "Invalid interp method %d in config, resetting to default\n"
 msgstr ""
 "Неважећа метода интерполације %d у конфигурацији, ресетовање на "
 "подразумевано\n"
 
-#: src/rc_config.c:1341
+#: src/rc_config.c:1560
+msgid "batch mode: skipping configuration save\n"
+msgstr "batch режим: прескачем чување конфигурације\n"
+
+#: src/rc_config.c:1567
 #, c-format
 msgid "cannot open xnec2c's config file %s: %s\n"
 msgstr "није могуће отворити конфигурациону датотеку xnec2c %s: %s\n"
 
-#: src/rdpattern_ui.c:36
+#: src/rdpattern_ui.c:37
 msgid ""
 "Animation requires near field data.\n"
 "\n"
@@ -4919,11 +5385,16 @@ msgid ""
 msgstr ""
 "Анимација захтева податке блиског поља.\n"
 "\n"
+"Анимација E-поља: Додајте NE картицу у NEC датотеку\n"
+"Анимација H-поља: Додајте NH картицу у NEC датотеку\n"
+"Појнтингов вектор: Додајте и NE и NH картицеАнимација захтева податке "
+"блиског поља.\n"
+"\n"
 "Анимација Е-поља: Додајте NE картицу у NEC датотеку\n"
 "Анимација H-поља: Додајте NH картицу у NEC датотеку\n"
 "Појнтингов вектор: Додајте и NE и NH картице"
 
-#: src/rdpattern_ui.c:92
+#: src/rdpattern_ui.c:93
 #, c-format
 msgid ""
 "Scale_Gain_Resolved: gain_style %d out of range [0..%d], defaulting to "
@@ -4932,7 +5403,7 @@ msgstr ""
 "Scale_Gain_Resolved: gain_style %d ван опсега [0..%d], подразумевано "
 "GS_LINP\n"
 
-#: src/rdpattern_ui.c:561 src/rdpattern_ui.c:567
+#: src/rdpattern_ui.c:562 src/rdpattern_ui.c:568
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
@@ -4940,15 +5411,15 @@ msgstr ""
 "Елевациони угао посматрања. Помера границу небо/земља за евалуацију "
 "температуре антене. 0° = хоризонт."
 
-#: src/rdpattern_ui.c:564 src/rdpattern_ui.c:570
+#: src/rdpattern_ui.c:565 src/rdpattern_ui.c:571
 msgid ""
 "Observation elevation for antenna temperature.\n"
 "Select Gain Style → Noise Temperature to enable."
 msgstr ""
 "Елевациони угао посматрања за температуру антене.\n"
-"Изаберите Стил појачања → Температура шума да бисте омогућили."
+"Изаберите Стил добитка → Температура шума да бисте омогућили."
 
-#: src/rdpattern_ui.c:573
+#: src/rdpattern_ui.c:574
 msgid ""
 "Independent sky, earth, and interpolation selectors for noise temperature "
 "models."
@@ -4956,79 +5427,79 @@ msgstr ""
 "Независни селектори модела неба, земље и интерполације за моделе температуре "
 "шума."
 
-#: src/rdpattern_ui.c:575
+#: src/rdpattern_ui.c:576
 msgid ""
 "Sky and earth noise temperature models.\n"
 "Select Gain Style → Noise Temperature to enable."
 msgstr ""
 "Модели температуре шума неба и земље.\n"
-"Изаберите Стил појачања → Температура шума да бисте омогућили."
+"Изаберите Стил добитка → Температура шума да бисте омогућили."
 
-#: src/rdpattern_ui.c:976
+#: src/rdpattern_ui.c:961
 msgid "Total Gain"
-msgstr "Укупно појачање"
+msgstr "Укупан добитак"
 
-#: src/rdpattern_ui.c:977
+#: src/rdpattern_ui.c:962
 msgid "Horizontal Polarization"
 msgstr "Хоризонтална поларизација"
 
-#: src/rdpattern_ui.c:978
+#: src/rdpattern_ui.c:963
 msgid "Vertical Polarization"
 msgstr "Вертикална поларизација"
 
-#: src/rdpattern_ui.c:979
+#: src/rdpattern_ui.c:964
 msgid "RH Circular Polarization"
 msgstr "Десна кружна поларизација"
 
-#: src/rdpattern_ui.c:980
+#: src/rdpattern_ui.c:965
 msgid "LH Circular Polarization"
 msgstr "Лева кружна поларизација"
 
-#: src/rdpattern_ui.c:985
+#: src/rdpattern_ui.c:970
 msgid "Linear Power"
 msgstr "Линеарна снага"
 
-#: src/rdpattern_ui.c:986
+#: src/rdpattern_ui.c:971
 msgid "Linear Voltage"
 msgstr "Линеарни напон"
 
-#: src/rdpattern_ui.c:987
+#: src/rdpattern_ui.c:972
 msgid "ARRL Scale"
 msgstr "ARRL скала"
 
-#: src/rdpattern_ui.c:988
+#: src/rdpattern_ui.c:973
 msgid "Logarithmic Scale"
 msgstr "Логаритамска скала"
 
-#: src/rdpattern_ui.c:989
+#: src/rdpattern_ui.c:974
 msgid "Noise Temperature"
 msgstr "Температура шума"
 
-#: src/rdpattern_ui.c:990
+#: src/rdpattern_ui.c:975
 msgid "Noise Temp (log scale)"
 msgstr "Темп. шума (лог. скала)"
 
-#: src/rdpattern_ui.c:1002
+#: src/rdpattern_ui.c:987
 msgid "Radiation Pattern: - "
 msgstr "Дијаграм зрачења: - "
 
-#: src/rdpattern_ui.c:1022
+#: src/rdpattern_ui.c:1007
 msgid "Near Fields:"
 msgstr "Блиска поља:"
 
-#: src/rdpattern_ui.c:1024
+#: src/rdpattern_ui.c:1009
 msgid " - E Field"
 msgstr " - E поље"
 
-#: src/rdpattern_ui.c:1026
+#: src/rdpattern_ui.c:1011
 msgid " - H Field"
 msgstr " - H поље"
 
-#: src/rdpattern_ui.c:1028
+#: src/rdpattern_ui.c:1013
 msgid " - Poynting Vector"
 msgstr " - Појнтингов вектор"
 
-#: src/rdpattern_ui.c:1038
+#: src/rdpattern_ui.c:1023
 msgid "Frequency Data Plots - "
 msgstr "Графици фреквенцијских података - "
 
@@ -5042,57 +5513,41 @@ msgstr "fstep=%d је ван опсега. calc_data.steps_total=%d"
 msgid "gradient_cache_update: surface creation failed (%dx%d)\n"
 msgstr "gradient_cache_update: креирање површине није успело (%dx%d)\n"
 
-#: src/render/render_dispatch.c:413
+#: src/render/render_dispatch.c:474
 #, c-format
 msgid "render: unhandled mode %d\n"
 msgstr "render: необрађени режим %d\n"
 
-#: src/settings/render_settings_common.c:124
+#: src/settings/render_settings_common.c:86
+msgid "config_reset_tab_user: field has no rc_config_vars row\n"
+msgstr "config_reset_tab_user: поље нема rc_config_vars ред\n"
+
+#: src/settings/render_settings_common.c:116
 #, c-format
 msgid "render_settings_init: failed to load glade: %s\n"
 msgstr "render_settings_init: није успело учитавање glade: %s\n"
 
-#: src/settings/render_settings_common.c:134
+#: src/settings/render_settings_common.c:126
 #, c-format
 msgid "render_settings_init: failed to load opengl glade: %s\n"
 msgstr "render_settings_init: није успело учитавање opengl glade: %s\n"
 
-#: src/settings/render_settings_common.c:144
+#: src/settings/render_settings_common.c:136
 #, c-format
 msgid "render_settings_init: failed to load cairo glade: %s\n"
 msgstr "render_settings_init: није успело учитавање cairo glade: %s\n"
 
-#: src/settings/render_settings_common.c:157
+#: src/settings/render_settings_common.c:149
 msgid "render_settings_init: failed to get render_settings_window from glade\n"
 msgstr ""
 "render_settings_init: није успело преузимање render_settings_window из "
 "glade\n"
 
-#: src/settings/render_settings_dispatch.c:104
-#, c-format
-msgid "config_apply_entry: missing widget '%s'\n"
-msgstr "config_apply_entry: недостаје виџет '%s'\n"
-
-#: src/settings/render_settings_dispatch.c:136
-#, c-format
-msgid "config_apply_entry: unknown widget type for '%s'\n"
-msgstr "config_apply_entry: непознати тип виџета за '%s'\n"
-
-#: src/settings/render_settings_dispatch.c:164
-#, c-format
-msgid "config_sync_entry: missing widget '%s'\n"
-msgstr "config_sync_entry: недостаје виџет '%s'\n"
-
-#: src/settings/render_settings_dispatch.c:193
-#, c-format
-msgid "config_sync_entry: unknown widget type for '%s'\n"
-msgstr "config_sync_entry: непознати тип виџета за '%s'\n"
-
-#: src/somnec.c:237
+#: src/somnec.c:302
 msgid "Hankel not valid for z = 0"
 msgstr "Hankel није валидан за Z = 0"
 
-#: src/somnec.c:748
+#: src/somnec.c:807
 msgid "No convergence"
 msgstr "Нема конвергенције"
 
@@ -5191,6 +5646,42 @@ msgstr ""
 "Одређује да ли овај параметар замењује вредност NEC модела.\n"
 "Искључите Opt за независно управљање."
 
+#: src/themes/theme.c:129
+#, c-format
+msgid "theme '%s' role '%s' invalid color, using legacy default\n"
+msgstr "тема '%s' улога '%s' неважећа боја, користим legacy подразумевано\n"
+
+#: src/themes/theme.c:212
+#, c-format
+msgid "theme: cannot load resource %s: %s\n"
+msgstr "тема: није могуће учитати ресурс %s: %s\n"
+
+#: src/themes/theme.c:222
+#, c-format
+msgid "theme: cannot parse resource %s: %s\n"
+msgstr "тема: није могуће рашчланити ресурс %s: %s\n"
+
+#: src/themes/theme.c:248
+#, c-format
+msgid "theme: cannot parse %s, using built-in defaults\n"
+msgstr ""
+"тема: није могуће рашчланити %s, користим уграђене подразумеване вредности\n"
+
+#: src/themes/theme.c:377
+#, c-format
+msgid "theme '%s' has no inverted variant, using base\n"
+msgstr "тема '%s' нема инверзну варијанту, користим основну\n"
+
+#: src/themes/theme.c:385
+#, c-format
+msgid "theme '%s' not found, using legacy\n"
+msgstr "тема '%s' није пронађена, користим legacy\n"
+
+#: src/themes/theme.c:457
+#, c-format
+msgid "width '%s' invalid, keeping current value\n"
+msgstr "ширина '%s' неважећа, задржавам тренутну вредност\n"
+
 #: src/utils.c:42
 #, c-format
 msgid ""
@@ -5229,6 +5720,7 @@ msgid ""
 "  --write-currents        <filename>  - write CSV of currents and charges\n"
 "  --write-gnuplot-structure <filename> - write gnuplot structure file\n"
 "  --write-patch-currents  <filename>  - write CSV of patch surface currents\n"
+"  --write-validation-dir <directory> - write full validation data tree\n"
 msgstr ""
 "Употреба: xnec2c [опције] [<име-улазне-датотеке>]\n"
 "  -i|--input         <име-улазне-датотеке>\n"
@@ -5276,8 +5768,10 @@ msgstr ""
 "структуре\n"
 "  --write-patch-currents  <име-датотеке>  - упиши CSV патч површинских "
 "струја\n"
+"  --write-validation-dir <директоријум> - упиши потпуно дрво података "
+"верификације\n"
 
-#: src/utils.c:98 src/utils.c:103
+#: src/utils.c:99 src/utils.c:104
 #, c-format
 msgid ""
 "\n"
@@ -5290,50 +5784,98 @@ msgstr ""
 "%s\n"
 "\n"
 
-#: src/utils.c:184
+#: src/utils.c:185
 #, c-format
 msgid "Stop: %s\n"
 msgstr "Заустави: %s\n"
 
-#: src/utils.c:220 src/utils.c:222
+#: src/utils.c:224 src/utils.c:226
 #, c-format
 msgid "Stop during freq loop, deadlock prevented: %s\n"
 msgstr "Заустављање током фреквенцијске петље, deadlock спречен: %s\n"
 
-#: src/utils.c:402
+#: src/utils.c:410
 #, c-format
 msgid "using %d OpenMP threads per job (%d/%d CPUs)\n"
 msgstr "користим %d OpenMP нити по послу (%d/%d процесора)\n"
 
-#: src/utils.c:418
+#: src/utils.c:426
 #, c-format
 msgid "%s[%d]: %f seconds\n"
 msgstr "%s[%d]: %f секунди\n"
 
-#: src/utils.c:443
+#: src/utils.c:451
 #, c-format
 msgid "xnec2c[%d]: %s: Failed to open file: %s\n"
 msgstr "xnec2c[%d]: %s: Није успело отварање датотеке: %s\n"
 
-#: src/utils.c:833
+#: src/utils.c:850
 msgid "Optimizer loop incomplete, suppressing intermediate redraw.\n"
 msgstr "Петља оптимизатора није завршена, прескачем привремено исцртавање.\n"
 
-#: src/utils.c:849
+#: src/utils.c:866
 msgid "  Backtrace:\n"
 msgstr "  Повратни траг:\n"
 
-#: src/utils.c:851
+#: src/utils.c:868
 #, c-format
 msgid "    %d. %s\n"
 msgstr "    %d. %s\n"
 
-#: src/utils.c:878
+#: src/utils.c:895
 #, c-format
 msgid "%s:\n"
 msgstr "%s:\n"
 
-#: src/xnec2c.c:281
+#: src/validation_dump.c:33
+msgid ""
+"validation: nec2-builtin mathlib not available; numeric results may differ "
+"from reference\n"
+msgstr ""
+"верификација: nec2-builtin mathlib није доступна; нумерички резултати могу "
+"се разликовати од референце\n"
+
+#: src/validation_dump.c:38
+msgid "validation: forced mathlib to nec2-builtin for reproducibility\n"
+msgstr "верификација: mathlib приморан на nec2-builtin ради поновљивости\n"
+
+#: src/validation_dump.c:57
+msgid ""
+"validation: forced antenna-temp models and elevation for reproducibility\n"
+msgstr ""
+"верификација: модели температуре антене и елевација приморани ради "
+"поновљивости\n"
+
+#: src/validation_dump.c:67
+msgid "validation: forced polarization to total for reproducibility\n"
+msgstr "верификација: поларизација приморана на укупну ради поновљивости\n"
+
+#: src/validation_dump.c:78
+msgid ""
+"validation: reset structure viewer to default orientation for "
+"reproducibility\n"
+msgstr ""
+"верификација: приказивач структуре ресетован на подразумевану оријентацију "
+"ради поновљивости\n"
+
+#: src/validation_dump.c:568 src/validation_dump.c:574
+msgid "Validation Tree"
+msgstr "Дрво верификације"
+
+#: src/validation_dump.c:568
+msgid "Cannot save: frequency loop not done"
+msgstr "Није могуће сачувати: фреквенцијска петља није завршена"
+
+#: src/validation_dump.c:574
+msgid "Cannot create output directory"
+msgstr "Није могуће креирати излазни директоријум"
+
+#: src/validation_dump.c:606
+#, c-format
+msgid "validation tree written to: %s\n"
+msgstr "дрво верификације уписано у: %s\n"
+
+#: src/xnec2c.c:282
 #, c-format
 msgid ""
 "complex dielectric constant from file: %12.5E%+12.5Ej, requested: %12.5E"
@@ -5342,21 +5884,21 @@ msgstr ""
 "комплексна диелектрична константа из датотеке: %12.5E%+12.5Ej, захтевана: "
 "%12.5E%+12.5Ej\n"
 
-#: src/xnec2c.c:284
+#: src/xnec2c.c:285
 msgid "Ground_Parameters():Error in ground parameters"
 msgstr "Ground_Parameters(): Грешка у параметрима уземљења"
 
-#: src/xnec2c.c:611
+#: src/xnec2c.c:708
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
 msgstr "%.6f MHz: %f секунди. (%s)\n"
 
-#: src/xnec2c.c:865
+#: src/xnec2c.c:962
 #, c-format
 msgid "green_line_eval returned unknown class %d\n"
 msgstr "green_line_eval returned unknown class %d\n"
 
-#: src/xnec2c.c:946
+#: src/xnec2c.c:1043
 #, c-format
 msgid ""
 "step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
@@ -5364,16 +5906,16 @@ msgstr ""
 "корак %d је претекао: послато %.6f MHz, тренутно %.6f MHz; понављам "
 "прорачун\n"
 
-#: src/xnec2c.c:1042
+#: src/xnec2c.c:1139
 #, c-format
 msgid "child %d has invalid pipe fd during forked collect\n"
 msgstr "подређени процес %d има неважећи pipe fd током форкованог прикупљања\n"
 
-#: src/xnec2c.c:1097
+#: src/xnec2c.c:1194
 msgid "Failed to read data from forked child\n"
 msgstr "Није успело читање података од форкованог подређеног процеса\n"
 
-#: src/xnec2c.c:1174
+#: src/xnec2c.c:1271
 #, c-format
 msgid ""
 "fmhz_save %.4f MHz outside FR card ranges; reset to %.4f MHz (VSWR %.2f)\n"
@@ -5381,11 +5923,15 @@ msgstr ""
 "fmhz_save %.4f MHz ван опсега FR картице; ресетовање на %.4f MHz (VSWR "
 "%.2f)\n"
 
-#: src/xnec2c.c:1199
+#: src/xnec2c.c:1300
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
 msgstr "Протекло време петље фреквенције: %f секунди. (%s)\n"
 
-#: src/xnec2c.c:1438
+#: src/xnec2c.c:1567
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "није успело покретање Frequency_Loop_Thread\n"
+
+#, c-format
+#~ msgid "invalid color family %d, using power\n"
+#~ msgstr "неважећа породица боје %d, користим снагу\n"
