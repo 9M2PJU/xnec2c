@@ -23,6 +23,12 @@ src/callback_func.c
 src/callback_func.h
 src/callbacks.c
 src/callbacks.h
+src/chroma/chroma.c
+src/chroma/chroma_glyph.c
+src/chroma/chroma_glyph.h
+src/chroma/chroma.h
+src/chroma/chroma_source.c
+src/chroma/chroma_source.h
 src/cmnd_edit.c
 src/cmnd_edit.h
 src/color/color_edge.h
