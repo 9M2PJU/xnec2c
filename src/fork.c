@@ -262,8 +262,6 @@ static size_t size_nphth_int(void)      { return (size_t)(fpat.nph * fpat.nth) *
 static size_t size_n_ports_dbl(void)    { return (size_t)Num_Feedpoint_Ports() * sizeof(double); }
 static size_t size_nf_points(void)      { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t); }
 static size_t size_nf_vectors(void)     { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(nf_vector_t); }
-static size_t size_seg_rgb(void)        { return (size_t)data.n  * sizeof(rgb_f_t); }
-static size_t size_patch_rgb(void)      { return (size_t)data.m  * sizeof(rgb_f_t); }
 static size_t size_patch_flow(void)     { return (size_t)data.m  * 4 * sizeof(float); }
 
 /* freq_field_active()
@@ -327,10 +325,7 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
     { &rad_pattern[fstep].efficiency,  NULL,           sizeof(double),           FREQ_COND_RDPAT  },
     /* Per-fstep noise temperature table (allocated alongside rad_pattern[]) */
     { &noise_temp[fstep],              NULL,              sizeof(noise_temp_t),  FREQ_COND_RDPAT  },
-    /* Per-fstep structure colors (current/charge RGB + cmin/cmax) */
-    { struct_colors[fstep].wire_crnt_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
-    { struct_colors[fstep].wire_chrg_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
-    { struct_colors[fstep].patch_crnt_rgb, size_patch_rgb, 0,                   FREQ_COND_ALWAYS },
+    /* Per-fstep structure colors (patch flow + cmin/cmax range scalars) */
     { struct_colors[fstep].patch_flow_data, size_patch_flow, 0,                FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_crnt_cmin, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_crnt_cmax, NULL,          sizeof(float),       FREQ_COND_ALWAYS },

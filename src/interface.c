@@ -24,6 +24,7 @@
 #include "gdk_scroll.h"
 #include "i18n.h"
 #include "themes/theme.h"
+#include "color/color_palette.h"
 
 /*------------------------------------------------------------------*/
 
@@ -226,6 +227,7 @@ create_main_window( GtkBuilder **builder )
   gchar *object_ids[] = { MAIN_WINDOW_IDS };
   Gtk_Builder( builder, object_ids );
   scroll_install_all_spins( *builder );
+  color_family_menu_attach( *builder );
   ret = Builder_Get_Object( *builder, "main_window" );
   return( ret );
 }
@@ -248,9 +250,8 @@ create_freqplots_window( GtkBuilder **builder )
   Gtk_Builder( builder, object_ids );
   ret = Builder_Get_Object( *builder, "freqplots_window" );
 
-  /* The color-theme registry and the per-purpose widths load once with the
-   * window; the Color Theme submenu is generated from the registry. */
-  theme_registry_init();
+  /* Per-purpose plot widths load once with the window; the Color Theme
+   * submenu is generated from the startup-initialized theme registry. */
   fp_width_init();
   freqplots_theme_menu_build( *builder );
 
@@ -357,8 +358,17 @@ create_error_dialog( GtkBuilder **builder )
 create_animate_dialog( GtkBuilder **builder )
 {
   GtkWidget *ret = NULL;
-  gchar *object_ids[] = { ANIMATE_DIALOG_IDS };
-  Gtk_Builder( builder, object_ids );
+  GError *gerror = NULL;
+
+  /* Load the standalone animate dialog whole through its own builder,
+   * mirroring sy_overrides_init rather than filtering ids from xnec2c.glade. */
+  *builder = gtk_builder_new();
+  if( !gtk_builder_add_from_resource( *builder, "/animate.glade", &gerror ) )
+  {
+    pr_err("create_animate_dialog: failed to load animate.glade: %s\n", gerror->message);
+    exit( -1 );
+  }
+  gtk_builder_connect_signals( *builder, NULL );
   ret = Builder_Get_Object( *builder, "animate_dialog" );
   return( ret );
 }

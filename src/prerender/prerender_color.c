@@ -23,7 +23,7 @@
  * No Cairo, no OpenGL, no GTK dependencies.
  */
 #include "prerender_color.h"
-#include "prerender_color_proj.h"
+#include "../chroma/chroma.h"
 #include "../shared.h"
 
 rgb_f_t *seg_rgb   = NULL;
@@ -140,80 +140,6 @@ segment_type_to_width(segment_color_type_t type)
 /*-----------------------------------------------------------------------*/
 
 /**
- * Value_to_Color() - Map a scalar to an RGB rainbow ramp
- * @red: output red channel [0..1]
- * @grn: output green channel [0..1]
- * @blu: output blue channel [0..1]
- * @val: input value
- * @max: normalization maximum
- *
- * Produces magenta→blue→cyan→green→yellow→red for val in [0..max].
- */
-  void
-Value_to_Color(double *red, double *grn, double *blu, double val, double max)
-{
-  int ival;
-
-  /* Scale val so that normalized ival is 0-1279 */
-  ival = (int)(1279.0 * val / max);
-
-  switch( ival / 256 )
-  {
-    case 0: /* 0-255 : magenta to blue */
-      *red = 255.0 - (double)ival;
-      *grn = 0.0;
-      *blu = 255.0;
-      break;
-
-    case 1: /* 256-511 : blue to cyan */
-      *red = 0.0;
-      *grn = (double)ival - 256.0;
-      *blu = 255.0;
-      break;
-
-    case 2: /* 512-767 : cyan to green */
-      *red = 0.0;
-      *grn = 255.0;
-      *blu = 767.0 - (double)ival;
-      break;
-
-    case 3: /* 768-1023 : green to yellow */
-      *red = (double)ival - 768.0;
-      *grn = 255.0;
-      *blu = 0.0;
-      break;
-
-    case 4: /* 1024-1279 : yellow to red */
-      *red = 255.0;
-      *grn = 1279.0 - (double)ival;
-      *blu = 0.0;
-      break;
-
-    default: /* Clamp out-of-range to endpoints */
-      if( ival < 0 )
-      {
-        *red = 255.0;
-        *grn = 0.0;
-        *blu = 255.0;
-      }
-      else
-      {
-        *red = 255.0;
-        *grn = 0.0;
-        *blu = 0.0;
-      }
-      break;
-  }
-
-  /* Scale channels to [0..1] */
-  *red /= 255.0;
-  *grn /= 255.0;
-  *blu /= 255.0;
-}
-
-/*-----------------------------------------------------------------------*/
-
-/**
  * free_struct_colors_step() - Release one fstep's color sub-buffers
  * @elem: pointer to one struct_colors_t element
  */
@@ -221,9 +147,6 @@ static void
 free_struct_colors_step(void *elem)
 {
   struct_colors_t *c = elem;
-  mem_array_free(&c->wire_crnt_rgb);
-  mem_array_free(&c->wire_chrg_rgb);
-  mem_array_free(&c->patch_crnt_rgb);
   mem_array_free(&c->patch_flow_data);
 }
 
@@ -247,21 +170,11 @@ alloc_struct_colors(int nfrq)
 
   for( i = 0; i < nfrq; i++ )
   {
-    if( data.n > 0 )
-    {
-      mem_array_alloc(&struct_colors[i].wire_crnt_rgb, data.n);
-      mem_array_alloc(&struct_colors[i].wire_chrg_rgb, data.n);
-    }
-
     if( data.m > 0 )
-    {
-      mem_array_alloc(&struct_colors[i].patch_crnt_rgb, data.m);
-
       mem_array_alloc(&struct_colors[i].patch_flow_data, data.m);
-    }
   }
 
-  color_proj_alloc();
+  chroma_proj_alloc();
 }
 
 /*-----------------------------------------------------------------------*/
@@ -287,7 +200,7 @@ free_struct_colors(void)
   mem_array_free(&seg_width);
   mem_array_free(&patch_rgb);
 
-  color_proj_free();
+  chroma_proj_free();
 }
 
 /*-----------------------------------------------------------------------*/
@@ -339,8 +252,8 @@ init_geometry_colors(void)
  * struct_colors_fill_fstep() - Compute Tier 2 wire/patch colors for one fstep
  * @fstep: frequency step index
  *
- * Reads crnt_fstep[fstep] current/charge amplitudes.  Scans magnitude
- * range, then maps each segment/patch via Value_to_Color().
+ * Reads crnt_fstep[fstep] current/charge amplitudes, scans the magnitude
+ * ranges, and bakes the patch tangent-flow phasor projections.
  */
   void
 struct_colors_fill_fstep(int fstep)
@@ -399,37 +312,6 @@ struct_colors_fill_fstep(int fstep)
   struct_colors[fstep].wire_chrg_cmax  = (float)cmax_wire_chrg;
   struct_colors[fstep].patch_crnt_cmin = (float)cmin_patch;
   struct_colors[fstep].patch_crnt_cmax = (float)cmax_patch;
-
-  /* Map wire current colors */
-  if( struct_colors[fstep].wire_crnt_rgb != NULL && cmax_wire_crnt > 0.0 )
-  {
-    for( i = 0; i < data.n; i++ )
-    {
-      cabs_val = cabs(crnt_fstep[fstep].cur[i]);
-      struct_colors[fstep].wire_crnt_rgb[i] = color_from_value(cabs_val, cmax_wire_crnt);
-    }
-  }
-
-  /* Map wire charge colors */
-  if( struct_colors[fstep].wire_chrg_rgb != NULL && cmax_wire_chrg > 0.0 )
-  {
-    for( i = 0; i < data.n; i++ )
-    {
-      cabs_val = hypot(crnt_fstep[fstep].bir[i], crnt_fstep[fstep].bii[i]);
-      struct_colors[fstep].wire_chrg_rgb[i] = color_from_value(cabs_val, cmax_wire_chrg);
-    }
-  }
-
-  /* Map patch current colors from patch normal component cur[ci+0] */
-  if( struct_colors[fstep].patch_crnt_rgb != NULL && cmax_patch > 0.0 )
-  {
-    for( i = 0; i < data.m; i++ )
-    {
-      int ci = data.n + 3 * i;
-      struct_colors[fstep].patch_crnt_rgb[i] =
-          color_from_value(cabs(crnt_fstep[fstep].cur[ci]), cmax_patch);
-    }
-  }
 
   /* Precompute patch tangent-axis phasor projections for arrow rendering */
   if( struct_colors[fstep].patch_flow_data != NULL )

@@ -25,7 +25,7 @@
 #include "mathlib.h"
 #include "measurements.h"
 #include "config_hooks.h"
-#include "prerender/prerender_color_proj.h"
+#include "chroma/chroma.h"
 
 #include "opengl/opengl_structure.h"
 #include "opengl/opengl_msaa.h"
@@ -87,13 +87,20 @@ rc_config_vars_t rc_config_vars[] = {
 						CONFIG_WIDGET( .widget_id = "main_currents_togglebutton" ), NULL ) ),
 				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
 					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "anim_currents" ), NULL ) ),
+						CONFIG_WIDGET( .widget_id = "anim_qty_currents" ), NULL ) ),
 				NULL ) ) },
 
 	{ .desc = "Main Window Charges toggle button state", .format = "%d",
 		.vars = { &rc_config.main_charges_togglebutton },
-		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder,
-			"main_charges_togglebutton", hook_main_charges ) },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_main_charges,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "main_charges_togglebutton" ), NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_qty_charges" ), NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Polarization Type", .format = "%d",
 		.vars = { &calc_data.pol_type }, .def = { { .i = POL_TOTAL } },
@@ -399,40 +406,118 @@ rc_config_vars_t rc_config_vars[] = {
 
 	{ .desc = "Animate Color Projection", .format = "%d",
 		.vars = { &rc_config.anim_color_proj },
-		.def = { { .i = COLOR_PROJ_INSTANT } },
+		.def = { { .i = CHROMA_PROJ_INSTANT } },
 		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_color_vis,
 			.groups = CONFIG_WIDGET_GROUPS(
 				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
 					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "anim_color_proj",
-							.values = CONFIG_WIDGET_VALUES(COLOR_PROJ_INSTANT,
-								COLOR_PROJ_SIGNED, COLOR_PROJ_PHASE) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_instant",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_INSTANT) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_polarity",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_SIGNED) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_phase",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_PHASE) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_dual",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_DUAL) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_amplitude",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_AMPLITUDE) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_standing",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_STANDING) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_farfield",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_FARFIELD) ),
 						NULL ) ),
 				NULL ) ) },
 
 	{ .desc = "Color Scale", .format = "%d",
 		.vars = { &rc_config.color_scale },
-		.def = { { .i = COLOR_SCALE_LINEAR } },
-		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_color_vis,
+		.def = { { .i = COLOR_TONE_POWER } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_color_family,
 			.groups = CONFIG_WIDGET_GROUPS(
 				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
 					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "main_color_scale_linear",
-							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_LINEAR) ),
-						CONFIG_WIDGET( .widget_id = "main_color_scale_sqrt",
-							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_SQRT) ),
-						CONFIG_WIDGET( .widget_id = "main_color_scale_squared",
-							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_SQUARED) ),
-						CONFIG_WIDGET( .widget_id = "main_color_scale_db",
-							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_DB) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_power",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_POWER) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_db",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_DB) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_asinh",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_ASINH) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_mulaw",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_MULAW) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_reinhard",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_REINHARD) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_sigmoid",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_SIGMOID) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_none",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_NONE) ),
 						NULL ) ),
 				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
 					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "anim_color_scale",
-							.values = CONFIG_WIDGET_VALUES(COLOR_SCALE_LINEAR,
-								COLOR_SCALE_SQRT, COLOR_SCALE_SQUARED, COLOR_SCALE_DB) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_power",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_POWER) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_db",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_DB) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_asinh",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_ASINH) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_mulaw",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_MULAW) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_reinhard",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_REINHARD) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_sigmoid",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_SIGMOID) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_none",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_NONE) ),
 						NULL ) ),
 				NULL ) ) },
+
+	{ .desc = "Color Family Param Power", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_POWER] }, .def = { { .d = 0.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_power", hook_color_vis ) },
+
+	{ .desc = "Color Family Param dB", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_DB] }, .def = { { .d = 40.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_db", hook_color_vis ) },
+
+	{ .desc = "Color Family Param asinh", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_ASINH] }, .def = { { .d = -1.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_asinh", hook_color_vis ) },
+
+	{ .desc = "Color Family Param mu-law", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_MULAW] }, .def = { { .d = 40.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_mulaw", hook_color_vis ) },
+
+	{ .desc = "Color Family Param Reinhard", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_REINHARD] }, .def = { { .d = 0.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_reinhard", hook_color_vis ) },
+
+	{ .desc = "Color Family Param Sigmoid", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_SIGMOID] }, .def = { { .d = 0.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_sigmoid", hook_color_vis ) },
+
+	{ .desc = "Color Brightness Floor", .format = "%lf",
+		.vars = { &rc_config.color_lum_floor }, .def = { { .d = 0.20 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_bright_floor", hook_color_vis ) },
+
+	{ .desc = "Color Width From Amplitude", .format = "%d",
+		.vars = { &rc_config.color_width_amp },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_width_amp", hook_color_vis ) },
+
+	{ .desc = "Overlay Nodes", .format = "%d",
+		.vars = { &rc_config.overlay_nodes },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_overlay_nodes", hook_color_vis ) },
+
+	{ .desc = "Overlay Comet", .format = "%d",
+		.vars = { &rc_config.overlay_comet },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_overlay_comet", hook_color_vis ) },
 
 	{ .desc = "Brightness Segments", .format = "%f",
 		.vars = { &rc_config.brightness_segments }, .def = { { .f = 0.47f } },
@@ -696,12 +781,19 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.ant_temp_custom_t_earth },
 		.def = { { .d = ANT_TEMP_CUSTOM_T_EARTH_DEFAULT } } },
 
+	/* The theme selector radios are runtime-built menu items owned by
+	 * theme.c, so these trees bind no widgets; the rows still own the
+	 * unified theme-derived refresh fired by config_widget_field_changed. */
 	{ .desc = "Frequency Plots Color Theme", .format = "%s",
 		.vars = { rc_config.freqplots_theme }, .size = sizeof(rc_config.freqplots_theme),
-		.def = { { .s = "legacy" } } },
+		.def = { { .s = "legacy" } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_theme_change,
+			.groups = CONFIG_WIDGET_GROUPS( NULL ) ) },
 
 	{ .desc = "Frequency Plots Theme Inverted", .format = "%d",
-		.vars = { &rc_config.freqplots_theme_invert } },
+		.vars = { &rc_config.freqplots_theme_invert },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_theme_change,
+			.groups = CONFIG_WIDGET_GROUPS( NULL ) ) },
 
 };
 
@@ -973,6 +1065,10 @@ size_t rc_config_field_size(const rc_config_vars_t *v)
 		return sizeof(float);
 	if (strcmp(v->format, "%lf") == 0)
 		return sizeof(double);
+
+	/* String rows carry their buffer width in .size */
+	if (strcmp(v->format, "%s") == 0 && v->size > 0)
+		return v->size;
 
 	BUG("rc_config_field_size: %s: unsupported format %s\n", v->desc, v->format);
 	return 0;

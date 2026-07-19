@@ -37,21 +37,6 @@ typedef enum
 } segment_color_type_t;
 
 /**
- * Value_to_Color() - Map a scalar value to an RGB color
- * @red:   output red channel [0..1]
- * @grn:   output green channel [0..1]
- * @blu:   output blue channel [0..1]
- * @val:   input value
- * @max:   normalization maximum
- *
- * Maps val/max through a blue-cyan-green-yellow-red rainbow ramp.
- * Values outside [0..max] are clamped.
- */
-void Value_to_Color(
-    double *red, double *grn, double *blu,
-    double val, double max);
-
-/**
  * segment_type_to_rgb() - Map segment classification to display color
  * @type: segment color classification
  * @r:    output red [0..1]
@@ -83,38 +68,14 @@ float segment_type_to_width(segment_color_type_t type);
 
 /* rgb_f_t defined in common.h */
 
-/**
- * color_from_value() - Map a scalar to an rgb_f_t via the rainbow ramp
- * @val: value to map (0..max)
- * @max: normalization maximum; returns black when max <= 0
- *
- * Single point of truth for the Value_to_Color → rgb_f_t conversion used
- * by struct_colors_fill_fstep and ff_presentation_recompute.
- */
-static inline rgb_f_t
-color_from_value(double val, double max)
-{
-  rgb_f_t c;
-  double r, g, b;
-  Value_to_Color(&r, &g, &b, val, max);
-  c.r = (float)r;
-  c.g = (float)g;
-  c.b = (float)b;
-  return c;
-}
-
 /*-----------------------------------------------------------------------
- * Per-fstep wire/patch color buffers (Tier 2)
+ * Per-fstep magnitude ranges and patch flow projections (Tier 2)
  *
- * Filled by struct_colors_fill_fstep() per frequency step.
- * Dispatch selects which set to pass to backends.
+ * Filled by struct_colors_fill_fstep() per frequency step; the color
+ * projection layer normalizes its sources against the range scalars.
  *----------------------------------------------------------------------*/
 typedef struct
 {
-  rgb_f_t *wire_crnt_rgb;       /* [data.n] wire current magnitude colors */
-  rgb_f_t *wire_chrg_rgb;       /* [data.n] wire charge density colors */
-  rgb_f_t *patch_crnt_rgb;      /* [data.m] patch current magnitude colors */
-
   /* Precomputed tangent-axis phasor projections normalized by cmax.
    * [i][0..3] = {Re(ct1), Im(ct1), Re(ct2), Im(ct2)} / cmax_patch.
    * Zeroed when no current data is available for this fstep. */
@@ -180,8 +141,8 @@ void init_geometry_colors(void);
  * struct_colors_fill_fstep() - Compute Tier 2 colors for one fstep
  * @fstep: frequency step index
  *
- * Reads crnt_fstep[fstep] current/charge data.  Scans cmin/cmax.
- * Calls Value_to_Color() for wire current/charge and patch magnitudes.
+ * Reads crnt_fstep[fstep] current/charge amplitudes, scans the magnitude
+ * ranges, and bakes the patch tangent-flow phasor projections.
  */
 void struct_colors_fill_fstep(int fstep);
 

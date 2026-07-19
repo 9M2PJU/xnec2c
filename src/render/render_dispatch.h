@@ -55,9 +55,10 @@ typedef enum
 /* Dispatch-resolved structure draw parameters — passed to draw_structure backends */
 typedef struct
 {
-  const rgb_f_t *wire_colors;   /* seg_rgb | wire_crnt_rgb | wire_chrg_rgb */
+  const rgb_f_t *wire_colors;   /* seg_rgb | composed projection colors */
   const float   *wire_widths;   /* seg_width [data.n] per-segment line widths */
-  const rgb_f_t *patch_colors;  /* patch_rgb | patch_crnt_rgb */
+  const rgb_f_t *patch_colors;  /* patch_rgb | composed projection colors */
+  const unsigned char *wire_glyphs; /* per-segment GLYPH_* code [data.n], or NULL */
   double         cmax;          /* fmax(wire_crnt_cmax, patch_crnt_cmax) or 0.0 */
   double         freq_mhz;      /* frequency for staleness detection */
   gboolean       show_flow;     /* TRUE only for DRAW_CURRENTS */

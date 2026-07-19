@@ -57,56 +57,56 @@ Draw_Structure_UI(void)
   int fstep = calc_data.freq_step;
   if( CRNT_FSTEP_AVAILABLE(fstep) && struct_colors )
   {
-    char maxlabel[16], zerolabel[16];
+    char maxlabel[16] = "", zerolabel[16] = "";
     gboolean do_update = FALSE;
-    double maxval = 0.0, cmin = 0.0, cmax = 0.0;
+    double maxval = 0.0;
 
     if( isFlagSet(DRAW_CURRENTS) )
     {
       maxval = (double)struct_colors[fstep].wire_crnt_cmax * (double)data.wlam;
-      cmin = (double)struct_colors[fstep].wire_crnt_cmin;
-      cmax = (double)struct_colors[fstep].wire_crnt_cmax;
       do_update = TRUE;
     }
     else if( isFlagSet(DRAW_CHARGES) )
     {
       maxval = (double)struct_colors[fstep].wire_chrg_cmax
              * 1.0E-6 / (double)calc_data.freq_mhz;
-      cmin = (double)struct_colors[fstep].wire_chrg_cmin;
-      cmax = (double)struct_colors[fstep].wire_chrg_cmax;
       do_update = TRUE;
     }
     /* else geometry mode: labels retain previous values */
 
     if( do_update )
     {
-      color_scale_t scale = color_scale_sanitize(rc_config.color_scale);
+      color_tone_t fam = color_tone_active();
 
-      /* Label endpoints per the projection output kind */
-      switch( color_proj_out[color_proj_active()] )
+      /* Label endpoints per the projection's hue palette */
+      switch(chroma_proj_palette_kind(chroma_proj_rows[color_proj_active()].hue_enc) )
       {
-        case PROJ_OUT_DIVERGING:
+        case PALETTE_DIVERGING:
           snprintf( maxlabel, sizeof(maxlabel) - 1, "%8.2E", maxval );
           snprintf( zerolabel, sizeof(zerolabel) - 1, "-%.1E", maxval );
           break;
 
-        case PROJ_OUT_HSV:
+        case PALETTE_CYCLIC:
           snprintf( maxlabel, sizeof(maxlabel) - 1, "%s", "360°" );
           snprintf( zerolabel, sizeof(zerolabel) - 1, "%s", "0°" );
           break;
 
-        case PROJ_OUT_RAMP:
+        case PALETTE_RAMP:
           snprintf( maxlabel, sizeof(maxlabel) - 1, "%8.2E", maxval );
-          if( scale == COLOR_SCALE_DB )
+          if( fam == COLOR_TONE_DB )
           {
-            /* The dB strip bottoms out at the auto-ranged floor, not zero */
-            color_ctx_t x;
-            color_ctx_init( &x, 0.0, cmin, cmax, scale );
+            /* The dB strip bottoms out at the range floor, not zero */
+            tone_param_t tp;
+            tone_param_init( &tp, fam );
             snprintf( zerolabel, sizeof(zerolabel) - 1, "%8.2E",
-                maxval * x.floor_ratio );
+                maxval * tp.floor_ratio );
           }
           else
             snprintf( zerolabel, sizeof(zerolabel) - 1, "%s", "0" );
+          break;
+
+        case PALETTE_NUM:
+          BUG("unreachable palette kind sentinel\n");
           break;
       }
 
@@ -402,15 +402,16 @@ animation_is_active(void)
 
 /** color_proj_active() - Resolve the color projection now in effect
  *
- * Selects the animated projection while animation playback is live,
- * else the static amplitude baseline.
+ * A live menu-hover preview renders at once; otherwise the animated
+ * projection applies while animation playback is live, else the static
+ * amplitude baseline.
  */
-  color_proj_t
+  chroma_proj_t
 color_proj_active(void)
 {
-  return animation_is_active()
-      ? color_proj_sanitize(rc_config.anim_color_proj)
-      : COLOR_PROJ_AMPLITUDE;
+  return (chroma_proj_preview_active() || animation_is_active())
+      ? chroma_proj_selected()
+      : CHROMA_PROJ_AMPLITUDE;
 }
 
 /*-----------------------------------------------------------------------*/

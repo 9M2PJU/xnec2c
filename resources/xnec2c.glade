@@ -48,478 +48,6 @@ PLEASE read the documentation in the doc/ sub-directory as xnec2c is not fully c
       </object>
     </child>
   </object>
-  <object class="GtkAdjustment" id="animate_freq_adjustment">
-    <property name="lower">0.1</property>
-    <property name="upper">10</property>
-    <property name="value">1</property>
-    <property name="step-increment">0.1</property>
-    <property name="page-increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="animate_steps_adjustment">
-    <property name="lower">1</property>
-    <property name="upper">120</property>
-    <property name="value">30</property>
-    <property name="step-increment">1</property>
-    <property name="page-increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="animate_phase_adjustment">
-    <property name="upper">720</property>
-    <property name="step-increment">1</property>
-    <property name="page-increment">15</property>
-  </object>
-  <object class="GtkDialog" id="animate_dialog">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="border-width">2</property>
-    <property name="width-request">460</property>
-    <property name="title" translatable="yes">Near Field Animation</property>
-    <property name="resizable">True</property>
-    <property name="window-position">mouse</property>
-    <property name="icon">xnec2c.svg</property>
-    <property name="type-hint">dialog</property>
-    <signal name="destroy" handler="on_animate_dialog_destroy" swapped="no"/>
-    <child internal-child="vbox">
-      <object class="GtkBox">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">6</property>
-        <property name="homogeneous">False</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="layout-style">end</property>
-            <child>
-              <object class="GtkButton" id="animation_applybutton">
-                <property name="label">Start</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="receives-default">False</property>
-                <signal name="clicked" handler="on_animation_applybutton_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="animation_cancelbutton">
-                <property name="label">Stop</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="receives-default">False</property>
-                <signal name="clicked" handler="on_animation_cancelbutton_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="animation_okbutton">
-                <property name="label">Close</property>
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="can-default">True</property>
-                <property name="receives-default">False</property>
-                <signal name="clicked" handler="on_animation_okbutton_clicked" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack-type">end</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkFrame">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="label-xalign">0</property>
-            <child>
-              <object class="GtkBox">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="orientation">vertical</property>
-                <property name="border-width">4</property>
-                <property name="spacing">2</property>
-                <child>
-                  <object class="GtkScale" id="animate_phase_slider">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="hexpand">True</property>
-                    <property name="adjustment">animate_phase_adjustment</property>
-                    <property name="round-digits">0</property>
-                    <property name="digits">0</property>
-                    <property name="draw-value">False</property>
-                    <property name="tooltip-text" translatable="yes">Scrub the animation phase manually.&#10;Disabled while the animation is running.</property>
-                    <marks>
-                      <mark value="0" position="top">0</mark>
-                      <mark value="720" position="top">720°</mark>
-                    </marks>
-                    <signal name="change-value" handler="on_animate_phase_slider_change_value" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="animate_phase_value">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">φ 0°</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-              </object>
-            </child>
-            <child type="label">
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Phase</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <!-- n-columns=2 n-rows=2 -->
-          <object class="GtkGrid">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="row-spacing">2</property>
-            <property name="column-spacing">2</property>
-            <property name="row-homogeneous">True</property>
-            <property name="column-homogeneous">True</property>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Frames/Sec</property>
-                <property name="single-line-mode">True</property>
-                <property name="track-visited-links">False</property>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Animate Freq (Hz)</property>
-                <property name="single-line-mode">True</property>
-                <property name="track-visited-links">False</property>
-              </object>
-              <packing>
-                <property name="left-attach">1</property>
-                <property name="top-attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSpinButton" id="animate_steps_spinbutton">
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="xalign">1</property>
-                <property name="shadow-type">etched-in</property>
-                <property name="input-purpose">number</property>
-                <property name="adjustment">animate_steps_adjustment</property>
-                <property name="climb-rate">0.1</property>
-                <property name="numeric">True</property>
-                <property name="update-policy">if-valid</property>
-                <signal name="value-changed" handler="on_animate_spinbutton_value_changed" swapped="no"/>
-                <signal name="focus-out-event" handler="on_animate_spinbutton_focus_out_event" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left-attach">0</property>
-                <property name="top-attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkSpinButton" id="animate_freq_spinbutton">
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="xalign">1</property>
-                <property name="shadow-type">etched-in</property>
-                <property name="input-purpose">number</property>
-                <property name="adjustment">animate_freq_adjustment</property>
-                <property name="climb-rate">0.1</property>
-                <property name="digits">1</property>
-                <property name="numeric">True</property>
-                <property name="update-policy">if-valid</property>
-                <signal name="value-changed" handler="on_animate_spinbutton_value_changed" swapped="no"/>
-                <signal name="focus-out-event" handler="on_animate_spinbutton_focus_out_event" swapped="no"/>
-              </object>
-              <packing>
-                <property name="left-attach">1</property>
-                <property name="top-attach">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="spacing">6</property>
-            <property name="homogeneous">True</property>
-            <child>
-              <object class="GtkFrame" id="anim_structure_frame">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label-xalign">0</property>
-                <child>
-                  <object class="GtkBox">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="orientation">vertical</property>
-                    <property name="border-width">4</property>
-                    <property name="spacing">4</property>
-                    <child>
-                      <object class="GtkCheckButton" id="anim_currents">
-                        <property name="label" translatable="yes">Show currents</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">False</property>
-                        <property name="tooltip-text" translatable="yes">Animate current magnitude and direction along the wires.&#10;Mirrors the Currents button in the main window.</property>
-                        <property name="draw-indicator">True</property>
-                        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Color projection:</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkComboBoxText" id="anim_color_proj">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="tooltip-text" translatable="yes">Select how wire and patch colors follow the excitation phase while animating.</property>
-                        <items>
-                          <item translatable="yes">Instantaneous Magnitude</item>
-                          <item translatable="yes">Instantaneous Polarity</item>
-                          <item translatable="yes">Phase Hue</item>
-                        </items>
-                        <signal name="changed" handler="on_config_widget_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Color scale:</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">3</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkComboBoxText" id="anim_color_scale">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="tooltip-text" translatable="yes">Select the magnitude-to-color transfer.&#10;Mirrors the Visualization menu setting in the main window.&#10;Squared is proportional to power for currents and to energy density for near fields; Sqrt and dB are contrast transfers relative to the step peak.</property>
-                        <items>
-                          <item translatable="yes">Linear</item>
-                          <item translatable="yes">Sqrt</item>
-                          <item translatable="yes">Squared</item>
-                          <item translatable="yes">dB</item>
-                        </items>
-                        <signal name="changed" handler="on_config_widget_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">4</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Patch flow direction:</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">5</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkComboBoxText" id="anim_flow_dir">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <items>
-                          <item translatable="yes">Reference phase</item>
-                          <item translatable="yes">LIC</item>
-                          <item translatable="yes">Wireframe</item>
-                        </items>
-                        <signal name="changed" handler="on_config_widget_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">6</property>
-                      </packing>
-                    </child>
-                  </object>
-                </child>
-                <child type="label">
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Structure</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkFrame">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label-xalign">0</property>
-                <child>
-                  <object class="GtkBox">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="orientation">vertical</property>
-                    <property name="border-width">4</property>
-                    <property name="spacing">4</property>
-                    <child>
-                      <object class="GtkCheckButton" id="anim_efield">
-                        <property name="label" translatable="yes">Near E field</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">False</property>
-                        <property name="tooltip-text" translatable="yes">Show the near electric field vectors while animating.&#10;Enable by opening the radiation pattern window.</property>
-                        <property name="draw-indicator">True</property>
-                        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="anim_hfield">
-                        <property name="label" translatable="yes">Near H field</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">False</property>
-                        <property name="tooltip-text" translatable="yes">Show the near magnetic field vectors while animating.&#10;Enable by opening the radiation pattern window.</property>
-                        <property name="draw-indicator">True</property>
-                        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkCheckButton" id="anim_poynting">
-                        <property name="label" translatable="yes">Poynting vector</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">False</property>
-                        <property name="tooltip-text" translatable="yes">Show the Poynting power-flow vectors while animating.&#10;Enable by opening the radiation pattern window.</property>
-                        <property name="draw-indicator">True</property>
-                        <signal name="toggled" handler="on_config_widget_changed" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                  </object>
-                </child>
-                <child type="label">
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Near Field</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-      </object>
-    </child>
-    <action-widgets>
-      <action-widget response="-10">animation_applybutton</action-widget>
-      <action-widget response="-6">animation_cancelbutton</action-widget>
-      <action-widget response="-5">animation_okbutton</action-widget>
-    </action-widgets>
-  </object>
   <object class="GtkAdjustment" id="arc_dia_adjustment">
     <property name="upper">100</property>
     <property name="value">0.01</property>
@@ -11438,11 +10966,11 @@ Save NEC2 Editor data first?
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkRadioMenuItem" id="main_color_scale_linear">
+                                  <object class="GtkRadioMenuItem" id="main_color_fam_power">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="tooltip-text" translatable="yes">Color varies in direct proportion to magnitude, relative to this frequency step's peak.&#10;Reads the same for currents, charges, and near fields.</property>
-                                    <property name="label" translatable="yes">Li_near</property>
+                                    <property name="tooltip-text" translatable="yes">Power transfer n^γ relative to this frequency step's peak.&#10;γ = 0.5 expands weak regions, γ = 1 is linear amplitude, γ = 2 shows the squared magnitude: |I|² is proportional to per-segment dissipated power (and its radiated-power contribution via radiation resistance), |q|² to stored electrostatic energy.&#10;Adjust γ in the animate dialog.</property>
+                                    <property name="label" translatable="yes">_Power</property>
                                     <property name="use-underline">True</property>
                                     <property name="active">True</property>
                                     <property name="draw-as-radio">True</property>
@@ -11450,38 +10978,74 @@ Save NEC2 Editor data first?
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkRadioMenuItem" id="main_color_scale_sqrt">
+                                  <object class="GtkRadioMenuItem" id="main_color_fam_db">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="tooltip-text" translatable="yes">Square-root transfer: expands weak regions and compresses peaks.&#10;A perceptual contrast choice; implies no physical quantity.</property>
-                                    <property name="label" translatable="yes">S_qrt</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="draw-as-radio">True</property>
-                                    <property name="group">main_color_scale_linear</property>
-                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="main_color_scale_squared">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="tooltip-text" translatable="yes">Squared transfer: concentrates the color range on the strongest regions.&#10;Proportional to dissipated power for currents and to energy density for near fields; for charges, contrast only.</property>
-                                    <property name="label" translatable="yes">Sq_uared</property>
-                                    <property name="use-underline">True</property>
-                                    <property name="draw-as-radio">True</property>
-                                    <property name="group">main_color_scale_linear</property>
-                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkRadioMenuItem" id="main_color_scale_db">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="tooltip-text" translatable="yes">Logarithmic scale relative to the peak; the floor auto-ranges 20–60 dB with the data.&#10;Reveals weak detail that linear display hides.</property>
+                                    <property name="tooltip-text" translatable="yes">Logarithmic scale over a user-set range R below the peak.&#10;Reveals weak detail that linear display hides; adjust R in the animate dialog.</property>
                                     <property name="label" translatable="yes">_dB</property>
                                     <property name="use-underline">True</property>
                                     <property name="draw-as-radio">True</property>
-                                    <property name="group">main_color_scale_linear</property>
+                                    <property name="group">main_color_fam_power</property>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_color_fam_asinh">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="tooltip-text" translatable="yes">Inverse hyperbolic sine transfer: linear below the softening knee k, logarithmic above.&#10;Adjust k in the animate dialog.</property>
+                                    <property name="label" translatable="yes">_Asinh</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_color_fam_power</property>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_color_fam_mulaw">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="tooltip-text" translatable="yes">μ-law companding transfer: lifts weak detail with bounded compression.&#10;Adjust the compression in the animate dialog.</property>
+                                    <property name="label" translatable="yes">μ-_law</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_color_fam_power</property>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_color_fam_reinhard">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="tooltip-text" translatable="yes">Reinhard rational soft-compressor with knee k.&#10;Adjust k in the animate dialog.</property>
+                                    <property name="label" translatable="yes">_Reinhard</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_color_fam_power</property>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_color_fam_sigmoid">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="tooltip-text" translatable="yes">Hyperbolic tangent transfer with contrast steepness a.&#10;Adjust a in the animate dialog.</property>
+                                    <property name="label" translatable="yes">_Sigmoid</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_color_fam_power</property>
+                                    <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkRadioMenuItem" id="main_color_fam_none">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="tooltip-text" translatable="yes">Full brightness for every magnitude; the color projection alone sets the rendering.</property>
+                                    <property name="label" translatable="yes">_None</property>
+                                    <property name="use-underline">True</property>
+                                    <property name="draw-as-radio">True</property>
+                                    <property name="group">main_color_fam_power</property>
                                     <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                   </object>
                                 </child>
@@ -12045,7 +11609,7 @@ Save NEC2 Editor data first?
                 <property name="height-request">24</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <signal name="draw" handler="on_main_colorcode_drawingarea_draw" swapped="no"/>
+                <signal name="draw" handler="on_colorcode_drawingarea_draw" swapped="no"/>
               </object>
               <packing>
                 <property name="left-attach">1</property>
@@ -12800,7 +12364,7 @@ Save NEC2 Editor data first?
                                             <property name="use-underline">True</property>
                                             <property name="active">True</property>
                                             <property name="draw-as-radio">True</property>
-                                            <signal name="activate" handler="on_near_peak_value_activate" swapped="no"/>
+                                            <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                           </object>
                                         </child>
                                         <child>
@@ -12811,7 +12375,7 @@ Save NEC2 Editor data first?
                                             <property name="use-underline">True</property>
                                             <property name="draw-as-radio">True</property>
                                             <property name="group">near_peak_value</property>
-                                            <signal name="activate" handler="on_near_snapshot_activate" swapped="no"/>
+                                            <signal name="activate" handler="on_config_widget_changed" swapped="no"/>
                                           </object>
                                         </child>
                                       </object>

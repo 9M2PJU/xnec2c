@@ -26,6 +26,8 @@
 #include "opengl/opengl_structure.h"
 #include "cairo/cairo_draw.h"
 #include "config_hooks.h"
+#include "themes/theme.h"
+#include "color/color_palette.h"
 
 /* Forward declaration — full sy_overrides.h conflicts with openblas via gsl */
 extern void sy_overrides_close_if_empty(void);
@@ -545,6 +547,12 @@ main (int argc, char *argv[])
    * before any config value is loaded or restored. */
   config_hooks_init();
   rc_config_register_widgets();
+
+  /* Theme registry and palette LUTs precede every theme_active() consumer;
+   * the hook pass inside Read_Config() then rebuilds the palettes for the
+   * persisted theme selection. */
+  theme_registry_init();
+  palette_registry_init();
 
   /* Read GUI state config file and reset geometry */
   Read_Config();

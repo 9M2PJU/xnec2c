@@ -1,5 +1,6 @@
 # List of source files containing translatable strings.
 files/xnec2c.desktop.in
+resources/animate.glade
 resources/settings/cairo_settings.glade
 resources/settings/opengl_settings.glade
 resources/settings/render_settings.glade
@@ -181,8 +182,6 @@ src/prerender/prerender_aggregate.c
 src/prerender/prerender_aggregate.h
 src/prerender/prerender_color.c
 src/prerender/prerender_color.h
-src/prerender/prerender_color_proj.c
-src/prerender/prerender_color_proj.h
 src/prerender/prerender_farfield.c
 src/prerender/prerender_farfield.h
 src/prerender/prerender_nearfield.c

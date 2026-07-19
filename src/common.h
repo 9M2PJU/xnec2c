@@ -51,6 +51,7 @@
 #include "mem/mem.h"
 #include "i18n.h"
 #include "view/view_core.h"
+#include "color/color_tone.h"
 
 // Define GSourceOnceFunc if compiling against an older version of GLIB:
 #if GLIB_VERSION_CUR_STABLE < G_ENCODE_VERSION(2,74)
@@ -457,11 +458,23 @@ typedef struct
   /* Patch current flow visualization mode (View menu, not OpenGL settings) */
   int current_flow_visualization_mode;
 
-  /* Animated color projection (animate dialog, color_proj_t) */
+  /* Animated color projection (animate dialog, chroma_proj_t) */
   int anim_color_proj;
 
-  /* Color scale (color_scale_t), shared by menu and animate dialog */
+  /* Tone family selector (color_tone_t), shared by menu and animate dialog */
   int color_scale;
+
+  /* Per-family tone parameter in the slider domain, indexed by color_tone_t */
+  double color_fam_param[COLOR_TONE_NUM];
+
+  /* Brightness floor in [0,1] keeping geometry visible at wave nulls */
+  double color_lum_floor;
+
+  /* Width-from-amplitude carrier gate */
+  int color_width_amp;
+
+  /* Wire overlay gates: comet crest, node/antinode marks */
+  int overlay_comet, overlay_nodes;
 
   /* Whether transparency is triggered by click/drag (1) or always on (0) */
   int opengl_transparent_on_click;
@@ -576,8 +589,8 @@ typedef struct
 
 /* Maximum independent draw batches per view content
  * (structure: segments, patches, network/transmission-line outlines,
- * two-port network polygon fills) */
-#define GL_VIEW_MAX_BATCHES 4
+ * two-port network polygon fills, node/antinode glyph overlay) */
+#define GL_VIEW_MAX_BATCHES 5
 
 /* OpenGL types */
 #ifdef HAVE_OPENGL
@@ -1321,7 +1334,6 @@ void Nf_Peak_Vector(double exm, double eym, double ezm, double fx, double fy, do
 void Recompute_Near_Field_Vectors(int fstep, gboolean snapshot);
 void Draw_Colorcode(cairo_t *cr);
 void draw_colorcode_projected(cairo_t *cr);
-void update_color_scale_labels(void);
 void Gtk_Widget_Destroy(GtkWidget **widget);
 /* callbacks.c */
 void on_main_window_destroy(GObject *object, gpointer user_data);
@@ -1339,7 +1351,8 @@ void on_main_freqplots_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_view_preset_clicked(GtkButton *button, gpointer user_data);
 void on_main_rotate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 void on_main_incline_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
-gboolean on_main_colorcode_drawingarea_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
+gboolean on_colorcode_drawingarea_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
+void on_anim_color_reset_clicked(GtkButton *button, gpointer user_data);
 void on_new_freq_clicked(GtkButton *button, gpointer user_data);
 gboolean on_structure_drawingarea_configure_event(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data);
 gboolean on_structure_drawingarea_motion_notify_event(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
@@ -1642,6 +1655,7 @@ void on_freqplots_theme_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_theme_invert_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
 void freqplots_invert_item_sync(GtkWidget *invert, const char *base);
 void freqplots_theme_menu_build(GtkBuilder *builder);
+void color_family_menu_attach(GtkBuilder *builder);
 void on_freqplots_theme_select(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_theme_menu_hide(GtkWidget *menu, gpointer user_data);
 gboolean on_structure_drawingarea_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
@@ -1680,7 +1694,6 @@ void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, doub
      && save.fstep != NULL && save.fstep[(fs)] \
      && near_field_fstep != NULL && near_field_fstep[(fs)].points != NULL)
 
-void Value_to_Color(double *red, double *grn, double *blu, double val, double max);
 /* rdpattern_ui.c */
 gboolean Validate_Nearfield_Animation(void);
 void compute_near_field_frame(double wt);

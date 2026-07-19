@@ -31,6 +31,13 @@
 #include "../prerender/prerender_state.h"
 #include "../prerender/prerender_color.h"
 #include "../rdpattern_ui.h"
+#include "../chroma/chroma_glyph.h"
+
+/* Node/antinode tick geometry in screen pixels: a floor plus a multiple of
+ * the wire width so a thick wire never occludes the mark. */
+#define GLYPH_TICK_MIN_PX    6.0f
+#define GLYPH_TICK_WIDTH_K   2.5f
+#define GLYPH_TICK_LINE_PX   1.5f
 
 /**
  * patch_z_mid() - Average z_mid across four patch-corner segments
@@ -216,6 +223,32 @@ draw_wire_segments(cairo_scenebuffer_t *sb, view_t *v, Segment_t *segm, gint nse
     seg_set_color(&segm[idx], params->wire_colors[idx]);
     segm[idx].width = (float)params->wire_widths[idx];
     scenebuffer_add(sb, &segm[idx]);
+
+    /* Overlay node/antinode tick marks through the screen basis, scaled
+     * above the wire pixel width so a thick wire never occludes them. */
+    if( params->wire_glyphs != NULL && params->wire_glyphs[idx] != GLYPH_NONE )
+    {
+      const glyph_shape_t *gs = &glyph_shapes[params->wire_glyphs[idx]];
+      float cx  = 0.5f * (float)(segm[idx].x1 + segm[idx].x2);
+      float cy  = 0.5f * (float)(segm[idx].y1 + segm[idx].y2);
+      float ext = fmaxf(GLYPH_TICK_MIN_PX,
+          segm[idx].width * GLYPH_TICK_WIDTH_K);
+      int k;
+
+      for( k = 0; k < gs->n_strokes; k++ )
+      {
+        const glyph_stroke_t *st = &gs->strokes[k];
+        Segment_t tick = segm[idx];   /* inherit z_mid for depth sorting */
+
+        seg_set_color(&tick, gs->color);
+        tick.width = GLYPH_TICK_LINE_PX;
+        tick.x1 = (gint)(cx + st->ax * ext);
+        tick.y1 = (gint)(cy + st->ay * ext);
+        tick.x2 = (gint)(cx + st->bx * ext);
+        tick.y2 = (gint)(cy + st->by * ext);
+        scenebuffer_add(sb, &tick);
+      }
+    }
   }
 
 } /* draw_wire_segments() */

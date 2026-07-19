@@ -378,18 +378,17 @@ static void dump_nf_pre(FILE *fp)
 }
 
 /* struct_colors.csv
- * Per-fstep wire/patch display colors from struct_colors[].  One row per
- * entity in three blocks (wire current, wire charge, patch current); the
- * patch_flow phasor projection columns are nonzero only for patch_crnt rows.
- * The cmin/cmax range scalars repeat on every row of an fstep.
- * mhz, fstep, entity_kind, entity_idx, r, g, b,
+ * Per-fstep magnitude ranges and patch flow projections from
+ * struct_colors[].  One range row per fstep carries the cmin/cmax scalars;
+ * one patch_flow row per patch carries the tangent phasor projection, with
+ * the range scalars repeated.
+ * mhz, fstep, entity_kind, entity_idx,
  * flow0, flow1, flow2, flow3,
  * wire_crnt_cmin, wire_crnt_cmax, wire_chrg_cmin, wire_chrg_cmax,
  * patch_crnt_cmin, patch_crnt_cmax */
 static void dump_struct_colors(FILE *fp)
 {
 	fprintf(fp, "mhz,fstep,entity_kind,entity_idx,"
-		"r,g,b,"
 		"flow0,flow1,flow2,flow3,"
 		"wire_crnt_cmin,wire_crnt_cmax,"
 		"wire_chrg_cmin,wire_chrg_cmax,"
@@ -405,41 +404,22 @@ static void dump_struct_colors(FILE *fp)
 
 		struct_colors_t *sc = &struct_colors[fs];
 
-		if (sc->wire_crnt_rgb != NULL)
-			for (int i = 0; i < data.n; i++)
-			{
-				rgb_f_t c = sc->wire_crnt_rgb[i];
-				fprintf(fp, "%.6f,%d,wire_crnt,%d,"
-					"%g,%g,%g,0,0,0,0,"
-					"%g,%g,%g,%g,%g,%g\n",
-					save.freq[fs], fs, i, c.r, c.g, c.b,
-					sc->wire_crnt_cmin, sc->wire_crnt_cmax,
-					sc->wire_chrg_cmin, sc->wire_chrg_cmax,
-					sc->patch_crnt_cmin, sc->patch_crnt_cmax);
-			}
+		fprintf(fp, "%.6f,%d,range,0,"
+			"0,0,0,0,"
+			"%g,%g,%g,%g,%g,%g\n",
+			save.freq[fs], fs,
+			sc->wire_crnt_cmin, sc->wire_crnt_cmax,
+			sc->wire_chrg_cmin, sc->wire_chrg_cmax,
+			sc->patch_crnt_cmin, sc->patch_crnt_cmax);
 
-		if (sc->wire_chrg_rgb != NULL)
-			for (int i = 0; i < data.n; i++)
-			{
-				rgb_f_t c = sc->wire_chrg_rgb[i];
-				fprintf(fp, "%.6f,%d,wire_chrg,%d,"
-					"%g,%g,%g,0,0,0,0,"
-					"%g,%g,%g,%g,%g,%g\n",
-					save.freq[fs], fs, i, c.r, c.g, c.b,
-					sc->wire_crnt_cmin, sc->wire_crnt_cmax,
-					sc->wire_chrg_cmin, sc->wire_chrg_cmax,
-					sc->patch_crnt_cmin, sc->patch_crnt_cmax);
-			}
-
-		if (sc->patch_crnt_rgb != NULL)
+		if (sc->patch_flow_data != NULL)
 			for (int i = 0; i < data.m; i++)
 			{
-				rgb_f_t c = sc->patch_crnt_rgb[i];
 				float *fl = sc->patch_flow_data[i];
-				fprintf(fp, "%.6f,%d,patch_crnt,%d,"
-					"%g,%g,%g,%g,%g,%g,%g,"
+				fprintf(fp, "%.6f,%d,patch_flow,%d,"
+					"%g,%g,%g,%g,"
 					"%g,%g,%g,%g,%g,%g\n",
-					save.freq[fs], fs, i, c.r, c.g, c.b,
+					save.freq[fs], fs, i,
 					fl[0], fl[1], fl[2], fl[3],
 					sc->wire_crnt_cmin, sc->wire_crnt_cmax,
 					sc->wire_chrg_cmin, sc->wire_chrg_cmax,

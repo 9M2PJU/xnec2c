@@ -27,6 +27,7 @@
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
 #include "config_hooks.h"
+#include "rc_config.h"
 #include "cairo/cairo_draw.h"
 #include "cairo/cairo_frame.h"
 #include <pthread.h>
@@ -843,7 +844,7 @@ on_main_incline_spinbutton_value_changed(
 
 
   gboolean
-on_main_colorcode_drawingarea_draw(
+on_colorcode_drawingarea_draw(
     GtkWidget       *widget,
     cairo_t         *cr,
     gpointer         user_data)
@@ -2126,7 +2127,7 @@ static const struct
   GtkBuilder **owner_builder;
 } anim_panel_owners[] =
 {
-  { "anim_currents", &main_window_builder      },
+  { "anim_display_frame", &main_window_builder },
   { "anim_efield",   &rdpattern_window_builder },
   { "anim_hfield",   &rdpattern_window_builder },
   { "anim_poynting", &rdpattern_window_builder },
@@ -2169,9 +2170,6 @@ anim_panel_sensitivity(void)
           "Mirrors the Visualization menu setting in the main window.")
       : _("Patch flow animation requires surface patches"
           " (SP/SM cards) in the model.") );
-
-  widget = Builder_Get_Object( animate_dialog_builder, "anim_structure_frame" );
-  gtk_widget_set_sensitive( widget, main_window_builder != NULL );
 }
 
 /* Wrap value into the half-open phase span [lower, lower+span). */
@@ -2289,6 +2287,248 @@ on_phase_slider_motion_notify(GtkWidget *widget, GdkEventMotion *event,
   return( FALSE );
 }
 
+/* Snap window around a slider mark as a fraction of the slider span */
+#define FAM_MARK_SNAP_FRACTION 0.025
+
+/** on_color_fam_format_value() - Render a slider value as the natural parameter
+ * @scale: emitting family slider
+ * @value: slider-domain value
+ * @user_data: the slider's color_tone_row_t
+ *
+ * Returns a heap string in the family's natural-parameter format; GTK
+ * frees it after display.
+ */
+  static gchar *
+on_color_fam_format_value(GtkScale *scale, gdouble value, gpointer user_data)
+{
+  const color_tone_row_t *row = user_data;
+
+  (void)scale;
+
+  return g_strdup_printf(row->value_fmt, row->param_map(value));
+}
+
+/** on_color_fam_change_value() - Snap a family slider onto its marks
+ * @range: emitting family slider
+ * @scroll: scroll type, unused
+ * @value: proposed slider-domain value
+ * @user_data: the slider's color_tone_row_t
+ *
+ * Snaps within FAM_MARK_SNAP_FRACTION of the slider span onto the row's
+ * mark; the set_value call emits the final value-changed.
+ */
+  static gboolean
+on_color_fam_change_value(GtkRange *range, GtkScrollType scroll,
+    gdouble value, gpointer user_data)
+{
+  const color_tone_row_t *row = user_data;
+  GtkAdjustment *adj = gtk_range_get_adjustment(range);
+  double span = gtk_adjustment_get_upper(adj) - gtk_adjustment_get_lower(adj);
+  gboolean snapped = FALSE;
+  int i;
+
+  (void)scroll;
+
+  for( i = 0; !snapped && !isnan(row->marks[i]); i++ )
+    if( fabs(value - row->marks[i]) <= span * FAM_MARK_SNAP_FRACTION )
+    {
+      gtk_range_set_value(range, row->marks[i]);
+      snapped = TRUE;
+    }
+
+  return snapped;
+}
+
+/** anim_fam_marks_attach() - Mark and wire the family sliders at creation
+ *
+ * Adds each family's snap marks labeled with the natural parameter and
+ * connects the shared snap and value-format handlers with the row as
+ * user data.
+ */
+  static void
+anim_fam_marks_attach(void)
+{
+  int fam, i;
+  char label[32];
+
+  for( fam = 0; fam < COLOR_TONE_NUM; fam++ )
+  {
+    const color_tone_row_t *row = &color_tones[fam];
+    GtkScale *scale;
+
+    if( row->scale_id == NULL || row->marks == NULL )
+      continue;
+
+    scale = GTK_SCALE(Builder_Get_Object(animate_dialog_builder,
+          row->scale_id));
+
+    for( i = 0; !isnan(row->marks[i]); i++ )
+    {
+      snprintf(label, sizeof(label), "%g", row->param_map(row->marks[i]));
+      gtk_scale_add_mark(scale, row->marks[i], GTK_POS_BOTTOM, label);
+    }
+
+    g_signal_connect(scale, "change-value",
+        G_CALLBACK(on_color_fam_change_value), (gpointer)row);
+    g_signal_connect(scale, "format-value",
+        G_CALLBACK(on_color_fam_format_value), (gpointer)row);
+  }
+}
+
+/** on_anim_projsel_select() - Preview a hovered projection menu row
+ * @menuitem: hovered radio item, unused
+ * @user_data: the row's chroma_proj_t value
+ *
+ * Renders the hovered projection at once without committing it; leaving
+ * the menu without activating reverts via on_anim_projsel_menu_hide.
+ */
+  static void
+on_anim_projsel_select(GtkMenuItem *menuitem, gpointer user_data)
+{
+  (void)menuitem;
+
+  chroma_proj_preview_set( GPOINTER_TO_INT(user_data) );
+  hook_color_vis();
+}
+
+/** on_anim_projsel_menu_hide() - Revert an uncommitted projection preview
+ * @menu: collapsing projection menu, unused
+ * @user_data: unused
+ *
+ * A click commits through the config machinery while the preview equals
+ * the clicked value, so the clear resolves to the committed state; a
+ * collapse on a mere hover restores the prior selection.
+ */
+  static void
+on_anim_projsel_menu_hide(GtkWidget *menu, gpointer user_data)
+{
+  (void)menu;
+  (void)user_data;
+
+  if( !chroma_proj_preview_active() )
+    return;
+
+  chroma_proj_preview_clear();
+  hook_color_vis();
+}
+
+/** on_color_famsel_select() - Preview a hovered scale-family menu row
+ * @menuitem: hovered radio item, unused
+ * @user_data: the row's color_tone_t value
+ *
+ * Renders the hovered family at once, including its slider row and
+ * formula; leaving the menu without activating reverts on menu hide.
+ */
+  static void
+on_color_famsel_select(GtkMenuItem *menuitem, gpointer user_data)
+{
+  (void)menuitem;
+
+  color_tone_preview_set( GPOINTER_TO_INT(user_data) );
+  hook_color_family();
+}
+
+/** on_color_famsel_menu_hide() - Revert an uncommitted family preview
+ * @menu: collapsing family menu, unused
+ * @user_data: unused
+ */
+  static void
+on_color_famsel_menu_hide(GtkWidget *menu, gpointer user_data)
+{
+  (void)menu;
+  (void)user_data;
+
+  if( !color_tone_preview_active() )
+    return;
+
+  color_tone_preview_clear();
+  hook_color_family();
+}
+
+/** anim_select_preview_attach() - Wire hover preview on the dialog selectors
+ *
+ * Connects each projection and family radio item's select edge and each
+ * menu's hide edge, with the enum value as user data.
+ */
+  static void
+anim_select_preview_attach(void)
+{
+  int i;
+
+  for( i = 0; i < CHROMA_PROJ_NUM; i++ )
+    g_signal_connect( Builder_Get_Object(animate_dialog_builder,
+          chroma_proj_rows[i].sel_id), "select",
+                     G_CALLBACK(on_anim_projsel_select), GINT_TO_POINTER(i) );
+
+  for( i = 0; i < COLOR_TONE_NUM; i++ )
+    g_signal_connect( Builder_Get_Object(animate_dialog_builder,
+          color_tones[i].sel_id), "select",
+        G_CALLBACK(on_color_famsel_select), GINT_TO_POINTER(i) );
+
+  g_signal_connect( Builder_Get_Object(animate_dialog_builder,
+        "anim_color_proj_menu"), "hide",
+      G_CALLBACK(on_anim_projsel_menu_hide), NULL );
+  g_signal_connect( Builder_Get_Object(animate_dialog_builder,
+        "anim_color_family_menu"), "hide",
+      G_CALLBACK(on_color_famsel_menu_hide), NULL );
+}
+
+/** color_family_menu_attach() - Wire hover preview on the main-window family radios
+ * @builder: main window builder
+ *
+ * Connects the Visualization menu's family radio items to the shared
+ * family preview handlers and the submenu's hide edge to the revert.
+ */
+  void
+color_family_menu_attach(GtkBuilder *builder)
+{
+  int i;
+
+  for( i = 0; i < COLOR_TONE_NUM; i++ )
+    g_signal_connect( Builder_Get_Object(builder, color_tones[i].main_id),
+        "select", G_CALLBACK(on_color_famsel_select), GINT_TO_POINTER(i) );
+
+  g_signal_connect( Builder_Get_Object(builder, "main_flow_dir_menu_menu"),
+      "hide", G_CALLBACK(on_color_famsel_menu_hide), NULL );
+}
+
+/** on_anim_color_reset_clicked() - Restore the color controls' defaults
+ * @button: emitting button, unused
+ * @user_data: unused
+ *
+ * Resets the projection, scale family, brightness floor, width carrier,
+ * and every family parameter to their compiled-in defaults, reruns the
+ * color hooks, then syncs the bound widgets from the fields.  Overlay
+ * gates keep their user state.
+ */
+  void
+on_anim_color_reset_clicked(GtkButton *button, gpointer user_data)
+{
+  int fam;
+
+  (void)button;
+  (void)user_data;
+
+  rc_config_set_default( rc_config_find_by_field(&rc_config.anim_color_proj) );
+  rc_config_set_default( rc_config_find_by_field(&rc_config.color_scale) );
+  rc_config_set_default( rc_config_find_by_field(&rc_config.color_lum_floor) );
+  rc_config_set_default( rc_config_find_by_field(&rc_config.color_width_amp) );
+
+  for( fam = 0; fam < COLOR_TONE_NUM; fam++ )
+  {
+    /* Only slider-backed families persist a parameter row */
+    if( color_tones[fam].scale_id == NULL )
+      continue;
+
+    rc_config_set_default(
+        rc_config_find_by_field(&rc_config.color_fam_param[fam]) );
+  }
+
+  /* Reset sequence: defaults above, hooks, then widget sync */
+  hook_color_family();
+  config_widget_sync_all();
+}
+
 /* Create the animation dialog on first use, wire the phase slider drag
  * handler, then show it and reflect the mirrored visualization state. */
   static void
@@ -2303,12 +2543,14 @@ show_animate_dialog(void)
     g_signal_connect( Builder_Get_Object(animate_dialog_builder,
           "animate_phase_slider"), "motion-notify-event",
         G_CALLBACK(on_phase_slider_motion_notify), NULL );
+
+    anim_fam_marks_attach();
+    anim_select_preview_attach();
   }
   gtk_widget_show( animate_dialog );
   config_widget_sync_builder( &animate_dialog_builder );
   config_widget_run_hooks( &animate_dialog_builder );
   anim_panel_sensitivity();
-  update_color_scale_labels();
 }
 
 
@@ -5112,7 +5354,7 @@ on_freqplots_theme_activate(
   if( invert != NULL )
     freqplots_invert_item_sync( invert, base );
 
-  freq_step_update_ui( calc_data.freq_step, TRUE );
+  config_widget_field_changed( rc_config.freqplots_theme );
 }
 
 /* on_freqplots_theme_invert_toggled()
@@ -5127,7 +5369,7 @@ on_freqplots_theme_invert_toggled(
   rc_config.freqplots_theme_invert =
       gtk_check_menu_item_get_active(menuitem) ? 1 : 0;
 
-  freq_step_update_ui( calc_data.freq_step, TRUE );
+  config_widget_field_changed( &rc_config.freqplots_theme_invert );
 }
 
 /* on_freqplots_theme_select()
@@ -5147,7 +5389,7 @@ on_freqplots_theme_select(
     return;
 
   theme_preview_set( base );
-  freq_step_update_ui( calc_data.freq_step, TRUE );
+  hook_theme_change();
 }
 
 /* on_freqplots_theme_menu_hide()
@@ -5165,7 +5407,7 @@ on_freqplots_theme_menu_hide(
     return;
 
   theme_preview_clear();
-  freq_step_update_ui( calc_data.freq_step, TRUE );
+  hook_theme_change();
 }
 
 

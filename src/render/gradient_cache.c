@@ -23,6 +23,7 @@
  * and comparing against current authoritative state on each update call.
  */
 #include "gradient_cache.h"
+#include "../color/color_ramp.h"
 #include "../shared.h"
 #include "../rdpattern_ui.h"
 

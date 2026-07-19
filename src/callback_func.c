@@ -22,7 +22,8 @@
 #include "shared.h"
 #include "prerender/prerender_state.h"
 #include "prerender/prerender_color.h"
-#include "prerender/prerender_color_proj.h"
+#include "color/color_ramp.h"
+#include "chroma/chroma.h"
 #include "structure_ui.h"
 #include "mem/mem_track.h"
 
@@ -431,46 +432,6 @@ Free_Crnt_Buffs( void )
 
 /*-----------------------------------------------------------------------*/
 
-/**
- * update_color_scale_labels() - Relabel the Squared color-scale choices
- *
- * The squared transfer is proportional to dissipated power only while
- * currents are displayed, so the label carries the physical reading in
- * that mode alone.  Covers the main-window menu item and, when the
- * animate dialog is open, its color-scale combo item.
- */
-  void
-update_color_scale_labels( void )
-{
-  gtk_menu_item_set_label(
-      GTK_MENU_ITEM(Builder_Get_Object(
-          main_window_builder, "main_color_scale_squared")),
-      isFlagSet(DRAW_CURRENTS) ? _("Sq_uared (Power)") : _("Sq_uared") );
-
-  if( animate_dialog_builder != NULL )
-  {
-    GtkComboBoxText *combo = GTK_COMBO_BOX_TEXT(Builder_Get_Object(
-          animate_dialog_builder, "anim_color_scale") );
-
-    /* Squared item position per the combo's CONFIG_WIDGET_VALUES order
-     * (Linear, Sqrt, Squared, dB) in rc_config.c */
-    const gint idx = 2;
-    gint active = gtk_combo_box_get_active( GTK_COMBO_BOX(combo) );
-
-    /* Rewriting the item removes it first, which would clear and re-fire
-     * the selection; block the config handler, then restore the active
-     * row before unblocking below. */
-    SIGNAL_BLOCK( combo, on_config_widget_changed );
-    gtk_combo_box_text_remove( combo, idx );
-    gtk_combo_box_text_insert_text( combo, idx,
-        isFlagSet(DRAW_CURRENTS) ? _("Squared (Power)") : _("Squared") );
-    gtk_combo_box_set_active( GTK_COMBO_BOX(combo), active );
-    SIGNAL_UNBLOCK( combo, on_config_widget_changed );
-  }
-}
-
-/*-----------------------------------------------------------------------*/
-
 /* Main_Currents_Togglebutton_Toggled()
  *
  * Callback function for Main Currents toggle button
@@ -515,8 +476,6 @@ Main_Currents_Togglebutton_Toggled( gboolean flag )
     if( overlay_struct_active() )
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
-
-  update_color_scale_labels();
 
 } /* Main_Currents_Togglebutton_Toggled() */
 
@@ -570,8 +529,6 @@ Main_Charges_Togglebutton_Toggled( gboolean flag )
     if( overlay_struct_active() )
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
-
-  update_color_scale_labels();
 
 } /* Main_Charges_Togglebutton_Toggled() */
 
@@ -978,42 +935,24 @@ Draw_Colorcode( cairo_t *cr )
   void
 draw_colorcode_projected( cairo_t *cr )
 {
-  color_proj_t proj = color_proj_active();
-  color_scale_t scale = color_scale_sanitize(rc_config.color_scale);
-  color_ctx_t x;
-  double cmin = 1.0, cmax = 1.0;
-  int fstep = calc_data.freq_step;
+  chroma_proj_t proj = color_proj_active();
+  color_tone_t fam = color_tone_active();
+  const chroma_proj_row_t *row = &chroma_proj_rows[proj];
+  const palette_t *pal = palette_get(chroma_proj_palette_kind(row->hue_enc));
+  tone_param_t tp;
   int idx;
 
-  if( CRNT_FSTEP_AVAILABLE(fstep) && struct_colors != NULL )
-  {
-    if( isFlagSet(DRAW_CHARGES) )
-    {
-      cmin = (double)struct_colors[fstep].wire_chrg_cmin;
-      cmax = (double)struct_colors[fstep].wire_chrg_cmax;
-    }
-    else
-    {
-      /* Currents display spans wires and patches, matching dispatch cmax */
-      cmin = fmin((double)struct_colors[fstep].wire_crnt_cmin,
-                  (double)struct_colors[fstep].patch_crnt_cmin);
-      cmax = fmax((double)struct_colors[fstep].wire_crnt_cmax,
-                  (double)struct_colors[fstep].patch_crnt_cmax);
-    }
-  }
-
-  if( cmax <= 0.0 )
-  {
-    cmin = 1.0;
-    cmax = 1.0;
-  }
-
-  color_ctx_init( &x, 0.0, cmin, cmax, scale );
+  tone_param_init( &tp, fam );
 
   for( idx = 0; idx < COLORCODE_WIDTH; idx++ )
   {
-    rgb_f_t c = color_project_norm(
-        (double)idx / (double)(COLORCODE_WIDTH - 1), proj, &x );
+    double p = (double)idx / (double)(COLORCODE_WIDTH - 1);
+    /* Ramp maps the value axis through the tone transfer s(n); the diverging
+     * and cyclic wheels sweep their domain linearly. */
+    double coord = (row->hue_enc == HUE_MAG_RAMP)
+        ? color_tones[fam].transfer( p, &tp ) : p;
+    rgb_f_t c = palette_lookup_scaled( pal, coord, 1.0 );
+
     cairo_set_source_rgb( cr, c.r, c.g, c.b );
     Cairo_Draw_Line( cr, idx, 0, idx, COLORCODE_HEIGHT );
   }

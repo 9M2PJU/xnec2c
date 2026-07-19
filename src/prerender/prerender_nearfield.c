@@ -25,7 +25,7 @@
  */
 #include "prerender_nearfield.h"
 #include "prerender_color.h"
-#include "prerender_color_proj.h"
+#include "../color/color_palette.h"
 #include "prerender_aggregate.h"
 #include "../shared.h"
 
@@ -45,23 +45,14 @@ prerender_field_vectors(nf_vector_t *vecs, near_field_t *nf,
 {
   int idx;
   double max_val = e_mode ? nf->max_er : nf->max_hr;
-  double min_val = max_val;
-  color_ctx_t x;
-
-  /* Scan the smallest nonzero magnitude in consumer scope so the dB floor
-   * follows every writer that refills the point buffer (freq loop and both
-   * animation recompute paths). */
-  for( idx = 0; idx < npts; idx++ )
-  {
-    double mag = e_mode ? nf->points[idx].er : nf->points[idx].hr;
-    if( mag > 0.0 && mag < min_val )
-      min_val = mag;
-  }
+  color_tone_t fam = color_tone_active();
+  const palette_t *ramp = palette_get(PALETTE_RAMP);
+  tone_param_t tp;
 
   /* Near-field stores a peak-envelope real vector, so the color axis is the
-   * Amplitude projection; the scale axis applies in full. */
-  color_ctx_init(&x, 0.0, min_val, max_val,
-      color_scale_sanitize(rc_config.color_scale));
+   * amplitude ramp; the tone family shapes the magnitude transfer, its dB
+   * floor derived from the user range. */
+  tone_param_init(&tp, fam);
 
   for( idx = 0; idx < npts; idx++ )
   {
@@ -90,7 +81,8 @@ prerender_field_vectors(nf_vector_t *vecs, near_field_t *nf,
     vecs[idx].dy = (float)(ry * fscale);
     vecs[idx].dz = (float)(rz * fscale);
 
-    c = color_project(mag, COLOR_PROJ_AMPLITUDE, &x);
+    c = palette_lookup_scaled(ramp,
+        color_tone_transfer_norm(fam, &tp, mag, max_val), 1.0);
     vecs[idx].rgb[0] = c.r;
     vecs[idx].rgb[1] = c.g;
     vecs[idx].rgb[2] = c.b;
@@ -156,22 +148,16 @@ Prerender_Near_Field(int fstep)
         np->pov_max = np->pr_buf[idx];
     }
 
-    /* Smallest nonzero Poynting magnitude anchors the dB auto-floor */
-    float pov_min = np->pov_max;
-    for( idx = 0; idx < npts; idx++ )
-    {
-      if( np->pr_buf[idx] > 0.0f && np->pr_buf[idx] < pov_min )
-        pov_min = np->pr_buf[idx];
-    }
-
-    color_ctx_t x;
-    color_ctx_init(&x, 0.0, (double)pov_min, (double)np->pov_max,
-        color_scale_sanitize(rc_config.color_scale));
+    color_tone_t fam = color_tone_active();
+    const palette_t *ramp = palette_get(PALETTE_RAMP);
+    tone_param_t tp;
+    tone_param_init(&tp, fam);
 
     for( idx = 0; idx < npts; idx++ )
     {
-      rgb_f_t c = color_project((double)np->pr_buf[idx],
-          COLOR_PROJ_AMPLITUDE, &x);
+      double s = color_tone_transfer_norm(fam, &tp,
+          (double)np->pr_buf[idx], (double)np->pov_max);
+      rgb_f_t c = palette_lookup_scaled(ramp, s, 1.0);
       np->pov_vecs[idx].rgb[0] = c.r;
       np->pov_vecs[idx].rgb[1] = c.g;
       np->pov_vecs[idx].rgb[2] = c.b;

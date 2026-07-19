@@ -23,6 +23,7 @@
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
 #include "prerender/prerender_nearfield.h"
+#include "color/color_palette.h"
 
 #ifdef HAVE_OPENGL
 #include "opengl/opengl_structure.h"
@@ -72,6 +73,47 @@ hook_flow_direction(void)
 
 /*------------------------------------------------------------------------*/
 
+/* Gate the wire overlay checkboxes by projection class and wire presence.
+ * Comet needs a phase-varying projection; both overlays need wire-current
+ * segments.  A disabled control carries a tooltip naming the reason.
+ * Single source called from hook_color_vis (projection edge) and from
+ * config_widget_run_hooks on dialog open. */
+static void
+anim_overlay_sensitivity(void)
+{
+  const char *no_wire = _("This overlay derives from wire-current segments;"
+      " this model has none.");
+  gboolean animated, has_wires;
+  GtkWidget *comet, *nodes;
+
+  if( animate_dialog_builder == NULL )
+    return;
+
+  animated  = chroma_proj_animated(chroma_proj_selected());
+  has_wires = (data.n > 0);
+
+  comet = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_overlay_comet"));
+  nodes = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_overlay_nodes"));
+
+  gtk_widget_set_sensitive( comet, animated && has_wires );
+  gtk_widget_set_sensitive( nodes, has_wires );
+
+  if( !has_wires )
+  {
+    gtk_widget_set_tooltip_text( comet, no_wire );
+    gtk_widget_set_tooltip_text( nodes, no_wire );
+  }
+  else
+  {
+    gtk_widget_set_tooltip_text( comet, animated
+        ? _("Highlight the moving wave crest as a bright comet head.")
+        : _("Comet rides the animated wave crest; this projection is a static"
+            " read with no moving phase.") );
+    gtk_widget_set_tooltip_text( nodes,
+        _("Mark current nodes (cyan) and antinodes (red) along the wires.") );
+  }
+}
+
 /** hook_color_vis() - Rebake baked colors and redraw after a
  * color projection or scale change, including the legend strip.
  */
@@ -98,6 +140,81 @@ hook_color_vis(void)
   if( main_window_builder != NULL )
     xnec2_widget_queue_draw( Builder_Get_Object(main_window_builder,
         "main_colorcode_drawingarea"), TRUE );
+
+  /* Track the animate dialog's projection selector label and formula to
+   * the selected row and refresh the dialog's copy of the legend strip */
+  if( animate_dialog_builder != NULL )
+  {
+    chroma_proj_t sel = chroma_proj_selected();
+
+    gtk_button_set_label( GTK_BUTTON(Builder_Get_Object(animate_dialog_builder,
+            "anim_color_proj_button")),
+        gtk_menu_item_get_label( GTK_MENU_ITEM(Builder_Get_Object(
+              animate_dialog_builder, chroma_proj_rows[sel].sel_id)) ) );
+
+    gtk_label_set_markup( GTK_LABEL(Builder_Get_Object(animate_dialog_builder,
+            "anim_proj_formula")),
+        chroma_proj_rows[sel].formula );
+
+    xnec2_widget_queue_draw( Builder_Get_Object(animate_dialog_builder,
+        "anim_colorcode_drawingarea"), TRUE );
+  }
+
+  anim_overlay_sensitivity();
+}
+
+/*------------------------------------------------------------------------*/
+
+/** hook_color_family() - Swap the active family's slider row and formula
+ *
+ * Shows only the active family's brightness-slider row in the animate
+ * dialog, renders its closed-form transfer in the formula label, then
+ * rebakes colors via hook_color_vis().
+ */
+void
+hook_color_family(void)
+{
+  color_tone_t active = color_tone_active();
+  int fam;
+
+  if( animate_dialog_builder != NULL )
+  {
+    for( fam = 0; fam < COLOR_TONE_NUM; fam++ )
+      gtk_widget_set_visible(
+          GTK_WIDGET(Builder_Get_Object(animate_dialog_builder,
+              color_tones[fam].row_id)),
+          fam == (int)active );
+
+    gtk_label_set_markup( GTK_LABEL(Builder_Get_Object(animate_dialog_builder,
+            "anim_scale_formula")),
+        color_tones[active].formula );
+
+    gtk_button_set_label( GTK_BUTTON(Builder_Get_Object(animate_dialog_builder,
+            "anim_color_family_button")),
+        gtk_menu_item_get_label( GTK_MENU_ITEM(Builder_Get_Object(
+              animate_dialog_builder, color_tones[active].sel_id)) ) );
+  }
+
+  hook_color_vis();
+}
+
+/*------------------------------------------------------------------------*/
+
+/** hook_theme_change() - Refresh everything derived from the active theme
+ *
+ * Single unified refresh for every theme-derived consumer: rebuild the
+ * palette LUTs from the theme's gradient roles, rebake and redraw the
+ * color-projected surfaces and legend strips, then repaint the frequency
+ * plots through the redraw orchestration path.  Every theme commit,
+ * preview, and revert edge calls this one function; a new theme-derived
+ * consumer adds its refresh here.
+ */
+void
+hook_theme_change(void)
+{
+  palette_registry_init();
+  hook_color_vis();
+  freq_step_update_ui(calc_data.freq_step, TRUE);
 }
 
 /*------------------------------------------------------------------------*/
@@ -163,16 +280,49 @@ hook_frequency(void)
 
 /*------------------------------------------------------------------------*/
 
+/* Radio anim_qty_off is a display-quantity view with no bound variable.
+ * Currents and charges are mutually exclusive, so when both settle to zero
+ * the radio group has no active member; mark anim_qty_off active here.
+ * Block the sibling radios' config handler so the group write does not
+ * recurse into a variable update.  Paired with hook_main_currents and
+ * hook_main_charges, which schedule this at idle: a direct currents<->charges
+ * switch applies one field per toggled signal, so a synchronous settle
+ * observes the group transiently empty and steals focus to off; running at
+ * idle lets the group transaction finish and both fields settle first. */
+static void
+anim_qty_settle_off(void)
+{
+  GtkWidget *off, *cur, *chg;
+
+  if( animate_dialog_builder == NULL )
+    return;
+  if( rc_config.main_currents_togglebutton ||
+      rc_config.main_charges_togglebutton )
+    return;
+
+  off = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_qty_off"));
+  cur = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_qty_currents"));
+  chg = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_qty_charges"));
+
+  SIGNAL_BLOCK( cur, on_config_widget_changed );
+  SIGNAL_BLOCK( chg, on_config_widget_changed );
+  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(off), TRUE );
+  SIGNAL_UNBLOCK( chg, on_config_widget_changed );
+  SIGNAL_UNBLOCK( cur, on_config_widget_changed );
+}
+
 void
 hook_main_currents(void)
 {
   Main_Currents_Togglebutton_Toggled(rc_config.main_currents_togglebutton);
+  g_idle_add_once( (GSourceOnceFunc)anim_qty_settle_off, NULL );
 }
 
 void
 hook_main_charges(void)
 {
   Main_Charges_Togglebutton_Toggled(rc_config.main_charges_togglebutton);
+  g_idle_add_once( (GSourceOnceFunc)anim_qty_settle_off, NULL );
 }
 
 /*------------------------------------------------------------------------*/

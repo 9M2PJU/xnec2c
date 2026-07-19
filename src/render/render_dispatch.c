@@ -31,7 +31,7 @@
 #include "render_dispatch.h"
 #include "gradient_cache.h"
 #include "../shared.h"
-#include "../prerender/prerender_color_proj.h"
+#include "../chroma/chroma.h"
 #include "../prerender/prerender_farfield.h"
 #include "../rdpattern_ui.h"
 #include "../structure_ui.h"
@@ -218,37 +218,44 @@ build_struct_draw_params(int fstep)
   struct_draw_params_t params;
   int fs = fstep;
 
-  color_proj_t proj = color_proj_active();
-  color_scale_t scale = color_scale_sanitize(rc_config.color_scale);
+  chroma_proj_t proj = color_proj_active();
+  color_tone_t fam = color_tone_active();
 
   if( isFlagSet(DRAW_CURRENTS) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
   {
-    params.wire_colors  = color_proj_wire_current(fs, (double)flow_phase,
-        proj, scale);
-    params.wire_widths  = seg_width;
-    params.patch_colors = color_proj_patch(fs, (double)flow_phase,
-        proj, scale);
+    params.wire_colors  = chroma_proj_frame_wire(fs, (double)flow_phase,
+        proj, fam, CHAN_CURRENT);
+    params.wire_widths  = chroma_proj_frame_wire_widths(fs, proj, fam,
+        CHAN_CURRENT);
+    params.patch_colors = chroma_proj_frame_patch(fs, (double)flow_phase,
+        proj, fam);
+    params.wire_glyphs  = chroma_proj_frame_wire_glyphs(fs, proj, fam,
+        CHAN_CURRENT);
     params.cmax = fmax((double)struct_colors[fs].wire_crnt_cmax,
                        (double)struct_colors[fs].patch_crnt_cmax);
     params.show_flow = TRUE;
-    params.color_generation = color_proj_generation();
+    params.color_generation = chroma_proj_generation();
   }
   else if( isFlagSet(DRAW_CHARGES) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
   {
     /* Patches carry no charge quantity; fill stays the static geometry color */
-    params.wire_colors  = color_proj_wire_charge(fs, (double)flow_phase,
-        proj, scale);
-    params.wire_widths  = seg_width;
+    params.wire_colors  = chroma_proj_frame_wire(fs, (double)flow_phase,
+        proj, fam, CHAN_CHARGE);
+    params.wire_widths  = chroma_proj_frame_wire_widths(fs, proj, fam,
+        CHAN_CHARGE);
     params.patch_colors = patch_rgb;
+    params.wire_glyphs  = chroma_proj_frame_wire_glyphs(fs, proj, fam,
+        CHAN_CHARGE);
     params.cmax = (double)struct_colors[fs].wire_chrg_cmax;
     params.show_flow = FALSE;
-    params.color_generation = color_proj_generation();
+    params.color_generation = chroma_proj_generation();
   }
   else
   {
     params.wire_colors  = seg_rgb;
     params.wire_widths  = seg_width;
     params.patch_colors = patch_rgb;
+    params.wire_glyphs  = NULL;
     params.cmax = 0.0;
     params.show_flow = FALSE;
     params.color_generation = 0;
