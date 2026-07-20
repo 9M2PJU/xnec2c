@@ -3111,7 +3111,6 @@ Zo_Command( int action )
 
   /* Tx Line Impedance */
   static gint zo;
-  static gchar szo[13];
 
   /* Card (row) name */
   gchar name[3];
@@ -3142,7 +3141,7 @@ Zo_Command( int action )
 
       /* Set range data */
       gtk_list_store_set(
-          cmnd_store, &iter_zo, CMND_COL_I1, szo, -1 );
+          cmnd_store, &iter_zo, CMND_COL_I1, zo, -1 );
     }
     save_data = FALSE;
   } /* if( (action & EDITOR_SAVE) && save_data ) */
@@ -3197,7 +3196,6 @@ Zo_Command( int action )
   spin = GTK_SPIN_BUTTON(
       Builder_Get_Object(zo_editor_builder, "zo_spinbutton") );
   zo = gtk_spin_button_get_value_as_int( spin );
-  snprintf( szo, sizeof(szo), "%4d", zo );
 
   busy = FALSE;
 
