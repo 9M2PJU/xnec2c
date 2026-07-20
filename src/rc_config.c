@@ -78,28 +78,33 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.main_x, &rc_config.main_y },
 		.def = { { .i = 50 }, { .i = 50 } } },
 
+	// Reuses the historical "currents" key as a struct_view_t enum holder:
+	// value 1 keeps its old CURRENTS meaning, 0 becomes CHARGES, and the
+	// DISABLED (-1) geometry view is a value no old file ever wrote, reached
+	// by releasing the pressed toggle.  The two-value toggles carry the
+	// released DISABLED state, so clearing the active view shows geometry and
+	// the fresh default is geometry; the engine sync enforces exclusivity.
+	// The dropped "charges" key is ignored.
 	{ .desc = "Main Window Currents toggle button state", .format = "%d",
-		.vars = { &rc_config.main_currents_togglebutton },
-		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_main_currents,
+		.vars = { &rc_config.structure_view }, .def = { { .i = STRUCT_VIEW_DISABLED } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = structure_view_apply,
 			.groups = CONFIG_WIDGET_GROUPS(
 				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
 					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "main_currents_togglebutton" ), NULL ) ),
+						CONFIG_WIDGET( .widget_id = "main_currents_togglebutton",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_CURRENTS, STRUCT_VIEW_DISABLED) ),
+						CONFIG_WIDGET( .widget_id = "main_charges_togglebutton",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_CHARGES, STRUCT_VIEW_DISABLED) ),
+						NULL ) ),
 				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
 					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "anim_qty_currents" ), NULL ) ),
-				NULL ) ) },
-
-	{ .desc = "Main Window Charges toggle button state", .format = "%d",
-		.vars = { &rc_config.main_charges_togglebutton },
-		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_main_charges,
-			.groups = CONFIG_WIDGET_GROUPS(
-				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
-					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "main_charges_togglebutton" ), NULL ) ),
-				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
-					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "anim_qty_charges" ), NULL ) ),
+						CONFIG_WIDGET( .widget_id = "anim_qty_off",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_DISABLED) ),
+						CONFIG_WIDGET( .widget_id = "anim_qty_charges",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_CHARGES) ),
+						CONFIG_WIDGET( .widget_id = "anim_qty_currents",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_CURRENTS) ),
+						NULL ) ),
 				NULL ) ) },
 
 	{ .desc = "Polarization Type", .format = "%d",
@@ -168,15 +173,23 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.rdpattern_x, &rc_config.rdpattern_y },
 		.def = { { .i = -1 }, { .i = -1 } } },
 
+	// Reuses the historical "gain" key as a rdpat_mode_t enum holder: value 1
+	// keeps its old GAIN meaning and 0 becomes EHFIELD.  The two-value toggles
+	// carry the released DISABLED state, so clearing the active field shows no
+	// pattern; the engine sync enforces exclusivity.  The dropped "eh" key is
+	// ignored.
 	{ .desc = "Radiation Pattern Window Gain toggle button state", .format = "%d",
-		.vars = { &rc_config.rdpattern_gain_togglebutton }, .def = { { .i = 1 } },
-		.widgets = CONFIG_WIDGET_SINGLE( &rdpattern_window_builder,
-			"rdpattern_gain_togglebutton", hook_rdpat_gain ) },
-
-	{ .desc = "Radiation Pattern Window EH toggle button state", .format = "%d",
-		.vars = { &rc_config.rdpattern_eh_togglebutton },
-		.widgets = CONFIG_WIDGET_SINGLE( &rdpattern_window_builder,
-			"rdpattern_eh_togglebutton", hook_rdpat_eh ) },
+		.vars = { &rc_config.rdpattern_mode }, .def = { { .i = RDPAT_FIELD_GAIN } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = rdpattern_mode_apply,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_gain_togglebutton",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_FIELD_GAIN, RDPAT_FIELD_DISABLED) ),
+						CONFIG_WIDGET( .widget_id = "rdpattern_eh_togglebutton",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_FIELD_EHFIELD, RDPAT_FIELD_DISABLED) ),
+						NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Radiation Pattern Window Menu E-field state", .format = "%d",
 		.vars = { &rc_config.rdpattern_e_field }, .def = { { .i = 1 } },

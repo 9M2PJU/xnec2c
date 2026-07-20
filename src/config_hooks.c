@@ -126,7 +126,7 @@ hook_color_vis(void)
 
   /* Near-field colors are baked at prerender time, so rebake the current
    * step under the data lock before queueing the redraws. */
-  if( isFlagSet(DRAW_EHFIELD) && NF_FSTEP_AVAILABLE(calc_data.freq_step) )
+  if( rdpat_ehfield_active() && NF_FSTEP_AVAILABLE(calc_data.freq_step) )
   {
     g_rec_mutex_lock(&freq_data_lock);
     Prerender_Near_Field(calc_data.freq_step);
@@ -280,58 +280,11 @@ hook_frequency(void)
 
 /*------------------------------------------------------------------------*/
 
-/* Radio anim_qty_off is a display-quantity view with no bound variable.
- * Currents and charges are mutually exclusive, so when both settle to zero
- * the radio group has no active member; mark anim_qty_off active here.
- * Block the sibling radios' config handler so the group write does not
- * recurse into a variable update.  Paired with hook_main_currents and
- * hook_main_charges, which schedule this at idle: a direct currents<->charges
- * switch applies one field per toggled signal, so a synchronous settle
- * observes the group transiently empty and steals focus to off; running at
- * idle lets the group transaction finish and both fields settle first. */
-static void
-anim_qty_settle_off(void)
-{
-  GtkWidget *off, *cur, *chg;
-
-  if( animate_dialog_builder == NULL )
-    return;
-  if( rc_config.main_currents_togglebutton ||
-      rc_config.main_charges_togglebutton )
-    return;
-
-  off = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_qty_off"));
-  cur = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_qty_currents"));
-  chg = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_qty_charges"));
-
-  SIGNAL_BLOCK( cur, on_config_widget_changed );
-  SIGNAL_BLOCK( chg, on_config_widget_changed );
-  gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(off), TRUE );
-  SIGNAL_UNBLOCK( chg, on_config_widget_changed );
-  SIGNAL_UNBLOCK( cur, on_config_widget_changed );
-}
-
-void
-hook_main_currents(void)
-{
-  Main_Currents_Togglebutton_Toggled(rc_config.main_currents_togglebutton);
-  g_idle_add_once( (GSourceOnceFunc)anim_qty_settle_off, NULL );
-}
-
-void
-hook_main_charges(void)
-{
-  Main_Charges_Togglebutton_Toggled(rc_config.main_charges_togglebutton);
-  g_idle_add_once( (GSourceOnceFunc)anim_qty_settle_off, NULL );
-}
-
-/*------------------------------------------------------------------------*/
-
 void
 hook_rdpat_e_field(void)
 {
   Set_Window_Labels();
-  if( isFlagSet(DRAW_EHFIELD) )
+  if( rdpat_ehfield_active() )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
@@ -339,7 +292,7 @@ void
 hook_rdpat_h_field(void)
 {
   Set_Window_Labels();
-  if( isFlagSet(DRAW_EHFIELD) )
+  if( rdpat_ehfield_active() )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
@@ -347,7 +300,7 @@ void
 hook_rdpat_poynting(void)
 {
   Set_Window_Labels();
-  if( isFlagSet(DRAW_EHFIELD) )
+  if( rdpat_ehfield_active() )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
@@ -367,18 +320,6 @@ void
 hook_rdpat_draw_style(void)
 {
   Queue_Radiation_Redraw();
-}
-
-void
-hook_rdpat_gain(void)
-{
-  Rdpattern_Gain_Togglebutton_Toggled(rc_config.rdpattern_gain_togglebutton);
-}
-
-void
-hook_rdpat_eh(void)
-{
-  Rdpattern_EH_Togglebutton_Toggled(rc_config.rdpattern_eh_togglebutton);
 }
 
 /*------------------------------------------------------------------------*/

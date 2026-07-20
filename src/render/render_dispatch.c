@@ -78,7 +78,7 @@ render_rdpattern_mode_message(void)
 /** render_check_nearfield() - Resolve near-field preconditions
  * @r: result struct with fstep already set; populated on return
  *
- * DRAW_EHFIELD is already confirmed set by caller.
+ * Near E/H field mode is already confirmed active by caller.
  */
   static void
 render_check_nearfield(render_check_result_t *r)
@@ -122,7 +122,7 @@ render_check_nearfield(render_check_result_t *r)
 /** render_check_farfield() - Resolve far-field preconditions
  * @r: result struct with fstep already set; populated on return
  *
- * DRAW_GAIN is already confirmed set by caller.
+ * Far-field gain mode is already confirmed active by caller.
  */
   static void
 render_check_farfield(render_check_result_t *r)
@@ -154,9 +154,9 @@ render_check_farfield(render_check_result_t *r)
   static void
 render_check_rdpattern(render_check_result_t *r)
 {
-  if( isFlagSet(DRAW_EHFIELD) )
+  if(rdpat_ehfield_active())
     render_check_nearfield(r);
-  else if( isFlagSet(DRAW_GAIN) )
+  else if(rdpat_gain_active())
     render_check_farfield(r);
   else
   {
@@ -209,7 +209,7 @@ render_check(view_type_t view_type)
  * @fstep: frequency step index
  *
  * Selects wire_colors and patch_colors from precomputed struct_colors
- * based on DRAW_CURRENTS / DRAW_CHARGES flags, or falls back to
+ * per the current structure view (currents or charges), or falls back to
  * geometry-mode seg_rgb / patch_rgb.
  */
   static struct_draw_params_t
@@ -221,7 +221,7 @@ build_struct_draw_params(int fstep)
   chroma_proj_t proj = color_proj_active();
   color_tone_t fam = color_tone_active();
 
-  if( isFlagSet(DRAW_CURRENTS) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
+  if(struct_view_currents() && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
   {
     params.wire_colors  = chroma_proj_frame_wire(fs, (double)flow_phase,
         proj, fam, CHAN_CURRENT);
@@ -236,7 +236,7 @@ build_struct_draw_params(int fstep)
     params.show_flow = TRUE;
     params.color_generation = chroma_proj_generation();
   }
-  else if( isFlagSet(DRAW_CHARGES) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
+  else if(struct_view_charges() && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
   {
     /* Patches carry no charge quantity; fill stays the static geometry color */
     params.wire_colors  = chroma_proj_frame_wire(fs, (double)flow_phase,

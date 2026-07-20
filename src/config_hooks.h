@@ -40,8 +40,6 @@ void hook_color_family(void);
 void hook_theme_change(void);
 void hook_orthographic(void);
 void hook_frequency(void);
-void hook_main_currents(void);
-void hook_main_charges(void);
 
 void hook_rdpat_e_field(void);
 void hook_rdpat_h_field(void);
@@ -49,8 +47,6 @@ void hook_rdpat_poynting(void);
 void hook_rdpat_overlay(void);
 void hook_rdpat_gradient_key(void);
 void hook_rdpat_draw_style(void);
-void hook_rdpat_gain(void);
-void hook_rdpat_eh(void);
 
 void hook_freqplots_gmax(void);
 void hook_freqplots_gdir(void);

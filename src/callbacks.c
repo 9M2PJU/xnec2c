@@ -310,10 +310,10 @@ on_main_save_activate(
 
   /* Make the structure image save file name from input file
    * name. The count of each image type saved is incremented */
-  if( isFlagSet(DRAW_CURRENTS) )
+  if(struct_view_currents())
     snprintf( saveas, s, "%s-%s_%03d.%s",
         rc_config.input_file, "current", ++ccr, "png" );
-  else if( isFlagSet(DRAW_CHARGES) )
+  else if(struct_view_charges())
     snprintf( saveas, s, "%s-%s_%03d.%s",
         rc_config.input_file, "charge", ++cch, "png" );
   else
@@ -1302,10 +1302,10 @@ on_rdpattern_save_activate(
 
   /* Make the rad pattern save
    * file name from input name */
-  if( isFlagSet(DRAW_GAIN) )
+  if(rdpat_gain_active())
     snprintf( saveas, s, "%s-%s_%03d%s",
         rc_config.input_file, "gain", ++cgn, ".png" );
-  else if( isFlagSet(DRAW_EHFIELD) )
+  else if(rdpat_ehfield_active())
     snprintf( saveas, s, "%s-%s_%03d%s",
         rc_config.input_file, "fields", ++ceh, ".png" );
   else return;
@@ -1830,11 +1830,11 @@ opengl_set_renderer(gboolean enable)
     }
 
     /* Signal pattern data needs refresh */
-    if( isFlagSet(DRAW_GAIN) )
+    if(rdpat_gain_active())
     {
       SetFlag( DRAW_NEW_RDPAT );
     }
-    else if( isFlagSet(DRAW_EHFIELD) )
+    else if(rdpat_ehfield_active())
     {
       SetFlag( DRAW_NEW_EHFIELD );
     }
@@ -2091,7 +2091,7 @@ on_near_peak_value_activate(
     g_rec_mutex_lock(&freq_data_lock);
     Recompute_Near_Field_Vectors( fstep, FALSE );
     g_rec_mutex_unlock(&freq_data_lock);
-    if( isFlagSet(DRAW_EHFIELD) )
+    if(rdpat_ehfield_active())
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
   /* else: on_near_snapshot_activate fires for the newly-selected item */
@@ -2109,7 +2109,7 @@ on_near_snapshot_activate(
     g_rec_mutex_lock(&freq_data_lock);
     Recompute_Near_Field_Vectors( fstep, TRUE );
     g_rec_mutex_unlock(&freq_data_lock);
-    if( isFlagSet(DRAW_EHFIELD) )
+    if(rdpat_ehfield_active())
       xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
   /* else: on_near_peak_value_activate fires for the newly-selected item */
@@ -2559,7 +2559,7 @@ on_rdpattern_animate_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
 {
-  if( isFlagClear(DRAW_EHFIELD) )
+  if(!rdpat_ehfield_active())
   {
     if( fpat.nfeh )
     {
@@ -2690,7 +2690,7 @@ on_animation_applybutton_clicked(
 
   /* Validate near-field setup only when no structure content can animate */
   if( data.n == 0 && data.m == 0 &&
-      isFlagSet(DRAW_EHFIELD) && !Validate_Nearfield_Animation() )
+      rdpat_ehfield_active() && !Validate_Nearfield_Animation() )
     return;
 
   SetFlag( ANIMATE );

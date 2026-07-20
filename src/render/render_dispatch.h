@@ -46,7 +46,7 @@ typedef enum
   RENDER_NO_RP_CARD,
   RENDER_NO_NF_CARD,
   RENDER_NF_NOT_READY,
-  RENDER_NO_NF_FIELD,   /* DRAW_EHFIELD set but no E/H/Poynting component selected */
+  RENDER_NO_NF_FIELD,   /* near E/H field mode but no E/H/Poynting component selected */
   RENDER_NO_DATA,
   RENDER_NO_GEOMETRY,   /* VIEW_STRUCTURE with no geometry loaded (data.n == data.m == 0) */
   RENDER_NO_MODE
@@ -61,7 +61,7 @@ typedef struct
   const unsigned char *wire_glyphs; /* per-segment GLYPH_* code [data.n], or NULL */
   double         cmax;          /* fmax(wire_crnt_cmax, patch_crnt_cmax) or 0.0 */
   double         freq_mhz;      /* frequency for staleness detection */
-  gboolean       show_flow;     /* TRUE only for DRAW_CURRENTS */
+  gboolean       show_flow;     /* TRUE only in currents view */
   int            fstep;         /* for crnt_fstep[] access */
   uint32_t       color_generation; /* bumped whenever dispatch rebakes wire/patch color */
 } struct_draw_params_t;

@@ -972,22 +972,10 @@ Open_Input_File( gpointer arg )
     if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) && !rc_config.main_loop_start)
       Main_Rdpattern_Activate( FALSE );
 
-    /* Select display of radiation or EH pattern */
-    if( isFlagSet(DRAW_GAIN) )
-    {
-      if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) && !rc_config.main_loop_start)
-        Rdpattern_Gain_Togglebutton_Toggled( TRUE );
-    }
-    else if( isFlagSet(DRAW_EHFIELD) )
-    {
-      if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
-        Rdpattern_EH_Togglebutton_Toggled( TRUE );
-    }
-    else
-    {
-      Rdpattern_Gain_Togglebutton_Toggled( FALSE );
-      Rdpattern_EH_Togglebutton_Toggled( FALSE );
-    }
+    /* Re-apply the persisted radiation-pattern field mode for the reloaded
+     * file; the rc_config enum selects far-field gain or near E/H field */
+    if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) && !rc_config.main_loop_start )
+      rdpattern_mode_apply();
 
     GtkWidget *box = Builder_Get_Object( rdpattern_window_builder, "rdpattern_box" );
     gtk_widget_show( box );
@@ -1058,12 +1046,9 @@ Open_Input_File( gpointer arg )
   }
 
 
-  /* If currents or charges draw button is active
-   * re-initialize structure currents/charges drawing */
-  if( isFlagSet(DRAW_CURRENTS) )
-    Main_Currents_Togglebutton_Toggled( TRUE );
-  if( isFlagSet(DRAW_CHARGES) )
-    Main_Charges_Togglebutton_Toggled( TRUE );
+  /* Re-apply the persisted structure view for the reloaded geometry; the
+   * rc_config enum selects geometry, currents, or charges */
+  structure_view_apply();
 
   /* Redraw structure with updated geometry regardless of overlay state.
    * During optimization freq_step_update_ui_idle_force handles both

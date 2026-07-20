@@ -186,8 +186,6 @@ static inline int dl_feq_eps(double a, double b, double eps) { return fabs(a - b
 #define FREQ_LOOP_STOP      0x0000000000000008ll
 
 /* Main Window Control flags */
-#define DRAW_CURRENTS       0x0000000000000010ll
-#define DRAW_CHARGES        0x0000000000000020ll
 #define MAIN_QUIT           0x0000000000000200ll
 
 /* Freq Plot Control flags */
@@ -196,8 +194,6 @@ static inline int dl_feq_eps(double a, double b, double eps) { return fabs(a - b
 #define PLOT_QUIT           0x0000000000100000ll
 
 /* Radiation Pattern Control flags */
-#define DRAW_GAIN           0x0000000000400000ll
-#define DRAW_EHFIELD        0x0000000002000000ll
 #define DRAW_ENABLED        0x0000000008000000ll
 #define DRAW_QUIT           0x0000000010000000ll
 #define DRAW_NEW_RDPAT      0x0000000020000000ll
@@ -206,8 +202,6 @@ static inline int dl_feq_eps(double a, double b, double eps) { return fabs(a - b
 #define ENABLE_RDPAT        0x0000000400000000ll
 #define ENABLE_NEAREH       0x0000000800000000ll
 #define DRAW_FLAGS ( \
-  DRAW_GAIN         | \
-  DRAW_EHFIELD      | \
   DRAW_ENABLED      | \
   DRAW_QUIT         | \
   DRAW_NEW_RDPAT    | \
@@ -296,10 +290,10 @@ typedef struct
     main_width,
     main_height;
 
-  /* Main (structure) window state of widgets */
+  /* Main (structure) window state of widgets.  structure_view holds a
+   * struct_view_t member selecting geometry, charges, or currents. */
   int
-    main_currents_togglebutton,
-    main_charges_togglebutton,
+    structure_view,
     main_loop_start;
 
   int
@@ -316,10 +310,10 @@ typedef struct
     rdpattern_height,
     rdpattern_zoom_spinbutton;
 
-  /* Radiation pattern window state of widgets */
+  /* Radiation pattern window state of widgets.  rdpattern_mode holds a
+   * rdpat_mode_t member selecting far-field gain or near E/H field. */
   int
-    rdpattern_gain_togglebutton,
-    rdpattern_eh_togglebutton,
+    rdpattern_mode,
     rdpattern_e_field,
     rdpattern_h_field,
     rdpattern_poynting_vector,
@@ -523,6 +517,24 @@ enum RDPAT_STYLE
   RDPAT_STYLE_BOTH,
   NUM_RDPAT_STYLES
 };
+
+/* Main-window structure display selection, stored under the reused
+ * "currents" config key so an old file's 0/1 value keeps its meaning. */
+typedef enum
+{
+  STRUCT_VIEW_DISABLED = -1, /* geometry only; fresh default; released via the toggle group; never written by old files */
+  STRUCT_VIEW_CHARGES  = 0,  /* reuses the currents-key value 0 */
+  STRUCT_VIEW_CURRENTS = 1   /* reuses the currents-key value 1 */
+} struct_view_t;
+
+/* Radiation-pattern field display selection, stored under the reused
+ * "gain" config key so an old file's 0/1 value keeps its meaning. */
+typedef enum
+{
+  RDPAT_FIELD_DISABLED = -1, /* neither field; released via the toggle group; never written by old files */
+  RDPAT_FIELD_EHFIELD  = 0,  /* reuses the gain-key value 0 */
+  RDPAT_FIELD_GAIN     = 1   /* reuses the gain-key value 1; fresh default (far field) */
+} rdpat_mode_t;
 
 /* Gain Scaling style */
 enum GAIN_SCALE
@@ -1299,10 +1311,8 @@ void
 Card_Clicked(GtkWidget **editor, GtkBuilder **editor_builder, GtkWidget *create_fun(GtkBuilder **), void editor_fun(int), int *editor_action);
 void Main_Rdpattern_Activate(gboolean from_menu);
 gboolean Main_Freqplots_Activate(void);
-void Rdpattern_Gain_Togglebutton_Toggled(gboolean flag);
-void Rdpattern_EH_Togglebutton_Toggled(gboolean flag);
-void Main_Currents_Togglebutton_Toggled(gboolean flag);
-void Main_Charges_Togglebutton_Toggled(gboolean flag);
+void rdpattern_mode_apply(void);
+void structure_view_apply(void);
 GtkWidget *Open_Filechooser(GtkFileChooserAction action, char *pattern, char *prefix, char *filename, char *foldername);
 void Filechooser_Response(GtkDialog *dialog, gint response_id, int saveas_width, int saveas_height);
 void Open_Nec2_Editor(int action);

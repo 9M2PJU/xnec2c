@@ -61,12 +61,12 @@ Draw_Structure_UI(void)
     gboolean do_update = FALSE;
     double maxval = 0.0;
 
-    if( isFlagSet(DRAW_CURRENTS) )
+    if(struct_view_currents())
     {
       maxval = (double)struct_colors[fstep].wire_crnt_cmax * (double)data.wlam;
       do_update = TRUE;
     }
-    else if( isFlagSet(DRAW_CHARGES) )
+    else if(struct_view_charges())
     {
       maxval = (double)struct_colors[fstep].wire_chrg_cmax
              * 1.0E-6 / (double)calc_data.freq_mhz;
@@ -131,9 +131,9 @@ Show_Viewer_Gain(
     gchar *widget,
     view_t *v )
 {
-  if( isFlagSet(DRAW_CURRENTS) ||
-      isFlagSet(DRAW_CHARGES)  ||
-      isFlagSet(DRAW_GAIN)     ||
+  if(struct_view_currents() ||
+      struct_view_charges()  ||
+      rdpat_gain_active()     ||
       isFlagSet(FREQ_LOOP_RUNNING) )
   {
     char txt[16];
@@ -322,13 +322,13 @@ Animate_Phase(gpointer _udata)
 apply_animation_phase(void)
 {
   /* Near-field computation only runs when EH field visualization is active */
-  if( isFlagSet(DRAW_EHFIELD) )
+  if(rdpat_ehfield_active())
     compute_near_field_frame((double)flow_phase);
 
   xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
   /* Queue rdpattern for near-field visualization or structure overlay */
-  if( isFlagSet(DRAW_EHFIELD) || overlay_struct_active() )
+  if(rdpat_ehfield_active() || overlay_struct_active() )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 
   /* Update the phase readout from flow_phase without moving the slider, whose

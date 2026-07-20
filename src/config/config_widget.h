@@ -40,9 +40,10 @@
  * terminates a selection-value list instead of NULL. */
 #define CONFIG_WIDGET_VALUES_END INT_MIN
 
-/* One bound widget: its glade id and, for radios/combos, the field values
- * its selection positions express.  values == NULL means pass-through
- * (toggle, check menu item, spin, range). */
+/* One bound widget: its glade id and, for radios/combos/valued toggles, the
+ * field values its selection positions express.  A valued toggle carries two
+ * entries: [0] written when pressed, [1] the released state.  values == NULL
+ * means pass-through (plain toggle, check menu item, spin, range). */
 typedef struct {
   const char *widget_id;
   const int  *values;

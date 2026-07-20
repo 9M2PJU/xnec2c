@@ -982,7 +982,7 @@ Set_Window_Labels( void )
   {
     /* Set window labels */
     Strlcpy( txt, _("Radiation Patterns"), s );
-    if( isFlagSet(DRAW_GAIN) )
+    if(rdpat_gain_active())
     {
       Strlcpy( txt, _("Radiation Pattern: - "), s );
       Strlcat( txt, pol_type[calc_data.pol_type], s );
@@ -1002,7 +1002,7 @@ Set_Window_Labels( void )
           Strlcat( txt, ant_temp_method_names[rc_config.ant_temp_interp], s );
       }
     }
-    else if( isFlagSet(DRAW_EHFIELD) )
+    else if(rdpat_ehfield_active())
     {
       Strlcpy( txt, _("Near Fields:"), s );
       if( draw_efield_active() )

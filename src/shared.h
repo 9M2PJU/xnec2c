@@ -40,6 +40,20 @@ static inline int draw_poynting_active(void)
 static inline int overlay_struct_active(void)
   { return isFlagSet(DRAW_ENABLED) && rc_config.rdpattern_overlay_structure; }
 
+/* Structure-view content predicates.  The main window always draws, so the
+ * enum member alone selects the current or charge overlay. */
+static inline int struct_view_currents(void)
+  { return rc_config.structure_view == STRUCT_VIEW_CURRENTS; }
+static inline int struct_view_charges(void)
+  { return rc_config.structure_view == STRUCT_VIEW_CHARGES; }
+
+/* Rad-pattern field-mode predicates.  Each selects its field only while the
+ * rad-pattern window holds DRAW_ENABLED, so a closed window draws none. */
+static inline int rdpat_gain_active(void)
+  { return isFlagSet(DRAW_ENABLED) && rc_config.rdpattern_mode == RDPAT_FIELD_GAIN; }
+static inline int rdpat_ehfield_active(void)
+  { return isFlagSet(DRAW_ENABLED) && rc_config.rdpattern_mode == RDPAT_FIELD_EHFIELD; }
+
 /* Flag to control verify_segments check */
 extern gboolean skip_verify_segments;
 
