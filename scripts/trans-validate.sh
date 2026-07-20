@@ -2,17 +2,18 @@
 
 # Loop the single-catalog worker over each catalog argument.
 #
-# Usage: scripts/trans-validate.sh [--mode new|update|validate] [--model NAME] <po-file>...
+# Usage: scripts/trans-validate.sh [--mode new|update|validate|fast] [--model NAME] <po-file>...
 
 usage() {
 	cat >&2 <<'EOF'
-usage: trans-validate.sh    [--mode new|update|validate] [--model NAME] <po-file>...
-       trans-validate-1.sh  [--mode new|update|validate] [--model NAME] <po-file>
+usage: trans-validate.sh    [--mode new|update|validate|fast] [--model NAME] <po-file>...
+       trans-validate-1.sh  [--mode new|update|validate|fast] [--model NAME] <po-file>
 
 Loop the single-catalog worker over each catalog argument.
 
 Leading options, shifted off before the catalogs:
-  --mode new|update|validate   force the mode for every catalog; when omitted,
+  --mode new|update|validate|fast
+                               force the mode for every catalog; when omitted,
                                each catalog's mode auto-detects.
   --model NAME                 override the mode's default model for every
                                catalog; when omitted, the mode default applies.
@@ -24,6 +25,7 @@ Modes (default model):
   new       untranslated scope,   claude-sonnet-5[1m], reconcile,    full gate
   update    untranslated + fuzzy, claude-sonnet-5[1m], reconcile,    full gate
   validate  staged git hunks,     claude-opus-4-8[1m], no reconcile, --review gate
+  fast      staged git hunks,     claude-opus-4-8[1m], no reconcile, --review gate, single pass
 
 Detection precedence: no file -> new; staged edits -> validate;
 zero translated entries -> new; otherwise update.

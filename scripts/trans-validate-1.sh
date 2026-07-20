@@ -2,7 +2,7 @@
 
 # Translate and validate a single .po catalog in one of three modes.
 #
-# Usage: scripts/trans-validate-1.sh [--mode new|update|validate] [--model NAME] <po-file>
+# Usage: scripts/trans-validate-1.sh [--mode new|update|validate|fast] [--model NAME] <po-file>
 #
 # Modes come from the table below; each row varies only four values:
 # scope contributors, model, thinking budget, reconcile, gate. Adding a
@@ -12,21 +12,24 @@
 export CLAUDE_HOOKS_KILL_ON_STOP=done
 
 usage() {
-	echo "usage: $0 [--mode new|update|validate] <po-file>" >&2
+	echo "usage: $0 [--mode new|update|validate|fast] <po-file>" >&2
 	return 0
 }
 
-# Mode table: name contributors model think reconcile gate effort catalog diff.
-# The catalog column injects the full catalog only when yes; update and
-# validate work from the scoped subset and read the catalog on demand. The
+# Mode table: name contributors model think reconcile gate effort catalog diff
+# procedure. The catalog column injects the full catalog only when yes; update
+# and validate work from the scoped subset and read the catalog on demand. The
 # diff column injects the catalog's staged and working-tree git diffs when yes.
+# The procedure column names the injected prompt procedure: phases.md drives the
+# phased iterative review, pass.md drives a single-pass correction.
 mode_table() {
 
-#name     contribs            rowmodel             think  reconcile  gate    effort  catalog  diff
+#name     contribs            rowmodel             think  reconcile  gate    effort  catalog  diff  procedure
 	cat <<'EOF'                                                                             
-new       untranslated        claude-sonnet-5[1m]  31999  yes        full    low     yes      no
-update    untranslated,fuzzy  claude-sonnet-5[1m]  2048   yes        full    low     no       no
-validate  staged              claude-opus-4-8[1m]  31999  no         review  low     no       yes
+new       untranslated        claude-sonnet-5[1m]  31999  yes        full    low     yes      no    phases.md
+update    untranslated,fuzzy  claude-sonnet-5[1m]  2048   yes        full    low     no       no    phases.md
+validate  staged              claude-opus-4-8[1m]  31999  no         review  low     no       yes   phases.md
+fast      staged              claude-opus-4-8[1m]  31999  no         review  low     no       yes   pass.md
 EOF
 	return 0
 }
@@ -132,6 +135,11 @@ notice_validate() {
 	return 0
 }
 
+notice_fast() {
+	printf 'Validate this catalog'\''s staged translations in a single pass from the injected diff alone: it is the complete record of every changed entry. Decide each correction against the rules and apply all edits; perform no Read, Grep, or catalog sweep, and do not split the work into phases or turns.'
+	return 0
+}
+
 # Parse the leading option flags, shifting each off before the catalog argument.
 mode=""
 model=""
@@ -167,7 +175,7 @@ l=${l#"$root"/}
 lang=$(basename "$l" .po)
 mode=${mode:-$(detect_mode "$l")}
 
-read name contribs rowmodel think reconcile gate effort catalog diff <<EOF
+read name contribs rowmodel think reconcile gate effort catalog diff procedure <<EOF
 $(select_row "$mode")
 EOF
 
@@ -231,7 +239,7 @@ fi
 # Hand off through claude-inject so frame, reference, catalog, and scope load
 # untruncated as synthetic records, separated from the reminder bookends.
 claude-inject --claude claude-xraw --cwd "$root" --permission-mode acceptEdits --model "$model" \
-	po/prompt/frame.md doc/TRANSLATING.md "po/rules/$lang.md" "$scope" $catalogarg $diffarg \
+	po/prompt/frame.md "po/prompt/$procedure" doc/TRANSLATING.md "po/rules/$lang.md" "$scope" $catalogarg $diffarg \
 	-- "$reminder"
 
 # Reconcile against the template only for full-catalog modes; validate leaves
