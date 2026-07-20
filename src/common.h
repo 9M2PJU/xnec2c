@@ -452,6 +452,10 @@ typedef struct
   /* Patch current flow visualization mode (View menu, not OpenGL settings) */
   int current_flow_visualization_mode;
 
+  /* Near-field static baseline mode (View menu total-field submenu);
+   * holds an nf_static_mode_t peak/snapshot selection. */
+  int nf_static_mode;
+
   /* Animated color projection (animate dialog, chroma_proj_t) */
   int anim_color_proj;
 
@@ -686,15 +690,19 @@ typedef struct
   double c3x, c3y, c3z;    /* center + s*t1 - s*t2 */
 } patch_corners_t;
 
-/* Per-sample near-field E/H magnitude, phase, real components, and coordinates */
+/* Near-field static-baseline selector for the peak/snapshot mode; the
+ * rc_config.nf_static_mode field is the single source, read at draw. */
+typedef enum { NF_STATIC_PEAK = 0, NF_STATIC_SNAPSHOT } nf_static_mode_t;
+
+/* Per-sample near-field E/H amplitude, phase, and coordinates.  The phasor
+ * (amplitude + phase) is the sole stored near-field truth; the real vectors
+ * and their magnitudes derive at draw from it. */
 typedef struct
 {
   double ex, ey, ez;            /* E-field magnitude and phase */
   double hx, hy, hz;            /* H-field magnitude and phase */
   double fex, fey, fez;         /* E-field phasor */
   double fhx, fhy, fhz;         /* H-field phasor */
-  double erx, ery, erz, er;     /* E-field real components + magnitude */
-  double hrx, hry, hrz, hr;     /* H-field real components + magnitude */
   double px, py, pz;            /* Field point coordinates */
 } near_field_point_t;
 
@@ -1255,9 +1263,6 @@ typedef struct
 /* Near E/H field data */
 typedef struct
 {
-  /* Max of E/H field values */
-  double max_er, max_hr;
-
   /* Max distance from xyz origin */
   double r_max;
 
@@ -1341,7 +1346,6 @@ void child_procs_free(void);
 void close_child_command_pipes(void);
 void freqplots_cleanup(void);
 void Nf_Peak_Vector(double exm, double eym, double ezm, double fx, double fy, double fz, double *rx, double *ry, double *rz, double *r);
-void Recompute_Near_Field_Vectors(int fstep, gboolean snapshot);
 void Draw_Colorcode(cairo_t *cr);
 void draw_colorcode_projected(cairo_t *cr);
 void Gtk_Widget_Destroy(GtkWidget **widget);
@@ -1427,8 +1431,6 @@ gboolean on_rdpattern_drawingarea_motion_notify_event(GtkWidget *widget, GdkEven
 void on_quit_cancelbutton_clicked(GtkButton *button, gpointer user_data);
 void on_quit_okbutton_clicked(GtkButton *button, gpointer user_data);
 gboolean on_rdpattern_window_key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
-void on_near_peak_value_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_near_snapshot_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_structure_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
 gboolean on_animate_phase_slider_change_value(GtkRange *range, GtkScrollType scroll, gdouble value, gpointer user_data);
@@ -1706,7 +1708,6 @@ void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, doub
 
 /* rdpattern_ui.c */
 gboolean Validate_Nearfield_Animation(void);
-void compute_near_field_frame(double wt);
 double Scale_Gain_Resolved(double gain, int fstep, int idx,
     double t_sky, double t_earth);
 double Polarization_Factor(int pol_type, int fstep, int idx);

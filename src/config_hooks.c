@@ -22,7 +22,6 @@
 #include "callbacks.h"
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
-#include "prerender/prerender_nearfield.h"
 #include "color/color_palette.h"
 
 #ifdef HAVE_OPENGL
@@ -123,15 +122,6 @@ hook_color_vis(void)
 #ifdef HAVE_OPENGL
   opengl_structure_invalidate();
 #endif
-
-  /* Near-field colors are baked at prerender time, so rebake the current
-   * step under the data lock before queueing the redraws. */
-  if( rdpat_ehfield_active() && NF_FSTEP_AVAILABLE(calc_data.freq_step) )
-  {
-    g_rec_mutex_lock(&freq_data_lock);
-    Prerender_Near_Field(calc_data.freq_step);
-    g_rec_mutex_unlock(&freq_data_lock);
-  }
 
   Queue_Structure_Redraw();
   Queue_Radiation_Redraw();

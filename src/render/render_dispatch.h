@@ -80,7 +80,8 @@ typedef struct
  * Dispatch builds 0-3 of these; backend iterates and emits one batch per entry. */
 typedef struct
 {
-  const nf_vector_t     *vecs;        /* pre-scaled displacement + baked color */
+  const nf_vector_t     *vecs;    /* resolver-owned geometry displacement */
+  const rgb_f_t         *colors;  /* resolver-owned palette colors, parallel to vecs */
 } nf_field_set_t;
 
 #define NF_FIELD_SETS_MAX 3

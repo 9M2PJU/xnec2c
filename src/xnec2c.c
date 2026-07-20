@@ -25,7 +25,6 @@
 #include "measurements.h"
 #include "prerender/prerender_color.h"
 #include "prerender/prerender_farfield.h"
-#include "prerender/prerender_nearfield.h"
 #include "validation_dump.h"
 #include "mathlib.h"
 #include "opt_ui.h"
@@ -681,17 +680,14 @@ New_Frequency( void )
    * sky/earth model × method combinations are deterministic and hoistable. */
   ant_temp_fill_fstep( calc_data.freq_step );
 
-  /* Save per-step results before prerender so struct_colors_fill_fstep and
-   * Prerender_Near_Field read current crnt_fstep / near_field_fstep data. */
+  /* Save per-step results before prerender so struct_colors_fill_fstep
+   * reads current crnt_fstep / near_field_fstep data. */
   Save_Crnt_Data( calc_data.freq_step );
   Save_Nearfield_Data( calc_data.freq_step );
 
   /* Child-deterministic per-fstep prerender: no user-mutable inputs enter
    * these functions. */
   struct_colors_fill_fstep( calc_data.freq_step );
-
-  if( isFlagSet(ENABLE_NEAREH) )
-    Prerender_Near_Field( calc_data.freq_step );
 
   if( !CHILD )
   {

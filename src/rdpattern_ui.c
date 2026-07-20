@@ -20,7 +20,6 @@
 #include "rdpattern_ui.h"
 #include "measurements.h"
 #include "rc_config.h"
-#include "prerender/prerender_nearfield.h"
 #include "render/render_dispatch.h"
 #include "shared.h"
 #include "structure_ui.h"
@@ -349,83 +348,6 @@ Validate_Nearfield_Animation( void )
 
   return( TRUE );
 }
-
-/*-----------------------------------------------------------------------*/
-
-/** compute_near_field_frame() - Compute one near-field animation frame at phase wt
- * @wt: excitation phase (radians, omega*t)
- *
- * Acquires freq_data_lock, computes real E/H field components for all
- * near-field points at the given phase, updates per-point maxima, and
- * calls Prerender_Near_Field().  Returns silently when frequency-step
- * data is not yet available or point storage is absent.
- * Animate_Phase() owns all widget queue decisions.
- */
-  void
-compute_near_field_frame(double wt)
-{
-  int idx, npts;
-
-  int fstep = calc_data.freq_step;
-  if( !NF_FSTEP_AVAILABLE(fstep) )
-    return;
-
-  g_rec_mutex_lock(&freq_data_lock);
-
-  near_field_t *nf = &near_field_fstep[fstep];
-
-  /* Reset per-frame max for animation snapshot */
-  nf->max_er = 0.0;
-  nf->max_hr = 0.0;
-
-  /* Number of points in near fields */
-  npts = fpat.nrx * fpat.nry * fpat.nrz;
-  for( idx = 0; idx < npts; idx++ )
-  {
-    if( draw_efield_active() || draw_poynting_active() )
-    {
-      /* Real component of complex E field strength */
-      nf->points[idx].erx = nf->points[idx].ex *
-        cos( wt + nf->points[idx].fex);
-      nf->points[idx].ery = nf->points[idx].ey *
-        cos( wt + nf->points[idx].fey);
-      nf->points[idx].erz = nf->points[idx].ez *
-        cos( wt + nf->points[idx].fez);
-
-      /* Near total electric field vector */
-      nf->points[idx].er  = sqrt(nf->points[idx].erx * nf->points[idx].erx +
-                                 nf->points[idx].ery * nf->points[idx].ery +
-                                 nf->points[idx].erz * nf->points[idx].erz);
-      if( nf->max_er < nf->points[idx].er)
-        nf->max_er = nf->points[idx].er;
-    }
-
-    if( draw_hfield_active() || draw_poynting_active() )
-    {
-      /* Real component of complex H field strength */
-      nf->points[idx].hrx = nf->points[idx].hx *
-        cos( wt + nf->points[idx].fhx);
-      nf->points[idx].hry = nf->points[idx].hy *
-        cos( wt + nf->points[idx].fhy);
-      nf->points[idx].hrz = nf->points[idx].hz *
-        cos( wt + nf->points[idx].fhz);
-
-      /* Near total magnetic field vector*/
-      nf->points[idx].hr  = sqrt(nf->points[idx].hrx * nf->points[idx].hrx +
-                                 nf->points[idx].hry * nf->points[idx].hry +
-                                 nf->points[idx].hrz * nf->points[idx].hrz);
-      if( nf->max_hr < nf->points[idx].hr)
-        nf->max_hr = nf->points[idx].hr;
-    }
-
-  } /* for( idx = 0; idx < npts; idx++ ) */
-
-  /* Sync prerender vectors so all backends read current animation phase */
-  Prerender_Near_Field( fstep );
-
-  g_rec_mutex_unlock(&freq_data_lock);
-
-} /* compute_near_field_frame() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -763,91 +685,6 @@ Free_Nearfield_Fstep_Buffers( void )
 /*-----------------------------------------------------------------------*/
 
 /**
- * Recompute_Near_Field_Vectors() - Recompute rendered near-field vectors from cached amplitude+phase
- *
- * @fstep: Frequency step index
- * @snapshot: TRUE for instantaneous (phase=0), FALSE for peak envelope
- *
- * Overwrites erx/ery/erz/er and hrx/hry/hrz/hr in near_field_fstep[fstep]
- * from the immutable amplitude (ex/ey/ez) and phase (fex/fey/fez) arrays.
- * Phase values are stored in radians.
- */
-  void
-Recompute_Near_Field_Vectors( int fstep, gboolean snapshot )
-{
-  int i, npts;
-
-  if( !NF_FSTEP_AVAILABLE(fstep) )
-    return;
-
-  near_field_t *nf = &near_field_fstep[fstep];
-  npts = fpat.nrx * fpat.nry * fpat.nrz;
-
-  if( fpat.nfeh & NEAR_EFIELD )
-  {
-    nf->max_er = 0.0;
-    for( i = 0; i < npts; i++ )
-    {
-      if( snapshot )
-      {
-        /* Instantaneous field at phase=0: real part of E*exp(j*0) */
-        nf->points[i].erx = nf->points[i].ex * cos(nf->points[i].fex);
-        nf->points[i].ery = nf->points[i].ey * cos(nf->points[i].fey);
-        nf->points[i].erz = nf->points[i].ez * cos(nf->points[i].fez);
-        nf->points[i].er  = sqrt(nf->points[i].erx*nf->points[i].erx +
-                                 nf->points[i].ery*nf->points[i].ery +
-                                 nf->points[i].erz*nf->points[i].erz);
-      }
-      else
-      {
-        Nf_Peak_Vector(nf->points[i].ex, nf->points[i].ey, nf->points[i].ez,
-                        nf->points[i].fex, nf->points[i].fey,
-                        nf->points[i].fez,
-                        &nf->points[i].erx, &nf->points[i].ery,
-                        &nf->points[i].erz, &nf->points[i].er);
-      }
-
-      if( nf->max_er < nf->points[i].er)
-        nf->max_er = nf->points[i].er;
-    }
-  }
-
-  if( fpat.nfeh & NEAR_HFIELD )
-  {
-    nf->max_hr = 0.0;
-    for( i = 0; i < npts; i++ )
-    {
-      if( snapshot )
-      {
-        nf->points[i].hrx = nf->points[i].hx * cos(nf->points[i].fhx);
-        nf->points[i].hry = nf->points[i].hy * cos(nf->points[i].fhy);
-        nf->points[i].hrz = nf->points[i].hz * cos(nf->points[i].fhz);
-        nf->points[i].hr  = sqrt(nf->points[i].hrx*nf->points[i].hrx +
-                                 nf->points[i].hry*nf->points[i].hry +
-                                 nf->points[i].hrz*nf->points[i].hrz);
-      }
-      else
-      {
-        Nf_Peak_Vector(nf->points[i].hx, nf->points[i].hy, nf->points[i].hz,
-                        nf->points[i].fhx, nf->points[i].fhy,
-                        nf->points[i].fhz,
-                        &nf->points[i].hrx, &nf->points[i].hry,
-                        &nf->points[i].hrz, &nf->points[i].hr);
-      }
-
-      if( nf->max_hr < nf->points[i].hr)
-        nf->max_hr = nf->points[i].hr;
-    }
-  }
-
-  /* Sync nf_pre so GL backend reads the recomputed phase data */
-  Prerender_Near_Field( fstep );
-
-} /* Recompute_Near_Field_Vectors() */
-
-/*-----------------------------------------------------------------------*/
-
-/**
  * Save_Nearfield_Data() - Save current near field data for a frequency step
  *
  * @fstep: Frequency step index
@@ -866,10 +703,8 @@ Save_Nearfield_Data( int fstep )
   size_t nbytes = (size_t)fpat.nrx * fpat.nry * fpat.nrz * sizeof(near_field_point_t);
   memcpy(near_field_fstep[fstep].points, near_field.points, nbytes);
 
-  /* Scalars */
-  near_field_fstep[fstep].max_er = near_field.max_er;
-  near_field_fstep[fstep].max_hr = near_field.max_hr;
-  near_field_fstep[fstep].r_max  = near_field.r_max;
+  /* Spatial extent; the magnitude maxima derive at draw in the resolver */
+  near_field_fstep[fstep].r_max = near_field.r_max;
 
 } /* Save_Nearfield_Data() */
 

@@ -102,13 +102,13 @@ xnec2c_SOURCES = \
     chroma/chroma_source.c   chroma/chroma_source.h \
     chroma/chroma_glyph.c    chroma/chroma_glyph.h \
     chroma/chroma.c          chroma/chroma.h \
+    chroma/chroma_nearfield.c chroma/chroma_nearfield.h \
     prerender/prerender_state.c     prerender/prerender_state.h \
     prerender/prerender_aggregate.c prerender/prerender_aggregate.h \
     prerender/prerender_rdpattern.c prerender/prerender_rdpattern.h \
     prerender/prerender_color.c     prerender/prerender_color.h \
     prerender/prerender_farfield.c  prerender/prerender_farfield.h \
     prerender/presentation_cache_key.c prerender/presentation_cache_key.h \
-    prerender/prerender_nearfield.c prerender/prerender_nearfield.h \
     prerender/prerender_patch_arrow.c prerender/prerender_patch_arrow.h \
     render/render_dispatch.c        render/render_dispatch.h \
     render/render_message.c         render/render_message.h \

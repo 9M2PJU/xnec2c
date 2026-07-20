@@ -227,6 +227,19 @@ rc_config_vars_t rc_config_vars[] = {
 						CONFIG_WIDGET( .widget_id = "anim_poynting" ), NULL ) ),
 				NULL ) ) },
 
+	{ .desc = "Near Field Static Baseline", .format = "%d",
+		.vars = { &rc_config.nf_static_mode }, .def = { { .i = NF_STATIC_PEAK } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_render_redraw,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "near_peak_value",
+							.values = CONFIG_WIDGET_VALUES(NF_STATIC_PEAK) ),
+						CONFIG_WIDGET( .widget_id = "near_snapshot",
+							.values = CONFIG_WIDGET_VALUES(NF_STATIC_SNAPSHOT) ),
+						NULL ) ),
+				NULL ) ) },
+
 	{ .desc = "Radiation Pattern Window Gradient Key", .format = "%d",
 		.vars = { &rc_config.rdpattern_gradient_key }, .def = { { .i = 1 } },
 		.widgets = CONFIG_WIDGET_SINGLE( &rdpattern_window_builder,

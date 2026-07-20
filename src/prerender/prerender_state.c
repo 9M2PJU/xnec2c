@@ -25,7 +25,6 @@ geom_pre_t    geom_pre;
 
 /* Per-fstep prerender arrays (Tier 3) */
 ff_pre_t     *ff_pre     = NULL;
-nf_pre_t     *nf_pre     = NULL;
 
 /*-----------------------------------------------------------------------*/
 
@@ -43,20 +42,6 @@ free_ff_pre_step(void *elem)
   mem_array_free(&fp->vertex_rgb);
 }
 
-/**
- * free_nf_pre_step() - Release one nf_pre_t entry
- * @elem: pointer to one nf_pre_t element
- */
-static void
-free_nf_pre_step(void *elem)
-{
-  nf_pre_t *np = elem;
-  mem_array_free(&np->e_vecs);
-  mem_array_free(&np->h_vecs);
-  mem_array_free(&np->pov_vecs);
-  mem_array_free(&np->pr_buf);
-}
-
 /*-----------------------------------------------------------------------*/
 
   void
@@ -68,25 +53,6 @@ prerender_state_alloc(int steps_total)
   /* Resize each array, freeing only the shrink tail; surviving entries
    * keep their sub-buffers for reuse by the inner alloc loop. */
   mem_array_resize(&ff_pre, steps_total, free_ff_pre_step);
-  mem_array_resize(&nf_pre, steps_total, free_nf_pre_step);
-
-  /* Pre-allocate near-field inner arrays as pipe-read destinations.
-   * PRead_Pipe writes directly into these pointers; they must be
-   * allocated before Get_Freq_Data() is called on the parent side. */
-  int npts = fpat.nrx * fpat.nry * fpat.nrz;
-  int i;
-  for( i = 0; i < steps_total; i++ )
-  {
-    if( npts > 0 )
-    {
-      if( fpat.nfeh & NEAR_EFIELD )
-        mem_array_alloc(&nf_pre[i].e_vecs, npts);
-      if( fpat.nfeh & NEAR_HFIELD )
-        mem_array_alloc(&nf_pre[i].h_vecs, npts);
-      if( (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
-        mem_array_alloc(&nf_pre[i].pov_vecs, npts);
-    }
-  }
 }
 
 /*-----------------------------------------------------------------------*/
@@ -102,14 +68,6 @@ prerender_state_free(void)
     for( i = 0; i < n; i++ )
       free_ff_pre_step(&ff_pre[i]);
     mem_array_free(&ff_pre);
-  }
-
-  if( nf_pre != NULL )
-  {
-    int n = mem_array_count(nf_pre);
-    for( i = 0; i < n; i++ )
-      free_nf_pre_step(&nf_pre[i]);
-    mem_array_free(&nf_pre);
   }
 
   mem_array_free(&geom_pre.sin_theta);

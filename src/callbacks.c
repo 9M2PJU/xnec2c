@@ -2080,42 +2080,6 @@ on_rdpattern_window_key_press_event(
 }
 
 
-  void
-on_near_peak_value_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-  {
-    int fstep = calc_data.freq_step;
-    g_rec_mutex_lock(&freq_data_lock);
-    Recompute_Near_Field_Vectors( fstep, FALSE );
-    g_rec_mutex_unlock(&freq_data_lock);
-    if(rdpat_ehfield_active())
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  }
-  /* else: on_near_snapshot_activate fires for the newly-selected item */
-}
-
-
-  void
-on_near_snapshot_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-  {
-    int fstep = calc_data.freq_step;
-    g_rec_mutex_lock(&freq_data_lock);
-    Recompute_Near_Field_Vectors( fstep, TRUE );
-    g_rec_mutex_unlock(&freq_data_lock);
-    if(rdpat_ehfield_active())
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  }
-  /* else: on_near_peak_value_activate fires for the newly-selected item */
-}
-
-
 /* Animation panel controls mirror visualization fields owned by the main and
  * rdpattern windows.  Each control is meaningful only while its owning window
  * is open; anim_panel_sensitivity greys those whose owner is closed.  The
@@ -2170,6 +2134,36 @@ anim_panel_sensitivity(void)
           "Mirrors the Visualization menu setting in the main window.")
       : _("Patch flow animation requires surface patches"
           " (SP/SM cards) in the model.") );
+}
+
+/* The near-field static-baseline menu items in the rdpattern window choose the
+ * peak or instantaneous vector drawn while the animation window is closed.
+ * While it is open the phase slider drives the vectors, so the selection has no
+ * effect; grey the items and explain why.  Derives from animate_dialog, synced
+ * at the dialog open and destroy edges. */
+  static void
+nf_static_menu_sync(void)
+{
+  static const char *const item_id[] = { "near_peak_value", "near_snapshot" };
+  gboolean open = (animate_dialog != NULL);
+  const char *reason = open
+      ? _("The animation window drives the near-field vectors from the phase"
+          " slider; close it to choose the static peak or instantaneous"
+          " baseline.")
+      : NULL;
+  size_t i;
+
+  if( rdpattern_window_builder == NULL )
+    return;
+
+  for( i = 0; i < G_N_ELEMENTS(item_id); i++ )
+  {
+    GtkWidget *w = GTK_WIDGET(
+        Builder_Get_Object(rdpattern_window_builder, item_id[i]) );
+
+    gtk_widget_set_sensitive( w, !open );
+    gtk_widget_set_tooltip_text( w, reason );
+  }
 }
 
 /* Wrap value into the half-open phase span [lower, lower+span). */
@@ -2551,6 +2545,7 @@ show_animate_dialog(void)
   config_widget_sync_builder( &animate_dialog_builder );
   config_widget_run_hooks( &animate_dialog_builder );
   anim_panel_sensitivity();
+  nf_static_menu_sync();
 }
 
 
@@ -2761,6 +2756,10 @@ on_animate_dialog_destroy(
   animate_dialog = NULL;
   g_object_unref( animate_dialog_builder );
   animate_dialog_builder = NULL;
+
+  /* Re-enable the near-field static-baseline menu now the phase no longer
+   * drives the vectors. */
+  nf_static_menu_sync();
 
   /* Playback ended with the dialog; rebake and redraw under the static
    * selection now that it is gone. */

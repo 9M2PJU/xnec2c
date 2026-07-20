@@ -1780,8 +1780,8 @@ Read_Commands( void )
       Alloc_Nearfield_Buffers( fpat.nrx, fpat.nry, fpat.nrz );
       Alloc_Nearfield_Fstep_Buffers( calc_data.steps_total + 1 );
 
-      /* nf_dr_norm reads fpat NF fields set by NE/NH cards above; both
-       * parent and child require it for Prerender_Near_Field. */
+      /* nf_dr_norm reads fpat NF fields set by NE/NH cards above; the
+       * parent's draw-time near-field resolver scales displacement by it. */
       compute_nf_dr_norm();
     }
 

@@ -28,6 +28,8 @@ src/chroma/chroma.c
 src/chroma/chroma_glyph.c
 src/chroma/chroma_glyph.h
 src/chroma/chroma.h
+src/chroma/chroma_nearfield.c
+src/chroma/chroma_nearfield.h
 src/chroma/chroma_source.c
 src/chroma/chroma_source.h
 src/cmnd_edit.c
@@ -184,8 +186,6 @@ src/prerender/prerender_color.c
 src/prerender/prerender_color.h
 src/prerender/prerender_farfield.c
 src/prerender/prerender_farfield.h
-src/prerender/prerender_nearfield.c
-src/prerender/prerender_nearfield.h
 src/prerender/prerender_patch_arrow.c
 src/prerender/prerender_patch_arrow.h
 src/prerender/prerender_rdpattern.c

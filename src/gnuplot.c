@@ -20,6 +20,7 @@
 #include "gnuplot.h"
 #include "shared.h"
 #include "prerender/prerender_state.h"
+#include "chroma/chroma_nearfield.h"
 
 // Touchstone save types:
 enum {
@@ -258,10 +259,14 @@ Save_RadPattern_Gnuplot_Data( char *filename )
       /* Write e-field out to file [DJS] */
       for( idx = 0; idx < npts; idx++ )
       {
-        fscale = dr / nf->points[idx].er;
-        fx = nf->points[idx].px + nf->points[idx].erx * fscale;
-        fy = nf->points[idx].py + nf->points[idx].ery * fscale;
-        fz = nf->points[idx].pz + nf->points[idx].erz * fscale;
+        double er[3];
+        double emag = nf_real_vector(&nf->points[idx], NF_CHAN_E,
+            FALSE, 0.0, rc_config.nf_static_mode, er);
+
+        fscale = dr / emag;
+        fx = nf->points[idx].px + er[0] * fscale;
+        fy = nf->points[idx].py + er[1] * fscale;
+        fz = nf->points[idx].pz + er[2] * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
@@ -281,10 +286,14 @@ Save_RadPattern_Gnuplot_Data( char *filename )
       /* Write h-field out to file [DJS] */
       for( idx = 0; idx < npts; idx++ )
       {
-        fscale = dr / nf->points[idx].hr;
-        fx = nf->points[idx].px + nf->points[idx].hrx * fscale;
-        fy = nf->points[idx].py + nf->points[idx].hry * fscale;
-        fz = nf->points[idx].pz + nf->points[idx].hrz * fscale;
+        double hr[3];
+        double hmag = nf_real_vector(&nf->points[idx], NF_CHAN_H,
+            FALSE, 0.0, rc_config.nf_static_mode, hr);
+
+        fscale = dr / hmag;
+        fx = nf->points[idx].px + hr[0] * fscale;
+        fy = nf->points[idx].py + hr[1] * fscale;
+        fz = nf->points[idx].pz + hr[2] * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
@@ -302,12 +311,6 @@ Save_RadPattern_Gnuplot_Data( char *filename )
         (fpat.nfeh & NEAR_EFIELD) &&
         (fpat.nfeh & NEAR_HFIELD) )
     {
-      int ipv;
-
-      /* Range of Poynting vector values,
-       * its max and min and log of max/min */
-      static double pov_max = 0;
-
       /* Grow the Poynting buffers when the point count exceeds the live
        * capacity; the allocator header is the single capacity record. */
       if( npts > mem_array_capacity(pov_x) )
@@ -318,30 +321,17 @@ Save_RadPattern_Gnuplot_Data( char *filename )
         mem_array_realloc(&pov_r, npts);
       }
 
-      /* Calculate Poynting vector and its max and min */
+      /* Poynting vector from the static real E and H vectors */
       fprintf( fp, _("# Poynting Vector\n") );
       for( idx = 0; idx < npts; idx++ )
       {
-        pov_max = 0;
-        for( ipv = 0; ipv < npts; ipv++ )
-        {
-          pov_x[ipv] =
-            nf->points[ipv].ery * nf->points[ipv].hrz -
-            nf->points[ipv].hry * nf->points[ipv].erz;
-          pov_y[ipv] =
-            nf->points[ipv].erz * nf->points[ipv].hrx -
-            nf->points[ipv].hrz * nf->points[ipv].erx;
-          pov_z[ipv] =
-            nf->points[ipv].erx * nf->points[ipv].hry -
-            nf->points[ipv].hrx * nf->points[ipv].ery;
-          pov_r[ipv] = sqrt(
-              pov_x[ipv] * pov_x[ipv] +
-              pov_y[ipv] * pov_y[ipv] +
-              pov_z[ipv] * pov_z[ipv] );
-          if( pov_max < pov_r[ipv] )
-            pov_max = pov_r[ipv];
+        double er[3], hr[3];
 
-        } /* for( ipv = 0; ipv < npts; ipv++ ) */
+        nf_real_vector(&nf->points[idx], NF_CHAN_E, FALSE, 0.0,
+            rc_config.nf_static_mode, er);
+        nf_real_vector(&nf->points[idx], NF_CHAN_H, FALSE, 0.0,
+            rc_config.nf_static_mode, hr);
+        pov_r[idx] = nf_poynting(er, hr, &pov_x[idx], &pov_y[idx], &pov_z[idx]);
 
         /* Scale factor for each field point, to make
          * near field direction lines equal-sized */

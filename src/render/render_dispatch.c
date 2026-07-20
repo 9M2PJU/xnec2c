@@ -32,6 +32,7 @@
 #include "gradient_cache.h"
 #include "../shared.h"
 #include "../chroma/chroma.h"
+#include "../chroma/chroma_nearfield.h"
 #include "../prerender/prerender_farfield.h"
 #include "../rdpattern_ui.h"
 #include "../structure_ui.h"
@@ -367,30 +368,45 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
     case RENDER_MODE_NEARFIELD:
     {
       near_field_t *nf = &near_field_fstep[r.fstep];
-      nf_pre_t *np = &nf_pre[r.fstep];
       int npts = fpat.nrx * fpat.nry * fpat.nrz;
       nf_field_set_t fields[NF_FIELD_SETS_MAX];
       int n_fields = 0;
       double dr = geom_pre.nf_dr_norm;
 
-      if( draw_efield_active() && (fpat.nfeh & NEAR_EFIELD) && np->e_vecs )
+      /* Resolve geometry and color at draw from the immutable phasor; the
+       * child ships no presentation, so the parent derives each active set. */
+      if( draw_efield_active() && (fpat.nfeh & NEAR_EFIELD) )
       {
-        fields[n_fields].vecs = np->e_vecs;
-        n_fields++;
+        nf_frame_t e = chroma_proj_frame_nearfield(r.fstep, NF_CHAN_E);
+        if( e.vecs != NULL )
+        {
+          fields[n_fields].vecs   = e.vecs;
+          fields[n_fields].colors = e.colors;
+          n_fields++;
+        }
       }
 
-      if( draw_hfield_active() && (fpat.nfeh & NEAR_HFIELD) && np->h_vecs )
+      if( draw_hfield_active() && (fpat.nfeh & NEAR_HFIELD) )
       {
-        fields[n_fields].vecs = np->h_vecs;
-        n_fields++;
+        nf_frame_t h = chroma_proj_frame_nearfield(r.fstep, NF_CHAN_H);
+        if( h.vecs != NULL )
+        {
+          fields[n_fields].vecs   = h.vecs;
+          fields[n_fields].colors = h.colors;
+          n_fields++;
+        }
       }
 
       if( draw_poynting_active() &&
-          (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) &&
-          np->pov_vecs )
+          (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
       {
-        fields[n_fields].vecs = np->pov_vecs;
-        n_fields++;
+        nf_frame_t p = chroma_proj_frame_nearfield(r.fstep, NF_CHAN_POV);
+        if( p.vecs != NULL )
+        {
+          fields[n_fields].vecs   = p.vecs;
+          fields[n_fields].colors = p.colors;
+          n_fields++;
+        }
       }
 
       /* Near-field overlay: structure in meters, same space as field vectors */

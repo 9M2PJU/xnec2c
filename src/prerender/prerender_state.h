@@ -116,23 +116,16 @@ typedef struct
 } ff_pre_t;
 
 /* Near-field vector displacement from sample origin.
- * Origin coordinates in near_field_fstep[fstep].points[i] (Tier 2). */
+ * Origin coordinates in near_field_fstep[fstep].points[i] (Tier 2).
+ * Geometry only: a forked child holds no palette, so color is resolved
+ * in the parent at draw beside this displacement, never stored here. */
 typedef struct
 {
   float dx, dy, dz;
-  float rgb[3];
 } nf_vector_t;
 
-/* Per-frequency near-field prerender.
- * Sample count = fpat.nrx * fpat.nry * fpat.nrz (Tier 0, not stored). */
-typedef struct
-{
-  float        pov_max;
-  nf_vector_t *e_vecs;        /* [npts] E-field, NULL if absent */
-  nf_vector_t *h_vecs;        /* [npts] H-field, NULL if absent */
-  nf_vector_t *pov_vecs;      /* [npts] Poynting, NULL if E or H absent */
-  float       *pr_buf;        /* [npts] Poynting magnitude scratch (persistent) */
-} nf_pre_t;
+/* Near-field channel discriminant, one field set per member */
+typedef enum { NF_CHAN_E = 0, NF_CHAN_H, NF_CHAN_POV, NF_CHAN_NUM } nf_channel_t;
 
 /*-----------------------------------------------------------------------
  * Global prerender state
@@ -140,7 +133,6 @@ typedef struct
 
 extern geom_pre_t    geom_pre;
 extern ff_pre_t     *ff_pre;
-extern nf_pre_t     *nf_pre;
 
 /*-----------------------------------------------------------------------
  * Lifecycle

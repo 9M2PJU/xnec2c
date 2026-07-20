@@ -20,9 +20,9 @@
 /*
  * cairo_nearfield: Cairo renderer for near E/H fields and Poynting vector.
  *
- * Reads prerendered nf_vector_t displacements and baked colors from
- * dispatch-assembled nf_field_set_t[]. Origin coordinates come from
- * the origins array passed by dispatch (Tier 2).
+ * Reads resolver-provided nf_vector_t displacements and their parallel
+ * palette colors from dispatch-assembled nf_field_set_t[]. Origin
+ * coordinates come from the origins array passed by dispatch (Tier 2).
  * No field math, no Poynting cross product, no Value_to_Color.
  */
 #include "cairo_draw.h"
@@ -79,9 +79,9 @@ cairo_draw_nearfield(void *ctx,
       double fz = pz + (double)vecs[idx].dz;
 
       Set_Gdk_Segment(&segm, v, scale, px, py, pz, fx, fy, fz, &segm.z_mid);
-      segm.r     = vecs[idx].rgb[0];
-      segm.g     = vecs[idx].rgb[1];
-      segm.b     = vecs[idx].rgb[2];
+      segm.r     = fields[f].colors[idx].r;
+      segm.g     = fields[f].colors[idx].g;
+      segm.b     = fields[f].colors[idx].b;
       segm.width = 2.0f;
       scenebuffer_add(cc->sb, &segm);
     }

@@ -288,7 +288,7 @@ structure_view_changed_cb(view_t *v, gpointer _user_data)
  * Returns G_SOURCE_REMOVE immediately when ANIMATE is cleared.
  * Otherwise advances flow_phase by one anim_step, dispatches to all
  * active animation consumers, then queues redraws.  Animate_Phase owns
- * all queue decisions; compute_near_field_frame() is pure computation.
+ * all queue decisions.
  */
   gboolean
 Animate_Phase(gpointer _udata)
@@ -314,17 +314,13 @@ Animate_Phase(gpointer _udata)
 /** apply_animation_phase() - Render structure and pattern at the current phase
  *
  * Shared by the timer tick and the manual phase slider.  Reads flow_phase
- * without modifying it: computes the near-field frame when EH field
- * visualization is active, queues the structure drawing area, and queues the
- * radiation-pattern drawing area for near-field or patch-arrow overlay.
+ * without modifying it: queues the structure drawing area and the
+ * radiation-pattern drawing area for near-field or patch-arrow overlay.  The
+ * draw-time resolver derives the near-field frame at flow_phase.
  */
   void
 apply_animation_phase(void)
 {
-  /* Near-field computation only runs when EH field visualization is active */
-  if(rdpat_ehfield_active())
-    compute_near_field_frame((double)flow_phase);
-
   xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
   /* Queue rdpattern for near-field visualization or structure overlay */
