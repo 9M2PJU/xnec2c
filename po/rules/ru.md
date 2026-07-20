@@ -3,6 +3,7 @@
 ## Character set / symbology
 - Cyrillic script, UTF-8. Quotes use «guillemets» when quoting UI text inside a sentence.
 - Numeric format specifiers (%d, %f, etc.) are runtime values; do not localize decimal separators.
+- Literal decimals in prose/formulas (e.g. `γ = 0.5`, `48.16 dB`) and spinbutton default values (`50.00`, `0.0100`) keep the dot separator for catalog-wide consistency with formula and default notation (consistency priority outranks locale-decimal form here); do not switch these to comma.
 - No case-folding ambiguity; Cyrillic has full upper/lower case.
 
 ## Technical writing style
@@ -33,6 +34,13 @@
 - опорная фаза — reference phase
 - направление потока — flow direction
 - визуализация — visualization
+- полярность — polarity (sign polarity: cold/negative vs hot/positive), never «поляризация» (wave polarization — different EM concept)
+- мгновенное — instantaneous; add the "(φ=0)" qualifier only where the English source itself carries it
+- вклад в дальнее поле — far-field contribution
+- узлы/пучности — nodes/antinodes (standing-wave sense)
+- семейство шкал — scale/tone family (color_tone.c transfer curves: Power, Log, μ-law, Reinhard, Sigmoid, Asinh)
+- цветовая проекция — color/hue projection (chroma.c hue-source selection, distinct from "семейство шкал")
+- статично / анимация — static / animated (as category or read-mode qualifiers)
 
 ## Disambiguation
 - Drop the specific technical qualifier ("электрический") when program context (electromagnetic simulator) makes the sense unambiguous; do not add qualifiers absent from the English source.

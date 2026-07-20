@@ -47,12 +47,22 @@
 | color projection | 色彩投影 (never 颜色投影; applies to labels, tooltips, and log messages alike) |
 | color scale / Color Scale (menu) | 色阶 |
 | scale family / color family / transfer family (the selectable transfer) | 色阶族 (never 颜色族) |
+| palette (kind) | 调色板 |
 | brightness | 亮度 |
 | animation / animate | 动画 |
 | optimizer | 优化器 |
 | validation | 校验 |
 | feedpoint | 馈电点 |
 | radiation pattern | 辐射方向图 |
+| polarity (instantaneous sign, +/−) | 极性 (never 极化 — 极化 is reserved for "Polarization", the EM wave polarization sense) |
+| null / node (current zero-crossing) | 波节 |
+| antinode / peak (current maximum) | 波腹 |
+| standing wave | 驻波 |
+| traveling wave | 行波 |
+| far-field contribution (color projection) | 远场贡献 |
+| comet (trailing-highlight overlay) | 彗星 |
+| hue | 色调 |
+| knee (transfer-curve bend point) | 拐点 |
 
 ### Never translate
 

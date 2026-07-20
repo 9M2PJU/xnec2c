@@ -66,6 +66,7 @@
 | widget | widget | technical/dev-facing, unchanged |
 | managed allocator / mem-report | allocateur géré / rapport mémoire | dev-facing log strings |
 | threshold / knee | genou (softening knee), seuil (generic threshold) | signal-processing sense |
+| tone-transfer family | Puissance (Power), Sigmoïde (Sigmoid) | descriptive family names translate; proper/function names (Reinhard, Asinh, μ-law) stay unchanged; dB kept |
 
 ## 5. Notes
 

@@ -31,6 +31,14 @@
   (eg "Sigur doriți să...", "Sunteți sigur..."), never the informal "tu" form.
 - Keep NEC2 mnemonics, file extensions, and unit symbols unchanged per
   doc/TRANSLATING.md.
+- The generic noun `card`/`carduri` is lowercase mid-phrase, including inside
+  parentheticals (eg `Comandă de excitație (card EX)`, `Parametri de sol
+  (carduri GN și GD)`); it is capitalized only when it is the first word of a
+  standalone label (eg `Card GH`, `Card SC`).
+- Coordinated option names that pair two distinct physical quantities or modes
+  with `/` or `+` capitalize each element, mirroring the source label
+  (eg `Staționară/Călătoare`, `Curent + Sarcină`); this is the one exception to
+  sentence case, because each element names an independent quantity.
 
 ## 3. Formality mapping
 
@@ -58,9 +66,10 @@
 | pattern (radiation) | diagramă (de radiație) | |
 | ground / ground plane | masă / plan de masă | electrical reference, not soil |
 | patch (NEC2 surface element) | Patch | kept as established loanword per existing TM |
-| tag (NEC2 identifier) | tag | kept as established loanword per existing TM |
+| tag (NEC2 identifier) | tag | loanword, not "etichetă"; lowercase mid-phrase (eg "Număr tag", "Increment tag") |
 | segment (NEC2 geometry) | segment | native Romanian cognate, translate |
-| polarity/polarization | polaritate / polarizare | |
+| polarity (sign of a value) | polaritate | eg hue-sign toggle; NOT "polarizare" |
+| polarization (antenna/wave) | polarizare | EM field orientation; distinct from "polaritate" above |
 | Total field | Câmp total | |
 | flow direction | direcție flux | |
 

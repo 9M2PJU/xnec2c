@@ -25,6 +25,7 @@
 - wireframe → rautalankamalli
 - magnitude → suuruus (never itseisarvo; keep one term catalog-wide)
 - peak value → huippuarvo
+- peak magnitude → huippusuuruus (magnitude=suuruus; distinct from peak value → huippuarvo, never conflate the two)
 - total field → kokonaiskenttä
 - instantaneous (φ=0) → hetkellinen (φ=0)
 - scale → skaalaa / skaala
@@ -38,10 +39,27 @@
 - segment (never translated) → segmentti/segmentit
 - geometry → geometria
 - color projection → väriprojektio
-- scale family → skaalaperhe
+- scale family → skaalaperhe (also covers internal "color tone" enum; never väriperhe)
 - color scale → väriskaala
 - gamma → gamma
 - softening knee → pehmennyspolvi
 - compression → kompressio
 - contrast → kontrasti
 - validation → validointi
+- hue → sävy (distinct axis from brightness; "Phase Hue" → Vaihesävy)
+- brightness → kirkkaus
+- hue encoding / brightness encoding → sävykoodaus / kirkkauskoodaus (distinct internal enums, never both "väriprojektio")
+- envelope (magnitude envelope) → verhokäyrä; peak envelope → huippuverhokäyrä
+- standing wave / traveling wave → seisova aalto / etenevä aalto
+- far-field contribution → kaukokentän osuus
+- palette / palette kind → paletti / palettityyppi
+- ramp (palette gradient) → liukuma
+- comet (bright wave-crest highlight) → komeetta
+- node / antinode → solmu / vastasolmu
+- near-field vector (electric/magnetic) → lähisähkökentän/lähimagneettikentän vektori
+- Poynting vector → Poyntingin vektori
+- μ-law companding → μ-laki-kompandointi
+- Reinhard tone-map → Reinhardin sävykartoitus
+- sigmoid / tanh soft limiter → sigmoidi / tangenttihyperbolinen pehmeä rajoitin
+- dynamic range → dynaaminen alue
+- sentinel (unreachable-case guard value) → vartioarvo

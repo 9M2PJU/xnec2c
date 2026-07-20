@@ -50,5 +50,15 @@
 ### Internal/debug message convention
 Messages carrying a function- or subsystem-name prefix (eg `config_widget_apply_element: ...`, `mem-report %s: ...`, `theme: cannot load resource %s: %s\n`) are developer diagnostics (LOW priority per TRANSLATING.md) and are kept identical to the English msgid. Generic operator-facing warnings without a code-identifier prefix (eg inotify status lines, validation-mode notices) are translated normally.
 
+Exception: where a nearest sibling family within the same subsystem already translates its message body (eg the `render_settings_init: failed to load ... glade: %s\n` family in src/settings/render_settings_common.c), match that established sibling convention for new entries of the same shape (`prefix: failed to load X: %s\n`) rather than defaulting to fully-identical; local precedent within the same function/module outranks the generic default when one exists.
+
+### Adjective gender agreement for mode labels
+Standalone adjective labels agree with their implied or sibling noun, never a default masculine:
+- "Instantaneous" as a color-projection/phase mode sits beside "Animated"→"Animované" and "Static"→"Statické" (neuter, implied *zobrazení*), so it is "Okamžité", not masculine "Okamžitý".
+- "Instantaneous (φ=0)" pairs with "Peak value"→"Špičková hodnota" (feminine *hodnota*), so it is "Okamžitá (φ=0)"; keep the leading `_` hotkey where the msgid carries one.
+
+### Math variable / coordinate casing
+A lowercase math variable or coordinate in the msgid (eg `z=`, `z = 0`) stays lowercase; it is a variable name, not a UI axis label, so the X/Y/Z-uppercase convention does not apply (eg "Velikost kroku omezena na z=", "Hankel není platný pro z = 0").
+
 ### Disambiguation policy
 No qualifier inflation: translate the domain term alone as the source does (e.g. "Proudy" for "Currents"), never add "elektrické" unless the English source itself qualifies it. Program context (an EM simulator) already disambiguates.

@@ -48,7 +48,10 @@
 | capacitance | kapasitans | |
 | conductivity | kekonduksian | |
 | near field | medan dekat | |
-| far field / radiation pattern | corak sinaran | |
+| far field (region) | medan jauh | spatial region, pairs with "medan dekat"; distinct from "corak sinaran" |
+| radiation pattern | corak sinaran | the plotted 3D directional response, not the far-field region itself |
+| polarity (sign, +/−) | kekutuban | electrical/charge sign; do NOT use "polarisasi" |
+| polarization (antenna/wave) | polarisasi | horizontal/vertical/circular wave polarization; distinct from "kekutuban" |
 | structure | struktur | |
 | geometry | geometri | |
 | optimizer | pengoptimum | |

@@ -37,6 +37,11 @@
 - patch (NEC surface patch) → patch (kept as the NEC2 geometry term, per doc/TRANSLATING.md "segment, patch, tag" never-translate list); do not confuse with GTK "patches" tab which also refers to this same geometry term.
 - Never translate: NEC2, card mnemonics (GW, GA, GH, EX, LD, FR, RP, GE, EN), VSWR, dBi, S-parameters, Z, file extensions (.nec, .csv, .s1p, .s2p, .png), unit symbols (MHz, dBi, Ω, degrees).
 - Disambiguation is selected by technical sense only; do not append explanatory qualifiers (eg "elétrica") absent from the English source (per frame.md Disambiguation and doc/TRANSLATING.md policy). Eg "View Currents" → "Ver Correntes", not "Ver Correntes Elétricas".
+- exit (process termination) → "encerramento"/"encerrado" (matching "child process ... exited" → "processo filho ... encerrado"). Do NOT render "default exit" as "saída padrão": in software pt "saída padrão" is the fixed term for stdout, a false collision. Use "encerramento padrão" for the default/fallback exit branch. Reserve "saída" for stdout/CLI output senses.
+
+## Casing (axis names)
+
+- Coordinate axis letters X/Y/Z are uppercase in pt even when the English source lowercases them (eg source "step size limited at z=" → "...limitado em Z="). Apply uniformly across all sibling strings so the same axis never appears both "z" and "Z".
 
 ## Hotkey policy
 

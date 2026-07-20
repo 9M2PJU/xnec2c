@@ -11,6 +11,11 @@
 - Noun phrases for labels/menu items: "Boja", "Skaliranje", "Faza".
 - No T-V pronoun distinction required; imperative form already implies formal register.
 
+## Verb formation for internationalisms
+- Use the Bosnian-standard `-irati` conjugation, never the Serbian `-ovati/-isati` variants: normalizirati (not normalizovati), definirati (not definisati), komprimirati (not komprimovati/komprimisati), resetirati (not resetovati), kontrolirati (not kontrolisati), inicijalizirati, konfigurirati, optimizirati, specificirati.
+- Present tense follows suit: definira (not definiše), kontrolira (not kontroliše), komprimira (not komprimuje).
+- Verbal nouns: resetiranje (not resetovanje), normaliziranje.
+
 ## Established lexicon (reuse for consistency)
 | English | Bosnian |
 |---|---|
@@ -38,6 +43,15 @@
 | Gain (antenna) | Dobitak (masc.; agrees: ukupni dobitak, neto dobitak, sirovi/maksimalni dobitak, dobitak posmatrača) |
 | feedpoint | napojna tačka |
 | Validation | Verifikacija/validacija (validation tree = stablo validacije) |
+| Polarity (color sign, diverging hue) | Polaritet (never "Polarizacija" — that is reserved for antenna Polarization axis) |
+| Standing/Traveling (wave projection) | Stojeći/putujući talas |
+| Nodes/antinodes (standing-wave overlay) | Čvorovi/trbusi |
+| Comet (moving-crest overlay) | Komet |
+| Overlays (label) | Preklopi |
+| Color tone (transfer-curve family: Power/Log/Asinh/μ-law/Reinhard/Sigmoid) | Ton boje |
+| Palette kind (Ramp vs other palette layouts) | Tip palete |
+| Identity (transfer, full-brightness passthrough) | Identitet |
+| Current + Charge (combined color projection) | Struja + naboj |
 
 ## Domain disambiguation (never over-qualify beyond source)
 - current → struja (electrical), never "trenutno" (temporal)

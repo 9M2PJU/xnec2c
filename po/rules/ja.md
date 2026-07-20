@@ -91,6 +91,13 @@ do not introduce synonyms:
 | Magnitude | 大きさ | modulus of a quantity (\|Z\|, current, charge); never 振幅 (that is amplitude, a distinct concept and wrong for \|Z\|) |
 | Net Gain | 正味利得 | net gain; never ネットゲイン — keep kanji 正味利得 as in graph titles |
 | Structure Geometry | 構造ジオメトリ | geometry stays ジオメトリ per Geometry row, not 形状 |
+| Polarity (sign, +/−) | 極性 | instantaneous sign of a displayed quantity; distinct from 偏波(_P) "_Polarization" (antenna wave polarization) — never conflate |
+| Far-field | 遠方界 | antonym of established 近傍界 "Near field"; eg "Far-field Contribution" → 遠方界寄与 |
+| Amplitude | 振幅 | distinct from Magnitude 大きさ (see Magnitude row); used only where source literally says "amplitude" |
+| Animated / Static (projection category) | アニメーション / 静的 | non-interactive menu group headers pairing dynamic vs phase-invariant projections |
+| Node / Antinode | 節 / 腹 | standing-wave zero/maximum points; standard Japanese physics terms, not transliterated |
+| Comet (overlay effect) | コメット | katakana loanword, matching established transliteration style for effect/algorithm names (Reinhard, Sigmoid, Asinh) |
+| Ground (earth reference / ground plane) | グラウンド (eg グラウンドプレーン) | electrical earth reference, not soil; always the full transliteration グラウンド, never the contracted グランド — apply catalog-wide (eg グラウンド効果, グラウンドパラメータ) |
 
 Unit symbols, NEC2 mnemonics (GW, GA, GH, EX, LD, FR, RP, GE, EN), file
 extensions, and Ω/dBi/MHz/VSWR/S-parameters/γ/φ/μ stay in Latin/Greek form

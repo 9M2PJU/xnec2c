@@ -21,7 +21,11 @@
   "МГц", "Гц", "дБ"). Physical field symbols **E** and **H** (electric /
   magnetic field, eg "Near E field", "Near _E Field") stay Latin — a
   Cyrillic "Н" would read as "N" and "Э" loses the standard notation;
-  match the spelled-out gnuplot strings which keep Latin E/H. The
+  match the spelled-out gnuplot strings which keep Latin E/H. This
+  applies to compound labels too: "E/H Fields" = "E/H Талаалары" (never
+  a Cyrillic "Э/Н"), and "E-field"/"H-field" prefixes stay Latin
+  ("E-талаа", "H-талаа"). Also note "near field" is always the EM
+  **талаа**, never "аймак" (= region/area). The
   antenna Front/Back ratio abbreviation **F/B** stays Latin everywhere
   (both the graph label and the port tooltip), never a Cyrillic calque
   such as "А/К". NEC2 mnemonics (GW, GA, GH, EX, LD, FR, RP, GE, EN)
@@ -85,6 +89,20 @@ introduce synonyms for the same concept):
 | radials | радиалдар | horizontal ground-plane wires |
 | wire | зым | thin conductor |
 | validation | текшерүү / валидация | do not confuse with "козгоо" (excitation) |
+| polarity (sign, +/−) | полярдуулук | electrical/color-sign polarity; never "поляризация" (that is wave polarization, a distinct concept — see "polarization" row above) |
+| hue | өң | color-wheel hue channel, eg "Фаза өңү" (Phase Hue); "hue encoding" = "өң кодировкасы" |
+| brightness | жарыктык | color-channel brightness/luminance; "brightness encoding" = "жарыктык кодировкасы" |
+| near field / far field | жакын талаа / алыс талаа | near/far antenna field region, opposed pair; "far-field contribution" = "алыс талаа салымы" |
+| overlay (UI element) | каптама | rendering/geometry overlay layer, eg "Failed to load overlay shaders" = "Каптама шейдерлерин жүктөө ийгиликсиз"; the verb "to overlay [the structure]" uses "кабаттоо" instead (different grammatical role, not a synonym conflict) |
+| palette | палитра | color palette; "palette kind" = "палитра түрү" |
+| ramp (palette/gradient) | тилке | linear gradient strip, matches existing "color strip" = "түс тилкеси" |
+| comet (trail effect) | комета | visual comet-head/trail overlay, not "геометрия" |
+| identity (transfer function) | тождик | mathematical identity/no-op transform, distinct from "identity" as personal identity (not present in this domain) |
+| companding | компандинг | telephony-style bounded log curve (μ-law), transliterated loanword |
+| swap (exchange) | алмаштыруу | verbal-noun; never the Kazakh-style "ауыштыруу" (Kyrgyz root is алмаш-) |
+| crossed (transmission line) | кайчылаш | conductors crossed/reversed; never "кесилген" (= cut/severed) |
+| viewer (observation direction) | көрүүчү | "Viewer Gain" = "Көрүүчү күч"; use everywhere, not the longer "карап туруучу" |
+| radiation pattern | нурланма диаграммасы | use "нурланма" for the pattern noun everywhere; never the process-noun "нурлануу" for this feature |
 
 Disambiguation follows program context; do not append an "electrical"
 qualifier absent from the English source (eg "Токторду көрүү" = "View

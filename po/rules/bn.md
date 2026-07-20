@@ -27,6 +27,13 @@ pure-Bengali synonyms for the same meaning:
 - flow → প্রবাহ (eg "Flow direction" → "প্রবাহের দিক"; not for current itself, which stays কারেন্ট)
 - render → রেন্ডার (verbal/gerund রেন্ডারিং)
 - projection → প্রক্ষেপণ
+- radiation → বিকিরণ (native term, used in all menu/title/axis labels; never transliterate
+  as রেডিয়েশন. Applies to compounds: "radiation pattern" → বিকিরণ প্যাটার্ন,
+  "radiation resistance" → বিকিরণ রেজিস্ট্যান্স, "radiated" → বিকিরিত)
+- near (near field/near-field) → নিকট (pairs with far → দূর: নিকট ক্ষেত্র / দূর-ক্ষেত্র);
+  never নিকটবর্তী
+- animated (mode/adjective) → অ্যানিমেটেড (verb stem অ্যানিমেট only for the imperative
+  "Animate" action)
 - color → রং (bare noun uses anusvara: রং, not রঙ; genitive is written রঙের)
 
 Do not add a qualifying adjective (eg "বৈদ্যুতিক"/electrical) that is absent from the

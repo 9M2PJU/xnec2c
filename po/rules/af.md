@@ -33,6 +33,8 @@ Established terms already in the catalog; reuse these exactly, everywhere:
 | gain | Aanwins | antenna directivity |
 | ground / ground plane | Grond / Grondvlak | RF ground reference |
 | wire | Draad | thin conductor |
+| diameter | Diameter / Draaddiameter | loanword canonical; never mix with "deursnee" (eg "Diameter Seg", "Diam. Taps", "Draaddiameter") |
+| pattern cut | Patroonsnit / Patroonsnitte | single linking, never double-s "Patroonssnitte" |
 | thread (compute) | Draad | same word as wire; program context disambiguates |
 | load (electrical) | Belasting | impedance load |
 | excitation | Opwekking | EM energy input |
@@ -67,3 +69,12 @@ Established terms already in the catalog; reuse these exactly, everywhere:
 | widget (GTK, diagnostics) | Legstuk | consistent across config_widget/callbacks/sy_overrides |
 | degrees (freestanding, prose/axis title) | grade | eg "Rad Angle - deg" → "Stralingshoek - grade", "360 degrees" → "360 grade" |
 | deg (parenthetical unit tag) | deg | keep verbatim like other unit tags (m), (Hz); eg "Initial Phi (deg)" → "Aanvanklike Phi (deg)" |
+| hue | Kleurskakering / Skakering | color-wheel angle; compounds as "Faseskakering" (Phase Hue), "kleurskakeringswiel" (hue wheel) |
+| polarity | Polariteit | sign of a quantity (+/−); distinct from polarization — false friend, do not confuse |
+| polarization | Polarisasie | EM wave polarization (existing catalog precedent, unchanged) |
+| palette | Palet / paletsoort | color palette selection |
+| tone (color-transfer curve family) | Toon / kleurtoon | distinct from "kleurfamilie"; "invalid color tone" → "ongeldige kleurtoon" |
+| comet (animation overlay) | Komeet | eg "Comet" → "Komeet", "comet head" → "kometkop" |
+| standing wave / traveling wave | Staande golf / Reisende golf | short form "Staande/Reisend" for paired UI label |
+| far field | Verreveld | mirrors existing "Nabyeveld" (near field) pattern; eg "Far-field Contribution" → "Verreveld-bydrae" |
+| animated/static (category header pair) | Geanimeer / Staties | section labels grouping color-projection entries; no hotkey underscore, since these are listbox/combo entries, not buttons |

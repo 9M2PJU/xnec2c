@@ -10,7 +10,7 @@
 
 ## 2. Technical program interface writing standards
 
-- Prefer established Urdu engineering/computing loanwords already transliterated into Perso-Arabic script over invented calques: کرنٹ (current), وولٹیج (voltage), فریکوئنسی (frequency), امپیڈنس (impedance), جیومیٹری (geometry), اینیمیشن/اینیمیٹ (animation/animate), ویژوالائزیشن (visualization), آپٹیمائزر (optimizer), تھریڈ (thread), ویجٹ (widget), کنفیگ (config), میموری (memory).
+- Prefer established Urdu engineering/computing loanwords already transliterated into Perso-Arabic script over invented calques: کرنٹ (current), وولٹیج (voltage), فریکوئنسی (frequency), امپیڈینس (impedance), جیومیٹری (geometry), اینیمیشن/اینیمیٹ (animation/animate), ویژوالائزیشن (visualization), آپٹیمائزر (optimizer), تھریڈ (thread), ویجٹ (widget), کنفیگ (config), میموری (memory).
 - Menu/button labels: short noun phrases or imperative verb phrases, consistent with existing catalog entries (eg "کرنٹس دیکھیں" style already used for "View Currents").
 - Error/debug messages: direct, technical register; keep identifier names, function names (eg `config_widget_lookup`), and printf specifiers untouched; translate only the surrounding descriptive text.
 - Hotkey convention: GTK "_X" underscore markers stay on a Latin letter matching the mnemonic already used elsewhere in this catalog for that command family (RTL scripts do not carry a native underline-mnemonic system, so xnec2c keeps the underscore anchored to the corresponding Latin/loanword abbreviation already established in-file, eg "_Asinh", "μ-_law").
@@ -34,6 +34,7 @@
   - wire → تار (thin conductor), segment → سیگمنٹ, patch → پیچ, tag → ٹیگ (kept close to NEC2 term)
 - Do not add qualifiers absent from the English source (eg "کرنٹس دیکھیں" not "برقی کرنٹس دیکھیں") — program context (an EM simulator) already disambiguates for the domain-expert user, matching the Afrikaans/German/Spanish examples in doc/TRANSLATING.md.
 - Keep NEC2 card mnemonics, unit symbols, and file extensions untranslated and LTR inside RTL sentences.
+- polarity (sign of a quantity, eg current/charge diverging-hue sign) → قطبیت — distinct from polarization (antenna field orientation) → پولرائزیشن; do not conflate: msgid "Polarity" is not msgid "_Polarization".
 
 ## 5. Established in-catalog glossary (for consistency)
 
@@ -70,7 +71,7 @@
 | loop | لوپ |
 | save | محفوظ |
 | surface patches | سطحی پیچ |
-| near-field | نیئر فیلڈ |
+| near-field | نزدیکی فیلڈ |
 | required | درکار |
 | memory allocation | میموری ایلوکیشن |
 | failed | ناکام |
@@ -91,3 +92,14 @@
 | validation | ویلیڈیشن |
 | batch mode | بیچ موڈ |
 | config / configuration | کنفیگ / کنفیگریشن |
+| polarity (sign) | قطبیت |
+| polarization | پولرائزیشن |
+| palette | پیلیٹ |
+| color tone | کلر ٹون |
+| comet (overlay style) | کومٹ |
+| electric field | برقی فیلڈ |
+| magnetic field | مقناطیسی فیلڈ |
+| radiation | ریڈی ایشن |
+| far-field | فار فیلڈ |
+| overlay(s) | اوورلے / اوورلیز |
+| node/antinode | نوڈ / اینٹی نوڈ |

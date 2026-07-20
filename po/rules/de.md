@@ -71,9 +71,18 @@
 | F/B (front/back ratio) | V/R-Verhältnis | Vor/Rück; symbol kept as V/R |
 | Smith Chart | Smith-Diagramm | proper-name compound |
 | scale family | Skalenfamilie | color transfer family |
-| net gain | Nettogewinn | closed compound |
+| net gain | Nettogewinn | closed compound; keep "Nettogewinn" intact as a unit in longer compounds ("Nettogewinn-Kurven", "Nettogewinn-Diagramm"), never split it as "Netto-Gewinn"; matches the "_Nettogewinn" plot-toggle widget label so tooltip references stay findable |
 | viewer gain | Betrachtergewinn | gain in viewer direction |
 | flow direction | Flussrichtung | patch current flow |
+| instantaneous (hue/brightness mode) | Momentanwert | short label, no added "(φ=0)" qualifier |
+| polarity (sign, +/-) | Polarität | never "Polarisation" (antenna E-field polarization is a distinct existing term) |
+| polarization (antenna) | Polarisation | E-field orientation; distinct from "Polarität" (sign) |
+| standing/traveling wave | Steh-/Wanderwelle | short label; "Stehwellenverhältnis" for spelled-out standing-wave ratio prose (VSWR acronym itself stays "VSWR") |
+| far-field contribution | Fernfeldbeitrag | never "Nahfeld-" (near-field) |
+| color tone (transfer family enum) | Tonwertfamilie | avoid "Farbton", which means hue and collides with the hue-encoding lexicon entry |
+| comet (overlay) | Komet / Kometenkopf | bright head riding the wave crest |
+| nodes/antinodes (overlay) | Knoten/Bäuche | standing-wave zero/max points; keep tooltip and label wording aligned |
+| envelope null (magnitude minimum) | Nullstelle | distinct from "Knoten" (nodes/antinodes overlay) |
 
 ## 6. Card-label conventions
 - NEC2 card dialog/editor titles keep the English designator "(XX Card)" as a fixed label (e.g. "Strahlungsdiagramm (RP Card)", "Anregungsbefehl (EX Card)"); this is the consistent title-widget convention across the geometry/command editor.

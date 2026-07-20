@@ -51,6 +51,18 @@ Taiwan technical UI drops the subject pronoun (您/你) entirely; use imperative
 | color | 顏色 | |
 | flow direction | 流向 | |
 | animate/animation | 動畫 | |
+| animated (category, adj.) | 動態 | paired with static 靜態; distinct from the noun/verb 動畫 |
+| static (category, adj.) | 靜態 | |
+| polarity (sign, +/−) | 極性 | distinct from polarization 極化 (EM wave sense); never conflate |
+| polarization | 極化 | EM wave polarization only |
+| standing wave / traveling wave | 駐波 / 行波 | not literal "standing/moving" |
+| node / antinode | 波節 / 波腹 | standing-wave physics terms, not literal "node" |
+| far-field contribution | 遠場貢獻 | distinct from "Near Field Animation" 近場動畫 |
+| palette | 調色盤 | |
+| ramp / gradient | 漸層 | |
+| scale family (tone-transfer family) | 刻度家族 | never 顏色家族 |
+| comet (wave-crest highlight) | 彗星 | |
+| instantaneous (projection name, no phase qualifier) | 瞬時 | distinct from "Instantaneous (φ=0)" 瞬時值 (φ=0), a separate near-field vector selector string |
 
 Never translate: VSWR, dBi, Ω, degrees, NEC2 card mnemonics (GW, EX, LD, FR, RP, GE, EN), file extensions (.nec, .csv, .s1p, .s2p, .png).
 

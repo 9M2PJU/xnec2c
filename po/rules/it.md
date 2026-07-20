@@ -35,7 +35,14 @@
 - radiali = ground-plane radial wires (never "relativo al raggio").
 - Keep VSWR, dBi, S-parametri (S11, S1P/S2P), Z, impedenza as the locked technical terms already used throughout (Impedenza Caratteristica, Impedenza vs Frequenza, Diagramma di Smith).
 - Amateur-radio audience: use terminology consistent with Italian radioamatori usage (ARI-aligned), e.g. "diagramma di radiazione", "guadagno", "adattamento d'impedenza", favoring the term already fixed in this catalog over a merely-common synonym.
+- polarità = instantaneous sign of a charge/quantity (diverging hue sense; NEC2 chroma UI), distinct from polarizzazione = antenna polarization (already fixed catalog-wide as "Polarizzazione"/"Asse Polarizzazione"); never conflate the two even though English uses "Polarity" for the former.
+- soglia = threshold/floor of a dynamic-range or brightness mapping (English "floor"), consistent with the pre-existing geometry-check usage "soglia di" for distance thresholds; never "valore minimo" for this sense.
+- stazionaria/progressiva = standing/traveling wave pair (onda stazionaria / onda progressiva), the standard Italian EE collocation; "viaggiante" is avoided as a less standard synonym.
+- palette (tipo di palette) and tono colore (color tone) are kept as distinct chroma-subsystem concepts from proiezione colore (color projection/hue source) and famiglia di scala (scale family/tone-transfer curve); do not merge these four terms even where the English source is terse.
+- cometa (Comet) = the moving-highlight overlay name; nodi/antinodi = current nulls/peaks tick-mark overlay ("Nodes/antinodes"), paired terms kept consistent between the checkbox label and its tooltip.
+- campo lontano (far field) vs campo vicino (near field) are locked opposites; "Contributo al Campo Lontano" is the fixed rendering of "Far-field Contribution".
+- function/log-message identifiers (e.g. `create_animate_dialog`, `config_widget_lookup`) are never translated inside pr_*/log-style msgids, matching existing catalog convention.
 
 ## 5. Status
 
-File created; scoped entries translated under this rule set; extend with new terms only when a future scoped batch introduces them.
+File created; scoped entries translated under this rule set, including the 2026-07-18 chroma/animate-dialog batch (color source, scale-family, and near-field tooltip strings); extend with new terms only when a future scoped batch introduces them. Consistency sweep normalizations: projection combo label "Phase Hue" set to Title Case "Tonalità di Fase" to match its siblings ("Corrente + Carica", "Contributo al Campo Lontano"); the geometry.c "segment extends below ground" pair changed from "suolo" to "piano di massa" to match the adjacent "lies in ground plane" entry and the massa lexicon (§4).

@@ -39,12 +39,20 @@
 | feedpoint | punkt zasilania | established |
 | color projection | projekcja kolorów | new UI feature (color-family rendering) |
 | color family / scale family | rodzina koloru / rodzina skali | new UI feature |
+| color tone (transfer function family: Power/Asinh/μ-law/Reinhard/Sigmoid) | tryb tonalny | distinct from "rodzina koloru" (palette family) and "projekcja koloru" (hue/brightness projection); do not conflate |
+| hue | odcień | |
+| hue encoding / brightness encoding | kodowanie odcienia / kodowanie jasności | internal chroma dispatch error strings |
 | gamma | gamma | keep as-is, math term |
 | dynamic range | zakres dynamiki | |
 | softening knee | próg (miękkiego) załamania | soft-compression control |
 | compression | kompresja | |
 | contrast | kontrast | |
 | brightness | jasność | |
+| magnitude | amplituda | peak/instantaneous signal magnitude s(n) |
+| standing wave / traveling wave | fala stojąca / fala bieżąca | established RF pair |
+| node / antinode | węzeł / strzałka (fali) | standing-wave nulls/peaks; "strzałka" is the standard Polish physics term for antinode, never "przeciwwęzeł" |
+| comet (animation overlay) | kometa | animation overlay name, not a geometry term |
+| far-field contribution (projection) | wkład w pole dalekie | do not confuse with "Near Field Animation" (Animacja pola bliskiego) — distinct features |
 
 Do not add qualifiers (eg "elektryczny/elektryczna") absent from the English source for current/charge/gain/load/ground; the electromagnetic-simulator context already disambiguates for the target audience.
 

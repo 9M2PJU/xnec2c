@@ -37,6 +37,13 @@
 - reset → بازنشانی
 - default(s) → پیش‌فرض(ها)
 - peak → اوج (not پیک); eg "Peak magnitude" → دامنه اوج, "Peak value" → مقدار اوج
+- polarity (instantaneous sign display) → قطبیت — distinct from polarization (EM wave
+  orientation) → قطبش; do not conflate the two
+- static / animated (projection timing) → ایستا / متحرک
+- comet (moving-crest overlay) → دنباله‌دار (not هندسه)
+- ramp (palette/scale ramp) → شیب
+- tone (color tone family) → تن
+- encoding (hue/brightness encoding) → رمزگذاری
 - projection (color/render mapping) → فرافکنی; "Color projection" → فرافکنی رنگ
   (not تصویر رنگ, which reads as "picture of color")
 - hue → رنگ‌مایه
@@ -44,11 +51,18 @@
 - softening → نرم‌سازی
 - compression → فشرده‌سازی
 - contrast → کنتراست
+- mnemonic (NEC2 card code descriptor) → یادیار; "card's mnemonic code" → کد یادیار
+  کارت — never یادداشت (which means memo/note; reserve یادداشت only for "Notes")
+- renderer → رندرر (transliteration); never موتور رندر. "Rendering Settings"
+  (menu label) → تنظیمات رندر; keep cross-references to it identical, not رندرینگ
+- identity (no-op tone transfer) → همانی — distinct from unity (Smith-chart) → یکه
 
 ## Never translate
 - NEC2 card mnemonics: GW, GA, GH, EX, LD, FR, RP, GE, EN, SP, SM, NE, NH
 - VSWR, dBi, S-parameters, Ω, MHz, dB
 - File extensions: .nec, .csv, .s1p, .s2p, .png
+- fork/forked/forking (process fork) — keep the Latin word "fork" (eg "fork کردن",
+  "fork شده", "fork نشده"); never translate as چنگال/چنگال‌زنی
 - Function/identifier names embedded in developer-facing pr_* messages (eg
   config_widget_lookup, mem_array_free) — keep verbatim, translate only the
   surrounding sentence.

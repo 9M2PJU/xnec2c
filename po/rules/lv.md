@@ -14,7 +14,7 @@
 - Dialog questions and confirmations addressed to the user use the formal plural verb form ("vai vēlaties", "vai esat pārliecināts") without necessarily spelling out "Jūs"; Latvian freely drops the subject pronoun when the verb ending already marks formal address.
 - Tooltips and status/help strings use short declarative sentences, third-person or impersonal constructions ("Atlasīt, kā ...", "Parāda ...", "Norāda ...").
 - Error/log messages (`pr_*` sourced strings) are terse, impersonal, and technical; keep them literal and unembellished, matching the low-formality register already present in the catalog's existing `src/*.c` entries.
-- Compound technical nouns follow Latvian genitive-chain compounding ("krāsu projekcijas ģimene", "signāla amplitūdas") rather than English-style noun-stacking; reorder as Latvian grammar requires while keeping format specifiers in source order.
+- Compound technical nouns follow Latvian genitive-chain compounding ("krāsu projekcijas saime", "signāla amplitūdas") rather than English-style noun-stacking; reorder as Latvian grammar requires while keeping format specifiers in source order.
 
 ## 3. Formality / informality mapping
 
@@ -27,7 +27,7 @@
 |---|---|---|
 | current (electrical) | strāva / strāvas | never "pašreizējais" (temporal) |
 | charge (electrical) | lādiņš / lādiņi | never "maksa" (billing) |
-| ground / ground plane | zeme / zemes plakne | never "augsne" |
+| ground / ground plane | zeme / zemes plakne | never "augsne"; never "zemējums" (grounding/earthing) for the NEC2 earth/ground concept — use "zeme" everywhere, incl. "ground present", "with ground specified", "Sommerfeld ground" |
 | wire | vads | never "kabelis/vadi=cables" |
 | gain | pastiprinājums | antenna directivity, dB |
 | pattern (radiation) | (starojuma) diagramma | never "veidne/paraugs" |
@@ -56,6 +56,16 @@
 | dynamic range | dinamiskais diapazons | |
 | validation | validācija | |
 | managed allocator / memory report | pārvaldītais atmiņas piešķīrējs / atmiņas pārskats | |
+| polarity (sign, +/-) | polaritāte | never "polarizācija" (a distinct concept, antenna polarization) |
+| polarization (antenna) | polarizācija | keep distinct from "polaritāte" (polarity/sign) |
+| far field / far-field contribution | tālais lauks / tālā lauka ieguldījums | paired with existing "tuvais lauks" (near field) |
+| standing wave / traveling wave | stāvvilnis / skrejvilnis | short noun labels for the Standing/Traveling color projection |
+| comet (overlay trailing the wave crest) | komēta / komētas galva | use "galva" (head), not diminutive "galviņa" |
+| hue encoding / brightness encoding | toņa kodējums / spilgtuma kodējums | distinct from "krāsu projekcija" (color projection, the user-facing mode name) |
+| family (of curves/scales/projections) | saime | mathematical/technical family, e.g. "mēroga saime" (scale family), "krāsu projekcijas saime"; never "ģimene" (a human/social family) |
+| color tone (scale-family enum, src/color/color_tone.c) | krāsu tonis | distinct from "mēroga saime" (Scale family: UI label) though same underlying concept |
+| palette kind | paletes veids | fallback/default palette referred to as "gradients" (ramp) |
+| node / antinode (standing-wave) | mezgls / pretmezgls | distinct wording from "nulle"/"maksimums" (null/peak) used in the tick-mark tooltip for the same feature |
 
 - Keep VSWR, S-parameters, Z (impedance symbol), dBi, MHz, Ω, and NEC2 card mnemonics untranslated per `doc/TRANSLATING.md`.
 - Do not add qualifiers absent from the English source (e.g. "elektriskā strāva" when the source just says "Currents"); the antenna-simulator context already disambiguates.

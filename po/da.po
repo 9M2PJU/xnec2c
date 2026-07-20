@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-07-12 15:24-0700\n"
+"POT-Creation-Date: 2026-07-20 15:27-0700\n"
 "PO-Revision-Date: 2025-12-28 20:37-0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2842
+#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:1784
 msgid "xnec2c"
 msgstr "xnec2c"
 
@@ -33,6 +33,562 @@ msgstr "Numerisk elektromagnetisk kode-software"
 msgid "nec2;em;simulator;"
 msgstr "nec2;em;simulator;"
 
+#: resources/animate.glade:78
+msgid "Animated"
+msgstr "Animeret"
+
+#: resources/animate.glade:85
+msgid ""
+"Hue shows the peak magnitude s(n); brightness follows the traveling wave |"
+"cos(arg z + φ)|, floored so nulls stay visible.\n"
+"\n"
+"Animated: bright regions sweep along the structure as the phase advances."
+msgstr ""
+"Farvetonen viser spidsstørrelsen s(n); lysstyrken følger den vandrende bølge "
+"|cos(arg z + φ)|, med et gulv så nulpunkter forbliver synlige.\n"
+"\n"
+"Animeret: lyse områder bevæger sig langs strukturen, efterhånden som fasen "
+"skrider frem."
+
+#: resources/animate.glade:86
+msgid "Instantaneous"
+msgstr "Øjeblikkelig"
+
+#: resources/animate.glade:96
+msgid ""
+"Diverging hue shows the instantaneous sign of the displayed quantity: cold "
+"negative, hot positive; brightness carries the magnitude s(n).\n"
+"\n"
+"Animated: regions swap poles as the phase advances."
+msgstr ""
+"Divergerende farvetone viser det øjeblikkelige fortegn for den viste "
+"størrelse: kold negativ, varm positiv; lysstyrken bærer størrelsen s(n).\n"
+"\n"
+"Animeret: områder skifter polaritet, efterhånden som fasen skrider frem."
+
+#: resources/animate.glade:97
+msgid "Polarity"
+msgstr "Polaritet"
+
+#: resources/animate.glade:107
+msgid ""
+"Cyclic hue wheel shows the phase angle arg z + φ; brightness carries the "
+"magnitude s(n).\n"
+"\n"
+"Animated: the whole wheel rotates as the phase advances."
+msgstr ""
+"Det cykliske farvehjul viser fasevinklen arg z + φ; lysstyrken bærer "
+"størrelsen s(n).\n"
+"\n"
+"Animeret: hele hjulet roterer, efterhånden som fasen skrider frem."
+
+#: resources/animate.glade:108
+msgid "Phase Hue"
+msgstr "Fasefarvetone"
+
+#: resources/animate.glade:118
+msgid ""
+"Diverging hue shows the instantaneous charge sign; brightness carries the "
+"current envelope s(|I|).\n"
+"\n"
+"Animated: one view of charge and current a quarter cycle apart."
+msgstr ""
+"Divergerende farvetone viser ladningens øjeblikkelige fortegn; lysstyrken "
+"bærer strømmens indhylningskurve s(|I|).\n"
+"\n"
+"Animeret: én visning af ladning og strøm forskudt en kvart cyklus."
+
+#: resources/animate.glade:119
+msgid "Current + Charge"
+msgstr "Strøm + ladning"
+
+#: resources/animate.glade:136
+msgid "Static"
+msgstr "Statisk"
+
+#: resources/animate.glade:143
+msgid ""
+"Rainbow ramp of this frequency step's peak magnitude s(n) at full "
+"brightness.\n"
+"\n"
+"Static: the phase-invariant baseline; colors hold still during playback."
+msgstr ""
+"Regnbuerampe for dette frekvenstrins spidsstørrelse s(n) ved fuld "
+"lysstyrke.\n"
+"\n"
+"Statisk: den faseuafhængige baseline; farverne holder stille under "
+"afspilning."
+
+#: resources/animate.glade:144
+msgid "Amplitude"
+msgstr "Amplitude"
+
+#: resources/animate.glade:154
+msgid ""
+"Hue ramps the per-region standing-wave ratio: cold traveling, hot standing; "
+"brightness carries the magnitude s(n).\n"
+"\n"
+"Static: a phase-invariant read; colors hold still during playback."
+msgstr ""
+"Farvetonen rampes efter det stående bølgeforhold i hvert område: kold "
+"vandrende, varm stående; lysstyrken bærer størrelsen s(n).\n"
+"\n"
+"Statisk: en faseuafhængig aflæsning; farverne holder stille under afspilning."
+
+#: resources/animate.glade:155
+msgid "Standing/Traveling"
+msgstr "Stående/vandrende"
+
+#: resources/animate.glade:165
+msgid ""
+"Hue ramps each segment's contribution to the selected far-field direction; "
+"brightness carries the magnitude s(n).\n"
+"\n"
+"Static: a phase-invariant read; colors hold still during playback."
+msgstr ""
+"Farvetonen rampes efter hvert segments bidrag til den valgte "
+"fjernfeltretning; lysstyrken bærer størrelsen s(n).\n"
+"\n"
+"Statisk: en faseuafhængig aflæsning; farverne holder stille under afspilning."
+
+#: resources/animate.glade:166
+msgid "Far-field Contribution"
+msgstr "Fjernfeltbidrag"
+
+#: resources/animate.glade:180
+msgid ""
+"Power-law transfer n^γ of the normalized magnitude.\n"
+"\n"
+"γ = 1 is linear amplitude; γ = 0.5 expands weak regions; γ = 2 shows the "
+"squared magnitude — |I|² is proportional to per-segment dissipated power "
+"(and its radiated-power contribution via radiation resistance), |q|² to "
+"stored electrostatic energy."
+msgstr ""
+"Potensoverførsel n^γ af den normaliserede størrelse.\n"
+"\n"
+"γ = 1 er lineær amplitude; γ = 0,5 udvider svage områder; γ = 2 viser den "
+"kvadrerede størrelse — |I|² er proportional med den afsatte effekt pr. "
+"segment (og dens bidrag til den udstrålede effekt via strålingsmodstanden), |"
+"q|² med den lagrede elektrostatiske energi."
+
+#: resources/animate.glade:181
+msgid "Power"
+msgstr "Potens"
+
+#: resources/animate.glade:191
+msgid ""
+"Logarithmic transfer over a user range R, the RF-standard 20·log₁₀ amplitude "
+"decibels.\n"
+"\n"
+"R sets the visible dynamic range; detail below the floor 10^(−R/20) clips to "
+"the bottom color."
+msgstr ""
+"Logaritmisk overførsel over et brugerdefineret område R, det RF-"
+"standardiserede 20·log₁₀ amplitude-decibel.\n"
+"\n"
+"R fastsætter det synlige dynamikområde; detaljer under gulvet 10^(−R/20) "
+"klippes til bundfarven."
+
+#: resources/animate.glade:192 resources/xnec2c.glade:11670
+#: resources/xnec2c.glade:13045
+msgid "dB"
+msgstr "dB"
+
+#: resources/animate.glade:202
+msgid ""
+"Inverse hyperbolic sine: linear below the knee k, logarithmic above.\n"
+"\n"
+"Keeps near-null currents visible while compressing strong peaks, like a lin-"
+"log instrument scale."
+msgstr ""
+"Invers hyperbolsk sinus: lineær under knækket k, logaritmisk derover.\n"
+"\n"
+"Holder strømme nær nul synlige, mens stærke spidser komprimeres, som en lin-"
+"log-instrumentskala."
+
+#: resources/animate.glade:203
+msgid "Asinh"
+msgstr "Asinh"
+
+#: resources/animate.glade:213
+msgid ""
+"μ-law companding, the telephony-standard bounded log curve.\n"
+"\n"
+"Lifts weak detail without a hard floor; 48.16 dB compression is the classic "
+"μ = 255."
+msgstr ""
+"μ-law-kompandering, den telefonistandardiserede begrænsede logkurve.\n"
+"\n"
+"Løfter svage detaljer uden et hårdt gulv; 48,16 dB kompression er den "
+"klassiske μ = 255."
+
+#: resources/animate.glade:214
+msgid "μ-law"
+msgstr "μ-law"
+
+#: resources/animate.glade:224
+msgid ""
+"Reinhard rational compressor (1+k)·n/(n+k), the photographic HDR tone-map.\n"
+"\n"
+"Preserves midtones while rolling highlights off smoothly; k sets the knee."
+msgstr ""
+"Reinhard rationel kompressor (1+k)·n/(n+k), den fotografiske HDR-"
+"tonemapping.\n"
+"\n"
+"Bevarer mellemtoner, mens højlys tones jævnt ud; k fastsætter knækpunktet."
+
+#: resources/animate.glade:225
+msgid "Reinhard"
+msgstr "Reinhard"
+
+#: resources/animate.glade:235
+msgid ""
+"Hyperbolic tangent soft limiter tanh(a·n)/tanh(a).\n"
+"\n"
+"Raises midrange contrast and saturates gently toward the peak, like "
+"amplifier compression; a sets the steepness."
+msgstr ""
+"Blød begrænser med hyperbolsk tangens tanh(a·n)/tanh(a).\n"
+"\n"
+"Øger kontrasten i mellemområdet og mætter blødt mod spidsen, ligesom "
+"forstærkerkompression; a fastsætter stejlheden."
+
+#: resources/animate.glade:236
+msgid "Sigmoid"
+msgstr "Sigmoid"
+
+#: resources/animate.glade:246
+msgid ""
+"Identity: every magnitude renders at full brightness.\n"
+"\n"
+"The color projection alone carries the information."
+msgstr ""
+"Identitet: enhver størrelse gengives med fuld lysstyrke.\n"
+"\n"
+"Alene farveprojektionen bærer informationen."
+
+#: resources/animate.glade:247 resources/settings/cairo_settings.glade:56
+msgid "None"
+msgstr "Ingen"
+
+#: resources/animate.glade:259 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
+#: src/rdpattern_ui.c:344
+msgid "Near Field Animation"
+msgstr "Nærfelt-animation"
+
+#: resources/animate.glade:351
+msgid ""
+"Scrub the animation phase manually.\n"
+"\n"
+"Disabled while the animation is running."
+msgstr ""
+"Skrub animationsfasen manuelt.\n"
+"\n"
+"Deaktiveret mens animationen kører."
+
+#: resources/animate.glade:368
+msgid "φ 0°"
+msgstr "φ 0°"
+
+#: resources/animate.glade:382
+msgid "Phase"
+msgstr "Fase"
+
+#: resources/animate.glade:405
+msgid "Frames/Sec"
+msgstr "Billeder/sek"
+
+#: resources/animate.glade:418
+msgid "Animate Freq (Hz)"
+msgstr "Animeringsfrekvens (Hz)"
+
+#: resources/animate.glade:491
+msgid "Color projection:"
+msgstr "Farveprojektion:"
+
+#: resources/animate.glade:505
+msgid ""
+"Select which physical quantity drives the hue and how brightness follows the "
+"excitation phase.\n"
+"\n"
+"Static projections (Amplitude, Standing/Traveling, Far-field Contribution) "
+"read without animating.\n"
+"\n"
+"Hovering an entry previews it live."
+msgstr ""
+"Vælg hvilken fysisk størrelse der styrer farvetonen, og hvordan lysstyrken "
+"følger excitationsfasen.\n"
+"\n"
+"Statiske projektioner (Amplitude, Stående/vandrende, Fjernfeltbidrag) "
+"aflæses uden animering.\n"
+"\n"
+"Hold musen over en post for at forhåndsvise den live."
+
+#: resources/animate.glade:532
+msgid "Scale family:"
+msgstr "Skalafamilie:"
+
+#: resources/animate.glade:546
+msgid ""
+"Select the magnitude-to-color transfer family.\n"
+"\n"
+"Adjust its slider until the contrast reveals the range your inspection "
+"needs.\n"
+"\n"
+"Hovering an entry previews it live."
+msgstr ""
+"Vælg familien for overførsel fra størrelse til farve.\n"
+"\n"
+"Justér skyderen, indtil kontrasten viser det område, din undersøgelse "
+"kræver.\n"
+"\n"
+"Hold musen over en post for at forhåndsvise den live."
+
+#: resources/animate.glade:585
+msgid "Gamma:"
+msgstr "Gamma:"
+
+#: resources/animate.glade:602
+msgid ""
+"Gamma exponent of the power transfer.\n"
+"\n"
+"γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
+"dissipated power for currents."
+msgstr ""
+"Gammaeksponent for potensoverførslen.\n"
+"\n"
+"γ = 0,5 udvider svage områder, γ = 1 er lineær, γ = 2 er proportional med "
+"afsat effekt for strømme."
+
+#: resources/animate.glade:624
+msgid "Range (dB):"
+msgstr "Område (dB):"
+
+#: resources/animate.glade:641
+msgid ""
+"Dynamic range R below the step peak mapped onto the color strip.\n"
+"\n"
+"The floor is 10^(−R/20) of the peak."
+msgstr ""
+"Dynamikområde R under trinets spidsværdi, afbildet på farvestrimlen.\n"
+"\n"
+"Bunden er 10^(−R/20) af spidsværdien."
+
+#: resources/animate.glade:663
+msgid "Softening:"
+msgstr "Blødgøring:"
+
+#: resources/animate.glade:680
+msgid "Softening knee k: linear below k, logarithmic above."
+msgstr "Blødgøringsknæk k: lineær under k, logaritmisk over."
+
+#: resources/animate.glade:702
+msgid "Compression (dB):"
+msgstr "Kompression (dB):"
+
+#: resources/animate.glade:719
+msgid "Compression strength in dB; higher values lift weak detail."
+msgstr "Kompressionsstyrke i dB; højere værdier fremhæver svage detaljer."
+
+#: resources/animate.glade:741
+msgid "Knee:"
+msgstr "Knæk:"
+
+#: resources/animate.glade:758
+msgid "Knee k of the rational soft-compressor."
+msgstr "Knæk k for den rationelle blødkompressor."
+
+#: resources/animate.glade:780
+msgid "Contrast:"
+msgstr "Kontrast:"
+
+#: resources/animate.glade:797
+msgid "Contrast steepness a of the tanh transfer."
+msgstr "Kontraststejlhed a for tanh-overførslen."
+
+#: resources/animate.glade:830
+msgid "Color gradient of the active projection and scale family."
+msgstr "Farveovergang for den aktive projektion og skalafamilie."
+
+#: resources/animate.glade:848
+msgid "Brightness floor:"
+msgstr "Lysstyrkegulv:"
+
+#: resources/animate.glade:866
+msgid ""
+"Minimum brightness under animation so elements cool toward this level "
+"instead of vanishing to black."
+msgstr ""
+"Minimum lysstyrke under animering, så elementer afkøles mod dette niveau i "
+"stedet for at forsvinde til sort."
+
+#: resources/animate.glade:877
+msgid "Width from amplitude"
+msgstr "Bredde efter amplitude"
+
+#: resources/animate.glade:882
+msgid ""
+"Scale wire segment width by the scaled amplitude envelope s(n), so strong "
+"regions draw thick and nulls draw thin."
+msgstr ""
+"Skalér trådsegmentets bredde efter den skalerede amplitudeindhylningskurve "
+"s(n), så stærke områder tegnes tykke og nulpunkter tegnes tynde."
+
+#: resources/animate.glade:908
+msgid "Overlays:"
+msgstr "Overlejringer:"
+
+#: resources/animate.glade:919
+msgid "Nodes/antinodes"
+msgstr "Knuder/antiknuder"
+
+#: resources/animate.glade:924
+msgid ""
+"Mark current nulls (plus tick) and peaks (cross tick) on wire segments.\n"
+"\n"
+"Marks derive from the phase-invariant envelope, so they hold still while the "
+"wave animates."
+msgstr ""
+"Markér strømnulpunkter (plus-mærke) og spidser (kryds-mærke) på "
+"trådsegmenter.\n"
+"\n"
+"Markeringerne udledes af den faseuafhængige indhylningskurve, så de holder "
+"stille, mens bølgen animeres."
+
+#: resources/animate.glade:935
+msgid "Comet"
+msgstr "Komet"
+
+#: resources/animate.glade:940
+msgid ""
+"Ride a bright head on the instantaneous positive crest so wave motion reads "
+"along each wire."
+msgstr ""
+"Lad et lyst hoved ride på den øjeblikkelige positive bølgetop, så "
+"bølgebevægelsen kan aflæses langs hver tråd."
+
+#: resources/animate.glade:973
+msgid "Reset"
+msgstr "Nulstil"
+
+#: resources/animate.glade:979
+msgid ""
+"Restore the color projection, scale family, and every family brightness "
+"parameter to their defaults."
+msgstr ""
+"Gendan farveprojektionen, skalafamilien og alle familiers lysstyrkeparametre "
+"til standardværdierne."
+
+#: resources/animate.glade:994
+msgid ""
+"<b>Color</b> <i>— currents, charges, and fields shade the wires, patches, "
+"and near-field vectors</i>"
+msgstr ""
+"<b>Farve</b> <i>— strømme, ladninger og felter farvelægger trådene, patches "
+"og nærfeltsvektorerne</i>"
+
+#: resources/animate.glade:1025
+msgid "None (geometry)"
+msgstr "Ingen (geometri)"
+
+#: resources/animate.glade:1029
+msgid "Show the bare structure geometry with no quantity coloring."
+msgstr "Vis den bare strukturgeometri uden farvelægning efter størrelse."
+
+#: resources/animate.glade:1042 resources/xnec2c.glade:11224
+msgid "Currents"
+msgstr "Strømme"
+
+#: resources/animate.glade:1046
+msgid "Animate current magnitude and direction along the wires."
+msgstr "Animér strømmens størrelse og retning langs trådene."
+
+#: resources/animate.glade:1059 resources/xnec2c.glade:11239
+msgid "Charges"
+msgstr "Ladninger"
+
+#: resources/animate.glade:1063
+msgid "Animate charge magnitude along the wires."
+msgstr "Animér ladningens størrelse langs trådene."
+
+#: resources/animate.glade:1080
+msgid "Display"
+msgstr "Visning"
+
+#: resources/animate.glade:1111
+msgid "Flow direction:"
+msgstr "Strømningsretning:"
+
+#: resources/animate.glade:1124
+msgid "Reference phase (animated)"
+msgstr "Referencefase (animeret)"
+
+#: resources/animate.glade:1125
+msgid "LIC texture (animated)"
+msgstr "LIC-tekstur (animeret)"
+
+#: resources/animate.glade:1126
+msgid "Wireframe (animated)"
+msgstr "Trådgitter (animeret)"
+
+#: resources/animate.glade:1127
+msgid "Polarization axis (static)"
+msgstr "Polariseringsakse (statisk)"
+
+#: resources/animate.glade:1128
+msgid "Peak magnitude (static)"
+msgstr "Spidsstørrelse (statisk)"
+
+#: resources/animate.glade:1144
+msgid "Patches"
+msgstr "Patches"
+
+#: resources/animate.glade:1172
+msgid "Near E field"
+msgstr "Nær E-felt"
+
+#: resources/animate.glade:1176
+msgid ""
+"Show the near electric field vectors while animating.\n"
+"\n"
+"Enable by opening the radiation pattern window."
+msgstr ""
+"Vis de nære elektriske feltvektorer under animering.\n"
+"\n"
+"Aktivér ved at åbne strålingsdiagramvinduet."
+
+#: resources/animate.glade:1188
+msgid "Near H field"
+msgstr "Nær H-felt"
+
+#: resources/animate.glade:1192
+msgid ""
+"Show the near magnetic field vectors while animating.\n"
+"\n"
+"Enable by opening the radiation pattern window."
+msgstr ""
+"Vis de nære magnetiske feltvektorer under animering.\n"
+"\n"
+"Aktivér ved at åbne strålingsdiagramvinduet."
+
+#: resources/animate.glade:1204
+msgid "Poynting vector"
+msgstr "Poynting-vektor"
+
+#: resources/animate.glade:1208
+msgid ""
+"Show the Poynting power-flow vectors while animating.\n"
+"\n"
+"Enable by opening the radiation pattern window."
+msgstr ""
+"Vis Poynting-effektflowvektorerne under animering.\n"
+"\n"
+"Aktivér ved at åbne strålingsdiagramvinduet."
+
+#: resources/animate.glade:1224
+msgid "Near Field"
+msgstr "Nærfelt"
+
 #: resources/settings/cairo_settings.glade:34
 msgid "Anti-aliasing"
 msgstr "Anti-aliasing"
@@ -45,10 +601,6 @@ msgstr "Standard"
 msgid "Fast"
 msgstr "Hurtig"
 
-#: resources/settings/cairo_settings.glade:56 resources/xnec2c.glade:414
-msgid "None"
-msgstr "Ingen"
-
 #: resources/settings/cairo_settings.glade:68
 msgid "Color Quantization"
 msgstr "Farvekvantisering"
@@ -57,7 +609,7 @@ msgstr "Farvekvantisering"
 msgid "Off"
 msgstr "Fra"
 
-#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4748
+#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:3690
 msgid "8"
 msgstr "8"
 
@@ -172,1013 +724,689 @@ msgstr ""
 msgid "translator-credits"
 msgstr "translator-credits"
 
-#: resources/xnec2c.glade:114 src/rdpattern_ui.c:330 src/rdpattern_ui.c:338
-#: src/rdpattern_ui.c:345
-msgid "Near Field Animation"
-msgstr "Nærfelt-animation"
-
-#: resources/xnec2c.glade:206
-msgid ""
-"Scrub the animation phase manually.\n"
-"Disabled while the animation is running."
-msgstr ""
-"Skrub animationsfasen manuelt.\n"
-"Deaktiveret mens animationen kører."
-
-#: resources/xnec2c.glade:223
-msgid "φ 0°"
-msgstr "φ 0°"
-
-#: resources/xnec2c.glade:237
-msgid "Phase"
-msgstr "Fase"
-
-#: resources/xnec2c.glade:260
-msgid "Frames/Sec"
-msgstr "Billeder/sek"
-
-#: resources/xnec2c.glade:273
-msgid "Animate Freq (Hz)"
-msgstr "Animeringsfrekvens (Hz)"
-
-#: resources/xnec2c.glade:348
-msgid "Color projection:"
-msgstr "Farveprojektion:"
-
-#: resources/xnec2c.glade:361
-msgid ""
-"Select how wire and patch colors follow the excitation phase while animating."
-msgstr ""
-"Vælg hvordan tråd- og patch-farver følger excitationsfasen under animering."
-
-#: resources/xnec2c.glade:363
-msgid "Instantaneous Magnitude"
-msgstr "Øjeblikkelig størrelse"
-
-#: resources/xnec2c.glade:364
-msgid "Instantaneous Polarity"
-msgstr "Øjeblikkelig polaritet"
-
-#: resources/xnec2c.glade:365
-msgid "Phase Hue"
-msgstr "Fasefarvetone"
-
-#: resources/xnec2c.glade:393
-msgid "Scale family:"
-msgstr "Skalafamilie:"
-
-#: resources/xnec2c.glade:406
-msgid ""
-"Select the magnitude-to-color transfer family.\n"
-"Mirrors the Visualization menu setting in the main window.\n"
-"Each family keeps its own brightness parameter on the slider below."
-msgstr ""
-"Vælg familien for overførsel fra størrelse til farve.\n"
-"Spejler indstillingen i menuen Visualisering i hovedvinduet.\n"
-"Hver familie har sin egen lysstyrkeparameter på skyderen nedenfor."
-
-#: resources/xnec2c.glade:408
-msgid "Power"
-msgstr "Potens"
-
-#: resources/xnec2c.glade:409 resources/xnec2c.glade:12728
-#: resources/xnec2c.glade:14103
-msgid "dB"
-msgstr "dB"
-
-#: resources/xnec2c.glade:410
-msgid "Asinh"
-msgstr "Asinh"
-
-#: resources/xnec2c.glade:411
-msgid "μ-law"
-msgstr "μ-law"
-
-#: resources/xnec2c.glade:412
-msgid "Reinhard"
-msgstr "Reinhard"
-
-#: resources/xnec2c.glade:413
-msgid "Sigmoid"
-msgstr "Sigmoid"
-
-#: resources/xnec2c.glade:454
-msgid "Gamma:"
-msgstr "Gamma:"
-
-#: resources/xnec2c.glade:471
-msgid ""
-"Gamma exponent of the power transfer.\n"
-"γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
-"dissipated power for currents."
-msgstr ""
-"Gammaeksponent for potensoverførslen.\n"
-"γ = 0,5 udvider svage områder, γ = 1 er lineær, γ = 2 er proportional med "
-"afsat effekt for strømme."
-
-#: resources/xnec2c.glade:494
-msgid "Range (dB):"
-msgstr "Område (dB):"
-
-#: resources/xnec2c.glade:511
-msgid ""
-"Dynamic range R below the step peak mapped onto the color strip.\n"
-"The floor is 10^(−R/20) of the peak."
-msgstr ""
-"Dynamikområde R under trinets spidsværdi, afbildet på farvestrimlen.\n"
-"Bunden er 10^(−R/20) af spidsværdien."
-
-#: resources/xnec2c.glade:534
-msgid "Softening:"
-msgstr "Blødgøring:"
-
-#: resources/xnec2c.glade:551
-msgid "Softening knee k: linear below k, logarithmic above."
-msgstr "Blødgøringsknæk k: lineær under k, logaritmisk over."
-
-#: resources/xnec2c.glade:574
-msgid "Compression (dB):"
-msgstr "Kompression (dB):"
-
-#: resources/xnec2c.glade:591
-msgid "Compression strength in dB; higher values lift weak detail."
-msgstr "Kompressionsstyrke i dB; højere værdier fremhæver svage detaljer."
-
-#: resources/xnec2c.glade:614
-msgid "Knee:"
-msgstr "Knæk:"
-
-#: resources/xnec2c.glade:631
-msgid "Knee k of the rational soft-compressor."
-msgstr "Knæk k for den rationelle blødkompressor."
-
-#: resources/xnec2c.glade:654
-msgid "Contrast:"
-msgstr "Kontrast:"
-
-#: resources/xnec2c.glade:671
-msgid "Contrast steepness a of the tanh transfer."
-msgstr "Kontraststejlhed a for tanh-overførslen."
-
-#: resources/xnec2c.glade:705
-msgid "Color gradient of the active projection and scale family."
-msgstr ""
-
-#: resources/xnec2c.glade:720
-#, fuzzy
-msgid "Color channel"
-msgstr "Farveskala"
-
-#: resources/xnec2c.glade:726
-msgid ""
-"Enable the projection’s hue/sign color encoding.\n"
-"Unchecked, colors desaturate to gray so only the brightness channel remains."
-msgstr ""
-
-#: resources/xnec2c.glade:737
-msgid "Brightness channel"
-msgstr ""
-
-#: resources/xnec2c.glade:743
-msgid ""
-"Enable the projection’s brightness modulation (cosine or magnitude factor).\n"
-"Unchecked, brightness stays at full and only the color encoding remains."
-msgstr ""
-
-#: resources/xnec2c.glade:754
-msgid "Swap channels"
-msgstr ""
-
-#: resources/xnec2c.glade:759
-msgid ""
-"Exchange the color and brightness carriers.\n"
-"The quantity that drove the hue rides brightness and vice versa."
-msgstr ""
-
-#: resources/xnec2c.glade:792
-msgid "Reset"
-msgstr "Nulstil"
-
-#: resources/xnec2c.glade:798
-msgid ""
-"Restore the color projection, scale family, and every family brightness "
-"parameter to their defaults."
-msgstr ""
-"Gendan farveprojektionen, skalafamilien og alle familiers lysstyrkeparametre "
-"til standardværdierne."
-
-#: resources/xnec2c.glade:812
-msgid "Color"
-msgstr "Farve"
-
-#: resources/xnec2c.glade:848
-msgid "None (geometry)"
-msgstr "Ingen (geometri)"
-
-#: resources/xnec2c.glade:852
-msgid "Show the bare structure geometry with no quantity coloring."
-msgstr "Vis den bare strukturgeometri uden farvelægning efter størrelse."
-
-#: resources/xnec2c.glade:865 resources/xnec2c.glade:12282
-msgid "Currents"
-msgstr "Strømme"
-
-#: resources/xnec2c.glade:869
-msgid ""
-"Animate current magnitude and direction along the wires.\n"
-"Mirrors the Currents button in the main window."
-msgstr ""
-"Animér strømmens størrelse og retning langs trådene.\n"
-"Spejler knappen Strømme i hovedvinduet."
-
-#: resources/xnec2c.glade:882 resources/xnec2c.glade:12297
-msgid "Charges"
-msgstr "Ladninger"
-
-#: resources/xnec2c.glade:886
-msgid ""
-"Animate charge magnitude along the wires.\n"
-"Mirrors the Charges button in the main window."
-msgstr ""
-"Animér ladningens størrelse langs trådene.\n"
-"Spejler knappen Ladninger i hovedvinduet."
-
-#: resources/xnec2c.glade:903
-msgid "Display"
-msgstr "Visning"
-
-#: resources/xnec2c.glade:936
-msgid "Flow direction:"
-msgstr "Strømningsretning:"
-
-#: resources/xnec2c.glade:949
-msgid "Reference phase (animated)"
-msgstr "Referencefase (animeret)"
-
-#: resources/xnec2c.glade:950
-msgid "LIC texture (animated)"
-msgstr "LIC-tekstur (animeret)"
-
-#: resources/xnec2c.glade:951
-msgid "Wireframe (animated)"
-msgstr "Trådgitter (animeret)"
-
-#: resources/xnec2c.glade:952
-msgid "Polarization axis (static)"
-msgstr "Polariseringsakse (statisk)"
-
-#: resources/xnec2c.glade:953
-msgid "Peak magnitude (static)"
-msgstr "Spidsstørrelse (statisk)"
-
-#: resources/xnec2c.glade:969
-msgid "Patches"
-msgstr "Patches"
-
-#: resources/xnec2c.glade:999
-msgid "Near E field"
-msgstr "Nær E-felt"
-
-#: resources/xnec2c.glade:1003
-msgid ""
-"Show the near electric field vectors while animating.\n"
-"Enable by opening the radiation pattern window."
-msgstr ""
-"Vis de nære elektriske feltvektorer under animering.\n"
-"Aktivér ved at åbne strålingsdiagramvinduet."
-
-#: resources/xnec2c.glade:1015
-msgid "Near H field"
-msgstr "Nær H-felt"
-
-#: resources/xnec2c.glade:1019
-msgid ""
-"Show the near magnetic field vectors while animating.\n"
-"Enable by opening the radiation pattern window."
-msgstr ""
-"Vis de nære magnetiske feltvektorer under animering.\n"
-"Aktivér ved at åbne strålingsdiagramvinduet."
-
-#: resources/xnec2c.glade:1031
-msgid "Poynting vector"
-msgstr "Poynting-vektor"
-
-#: resources/xnec2c.glade:1035
-msgid ""
-"Show the Poynting power-flow vectors while animating.\n"
-"Enable by opening the radiation pattern window."
-msgstr ""
-"Vis Poynting-effektflowvektorerne under animering.\n"
-"Aktivér ved at åbne strålingsdiagramvinduet."
-
-#: resources/xnec2c.glade:1050
-msgid "Total field:"
-msgstr "Totalfelt:"
-
-#: resources/xnec2c.glade:1062
-msgid ""
-"Choose peak-envelope or instantaneous (φ=0) near-field vectors.\n"
-"Mirrors the Total Field menu in the radiation pattern window."
-msgstr ""
-"Vælg mellem spidsværdi (indhylningskurve) eller øjeblikkelige (φ=0) "
-"nærfeltsvektorer.\n"
-"Spejler menuen Totalfelt i strålingsdiagramvinduet."
-
-#: resources/xnec2c.glade:1064
-msgid "Peak value"
-msgstr "Spidsværdi"
-
-#: resources/xnec2c.glade:1065
-msgid "Instantaneous (φ=0)"
-msgstr "Øjeblikkelig (φ=0)"
-
-#: resources/xnec2c.glade:1081
-msgid "Near Field"
-msgstr "Nærfelt"
-
-#: resources/xnec2c.glade:1164
+#: resources/xnec2c.glade:106
 msgid "Arc Element (GA card)"
 msgstr "Bueelement (GA-kort)"
 
-#: resources/xnec2c.glade:1192 resources/xnec2c.glade:2227
-#: resources/xnec2c.glade:4654 resources/xnec2c.glade:15821 src/cmnd_edit.c:488
+#: resources/xnec2c.glade:134 resources/xnec2c.glade:1169
+#: resources/xnec2c.glade:3596 resources/xnec2c.glade:14763 src/cmnd_edit.c:488
 msgid "Tag Number"
 msgstr "Tag-nummer"
 
-#: resources/xnec2c.glade:1205 resources/xnec2c.glade:15916
+#: resources/xnec2c.glade:147 resources/xnec2c.glade:14858
 msgid "No. Segments"
 msgstr "Antal segmenter"
 
-#: resources/xnec2c.glade:1218 resources/xnec2c.glade:4680
-#: resources/xnec2c.glade:16012
+#: resources/xnec2c.glade:160 resources/xnec2c.glade:3622
+#: resources/xnec2c.glade:14954
 msgid "Segs % lambda"
 msgstr "Segmenter % lambda"
 
-#: resources/xnec2c.glade:1231 resources/xnec2c.glade:4693
-#: resources/xnec2c.glade:16108
+#: resources/xnec2c.glade:173 resources/xnec2c.glade:3635
+#: resources/xnec2c.glade:15050
 msgid "Wire Diameter"
 msgstr "Tråddiameter"
 
-#: resources/xnec2c.glade:1319
+#: resources/xnec2c.glade:261
 msgid "Radius from Y"
 msgstr "Radius fra Y"
 
-#: resources/xnec2c.glade:1332
+#: resources/xnec2c.glade:274
 msgid "End 1 Angle"
 msgstr "Ende 1-vinkel"
 
-#: resources/xnec2c.glade:1345
+#: resources/xnec2c.glade:287
 msgid "End 2 Angle"
 msgstr "Ende 2-vinkel"
 
-#: resources/xnec2c.glade:1358 resources/xnec2c.glade:4890
-#: resources/xnec2c.glade:16173 src/cmnd_edit.c:2024
+#: resources/xnec2c.glade:300 resources/xnec2c.glade:3832
+#: resources/xnec2c.glade:15115 src/cmnd_edit.c:2024
 msgid "Conductivity S/m"
 msgstr "Ledningsevne S/m"
 
-#: resources/xnec2c.glade:1456
+#: resources/xnec2c.glade:398
 msgid "Wire Arc Data"
 msgstr "Trådbuedata"
 
-#: resources/xnec2c.glade:1518 resources/xnec2c.glade:1754
-#: resources/xnec2c.glade:2554 resources/xnec2c.glade:2777
-#: resources/xnec2c.glade:3235 resources/xnec2c.glade:3427
-#: resources/xnec2c.glade:3738 resources/xnec2c.glade:4424
-#: resources/xnec2c.glade:5224 resources/xnec2c.glade:5423
-#: resources/xnec2c.glade:5584 resources/xnec2c.glade:6116
-#: resources/xnec2c.glade:6752 resources/xnec2c.glade:8196
-#: resources/xnec2c.glade:9103 resources/xnec2c.glade:10109
-#: resources/xnec2c.glade:10389 resources/xnec2c.glade:14514
-#: resources/xnec2c.glade:15027 resources/xnec2c.glade:15626
-#: resources/xnec2c.glade:16462 resources/xnec2c.glade:16662
+#: resources/xnec2c.glade:460 resources/xnec2c.glade:696
+#: resources/xnec2c.glade:1496 resources/xnec2c.glade:1719
+#: resources/xnec2c.glade:2177 resources/xnec2c.glade:2369
+#: resources/xnec2c.glade:2680 resources/xnec2c.glade:3366
+#: resources/xnec2c.glade:4166 resources/xnec2c.glade:4365
+#: resources/xnec2c.glade:4526 resources/xnec2c.glade:5058
+#: resources/xnec2c.glade:5694 resources/xnec2c.glade:7138
+#: resources/xnec2c.glade:8045 resources/xnec2c.glade:9051
+#: resources/xnec2c.glade:9331 resources/xnec2c.glade:13456
+#: resources/xnec2c.glade:13969 resources/xnec2c.glade:14568
+#: resources/xnec2c.glade:15404 resources/xnec2c.glade:15604
 msgid "Delete Card"
 msgstr "Slet kort"
 
-#: resources/xnec2c.glade:1596
+#: resources/xnec2c.glade:538
 msgid "Cylindrical Structure (GR card)"
 msgstr "Cylindrisk struktur (GR-kort)"
 
-#: resources/xnec2c.glade:1626 resources/xnec2c.glade:10289
+#: resources/xnec2c.glade:568 resources/xnec2c.glade:9231
 msgid "Tag Number Increment"
 msgstr "Tag-nummerforøgelse"
 
-#: resources/xnec2c.glade:1639
+#: resources/xnec2c.glade:581
 msgid "Number of Structures"
 msgstr "Antal strukturer"
 
-#: resources/xnec2c.glade:1693
+#: resources/xnec2c.glade:635
 msgid "Cylindrical Structure"
 msgstr "Cylindrisk struktur"
 
-#: resources/xnec2c.glade:1819
+#: resources/xnec2c.glade:761
 msgid "Xnec2c Error"
 msgstr "Xnec2c-fejl"
 
-#: resources/xnec2c.glade:1927
+#: resources/xnec2c.glade:869
 msgid "Error"
 msgstr "Fejl"
 
-#: resources/xnec2c.glade:2006
+#: resources/xnec2c.glade:948
 msgid "Excitation Command (EX Card)"
 msgstr "Excitationskommando (EX-kort)"
 
-#: resources/xnec2c.glade:2032
+#: resources/xnec2c.glade:974
 msgid "Incident LH Wave"
 msgstr "Indkommende LH-bølge"
 
-#: resources/xnec2c.glade:2048
+#: resources/xnec2c.glade:990
 msgid "Incident Linear Wave "
 msgstr "Indkommende lineær bølge "
 
-#: resources/xnec2c.glade:2064
+#: resources/xnec2c.glade:1006
 msgid "Current Source"
 msgstr "Strømkilde"
 
-#: resources/xnec2c.glade:2080
+#: resources/xnec2c.glade:1022
 msgid "Incident RH Wave"
 msgstr "Indkommende RH-bølge"
 
-#: resources/xnec2c.glade:2096
+#: resources/xnec2c.glade:1038
 msgid "Current Slope Discontinuity"
 msgstr "Strømhældningsdiskontinuitet"
 
-#: resources/xnec2c.glade:2112
+#: resources/xnec2c.glade:1054
 msgid "Voltage Source"
 msgstr "Spændingskilde"
 
-#: resources/xnec2c.glade:2134
+#: resources/xnec2c.glade:1076
 msgid "Excitation Type"
 msgstr "Excitationstype"
 
-#: resources/xnec2c.glade:2159
+#: resources/xnec2c.glade:1101
 msgid "Maximum Admittance Matrix Asymmetry"
 msgstr "Maksimal admittansmatrix-asymmetri"
 
-#: resources/xnec2c.glade:2175
+#: resources/xnec2c.glade:1117
 msgid "Impedance of Source Segment"
 msgstr "Impedans for kildesegment"
 
-#: resources/xnec2c.glade:2197
+#: resources/xnec2c.glade:1139
 msgid "Print Control"
 msgstr "Udskriftskontrol"
 
-#: resources/xnec2c.glade:2240 src/cmnd_edit.c:489
+#: resources/xnec2c.glade:1182 src/cmnd_edit.c:489
 msgid "Segment Number"
 msgstr "Segmentnummer"
 
-#: resources/xnec2c.glade:2289
+#: resources/xnec2c.glade:1231
 msgid "Voltage - Real Part"
 msgstr "Spænding - realdel"
 
-#: resources/xnec2c.glade:2302
+#: resources/xnec2c.glade:1244
 msgid "Voltage - Imaginary Part"
 msgstr "Spænding - imaginærdel"
 
-#: resources/xnec2c.glade:2315
+#: resources/xnec2c.glade:1257
 msgid "Eta"
 msgstr "Eta"
 
-#: resources/xnec2c.glade:2385
+#: resources/xnec2c.glade:1327
 msgid "Theta"
 msgstr "Theta"
 
-#: resources/xnec2c.glade:2398
+#: resources/xnec2c.glade:1340
 msgid "Phi"
 msgstr "Phi"
 
-#: resources/xnec2c.glade:2411
+#: resources/xnec2c.glade:1353
 msgid "Ratio"
 msgstr "Forhold"
 
-#: resources/xnec2c.glade:2492
+#: resources/xnec2c.glade:1434
 msgid "Excitation Parameters"
 msgstr "Excitationsparametre"
 
-#: resources/xnec2c.glade:2619
+#: resources/xnec2c.glade:1561
 msgid "Execute Command (XQ Card)"
 msgstr "Udførelseskommando (XQ-kort)"
 
-#: resources/xnec2c.glade:2646
+#: resources/xnec2c.glade:1588
 msgid "No Pattern Cuts"
 msgstr "Ingen diagramsnit"
 
-#: resources/xnec2c.glade:2662
+#: resources/xnec2c.glade:1604
 msgid "Pattern in XZ Plane"
 msgstr "Diagram i XZ-plan"
 
-#: resources/xnec2c.glade:2678
+#: resources/xnec2c.glade:1620
 msgid "Pattern in YZ Plane"
 msgstr "Diagram i YZ-plan"
 
-#: resources/xnec2c.glade:2694
+#: resources/xnec2c.glade:1636
 msgid "Both XZ/YZ Patterns"
 msgstr "Begge XZ/YZ-diagrammer"
 
-#: resources/xnec2c.glade:2716
+#: resources/xnec2c.glade:1658
 msgid "Execute Command"
 msgstr "Udførelseskommando"
 
-#: resources/xnec2c.glade:2947
+#: resources/xnec2c.glade:1889
 msgid "Frequency Command (FR Card)"
 msgstr "Frekvenskommando (FR-kort)"
 
-#: resources/xnec2c.glade:2972
+#: resources/xnec2c.glade:1914
 msgid "Additive Stepping"
 msgstr "Additiv trinvis ændring"
 
-#: resources/xnec2c.glade:2989
+#: resources/xnec2c.glade:1931
 msgid "Multiplicative Stepping"
 msgstr "Multiplikativ trinvis ændring"
 
-#: resources/xnec2c.glade:3012
+#: resources/xnec2c.glade:1954
 msgid "Frequency Stepping"
 msgstr "Frekvenstrinsændring"
 
-#: resources/xnec2c.glade:3042
+#: resources/xnec2c.glade:1984
 msgid "No. Frequency Points"
 msgstr "Antal frekvenspunkter"
 
-#: resources/xnec2c.glade:3073
+#: resources/xnec2c.glade:2015
 msgid "Start Frequency (MHz)"
 msgstr "Startfrekvens (MHz)"
 
-#: resources/xnec2c.glade:3105
+#: resources/xnec2c.glade:2047
 msgid "Frequency Step (MHz)"
 msgstr "Frekvenstrin (MHz)"
 
-#: resources/xnec2c.glade:3138
+#: resources/xnec2c.glade:2080
 msgid "End Frequency (MHz)"
 msgstr "Slutfrekvens (MHz)"
 
-#: resources/xnec2c.glade:3174
+#: resources/xnec2c.glade:2116
 msgid "Frequency Stepping Parameters"
 msgstr "Frekvenstrinsparametre"
 
-#: resources/xnec2c.glade:3300
+#: resources/xnec2c.glade:2242
 msgid "Geometry End (GE Card)"
 msgstr "Geometri slut (GE-kort)"
 
-#: resources/xnec2c.glade:3325
+#: resources/xnec2c.glade:2267
 msgid "No Ground, Free Space condition"
 msgstr "Ingen jord, frit rum-betingelse"
 
-#: resources/xnec2c.glade:3342
+#: resources/xnec2c.glade:2284
 msgid "Ground present, Structure reflection"
 msgstr "Jord til stede, strukturrefleksion"
 
-#: resources/xnec2c.glade:3359
+#: resources/xnec2c.glade:2301
 msgid "Ground present, no Structure reflection"
 msgstr "Jord til stede, ingen strukturrefleksion"
 
-#: resources/xnec2c.glade:3382
+#: resources/xnec2c.glade:2324
 msgid "Ground Plane type"
 msgstr "Jordplantype"
 
-#: resources/xnec2c.glade:3516
+#: resources/xnec2c.glade:2458
 msgid "Ground Parameters (GD Card)"
 msgstr "Jordparametre (GD-kort)"
 
-#: resources/xnec2c.glade:3545 resources/xnec2c.glade:4014
-#: resources/xnec2c.glade:4100
+#: resources/xnec2c.glade:2487 resources/xnec2c.glade:2956
+#: resources/xnec2c.glade:3042
 msgid "Relative Dielectric Const."
 msgstr "Relativ dielektrisk konst."
 
-#: resources/xnec2c.glade:3577 resources/xnec2c.glade:4133
+#: resources/xnec2c.glade:2519 resources/xnec2c.glade:3075
 msgid "Distance to 2nd Medium"
 msgstr "Afstand til 2. medie"
 
-#: resources/xnec2c.glade:3609 resources/xnec2c.glade:4046
-#: resources/xnec2c.glade:4165
+#: resources/xnec2c.glade:2551 resources/xnec2c.glade:2988
+#: resources/xnec2c.glade:3107
 msgid "Ground Conductivity S/m"
 msgstr "Jordledningsevne S/m"
 
-#: resources/xnec2c.glade:3641 resources/xnec2c.glade:4197
+#: resources/xnec2c.glade:2583 resources/xnec2c.glade:3139
 msgid "Dist. below 1st Medium"
 msgstr "Afst. under 1. medie"
 
-#: resources/xnec2c.glade:3677 resources/xnec2c.glade:4233
+#: resources/xnec2c.glade:2619 resources/xnec2c.glade:3175
 msgid "2nd Medium Parameters"
 msgstr "2. medie-parametre"
 
-#: resources/xnec2c.glade:3858
+#: resources/xnec2c.glade:2800
 msgid "Ground Parameters (GN & GD Cards)"
 msgstr "Jordparametre (GN- og GD-kort)"
 
-#: resources/xnec2c.glade:3885
+#: resources/xnec2c.glade:2827
 msgid "Perfect Ground"
 msgstr "Perfekt jord"
 
-#: resources/xnec2c.glade:3901
+#: resources/xnec2c.glade:2843
 msgid "Sommerfeld/Norton"
 msgstr "Sommerfeld/Norton"
 
-#: resources/xnec2c.glade:3917
+#: resources/xnec2c.glade:2859
 msgid "Radial Ground Screen"
 msgstr "Radial jordskærm"
 
-#: resources/xnec2c.glade:3932
+#: resources/xnec2c.glade:2874
 msgid "Reflection Coeff. Approx"
 msgstr "Refleksionskoeff. approks."
 
-#: resources/xnec2c.glade:3948
+#: resources/xnec2c.glade:2890
 msgid "Nullify Previous Params"
 msgstr "Nulstil tidligere param."
 
-#: resources/xnec2c.glade:3964
+#: resources/xnec2c.glade:2906
 msgid "Second Medium (Cliff)"
 msgstr "Andet medie (skrænt)"
 
-#: resources/xnec2c.glade:3985
+#: resources/xnec2c.glade:2927
 msgid "Ground Type"
 msgstr "Jordtype"
 
-#: resources/xnec2c.glade:4113
+#: resources/xnec2c.glade:3055
 msgid "0.00000"
 msgstr "0,00000"
 
-#: resources/xnec2c.glade:4264
+#: resources/xnec2c.glade:3206
 msgid "Number of Radials"
 msgstr "Antal radialer"
 
-#: resources/xnec2c.glade:4277
+#: resources/xnec2c.glade:3219
 msgid "Radial Screen Radius"
 msgstr "Radialskærm-radius"
 
-#: resources/xnec2c.glade:4327
+#: resources/xnec2c.glade:3269
 msgid "Radial Wire Diameter"
 msgstr "Radialtråd-diameter"
 
-#: resources/xnec2c.glade:4363
+#: resources/xnec2c.glade:3305
 msgid "Radial Screen Parameters"
 msgstr "Radialskærm-parametre"
 
-#: resources/xnec2c.glade:4563
+#: resources/xnec2c.glade:3505
 msgid "Helical Element (GA card)"
 msgstr "Spiralelement (GA card)"
 
-#: resources/xnec2c.glade:4588
+#: resources/xnec2c.glade:3530
 msgid "Right Hand Helix"
 msgstr "Højrehånds helix"
 
-#: resources/xnec2c.glade:4604
+#: resources/xnec2c.glade:3546
 msgid "Left Hand Helix"
 msgstr "Venstrehånds helix"
 
-#: resources/xnec2c.glade:4620
+#: resources/xnec2c.glade:3562
 msgid "Right Hand Spiral"
 msgstr "Højrehånds spiral"
 
-#: resources/xnec2c.glade:4636
+#: resources/xnec2c.glade:3578
 msgid "Left Hand Spiral"
 msgstr "Venstrehånds spiral"
 
-#: resources/xnec2c.glade:4667
+#: resources/xnec2c.glade:3609
 msgid "Segments/Turn"
 msgstr "Segmenter/omgang"
 
-#: resources/xnec2c.glade:4706
+#: resources/xnec2c.glade:3648
 msgid "0.0100"
 msgstr "0,0100"
 
-#: resources/xnec2c.glade:4727
+#: resources/xnec2c.glade:3669
 msgid "5.00"
 msgstr "5,00"
 
-#: resources/xnec2c.glade:4768 resources/xnec2c.glade:12761
-#: resources/xnec2c.glade:13979
+#: resources/xnec2c.glade:3710 resources/xnec2c.glade:11703
+#: resources/xnec2c.glade:12921
 msgid "1"
 msgstr "1"
 
-#: resources/xnec2c.glade:4788
+#: resources/xnec2c.glade:3730
 msgid "Number of Turns"
 msgstr "Antal omgange"
 
-#: resources/xnec2c.glade:4801
+#: resources/xnec2c.glade:3743
 msgid "8.0000"
 msgstr "8,0000"
 
-#: resources/xnec2c.glade:4822
+#: resources/xnec2c.glade:3764
 msgid "Helix Length (HL)"
 msgstr "Helix-længde (HL)"
 
-#: resources/xnec2c.glade:4835
+#: resources/xnec2c.glade:3777
 msgid "5.0000"
 msgstr "5,0000"
 
-#: resources/xnec2c.glade:4856
+#: resources/xnec2c.glade:3798
 msgid "Turns Spacing"
 msgstr "Omgangsafstand"
 
-#: resources/xnec2c.glade:4869 resources/xnec2c.glade:4981
-#: resources/xnec2c.glade:5034 resources/xnec2c.glade:5087
-#: resources/xnec2c.glade:5135
+#: resources/xnec2c.glade:3811 resources/xnec2c.glade:3923
+#: resources/xnec2c.glade:3976 resources/xnec2c.glade:4029
+#: resources/xnec2c.glade:4077
 msgid "1.0000"
 msgstr "1,0000"
 
-#: resources/xnec2c.glade:4903
+#: resources/xnec2c.glade:3845
 msgid "0.0000"
 msgstr "0,0000"
 
-#: resources/xnec2c.glade:4923
+#: resources/xnec2c.glade:3865
 msgid "Radius in X (A1)"
 msgstr "Radius i X (A1)"
 
-#: resources/xnec2c.glade:4936
+#: resources/xnec2c.glade:3878
 msgid "Radius in Y (B1)"
 msgstr "Radius i Y (B1)"
 
-#: resources/xnec2c.glade:4949
+#: resources/xnec2c.glade:3891
 msgid "Radius in X (A2)"
 msgstr "Radius i X (A2)"
 
-#: resources/xnec2c.glade:4962
+#: resources/xnec2c.glade:3904
 msgid "Radius in Y (B2)"
 msgstr "Radius i Y (B2)"
 
-#: resources/xnec2c.glade:5160
+#: resources/xnec2c.glade:4102
 msgid "GH Card"
 msgstr "GH-kort"
 
-#: resources/xnec2c.glade:5297 resources/xnec2c.glade:16536
+#: resources/xnec2c.glade:4239 resources/xnec2c.glade:15478
 msgid "Interaction Approx Range (KH Card)"
 msgstr "Interaktionsapproks.-område (KH-kort)"
 
-#: resources/xnec2c.glade:5324
+#: resources/xnec2c.glade:4266
 msgid "Approximation Range (W/lengths)"
 msgstr "Approksimationsområde (bølgelængder)"
 
-#: resources/xnec2c.glade:5362
+#: resources/xnec2c.glade:4304
 msgid "Interaction Approximation Range"
 msgstr "Interaktionsapproksimationsområde"
 
-#: resources/xnec2c.glade:5488
+#: resources/xnec2c.glade:4430
 msgid "Thin Wire Kernel (EK Card)"
 msgstr "Tyndtrådskerne (EK-kort)"
 
-#: resources/xnec2c.glade:5506
+#: resources/xnec2c.glade:4448
 msgid "Extended Thin Wire Kernel"
 msgstr "Udvidet tyndtrådskerne"
 
-#: resources/xnec2c.glade:5523
+#: resources/xnec2c.glade:4465
 msgid "Thin Wire Kernel"
 msgstr "Tyndtrådskerne"
 
-#: resources/xnec2c.glade:5686
+#: resources/xnec2c.glade:4628
 msgid "Loading Command (LD Card)"
 msgstr "Belastningskommando (LD-kort)"
 
-#: resources/xnec2c.glade:5712
+#: resources/xnec2c.glade:4654
 msgid "Short all Loads (Nulls previous Loading Cards)"
 msgstr "Kortslut alle belastninger (nulstiller tidligere belastningskort)"
 
-#: resources/xnec2c.glade:5729
+#: resources/xnec2c.glade:4671
 msgid "Series, Lumped"
 msgstr "Serie, diskret"
 
-#: resources/xnec2c.glade:5745
+#: resources/xnec2c.glade:4687
 msgid "Parallel, Distributed"
 msgstr "Parallel, fordelt"
 
-#: resources/xnec2c.glade:5761
+#: resources/xnec2c.glade:4703
 msgid "Parallel, Lumped"
 msgstr "Parallel, diskret"
 
-#: resources/xnec2c.glade:5777
+#: resources/xnec2c.glade:4719
 msgid "Resistance & Reactance"
 msgstr "Resistans & reaktans"
 
-#: resources/xnec2c.glade:5793
+#: resources/xnec2c.glade:4735
 msgid "Series, Distributed"
 msgstr "Serie, fordelt"
 
-#: resources/xnec2c.glade:5809
+#: resources/xnec2c.glade:4751
 msgid "Wire Conductivity"
 msgstr "Trådledningsevne"
 
-#: resources/xnec2c.glade:5831
+#: resources/xnec2c.glade:4773
 msgid "Loading Type"
 msgstr "Belastningstype"
 
-#: resources/xnec2c.glade:5861
+#: resources/xnec2c.glade:4803
 msgid "Load Tag Number"
 msgstr "Belastningstagnummer"
 
-#: resources/xnec2c.glade:5892
+#: resources/xnec2c.glade:4834
 msgid "Resistance"
 msgstr "Resistans"
 
-#: resources/xnec2c.glade:5924
+#: resources/xnec2c.glade:4866
 msgid "From Segment #"
 msgstr "Fra segment nr."
 
-#: resources/xnec2c.glade:5955
+#: resources/xnec2c.glade:4897
 msgid "Inductance"
 msgstr "Induktans"
 
-#: resources/xnec2c.glade:5987
+#: resources/xnec2c.glade:4929
 msgid "To Segment #"
 msgstr "Til segment nr."
 
-#: resources/xnec2c.glade:6018
+#: resources/xnec2c.glade:4960
 msgid "Capacitance"
 msgstr "Kapacitans"
 
-#: resources/xnec2c.glade:6054
+#: resources/xnec2c.glade:4996
 msgid "Loading Parameters"
 msgstr "Belastningsparametre"
 
-#: resources/xnec2c.glade:6269
+#: resources/xnec2c.glade:5211
 msgid "Near Fields Command (NE/NH Cards)"
 msgstr "Nærfeltskommando (NE/NH-kort)"
 
-#: resources/xnec2c.glade:6296
+#: resources/xnec2c.glade:5238
 msgid "Near Electric Field"
 msgstr "Nært elektrisk felt"
 
-#: resources/xnec2c.glade:6312
+#: resources/xnec2c.glade:5254
 msgid "Rectangular Co-ordinates"
 msgstr "Rektangulære koordinater"
 
-#: resources/xnec2c.glade:6328
+#: resources/xnec2c.glade:5270
 msgid "Near Magnetic Field"
 msgstr "Nært magnetisk felt"
 
-#: resources/xnec2c.glade:6343
+#: resources/xnec2c.glade:5285
 msgid "Spherical Co-ordinates"
 msgstr "Sfæriske koordinater"
 
-#: resources/xnec2c.glade:6371
+#: resources/xnec2c.glade:5313
 msgid "Field Type & Co-ordinates"
 msgstr "Felttype og koordinater"
 
-#: resources/xnec2c.glade:6401
+#: resources/xnec2c.glade:5343
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:6432 resources/xnec2c.glade:12312
-#: resources/xnec2c.glade:13515
+#: resources/xnec2c.glade:5374 resources/xnec2c.glade:11254
+#: resources/xnec2c.glade:12457
 msgid "X"
 msgstr "X"
 
-#: resources/xnec2c.glade:6464
+#: resources/xnec2c.glade:5406
 msgid "DX"
 msgstr "DX"
 
-#: resources/xnec2c.glade:6496
+#: resources/xnec2c.glade:5438
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:6527 resources/xnec2c.glade:12327
-#: resources/xnec2c.glade:13530
+#: resources/xnec2c.glade:5469 resources/xnec2c.glade:11269
+#: resources/xnec2c.glade:12472
 msgid "Y"
 msgstr "Y"
 
-#: resources/xnec2c.glade:6559
+#: resources/xnec2c.glade:5501
 msgid "DY"
 msgstr "DY"
 
-#: resources/xnec2c.glade:6591
+#: resources/xnec2c.glade:5533
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:6622 resources/xnec2c.glade:12342
-#: resources/xnec2c.glade:13545
+#: resources/xnec2c.glade:5564 resources/xnec2c.glade:11284
+#: resources/xnec2c.glade:12487
 msgid "Z"
 msgstr "Z"
 
-#: resources/xnec2c.glade:6654
+#: resources/xnec2c.glade:5596
 msgid "DZ"
 msgstr "DZ"
 
-#: resources/xnec2c.glade:6690
+#: resources/xnec2c.glade:5632
 msgid "Field Pattern Parameters"
 msgstr "Feltdiagramparametre"
 
-#: resources/xnec2c.glade:6817
+#: resources/xnec2c.glade:5759
 msgid "Xnec2c: NEC2 Input File Editor"
 msgstr "Xnec2c: NEC2-inputfileditor"
 
-#: resources/xnec2c.glade:6904
+#: resources/xnec2c.glade:5846
 msgid "Manage Cards"
 msgstr "Administrer kort"
 
-#: resources/xnec2c.glade:7001
+#: resources/xnec2c.glade:5943
 msgid "File Save"
 msgstr "Gem fil"
 
-#: resources/xnec2c.glade:7061 src/nec2_model.c:278
+#: resources/xnec2c.glade:6003 src/nec2_model.c:278
 msgid "Comments"
 msgstr "Kommentarer"
 
-#: resources/xnec2c.glade:7088
+#: resources/xnec2c.glade:6030
 msgid "Wire"
 msgstr "Tråd"
 
-#: resources/xnec2c.glade:7102
+#: resources/xnec2c.glade:6044
 msgid "Arc"
 msgstr "Bue"
 
-#: resources/xnec2c.glade:7116
+#: resources/xnec2c.glade:6058
 msgid "Helix"
 msgstr "Helix"
 
-#: resources/xnec2c.glade:7130
+#: resources/xnec2c.glade:6072
 msgid "Patch"
 msgstr "Patch"
 
-#: resources/xnec2c.glade:7144
+#: resources/xnec2c.glade:6086
 msgid "Cylinder"
 msgstr "Cylinder"
 
-#: resources/xnec2c.glade:7158
+#: resources/xnec2c.glade:6100
 msgid "Move"
 msgstr "Flyt"
 
-#: resources/xnec2c.glade:7172
+#: resources/xnec2c.glade:6114
 msgid "Reflect"
 msgstr "Spejl"
 
-#: resources/xnec2c.glade:7186
+#: resources/xnec2c.glade:6128
 msgid "Scale"
 msgstr "Skalér"
 
-#: resources/xnec2c.glade:7200 resources/xnec2c.glade:7484
+#: resources/xnec2c.glade:6142 resources/xnec2c.glade:6426
 msgid "Add Var (SY)"
 msgstr "Tilføj var. (SY)"
 
-#: resources/xnec2c.glade:7220
+#: resources/xnec2c.glade:6162
 msgid "Edit Geometry Data"
 msgstr "Rediger geometridata"
 
-#: resources/xnec2c.glade:7274
+#: resources/xnec2c.glade:6216
 msgid "Geometry"
 msgstr "Geometri"
 
-#: resources/xnec2c.glade:7301
+#: resources/xnec2c.glade:6243
 msgid "Excitation"
 msgstr "Excitation"
 
-#: resources/xnec2c.glade:7315
+#: resources/xnec2c.glade:6257
 msgid "Radiation"
 msgstr "Stråling"
 
-#: resources/xnec2c.glade:7329
+#: resources/xnec2c.glade:6271
 msgid "Frequency"
 msgstr "Frekvens"
 
-#: resources/xnec2c.glade:7343
+#: resources/xnec2c.glade:6285
 msgid "Near Fields"
 msgstr "Nærfelter"
 
-#: resources/xnec2c.glade:7357
+#: resources/xnec2c.glade:6299
 msgid "Ground (GN)"
 msgstr "Jord (GN)"
 
-#: resources/xnec2c.glade:7371
+#: resources/xnec2c.glade:6313
 msgid "Ground (GD)"
 msgstr "Jord (GD)"
 
-#: resources/xnec2c.glade:7385
+#: resources/xnec2c.glade:6327
 msgid "Loading"
 msgstr "Belastning"
 
-#: resources/xnec2c.glade:7399
+#: resources/xnec2c.glade:6341
 msgid "Kernel"
 msgstr "Kerne"
 
-#: resources/xnec2c.glade:7413
+#: resources/xnec2c.glade:6355
 msgid "Network"
 msgstr "Netværk"
 
-#: resources/xnec2c.glade:7427
+#: resources/xnec2c.glade:6369
 msgid "Interaction"
 msgstr "Interaktion"
 
-#: resources/xnec2c.glade:7441
+#: resources/xnec2c.glade:6383
 msgid "Transm. Line"
 msgstr "Transm.linje"
 
-#: resources/xnec2c.glade:7456
+#: resources/xnec2c.glade:6398
 msgid "Execute"
 msgstr "Udfør"
 
-#: resources/xnec2c.glade:7470
+#: resources/xnec2c.glade:6412
 msgid "Zo"
 msgstr "Zo"
 
-#: resources/xnec2c.glade:7504
+#: resources/xnec2c.glade:6446
 msgid "Edit Control Commands"
 msgstr "Rediger kontrolkommandoer"
 
-#: resources/xnec2c.glade:7558
+#: resources/xnec2c.glade:6500
 msgid "Commands"
 msgstr "Kommandoer"
 
-#: resources/xnec2c.glade:7577
+#: resources/xnec2c.glade:6519
 msgid "Unsaved Data"
 msgstr "Ikke-gemte data"
 
-#: resources/xnec2c.glade:7653
+#: resources/xnec2c.glade:6595
 msgid ""
 "Unsaved data in NEC2 Editor.\n"
 "Save NEC2 Editor data first?\n"
@@ -1186,637 +1414,641 @@ msgstr ""
 "Ikke-gemte data i NEC2-editor.\n"
 "Gem NEC2-editordata først?\n"
 
-#: resources/xnec2c.glade:7752
+#: resources/xnec2c.glade:6694
 msgid "Network Command (NT Card)"
 msgstr "Netværkskommando (NT-kort)"
 
-#: resources/xnec2c.glade:7781
+#: resources/xnec2c.glade:6723
 msgid "Tag Number, Port 1  "
 msgstr "Tag-nummer, port 1  "
 
-#: resources/xnec2c.glade:7812
+#: resources/xnec2c.glade:6754
 msgid "Tag Number, Port 2  "
 msgstr "Tag-nummer, port 2  "
 
-#: resources/xnec2c.glade:7843
+#: resources/xnec2c.glade:6785
 msgid "Segment Num, Port 1"
 msgstr "Segmentnr., port 1"
 
-#: resources/xnec2c.glade:7874
+#: resources/xnec2c.glade:6816
 msgid "Segment Num, Port 2"
 msgstr "Segmentnr., port 2"
 
-#: resources/xnec2c.glade:7909 resources/xnec2c.glade:15322
+#: resources/xnec2c.glade:6851 resources/xnec2c.glade:14264
 msgid "Segment Identity"
 msgstr "Segmentidentitet"
 
-#: resources/xnec2c.glade:7939
+#: resources/xnec2c.glade:6881
 msgid "Element 1,1 Real Part"
 msgstr "Element 1,1 realdel"
 
-#: resources/xnec2c.glade:7971
+#: resources/xnec2c.glade:6913
 msgid "Element 1,2 Real Part"
 msgstr "Element 1,2 realdel"
 
-#: resources/xnec2c.glade:8003
+#: resources/xnec2c.glade:6945
 msgid "Element 2,2 Real Part"
 msgstr "Element 2,2 realdel"
 
-#: resources/xnec2c.glade:8035
+#: resources/xnec2c.glade:6977
 msgid "Element 1,1 Imag Part"
 msgstr "Element 1,1 imaginærdel"
 
-#: resources/xnec2c.glade:8067
+#: resources/xnec2c.glade:7009
 msgid "Element 1,2 Imag Part"
 msgstr "Element 1,2 imaginærdel"
 
-#: resources/xnec2c.glade:8099
+#: resources/xnec2c.glade:7041
 msgid "Element 2,2 Imag Part"
 msgstr "Element 2,2 imaginærdel"
 
-#: resources/xnec2c.glade:8135
+#: resources/xnec2c.glade:7077
 msgid "Admittance Matrix Elements"
 msgstr "Admittansmatrixelementer"
 
-#: resources/xnec2c.glade:8350
+#: resources/xnec2c.glade:7292
 msgid "Patch Element (SP & SC Cards)"
 msgstr "Patch-element (SP- og SC-kort)"
 
-#: resources/xnec2c.glade:8374
+#: resources/xnec2c.glade:7316
 msgid "Arbitrary"
 msgstr "Vilkårlig"
 
-#: resources/xnec2c.glade:8391
+#: resources/xnec2c.glade:7333
 msgid "Rectangle"
 msgstr "Rektangel"
 
-#: resources/xnec2c.glade:8408
+#: resources/xnec2c.glade:7350
 msgid "Triangle"
 msgstr "Trekant"
 
-#: resources/xnec2c.glade:8425
+#: resources/xnec2c.glade:7367
 msgid "Quadrilateral"
 msgstr "Firkant"
 
-#: resources/xnec2c.glade:8442
+#: resources/xnec2c.glade:7384
 msgid "Surface"
 msgstr "Overflade"
 
-#: resources/xnec2c.glade:8465
+#: resources/xnec2c.glade:7407
 msgid "Patch Type"
 msgstr "Patch-type"
 
-#: resources/xnec2c.glade:8495
+#: resources/xnec2c.glade:7437
 msgid "Corners 1-2 sub-division (NX)"
 msgstr "Hjørner 1-2 underopdeling (NX)"
 
-#: resources/xnec2c.glade:8526
+#: resources/xnec2c.glade:7468
 msgid "Corners 2-3 sub-division (NY)"
 msgstr "Hjørner 2-3 underopdeling (NY)"
 
-#: resources/xnec2c.glade:8561
+#: resources/xnec2c.glade:7503
 msgid "Surface Sub-division"
 msgstr "Overfladeopdeling"
 
-#: resources/xnec2c.glade:8591 src/geom_edit.c:1157
+#: resources/xnec2c.glade:7533 src/geom_edit.c:1157
 msgid "Center - X"
 msgstr "Center - X"
 
-#: resources/xnec2c.glade:8623 src/geom_edit.c:1163
+#: resources/xnec2c.glade:7565 src/geom_edit.c:1163
 msgid "Normal - Elev."
 msgstr "Normal - Elev."
 
-#: resources/xnec2c.glade:8655 src/geom_edit.c:1159
+#: resources/xnec2c.glade:7597 src/geom_edit.c:1159
 msgid "Center - Y"
 msgstr "Center - Y"
 
-#: resources/xnec2c.glade:8687 src/geom_edit.c:1165
+#: resources/xnec2c.glade:7629 src/geom_edit.c:1165
 msgid "Normal - Azim."
 msgstr "Normal - Azim."
 
-#: resources/xnec2c.glade:8719 src/geom_edit.c:1161
+#: resources/xnec2c.glade:7661 src/geom_edit.c:1161
 msgid "Center - Z"
 msgstr "Center - Z"
 
-#: resources/xnec2c.glade:8751 src/geom_edit.c:1167
+#: resources/xnec2c.glade:7693 src/geom_edit.c:1167
 msgid "Patch Area"
 msgstr "Patch-areal"
 
-#: resources/xnec2c.glade:8787
+#: resources/xnec2c.glade:7729
 msgid "SP/SM Cards"
 msgstr "SP/SM-kort"
 
-#: resources/xnec2c.glade:8823
+#: resources/xnec2c.glade:7765
 msgid "Corner 3 - X"
 msgstr "Hjørne 3 - X"
 
-#: resources/xnec2c.glade:8855
+#: resources/xnec2c.glade:7797
 msgid "Corner 3 - Y"
 msgstr "Hjørne 3 - Y"
 
-#: resources/xnec2c.glade:8887
+#: resources/xnec2c.glade:7829
 msgid "Corner 3 - Z"
 msgstr "Hjørne 3 - Z"
 
-#: resources/xnec2c.glade:8935
+#: resources/xnec2c.glade:7877
 msgid "Corner 4 - X"
 msgstr "Hjørne 4 - X"
 
-#: resources/xnec2c.glade:8967
+#: resources/xnec2c.glade:7909
 msgid "Corner 4 - Y"
 msgstr "Hjørne 4 - Y"
 
-#: resources/xnec2c.glade:8999
+#: resources/xnec2c.glade:7941
 msgid "Corner 4 - Z"
 msgstr "Hjørne 4 - Z"
 
-#: resources/xnec2c.glade:9042
+#: resources/xnec2c.glade:7984
 msgid "SC Card"
 msgstr "SC-kort"
 
-#: resources/xnec2c.glade:9258
+#: resources/xnec2c.glade:8200
 msgid "Quit xnec2c?"
 msgstr "Afslut xnec2c?"
 
-#: resources/xnec2c.glade:9337
+#: resources/xnec2c.glade:8279
 msgid "Radiation Pattern (RP Card)"
 msgstr "Strålingsdiagram (RP-kort)"
 
-#: resources/xnec2c.glade:9364
+#: resources/xnec2c.glade:8306
 msgid "Normal (Space) Wave"
 msgstr "Normal (rum) bølge"
 
-#: resources/xnec2c.glade:9380
+#: resources/xnec2c.glade:8322
 msgid "Space + Ground Wave"
 msgstr "Rum- + jordbølge"
 
-#: resources/xnec2c.glade:9396
+#: resources/xnec2c.glade:8338
 msgid "Linear Cliff"
 msgstr "Lineær skrænt"
 
-#: resources/xnec2c.glade:9412
+#: resources/xnec2c.glade:8354
 msgid "Radial wire screen"
 msgstr "Radial trådskærm"
 
-#: resources/xnec2c.glade:9428
+#: resources/xnec2c.glade:8370
 msgid "Circular Cliff + Radials"
 msgstr "Cirkulær skrænt + radialer"
 
-#: resources/xnec2c.glade:9444
+#: resources/xnec2c.glade:8386
 msgid "Circular Cliff"
 msgstr "Cirkulær skrænt"
 
-#: resources/xnec2c.glade:9460
+#: resources/xnec2c.glade:8402
 msgid "Linear Cliff + Radials"
 msgstr "Lineær skrænt + radialer"
 
-#: resources/xnec2c.glade:9478
+#: resources/xnec2c.glade:8420
 msgid "<b>See GN/GD Card Documentation</b>"
 msgstr "<b>Se GN/GD-kortdokumentation</b>"
 
-#: resources/xnec2c.glade:9496
+#: resources/xnec2c.glade:8438
 msgid "Wave Type and Ground (I1)"
 msgstr "Bølgetype og jord (I1)"
 
-#: resources/xnec2c.glade:9524
+#: resources/xnec2c.glade:8466
 msgid "Major & Minor Axis & Total Gain"
 msgstr "Hoved- og biakse og totalforstærkning"
 
-#: resources/xnec2c.glade:9540
+#: resources/xnec2c.glade:8482
 msgid "Vertical, Horizontal & Total Gain"
 msgstr "Vertikal, horisontal og totalforstærkning"
 
-#: resources/xnec2c.glade:9556
+#: resources/xnec2c.glade:8498
 msgid "Major Axis Gain Normalized"
 msgstr "Hovedakseforstærkning normaliseret"
 
-#: resources/xnec2c.glade:9572
+#: resources/xnec2c.glade:8514
 msgid "Vertical Axis Gain Normalized"
 msgstr "Vertikalakseforstærkning normaliseret"
 
-#: resources/xnec2c.glade:9588
+#: resources/xnec2c.glade:8530
 msgid "Total Gain Normalized"
 msgstr "Totalforstærkning normaliseret"
 
-#: resources/xnec2c.glade:9604
+#: resources/xnec2c.glade:8546
 msgid "Print/Normalize Directive Gain"
 msgstr "Udskriv/normaliser retningsforstærkning"
 
-#: resources/xnec2c.glade:9620
+#: resources/xnec2c.glade:8562
 msgid "No Normalized Gain"
 msgstr "Ingen normaliseret forstærkning"
 
-#: resources/xnec2c.glade:9636
+#: resources/xnec2c.glade:8578
 msgid "Minor Axis Gain Normalized"
 msgstr "Biakseforstærkning normaliseret"
 
-#: resources/xnec2c.glade:9652
+#: resources/xnec2c.glade:8594
 msgid "Horizontal Axis Gain Normalized"
 msgstr "Horisontalakseforstærkning normaliseret"
 
-#: resources/xnec2c.glade:9668
+#: resources/xnec2c.glade:8610
 msgid "Print/Normalize Power Gain"
 msgstr "Udskriv/normaliser effektforstærkning"
 
-#: resources/xnec2c.glade:9684
+#: resources/xnec2c.glade:8626
 msgid "No Gain Averaging"
 msgstr "Ingen forstærkningsgennemsnit"
 
-#: resources/xnec2c.glade:9700
+#: resources/xnec2c.glade:8642
 msgid "Points in Average Not Printed"
 msgstr "Punkter i gennemsnit ikke udskrevet"
 
-#: resources/xnec2c.glade:9716
+#: resources/xnec2c.glade:8658
 msgid "Average Gain Computed"
 msgstr "Gennemsnitlig forstærkning beregnet"
 
-#: resources/xnec2c.glade:9734
+#: resources/xnec2c.glade:8676
 msgid "<b>See RP Card Documentation</b>"
 msgstr "<b>Se RP-kort dokumentation</b>"
 
-#: resources/xnec2c.glade:9752
+#: resources/xnec2c.glade:8694
 msgid "Data Output Control (XNDA)"
 msgstr "Dataudgangskontrol (XNDA)"
 
-#: resources/xnec2c.glade:9782
+#: resources/xnec2c.glade:8724
 msgid "Points in Theta"
 msgstr "Punkter i Theta"
 
-#: resources/xnec2c.glade:9796 src/cmnd_edit.c:1763
+#: resources/xnec2c.glade:8738 src/cmnd_edit.c:1763
 msgid "Initial Theta (deg)"
 msgstr "Start-Theta (deg)"
 
-#: resources/xnec2c.glade:9809 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
+#: resources/xnec2c.glade:8751 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
 msgid "Increment in Theta"
 msgstr "Forøgelse i Theta"
 
-#: resources/xnec2c.glade:9878 src/cmnd_edit.c:1762
+#: resources/xnec2c.glade:8820 src/cmnd_edit.c:1762
 msgid "Points in Phi"
 msgstr "Punkter i Phi"
 
-#: resources/xnec2c.glade:9891
+#: resources/xnec2c.glade:8833
 msgid "Initial Phi (deg)"
 msgstr "Start-Phi (deg)"
 
-#: resources/xnec2c.glade:9904 src/cmnd_edit.c:2708
+#: resources/xnec2c.glade:8846 src/cmnd_edit.c:2708
 msgid "Increment in Phi"
 msgstr "Forøgelse i Phi"
 
-#: resources/xnec2c.glade:9973
+#: resources/xnec2c.glade:8915
 msgid "Field Point Distance"
 msgstr "Feltpunktsafstand"
 
-#: resources/xnec2c.glade:10005
+#: resources/xnec2c.glade:8947
 msgid "Gain Normalization"
 msgstr "Forstærkningsnormalisering"
 
-#: resources/xnec2c.glade:10047
+#: resources/xnec2c.glade:8989
 msgid "Radiation Pattern Parameters"
 msgstr "Strålingsdiagramparametre"
 
-#: resources/xnec2c.glade:10214
+#: resources/xnec2c.glade:9156
 msgid "Reflect Structure (GX card)"
 msgstr "Spejl struktur (GX-kort)"
 
-#: resources/xnec2c.glade:10242
+#: resources/xnec2c.glade:9184
 msgid "Reflect in YZ plane"
 msgstr "Spejl i YZ-plan"
 
-#: resources/xnec2c.glade:10257
+#: resources/xnec2c.glade:9199
 msgid "Reflect in XY plane"
 msgstr "Spejl i XY-plan"
 
-#: resources/xnec2c.glade:10272
+#: resources/xnec2c.glade:9214
 msgid "Reflect in XZ plane"
 msgstr "Spejl i XZ-plan"
 
-#: resources/xnec2c.glade:10328
+#: resources/xnec2c.glade:9270
 msgid "Reflect Options"
 msgstr "Spejlingsindstillinger"
 
-#: resources/xnec2c.glade:10459
+#: resources/xnec2c.glade:9401
 msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: Frekvensdata-plot"
 
-#: resources/xnec2c.glade:10484 resources/xnec2c.glade:11478
-#: resources/xnec2c.glade:13015
+#: resources/xnec2c.glade:9426 resources/xnec2c.glade:10420
+#: resources/xnec2c.glade:11957
 msgid "_File"
 msgstr "_Fil"
 
-#: resources/xnec2c.glade:10546 resources/xnec2c.glade:11540
-#: resources/xnec2c.glade:13077
+#: resources/xnec2c.glade:9488 resources/xnec2c.glade:10482
+#: resources/xnec2c.glade:12019
 msgid "Save as _gnuplot"
 msgstr "Gem som _gnuplot"
 
-#: resources/xnec2c.glade:10557 resources/xnec2c.glade:13087
+#: resources/xnec2c.glade:9499 resources/xnec2c.glade:12029
 msgid "Save as _CSV"
 msgstr "Gem som _CSV"
 
-#: resources/xnec2c.glade:10569
+#: resources/xnec2c.glade:9511
 msgid "Save as _Touchstone (.SnP)"
 msgstr "Gem som _Touchstone (.SnP)"
 
-#: resources/xnec2c.glade:10576
+#: resources/xnec2c.glade:9518
 msgid "Save as S_1P: Reflection Only"
 msgstr "Gem som S_1P: Kun refleksion"
 
-#: resources/xnec2c.glade:10586
+#: resources/xnec2c.glade:9528
 msgid "Save as S2P: _Max Gain (S21)"
 msgstr "Gem som S2P: _Maks. forstærkning (S21)"
 
-#: resources/xnec2c.glade:10596
+#: resources/xnec2c.glade:9538
 msgid "Save as S2P: _Viewer Gain (S21)"
 msgstr "Gem som S2P: _Visningsforstærkning (S21)"
 
-#: resources/xnec2c.glade:10633 resources/xnec2c.glade:11906
-#: resources/xnec2c.glade:13121
+#: resources/xnec2c.glade:9575 resources/xnec2c.glade:10848
+#: resources/xnec2c.glade:12063
 msgid "_View"
 msgstr "_Vis"
 
-#: resources/xnec2c.glade:10642 resources/xnec2c.glade:11934
-#: resources/xnec2c.glade:13129
+#: resources/xnec2c.glade:9584 resources/xnec2c.glade:10876
+#: resources/xnec2c.glade:12071
 msgid "_Polarization"
 msgstr "_Polarisering"
 
-#: resources/xnec2c.glade:10656 resources/xnec2c.glade:11948
-#: resources/xnec2c.glade:13143
+#: resources/xnec2c.glade:9598 resources/xnec2c.glade:10890
+#: resources/xnec2c.glade:12085
 msgid "_Total"
 msgstr "_Total"
 
-#: resources/xnec2c.glade:10667 resources/xnec2c.glade:11959
-#: resources/xnec2c.glade:13154
+#: resources/xnec2c.glade:9609 resources/xnec2c.glade:10901
+#: resources/xnec2c.glade:12096
 msgid "_Horizontal"
 msgstr "_Horisontal"
 
-#: resources/xnec2c.glade:10678 resources/xnec2c.glade:11970
-#: resources/xnec2c.glade:13165
+#: resources/xnec2c.glade:9620 resources/xnec2c.glade:10912
+#: resources/xnec2c.glade:12107
 msgid "_Vertical"
 msgstr "_Vertikal"
 
-#: resources/xnec2c.glade:10689 resources/xnec2c.glade:11981
-#: resources/xnec2c.glade:13176
+#: resources/xnec2c.glade:9631 resources/xnec2c.glade:10923
+#: resources/xnec2c.glade:12118
 msgid "_Right Hand"
 msgstr "_Højrehånds"
 
-#: resources/xnec2c.glade:10700 resources/xnec2c.glade:11992
-#: resources/xnec2c.glade:13187
+#: resources/xnec2c.glade:9642 resources/xnec2c.glade:10934
+#: resources/xnec2c.glade:12129
 msgid "_Left Hand"
 msgstr "_Venstrehånds"
 
-#: resources/xnec2c.glade:10715
+#: resources/xnec2c.glade:9657
 msgid "_Color Theme"
 msgstr "_Farvetema"
 
-#: resources/xnec2c.glade:10734
+#: resources/xnec2c.glade:9676
 msgid "_Net Gain"
 msgstr "_Nettoforstærkning"
 
-#: resources/xnec2c.glade:10743
+#: resources/xnec2c.glade:9685
 msgid "Show _Min/Max Values"
 msgstr "Vis _min./maks. værdier"
 
-#: resources/xnec2c.glade:10752
+#: resources/xnec2c.glade:9694
 msgid "Show _S11 (dB) Values"
 msgstr "Vis _S11 (dB) værdier"
 
-#: resources/xnec2c.glade:10761
+#: resources/xnec2c.glade:9703
 msgid "Clamp _VSWR Graph to 10"
 msgstr "Begræns _VSWR-graf til 10"
 
-#: resources/xnec2c.glade:10770
+#: resources/xnec2c.glade:9712
 msgid "Show Ta instead of TA"
 msgstr "Vis Ta i stedet for TA"
 
-#: resources/xnec2c.glade:10779
+#: resources/xnec2c.glade:9721
 msgid "Round _X Axis Frequency Values"
 msgstr "Afrund _X-akse frekvensværdier"
 
-#: resources/xnec2c.glade:10788
+#: resources/xnec2c.glade:9730
 msgid "S_wap Left/Right Click Frequency Selection"
 msgstr "_Byt venstre/højre-klik frekvensvalg"
 
-#: resources/xnec2c.glade:10812 resources/xnec2c.glade:10976
+#: resources/xnec2c.glade:9754 resources/xnec2c.glade:9918
 msgid "Max Gain"
 msgstr "Maks. forstærkning"
 
-#: resources/xnec2c.glade:10827
+#: resources/xnec2c.glade:9769
 msgid "Direction"
 msgstr "Retning"
 
-#: resources/xnec2c.glade:10842
+#: resources/xnec2c.glade:9784
 msgid "Viewer"
 msgstr "Visning"
 
-#: resources/xnec2c.glade:10857 resources/xnec2c.glade:11081
+#: resources/xnec2c.glade:9799 resources/xnec2c.glade:10023
 #: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:55
 msgid "VSWR"
 msgstr "VSWR"
 
-#: resources/xnec2c.glade:10872
+#: resources/xnec2c.glade:9814
 msgid "Zr/Zi"
 msgstr "Zr/Zi"
 
-#: resources/xnec2c.glade:10887
+#: resources/xnec2c.glade:9829
 msgid "Zm/Zph"
 msgstr "Zm/Zph"
 
-#: resources/xnec2c.glade:10902
+#: resources/xnec2c.glade:9844
 msgid "Smith"
 msgstr "Smith"
 
-#: resources/xnec2c.glade:10917
+#: resources/xnec2c.glade:9859
 msgid "G/Ta"
 msgstr "G/Ta"
 
-#: resources/xnec2c.glade:10960 resources/xnec2c.glade:10995
-#: resources/xnec2c.glade:11030 resources/xnec2c.glade:11065
-#: resources/xnec2c.glade:11309 resources/xnec2c.glade:11344
-#: resources/xnec2c.glade:11379 resources/xnec2c.glade:14238
+#: resources/xnec2c.glade:9902 resources/xnec2c.glade:9937
+#: resources/xnec2c.glade:9972 resources/xnec2c.glade:10007
+#: resources/xnec2c.glade:10251 resources/xnec2c.glade:10286
+#: resources/xnec2c.glade:10321 resources/xnec2c.glade:13180
 msgid " - - -"
 msgstr " - - -"
 
-#: resources/xnec2c.glade:11011 src/freqplots/graphs/impedance_graph.c:76
+#: resources/xnec2c.glade:9953 src/freqplots/graphs/impedance_graph.c:76
 msgid "Z-imag"
 msgstr "Z-imag"
 
-#: resources/xnec2c.glade:11046 src/freqplots/graphs/impedance_graph.c:74
+#: resources/xnec2c.glade:9988 src/freqplots/graphs/impedance_graph.c:74
 msgid "Z-real"
 msgstr "Z-real"
 
-#: resources/xnec2c.glade:11101
+#: resources/xnec2c.glade:10043
 msgid " - - - - "
 msgstr " - - - - "
 
-#: resources/xnec2c.glade:11117
+#: resources/xnec2c.glade:10059
 msgid "Freq MHz"
 msgstr "Frekv. MHz"
 
-#: resources/xnec2c.glade:11156 resources/xnec2c.glade:11169
+#: resources/xnec2c.glade:10098 resources/xnec2c.glade:10111
 msgid "Port"
 msgstr "Port"
 
-#: resources/xnec2c.glade:11181
+#: resources/xnec2c.glade:10123
 msgid "Tx Line Zo"
 msgstr "Tx-linje Zo"
 
-#: resources/xnec2c.glade:11195 resources/xnec2c.glade:12776
-#: resources/xnec2c.glade:14010
+#: resources/xnec2c.glade:10137 resources/xnec2c.glade:11718
+#: resources/xnec2c.glade:12952
 msgid "Freq Loop"
 msgstr "Frekvensløkke"
 
-#: resources/xnec2c.glade:11290 resources/xnec2c.glade:14116
+#: resources/xnec2c.glade:10232 resources/xnec2c.glade:13058
 msgid "T<sub>A</sub>(Elev.°)"
 msgstr "T<sub>A</sub>(Elev.°)"
 
-#: resources/xnec2c.glade:11325
+#: resources/xnec2c.glade:10267
 msgid "T<sub>a</sub>"
 msgstr "T<sub>a</sub>"
 
-#: resources/xnec2c.glade:11360
+#: resources/xnec2c.glade:10302
 msgid "G/T<sub>a</sub>"
 msgstr "G/T<sub>a</sub>"
 
-#: resources/xnec2c.glade:11434
+#: resources/xnec2c.glade:10376
 msgid "Frequency Data Plots"
 msgstr "Frekvensdata-plot"
 
-#: resources/xnec2c.glade:11551
+#: resources/xnec2c.glade:10493
 msgid "Save _Currents/Charges as CSV"
 msgstr "Gem _strømme/ladninger som CSV"
 
-#: resources/xnec2c.glade:11570
+#: resources/xnec2c.glade:10512
 msgid "Optimization Settings"
 msgstr "Optimeringsindstillinger"
 
-#: resources/xnec2c.glade:11585
+#: resources/xnec2c.glade:10527
 msgid "Reload and write data on .NEC file changes"
 msgstr "Genindlæs og skriv data ved .NEC-filændringer"
 
-#: resources/xnec2c.glade:11592
+#: resources/xnec2c.glade:10534
 msgid "_Write files selected below, now."
 msgstr "_Skriv valgte filer nedenfor nu."
 
-#: resources/xnec2c.glade:11607
+#: resources/xnec2c.glade:10549
 msgid "After calculation, write <file>.csv"
 msgstr "Efter beregning, skriv <file>.csv"
 
-#: resources/xnec2c.glade:11616
+#: resources/xnec2c.glade:10558
 msgid "After calculation, write <file>.s_1p"
 msgstr "Efter beregning, skriv <file>.s_1p"
 
-#: resources/xnec2c.glade:11625
+#: resources/xnec2c.glade:10567
 msgid "After calculation, write <file>-_maxgain.s2p"
 msgstr "Efter beregning, skriv <file>-_maxgain.s2p"
 
-#: resources/xnec2c.glade:11634
+#: resources/xnec2c.glade:10576
 msgid "After calculation, write <file>-_viewergain.s2p"
 msgstr "Efter beregning, skriv <file>-_viewergain.s2p"
 
-#: resources/xnec2c.glade:11643
+#: resources/xnec2c.glade:10585
 msgid "After calculation, write <file>-_radpattern.csv"
 msgstr "Efter beregning, skriv <file>-_radpattern.csv"
 
-#: resources/xnec2c.glade:11652
+#: resources/xnec2c.glade:10594
 msgid "After calculation, write <file>-_currents.csv"
 msgstr "Efter beregning, skriv <file>-_currents.csv"
 
-#: resources/xnec2c.glade:11661
+#: resources/xnec2c.glade:10603
 msgid "After calculation, write <file>-_structure.gplot"
 msgstr "Efter beregning, skriv <file>-_structure.gplot"
 
-#: resources/xnec2c.glade:11670
+#: resources/xnec2c.glade:10612
 msgid "After calculation, write <file>-_patch-currents.csv"
 msgstr "Efter beregning, skriv <file>-_patch-currents.csv"
 
-#: resources/xnec2c.glade:11685
+#: resources/xnec2c.glade:10627
 msgid "_Math Libraries"
 msgstr "_Matematikbiblioteker"
 
-#: resources/xnec2c.glade:11694
+#: resources/xnec2c.glade:10636
 msgid "_Interactive"
 msgstr "_Interaktiv"
 
-#: resources/xnec2c.glade:11714
+#: resources/xnec2c.glade:10656
 msgid "_Batch"
 msgstr "_Batch"
 
-#: resources/xnec2c.glade:11740
+#: resources/xnec2c.glade:10682
 msgid "Mathlib _Help"
 msgstr "Mathlib-_hjælp"
 
-#: resources/xnec2c.glade:11753
+#: resources/xnec2c.glade:10695
 msgid "Mathlib _Benchmarks"
 msgstr "Mathlib-_benchmarks"
 
-#: resources/xnec2c.glade:11764
+#: resources/xnec2c.glade:10706
 msgid "_Selected Mathlibs"
 msgstr "_Valgte mathlibs"
 
-#: resources/xnec2c.glade:11778
+#: resources/xnec2c.glade:10720
 msgid "Select All/None"
 msgstr "Vælg alle/ingen"
 
-#: resources/xnec2c.glade:11803
+#: resources/xnec2c.glade:10745
 msgid "_Parallel (-j N):\t\tO(N/J)"
 msgstr "_Parallel (-j N):\t\tO(N/J)"
 
-#: resources/xnec2c.glade:11812
+#: resources/xnec2c.glade:10754
 msgid "_Single Job (-j 1):\tO(N)"
 msgstr "_Enkelt job (-j 1):\tO(N)"
 
-#: resources/xnec2c.glade:11821
+#: resources/xnec2c.glade:10763
 msgid "_Iterate -j N/=2:\tO(N*log2(J))"
 msgstr "_Iterér -j N/=2:\tO(N*log2(J))"
 
-#: resources/xnec2c.glade:11830
+#: resources/xnec2c.glade:10772
 msgid "_Iterate -j N-=1:\tO(N*J)"
 msgstr "_Iterér -j N-=1:\tO(N*J)"
 
-#: resources/xnec2c.glade:11845
+#: resources/xnec2c.glade:10787
 msgid "Benchmark _Help"
 msgstr "Benchmark-_hjælp"
 
-#: resources/xnec2c.glade:11864
+#: resources/xnec2c.glade:10806
 msgid "Begin Frequency Loop at Startup"
 msgstr "Start frekvensløkke ved opstart"
 
-#: resources/xnec2c.glade:11875
+#: resources/xnec2c.glade:10817
 msgid "Confirm Quit"
 msgstr "Bekræft afslut"
 
-#: resources/xnec2c.glade:11914
+#: resources/xnec2c.glade:10856
 msgid "_Radiation Pattern"
 msgstr "_Strålingsdiagram"
 
-#: resources/xnec2c.glade:11924
+#: resources/xnec2c.glade:10866
 msgid "_Frequency Plots"
 msgstr "_Frekvensplot"
 
-#: resources/xnec2c.glade:12007
+#: resources/xnec2c.glade:10949
 msgid "_Visualization"
 msgstr "_Visualisering"
 
-#: resources/xnec2c.glade:12023
+#: resources/xnec2c.glade:10965
 msgid "Color Scale"
 msgstr "Farveskala"
 
-#: resources/xnec2c.glade:12030
+#: resources/xnec2c.glade:10972
 msgid ""
 "Power transfer n^γ relative to this frequency step's peak.\n"
-"γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
-"dissipated power for currents.\n"
+"γ = 0.5 expands weak regions, γ = 1 is linear amplitude, γ = 2 shows the "
+"squared magnitude: |I|² is proportional to per-segment dissipated power (and "
+"its radiated-power contribution via radiation resistance), |q|² to stored "
+"electrostatic energy.\n"
 "Adjust γ in the animate dialog."
 msgstr ""
 "Potensoverførsel n^γ i forhold til dette frekvenstrins spidsværdi.\n"
-"γ = 0,5 udvider svage områder, γ = 1 er lineær, γ = 2 er proportional med "
-"afsat effekt for strømme.\n"
+"γ = 0,5 udvider svage områder, γ = 1 er lineær amplitude, γ = 2 viser den "
+"kvadrerede størrelse: |I|² er proportional med den afsatte effekt pr. "
+"segment (og dens bidrag til den udstrålede effekt via strålingsmodstanden), |"
+"q|² med den lagrede elektrostatiske energi.\n"
 "Justér γ i animeringsdialogen."
 
-#: resources/xnec2c.glade:12031
+#: resources/xnec2c.glade:10973
 msgid "_Power"
 msgstr "_Potens"
 
-#: resources/xnec2c.glade:12042
+#: resources/xnec2c.glade:10984
 msgid ""
 "Logarithmic scale over a user-set range R below the peak.\n"
 "Reveals weak detail that linear display hides; adjust R in the animate "
@@ -1826,11 +2058,11 @@ msgstr ""
 "Afslører svage detaljer, som lineær visning skjuler; justér R i "
 "animeringsdialogen."
 
-#: resources/xnec2c.glade:12043
+#: resources/xnec2c.glade:10985
 msgid "_dB"
 msgstr "_dB"
 
-#: resources/xnec2c.glade:12054
+#: resources/xnec2c.glade:10996
 msgid ""
 "Inverse hyperbolic sine transfer: linear below the softening knee k, "
 "logarithmic above.\n"
@@ -1840,11 +2072,11 @@ msgstr ""
 "logaritmisk over.\n"
 "Justér k i animeringsdialogen."
 
-#: resources/xnec2c.glade:12055
+#: resources/xnec2c.glade:10997
 msgid "_Asinh"
 msgstr "_Asinh"
 
-#: resources/xnec2c.glade:12066
+#: resources/xnec2c.glade:11008
 msgid ""
 "μ-law companding transfer: lifts weak detail with bounded compression.\n"
 "Adjust the compression in the animate dialog."
@@ -1853,11 +2085,11 @@ msgstr ""
 "kompression.\n"
 "Justér kompressionen i animeringsdialogen."
 
-#: resources/xnec2c.glade:12067
+#: resources/xnec2c.glade:11009
 msgid "μ-_law"
 msgstr "μ-_law"
 
-#: resources/xnec2c.glade:12078
+#: resources/xnec2c.glade:11020
 msgid ""
 "Reinhard rational soft-compressor with knee k.\n"
 "Adjust k in the animate dialog."
@@ -1865,11 +2097,11 @@ msgstr ""
 "Reinhard rationel blødkompressor med knæk k.\n"
 "Justér k i animeringsdialogen."
 
-#: resources/xnec2c.glade:12079
+#: resources/xnec2c.glade:11021
 msgid "_Reinhard"
 msgstr "_Reinhard"
 
-#: resources/xnec2c.glade:12090
+#: resources/xnec2c.glade:11032
 msgid ""
 "Hyperbolic tangent transfer with contrast steepness a.\n"
 "Adjust a in the animate dialog."
@@ -1877,11 +2109,11 @@ msgstr ""
 "Hyperbolsk tangent-overførsel med kontraststejlhed a.\n"
 "Justér a i animeringsdialogen."
 
-#: resources/xnec2c.glade:12091
+#: resources/xnec2c.glade:11033
 msgid "_Sigmoid"
 msgstr "_Sigmoid"
 
-#: resources/xnec2c.glade:12102
+#: resources/xnec2c.glade:11044
 msgid ""
 "Full brightness for every magnitude; the color projection alone sets the "
 "rendering."
@@ -1889,410 +2121,410 @@ msgstr ""
 "Fuld lysstyrke for enhver størrelse; kun farveprojektionen bestemmer "
 "gengivelsen."
 
-#: resources/xnec2c.glade:12103
+#: resources/xnec2c.glade:11045
 msgid "_None"
 msgstr "_Ingen"
 
-#: resources/xnec2c.glade:12121
+#: resources/xnec2c.glade:11063
 msgid "Patch Flow — Animated"
 msgstr "Patch-flow — animeret"
 
-#: resources/xnec2c.glade:12128
+#: resources/xnec2c.glade:11070
 msgid "_Reference Phase"
 msgstr "_Referencefase"
 
-#: resources/xnec2c.glade:12139
+#: resources/xnec2c.glade:11081
 msgid "_LIC Texture"
 msgstr "_LIC-tekstur"
 
-#: resources/xnec2c.glade:12150 resources/xnec2c.glade:13334
+#: resources/xnec2c.glade:11092 resources/xnec2c.glade:12276
 msgid "_Wireframe"
 msgstr "_Trådgitter"
 
-#: resources/xnec2c.glade:12168
+#: resources/xnec2c.glade:11110
 msgid "Patch Flow — Static"
 msgstr "Patch-flow — statisk"
 
-#: resources/xnec2c.glade:12175
+#: resources/xnec2c.glade:11117
 msgid "Polarization _Axis"
 msgstr "Polariserings_akse"
 
-#: resources/xnec2c.glade:12186
+#: resources/xnec2c.glade:11128
 msgid "Peak _Magnitude"
 msgstr "Spidsst_ørrelse"
 
-#: resources/xnec2c.glade:12201
+#: resources/xnec2c.glade:11143
 msgid "A_nimate"
 msgstr "A_nimér"
 
-#: resources/xnec2c.glade:12210 resources/xnec2c.glade:13451
+#: resources/xnec2c.glade:11152 resources/xnec2c.glade:12393
 msgid "Common _Projection"
 msgstr "Fælles _projektion"
 
-#: resources/xnec2c.glade:12226
+#: resources/xnec2c.glade:11168
 msgid "_Symbol Overrides"
 msgstr "_Symboltilsidesættelser"
 
-#: resources/xnec2c.glade:12235
+#: resources/xnec2c.glade:11177
 msgid "Rendering _Settings..."
 msgstr "Gengivelses_indstillinger..."
 
-#: resources/xnec2c.glade:12246
+#: resources/xnec2c.glade:11188
 msgid "_Help"
 msgstr "_Hjælp"
 
-#: resources/xnec2c.glade:12255
+#: resources/xnec2c.glade:11197
 msgid "_About"
 msgstr "_Om"
 
-#: resources/xnec2c.glade:12478
+#: resources/xnec2c.glade:11420
 msgid " Zoom"
 msgstr " Zoom"
 
-#: resources/xnec2c.glade:12621 resources/xnec2c.glade:13946
+#: resources/xnec2c.glade:11563 resources/xnec2c.glade:12888
 #: src/freqplots/freqplots_core.c:54
 msgid "Gain"
 msgstr "Forstærkning"
 
-#: resources/xnec2c.glade:12636 resources/xnec2c.glade:12652
-#: resources/xnec2c.glade:13959 resources/xnec2c.glade:14220
+#: resources/xnec2c.glade:11578 resources/xnec2c.glade:11594
+#: resources/xnec2c.glade:12901 resources/xnec2c.glade:13162
 msgid "0.0"
 msgstr "0,0"
 
-#: resources/xnec2c.glade:12686
+#: resources/xnec2c.glade:11628
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:12742 resources/xnec2c.glade:13995
+#: resources/xnec2c.glade:11684 resources/xnec2c.glade:12937
 msgid "Step"
 msgstr "Trin"
 
-#: resources/xnec2c.glade:12889 resources/xnec2c.glade:14043
+#: resources/xnec2c.glade:11831 resources/xnec2c.glade:12985
 msgid "Apply Freq"
 msgstr "Anvend frekvens"
 
-#: resources/xnec2c.glade:12909
+#: resources/xnec2c.glade:11851
 msgid "Frequency Mhz"
 msgstr "Frekvens MHz"
 
-#: resources/xnec2c.glade:12970
+#: resources/xnec2c.glade:11912
 msgid "Structure Geometry"
 msgstr "Strukturgeometri"
 
-#: resources/xnec2c.glade:12989
+#: resources/xnec2c.glade:11931
 msgid "Xnec2c: Radiation Patterns"
 msgstr "Xnec2c: Strålingsdiagrammer"
 
-#: resources/xnec2c.glade:13202
+#: resources/xnec2c.glade:12144
 msgid "_Gain Scaling"
 msgstr "_Forstærkningsskalering"
 
-#: resources/xnec2c.glade:13217
+#: resources/xnec2c.glade:12159
 msgid "Linear _Power"
 msgstr "Lineær _effekt"
 
-#: resources/xnec2c.glade:13228
+#: resources/xnec2c.glade:12170
 msgid "Linear _Voltage"
 msgstr "Lineær _spænding"
 
-#: resources/xnec2c.glade:13239
+#: resources/xnec2c.glade:12181
 msgid "_ARRL Style"
 msgstr "_ARRL-stil"
 
-#: resources/xnec2c.glade:13250
+#: resources/xnec2c.glade:12192
 msgid "_Logarithmic"
 msgstr "_Logaritmisk"
 
-#: resources/xnec2c.glade:13261
+#: resources/xnec2c.glade:12203
 msgid "_Noise Temperature"
 msgstr "_Støjtemperatur"
 
-#: resources/xnec2c.glade:13272
+#: resources/xnec2c.glade:12214
 msgid "Noise Temp (_log scale)"
 msgstr "Støjtemp. (_log-skala)"
 
-#: resources/xnec2c.glade:13287
+#: resources/xnec2c.glade:12229
 msgid "Noise _Models"
 msgstr "Støj_modeller"
 
-#: resources/xnec2c.glade:13306
+#: resources/xnec2c.glade:12248
 msgid "_Gradient Key"
 msgstr "_Gradientnøgle"
 
-#: resources/xnec2c.glade:13316
+#: resources/xnec2c.glade:12258
 msgid "Draw St_yle"
 msgstr "Tegne_stil"
 
-#: resources/xnec2c.glade:13325
+#: resources/xnec2c.glade:12267
 msgid "S_urface"
 msgstr "O_verflade"
 
-#: resources/xnec2c.glade:13344
+#: resources/xnec2c.glade:12286
 msgid "_Both"
 msgstr "_Begge"
 
-#: resources/xnec2c.glade:13359
+#: resources/xnec2c.glade:12301
 msgid "_Near Field"
 msgstr "_Nærfelt"
 
-#: resources/xnec2c.glade:13374
+#: resources/xnec2c.glade:12316
 msgid "Near _E Field"
 msgstr "Nær _E-felt"
 
-#: resources/xnec2c.glade:13384
+#: resources/xnec2c.glade:12326
 msgid "Near _H Field"
 msgstr "Nær _H-felt"
 
-#: resources/xnec2c.glade:13394
+#: resources/xnec2c.glade:12336
 msgid "_Poynting Vector"
 msgstr "_Poynting-vektor"
 
-#: resources/xnec2c.glade:13403
+#: resources/xnec2c.glade:12345
 msgid "_Animate Dialog"
 msgstr "_Animationsdialog"
 
-#: resources/xnec2c.glade:13412
+#: resources/xnec2c.glade:12354
 msgid "_Total Field"
 msgstr "_Totalfelt"
 
-#: resources/xnec2c.glade:13421
+#: resources/xnec2c.glade:12363
 msgid "_Peak Value"
 msgstr "_Spidsværdi"
 
-#: resources/xnec2c.glade:13432
+#: resources/xnec2c.glade:12374
 msgid "_Instantaneous (φ=0)"
 msgstr "_Øjeblikkelig (φ=0)"
 
-#: resources/xnec2c.glade:13461
+#: resources/xnec2c.glade:12403
 msgid "_Overlay Structure"
 msgstr "_Overlejr struktur"
 
-#: resources/xnec2c.glade:13485
+#: resources/xnec2c.glade:12427
 msgid "Gain Pattern"
 msgstr "Forstærkningsdiagram"
 
-#: resources/xnec2c.glade:13500
+#: resources/xnec2c.glade:12442
 msgid "E/H Fields"
 msgstr "E/H-felter"
 
-#: resources/xnec2c.glade:13683
+#: resources/xnec2c.glade:12625
 msgid "Zoom % "
 msgstr "Zoom % "
 
-#: resources/xnec2c.glade:13722
+#: resources/xnec2c.glade:12664
 msgid "Elev.°"
 msgstr "Elev.°"
 
-#: resources/xnec2c.glade:14063
+#: resources/xnec2c.glade:13005
 msgid "Frequency MHz"
 msgstr "Frekvens MHz"
 
-#: resources/xnec2c.glade:14080
+#: resources/xnec2c.glade:13022
 msgid "0.010"
 msgstr "0,010"
 
-#: resources/xnec2c.glade:14134 resources/xnec2c.glade:14167
-#: resources/xnec2c.glade:14202
+#: resources/xnec2c.glade:13076 resources/xnec2c.glade:13109
+#: resources/xnec2c.glade:13144
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:14149
+#: resources/xnec2c.glade:13091
 msgid "T<sub>earth</sub>"
 msgstr "T<sub>earth</sub>"
 
-#: resources/xnec2c.glade:14184
+#: resources/xnec2c.glade:13126
 msgid "T<sub>sky</sub>"
 msgstr "T<sub>sky</sub>"
 
-#: resources/xnec2c.glade:14305 src/rdpattern_ui.c:984
+#: resources/xnec2c.glade:13247 src/rdpattern_ui.c:819
 msgid "Radiation Patterns"
 msgstr "Strålingsdiagrammer"
 
-#: resources/xnec2c.glade:14340
+#: resources/xnec2c.glade:13282
 msgid "Scale Structure (GS card)"
 msgstr "Skalér struktur (GS-kort)"
 
-#: resources/xnec2c.glade:14371
+#: resources/xnec2c.glade:13313
 msgid "Structure Scale Factor"
 msgstr "Strukturskaleringsfaktor"
 
-#: resources/xnec2c.glade:14384
+#: resources/xnec2c.glade:13326
 msgid "From Tag No."
 msgstr "Fra tag nr."
 
-#: resources/xnec2c.glade:14434
+#: resources/xnec2c.glade:13376
 msgid "To Tag No."
 msgstr "Til tag nr."
 
-#: resources/xnec2c.glade:14469
+#: resources/xnec2c.glade:13411
 msgid "Scale Structure"
 msgstr "Skalér struktur"
 
-#: resources/xnec2c.glade:14646
+#: resources/xnec2c.glade:13588
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "Koordinattransformation (GM-kort)"
 
-#: resources/xnec2c.glade:14676
+#: resources/xnec2c.glade:13618
 msgid "Tag Increment"
 msgstr "Tag-forøgelse"
 
-#: resources/xnec2c.glade:14707
+#: resources/xnec2c.glade:13649
 msgid "Rotate about X"
 msgstr "Rotér om X"
 
-#: resources/xnec2c.glade:14739
+#: resources/xnec2c.glade:13681
 msgid "Move along X"
 msgstr "Flyt langs X"
 
-#: resources/xnec2c.glade:14771
+#: resources/xnec2c.glade:13713
 msgid "New Structures"
 msgstr "Nye strukturer"
 
-#: resources/xnec2c.glade:14802
+#: resources/xnec2c.glade:13744
 msgid "Rotate about Y"
 msgstr "Rotér om Y"
 
-#: resources/xnec2c.glade:14834
+#: resources/xnec2c.glade:13776
 msgid "Move along Y"
 msgstr "Flyt langs Y"
 
-#: resources/xnec2c.glade:14866
+#: resources/xnec2c.glade:13808
 msgid "Start From Tag"
 msgstr "Start fra tag"
 
-#: resources/xnec2c.glade:14898
+#: resources/xnec2c.glade:13840
 msgid "Rotate about Z"
 msgstr "Rotér om Z"
 
-#: resources/xnec2c.glade:14930
+#: resources/xnec2c.glade:13872
 msgid "Move along Z"
 msgstr "Flyt langs Z"
 
-#: resources/xnec2c.glade:14966
+#: resources/xnec2c.glade:13908
 msgid "Co-ordinate Transformation Data"
 msgstr "Koordinattransformationsdata"
 
-#: resources/xnec2c.glade:15162
+#: resources/xnec2c.glade:14104
 msgid "Trans. Line Command (TL Card)"
 msgstr "Transmissionslinjekommando (TL-kort)"
 
-#: resources/xnec2c.glade:15192
+#: resources/xnec2c.glade:14134
 msgid "Tag Number, End 1  "
 msgstr "Tag-nummer, ende 1  "
 
-#: resources/xnec2c.glade:15224
+#: resources/xnec2c.glade:14166
 msgid "Tag Number, End 2  "
 msgstr "Tag-nummer, ende 2  "
 
-#: resources/xnec2c.glade:15255
+#: resources/xnec2c.glade:14197
 msgid "Segment Num, End 1"
 msgstr "Segmentnr., ende 1"
 
-#: resources/xnec2c.glade:15287
+#: resources/xnec2c.glade:14229
 msgid "Segment Num, End 2"
 msgstr "Segmentnr., ende 2"
 
-#: resources/xnec2c.glade:15351
+#: resources/xnec2c.glade:14293
 msgid "Crossed Transmission Line"
 msgstr "Krydset transmissionslinje"
 
-#: resources/xnec2c.glade:15369
+#: resources/xnec2c.glade:14311
 msgid "Characteristic Impedance"
 msgstr "Karakteristisk impedans"
 
-#: resources/xnec2c.glade:15401
+#: resources/xnec2c.glade:14343
 msgid "End 1 Y Real Part (S)"
 msgstr "Ende 1 Y realdel (S)"
 
-#: resources/xnec2c.glade:15433
+#: resources/xnec2c.glade:14375
 msgid "End 2 Y Real Part (S)"
 msgstr "Ende 2 Y realdel (S)"
 
-#: resources/xnec2c.glade:15465
+#: resources/xnec2c.glade:14407
 msgid "Length of Tx Line (m)"
 msgstr "Længde af Tx-linje (m)"
 
-#: resources/xnec2c.glade:15497
+#: resources/xnec2c.glade:14439
 msgid "End 1 Y Imag Part (S)"
 msgstr "Ende 1 Y imaginærdel (S)"
 
-#: resources/xnec2c.glade:15529
+#: resources/xnec2c.glade:14471
 msgid "End 2 Y Imag Part (S)"
 msgstr "Ende 2 Y imaginærdel (S)"
 
-#: resources/xnec2c.glade:15565
+#: resources/xnec2c.glade:14507
 msgid "Transmission Line"
 msgstr "Transmissionslinje"
 
-#: resources/xnec2c.glade:15792
+#: resources/xnec2c.glade:14734
 msgid "Wire Element (GW & GC cards)"
 msgstr "Trådelement (GW & GC-kort)"
 
-#: resources/xnec2c.glade:15852
+#: resources/xnec2c.glade:14794
 msgid "Wire X1"
 msgstr "Tråd X1"
 
-#: resources/xnec2c.glade:15884
+#: resources/xnec2c.glade:14826
 msgid "Wire X2"
 msgstr "Tråd X2"
 
-#: resources/xnec2c.glade:15947
+#: resources/xnec2c.glade:14889
 msgid "Wire Y1"
 msgstr "Tråd Y1"
 
-#: resources/xnec2c.glade:15980
+#: resources/xnec2c.glade:14922
 msgid "Wire Y2"
 msgstr "Tråd Y2"
 
-#: resources/xnec2c.glade:16044
+#: resources/xnec2c.glade:14986
 msgid "Wire Z1"
 msgstr "Tråd Z1"
 
-#: resources/xnec2c.glade:16076
+#: resources/xnec2c.glade:15018
 msgid "Wire Z2"
 msgstr "Tråd Z2"
 
-#: resources/xnec2c.glade:16141
+#: resources/xnec2c.glade:15083
 msgid "Wire Length"
 msgstr "Trådlængde"
 
-#: resources/xnec2c.glade:16212
+#: resources/xnec2c.glade:15154
 msgid "Wire Data"
 msgstr "Tråddata"
 
-#: resources/xnec2c.glade:16224
+#: resources/xnec2c.glade:15166
 msgid "Tapered Wire"
 msgstr "Tilspidset tråd"
 
-#: resources/xnec2c.glade:16266
+#: resources/xnec2c.glade:15208
 msgid "Length Taper"
 msgstr "Længdetilspidsning"
 
-#: resources/xnec2c.glade:16298
+#: resources/xnec2c.glade:15240
 msgid "Diameter Seg 1"
 msgstr "Diameter seg 1"
 
-#: resources/xnec2c.glade:16330
+#: resources/xnec2c.glade:15272
 msgid "Diameter Seg N"
 msgstr "Diameter seg N"
 
-#: resources/xnec2c.glade:16362
+#: resources/xnec2c.glade:15304
 msgid "Diam. Taper"
 msgstr "Diam. tilspidsning"
 
-#: resources/xnec2c.glade:16398
+#: resources/xnec2c.glade:15340
 msgid "Wire Taper Data"
 msgstr "Trådtilspidsningsdata"
 
-#: resources/xnec2c.glade:16563
+#: resources/xnec2c.glade:15505
 msgid "Impedance (Zo) Ohm"
 msgstr "Impedans (Zo) Ohm"
 
-#: resources/xnec2c.glade:16578
+#: resources/xnec2c.glade:15520
 msgid "50.00"
 msgstr "50,00"
 
-#: resources/xnec2c.glade:16601
+#: resources/xnec2c.glade:15543
 msgid "Transmission Line Impedance (Zo)"
 msgstr "Transmissionslinjeimpedans (Zo)"
 
@@ -2328,11 +2560,11 @@ msgstr "scenebuffer_flush: depth_bins=%d\n"
 msgid "scenebuffer_flush: layout has no base font description\n"
 msgstr "scenebuffer_flush: layout mangler basefontbeskrivelse\n"
 
-#: src/cairo/cairo_structure.c:133
+#: src/cairo/cairo_structure.c:140
 msgid "draw_wire_segments: wire_widths is NULL\n"
 msgstr "draw_wire_segments: wire_widths er NULL\n"
 
-#: src/cairo/cairo_structure.c:207
+#: src/cairo/cairo_structure.c:214
 #, c-format
 msgid "draw_wire_segments: unknown ntyp=%d\n"
 msgstr "draw_wire_segments: ukendt ntyp=%d\n"
@@ -2364,7 +2596,7 @@ msgstr "Segmentforbindelsesfejl i sbf()"
 msgid "Segment connection error in trio()"
 msgstr "Segmentforbindelsesfejl i trio()"
 
-#: src/callback_func.c:121
+#: src/callback_func.c:122
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
@@ -2372,7 +2604,7 @@ msgstr ""
 "Frekvensløkken kører\n"
 "Er du sikker på, at du vil afslutte beregningen?"
 
-#: src/callback_func.c:125
+#: src/callback_func.c:126
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
@@ -2380,51 +2612,46 @@ msgstr ""
 "Frekvensløkken kører\n"
 "Er du sikker på, at du vil lukke dette vindue?"
 
-#: src/callback_func.c:286
+#: src/callback_func.c:287
 #, c-format
 msgid ""
 "Excitation type %d has no feedpoint: VSWR and impedance plots are hidden.\n"
 msgstr ""
 "Excitationstype %d har intet fødepunkt: VSWR- og impedansplot er skjult.\n"
 
-#: src/callback_func.c:442
-msgid "View Geometry"
-msgstr "Vis geometri"
-
-#: src/callback_func.c:443
+#: src/callback_func.c:404
 msgid "View Currents"
 msgstr "Vis strømme"
 
-#: src/callback_func.c:444
+#: src/callback_func.c:406
 msgid "View Charges"
 msgstr "Vis ladninger"
 
-#: src/callback_func.c:458
-#, c-format
-msgid "invalid display quantity %d, using off\n"
-msgstr "ugyldig visningsstørrelse %d, bruger fra\n"
+#: src/callback_func.c:408
+msgid "View Geometry"
+msgstr "Vis geometri"
 
-#: src/callback_func.c:529
+#: src/callback_func.c:461
 msgid "PNG images (*.png)"
 msgstr "PNG-billeder (*.png)"
 
-#: src/callback_func.c:531
+#: src/callback_func.c:463
 msgid "GNUplot files (*.gplot)"
 msgstr "GNUplot-filer (*.gplot)"
 
-#: src/callback_func.c:533
+#: src/callback_func.c:465
 msgid "NEC2 files (*.nec)"
 msgstr "NEC2-filer (*.nec)"
 
-#: src/callback_func.c:535
+#: src/callback_func.c:467
 msgid "Touchstone 1-port files (*.s1p)"
 msgstr "Touchstone 1-port-filer (*.s1p)"
 
-#: src/callback_func.c:537
+#: src/callback_func.c:469
 msgid "Touchstone 2-port files (*.s2p)"
 msgstr "Touchstone 2-port-filer (*.s2p)"
 
-#: src/callback_func.c:539
+#: src/callback_func.c:471
 msgid "Comma-separated CSV files (*.csv)"
 msgstr "Kommaseparerede CSV-filer (*.csv)"
 
@@ -2450,7 +2677,7 @@ msgstr ""
 "stråle i XY-planet med observationselevation indstillet via drejeknap."
 
 #: src/callbacks.c:191 src/callbacks.c:468 src/callbacks.c:2034
-#: src/callbacks.c:2713
+#: src/callbacks.c:2848
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "Er du sikker på, at du vil afslutte xnec2c?"
 
@@ -2495,7 +2722,7 @@ msgstr ""
 "genberegne inputfilen ved ændring, når det udløses af inotify. Vælg filer "
 "til skrivning i \"Fil->Optimeringsindstillinger\"."
 
-#: src/callbacks.c:968 src/callbacks.c:1283 src/callbacks.c:2739
+#: src/callbacks.c:968 src/callbacks.c:1283 src/callbacks.c:2874
 msgid "Are you sure you wish to close this window?"
 msgstr "Er du sikker på, at du vil lukke dette vindue?"
 
@@ -2504,11 +2731,7 @@ msgid "OpenGL is not available on this display; cannot enable renderer.\n"
 msgstr ""
 "OpenGL er ikke tilgængeligt på denne skærm; kan ikke aktivere renderer.\n"
 
-#: src/callbacks.c:2108
-msgid "on_color_fam_format_value: unknown scale widget\n"
-msgstr "on_color_fam_format_value: ukendt skala-widget\n"
-
-#: src/callbacks.c:2263
+#: src/callbacks.c:2133
 msgid ""
 "Select how the animated patch current flow is rendered.\n"
 "Mirrors the Visualization menu setting in the main window."
@@ -2516,17 +2739,23 @@ msgstr ""
 "Vælg hvordan det animerede patch-strømflow gengives.\n"
 "Spejler indstillingen i menuen Visualisering i hovedvinduet."
 
-#: src/callbacks.c:2265
+#: src/callbacks.c:2135
 msgid ""
 "Patch flow animation requires surface patches (SP/SM cards) in the model."
 msgstr ""
 "Animering af patch-strømflow kræver overfladepatches (SP/SM-kort) i modellen."
 
-#: src/callbacks.c:2549
+#: src/callbacks.c:2150
+msgid ""
+"The animation window drives the near-field vectors from the phase slider; "
+"close it to choose the static peak or instantaneous baseline."
+msgstr ""
+
+#: src/callbacks.c:2680
 msgid "Animation"
 msgstr "Animation"
 
-#: src/callbacks.c:2550
+#: src/callbacks.c:2681
 msgid ""
 "Animation requires wire currents or charges, surface patches (SP/SM NEC "
 "cards), or near-field data (NE/NH NEC cards)"
@@ -2534,11 +2763,11 @@ msgstr ""
 "Animation kræver trådstrømme eller -ladninger, overfladepatches (SP/SM NEC-"
 "kort) eller nærfeltsdata (NE/NH NEC-kort)"
 
-#: src/callbacks.c:2675
+#: src/callbacks.c:2810
 msgid "No open NEC2 input file"
 msgstr "Ingen åben NEC2-inputfil"
 
-#: src/callbacks.c:2770 src/callbacks.c:2800
+#: src/callbacks.c:2905 src/callbacks.c:2935
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -2546,11 +2775,11 @@ msgstr ""
 "NEC2-editorens data kan ikke gemmes\n"
 "mens frekvensløkken kører"
 
-#: src/callbacks.c:2782 src/callbacks.c:2808
+#: src/callbacks.c:2917 src/callbacks.c:2943
 msgid "untitled.nec"
 msgstr "unavngivet.nec"
 
-#: src/callbacks.c:3273 src/callbacks.c:3293 src/callbacks.c:3313
+#: src/callbacks.c:3408 src/callbacks.c:3428 src/callbacks.c:3448
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
@@ -2558,6 +2787,35 @@ msgid ""
 msgstr ""
 "Frekvens (FR) kort er endnu ikke behandlet.\n"
 "Du skal muligvis gemme NEC2-editorens data først."
+
+#: src/chroma/chroma.c:239
+#, c-format
+msgid "unhandled hue encoding %d\n"
+msgstr "uhåndteret farvetonekodning %d\n"
+
+#: src/chroma/chroma.c:270
+#, c-format
+msgid "unhandled brightness encoding %d\n"
+msgstr "uhåndteret lysstyrkekodning %d\n"
+
+#: src/chroma/chroma.c:288
+#, c-format
+msgid "invalid color projection %d, using instant\n"
+msgstr "ugyldig farveprojektion %d, bruger øjeblikkelig\n"
+
+#: src/chroma/chroma_nearfield.c:96
+#, c-format
+msgid "nf_real_vector: channel %d carries no phasor\n"
+msgstr ""
+
+#: src/chroma/chroma_source.c:334
+msgid "far-field contribution needs radiation pattern data\n"
+msgstr "fjernfeltbidrag kræver strålingsdiagramdata\n"
+
+#: src/chroma/chroma_source.c:405
+#, c-format
+msgid "unsupported color source elem %d chan %d\n"
+msgstr "ikke understøttet farvekilde-element %d kanal %d\n"
 
 #: src/cmnd_edit.c:108
 msgid ""
@@ -2765,6 +3023,16 @@ msgstr "Første punkt Theta"
 msgid "Increment in R (m)"
 msgstr "Forøgelse i R (m)"
 
+#: src/color/color_palette.c:139
+#, c-format
+msgid "invalid palette kind %d, using ramp\n"
+msgstr "ugyldig palettetype %d, bruger rampe\n"
+
+#: src/color/color_tone.c:125
+#, c-format
+msgid "invalid color tone %d, using power\n"
+msgstr "ugyldig farvefamilie %d, bruger potens\n"
+
 #: src/config/config_widget.c:129
 #, c-format
 msgid "config_widget_lookup: missing widget '%s'\n"
@@ -2775,53 +3043,64 @@ msgstr "config_widget_lookup: manglende widget '%s'\n"
 msgid "config_widget_values_at: index %d exceeds values list\n"
 msgstr "config_widget_values_at: indeks %d overstiger værdiliste\n"
 
-#: src/config/config_widget.c:178
+#: src/config/config_widget.c:181
 #, c-format
 msgid "config_widget_apply_element: radio menu item '%s' has no values\n"
 msgstr "config_widget_apply_element: radiomenupunkt '%s' har ingen værdier\n"
 
-#: src/config/config_widget.c:191
-#, c-format
-msgid "config_widget_apply_element: radio button '%s' has no values\n"
-msgstr "config_widget_apply_element: radioknap '%s' har ingen værdier\n"
-
-#: src/config/config_widget.c:201
+#: src/config/config_widget.c:206
 #, c-format
 msgid "config_widget_apply_element: combo '%s' has no values\n"
 msgstr "config_widget_apply_element: combo '%s' har ingen værdier\n"
 
-#: src/config/config_widget.c:234
+#: src/config/config_widget.c:242
 #, c-format
 msgid "config_widget_apply_element: unknown widget type for '%s'\n"
 msgstr "config_widget_apply_element: ukendt widget-type for '%s'\n"
 
-#: src/config/config_widget.c:255
+#: src/config/config_widget.c:263
 #, c-format
 msgid "config_widget_sync_element: radio menu item '%s' has no values\n"
 msgstr "config_widget_sync_element: radiomenupunkt '%s' har ingen værdier\n"
 
-#: src/config/config_widget.c:268
-#, c-format
-msgid "config_widget_sync_element: radio button '%s' has no values\n"
-msgstr "config_widget_sync_element: radioknap '%s' har ingen værdier\n"
-
-#: src/config/config_widget.c:276
+#: src/config/config_widget.c:286
 #, c-format
 msgid "config_widget_sync_element: combo '%s' has no values\n"
 msgstr "config_widget_sync_element: combo '%s' har ingen værdier\n"
 
-#: src/config/config_widget.c:319
+#: src/config/config_widget.c:330
 #, c-format
 msgid "config_widget_sync_element: unknown widget type for '%s'\n"
 msgstr "config_widget_sync_element: ukendt widget-type for '%s'\n"
 
-#: src/config/config_widget.c:375
+#: src/config/config_widget.c:386
 msgid "config_widget_sync_field: field is not registered\n"
 msgstr "config_widget_sync_field: felt er ikke registreret\n"
 
-#: src/config/config_widget.c:399
+#: src/config/config_widget.c:410
 msgid "config_widget_field_changed: field is not registered\n"
 msgstr "config_widget_field_changed: felt er ikke registreret\n"
+
+#: src/config_hooks.c:83
+msgid "This overlay derives from wire-current segments; this model has none."
+msgstr ""
+"Denne overlejring udledes af trådstrømsegmenter; denne model har ingen."
+
+#: src/config_hooks.c:108
+msgid "Highlight the moving wave crest as a bright comet head."
+msgstr "Fremhæv den bevægende bølgetop som et lyst komethoved."
+
+#: src/config_hooks.c:109
+msgid ""
+"Comet rides the animated wave crest; this projection is a static read with "
+"no moving phase."
+msgstr ""
+"Komet rider på den animerede bølgetop; denne projektion er en statisk "
+"aflæsning uden bevægende fase."
+
+#: src/config_hooks.c:112
+msgid "Mark current nodes (cyan) and antinodes (red) along the wires."
+msgstr "Markér strømknuder (cyan) og antiknuder (rød) langs trådene."
 
 #: src/expr_edit.h:34
 msgid ""
@@ -2836,12 +3115,12 @@ msgstr ""
 msgid "step size limited at z= %10.5f"
 msgstr "trinstørrelse begrænset ved Z= %10.5f"
 
-#: src/fork.c:230 src/fork.c:518
+#: src/fork.c:230 src/fork.c:500
 #, c-format
 msgid "child %d  length %d  return %d\n"
 msgstr "underproces %d  længde %d  retur %d\n"
 
-#: src/fork.c:524
+#: src/fork.c:506
 #, c-format
 msgid "early EOF?, child %d  length %d  return %d\n"
 msgstr "tidligt EOF?, underproces %d  længde %d  retur %d\n"
@@ -3327,8 +3606,8 @@ msgstr ""
 "Gyldige tags i din geometri er dem, der er tildelt GW/GA/GH/SP-kort."
 
 #: src/geometry.c:771 src/input.c:1755 src/input.c:1756 src/mathlib.c:752
-#: src/mathlib.c:989 src/rdpattern_ui.c:330 src/rdpattern_ui.c:338
-#: src/rdpattern_ui.c:345 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:134
+#: src/mathlib.c:981 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
+#: src/rdpattern_ui.c:344 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:134
 #: src/utils.c:452
 #, c-format
 msgid "%s"
@@ -3541,20 +3820,20 @@ msgstr ""
 "verify_segments() springer frekvensafhængige kontroller over - ingen "
 "frekvensdata\n"
 
-#: src/gnuplot.c:47
+#: src/gnuplot.c:48
 msgid "Gnuplot Data"
 msgstr "Gnuplot-data"
 
-#: src/gnuplot.c:47 src/gnuplot.c:91 src/gnuplot.c:174
+#: src/gnuplot.c:48 src/gnuplot.c:92 src/gnuplot.c:175
 msgid "Cannot save data while frequency loop is running"
 msgstr "Kan ikke gemme data mens frekvensløkken kører"
 
-#: src/gnuplot.c:61
+#: src/gnuplot.c:62
 #, c-format
 msgid "# Reference impedance Z0 = %.2f Ohm\n"
 msgstr "# Referenceimpedans Z0 = %.2f Ohm\n"
 
-#: src/gnuplot.c:63
+#: src/gnuplot.c:64
 #, c-format
 msgid ""
 "# To plot in gnuplot you can modify this command.  Presently it plots MHz vs "
@@ -3563,7 +3842,7 @@ msgstr ""
 "# For at plotte i gnuplot kan du ændre denne kommando. I øjeblikket plotter "
 "den MHz vs zreal og zimag:\n"
 
-#: src/gnuplot.c:64
+#: src/gnuplot.c:65
 #, c-format
 msgid ""
 "#    plot for [i=2:3]  'filename.gplot' using 1:i with lines smooth bezier "
@@ -3572,51 +3851,51 @@ msgstr ""
 "#    plot for [i=2:3]  'filnavn.gplot' using 1:i with lines smooth bezier "
 "title columnhead(i);\n"
 
-#: src/gnuplot.c:91 src/gnuplot.c:174
+#: src/gnuplot.c:92 src/gnuplot.c:175
 msgid "Touchstone Data"
 msgstr "Touchstone-data"
 
-#: src/gnuplot.c:105
+#: src/gnuplot.c:106
 #, c-format
 msgid "! Reference impedance Z0 = %.2f Ohm\n"
 msgstr "! Referenceimpedans Z0 = %.2f Ohm\n"
 
-#: src/gnuplot.c:133
+#: src/gnuplot.c:134
 #, c-format
 msgid "This should never happen. touchstone type=%d\n"
 msgstr "Dette burde aldrig ske. touchstone type=%d\n"
 
-#: src/gnuplot.c:257
+#: src/gnuplot.c:258
 #, c-format
 msgid "# Near E field\n"
 msgstr "# Nær E-felt\n"
 
-#: src/gnuplot.c:280
+#: src/gnuplot.c:285
 #, c-format
 msgid "# Near H field\n"
 msgstr "# Nær H-felt\n"
 
-#: src/gnuplot.c:322
+#: src/gnuplot.c:325
 #, c-format
 msgid "# Poynting Vector\n"
 msgstr "# Poynting-vektor\n"
 
-#: src/gnuplot.c:394
+#: src/gnuplot.c:384
 #, c-format
 msgid "# Radiation Pattern\n"
 msgstr "# Strålingsdiagram\n"
 
-#: src/gnuplot.c:532
+#: src/gnuplot.c:522
 #, c-format
 msgid "# structure patch segments\n"
 msgstr "# struktur patch-segmenter\n"
 
-#: src/gnuplot.c:567
+#: src/gnuplot.c:557
 #, c-format
 msgid "# structure wire segments\n"
 msgstr "# struktur trådsegmenter\n"
 
-#: src/gnuplot.c:597
+#: src/gnuplot.c:587
 #, c-format
 msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
@@ -3625,11 +3904,11 @@ msgstr ""
 "Vis med: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
 "close\"\n"
 
-#: src/gnuplot.c:609
+#: src/gnuplot.c:599
 msgid "Save Currents and Charges to CSV"
 msgstr "Gem Strømme og Ladninger til CSV"
 
-#: src/gnuplot.c:610
+#: src/gnuplot.c:600
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
@@ -3637,11 +3916,11 @@ msgstr ""
 "Du skal aktivere strømdata ved at klikke på \"Strømme\" eller \"Ladninger\" "
 "i xnec2c-hovedvinduet."
 
-#: src/gnuplot.c:675 src/gnuplot.c:685
+#: src/gnuplot.c:665 src/gnuplot.c:675
 msgid "Save Patch Currents to CSV"
 msgstr "Gem Patch-strømme til CSV"
 
-#: src/gnuplot.c:676
+#: src/gnuplot.c:666
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
@@ -3649,7 +3928,7 @@ msgstr ""
 "Du skal aktivere strømdata ved at klikke på \"Strømme\" eller \"Ladninger\" "
 "i xnec2c-hovedvinduet."
 
-#: src/gnuplot.c:686
+#: src/gnuplot.c:676
 msgid "No surface patches in this model."
 msgstr "Ingen overfladepatches i denne model."
 
@@ -4105,47 +4384,47 @@ msgstr ""
 "Geometri-datakortfejl\n"
 "Kortets mnemoniske kode er for kort eller mangler"
 
-#: src/interface.c:135
+#: src/interface.c:136
 #, c-format
 msgid "xnec2c Main: %s"
 msgstr "xnec2c Hovedvindue: %s"
 
-#: src/interface.c:141
+#: src/interface.c:142
 #, c-format
 msgid "xnec2c Editor: %s"
 msgstr "xnec2c Redigering: %s"
 
-#: src/interface.c:147
+#: src/interface.c:148
 #, c-format
 msgid "xnec2c Frequency Plots: %s"
 msgstr "xnec2c Frekvensplot: %s"
 
-#: src/interface.c:153
+#: src/interface.c:154
 #, c-format
 msgid "xnec2c Radiation Pattern: %s"
 msgstr "xnec2c Strålingsdiagram: %s"
 
-#: src/interface.c:168
+#: src/interface.c:169
 #, c-format
 msgid "Fatal Error: builder could not find object '%s'"
 msgstr "Fatal fejl: builder kunne ikke finde objekt '%s'"
 
-#: src/interface.c:193
+#: src/interface.c:194
 #, c-format
 msgid "failed to add objects to builder: %s\n"
 msgstr "kunne ikke tilføje objekter til builder: %s\n"
 
-#: src/interface.c:195
+#: src/interface.c:196
 msgid "Listing Object Ids:\n"
 msgstr "Viser objekt-id'er:\n"
 
-#: src/interface.c:199 src/utils.c:192 src/utils.c:196 src/utils.c:206
+#: src/interface.c:200 src/utils.c:192 src/utils.c:196 src/utils.c:206
 #: src/utils.c:208
 #, c-format
 msgid "%s\n"
 msgstr "%s\n"
 
-#: src/interface.c:210 src/interface.c:213
+#: src/interface.c:211 src/interface.c:214
 msgid ""
 "libgmodule not supported: xnec2c may not function properly on this "
 "platform.\n"
@@ -4153,141 +4432,146 @@ msgstr ""
 "libgmodule understøttes ikke: xnec2c fungerer muligvis ikke korrekt på denne "
 "platform.\n"
 
-#: src/interface.c:277
+#: src/interface.c:278
 #, c-format
 msgid "xnec2c %s: %s"
 msgstr "xnec2c %s: %s"
 
-#: src/main.c:144
+#: src/interface.c:368
+#, c-format
+msgid "create_animate_dialog: failed to load animate.glade: %s\n"
+msgstr "create_animate_dialog: kunne ikke indlæse animate.glade: %s\n"
+
+#: src/main.c:146
 #, c-format
 msgid "%s requires a positive integer argument\n"
 msgstr "%s kræver et positivt heltalsargument\n"
 
-#: src/main.c:207
+#: src/main.c:209
 #, c-format
 msgid "Detected %d CPUs\n"
 msgstr "Fandt %d CPU'er\n"
 
-#: src/main.c:226
+#: src/main.c:228
 #, c-format
 msgid "Detected %s windowing backend\n"
 msgstr "Fandt %s vinduesbackend\n"
 
-#: src/main.c:236
+#: src/main.c:238
 msgid "config file path too long\n"
 msgstr "konfigurationsfilsti er for lang\n"
 
-#: src/main.c:254
+#: src/main.c:256
 #, c-format
 msgid "config file does not exist or is not readable: %s\n"
 msgstr "konfigurationsfil findes ikke eller er ikke læsbar: %s\n"
 
-#: src/main.c:263
+#: src/main.c:265
 #, c-format
 msgid "config file path too long ( > %d char )\n"
 msgstr "konfigurationsfilsti er for lang ( > %d tegn )\n"
 
-#: src/main.c:275
+#: src/main.c:277
 #, c-format
 msgid "input file name too long ( > %d char )\n"
 msgstr "inputfilnavn er for langt ( > %d tegn )\n"
 
-#: src/main.c:302
+#: src/main.c:304
 msgid "Forking disabled!\n"
 msgstr "Forking deaktiveret!\n"
 
-#: src/main.c:310
+#: src/main.c:312
 msgid "pthread freqloop disabled!\n"
 msgstr "pthread freqloop deaktiveret!\n"
 
-#: src/main.c:314
+#: src/main.c:316
 msgid "batch mode enabled, will exit after first loop\n"
 msgstr "batch-tilstand aktiveret, afslutter efter første løkke\n"
 
-#: src/main.c:380
+#: src/main.c:382
 msgid "verify segments check disabled\n"
 msgstr "verificer segmenter-kontrol deaktiveret\n"
 
-#: src/main.c:385
+#: src/main.c:387
 msgid "forcing overlap check on large models\n"
 msgstr "tvinger overlapskontrol på store modeller\n"
 
-#: src/main.c:393
+#: src/main.c:395
 msgid "managed allocator leak report enabled\n"
 msgstr "rapport om hukommelseslæk fra administreret allokator aktiveret\n"
 
-#: src/main.c:407
+#: src/main.c:409
 msgid "--batch and --optimize are mutual exclusive.\n"
 msgstr "--batch og --optimize er gensidigt udelukkende.\n"
 
-#: src/main.c:423
+#: src/main.c:425
 #, c-format
 msgid "input file path name too long ( > %d char )\n"
 msgstr "inputfilstinavn er for langt ( > %d tegn )\n"
 
-#: src/main.c:430
+#: src/main.c:432
 #, c-format
 msgid "unexpected argument '%s' does not appear to be a .nec file\n"
 msgstr "uventet argument '%s' ser ikke ud til at være en .nec-fil\n"
 
-#: src/main.c:437
+#: src/main.c:439
 #, c-format
 msgid "unexpected argument: %s\n"
 msgstr "uventet argument: %s\n"
 
-#: src/main.c:443
+#: src/main.c:445
 msgid "batch mode requires an input file\n"
 msgstr "batch-tilstand kræver en inputfil\n"
 
-#: src/main.c:453
+#: src/main.c:455
 msgid "cannot open display: a running X11 or Wayland session is required\n"
 msgstr ""
 "kan ikke åbne skærm: en kørende X11- eller Wayland-session er påkrævet\n"
 
-#: src/main.c:472
+#: src/main.c:474
 #, c-format
 msgid "Forking %d jobs.\n"
 msgstr "Forker %d jobs.\n"
 
-#: src/main.c:484 src/main.c:492
+#: src/main.c:486 src/main.c:494
 msgid "exiting after fatal error: pipe() failed"
 msgstr "afslutter efter fatal fejl: pipe() mislykkedes"
 
-#: src/main.c:501
+#: src/main.c:503
 msgid "exiting after fatal error: fork() failed"
 msgstr "afslutter efter fatal fejl: fork() mislykkedes"
 
-#: src/main.c:1082
+#: src/main.c:1078
 msgid "exiting via user interrupt\n"
 msgstr "afslutter via brugerafbrydelse\n"
 
-#: src/main.c:1086
+#: src/main.c:1082
 msgid "segmentation fault, exiting\n"
 msgstr "segmenteringsfejl, afslutter\n"
 
-#: src/main.c:1090
+#: src/main.c:1086
 msgid "floating point exception, exiting\n"
 msgstr "flydende komma-undtagelse, afslutter\n"
 
-#: src/main.c:1094
+#: src/main.c:1090
 msgid "abort signal received, exiting\n"
 msgstr "afbrydelsessignal modtaget, afslutter\n"
 
-#: src/main.c:1098
+#: src/main.c:1094
 msgid "termination request received, exiting\n"
 msgstr "afslutningsanmodning modtaget, afslutter\n"
 
-#: src/main.c:1108
+#: src/main.c:1104
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
 msgstr "ikke forgrenet, ignorerer SIGCHLD fra pid %d\n"
 
-#: src/main.c:1116
+#: src/main.c:1112
 #, c-format
 msgid "child process pid %d exited\n"
 msgstr "underproces pid %d afsluttet\n"
 
-#: src/main.c:1125
+#: src/main.c:1121
 #, c-format
 msgid "default exit with signal: %d\n"
 msgstr "standardafslutning med signal: %d\n"
@@ -4482,7 +4766,7 @@ msgstr ""
 "antallet af jobs med 1. Dette tager længst tid at køre.\n"
 
 #: src/mathlib.c:839 src/mathlib.c:846 src/mathlib.c:852 src/mathlib.c:869
-#: src/mathlib.c:874 src/mathlib.c:989
+#: src/mathlib.c:874 src/mathlib.c:981
 msgid "Mathlib Benchmark"
 msgstr "Mathlib-benchmark"
 
@@ -4558,17 +4842,17 @@ msgstr ""
 "\n"
 "Klik OK for at fortsætte, denne dialog lukkes, når det er færdigt."
 
-#: src/mathlib.c:931
+#: src/mathlib.c:926
 #, c-format
 msgid "Starting %s benchmark (-j %d)\n"
 msgstr "Starter %s benchmark (-j %d)\n"
 
-#: src/mathlib.c:1022
+#: src/mathlib.c:1014
 #, c-format
 msgid "mathlib_lock_intel: Cannot find library for mathlib ID='%s'\n"
 msgstr "mathlib_lock_intel: Kan ikke finde bibliotek for mathlib ID='%s'\n"
 
-#: src/mathlib.c:1033
+#: src/mathlib.c:1025
 #, c-format
 msgid ""
 "\n"
@@ -4595,25 +4879,25 @@ msgstr ""
 "* \n"
 "* Se Intels dokumentation om mkl_set_threading_layer() for flere detaljer.\n"
 
-#: src/mathlib.c:1108
+#: src/mathlib.c:1100
 msgid "zgetrf: current_mathlib is NULL, this should never happen.\n"
 msgstr "zgetrf: current_mathlib er NULL, dette bør aldrig ske.\n"
 
-#: src/mathlib.c:1132 src/mathlib.c:1177
+#: src/mathlib.c:1124 src/mathlib.c:1169
 #, c-format
 msgid "%s: unsupported mathlib type %d\n"
 msgstr "%s: ikke-understøttet mathlib-type %d\n"
 
-#: src/mathlib.c:1145
+#: src/mathlib.c:1137
 msgid "zgetrs: current_mathlib is NULL, this should never happen.\n"
 msgstr "zgetrs: current_mathlib er NULL, dette bør aldrig ske.\n"
 
-#: src/mathlib.c:1170
+#: src/mathlib.c:1162
 #, c-format
 msgid "zgetrs warning: lda(%d) != ldb(%d)\n"
 msgstr "zgetrs advarsel: lda(%d) != ldb(%d)\n"
 
-#: src/mathlib.c:1205
+#: src/mathlib.c:1197
 #, c-format
 msgid "dlsym(mkl_set_threading_layer): %s\n"
 msgstr "dlsym(mkl_set_threading_layer): %s\n"
@@ -4950,7 +5234,7 @@ msgstr ""
 "OpenGL er ikke tilgængeligt på denne skærm; skifter til Cairo-renderer. Se "
 "'OpenGL-renderer' i Vis > Gengivelsesindstillinger.\n"
 
-#: src/opengl/opengl_structure_geometry.c:227
+#: src/opengl/opengl_structure_geometry.c:244
 #, c-format
 msgid "generate_network_lines: unknown ntyp=%d\n"
 msgstr "generate_network_lines: ukendt ntyp=%d\n"
@@ -5233,26 +5517,15 @@ msgstr "opt_ui: optimering afsluttet, bedste fitness: %.6g\n"
 msgid "Optimization"
 msgstr "Optimering"
 
-#: src/prerender/prerender_color.c:108
+#: src/prerender/prerender_color.c:109
 #, c-format
 msgid "segment_type_to_rgb: unknown type %d\n"
 msgstr "segment_type_to_rgb: ukendt type %d\n"
 
-#: src/prerender/prerender_color.c:135
+#: src/prerender/prerender_color.c:136
 #, c-format
 msgid "segment_type_to_width: unknown type %d\n"
 msgstr "segment_type_to_width: ukendt type %d\n"
-
-#: src/prerender/prerender_color_proj.c:299
-#: src/prerender/prerender_color_proj.c:326
-#, c-format
-msgid "unhandled color projection %d\n"
-msgstr "uhåndteret farveprojektion %d\n"
-
-#: src/prerender/prerender_color_proj.c:337
-#, c-format
-msgid "invalid color projection %d, using amplitude\n"
-msgstr "ugyldig farveprojektion %d, bruger amplitude\n"
 
 #: src/radiation.c:879
 #, c-format
@@ -5270,53 +5543,53 @@ msgstr ""
 "Gennemsnitlig forstærkning: %.4f (%.2f dBi), effektivitet: %.1f%%, "
 "rumvinkel: %.4f * pi sr\n"
 
-#: src/rc_config.c:808
+#: src/rc_config.c:837
 #, c-format
 msgid "unable to getcwd(): %s\n"
 msgstr "kan ikke getcwd(): %s\n"
 
-#: src/rc_config.c:812
+#: src/rc_config.c:841
 #, c-format
 msgid "environment variable HOME is undefined, using %s\n"
 msgstr "miljøvariablen HOME er udefineret, bruger %s\n"
 
-#: src/rc_config.c:897
+#: src/rc_config.c:926
 #, c-format
 msgid ""
 "%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
 msgstr ""
 "%s (locale=%s): matchede kun %d af %lu tegn, prøver en anden locale: %s\n"
 
-#: src/rc_config.c:977
+#: src/rc_config.c:1006
 msgid "rc_config_default_int: no integer default for field\n"
 msgstr "rc_config_default_int: ingen heltalsstandard for felt\n"
 
-#: src/rc_config.c:1066
+#: src/rc_config.c:1099
 #, c-format
 msgid "rc_config_field_size: %s: unsupported format %s\n"
 msgstr "rc_config_field_size: %s: format %s understøttes ikke\n"
 
-#: src/rc_config.c:1112
+#: src/rc_config.c:1145
 #, c-format
 msgid "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
 msgstr "vindue: x=%-5d y=%-5d w=%-5d h=%-5d  titel: \"%s\"\n"
 
-#: src/rc_config.c:1146
+#: src/rc_config.c:1179
 #, c-format
 msgid "%s: EOF reading application version.\n"
 msgstr "%s: EOF ved læsning af programversion.\n"
 
-#: src/rc_config.c:1152
+#: src/rc_config.c:1185
 #, c-format
 msgid "existing config file version differs: %s != %s\n"
 msgstr "eksisterende konfigurationsfils version adskiller sig: %s != %s\n"
 
-#: src/rc_config.c:1291
+#: src/rc_config.c:1324
 #, c-format
 msgid "stat failed for %s: %s\n"
 msgstr "stat mislykkedes for %s: %s\n"
 
-#: src/rc_config.c:1297
+#: src/rc_config.c:1330
 #, c-format
 msgid ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
@@ -5325,48 +5598,48 @@ msgstr ""
 "Rettede %s mappetilladelser fra 0%o til 0%o fra fejl introduceret i "
 "4e62893b.\n"
 
-#: src/rc_config.c:1328
+#: src/rc_config.c:1361
 #, c-format
 msgid "%s:%d: Line not parsed: %s\n"
 msgstr "%s:%d: Linje ikke parset: %s\n"
 
-#: src/rc_config.c:1334
+#: src/rc_config.c:1367
 #, c-format
 msgid "%s:%d: Early end of file for %s: %s \n"
 msgstr "%s:%d: Tidligt filslut for %s: %s \n"
 
-#: src/rc_config.c:1359
+#: src/rc_config.c:1392
 #, c-format
 msgid "%s:%d: parse error (%s): %s \n"
 msgstr "%s:%d: parsefejl (%s): %s \n"
 
-#: src/rc_config.c:1373
+#: src/rc_config.c:1406
 #, c-format
 msgid "Invalid sky model index %d in config, resetting to default\n"
 msgstr ""
 "Ugyldig himmelsmodelindeks %d i konfiguration, nulstiller til standard\n"
 
-#: src/rc_config.c:1379
+#: src/rc_config.c:1412
 #, c-format
 msgid "Invalid earth model index %d in config, resetting to default\n"
 msgstr "Ugyldig jordmodelindeks %d i konfiguration, nulstiller til standard\n"
 
-#: src/rc_config.c:1385
+#: src/rc_config.c:1418
 #, c-format
 msgid "Invalid interp method %d in config, resetting to default\n"
 msgstr ""
 "Ugyldig interpolationsmetode %d i konfiguration, nulstiller til standard\n"
 
-#: src/rc_config.c:1560
+#: src/rc_config.c:1593
 msgid "batch mode: skipping configuration save\n"
 msgstr "batch-tilstand: springer konfigurationsgemning over\n"
 
-#: src/rc_config.c:1567
+#: src/rc_config.c:1600
 #, c-format
 msgid "cannot open xnec2c's config file %s: %s\n"
 msgstr "kan ikke åbne xnec2c's konfigurationsfil %s: %s\n"
 
-#: src/rdpattern_ui.c:37
+#: src/rdpattern_ui.c:36
 msgid ""
 "Animation requires near field data.\n"
 "\n"
@@ -5380,7 +5653,7 @@ msgstr ""
 "H-felt-animation: Tilføj NH-kort til NEC-fil\n"
 "Poynting-vektor: Tilføj både NE- og NH-kort"
 
-#: src/rdpattern_ui.c:93
+#: src/rdpattern_ui.c:92
 #, c-format
 msgid ""
 "Scale_Gain_Resolved: gain_style %d out of range [0..%d], defaulting to "
@@ -5389,7 +5662,7 @@ msgstr ""
 "Scale_Gain_Resolved: gain_style %d uden for interval [0..%d], bruger "
 "standard GS_LINP\n"
 
-#: src/rdpattern_ui.c:562 src/rdpattern_ui.c:568
+#: src/rdpattern_ui.c:484 src/rdpattern_ui.c:490
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
@@ -5397,7 +5670,7 @@ msgstr ""
 "Observationselevationsvinkel. Flytter himmel/jord-grænse for evaluering af "
 "antennetemperatur. 0° = horisont."
 
-#: src/rdpattern_ui.c:565 src/rdpattern_ui.c:571
+#: src/rdpattern_ui.c:487 src/rdpattern_ui.c:493
 msgid ""
 "Observation elevation for antenna temperature.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -5405,7 +5678,7 @@ msgstr ""
 "Observationselevation for antennetemperatur.\n"
 "Vælg Gain Style → Noise Temperature for at aktivere."
 
-#: src/rdpattern_ui.c:574
+#: src/rdpattern_ui.c:496
 msgid ""
 "Independent sky, earth, and interpolation selectors for noise temperature "
 "models."
@@ -5413,7 +5686,7 @@ msgstr ""
 "Uafhængige himmel-, jord- og interpolationsvælgere for "
 "støjtemperaturmodeller."
 
-#: src/rdpattern_ui.c:576
+#: src/rdpattern_ui.c:498
 msgid ""
 "Sky and earth noise temperature models.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -5421,85 +5694,85 @@ msgstr ""
 "Himmel- og jordstøjtemperaturmodeller.\n"
 "Vælg Gain Style → Noise Temperature for at aktivere."
 
-#: src/rdpattern_ui.c:961
+#: src/rdpattern_ui.c:796
 msgid "Total Gain"
 msgstr "Total forstærkning"
 
-#: src/rdpattern_ui.c:962
+#: src/rdpattern_ui.c:797
 msgid "Horizontal Polarization"
 msgstr "Horisontal polarisering"
 
-#: src/rdpattern_ui.c:963
+#: src/rdpattern_ui.c:798
 msgid "Vertical Polarization"
 msgstr "Vertikal polarisering"
 
-#: src/rdpattern_ui.c:964
+#: src/rdpattern_ui.c:799
 msgid "RH Circular Polarization"
 msgstr "Højredrejet cirkulær polarisering"
 
-#: src/rdpattern_ui.c:965
+#: src/rdpattern_ui.c:800
 msgid "LH Circular Polarization"
 msgstr "Venstredrejet cirkulær polarisering"
 
-#: src/rdpattern_ui.c:970
+#: src/rdpattern_ui.c:805
 msgid "Linear Power"
 msgstr "Lineær effekt"
 
-#: src/rdpattern_ui.c:971
+#: src/rdpattern_ui.c:806
 msgid "Linear Voltage"
 msgstr "Lineær spænding"
 
-#: src/rdpattern_ui.c:972
+#: src/rdpattern_ui.c:807
 msgid "ARRL Scale"
 msgstr "ARRL-skala"
 
-#: src/rdpattern_ui.c:973
+#: src/rdpattern_ui.c:808
 msgid "Logarithmic Scale"
 msgstr "Logaritmisk skala"
 
-#: src/rdpattern_ui.c:974
+#: src/rdpattern_ui.c:809
 msgid "Noise Temperature"
 msgstr "Støjtemperatur"
 
-#: src/rdpattern_ui.c:975
+#: src/rdpattern_ui.c:810
 msgid "Noise Temp (log scale)"
 msgstr "Støjtemp. (log-skala)"
 
-#: src/rdpattern_ui.c:987
+#: src/rdpattern_ui.c:822
 msgid "Radiation Pattern: - "
 msgstr "Strålingsdiagram: - "
 
-#: src/rdpattern_ui.c:1007
+#: src/rdpattern_ui.c:842
 msgid "Near Fields:"
 msgstr "Nærfelter:"
 
-#: src/rdpattern_ui.c:1009
+#: src/rdpattern_ui.c:844
 msgid " - E Field"
 msgstr " - E-felt"
 
-#: src/rdpattern_ui.c:1011
+#: src/rdpattern_ui.c:846
 msgid " - H Field"
 msgstr " - H-felt"
 
-#: src/rdpattern_ui.c:1013
+#: src/rdpattern_ui.c:848
 msgid " - Poynting Vector"
 msgstr " - Poynting-vektor"
 
-#: src/rdpattern_ui.c:1023
+#: src/rdpattern_ui.c:858
 msgid "Frequency Data Plots - "
 msgstr "Frekvensdata-plot - "
 
-#: src/render/gradient_cache.c:77
+#: src/render/gradient_cache.c:78
 #, c-format
 msgid "fstep=%d is out of bounds. calc_data.steps_total=%d"
 msgstr "fstep=%d er uden for grænserne. calc_data.steps_total=%d"
 
-#: src/render/gradient_cache.c:311
+#: src/render/gradient_cache.c:312
 #, c-format
 msgid "gradient_cache_update: surface creation failed (%dx%d)\n"
 msgstr "gradient_cache_update: overfladeoprettelse mislykkedes (%dx%d)\n"
 
-#: src/render/render_dispatch.c:474
+#: src/render/render_dispatch.c:447
 #, c-format
 msgid "render: unhandled mode %d\n"
 msgstr "render: uhåndteret tilstand %d\n"
@@ -5535,6 +5808,10 @@ msgstr "Hankel ikke gyldig for Z = 0"
 #: src/somnec.c:807
 msgid "No convergence"
 msgstr "Ingen konvergens"
+
+#: src/structure_ui.c:109
+msgid "unreachable palette kind sentinel\n"
+msgstr "uopnåelig palettetype-sentinel\n"
 
 #: src/sy_expr.c:137
 msgid "(further errors suppressed)\n"
@@ -5631,37 +5908,37 @@ msgstr ""
 "Styrer om denne parameter tilsidesætter NEC-modelværdien.\n"
 "Fjern markering af Opt for at styre uafhængigt."
 
-#: src/themes/theme.c:129
+#: src/themes/theme.c:136
 #, c-format
 msgid "theme '%s' role '%s' invalid color, using legacy default\n"
 msgstr "tema '%s' rolle '%s' ugyldig farve, bruger forældet standard\n"
 
-#: src/themes/theme.c:212
+#: src/themes/theme.c:219
 #, c-format
 msgid "theme: cannot load resource %s: %s\n"
 msgstr "tema: kan ikke indlæse ressource %s: %s\n"
 
-#: src/themes/theme.c:222
+#: src/themes/theme.c:229
 #, c-format
 msgid "theme: cannot parse resource %s: %s\n"
 msgstr "tema: kan ikke fortolke ressource %s: %s\n"
 
-#: src/themes/theme.c:248
+#: src/themes/theme.c:255
 #, c-format
 msgid "theme: cannot parse %s, using built-in defaults\n"
 msgstr "tema: kan ikke fortolke %s, bruger indbyggede standarder\n"
 
-#: src/themes/theme.c:377
+#: src/themes/theme.c:384
 #, c-format
 msgid "theme '%s' has no inverted variant, using base\n"
 msgstr "tema '%s' har ingen inverteret variant, bruger basis\n"
 
-#: src/themes/theme.c:385
+#: src/themes/theme.c:392
 #, c-format
 msgid "theme '%s' not found, using legacy\n"
 msgstr "tema '%s' ikke fundet, bruger forældet\n"
 
-#: src/themes/theme.c:457
+#: src/themes/theme.c:464
 #, c-format
 msgid "width '%s' invalid, keeping current value\n"
 msgstr "bredde '%s' ugyldig, beholder nuværende værdi\n"
@@ -5806,7 +6083,7 @@ msgstr "    %d. %s\n"
 msgid "%s:\n"
 msgstr "%s:\n"
 
-#: src/validation_dump.c:33
+#: src/validation_dump.c:34
 msgid ""
 "validation: nec2-builtin mathlib not available; numeric results may differ "
 "from reference\n"
@@ -5814,21 +6091,21 @@ msgstr ""
 "validation: nec2-builtin mathlib ikke tilgængeligt; numeriske resultater kan "
 "afvige fra reference\n"
 
-#: src/validation_dump.c:38
+#: src/validation_dump.c:39
 msgid "validation: forced mathlib to nec2-builtin for reproducibility\n"
 msgstr "validation: tvang mathlib til nec2-builtin for reproducerbarhed\n"
 
-#: src/validation_dump.c:57
+#: src/validation_dump.c:58
 msgid ""
 "validation: forced antenna-temp models and elevation for reproducibility\n"
 msgstr ""
 "validation: tvang antenne-temp-modeller og elevation for reproducerbarhed\n"
 
-#: src/validation_dump.c:67
+#: src/validation_dump.c:68
 msgid "validation: forced polarization to total for reproducibility\n"
 msgstr "validation: tvang polarisering til total for reproducerbarhed\n"
 
-#: src/validation_dump.c:78
+#: src/validation_dump.c:79
 msgid ""
 "validation: reset structure viewer to default orientation for "
 "reproducibility\n"
@@ -5836,24 +6113,24 @@ msgstr ""
 "validation: nulstillede strukturviseren til standardorientering for "
 "reproducerbarhed\n"
 
-#: src/validation_dump.c:568 src/validation_dump.c:574
+#: src/validation_dump.c:584 src/validation_dump.c:590
 msgid "Validation Tree"
 msgstr "Valideringstræ"
 
-#: src/validation_dump.c:568
+#: src/validation_dump.c:584
 msgid "Cannot save: frequency loop not done"
 msgstr "Kan ikke gemme: frekvensløkken er ikke færdig"
 
-#: src/validation_dump.c:574
+#: src/validation_dump.c:590
 msgid "Cannot create output directory"
 msgstr "Kan ikke oprette outputmappe"
 
-#: src/validation_dump.c:606
+#: src/validation_dump.c:622
 #, c-format
 msgid "validation tree written to: %s\n"
 msgstr "valideringstræ skrevet til: %s\n"
 
-#: src/xnec2c.c:282
+#: src/xnec2c.c:281
 #, c-format
 msgid ""
 "complex dielectric constant from file: %12.5E%+12.5Ej, requested: %12.5E"
@@ -5862,36 +6139,36 @@ msgstr ""
 "kompleks dielektrisk konstant fra fil: %12.5E%+12.5Ej, anmodet: %12.5E"
 "%+12.5Ej\n"
 
-#: src/xnec2c.c:285
+#: src/xnec2c.c:284
 msgid "Ground_Parameters():Error in ground parameters"
 msgstr "Ground_Parameters():Fejl i jordparametre"
 
-#: src/xnec2c.c:708
+#: src/xnec2c.c:704
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
 msgstr "%.6f MHz: %f sekunder. (%s)\n"
 
-#: src/xnec2c.c:962
+#: src/xnec2c.c:958
 #, c-format
 msgid "green_line_eval returned unknown class %d\n"
 msgstr "green_line_eval returnerede ukendt klasse %d\n"
 
-#: src/xnec2c.c:1043
+#: src/xnec2c.c:1039
 #, c-format
 msgid ""
 "step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
 msgstr "trin %d kapløb: afsendte %.6f MHz, aktuel %.6f MHz; genberegner\n"
 
-#: src/xnec2c.c:1139
+#: src/xnec2c.c:1135
 #, c-format
 msgid "child %d has invalid pipe fd during forked collect\n"
 msgstr "underproces %d har ugyldig pipe-fd under forgrenet indsamling\n"
 
-#: src/xnec2c.c:1194
+#: src/xnec2c.c:1190
 msgid "Failed to read data from forked child\n"
 msgstr "Kunne ikke læse data fra forgrenet underproces\n"
 
-#: src/xnec2c.c:1271
+#: src/xnec2c.c:1267
 #, c-format
 msgid ""
 "fmhz_save %.4f MHz outside FR card ranges; reset to %.4f MHz (VSWR %.2f)\n"
@@ -5899,15 +6176,25 @@ msgstr ""
 "fmhz_save %.4f MHz uden for FR-kortintervaller; nulstillet til %.4f MHz "
 "(VSWR %.2f)\n"
 
-#: src/xnec2c.c:1300
+#: src/xnec2c.c:1296
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
 msgstr "Frekvensløkke forløbet tid: %f sekunder. (%s)\n"
 
-#: src/xnec2c.c:1567
+#: src/xnec2c.c:1563
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "kunne ikke starte Frequency_Loop_Thread\n"
 
-#, c-format
-#~ msgid "invalid color family %d, using power\n"
-#~ msgstr "ugyldig farvefamilie %d, bruger potens\n"
+#~ msgid "Total field:"
+#~ msgstr "Totalfelt:"
+
+#~ msgid "Choose peak-envelope or instantaneous (φ=0) near-field vectors."
+#~ msgstr ""
+#~ "Vælg mellem spidsværdi (indhylningskurve) eller øjeblikkelige (φ=0) "
+#~ "nærfeltsvektorer."
+
+#~ msgid "Peak value"
+#~ msgstr "Spidsværdi"
+
+#~ msgid "Instantaneous (φ=0)"
+#~ msgstr "Øjeblikkelig (φ=0)"

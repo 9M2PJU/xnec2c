@@ -71,6 +71,18 @@
 - Hoofdas / Nevenas = major axis / minor axis (polarization ellipse); pair consistently, never "Kleine as" for minor.
 - magnitude → "grootte" for a static/modulus quantity (impedance |Z| = "Z-grootte", "Z grootte / fase"; vector "grootte en richting"); never "amplitude" for impedance modulus. Reserve "amplitude" for the oscillating-field color-projection family only (Momentane amplitude, Piekamplitude, "using amplitude").
 - F/B (front-to-back ratio) → "V/A" (voor-achterverhouding); apply everywhere including compact chart-list abbreviations, never leave standalone "F/B" untranslated once "V/A-verhouding" is the chosen term.
-- oppervlaktepatches = surface patches; use the combining prefix "oppervlakte-" for "surface" in compounds (oppervlaktestromen, oppervlaktegolf), matching standard Dutch technical usage; reserve standalone "oppervlak" for the head-noun sense (Patchoppervlak, draw-style "oppervlak", Cairo-oppervlak).
+- oppervlaktepatches = surface patches; use the combining prefix "oppervlakte-" for "surface" in compounds (oppervlaktestromen, oppervlaktegolf), matching standard Dutch technical usage; reserve standalone "oppervlak" for the head-noun sense (Patchoppervlak, draw-style "oppervlak", Cairo-oppervlak); eg "Surface Sub-division" → "Oppervlakteonderverdeling" (modifier compound), not "Oppervlakonderverdeling".
 - Address: formal "u" register only; never informal "je/jij/jouw" (eg "voordat u benchmarks uitvoert").
 - Lowercase math/coordinate variable "z" (eg "step size limited at z=", "Hankel not valid for z = 0") stays lowercase; do not capitalize to the axis Z. The X/Y/Z-uppercase rule applies to axis labels, not lowercase source variables.
+- Animated/Static color-projection group headers (combo/radio category labels, not buttons) → "Geanimeerd"/"Statisch", no underscore mnemonic, matching the existing "(geanimeerd)/(statisch)" qualifier convention.
+- Polarity (instantaneous sign of a displayed quantity) → "Polariteit", no mnemonic when it is a combo/radio item name, not a menu button.
+- "Current + Charge" (paired-quantity projection name) → "Stroom + Lading", preserving the "+" join.
+- far field → "verre veld", hyphenated in compounds matching the existing "nabije-veld" pattern (eg "Verre-veldbijdrage" for "Far-field Contribution", parallel to "Nabije-veldanimatie" for "Near Field Animation").
+- Nodes/antinodes (standing-wave) → "Knopen/buiken" (classic Dutch standing-wave physics terms), not a literal transliteration; "current nodes/antinodes" → "stroomknopen/-buiken".
+- Comet (moving-crest highlight overlay) → "Komeet"/"kometenkop" for "comet head".
+- ramp/gradient (color-transfer or palette-kind sense, eg "Rainbow ramp", "Color gradient", "using ramp") → "verloop" ("Regenboogverloop", "Kleurverloop"); do not confuse with "Bereik" (dB range control).
+- "Brightness floor" → "Helderheidsondergrens" (floor = "ondergrens" throughout, eg "met een ondergrens zodat nullen zichtbaar blijven").
+- "Overlays:" kept as the English loanword (established graphics/rendering-software term in Dutch).
+- palette kind → "paletsoort"; hue encoding / brightness encoding (internal chroma dev messages) → "tintcodering" / "helderheidscodering"; never reuse "kleurprojectie" for these distinct internal enums.
+- "color tone" (the scale/transfer-family enum in src/color/color_tone.c) → "schaalfamilie", matching the established "Schaalfamilie" UI term; do not introduce a separate "kleurfamilie" synonym.
+- Compound "X vectoren" (eg Poynting-vermogensstroomvectoren) joins without an internal space; Dutch compounds are not split before the head noun.

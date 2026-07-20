@@ -56,6 +56,18 @@
 | batch mode | dávkový režim | |
 | thread | vlákno | |
 | managed allocator | spravovaný alokátor | |
+| hue | odtieň | color-projection hue channel |
+| brightness | jas | color-projection brightness channel |
+| envelope (signal) | obálka | current/amplitude envelope s(n), s(\|I\|) |
+| node (standing wave) | uzol | zero-amplitude point; never "null" literal |
+| antinode (standing wave) | kmitňa | max-amplitude point paired with uzol |
+| crest (wave) | hrebeň (vlny) | instantaneous positive crest, comet overlay |
+| comet (overlay) | kométa | never reuse unrelated string |
+| ramp (palette/curve) | škála | color ramp / rainbow ramp fallback |
+| palette kind | druh palety | color_palette.c fallback messages |
+| scale family / color tone | rodina mierky | Power/dB/Asinh/μ-law/Reinhard/Sigmoid family selector; distinct from "rodina farieb" |
+| companding | kompandovanie | μ-law companding |
+| knee (soft-knee curve) | koleno | Asinh/Reinhard knee parameter k |
 
 ## Disambiguation
 - Domain context alone disambiguates "prúd"/"náboj"; do not add "elektrický" qualifier unless source text itself qualifies.

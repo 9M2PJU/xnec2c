@@ -39,6 +39,10 @@ Translate as established Spanish EE nouns (already used consistently in this cat
 - load → carga/impedancia de carga depending on context (never "peso").
 - radials → radiales (ground-plane wires; never "relativo al radio" sense).
 
+Color/animation subsystem (keep one term per meaning across the catalog):
+- hue → tono; brightness → brillo; projection → proyección.
+- scale family → familia de escala; the `color_tone` enum error ("invalid color tone") maps to "familia de escala" so runtime messages match the user-facing UI label, not literal "tono".
+
 Disambiguation policy: choose the correct technical sense implicitly from the antenna-simulator context; do not append clarifying qualifiers absent from the English source (e.g. "Ver Corrientes", not "Ver Corrientes Eléctricas").
 
 ## 5. Hotkey policy

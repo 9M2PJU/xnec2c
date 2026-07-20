@@ -17,7 +17,9 @@
 ## 3. Formality and informality
 
 - Use formal "Anda" (capitalized) for second person in any user-facing dialog text; never use informal "kamu"/"lu".
-- UI imperative commands (buttons/menu items) omit both "Anda" and softening particles like "silakan"; keep them terse, matching English UI convention (e.g. plain "Simpan", not "Silakan simpan").
+- UI imperative commands (buttons/menu items) omit both "Anda" and softening particles like "silakan"; keep them terse, matching English UI convention (e.g. plain "Simpan", not "Silakan simpan"). "silakan"/"SILAKAN" is permitted only inside dialog/error prose that mirrors an English "please".
+- Add a GTK mnemonic underscore only where the source msgid carries one at the corresponding letter; never invent a mnemonic for a label whose msgid has none (e.g. radio label "Animated" → "Animasi", but menu "A_nimate" → "A_nimasi"). Sibling controls in one group share the source's presence/absence of mnemonics.
+- Menu-path references inside message text must name the menu by its translated label; the File menu is "_File", so cross-references read "File->…", never "Berkas->…".
 - Dialog/confirmation messages addressing the user directly use "Anda" where the English source has "you" (e.g. "Are you sure..." → "Apakah Anda yakin...").
 
 ## 4. NEC2 electromagnetic-simulation domain mapping

@@ -43,6 +43,13 @@
 | scale | skala / skalér | |
 | flow direction | strømningsretning | one word, established at line 375 |
 | wireframe | trådgitter | |
+| polarity (color sign, diverging hue) | polaritet | electrical/signal sign sense; keep distinct from antenna "polarization" = polarisering (established, unrelated concept, both live in this catalog) |
+| far-field contribution (chroma projection) | fjernfeltbidrag | established at animate.glade:166; not "nærfelt-animation" (that string is reserved for the separate Near Field Animation dialog title) |
+| instantaneous (chroma projection label) | øjeblikkelig | bare label, no "(φ=0)" suffix once msgid dropped it; the qualifier lives in the longer tooltip strings instead |
+| comet (color overlay) | komet | animated bright-head overlay; not "geometri" |
+| hue encoding / brightness encoding (internal) | farvetonekodning / lysstyrkekodning | distinct internal enums; do not collapse both into "farveprojektion" |
+| palette kind | palettetype | |
+| color tone (scale/transfer family enum) | farvefamilie | matches "Skalafamilie:" label family (Power/Log/μ-law/Reinhard/Sigmoid/Asinh/Identity) |
 
 ## 5. Priority application
 

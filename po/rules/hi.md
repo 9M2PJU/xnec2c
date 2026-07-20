@@ -10,10 +10,12 @@
   numerals (०-९). This matches existing entries (`आवृत्ति MHz`, `300ms`,
   `S2P`, etc.) and Indian technical-software convention (Android/Windows
   Hindi locales).
-- Punctuation: use standard Western punctuation (`.` `,` `:` `;` `!` `?`
-  `"…"`) already used throughout this catalog. Do not introduce the
-  Devanagari danda (।) — it is not used in existing entries and is
-  inconsistent with a software UI register.
+- Punctuation: the Devanagari danda (।) is the sentence-final full stop and
+  is used throughout this catalog (~177 occurrences); keep it for full stops.
+  Use Western punctuation for inline separators (`,` `:` `;` `!` `?` `"…"`)
+  and for abbreviations, decimals, units, and Latin technical tokens. Never
+  substitute a Latin period `.` for a sentence-final danda, and never mix the
+  two terminators across sibling strings.
 - No case distinction exists in Devanagari (no uppercase concept); casing
   rules from Latin-script languages do not apply.
 - NEC2 mnemonics, file extensions, unit symbols, and other Latin-script
@@ -92,6 +94,15 @@
   - scale → स्केल
   - peak → शिखर
   - phase → फ़ेज
+  - element (geometry-card dialog heading — Arc/Helical/Patch/Wire Element)
+    → तत्व, consistently; never एलिमेंट/एलीमेंट/अवयव. A matrix entry is a
+    distinct sense ("Element 1,1", "Admittance Matrix Elements") → अवयव.
+  - normalize / normalized / normalization → सामान्यीकरण / सामान्यीकृत
+    (translate; never transliterate नॉर्मलाइज़ / नॉर्मलाइज़्ड / नॉर्मलाइज़ेशन).
+  - minor (axis) → लघु; major (axis) → मुख्य (never माइनर).
+  - card → कार्ड in running Hindi prose (eg "NE कार्ड जोड़ें", "कार्ड हटाएं");
+    keep the source English "Card"/"card" inside a mnemonic-paired dialog-title
+    parenthetical ("(GA card)", "(RP Card)"), matching the source case.
   - wavelength → तरंगदैर्घ्य (from दीर्घ → दैर्घ्य; always spell with घ्य,
     never the misspelling तरंगदैर्ध्य)
   - patch → **never translate** (bare NEC2 geometry term alongside

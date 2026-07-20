@@ -44,9 +44,22 @@
 | color projection | пројекција боје | |
 | geometry | геометрија | |
 | feedpoint | тачка напајања | |
+| overlay (graphic annotation layer) | преклоп | masc. noun; matches existing "cairo преклоп сенчара"; plural "преклопи" |
+| comet (moving-crest marker) | комета | |
+| encoding (hue/brightness) | кодирање | distinct from "пројекција" (projection); do not collapse hue/brightness encodings to one shared msgstr |
+| radius | полупречник | native technical term; never the loanword "радијус" (was inconsistent in geometry.c/geom_edit error strings) |
+| radials (ground wires) | радијали | horizontal ground-plane wires; distinct from "полупречник" |
+| kernel (integral-equation / thin-wire) | језгро | mathematical kernel term; never the transliteration "Кернел" (unify UI EK-card labels with geometry.c messages) |
+| cliff (two-medium ground boundary) | литица | Linear/Circular Cliff ground types; matches "Други медијум (литица)"; never "прелом" |
+| token (expression parser) | токен | not left as Latin "token" |
+| kernel-value coordinate readout z | z (lowercase) | keep the source-lowercase "z=" in "step size limited at z=" messages; do not uppercase to axis-label "Z" |
 
 ## Disambiguation
 - Choose the electrical/domain sense directly (струја=current, наелектрисање=charge, добитак=gain, импеданса=load) without adding a qualifying adjective ("електрична") absent from the English source, per frame disambiguation rule.
+
+## Script hygiene
+- The catalog historically leaked Latin-script (latinica) Serbian words into otherwise-Cyrillic msgstrs (eg `za`, `kada`, `koji`, `jednom`, `ali`, `možete`, `nakon`, `Generisan atlas tekstura oznaka`) and homoglyph mixes (`objекат`, `nepознати`, `иmе`, `даљe`). All Serbian text is Cyrillic; only genuine Latin technical tokens stay Latin. Sweep with two regexes: `[čćžšđČĆŽŠĐ]` (Latin-only diacritics never valid here) and `[A-Za-z][А-Яа-я]|[А-Яа-я][A-Za-z]` (homoglyph adjacency); both must return zero non-token hits.
+- Translate plain English words that are not identifiers/units (eg `legacy` → `наслеђено`); keep API/identifier tokens (inotify, eventfd, FBO, mathlib, MKL, threading).
 
 ## Format specifiers
 - Preserve %s/%d/%c/%f/%% in the same left-to-right order as the msgid; Serbian free word order lets sentence structure adapt around fixed specifier positions.

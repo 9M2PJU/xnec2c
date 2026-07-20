@@ -28,7 +28,13 @@
   - Magnitude → dydis (eg "Instantaneous Magnitude" → "Momentinis dydis", "Peak Magnitude" → "Didžiausias dydis"); keep distinct from Value → reikšmė ("Peak Value" → "Didžiausia reikšmė") so the two separate UI options never collapse to the same label
   - real part → realioji dalis (real./realioji), imag part → menamoji dalis (menam./menamoji); NEVER "tikroji/įsivaizduojamoji" for complex-number parts (eg "Impedance (real/imag)" → "Varža (real./menam.)")
   - Viewer (observer/3D-view direction) → peržiūra / peržiūros (eg "Viewer Gain" → "Peržiūros stiprinimas", "Gain in Viewer Direction" → "Stiprinimas peržiūros kryptimi"); keep one term, do not mix with "stebėtojas"
+  - Near field → artimasis laukas; Far field / far-field contribution → tolimasis laukas / tolimojo lauko indėlis (eg "Far-field Contribution" → "Tolimojo lauko indėlis", "far-field contribution needs radiation pattern data" → uses the same "tolimojo lauko indėlis" noun phrase); keep the near/far pair symmetric
+  - Standing wave / traveling wave node vs antinode → mazgas (node) / pūkšnis (antinode), eg "Nodes/antinodes" → "Mazgai/pūkšniai"; never "kraštinis taškas" or other paraphrase once this pair is set
+  - Overlay (animate dialog checkbox layer, eg current nulls/peaks or field vectors drawn atop the wires) → perdanga / perdangos (eg "Overlays:" → "Perdangos:")
+  - hue vs brightness vs (color) projection are three distinct internal fields, never collapsed to one word: hue encoding → atspalvio kodavimas, brightness encoding → ryškumo kodavimas, color projection → spalvų projekcija (eg dev messages "unhandled hue encoding %d" / "unhandled brightness encoding %d" / "invalid color projection %d" each keep their own noun)
+  - Current + Charge (combined animate-dialog projection choice) → Srovė + krūvis; never "Srovės šaltinis" (Current Source), which is the unrelated EX-card term at "Current Source" → "Srovės šaltinis"
 - Parenthetical mode qualifiers "(static)"/"(animated)" agree in gender with the head noun of the label: masculine karkasas → "(animuotas)"/"(statinis)"; feminine ašis/fazė/tekstūra → "(statinė)"/"(animuota)".
+- Animate-dialog color-projection group headers "Animated"/"Static" name a set of projections (projekcijos, fem pl) → "Animuotos"/"Statinės"; keep both feminine plural and consistent with each other. The projection/near-field mode label "Instantaneous" is masculine singular "Momentinis" (implied momentinis vektorius/vaizdas), used consistently everywhere including "Instantaneous (φ=0)" → "Momentinis (φ=0)"; do not switch it to feminine to match the group headers, the two are different grammatical heads.
 
 ## 3. Formality mapping
 

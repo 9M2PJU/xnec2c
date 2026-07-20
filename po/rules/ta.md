@@ -76,7 +76,7 @@
 | batch mode | தொகுதி பயன்முறை | |
 | treeview | மரக்காட்சி | |
 | convergence (numerical) | ஒருங்கிணைவு | |
-| expression (math/sy_expr) | வெளிப்பாடு | |
+| expression (math/sy_expr) | கோவை | standard Tamil math term for an expression; not வெளிப்பாடு (manifestation/utterance sense) | |
 | colon (punctuation) | முக்காற்புள்ளி | |
 
 ## Never Translate

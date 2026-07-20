@@ -66,6 +66,16 @@ construction by UI element type, 3 covers pronoun/address formality only.
 | patch | патч / патчове | NEC2 surface patch (SP/SM); not "пач" |
 | viewer | наблюдател | Viewer gain/direction |
 | net gain | нетно усилване | consistent "нетно" |
+| far field | далечно поле | symmetric with established "близко поле" (near field); "far-field contribution" = "принос на далечното поле" |
+| ramp (color transfer noun) | градация | eg "Rainbow ramp" → "Дъгова градация"; "invalid palette kind, using ramp" → "...използва се градация" |
+| palette kind | вид палитра | distinct from "цветова проекция" (color projection) and "цветово семейство" (scale/tone family) |
+| color tone (scale/transfer family, src/color/color_tone.c) | цветово семейство | "тон" is reserved for hue (see below); avoid "цветови тон" to prevent collision |
+| hue | тон | eg "Phase Hue" = "Фазов тон"; do not reuse "тон" for the color_tone.c "family" concept |
+| standing wave / traveling wave | стояща вълна / бягаща вълна | "Standing/Traveling" label → "Стояща/Бягаща" |
+| comet (overlay) | комета | visual trail effect on animated wave crest; not "геометрия" |
+| contribution | принос | eg far-field contribution |
+| polarity (instantaneous sign encoding) | Полярност | sign of the displayed quantity (cold negative / hot positive); never "Поляризация" |
+| polarization (antenna/wave) | поляризация | EM wave/antenna polarization (Horizontal/Vertical/Circular, polarization axis); distinct from polarity |
 
 Axis coordinates X/Y/Z stay uppercase in messages even when the English source
 lowercases them (eg "step size limited at z=" → "...при Z="), per the frame's

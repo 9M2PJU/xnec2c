@@ -28,3 +28,10 @@
 - Keep unit symbols and technical abbreviations unchanged: MHz, dBi, Ω, VSWR, S-parametri (S-parameters may take Croatian plural suffix on "parametri" but keep "S-" prefix), dB.
 - Disambiguate per domain sense without adding qualifiers absent from source (per doc/TRANSLATING.md policy): "struja" for current (electrical), "naboj" for charge (electrical), "uzemljenje"/"masa" for ground, "žica" for wire, "dobitak" for gain, "opterećenje"/"impedancija" for load depending on context, "zakrpa" for patch, "uzorak zračenja" for radiation pattern.
 - Established catalog terms to reuse consistently: `struja` (current), `naboj` (charge), `faza` (phase), `iznos`/`veličina` (magnitude), `projekcija` (projection), `zakrpa` (patch), `žica` (wire), `pobuda` (excitation, as already used: `Vrsta pobude`).
+- Computing/CLI lexicon (standardized here for whole-catalog consistency; the loanword/transliteration variants were corrected to the Croatian-normative forms and must not be reintroduced):
+	- library → `knjižnica` (programska knjižnica), never `biblioteka`.
+	- thread → `dretva`, never `nit`/`niti` in the thread sense (beware `niti` is also the conjunction "neither/nor" — leave those).
+	- fork (process) → `račvanje`/`račvati`, never `forkanje`.
+	- batch mode → `skupni način` (matches UI `Skupno`), never `batch način`; keep the literal `--batch` flag name untranslated when it is being named as a flag.
+- Coordinate/axis labels that appear lowercase in a source output template (e.g. `z=` in `step size limited at z=`) stay lowercase — this is a literal program-output token, not a display-convention axis name, so do not upper-case it.
+- Reflexive verbs: intransitive "cool down" is `hladiti se` — keep the `se` (e.g. `elementi se hlade`), not bare `hlade`.

@@ -53,12 +53,14 @@
 | ground / ground plane | mặt đất (RF reference) / mặt phẳng đất | not "đất" alone (soil) when ambiguous |
 | wire | dây (dẫn) | thin conductor; not "cáp" (cable/cord) |
 | gain | độ lợi / khuếch đại | antenna directivity (dB); never "lợi nhuận" (profit) |
-| radiation pattern | giản đồ bức xạ | not "mẫu"/"khuôn" (template/mold) |
+| radiation pattern | giản đồ bức xạ | not "mẫu"/"khuôn" (template/mold); NOT "đồ thị bức xạ" — "đồ thị" is reserved for XY plots (eg "Đồ thị dữ liệu tần số") |
+| gain pattern | giản đồ độ lợi | the gain radiation pattern; same "giản đồ" rule as radiation pattern |
+| net gain | độ lợi ròng | never "độ lợi thực" ("thực" = real part, eg Z-real → Z-thực) |
 | excitation | kích thích | EM energy input; no emotional sense in Vietnamese anyway |
 | load (impedance) | tải | not "gánh nặng" (burden) |
 | segment | đoạn (dây) | NEC2 geometry term |
 | patch | mảnh | NEC2 geometry term (surface patch) |
-| tag | thẻ (đánh dấu hình học) | do not confuse with "thẻ dữ liệu" (data card) |
+| tag | tag (giữ nguyên) | NEC2 geometry identifier; keep English (per doc/TRANSLATING.md) to avoid collision with "thẻ" (card); eg "Số tag", never "Số thẻ" |
 | command/data card | thẻ (lệnh/dữ liệu) | NEC2 card mnemonic carrier, eg "thẻ FR" |
 | geometry | hình học | |
 | polarization | phân cực | |

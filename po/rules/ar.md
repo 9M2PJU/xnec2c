@@ -39,6 +39,7 @@ Locked terms — apply everywhere in po/ar.po, correct technical sense per doc/T
 | gain | كسب | antenna directivity (dB), never "ربح" (profit) |
 | pattern (radiation) | نمط | radiation pattern; keep distinct from "وضع" (mode) used for render/display modes |
 | mode (render/display/batch) | وضع | render/display/batch mode; never نمط (that is reserved for radiation pattern) |
+| draw style (render surface/wireframe select) | وضع (رسم) | belongs to the render-mode family; use وضع, never نمط (reserved for radiation pattern) |
 | excitation | إثارة | EM energy input |
 | load | حمل | impedance load, never "ثقل" (weight) |
 | radials | أسلاك شعاعية | horizontal ground-plane wires |
@@ -55,6 +56,13 @@ Locked terms — apply everywhere in po/ar.po, correct technical sense per doc/T
 | instantaneous | لحظي | |
 | peak | قيمة قصوى / ذروة | قيمة قصوى for the discrete "Peak value/magnitude" UI option; ذروة for the peak/apex of a curve or frequency step in prose |
 | reference (phase) | مرجعي | |
+| node (current null) | عُقدة (ج. عُقد) | zero-current point on a standing wave; also covers "null" when it denotes the same zero-current position (eg overlay marks, brightness floor over near-zero regions) |
+| antinode (current peak) | بطن (ج. بطون) | maximum-current point on a standing wave; distinct from the general scalar "peak value" sense (قيمة قصوى/ذروة) — this is a position along the wire, not a magnitude |
+| crest (wave) | قمة | apex of a traveling/animated wave motion (comet-head, positive-crest tracking); distinct from ذروة (curve/step peak) and قيمة قصوى (discrete peak-value option) |
+| comet (animation overlay) | مذنّب | bright head riding the instantaneous wave crest |
+| magnitude s(n) (chroma/tone-map notation) | المقدار s(n) | the generic scaled/normalized magnitude function; when the source explicitly says "peak magnitude s(n)" translate القيمة القصوى للمقدار s(n) — mirror the source's own peak/bare distinction, do not add or drop "peak" beyond what English states |
+| ramp (palette kind) | تدرّج | matches "gradient" (التدرّج اللوني) |
+| tone (color tone-map family, src/color/color_tone.c) | عائلة (لون) | synonym of "scale family" (عائلة التحجيم) in this codebase; do not introduce a separate word for "tone" here |
 
 Never-translate NEC2 geometry identifiers (per doc/TRANSLATING.md — kept English/LTR):
 

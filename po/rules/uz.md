@@ -23,6 +23,9 @@
 |---|---|---|
 | current (electrical) | tok | never `joriy`/`hozirgi` (time sense) |
 | charge | zaryad | electrical charge |
+| ground / earth (plane) | yer | never `er` (=husband); RF ground plane = `yer tekisligi` |
+| polarity | qutblilik | instantaneous sign; distinct from `qutblanish` (polarization) |
+| polarization | qutblanish | EM wave polarization; never reuse for "polarity" |
 | gain | kuchaytirish | antenna directivity, not profit |
 | polarization | qutblanish | |
 | field | maydon | |
@@ -61,3 +64,9 @@
 | structure viewer | tuzilma koʻruvchi | |
 | validation | tekshiruv | |
 | theme | mavzu | UI theme |
+| hue | tus | never `rang toni`; matches existing `Faza tusi` (Phase Hue) |
+| palette | palitra | |
+| ramp (color) | gradient | reuse the existing `gradient` loanword, not `masshtab`/`shkala` |
+| comet (overlay) | kometa | |
+| identity (color transfer) | identifikatsiya | |
+| loop (frequency/while) | sikl | never `tsikl` (Russian spelling) or `aylanish` (=rotation) |

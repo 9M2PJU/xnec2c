@@ -70,7 +70,29 @@
 | impedance                       | Εμπέδηση                | catalog precedent: "Impedance (real/imag)" -> "Εμπέδηση (πραγμ./φανταστ.)" |
 | pattern (radiation)             | Διάγραμμα (ακτινοβολίας)| |
 | patch / Tag (NEC2 geometry term)| Patch / Tag (unchanged)| Latin loanword, catalog precedent |
+| polarity (sign, +/-)            | Πολικότητα              | false friend of "polarization"; keep distinct from Πόλωση |
+| polarization (antenna axis)     | Πόλωση                  | never used for "polarity" (sign) sense above |
+| animated / animation            | Κίνηση                  | menu-header/category label, no mnemonic underscore unless msgid carries one |
+| static (phase-invariant read)   | Στατικό                 | catalog precedent: "Ροή Patch — Στατικό" |
+| comet (moving-crest overlay)    | Κομήτης                 | animation overlay name, not "Γεωμετρία" |
+| overlay(s)                      | Επικάλυψη / Επικαλύψεις | UI overlay toggles on the animation dialog |
+| hue/brightness encoding         | κωδικοποίηση απόχρωσης / φωτεινότητας | internal color-pipeline error strings |
+| color tone (transfer curve)     | τόνος χρώματος          | distinct from "scale family" (Οικογένεια κλίμακας) |
+| palette kind                    | τύπος παλέτας           | distinct from "color tone" above |
+| power (power-law tone curve n^γ)| Δύναμη                  | mathematical exponentiation, never Ισχύς (electrical watts); label, "power transfer", and "using power" fallback all take δύναμη, matching "Μετασχηματισμός δύναμης n^γ". Reserve Ισχύς for physical power (radiated/dissipated power, power gain, power-flow). |
+| power (electrical, watts)       | Ισχύς                   | radiated/dissipated power, power gain (κέρδος ισχύος), Poynting power-flow (ροή ισχύος) |
+| knee (compressor soft knee k)   | Γόνατο                  | UI slider label is "Γόνατο:"; use everywhere for the knee parameter k, never "σημείο καμπής" |
 
 No qualifier such as "ηλεκτρικό/ηλεκτρικά" is added to Ρεύμα/Φορτίο where
 the electromagnetic-simulator program context already disambiguates the
 sense (matches TRANSLATING.md's Afrikaans/German/Spanish examples).
+
+## 5. Fuzzy-repair caution
+
+Automatic fuzzy-matching in this catalog has previously carried a msgstr
+across to an unrelated msgid with similar English wording (eg "Polarity"
+inheriting "_Πόλωση" from "_Polarization"; "Comet" inheriting "Γεωμετρία"
+from "Geometry"; several `%d`-only chroma/palette error strings all
+inheriting the same wrong sentence). When repairing a fuzzy entry, always
+re-derive the translation from the current msgid text and verify against
+its own tooltip/context rather than trusting the inherited msgstr.

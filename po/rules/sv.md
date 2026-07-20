@@ -104,6 +104,67 @@ electrical charge, etc. (see TRANSLATING.md Context-Dependent Disambiguation).
   itself says "Optimizer Settings" vs the menu's "Optimization Settings", the
   distinct source wording is mirrored ("Optimerarinställningar").
 
+## Lexicon decisions (round 2 — chroma/animate subsystem)
+
+- **hue** (chroma color-projection axis, distinct from "color" in general):
+  "färgton" — used for hue-driven tooltip prose ("Färgtonen visar...",
+  "Divergerande färgton visar..."). Distinct from **tone** (the tone-transfer
+  *family* concept, eg `color_tone.c`, "color tone"): that maps to
+  "skalfamilj", matching the established UI label "Scale family:" =
+  "Skalfamilj:" — never "färgfamilj" (superseded; was an inconsistent
+  pre-existing translation for the same concept, corrected for
+  catalog-wide consistency).
+- **Polarity** (sign-of-quantity color axis, "Polarity"/"Polaritet"): kept
+  distinct from **Polarization** ("Polarisation") — a false-cognate error
+  existed where "Polarity" was mistranslated as "_Polarisation"; these are
+  different EM/UI concepts and must never share a translation.
+- **Instantaneous** (bare projection-mode label): "Momentan" with no
+  "(φ=0)" qualifier when the English source itself has none; the
+  qualifier is added only where the source spells it out, eg "instantaneous
+  (φ=0)" in the near-field vector chooser → "momentana (φ=0)".
+- **palette kind** (internal enum distinct from "color projection" and
+  from "scale family"/tone): "palettyp". Its named fallback value "ramp"
+  renders as "rampskala" (parallel to "Rainbow ramp" → "Regnbågsskala",
+  which also drops bare "ramp" for "-skala").
+- **wave crest** (animation/comet-overlay tooltips): "vågtopp".
+- **Overlays:** (animate-dialog section label) → "Overlag:"; **overlay**
+  (the derived-quantity concept in disabled-widget tooltips, eg
+  config_hooks.c) → "overlag" (neuter), lowercase in running prose.
+- **γ = 0.5 / 48.16 dB style decimal constants in prose**: kept with a
+  period, not a comma — same precedent as the existing γ = 0.5 rule;
+  applies to any literal numeric constant naming a mathematical/standards
+  quantity in these tone-transfer tooltips (μ-law's "48.16 dB" is the
+  fixed μ = 255 companding constant, not a general Swedish prose number).
+- **Multi-paragraph tooltip msgids using a blank `\n\n` line between
+  sentences**: the Swedish msgstr must reproduce the same blank-line
+  paragraph break at the same position; several fuzzy entries had a
+  stale msgstr collapsing two msgid paragraphs onto adjacent lines with a
+  single `\n` — always mirror the msgid's exact `\n` vs `\n\n` structure.
+- **Stale "Mirrors the X button/menu in the main window." trailing
+  sentences**: several fuzzy entries carried an extra second sentence
+  referencing a sibling widget that no longer appears in the current
+  (shortened) English msgid; when the msgid no longer has that clause,
+  drop it from msgstr rather than preserving it.
+
+## Lexicon decisions (round 3 — animate/settings staged review)
+
+- **radiation pattern → "strålningsdiagram"**: the established, catalog-wide EE
+  term (all menu/title/label entries: "_Strålningsdiagram", "Strålningsdiagram
+  (RP-kort)", "Strålningsdiagramparametrar", etc.) and standard Swedish antenna
+  usage. This overrides the generic `pattern → mönster` mapping in section 4 for
+  this compound; "mönster" stays only for a non-antenna repeating pattern/template.
+  Corrected staged strays "strålningsmönster(data)" → "strålningsdiagram(data)"
+  (near E/H/Poynting field tooltips and the far-field-contribution error string).
+- **hue → "färgton"** applies to labels too: "Phase Hue" → "Fasfärgton" (corrected
+  from "Fasnyans"; "nyans" = nuance/shade, not the codified hue term). Exception:
+  the fixed compound "hue wheel" stays the idiomatic "färghjul" (color wheel).
+- **"Visual only" → "Endast visuellt"**: adverbial word order; "Visuell endast" is
+  an unnatural English calque.
+- **bare "ground" → "jord/jorden"** reaffirmed: "extends below ground" =
+  "sträcker sig under jorden", never "under jordplanet" (that reads the msgid as
+  "ground plane", which it is not). "ligger i jordplanet" is correct only where
+  the msgid says "lies in ground plane".
+
 ## Plural form
 
 `nplurals=2; plural=(n != 1);`

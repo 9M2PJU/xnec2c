@@ -38,6 +38,14 @@
 | validation | валидација |
 | magnitude (field/current) | амплитуда |
 | magnitude/modulus (impedance \|Z\|) | модул (eg "Z-модул", "мод/фаза") |
+| polarity (sign +/−) | поларитет | distinct from "polarization" (поларизација); never conflate |
+| hue | нијанса | standard color-theory term |
+| overlay | преклоп | UI layer drawn atop the base geometry |
+| node / antinode (standing wave) | јазол / антијазол | standard EE standing-wave terminology |
+| far-field contribution | придонес во далечно поле | "far field" = далечно поле, "contribution" = придонес |
+| comet (wave-crest overlay) | комета | direct loanword, matches the visual metaphor |
+| floor (brightness/dB clip level) | под | reused across dB-range and brightness-floor contexts |
+| envelope (amplitude/current) | обвивка | established EE signal-processing term |
 
 ## New lexicon coined this pass
 | English | Macedonian | Rationale |
@@ -52,3 +60,8 @@
 | dynamic range | динамички опсег | standard EE term |
 | brightness | осветленост | standard term |
 | Reinhard / Sigmoid / Asinh / Power / μ-law | left as proper/technical names, only UI verb text translated around them | algorithm names, not translated (cf. "Smith" chart precedent) |
+| hue encoding / brightness encoding (internal) | кодирање на нијанса / кодирање на осветленост | mirrors existing "кодирање" pattern for internal error strings |
+| palette kind (internal enum) | вид на палета | distinct lower-level concept from "scale family" (тон-мапирање); values: линеарна (ramp), дивергентна (diverging), циклична (cyclic) |
+| sentinel (defensive enum value) | сентинел | CS loanword, parallels other untranslated algorithm/technical identifiers |
+| hue wheel | тркало на нијанси | literal "color wheel" analogue |
+| cold/hot (color-temperature metaphor for sign) | ладно/топло | standard Macedonian color-temperature idiom ("топли и ладни бои"), not "студено" (physically cold) |

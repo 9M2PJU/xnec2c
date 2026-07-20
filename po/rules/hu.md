@@ -11,6 +11,7 @@
 - Sentence case throughout; no title case.
 - Keep locked acronyms/terms untranslated: VSWR, dBi, NEC2, S-parameter, GW/GA/GH/EX/LD/FR/RP/GE/EN, patch (label) kept as "Patch".
 - Pro-drop: omit subject pronouns when the verb conjugation carries the person/number.
+- GTK accelerators: no duplicate hotkey letter within one menu. In the Frequency Plots `_View` menu "_S11" keeps `S`, so "_Color Theme" shifts to `Szín_téma` (t).
 
 ## 3. Formality
 - Formal register = 3rd-person-singular/plural verb conjugation implying omitted "Ön/Önök"; never insert the pronoun explicitly, never use informal "te" forms.
@@ -29,7 +30,8 @@
 | excitation | gerjesztés | EM excitation |
 | impedance | impedancia | |
 | phase | fázis | |
-| wire | huzal | |
+| wire | huzal | electrical conductor; NOT "vezeték" — reserve one term. Applies in compounds: huzalsugár, huzalszegmens, kúpos huzal |
+| radial / radials | radiális / radiálisok | ground radial wires; standardized to "radiális", NOT "sugárirányú" (eg "Radiális huzalernyő", "…+ radiálisok") |
 | segment | szegmens | |
 | patch (noun/label) | Patch | kept as-is per existing catalog usage |
 | tag | címke | |
@@ -56,3 +58,12 @@
 | widget | widget | kept (GTK term, established in catalog) |
 | managed allocator | felügyelt foglaló | mem_track terms |
 | validation | validáció / ellenőrzés | context: validation_dump = validáció |
+| overlay (wire-marker toggle) | rárajzolás | Nodes/antinodes, Comet toggles |
+| node / antinode (current) | csomópont / anticsomópont | current-null / current-peak markers |
+| comet (moving-crest marker) | üstökös | eg "Comet" toggle, "üstökösfej" = comet head |
+| identity (transfer curve) | azonosság | scale-family "Identity" curve, n^1 passthrough |
+| sentinel (defensive/unreachable value) | őrérték | eg "unreachable ... sentinel" internal messages |
+| tone-map / tone mapping | tónusleképezés | HDR photographic term (Reinhard curve) |
+| color tone (internal, = scale family) | skálacsalád | src/color/color_tone.c messages; keep same term as "Scale family:" label, NOT "színcsalád" |
+| polarity (instantaneous sign) | polaritás | current/charge sign; NOT "polarizáció" (EM wave polarization is a different concept, see _Polarization) |
+| instantaneous (bare, projection name) | azonnali | plain "Instantaneous" projection label; add "(φ=0)" qualifier only when source includes it |

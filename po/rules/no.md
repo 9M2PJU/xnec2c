@@ -45,5 +45,11 @@
 | feedpoint | matepunkt | antenna feed point; established in freqplots port-selector strings |
 | Power (color/scale family name) | Effekt | family name for the power-law magnitude-to-color transfer, not "linear power" |
 | Asinh, Reinhard, Sigmoid, μ-law | unchanged | named transfer-function/algorithm terms, kept as international technical loanwords like VSWR |
+| polarity (sign, +/−) | Polaritet | electrical/signal sign; never "Polarisering" (that is antenna *polarization*, a distinct EM concept — horizontal/vertical/RH/LH) |
+| polarization (antenna) | Polarisering / Polariseringsakse | antenna polarization sense; keep separate from "polaritet" above |
+| far-field contribution | Bidrag til fjernfelt | per-segment/per-point contribution to a far-field direction; never confuse with "nærfelt" (near-field) — opposite domain concept |
+| comet (visual trail effect) | Komet | translated as an ordinary descriptive noun, unlike the named transfer-function loanwords above; `komethode` for "comet head" |
+| Animated / Static (category headers) | Animert / Statisk | adjective category labels for chroma-source groupings, not imperative verb forms; no hotkey needed (not buttons) |
+| hue encoding / brightness encoding / color tone / palette kind | fargetonekoding / lysstyrkekoding / fargetone / palettype | internal enum-name terms in `pr_*` fallback messages; keep each distinct — do not collapse to the generic "fargeprojeksjon" |
 
 No qualifier is added beyond what the English source states (eg "Strømmer" alone for "Currents", not "Elektriske strømmer") — program context (NEC2 electromagnetic simulator) disambiguates for the user.

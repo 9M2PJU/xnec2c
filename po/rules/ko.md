@@ -30,8 +30,9 @@
 |---|---|---|
 | current | 전류 | electrical current (Amperes), never "현재/최근" |
 | charge | 전하 | electrical charge (Coulombs), never billing |
-| ground / ground plane | 접지 / 그라운드플레인 | RF reference plane, never soil |
-| wire | 도선 | thin conductor, never cable/cord |
+| ground / ground plane | 접지 / 접지면 | RF reference plane, never soil; use 접지면 for "ground plane", 접지 for bare "ground/grounding"; 지면 only for the physical earth/horizon (eg sky/ground boundary) |
+| wire | 도선 | thin conductor, never cable/cord (never 전선/케이블) |
+| field | 필드 / 장 | use 장 in Korean-word compounds (전기장, 자기장, 근접장=near field, 원거리장=far-field); use 필드 after a Latin symbol (E 필드, H 필드) or bare "field" |
 | gain | 이득 | antenna directivity ratio, never profit |
 | pattern (radiation) | 패턴 | 방사 패턴 when qualifying "radiation pattern"; keep bare 패턴 when source is bare |
 | excitation | 여기 | electromagnetic energy input, never emotional state |
@@ -49,3 +50,4 @@
 
 - Use the correct technical sense from §4 without adding qualifiers absent from the English source (eg "전류" alone for "View Currents", not "전기 전류").
 - Add a qualifying word only when Korean usage would otherwise be ambiguous within the specific UI context (eg distinguishing "여기" excitation from other unrelated senses only if genuinely ambiguous in that string).
+- excitation is 여기 catalog-wide, but 여기 also spells the locative "here"; never let both senses collide in one string. When a string needs the locative "here" alongside excitation, reword the locative (eg "이 목록에" = in this list, "여기서" only when no excitation term shares the string) so the sole remaining 여기 reads as excitation.

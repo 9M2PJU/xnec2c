@@ -51,6 +51,16 @@ Established/preferred terms — use these consistently across the catalog:
 | configuration | seadistus / konfiguratsioon | "seadistus" preferred for UI settings, "konfiguratsioon" for config files/CLI |
 | feedpoint | toitepunkt | |
 | port | port | loanword, keep as-is |
+| polarity (sign, +/−) | polaarsus | never "polarisatsioon" (antenna wave polarization); false-friend risk, keep the two senses distinct |
+| polarization (antenna wave) | polarisatsioon | eg "Polarization axis" → "Polarisatsiooni telg"; never used for sign polarity |
+| node / antinode (standing wave) | sõlm / kõhk | "sõlmed/kõhud" for the plural UI pair; never "antisõlm" (calque) |
+| hue encoding / brightness encoding (internal enum) | toonikodeering / heleduskodeering | internal chroma-source encoding selectors; distinct from the user-facing "värviprojektsioon" (Color projection) label |
+| palette kind (internal enum) | paletiliik | distinct from "skaala pere" (scale/tone family, §-linked to "Scale family:") |
+| ramp / gradient (palette kind, color scale) | gradient | loanword; one term for both "ramp" and "gradient" senses, eg "värvigradient" (Color gradient), "Vikerkaar-gradient" (Rainbow ramp) |
+| floor (minimum/lower clamp of a value) | alammäär | never "põrand" (room floor, calque); use one stem for the label ("Brightness floor" → "Heleduse alammäär") and every "floor" tooltip (floored → "alammääraga", below the floor → "alammäärast madalam", hard floor → "range alammäär") |
+| bins (discretization buckets, eg depth sorting) | vahemikud | never "täkked" (notches/tallies); "Depth Bins" → "Sügavuse vahemikud" |
+| override (supersede a value, eg SY symbol) | alistus | never "ülekirjutus" (overwrite); "Symbol Overrides" → "Sümbolite alistused" (plural title/menu); after a count use partitive singular "%d sümboli alistust" |
+| overlay (added visual layer) | kiht | eg "Overlays:" → "Kihid:", "This overlay" → "See kiht"; keep consistent with layer sense |
 
 ## 5. Format specifiers
 

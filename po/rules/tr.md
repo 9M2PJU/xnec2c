@@ -53,6 +53,8 @@
 | tag (NEC2 identifier) | etiket | |
 | frequency | frekans | |
 | phase | faz | |
+| real (part, complex) | gerçel | modern TDK native term; standardized catalog-wide (e.g. "Z-gerçel", "Gerçel Kısım"); never the loanword "reel" nor "gerçek" (=genuine) |
+| imaginary (part, complex) | sanal | modern TDK native term; standardized catalog-wide (e.g. "Z-sanal", "Sanal Kısım"); never the loanword "imajiner" |
 | magnitude | büyüklük / genlik | "büyüklük" for scalar magnitude, "genlik" for waveform amplitude; keep per established use at each site |
 | impedance magnitude (\|Z\|) | büyüklük | scalar magnitude → "büyüklük" (e.g. "Z-magn" = "Z-büyüklük", "Empedans (büyüklük/faz)"); never "genlik" here |
 | amplitude (waveform) | genlik | e.g. color projection "using amplitude" = "genlik kullanılıyor" |
@@ -71,6 +73,13 @@
 | window | pencere | |
 | settings | ayarlar | |
 | error | hata | |
+| hue (color) | ton | e.g. "Phase Hue" = "Faz Tonu"; never "renk" alone (that is the broader "color") |
+| polarity (sign, +/−) | kutupluluk | distinct from antenna "polarization" = "polarizasyon"; never conflate the two |
+| overlay (visual layer) | kaplama | established catalog precedent ("_Overlay Structure" → "_Yapıyı Kapla", "overlay shader" → "kaplama gölgelendiricisi") |
+| comet (moving-crest highlight) | kuyrukluyıldız | animate-dialog overlay name |
+| node / antinode (standing wave) | düğüm / karşı düğüm | physics standing-wave terms |
+| ramp (palette fallback name) | rampa | distinct from "gradient" = "gradyan" (e.g. "Gradyan Anahtarı"); keep the two separate even though visually similar |
+| color tone / scale family | renk tonu | "tone" as in "color tone %d"; do not use "renk ailesi" (family) here — reserve "aile" for the animate-dialog "scale family" UI grouping |
 
 ## Never Translate
 - NEC2 mnemonics: GW, GA, GH, EX, LD, FR, RP, GE, EN, GC, GM, GX, GR, GS, GN, GD, NE, NH,
@@ -94,6 +103,9 @@
   Küçük Eksen ve Toplam Kazanç", "Dikey, Yatay ve Toplam Kazanç").
 - `vs` in chart titles renders as " - " (e.g. "Empedans - Frekans"); keep this
   consistent across all frequency-plot titles.
+- Dialog frame-label card parentheticals join mnemonics with "ve", not "&"
+  (e.g. "(GN ve GD Kartları)", "(SP ve SC Kartları)", "(GW ve GC kartları)");
+  reserve the compact `&` for graph/plot titles only.
 
 ## Format Specifiers
 - Preserve `%s`, `%d`, `%f`, `%c`, `%%`, `%g`, `%lu`, `%llu` etc. in identical

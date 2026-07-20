@@ -24,6 +24,7 @@
   - Prefer impersonal/nominal phrasing (§2) over direct second-person address to sidestep gender marking and read as professional.
   - Where second-person address is unavoidable, default to the masculine form (אתה/-ך), the standard generic form in existing Hebrew technical software; this is a register/genderdefault choice, distinct from the orthographic rules in §1 and the phrasing-structure rules in §2.
   - Maintain a professional, neutral tone throughout; avoid slang, colloquial contractions, or casual particles.
+- Confirmation dialogs use the impersonal infinitive question, never the gender-forcing "אתה בטוח שברצונך" construction (§2): "Are you sure you wish to quit xnec2c?" → "האם לצאת מ-xnec2c?"; "…end the calculation?" → "האם לסיים את החישוב?"; "…close this window?" → "האם לסגור חלון זה?".
 
 ## 4. NEC2 electromagnetic-simulator domain glossary (Hebrew)
 
@@ -42,7 +43,7 @@ Established terms already used in this catalog — reuse them consistently, do n
 | excitation | עירור | |
 | load (electrical) | עומס | not משקל (weight) |
 | wire | תיל | not כבל (cable), not חוט (thread); unify all "wire" senses (Wire Diameter, Thin Wire Kernel, wire radius, radial wires, structure wire segments) to תיל |
-| radials | רדיאלים | established ham-radio transliteration |
+| radials | רדיאלים | established ham-radio transliteration; noun "Radials" (eg "Circular Cliff + Radials") → רדיאלים, distinct from the plural adjective "radial wires" → תילים רדיאליים |
 | segment | מקטע | NEC2 geometry term |
 | patch (surface patch) | טלאי | |
 | pattern (radiation pattern) | תבנית (קרינה) | not תבנית as "template" |
@@ -52,7 +53,15 @@ Established terms already used in this catalog — reuse them consistently, do n
 | geometry | גאומטריה | |
 | frequency | תדר | |
 | structure | מבנה | |
+| model | מודל | not דגם; unify every "model" sense (NEC model, noise-temperature models) |
+| plot / graph | גרף (רבים: גרפים) | "Frequency (Data) Plots" → גרפי (נתוני) תדר; not תרשים |
+| linear | לינארי | standard כתיב מלא — the tzere on נ is not written with yod, so not ליניארי; applies to "linear algebra/power/voltage/wave", גל פוגע לינארי, אלגברה לינארית |
 | scale | קנה מידה | |
+| scale family / color tone (transfer curve) | משפחת קנה מידה | Power/Log/Asinh/μ-law/Reinhard/Sigmoid/None; "color tone" in dev messages is this same family, not משפחת צבע |
+| standing wave / traveling wave | גל עומד / גל נע | short-label pairing "Standing/Traveling" → עומד/נע |
+| null (current) / peak (current) | אפס / שיא | "Nodes/antinodes" UI label and "nulls...peaks" tooltip both map to this pair for consistency |
+| comet (visual overlay) | שביט | animated bright-head overlay riding the wave crest; not גאומטריה |
+| far-field | שדה רחוק | contrasts near-field שדה קרוב; "Far-field Contribution" → תרומת שדה רחוק |
 
 Never-translate list (per doc/TRANSLATING.md): NEC2 card mnemonics (GW, GA, GH, EX, LD, FR, RP, GE, EN), VSWR, dBi, S-parameters, Z, .nec/.csv/.s1p/.s2p/.png, MHz, Ω, degrees.
 
