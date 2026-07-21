@@ -1,7 +1,7 @@
 .de URL
 \\$2 \(laURL: \\$1 \(ra\\$3
 ..
-.TH XNEC2C "1" "August 2023" "@PACKAGE_STRING@" "User Commands"
+.TH XNEC2C "1" "July 2026" "@PACKAGE_STRING@" "User Commands"
 .SH NAME
 xnec2c \- a GTK+ graphical interactive version of nec2c,
 a translation to C of the FORTRAN application NEC2
@@ -70,6 +70,8 @@ specify on the command line will not be written.
 \-\-write\-gnuplot\-structure <filename>  \- write gnuplot structure file
 .IP
 \-\-write\-patch\-currents   <filename>  \- write CSV of patch surface currents
+.IP
+\-\-write\-validation\-dir  <directory> \- write full validation data tree
 .IP
 .SH "ENVIRONMENT"
 .TP
