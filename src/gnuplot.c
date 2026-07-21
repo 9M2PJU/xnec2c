@@ -110,24 +110,29 @@ void Save_FreqPlots_Touchstone(char *filename, int type)
 	switch (type)
 	{
 		case TOUCHSTONE_S1P:
-			fprintf(fp, "!MHz\tS11(Real)\tS11(Ang)\n");
+			fprintf(fp, "!MHz\tS11(dB)\tS11(Ang)\n");
 			format = "{mhz}\t{s11_real}\t{s11_ang}\n";
 			break;
 
 
 		// For .s2p files gain is used as S21 and S12.  We assume they
-		// are passive so S21==S12.  S22 is a bit of a mystery, so we 
+		// are passive so S21==S12.  S22 is a bit of a mystery, so we
 		// assume that all S22 behavior is normalized into S11 and thus
 		// S22 is deminimus and set it to -100 dB.
 		//
+		// The option line declares "DB" format, so each column pair is
+		// (20*log10|S|, angle).  The dBi gain lands in the S21 dB-magnitude
+		// column, making |S21|^2 the power gain; S21 thus carries the
+		// field-amplitude term.  See github issue #80.
+		//
 		case TOUCHSTONE_S2P_MAXGAIN:
 			format = "{mhz}\t{s11_real}\t{s11_ang}\t{gain_max}\t0\t{gain_max}\t0\t-100\t0\n";
-			fprintf(fp, "!MHz\tS11(Real)\tS11(Ang)\tS21(Real)\tS21(Ang)\tS12(Real)\tS12(Ang)\tS22(Real)\tS22(Ang)\n");
+			fprintf(fp, "!MHz\tS11(dB)\tS11(Ang)\tS21(dB)\tS21(Ang)\tS12(dB)\tS12(Ang)\tS22(dB)\tS22(Ang)\n");
 			break;
 
 		case TOUCHSTONE_S2P_VIEWERGAIN:
 			format = "{mhz}\t{s11_real}\t{s11_ang}\t{gain_viewer}\t0\t{gain_viewer}\t0\t-100\t0\n";
-			fprintf(fp, "!MHz\tS11(Real)\tS11(Ang)\tS21(Real)\tS21(Ang)\tS12(Real)\tS12(Ang)\tS22(Real)\tS22(Ang)\n");
+			fprintf(fp, "!MHz\tS11(dB)\tS11(Ang)\tS21(dB)\tS21(Ang)\tS12(dB)\tS12(Ang)\tS22(dB)\tS22(Ang)\n");
 			break;
 
 		default:

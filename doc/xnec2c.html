@@ -2246,7 +2246,10 @@ Plots with <span class="menu-path">File → Save as Touchstone (.SnP)</span>.
 
 <p>
 For <span class="fileext">.s2p</span> files gain is used as S<sub>21</sub> and S<sub>12</sub>: we assume the antenna is
-passive so <code>S<sub>21</sub>&nbsp;==&nbsp;S<sub>12</sub></code>.  S<sub>22</sub> is a bit of a mystery, so we assume
+passive so <code>S<sub>21</sub>&nbsp;==&nbsp;S<sub>12</sub></code>.  The gain is stored in the S<sub>21</sub>
+dB-magnitude column as the field-amplitude term, so the antenna power gain is
+<code>|S<sub>21</sub>|<sup>2</sup></code> and the stored dB value equals the gain in dBi
+(see <a href="https://github.com/KJ7LNW/xnec2c/issues/80">issue&nbsp;#80</a>).  S<sub>22</sub> is a bit of a mystery, so we assume
 that all S<sub>22</sub> behavior is normalized into S<sub>11</sub> and thus S<sub>22</sub> is deminimus
 and set it to −100&nbsp;dB.  This may not be a correct assumption, so please
 provide a suggestion here if you know a better way.
@@ -3522,6 +3525,7 @@ visualization, and internationalization support.</p>
 			<li><span class="contact" data-callsign="G1OGY" data-github="g1ogy">G1OGY</span> &mdash; reported WSL2/Debian compile failure (<a href="https://github.com/KJ7LNW/xnec2c/issues/78" target="_blank" rel="noopener noreferrer">#78</a>)</li>
 			<li><span class="contact" data-github="malcolmboyd">malcolmboyd</span> &mdash; reported optimizer single-frequency issue (<a href="https://github.com/KJ7LNW/xnec2c/issues/62" target="_blank" rel="noopener noreferrer">#62</a>)</li>
 			<li><span class="contact" data-github="AsciiWolf">AsciiWolf</span> &mdash; reported segfault crashes (<a href="https://github.com/KJ7LNW/xnec2c/issues/69" target="_blank" rel="noopener noreferrer">#69</a>)</li>
+			<li><span class="contact" data-github="Peter3579">Peter3579</span> &mdash; thanks for testing and validating the Touchstone format for antenna gain in the virtual two-port model (<a href="https://github.com/KJ7LNW/xnec2c/issues/80" target="_blank" rel="noopener noreferrer">#80</a>)</li>
 		</ul>
 	</li>
 
