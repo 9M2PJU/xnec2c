@@ -692,9 +692,13 @@ List_Commands( void )
     if( !ret )
       gtk_list_store_append( cmnd_store, &iter );
 
-    /* Set numeric data to list store */
+    /* Set the card token, canonicalising a legacy alias to its canonical
+     * spelling in the editor and on save; an unknown token has no canonical
+     * form and passes through unchanged */
+    const char *canon = cmnd_mnemonic( cmnd_mnemonic_num( ain ) );
     gtk_list_store_set(
-        cmnd_store, &iter, CMND_COL_NAME, ain, -1 );
+        cmnd_store, &iter, CMND_COL_NAME,
+        canon ? canon : ain, -1 );
     for( idx = CMND_COL_I1; idx <= CMND_COL_I4; idx++ )
       gtk_list_store_set(
           cmnd_store, &iter, idx, iv[idx-CMND_COL_I1], -1 );

@@ -21,6 +21,7 @@
 #include "shared.h"
 #include "expr_edit.h"
 #include "sy_expr.h"
+#include "input.h"
 
 /*------------------------------------------------------------------------*/
 
@@ -3156,7 +3157,7 @@ Zo_Command( int action )
       /* Insert a new blank ZO row after a selected row,
        * if any, otherwise before the last (EN) row */
       Insert_Blank_Command_Row(
-          cmnd_treeview, cmnd_store, &iter_zo, "ZO" );
+          cmnd_treeview, cmnd_store, &iter_zo, cmnd_mnemonic(Z0) );
 
       /* Scroll tree view to bottom */
       gtk_adjustment_set_value( cmnd_adjustment,

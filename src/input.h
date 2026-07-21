@@ -47,7 +47,7 @@ enum CMND_MNM
   SY, // 16
   TL, // 17
   XQ, // 18
-  ZO, // 19
+  Z0, // 19
   NUM_CMNDS
 };
 
@@ -107,6 +107,22 @@ void readgm_get_field_exprs( char iexprs[][EXPR_FIELD_LEN],
  */
 void readmn_get_field_exprs( char iexprs[][EXPR_FIELD_LEN],
     char fexprs[][EXPR_FIELD_LEN] );
+
+/*
+ * cmnd_mnemonic_num - resolve a card mnemonic to its enumerator
+ *
+ * Consults the canonical mnemonic table first and the legacy alias table
+ * second, so both the canonical and legacy spellings resolve. Returns
+ * NUM_CMNDS when the mnemonic names no command card.
+ */
+enum CMND_MNM cmnd_mnemonic_num( const char *mn );
+
+/*
+ * cmnd_mnemonic - canonical two-character token for a command enumerator
+ *
+ * Returns NULL when the enumerator names no command card.
+ */
+const char *cmnd_mnemonic( enum CMND_MNM num );
 
 #endif
 

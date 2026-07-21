@@ -468,8 +468,19 @@ static const char *const cmnd_mnemonics[] =
   [CM] = "CM", [CP] = "CP", [EK] = "EK", [EN] = "EN", [EX] = "EX",
   [FR] = "FR", [GD] = "GD", [GN] = "GN", [KH] = "KH", [LD] = "LD",
   [NE] = "NE", [NH] = "NH", [NT] = "NT", [PQ] = "PQ", [PT] = "PT",
-  [RP] = "RP", [SY] = "SY", [TL] = "TL", [XQ] = "XQ", [ZO] = "ZO",
+  [RP] = "RP", [SY] = "SY", [TL] = "TL", [XQ] = "XQ", [Z0] = "Z0",
   [NUM_CMNDS] = NULL,
+};
+
+/* Legacy input-only mnemonic aliases mapped to their canonical
+ * enumerator; the NULL alias entry terminates the list. Consulted only
+ * after the canonical table misses, so a canonical spelling never routes
+ * through an alias. */
+static const struct { const char *alias; enum CMND_MNM canon; }
+cmnd_aliases[] =
+{
+  { "ZO", Z0 },   /* legacy letter-O spelling of Z-naught */
+  { NULL, 0 },
 };
 
 /* Geometry card mnemonics indexed by enum GEOM_MNM; the NULL entry at
@@ -512,16 +523,53 @@ is_geometry_mnemonic( const char *mn )
   return mnemonic_in_list( mn, geom_mnemonics );
 }
 
+/* cmnd_mnemonic_num()
+ *
+ * Resolves a two-character card mnemonic to its enumerator, scanning the
+ * canonical table first and the legacy alias table second, so both the
+ * canonical and legacy spellings parse while only the canonical token is
+ * emitted. Returns NUM_CMNDS when the mnemonic names no command card.
+ */
+  enum CMND_MNM
+cmnd_mnemonic_num( const char *mn )
+{
+  int i;
+
+  for( i = 0; cmnd_mnemonics[i] != NULL; i++ )
+    if( strncmp( mn, cmnd_mnemonics[i], 2 ) == 0 )
+      return( i );
+
+  for( i = 0; cmnd_aliases[i].alias != NULL; i++ )
+    if( strncmp( mn, cmnd_aliases[i].alias, 2 ) == 0 )
+      return( cmnd_aliases[i].canon );
+
+  return( NUM_CMNDS );
+}
+
+/* cmnd_mnemonic()
+ *
+ * Returns the canonical two-character token for a command enumerator, or
+ * NULL when the enumerator names no command card.
+ */
+  const char *
+cmnd_mnemonic( enum CMND_MNM num )
+{
+  if( num < 0 || num >= NUM_CMNDS )
+    return( NULL );
+
+  return( cmnd_mnemonics[num] );
+}
+
 /* is_command_mnemonic()
  *
  * Reports whether a mnemonic names a command card, letting the geometry
  * reader tell a misplaced command card apart from a mnemonic that
- * belongs to no section.
+ * belongs to no section. Recognises legacy aliases through the resolver.
  */
   static gboolean
 is_command_mnemonic( const char *mn )
 {
-  return mnemonic_in_list( mn, cmnd_mnemonics );
+  return( cmnd_mnemonic_num( mn ) != NUM_CMNDS );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -1165,9 +1213,7 @@ Read_Commands( void )
     mpcnt++;
 
     /* identify command card id mnemonic */
-    for( ain_num = 0; cmnd_mnemonics[ain_num] != NULL; ain_num++ )
-      if( strncmp( ain, cmnd_mnemonics[ain_num], 2) == 0 )
-        break;
+    ain_num = cmnd_mnemonic_num( ain );
 
     /* take action according to card id mnemonic */
     switch( ain_num )
@@ -1731,7 +1777,7 @@ Read_Commands( void )
          * XQ now is the same as EN because of above */
         break;
 
-      case ZO: /* My addition, impedance against which VSWR is calculated */
+      case Z0: /* My addition, impedance against which VSWR is calculated */
         calc_data.zo = (double)itmp1;
 
         /* Set the Zo spinbutton value */
