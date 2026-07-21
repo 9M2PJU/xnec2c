@@ -316,9 +316,15 @@ nobase_dist_pkgdata_DATA += examples/satellite.nec
 # committed reference data under examples/data/*.csv stays in the list.
 CLEANFILES += examples-automake.lst
 CLEANFILES += examples-srcdir.lst
-check-local: check-examples-file-list check-potfiles-list
+check-local: check-examples-file-list check-potfiles-list check-po-catalogs
 check-potfiles-list:
 	@$(srcdir)/scripts/trans-update.sh --check
+check-po-catalogs:
+	@lc=$$(grep -v '^[[:space:]]*#' $(srcdir)/po/LINGUAS | grep -v '^[[:space:]]*$$'); \
+	for lang in $$lc; do \
+	  $(srcdir)/scripts/trans-check.sh --review $(srcdir)/po/$$lang.po || exit 1; \
+	done
+.PHONY: check-po-catalogs
 check-examples-file-list:
 	@for f in $(nobase_dist_pkgdata_DATA); do echo "$$f"; done | sort > examples-automake.lst
 	@(cd $(srcdir) && find examples -type f -not -name '*.sy' -not -name '*.SY' -not \( -path 'examples/*.csv' ! -path 'examples/*/*.csv' \)) | sort > examples-srcdir.lst
