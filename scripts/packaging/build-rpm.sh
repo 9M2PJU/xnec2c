@@ -34,6 +34,9 @@ fi
 DISTRO=$(grep -m1 '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
 ARCH=$(rpm --eval '%{_arch}')
 
+# RPM Release field cannot contain hyphens; sanitize the distro tag.
+DISTRO_TAG="${DISTRO//-/_}"
+
 PKG_NAME="xnec2c"
 RPM_NAME="${PKG_NAME}-${VERSION}-1.${ARCH}.${DISTRO}.rpm"
 
@@ -60,7 +63,7 @@ mkdir -p "$RPM_TOP"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 cat > "$RPM_TOP/SPECS/xnec2c.spec" << EOF
 Name:           ${PKG_NAME}
 Version:        ${VERSION}
-Release:        1%{?dist}
+Release:        1.${DISTRO_TAG}
 Summary:        A multi-threaded EM tool to model antenna near- and far-field radiation patterns.
 
 License:        GPLv2+
@@ -155,8 +158,10 @@ tar -czf "$TARBALL" \
     --exclude='rpmbuild' \
     .
 
-# Build the RPM.
+# Build the RPM.  --nodeps skips BuildRequires resolution since deps are
+# installed manually by the caller (package names differ across distros).
 rpmbuild -bb \
+    --nodeps \
     --define "_topdir $RPM_TOP" \
     --define "dist .${DISTRO}" \
     --target "$ARCH" \
