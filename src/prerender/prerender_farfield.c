@@ -28,6 +28,7 @@
  */
 #include "prerender_farfield.h"
 #include "prerender_color.h"
+#include "../color/color_ramp.h"
 #include "../shared.h"
 #include "../measurements.h"
 

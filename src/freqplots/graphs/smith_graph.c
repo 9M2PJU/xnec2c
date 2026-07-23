@@ -504,7 +504,7 @@ Plot_Graph_Smith(
   const float annot_text = 1.0f;
 
   /* Normalising-impedance annotation */
-  g_snprintf( z0buf, sizeof(z0buf), _("Z0 = %g Ω"), calc_data.zo );
+  g_snprintf( z0buf, sizeof(z0buf), _("Z₀ = %g Ω"), calc_data.zo );
   fp_add_text(fp, plot_rect.x, plot_rect.y, annot_text, z0buf,
               JUSTIFY_LEFT | JUSTIFY_BELOW, th->colors[THEME_ROLE_MARKER_EXTREME]);
 

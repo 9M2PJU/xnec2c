@@ -94,13 +94,21 @@ xnec2c_SOURCES = \
     view/view_drag.c \
     view/view_gtk.c \
     view/view_presets.h \
+    color/color_srgb.h \
+    color/color_edge.h \
+    color/color_ramp.c     color/color_ramp.h \
+    color/color_palette.c  color/color_palette.h \
+    color/color_tone.c     color/color_tone.h \
+    chroma/chroma_source.c   chroma/chroma_source.h \
+    chroma/chroma_glyph.c    chroma/chroma_glyph.h \
+    chroma/chroma.c          chroma/chroma.h \
+    chroma/chroma_nearfield.c chroma/chroma_nearfield.h \
     prerender/prerender_state.c     prerender/prerender_state.h \
     prerender/prerender_aggregate.c prerender/prerender_aggregate.h \
     prerender/prerender_rdpattern.c prerender/prerender_rdpattern.h \
     prerender/prerender_color.c     prerender/prerender_color.h \
     prerender/prerender_farfield.c  prerender/prerender_farfield.h \
     prerender/presentation_cache_key.c prerender/presentation_cache_key.h \
-    prerender/prerender_nearfield.c prerender/prerender_nearfield.h \
     prerender/prerender_patch_arrow.c prerender/prerender_patch_arrow.h \
     render/render_dispatch.c        render/render_dispatch.h \
     render/render_message.c         render/render_message.h \
@@ -261,7 +269,7 @@ xnec2c_SOURCES += xnec2c-resources.c
 CLEANFILES     += xnec2c-resources.c
 # --generate-phony-targets: emit phony Make targets for each resource file so
 # deleting a resource file triggers a rebuild instead of a stale-dep error.
-xnec2c-resources.c: $(top_srcdir)/resources/xnec2c.gresource.xml $(top_srcdir)/resources/xnec2c.glade $(top_srcdir)/resources/settings/render_settings.glade $(top_srcdir)/resources/settings/opengl_settings.glade $(top_srcdir)/resources/settings/cairo_settings.glade $(top_srcdir)/resources/themes.ini $(top_srcdir)/resources/freqplots_widths.ini
+xnec2c-resources.c: $(top_srcdir)/resources/xnec2c.gresource.xml $(top_srcdir)/resources/xnec2c.glade $(top_srcdir)/resources/animate.glade $(top_srcdir)/resources/settings/render_settings.glade $(top_srcdir)/resources/settings/opengl_settings.glade $(top_srcdir)/resources/settings/cairo_settings.glade $(top_srcdir)/resources/themes.ini $(top_srcdir)/resources/freqplots_widths.ini
 	$(AM_V_GEN)$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/resources --dependency-file=./$(XNEC2C_DEPDIR)/xnec2c-resources.Pc --generate-phony-targets --target=xnec2c-resources.c --generate-source $(top_srcdir)/resources/xnec2c.gresource.xml
 
 # Do not dist the generated source file so that building from tarball

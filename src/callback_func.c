@@ -22,6 +22,9 @@
 #include "shared.h"
 #include "prerender/prerender_state.h"
 #include "prerender/prerender_color.h"
+#include "color/color_ramp.h"
+#include "chroma/chroma.h"
+#include "structure_ui.h"
 #include "mem/mem_track.h"
 
 #include "opengl/opengl_structure.h"
@@ -238,16 +241,6 @@ Card_Clicked(
   void
 Main_Rdpattern_Activate( gboolean from_menu )
 {
-  /* Set structure overlay in Rad Pattern window */
-  if( isFlagClear(OVERLAY_STRUCT) )
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-          Builder_Get_Object(rdpattern_window_builder,
-            "rdpattern_overlay_structure")), FALSE );
-  else
-    gtk_check_menu_item_set_active( GTK_CHECK_MENU_ITEM(
-          Builder_Get_Object(rdpattern_window_builder,
-            "rdpattern_overlay_structure")), TRUE );
-
   /* Sync common projection spinbuttons from the master view. */
   if( rdpattern_view != NULL && rdpattern_view->rotation_master != NULL )
   {
@@ -302,102 +295,57 @@ Main_Freqplots_Activate( void )
 
 /*-----------------------------------------------------------------------*/
 
-/** rdpattern_trigger_redraw() - Shared tail for rdpattern mode activation:
- *  fetch frequency data when drawing is enabled and no frequency loop is
- *  running, then update window labels.
+/** rdpattern_mode_apply() - Apply the radiation-pattern field mode
+ *
+ * Config post_apply hook for rc_config.rdpattern_mode.  Runs at window
+ * create, on restore, and on every field-mode toggle change; the enum
+ * member selects far-field gain, near E/H field, or neither.  Near-field
+ * prep (buffer allocation and the stale-data flag) precedes the fetch so
+ * the fetch sees allocated buffers; without valid card data the renderer
+ * shows the status message on the queued redraw.
  */
-  static void
-rdpattern_trigger_redraw(void)
+  void
+rdpattern_mode_apply( void )
 {
-  if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
-    fetch_freq_data();
+  gboolean have_data;
+
+  if( rc_config.rdpattern_mode == RDPAT_FIELD_GAIN )
+    have_data = isFlagSet( ENABLE_RDPAT );
+  else if( rc_config.rdpattern_mode == RDPAT_FIELD_EHFIELD )
+  {
+    /* Release the gain far-field draw buffers before near-field prep */
+    Free_Draw_Buffers();
+    have_data = ( fpat.nfeh != 0 );
+
+    /* Delegate near field calculations to child processes if forked, then
+     * mark the near field stale; the flag is set inside the same guard as
+     * fetch_freq_data */
+    if( have_data )
+    {
+      if( FORKED )
+        Alloc_Nearfield_Buffers( fpat.nrx, fpat.nry, fpat.nrz );
+      if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
+        SetFlag( DRAW_NEW_EHFIELD );
+    }
+  }
+  else /* RDPAT_FIELD_DISABLED: neither field selected */
+  {
+    /* Release the far-field draw buffers; the queued redraw shows the
+     * no-mode status message */
+    Free_Draw_Buffers();
+    have_data = FALSE;
+  }
+
+  if( have_data )
+  {
+    if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
+      fetch_freq_data();
+  }
+  else
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 
   Set_Window_Labels();
-}
-
-/*-----------------------------------------------------------------------*/
-
-/* Rdpattern_Gain_Togglebutton_Toggled()
- *
- * Callback function for Rad Pattern window Gain button
- */
-  void
-Rdpattern_Gain_Togglebutton_Toggled( gboolean flag )
-{
-  if( flag )
-  {
-    SetFlag( DRAW_GAIN );
-    ClearFlag( DRAW_EHFIELD );
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(
-          Builder_Get_Object(rdpattern_window_builder, "rdpattern_eh_togglebutton")),
-        FALSE );
-
-    /* No RP card: flags are set so the renderer shows the status message;
-     * skip data operations that require valid radiation pattern data */
-    if( isFlagClear(ENABLE_RDPAT) )
-    {
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-      return;
-    }
-
-    /* Enable gain (radiation) pattern plotting */
-    rdpattern_trigger_redraw();
-  }
-  else
-  {
-    /* Disable gain pattern; clear drawingarea if no mode active */
-    ClearFlag( DRAW_GAIN );
-    if( isFlagClear(DRAW_EHFIELD) && isFlagSet(DRAW_ENABLED) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-    Free_Draw_Buffers();
-  }
-} /* Rdpattern_Gain_Togglebutton_Toggled() */
-
-/*-----------------------------------------------------------------------*/
-
-/* Rdpattern_EH_Togglebutton_Toggled()
- *
- * Callback function for Rad Pattern window E/H field button
- */
-  void
-Rdpattern_EH_Togglebutton_Toggled( gboolean flag )
-{
-  if( flag )
-  {
-    SetFlag( DRAW_EHFIELD );
-    ClearFlag( DRAW_GAIN );
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(Builder_Get_Object(
-            rdpattern_window_builder, "rdpattern_gain_togglebutton")), FALSE );
-
-    /* No NE/NH cards: flags are set so the renderer shows the status message;
-     * skip data operations that require valid near-field configuration */
-    if( !fpat.nfeh )
-    {
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-      return;
-    }
-
-    /* Delegate near field calculations to child
-     * processes if forked and near field data valid */
-    if( FORKED )
-      Alloc_Nearfield_Buffers(fpat.nrx, fpat.nry, fpat.nrz);
-
-    /* Mark nearfield data stale before triggering redraw;
-     * flag must be set inside the same guard as fetch_freq_data */
-    if( isFlagSet(DRAW_ENABLED) && isFlagClear(FREQ_LOOP_RUNNING) )
-      SetFlag( DRAW_NEW_EHFIELD );
-
-    /* Enable E/H field plotting */
-    rdpattern_trigger_redraw();
-  }
-  else
-  {
-    /* Disable E/H field; clear drawingarea if no mode active */
-    ClearFlag( DRAW_EHFIELD );
-    if( isFlagClear(DRAW_GAIN) && isFlagSet(DRAW_ENABLED) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  }
-} /* Rdpattern_EH_Togglebutton_Toggled() */
+} /* rdpattern_mode_apply() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -439,105 +387,51 @@ Free_Crnt_Buffs( void )
 
 /*-----------------------------------------------------------------------*/
 
-/* Main_Currents_Togglebutton_Toggled()
+/** structure_view_apply() - Apply the main-window structure view
  *
- * Callback function for Main Currents toggle button
+ * Config post_apply hook for rc_config.structure_view.  Runs at window
+ * create, on restore, and on every view radio change; the enum member
+ * selects geometry, charges, or currents.  Geometry releases the draw
+ * buffers; currents and charges allocate them and fetch the step data.
+ * The rad-pattern structure overlay tracks the same view.
  */
   void
-Main_Currents_Togglebutton_Toggled( gboolean flag )
+structure_view_apply( void )
 {
-  /* Enable calculation and rendering of structure curents */
-  if( flag )
+  const char *label;
+
+  if( rc_config.structure_view == STRUCT_VIEW_CURRENTS )
+    label = _("View Currents");
+  else if( rc_config.structure_view == STRUCT_VIEW_CHARGES )
+    label = _("View Charges");
+  else /* STRUCT_VIEW_DISABLED: geometry only */
+    label = _("View Geometry");
+
+  gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
+          main_window_builder, "struct_label")), label );
+
+  if( rc_config.structure_view == STRUCT_VIEW_DISABLED )
   {
-    SetFlag( DRAW_CURRENTS );
-    ClearFlag( DRAW_CHARGES );
-    Alloc_Crnt_Buffs();
-
-    gtk_toggle_button_set_active(
-        GTK_TOGGLE_BUTTON(Builder_Get_Object(
-            main_window_builder, "main_charges_togglebutton")), FALSE );
-    gtk_label_set_text(GTK_LABEL(Builder_Get_Object(
-            main_window_builder, "struct_label")), _("View Currents") );
-
-    if( fetch_freq_data() )
+    /* Geometry view: release the current/charge draw buffers, then redraw
+     * the structure if a frequency loop is not running */
+    Free_Crnt_Buffs();
+    if( isFlagClear(FREQ_LOOP_RUNNING) )
       xnec2_widget_queue_draw( structure_drawingarea, TRUE );
-
-    if( isFlagSet(OVERLAY_STRUCT) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
   else
   {
-    ClearFlag( DRAW_CURRENTS );
-    if( isFlagClear(DRAW_CHARGES) )
-    {
-      /* Redraw structure on screen if frequency loop is not running */
-      gtk_label_set_text( GTK_LABEL(
-            Builder_Get_Object(main_window_builder, "struct_label")),
-          _("View Geometry") );
-      if( isFlagClear(FREQ_LOOP_RUNNING) )
-      {
-        xnec2_widget_queue_draw( structure_drawingarea, TRUE );
-      }
-      Free_Crnt_Buffs();
-    }
-    if( isFlagSet(OVERLAY_STRUCT) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  }
-
-} /* Main_Currents_Togglebutton_Toggled() */
-
-/*-----------------------------------------------------------------------*/
-
-/* Main_Charges_Togglebutton_Toggled()
- *
- * Callback function for Main Charges toggle button
- */
-  void
-Main_Charges_Togglebutton_Toggled( gboolean flag )
-{
-  if( flag )
-  {
-    SetFlag( DRAW_CHARGES );
-    ClearFlag( DRAW_CURRENTS );
+    /* Currents or charges: allocate the draw buffers, fetch the step data,
+     * and redraw the structure when the fetch reports fresh data */
     Alloc_Crnt_Buffs();
-
-    gtk_toggle_button_set_active(
-        GTK_TOGGLE_BUTTON(
-          Builder_Get_Object(main_window_builder, "main_currents_togglebutton")),
-        FALSE );
-    gtk_label_set_text(GTK_LABEL(
-          Builder_Get_Object(main_window_builder, "struct_label")),
-        _("View Charges") );
-
     if( fetch_freq_data() )
       xnec2_widget_queue_draw( structure_drawingarea, TRUE );
-
-    if( isFlagSet(OVERLAY_STRUCT) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  }
-  else
-  {
-    ClearFlag( DRAW_CHARGES );
-    if( isFlagClear(DRAW_CURRENTS) )
-    {
-      /* Redraw structure on screen if frequency loop is not running */
-      gtk_label_set_text(
-          GTK_LABEL(Builder_Get_Object(
-              main_window_builder, "struct_label")), _("View Geometry") );
-
-      if( isFlagClear(FREQ_LOOP_RUNNING) )
-      {
-        xnec2_widget_queue_draw( structure_drawingarea, TRUE );
-      }
-
-      Free_Crnt_Buffs();
-    }
-
-    if( isFlagSet(OVERLAY_STRUCT) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
   }
 
-} /* Main_Charges_Togglebutton_Toggled() */
+  /* The rad-pattern structure overlay tracks the structure view */
+  if( overlay_struct_active() )
+    xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
+
+} /* structure_view_apply() */
 
 /*-----------------------------------------------------------------------*/
 
@@ -928,6 +822,43 @@ Draw_Colorcode( cairo_t *cr )
   }
 
 } /* Draw_Colorcode() */
+
+/*-----------------------------------------------------------------------*/
+
+/**
+ * draw_colorcode_projected() - Draw the structure legend strip
+ * @cr: cairo context of the main-window color-code drawing area
+ *
+ * Colorizes each strip position through the active color projection and
+ * scale so the legend matches the displayed wire/patch mapping; bounds
+ * for the dB floor come from the displayed quantity's cmin/cmax.
+ */
+  void
+draw_colorcode_projected( cairo_t *cr )
+{
+  chroma_proj_t proj = color_proj_active();
+  color_tone_t fam = color_tone_active();
+  const chroma_proj_row_t *row = &chroma_proj_rows[proj];
+  const palette_t *pal = palette_get(chroma_proj_palette_kind(row->hue_enc));
+  tone_param_t tp;
+  int idx;
+
+  tone_param_init( &tp, fam );
+
+  for( idx = 0; idx < COLORCODE_WIDTH; idx++ )
+  {
+    double p = (double)idx / (double)(COLORCODE_WIDTH - 1);
+    /* Ramp maps the value axis through the tone transfer s(n); the diverging
+     * and cyclic wheels sweep their domain linearly. */
+    double coord = (row->hue_enc == HUE_MAG_RAMP)
+        ? color_tones[fam].transfer( p, &tp ) : p;
+    rgb_f_t c = palette_lookup_scaled( pal, coord, 1.0 );
+
+    cairo_set_source_rgb( cr, c.r, c.g, c.b );
+    Cairo_Draw_Line( cr, idx, 0, idx, COLORCODE_HEIGHT );
+  }
+
+} /* draw_colorcode_projected() */
 
 /*-----------------------------------------------------------------------*/
 

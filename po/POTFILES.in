@@ -1,5 +1,6 @@
 # List of source files containing translatable strings.
 files/xnec2c.desktop.in
+resources/animate.glade
 resources/settings/cairo_settings.glade
 resources/settings/opengl_settings.glade
 resources/settings/render_settings.glade
@@ -23,8 +24,24 @@ src/callback_func.c
 src/callback_func.h
 src/callbacks.c
 src/callbacks.h
+src/chroma/chroma.c
+src/chroma/chroma_glyph.c
+src/chroma/chroma_glyph.h
+src/chroma/chroma.h
+src/chroma/chroma_nearfield.c
+src/chroma/chroma_nearfield.h
+src/chroma/chroma_source.c
+src/chroma/chroma_source.h
 src/cmnd_edit.c
 src/cmnd_edit.h
+src/color/color_edge.h
+src/color/color_palette.c
+src/color/color_palette.h
+src/color/color_ramp.c
+src/color/color_ramp.h
+src/color/color_srgb.h
+src/color/color_tone.c
+src/color/color_tone.h
 src/common.h
 src/config/config_widget.c
 src/config/config_widget.h
@@ -169,8 +186,6 @@ src/prerender/prerender_color.c
 src/prerender/prerender_color.h
 src/prerender/prerender_farfield.c
 src/prerender/prerender_farfield.h
-src/prerender/prerender_nearfield.c
-src/prerender/prerender_nearfield.h
 src/prerender/prerender_patch_arrow.c
 src/prerender/prerender_patch_arrow.h
 src/prerender/prerender_rdpattern.c

@@ -24,6 +24,7 @@
 #include "gdk_scroll.h"
 #include "i18n.h"
 #include "themes/theme.h"
+#include "color/color_palette.h"
 
 /*------------------------------------------------------------------*/
 
@@ -226,6 +227,7 @@ create_main_window( GtkBuilder **builder )
   gchar *object_ids[] = { MAIN_WINDOW_IDS };
   Gtk_Builder( builder, object_ids );
   scroll_install_all_spins( *builder );
+  color_family_menu_attach( *builder );
   ret = Builder_Get_Object( *builder, "main_window" );
   return( ret );
 }
@@ -248,9 +250,8 @@ create_freqplots_window( GtkBuilder **builder )
   Gtk_Builder( builder, object_ids );
   ret = Builder_Get_Object( *builder, "freqplots_window" );
 
-  /* The color-theme registry and the per-purpose widths load once with the
-   * window; the Color Theme submenu is generated from the registry. */
-  theme_registry_init();
+  /* Per-purpose plot widths load once with the window; the Color Theme
+   * submenu is generated from the startup-initialized theme registry. */
   fp_width_init();
   freqplots_theme_menu_build( *builder );
 
@@ -281,8 +282,18 @@ create_freqplots_popup_window( freqplots_view_t *view, const char *graph_name )
    * popup shows its graph's metric values by name. */
   GtkWidget *vbox = gtk_box_new( GTK_ORIENTATION_VERTICAL, 0 );
   gtk_container_add( GTK_CONTAINER(win), vbox );
-  gtk_box_pack_start( GTK_BOX(vbox),
-      freqplots_readout_bar_new( view ), FALSE, FALSE, 0 );
+
+  /* One top row gives the readout bar the leading width and pins an optional
+   * port selector at its minimum width against the right edge, matching the
+   * main window; a graph that never follows the port contributes no selector
+   * and the readout bar fills the row alone. */
+  GtkWidget *topbar = gtk_box_new( GTK_ORIENTATION_HORIZONTAL, 0 );
+  gtk_box_pack_start( GTK_BOX(topbar),
+      freqplots_readout_bar_new( view ), TRUE, TRUE, 0 );
+  GtkWidget *port_combo = freqplots_port_combo_new( view );
+  if( port_combo != NULL )
+    gtk_box_pack_end( GTK_BOX(topbar), port_combo, FALSE, FALSE, 0 );
+  gtk_box_pack_start( GTK_BOX(vbox), topbar, FALSE, FALSE, 0 );
 
   da = gtk_drawing_area_new();
   gtk_box_pack_start( GTK_BOX(vbox), da, TRUE, TRUE, 0 );
@@ -347,8 +358,17 @@ create_error_dialog( GtkBuilder **builder )
 create_animate_dialog( GtkBuilder **builder )
 {
   GtkWidget *ret = NULL;
-  gchar *object_ids[] = { ANIMATE_DIALOG_IDS };
-  Gtk_Builder( builder, object_ids );
+  GError *gerror = NULL;
+
+  /* Load the standalone animate dialog whole through its own builder,
+   * mirroring sy_overrides_init rather than filtering ids from xnec2c.glade. */
+  *builder = gtk_builder_new();
+  if( !gtk_builder_add_from_resource( *builder, "/animate.glade", &gerror ) )
+  {
+    pr_err("create_animate_dialog: failed to load animate.glade: %s\n", gerror->message);
+    exit( -1 );
+  }
+  gtk_builder_connect_signals( *builder, NULL );
   ret = Builder_Get_Object( *builder, "animate_dialog" );
   return( ret );
 }

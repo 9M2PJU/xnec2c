@@ -49,6 +49,7 @@ window.addEventListener('load', function() {
     'VK': { flag: '🇦🇺', name: 'Australia' },
     'PA': { flag: '🇳🇱', name: 'Netherlands' },
     'NL': { flag: '🇳🇱', name: 'Netherlands' },
+    '9M': { flag: '🇲🇾', name: 'Malaysia' },
     'US': { flag: '🇺🇸', name: 'United States' }
   };
 
@@ -1003,6 +1004,11 @@ many more features:
 <pre><code>sudo port install xnec2c</code></pre>
 <p>See <a target="_blank" rel="noopener noreferrer" href="https://ports.macports.org/port/xnec2c/">MacPorts xnec2c</a> for details. Thanks to <span class="contact" data-callsign="VK1KCM" data-github="vk1kcm">Carl Makin</span> for providing this package in <a target="_blank" rel="noopener noreferrer" href="https://github.com/KJ7LNW/xnec2c/issues/66">issue #66</a>.</p>
 
+<p>The MacPorts port installs a Cairo-rendered build. To build from source
+on macOS, follow the compilation steps below: the Cairo renderer works and
+<code>--disable-opengl</code> builds cleanly. Quartz OpenGL support awaits a
+Mac tester (<a target="_blank" rel="noopener noreferrer" href="https://github.com/KJ7LNW/xnec2c/issues/87">issue #87</a>).</p>
+
 <h4>Compilation</h4>
 <ul>
 <li><code>git clone https://github.com/KJ7LNW/xnec2c.git</code></li>
@@ -1389,6 +1395,9 @@ filenames to write without <code>--batch</code> mode then enable the <span class
 
   <dt><code>--write-patch-currents &lt;filename&gt;</code></dt>
   <dd>Write CSV file of surface patch currents.</dd>
+
+  <dt><code>--write-validation-dir &lt;directory&gt;</code></dt>
+  <dd>Write the full validation data tree to the named directory.</dd>
 </dl>
 <h4>Command Line Notes</h4>
 <p><strong>&lt;<var>input-file-name</var>&gt;</strong>: Specify a NEC2 input file to
@@ -1440,8 +1449,10 @@ drawing area. The background color is black and the structure is
 rendered in blue. The excitation points (segments) are rendered in
 red, the x, y, z axis in white, loaded segments in yellow,
 transmission lines in cyan and two-port networks in magenta. These
-colors are hard-coded in the source code and at this stage of
-development there is no option to change them.
+default colors are supplied by the active color theme; the current color
+projection controls (see <a href="#ColorProjection">Current Color
+Projection and Tone Mapping</a>) determine how current and charge map to
+color, and the frequency plots carry their own selectable themes.
 <p>Once an input file is opened, the structure display can be
 rotated around the Z axis and tilted about a horizontal axis
 through the origin. This can be done either by pressing button #1
@@ -1511,7 +1522,7 @@ The <span class="menu-path">Current Visualization</span> submenu selects how cur
 flow is depicted on the structure; see
 <a href="#CurrentVisualization">Current Flow Visualization</a>.
 The <span class="menu-path">Animate</span> item opens the
-<a href="#RadiationWindow">near-field animation dialog</a>.
+<a href="#ColorProjection">Near Field Animation panel</a>.
 The <span class="menu-path">Symbol Overrides</span> item opens the
 <a href="#SymbolicVariables">SY parameter tuning window</a>.
 The <span class="menu-path">OpenGL Settings…</span> item opens the
@@ -1596,19 +1607,19 @@ by the color of the lines as using the line length for this purpose
 makes most lines too small to be useful. The drawing of the Near E
 or H Fields can be enabled or disabled by the <span class="menu-path">Near Field → Near E Field</span> and <span class="menu-path">Near Field → Near H Field</span>
 menu items.</p>
+<figure>
+<img src="images/satellite-nearfield.png" alt="Radiation Pattern window in E/H Fields mode showing near-field E vectors around the satellite example structure" loading="lazy">
+<figcaption>The <span class="filepath">examples/satellite.nec</span> model rendered in
+<span class="ui-button">E/H Fields</span> mode: near-field E vectors surround the
+structure, colored by field strength. The Near Field Animation panel animates the
+phase of this display.</figcaption>
+</figure>
 <p>The <span class="menu-path">Near Field → Animate Dialog</span> menu item (also
 available from <span class="menu-path">View → Animate</span> in the
-<a href="#MainWindow">Main window</a>) opens a dialog for setting
-animation parameters. The <span class="ui-button">Frames/Sec</span>
-spin button sets the target frame rate (1–120, default 30). The
-<span class="ui-button">Animate Frequency</span> spin button specifies a
-fictitious (slowed down) excitation frequency for which the
-animation is performed; the default is 1.0&nbsp;Hz. Clicking
-<span class="ui-button">Start</span> begins the animation;
-<span class="ui-button">Stop</span> halts it; <span class="ui-button">Close</span>
-dismisses the dialog. Changing either spin button value auto-applies
-after a 500&nbsp;ms pause, restarting the animation without pressing
-<span class="ui-button">Start</span>.</p>
+<a href="#MainWindow">Main window</a>) opens the Near Field Animation panel,
+which drives the phase animation and the current, charge, and near-field
+color mapping. See <a href="#ColorProjection">Near Field Animation and Color
+Mapping</a> for its controls.</p>
 <p>The <span class="ui-button">Total Field</span> sub-menu allows the selection of drawing
 either the <span class="ui-button">Peak</span> value or a "time-frozen" <span class="ui-button">Instantaneous (φ=0)</span> snapshot of
 the instantaneous value of the total Near Field E/H vectors. The
@@ -2074,6 +2085,78 @@ and G/T</a> reference by
 <span class="contact" data-callsign="DG7YBN">Hartmut
 Kl&uuml;ver</span>, DG7YBN.</p>
 
+<h4 id="ColorProjection">Near Field Animation and Color Mapping</h4>
+<p>The <span class="menu-path">Near Field → Animate Dialog</span> (also
+<span class="menu-path">View → Animate</span> in the
+<a href="#MainWindow">Main window</a>) opens the Near Field Animation panel.
+Its controls drive the phase animation and the color mapping, and the color
+settings apply uniformly to segments, patches, and near-field vectors, in
+both animated playback and the ordinary static render.</p>
+
+<dl>
+<dt>Playback</dt>
+<dd>
+<span class="ui-button">Phase</span> &mdash; scrub the display phase across
+0&ndash;720&deg;.
+<span class="ui-button">Frames/Sec</span> &mdash; target frame rate
+(1&ndash;120, default 30).
+<span class="ui-button">Animate Freq</span> &mdash; fictitious slowed-down
+excitation frequency at which the animation runs.
+<span class="ui-button">Start</span>, <span class="ui-button">Stop</span>,
+and <span class="ui-button">Close</span> run and dismiss playback; changing a
+value auto-applies after a brief pause.
+</dd>
+
+<dt>Display</dt>
+<dd>
+A radio group draws <span class="ui-button">None (geometry)</span>,
+<span class="ui-button">Currents</span>, or
+<span class="ui-button">Charges</span>. The
+<span class="ui-button">Near Field</span> checkboxes overlay the
+<em>E field</em>, <em>H field</em>, and <em>Poynting vector</em>. The
+<span class="ui-button">Flow direction</span> menu selects the patch shading
+style.
+</dd>
+
+<dt>Color mapping</dt>
+<dd>
+<span class="ui-button">Color projection</span> &mdash; the axis the color
+encodes, such as <em>Amplitude</em>, <em>Instantaneous</em>, <em>Dual current
+and charge</em>, <em>Standing wave</em>, or <em>Far-field contribution</em>.
+<span class="ui-button">Scale family</span> &mdash; the tone-transfer curve:
+<em>Power</em>, <em>dB</em>, <em>Asinh</em>, <em>mu-law</em>,
+<em>Reinhard</em>, <em>Sigmoid</em>, or <em>None</em>.
+The family slider &mdash; <span class="ui-button">Gamma</span> for the default
+Power curve (v = n<sup>&gamma;</sup>) &mdash; shapes the curve's contrast.
+<span class="ui-button">Brightness floor</span> &mdash; lifts the darkest
+values off black. Adjust the family slider and the brightness floor for the
+best contrast on whatever you are viewing: a low floor with higher gamma
+sharpens peaks, while a higher floor keeps weak regions visible.
+</dd>
+
+<dt>Overlays</dt>
+<dd>
+<span class="ui-button">Nodes/antinodes</span> marks the current extrema, and
+<span class="ui-button">Comet</span> adds a travelling brightness head along
+each wire.
+</dd>
+</dl>
+
+<p>The scale family and brightness floor are not limited to animation. The
+static color projections (<span class="ui-button">Amplitude</span>,
+<span class="ui-button">Standing wave</span>, and
+<span class="ui-button">Far-field contribution</span>) render without phase
+motion, yet still map current, charge, and near-field magnitude through the
+same scale family and brightness floor. Changing these controls therefore
+also re-shades the non-animated structure and near-field displays.</p>
+
+<figure>
+<img src="images/animation.png" alt="Near Field Animation panel with phase, color projection, scale family, gamma, and brightness floor controls" loading="lazy">
+<figcaption>The Near Field Animation panel. The color projection, scale
+family, gamma, and brightness floor shade the wires, patches, and near-field
+vectors in both animated and static views.</figcaption>
+</figure>
+
 <h3 id="FrequencyWindow">Frequency Data Plots window</h3>
 <figure>
 <img src="images/freq_plots.png" class="float-left" alt="Frequency plots window showing VSWR and gain graphs" loading="lazy">
@@ -2246,7 +2329,10 @@ Plots with <span class="menu-path">File → Save as Touchstone (.SnP)</span>.
 
 <p>
 For <span class="fileext">.s2p</span> files gain is used as S<sub>21</sub> and S<sub>12</sub>: we assume the antenna is
-passive so <code>S<sub>21</sub>&nbsp;==&nbsp;S<sub>12</sub></code>.  S<sub>22</sub> is a bit of a mystery, so we assume
+passive so <code>S<sub>21</sub>&nbsp;==&nbsp;S<sub>12</sub></code>.  The gain is stored in the S<sub>21</sub>
+dB-magnitude column as the field-amplitude term, so the antenna power gain is
+<code>|S<sub>21</sub>|<sup>2</sup></code> and the stored dB value equals the gain in dBi
+(see <a href="https://github.com/KJ7LNW/xnec2c/issues/80">issue&nbsp;#80</a>).  S<sub>22</sub> is a bit of a mystery, so we assume
 that all S<sub>22</sub> behavior is normalized into S<sub>11</sub> and thus S<sub>22</sub> is deminimus
 and set it to −100&nbsp;dB.  This may not be a correct assumption, so please
 provide a suggestion here if you know a better way.
@@ -2263,6 +2349,51 @@ values as max gain.
 Once you have your <span class="fileext">.s2p</span> or <span class="fileext">.s1p</span> files you can design a matching circuit
 or other RF behavior in your favorite RF design software.
 </p>
+
+<h4 id="ColorTheme">Color Themes</h4>
+<p>The <span class="menu-path">View → Color Theme</span> menu offers six
+built-in themes for the frequency plots, each with an
+<span class="ui-button">Invert</span> toggle. Place a
+<span class="filepath">~/.xnec2c/themes.ini</span> file to override the
+built-in palettes with your own.</p>
+
+<h4 id="GraphPopups">Detachable Graph Popups</h4>
+<p>Double-click a graph, or right-click a plot-select button, to open a
+single-graph window that carries its own readout bar. Press
+<kbd class="shortcut">Ctrl+W</kbd> to close the popup.</p>
+
+<h4 id="ExcitationPort">Excitation Port Selection</h4>
+<p>For models with more than one <code class="nec-card">EX</code>
+excitation, a per-view selector on the main window and on popup graphs
+picks which feedpoint's impedance, VSWR, and Smith data a view renders.
+This selects among the model's own feedpoints; it is not multiport network
+extraction. No N-port Touchstone (SnP) export exists, and the second port
+of a <span class="fileext">.s2p</span> file carries synthetic antenna gain
+rather than a network parameter. When an excitation defines no feedpoint
+(<code class="nec-card">EX</code> types 1&ndash;4), the impedance-derived
+panels grey out with explanatory tooltips.</p>
+
+<h4 id="SmithChart">Interactive Smith Chart</h4>
+<p>The Smith chart draws a full resistance and reactance grid with a
+wavelengths-toward-generator scale. Click the chart to select the operating
+frequency.</p>
+<figure>
+<img src="images/smith-popout-with-portselect.png" alt="Detached Smith chart window with its own readout bar and the excitation-port selector button" loading="lazy">
+<figcaption>A detached Smith chart popup. Its readout bar shows frequency,
+resistance, reactance, and VSWR; the port button at the top right selects
+which excitation feedpoint the chart renders.</figcaption>
+</figure>
+
+<h4 id="FrequencyClick">Frequency Selection Click Behavior</h4>
+<p>Clicking in a plot selects a frequency, and the two mouse buttons carry
+two different actions: selecting the nearest precalculated frequency step,
+and requesting a fresh calculation at the clicked frequency. By default the
+primary (left) button selects a precalculated step. Traditionally the
+primary button performed the new calculation, but selecting a precomputed
+step is the more common action and avoids forcing a recalculation on every
+click of a computationally expensive model. A persisted
+<span class="menu-path">View</span> toggle swaps the two button actions for
+users who prefer the traditional primary-click recalculation.</p>
 
 <h3 id="OpenGL">OpenGL Rendering</h3>
 <p>
@@ -2755,17 +2886,6 @@ Expression errors during editing are batched and shown in a single consolidated 
 rather than one popup per field.
 </p>
 
-<!-- Placeholder: GW card editor with expression fields.
-     Provide doc/images/gw_card_expressions.png and uncomment:
-<figure>
-<img src="images/gw_card_expressions.png"
-alt="GW card editor dialog showing symbolic expressions in coordinate fields"
-loading="lazy">
-<figcaption>GW tag 1 card editor showing symbolic expressions (<code>X1</code>,
-<code>L1/2</code>) in the coordinate fields rather than numeric values</figcaption>
-</figure>
--->
-
 <h3 id="Optimization">Antenna Geometry Optimization</h3>
 
 <p>
@@ -2912,7 +3032,7 @@ but should fall in the same general range.</li>
 </ol>
 
 <figure>
-<img src="images/sy_2m_yagi_SY_parametric-optimizer.png"
+<img src="images/5el_yagi_SY_parametric-optimizer.png"
 alt="Symbol Overrides window showing optimization variables and fitness goals for the parametric Yagi"
 loading="lazy">
 <figcaption>Symbol Overrides window with optimization controls configured for the
@@ -2920,23 +3040,12 @@ loading="lazy">
 </figure>
 
 <figure>
-<img src="images/sy_2m_yagi_SY_parametric-after-optimized.png"
+<img src="images/5el_yagi_SY_parametric-after-optimized.png"
 alt="Symbol Overrides window showing optimized variable values after Simplex refinement"
 loading="lazy">
 <figcaption>Symbol Overrides after optimization — variable values adjusted by PSO and
 refined by Simplex</figcaption>
 </figure>
-
-<!-- Placeholder: frequency plot screenshot showing VSWR before/after optimization.
-     Provide doc/images/freq_vswr_optimization.png and uncomment:
-<figure>
-<img src="images/freq_vswr_optimization.png"
-alt="Frequency plot comparing VSWR across band before and after optimization"
-loading="lazy">
-<figcaption>VSWR across the 2m band: before optimization showing peaks above 5.0,
-and after optimization with all points below 1.2</figcaption>
-</figure>
--->
 
 <h5>Iterative Refinement</h5>
 
@@ -3407,8 +3516,8 @@ active kernel's validity conditions.</dd>
 <dt><code class="nec-card">SY</code></dt>
 <dd>Symbolic variable definition for parametric modeling, compatible with 4nec2. Defines named constants and expressions that substitute into geometry and command card fields. See <a href="#SymbolicVariables">SY Symbolic Variables and Parameter Tuning</a> for full documentation.</dd>
 
-<dt><code class="nec-card">ZO</code></dt>
-<dd>As of <span class="version-tag">v3.7-beta</span>, this is a new "card" addition to the input file, which I have incorporated to allow the Transmission Line Z<sub>0</sub> to be specified in the NEC2 antenna description file.</dd>
+<dt><code class="nec-card">Z0</code></dt>
+<dd>Specifies the transmission-line reference impedance Z<sub>0</sub> in the NEC2 antenna description file. The mnemonic is canonically <code class="nec-card">Z0</code> (digit zero); legacy decks written with <code class="nec-card">ZO</code> (letter O) still parse.</dd>
 </dl>
 <h2 id="OutputFile">Output File Considerations</h2>
 <p>
@@ -3509,7 +3618,7 @@ Modifier combinations work regardless of widget focus within the window.</p>
 
 <h2 id="Version">Version History (newest first)</h2>
 
-<h3>Version <span class="version-tag">4.5.0</span></h3>
+<h3>Version <span class="version-tag">5.0</span></h3>
 <p>This release adds hardware-accelerated OpenGL rendering, an integrated
 antenna geometry optimizer with three algorithms, symbolic variable
 parametric modeling, noise temperature analysis, current flow
@@ -3521,7 +3630,10 @@ visualization, and internationalization support.</p>
 			<li><span class="contact" data-github="frazij">frazij</span> &mdash; suggested displaying model filename in window titles (<a href="https://github.com/KJ7LNW/xnec2c/issues/77" target="_blank" rel="noopener noreferrer">#77</a>)</li>
 			<li><span class="contact" data-callsign="G1OGY" data-github="g1ogy">G1OGY</span> &mdash; reported WSL2/Debian compile failure (<a href="https://github.com/KJ7LNW/xnec2c/issues/78" target="_blank" rel="noopener noreferrer">#78</a>)</li>
 			<li><span class="contact" data-github="malcolmboyd">malcolmboyd</span> &mdash; reported optimizer single-frequency issue (<a href="https://github.com/KJ7LNW/xnec2c/issues/62" target="_blank" rel="noopener noreferrer">#62</a>)</li>
-			<li><span class="contact" data-github="AsciiWolf">AsciiWolf</span> &mdash; reported segfault crashes (<a href="https://github.com/KJ7LNW/xnec2c/issues/69" target="_blank" rel="noopener noreferrer">#69</a>)</li>
+			<li><span class="contact" data-github="Peter3579">Peter3579</span> &mdash; tested and validated the Touchstone format for antenna gain in the virtual two-port model (<a href="https://github.com/KJ7LNW/xnec2c/issues/80" target="_blank" rel="noopener noreferrer">#80</a>), and reported the frequency-plot readout defect (<a href="https://github.com/KJ7LNW/xnec2c/issues/82" target="_blank" rel="noopener noreferrer">#82</a>)</li>
+			<li><span class="contact" data-callsign="G4IXT" data-github="g4ixt">Ian</span> &mdash; reproduced and tested the <code class="nec-card">Z0</code>-card value corruption (<a href="https://github.com/KJ7LNW/xnec2c/issues/86" target="_blank" rel="noopener noreferrer">#86</a>)</li>
+			<li><span class="contact" data-github="peteasa">peteasa</span> &mdash; drove the <code>--write-patch-currents</code> option and the gnuplot patch-line fix (<a href="https://github.com/KJ7LNW/xnec2c/issues/75" target="_blank" rel="noopener noreferrer">#75</a>, <a href="https://github.com/KJ7LNW/xnec2c/issues/76" target="_blank" rel="noopener noreferrer">#76</a>)</li>
+			<li><span class="contact" data-callsign="9M2PJU" data-github="9M2PJU">9M2PJU</span> &mdash; reported a build break and submitted a pull request (<a href="https://github.com/KJ7LNW/xnec2c/issues/84" target="_blank" rel="noopener noreferrer">#84</a>, <a href="https://github.com/KJ7LNW/xnec2c/issues/85" target="_blank" rel="noopener noreferrer">#85</a>)</li>
 		</ul>
 	</li>
 
@@ -3548,6 +3660,48 @@ visualization, and internationalization support.</p>
 			(<a href="#CurrentVisualization">documentation</a>)</li>
 			<li>Automatic Cairo software renderer fallback when OpenGL is
 			unavailable</li>
+			<li>Network and transmission-line
+			(<code class="nec-card">NT</code>/<code class="nec-card">TL</code>)
+			connections drawn in 3D, reaching parity with the Cairo
+			renderer</li>
+		</ul>
+	</li>
+
+	<li>Color projection and tone mapping
+	(<a href="#ColorProjection">documentation</a>):
+		<ul>
+			<li>Current color projection axes: Dual current and charge,
+			Standing and Traveling wave, and Far-field contribution</li>
+			<li>Tone-transfer families for the color scale: dB, Asinh,
+			mu-law, Reinhard, Sigmoid, and None</li>
+			<li>Animate dialog rebuilt as a standalone panel with a manual
+			phase-scrub slider (0&ndash;720&deg;), mirror checkboxes, a
+			flow-direction selector, and node/antinode and comet wire
+			overlays</li>
+		</ul>
+	</li>
+
+	<li>Frequency-plot enhancements
+	(<a href="#FrequencyWindow">documentation</a>):
+		<ul>
+			<li>Six built-in color themes under
+			<span class="menu-path">View → Color Theme</span> with an Invert
+			toggle and user override via
+			<span class="filepath">~/.xnec2c/themes.ini</span></li>
+			<li>Detachable single-graph popups opened by double-clicking a
+			graph or right-clicking a plot-select button, each carrying its
+			own readout bar and closed with <kbd class="shortcut">Ctrl+W</kbd></li>
+			<li>Per-feedpoint excitation-port selector choosing which
+			<code class="nec-card">EX</code> feedpoint drives the impedance,
+			VSWR, and Smith data of a view</li>
+			<li>Feedpoint-dependent panels grey with explanatory tooltips and
+			em-dash readouts when the excitation defines no feedpoint</li>
+			<li>Interactive Smith chart with a full resistance and reactance
+			grid, wavelengths-toward-generator scale, and click-to-select
+			frequency</li>
+			<li>Swap-click frequency selection, a persisted
+			<span class="menu-path">View</span> toggle that inverts the
+			left and right mouse frequency-pick actions</li>
 		</ul>
 	</li>
 
@@ -3616,6 +3770,11 @@ visualization, and internationalization support.</p>
 			<code>--optimize</code> for headless optimization runs</li>
 			<li>All checkbox menu item states persisted in configuration
 			file across sessions</li>
+			<li>Transmission-line reference-impedance card is canonically
+			<code class="nec-card">Z0</code> (digit zero); legacy
+			<code class="nec-card">ZO</code> decks still parse</li>
+			<li><code>--write-validation-dir</code> option to write the full
+			validation data tree</li>
 		</ul>
 	</li>
 
@@ -3630,9 +3789,19 @@ visualization, and internationalization support.</p>
 
 	<li>Examples:
 		<ul>
-			<li>ISS communication antenna designs (2m and 70cm 5-element RHCP
-			Yagi by <span class="contact" data-callsign="KJ7NLL">Zeke</span>)</li>
-			<li>Parametric 2m Yagi with optimizer configuration</li>
+			<li>ISS communication antenna designs
+			(<span class="filepath">2m-5el-rhcp-ARISS-KJ7NLL.nec</span> and
+			<span class="filepath">70cm-5el-rhcp-KJ7NLL.nec</span>, 5-element
+			RHCP Yagis by
+			<span class="contact" data-callsign="KJ7NLL">Zeke</span>)</li>
+			<li>Parametric Yagis with optimizer configuration
+			(<span class="filepath">2m_yagi_SY_parametric.nec</span>,
+			<span class="filepath">5el_yagi_SY_parametric.nec</span>)</li>
+			<li>Current-slope and current-source excitation demonstrations
+			(<span class="filepath">ex2_current_slope_disc_dipole.nec</span>,
+			<span class="filepath">ex4_current_source_sq_loop.nec</span>)</li>
+			<li>Network transmission-line example
+			(<span class="filepath">20m_dipole_NT_50ohm.nec</span>)</li>
 		</ul>
 	</li>
 
@@ -3654,6 +3823,12 @@ visualization, and internationalization support.</p>
 			rotation</li>
 			<li>Fix inotify watch for atomic editor writes</li>
 			<li>Fix stale geometry after SY variable apply</li>
+			<li>Correct Sommerfeld ground accuracy (gshank L1-norm, evlua
+			contour completion) so feed-point impedance over
+			<code class="nec-card">GN 2</code> ground converges to the
+			FORTRAN reference</li>
+			<li>Fix <code class="nec-card">Z0</code>-card value corruption
+			(<a href="https://github.com/KJ7LNW/xnec2c/issues/86" target="_blank" rel="noopener noreferrer">#86</a>)</li>
 		</ul>
 	</li>
 
@@ -4813,15 +4988,13 @@ always sending full-length filenames to the job children. If this seems
 to happen, then please send a bug report with as much detail as possible
 to reproduce the problem.
 </p>
-<p>A known inadequacy of xnec2c is the slowness of the animation of
-displayed drawings, e.g.&nbsp;the structure itself, the radiation
-pattern, near fields pattern etc. Specifically, dragging these
-drawings with the mouse to rotate or incline them seems very heavy
-on processor loading, and with most structures the movement is
-jerky. This is my first attempt at animated wire frame drawings and
-I lack experience with GTK3 in this field, so I probably went about
-this the wrong way. I am open to any suggestions that may solve
-this problem!</p>
+<p>Earlier releases suffered from slow animation of the displayed
+drawings &mdash; the structure itself, the radiation pattern, and the
+near-field pattern &mdash; where dragging with the mouse to rotate or
+incline them was heavy on processor loading and jerky on most structures.
+The hardware-accelerated <a href="#OpenGL">OpenGL renderer</a> introduced in
+<span class="version-tag">5.0</span> resolves this on systems with GPU
+support; the Cairo software fallback remains heavier on the processor.</p>
 </main>
 <footer role="contentinfo">
 <h2 id="Acknowledgement">Acknowledgment</h2>

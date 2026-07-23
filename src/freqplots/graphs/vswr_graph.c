@@ -26,7 +26,8 @@
   int
 fp_vswr_enabled(void)
 {
-  return isFlagSet(PLOT_VSWR) && fpat_has_feedpoint();
+  return rc_config.freqplots_vswr_togglebutton &&
+    fp_panel_available( FP_PANEL_VSWR );
 }
 
 /* VSWR and S11 trace buffers, reused across fp_vswr_render() calls. */

@@ -49,6 +49,18 @@ Alloc_Rdpattern_Buffers(int nfrq, int nth, int nph)
 {
 }
 
+/* Stub for per-fstep impedance array allocation */
+void
+Alloc_Impedance_Buffers(int nfrq, int n_ports)
+{
+}
+
+/* Stub for per-fstep impedance array free */
+void
+Free_Impedance_Buffers(void)
+{
+}
+
 /* Stub for patch data allocation */
 void
 New_Patch_Data(void)

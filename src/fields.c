@@ -1542,52 +1542,6 @@ Nf_Peak_Vector(
 
 /*-----------------------------------------------------------------------*/
 
-/* Near_Field_Total()
- *
- * Calculates the value of Total Near Field vector
- */
-  static void
-Near_Field_Total(
-    complex double ex,
-    complex double ey,
-    complex double ez,
-    int nfeh, int idx )
-{
-  /* Display Total near field vector peak */
-  {
-    double exm, eym, ezm, fx, fy, fz;
-
-    exm = (double)cabs(ex);
-    eym = (double)cabs(ey);
-    ezm = (double)cabs(ez);
-    fx  = (double)cang(ex)/(double)TODEG;
-    fy  = (double)cang(ey)/(double)TODEG;
-    fz  = (double)cang(ez)/(double)TODEG;
-
-    if( nfeh == 1 ) /* Magnetic field */
-    {
-      Nf_Peak_Vector( exm, eym, ezm, fx, fy, fz,
-                      &near_field.points[idx].hrx,
-                      &near_field.points[idx].hry,
-                      &near_field.points[idx].hrz, &near_field.points[idx].hr);
-      if( near_field.max_hr < near_field.points[idx].hr)
-        near_field.max_hr = near_field.points[idx].hr;
-    }
-    else /* Electric field */
-    {
-      Nf_Peak_Vector( exm, eym, ezm, fx, fy, fz,
-                      &near_field.points[idx].erx,
-                      &near_field.points[idx].ery,
-                      &near_field.points[idx].erz, &near_field.points[idx].er);
-      if( near_field.max_er < near_field.points[idx].er)
-        near_field.max_er = near_field.points[idx].er;
-    }
-  }
-
-} /* Near_Field_Total() */
-
-/*-----------------------------------------------------------------------*/
-
 /* compute near e or h fields over a range of points */
   void
 nfpat( int nfeh )
@@ -1601,11 +1555,6 @@ nfpat( int nfeh )
 
   Alloc_Nearfield_Buffers( fpat.nrx, fpat.nry, fpat.nrz );
 
-  /* Initialize according to E/H flag */
-  if( nfeh == 1 )
-    near_field.max_hr = 0.0;
-  else
-    near_field.max_er = 0.0;
   near_field.r_max = 0.0;
 
   idx = 0;
@@ -1654,9 +1603,6 @@ nfpat( int nfeh )
           nhfld( tmp1, tmp2, tmp3, &ex, &ey, &ez);
         else /* Electric field */
           nefld( tmp1, tmp2, tmp3, &ex, &ey, &ez);
-
-        /* Calculate total field vector */
-        Near_Field_Total( ex, ey, ez, nfeh, idx );
 
         /* Save field point co-ordinates */
         near_field.points[idx].px = (double)xob;

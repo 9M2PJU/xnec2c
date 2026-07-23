@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xnec2c 4.4.18\n"
 "Report-Msgid-Bugs-To: xnec2c-bugs@z.ewheeler.org\n"
-"POT-Creation-Date: 2026-06-26 14:17-0700\n"
+"POT-Creation-Date: 2026-07-20 15:27-0700\n"
 "PO-Revision-Date: 2025-12-28 20:37-0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:2194
+#: files/xnec2c.desktop.in:3 resources/xnec2c.glade:1784
 msgid "xnec2c"
 msgstr "xnec2c"
 
@@ -33,6 +33,559 @@ msgstr "Phần mềm mã điện từ số"
 msgid "nec2;em;simulator;"
 msgstr "nec2;em;simulator;"
 
+#: resources/animate.glade:78
+msgid "Animated"
+msgstr "Hoạt ảnh"
+
+#: resources/animate.glade:85
+msgid ""
+"Hue shows the peak magnitude s(n); brightness follows the traveling wave |"
+"cos(arg z + φ)|, floored so nulls stay visible.\n"
+"\n"
+"Animated: bright regions sweep along the structure as the phase advances."
+msgstr ""
+"Sắc độ thể hiện biên độ đỉnh s(n); độ sáng theo sóng lan truyền |cos(arg z + "
+"φ)|, có sàn để điểm nút vẫn hiển thị được.\n"
+"\n"
+"Hoạt ảnh: các vùng sáng quét dọc theo cấu trúc khi pha tiến triển."
+
+#: resources/animate.glade:86
+msgid "Instantaneous"
+msgstr "Tức thời"
+
+#: resources/animate.glade:96
+msgid ""
+"Diverging hue shows the instantaneous sign of the displayed quantity: cold "
+"negative, hot positive; brightness carries the magnitude s(n).\n"
+"\n"
+"Animated: regions swap poles as the phase advances."
+msgstr ""
+"Sắc độ phân kỳ thể hiện dấu tức thời của đại lượng hiển thị: lạnh là âm, "
+"nóng là dương; độ sáng mang biên độ s(n).\n"
+"\n"
+"Hoạt ảnh: các vùng đổi cực khi pha tiến triển."
+
+#: resources/animate.glade:97
+msgid "Polarity"
+msgstr "Cực tính"
+
+#: resources/animate.glade:107
+msgid ""
+"Cyclic hue wheel shows the phase angle arg z + φ; brightness carries the "
+"magnitude s(n).\n"
+"\n"
+"Animated: the whole wheel rotates as the phase advances."
+msgstr ""
+"Vòng sắc độ tuần hoàn thể hiện góc pha arg z + φ; độ sáng mang biên độ "
+"s(n).\n"
+"\n"
+"Hoạt ảnh: toàn bộ vòng xoay khi pha tiến triển."
+
+#: resources/animate.glade:108
+msgid "Phase Hue"
+msgstr "Sắc độ theo pha"
+
+#: resources/animate.glade:118
+msgid ""
+"Diverging hue shows the instantaneous charge sign; brightness carries the "
+"current envelope s(|I|).\n"
+"\n"
+"Animated: one view of charge and current a quarter cycle apart."
+msgstr ""
+"Sắc độ phân kỳ thể hiện dấu điện tích tức thời; độ sáng mang đường bao dòng "
+"điện s(|I|).\n"
+"\n"
+"Hoạt ảnh: một khung nhìn thể hiện điện tích và dòng điện lệch nhau một phần "
+"tư chu kỳ."
+
+#: resources/animate.glade:119
+msgid "Current + Charge"
+msgstr "Dòng điện + điện tích"
+
+#: resources/animate.glade:136
+msgid "Static"
+msgstr "Tĩnh"
+
+#: resources/animate.glade:143
+msgid ""
+"Rainbow ramp of this frequency step's peak magnitude s(n) at full "
+"brightness.\n"
+"\n"
+"Static: the phase-invariant baseline; colors hold still during playback."
+msgstr ""
+"Dải cầu vồng theo biên độ đỉnh s(n) của bước tần số này ở độ sáng tối đa.\n"
+"\n"
+"Tĩnh: đường nền bất biến theo pha; màu giữ nguyên trong khi phát."
+
+#: resources/animate.glade:144
+msgid "Amplitude"
+msgstr "Biên độ"
+
+#: resources/animate.glade:154
+msgid ""
+"Hue ramps the per-region standing-wave ratio: cold traveling, hot standing; "
+"brightness carries the magnitude s(n).\n"
+"\n"
+"Static: a phase-invariant read; colors hold still during playback."
+msgstr ""
+"Sắc độ biến thiên theo tỷ số sóng đứng từng vùng: lạnh là sóng chạy, nóng là "
+"sóng đứng; độ sáng mang biên độ s(n).\n"
+"\n"
+"Tĩnh: cách đọc bất biến theo pha; màu giữ nguyên trong khi phát."
+
+#: resources/animate.glade:155
+msgid "Standing/Traveling"
+msgstr "Sóng đứng/sóng chạy"
+
+#: resources/animate.glade:165
+msgid ""
+"Hue ramps each segment's contribution to the selected far-field direction; "
+"brightness carries the magnitude s(n).\n"
+"\n"
+"Static: a phase-invariant read; colors hold still during playback."
+msgstr ""
+"Sắc độ biến thiên theo đóng góp của từng đoạn dây vào hướng trường xa đã "
+"chọn; độ sáng mang biên độ s(n).\n"
+"\n"
+"Tĩnh: cách đọc bất biến theo pha; màu giữ nguyên trong khi phát."
+
+#: resources/animate.glade:166
+msgid "Far-field Contribution"
+msgstr "Đóng góp trường xa"
+
+#: resources/animate.glade:180
+msgid ""
+"Power-law transfer n^γ of the normalized magnitude.\n"
+"\n"
+"γ = 1 is linear amplitude; γ = 0.5 expands weak regions; γ = 2 shows the "
+"squared magnitude — |I|² is proportional to per-segment dissipated power "
+"(and its radiated-power contribution via radiation resistance), |q|² to "
+"stored electrostatic energy."
+msgstr ""
+"Phép biến đổi lũy thừa n^γ của biên độ đã chuẩn hóa.\n"
+"\n"
+"γ = 1 là biên độ tuyến tính; γ = 0.5 mở rộng vùng yếu; γ = 2 thể hiện bình "
+"phương biên độ — |I|² tỷ lệ với công suất tiêu tán trên từng đoạn (và phần "
+"đóng góp công suất bức xạ qua điện trở bức xạ), |q|² tỷ lệ với năng lượng "
+"tĩnh điện tích trữ."
+
+#: resources/animate.glade:181
+msgid "Power"
+msgstr "Lũy thừa"
+
+#: resources/animate.glade:191
+msgid ""
+"Logarithmic transfer over a user range R, the RF-standard 20·log₁₀ amplitude "
+"decibels.\n"
+"\n"
+"R sets the visible dynamic range; detail below the floor 10^(−R/20) clips to "
+"the bottom color."
+msgstr ""
+"Phép biến đổi logarit trên phạm vi R do người dùng đặt, theo chuẩn decibel "
+"biên độ RF 20·log₁₀.\n"
+"\n"
+"R quy định phạm vi động hiển thị; chi tiết dưới mức sàn 10^(−R/20) bị cắt về "
+"màu đáy."
+
+#: resources/animate.glade:192 resources/xnec2c.glade:11670
+#: resources/xnec2c.glade:13045
+msgid "dB"
+msgstr "dB"
+
+#: resources/animate.glade:202
+msgid ""
+"Inverse hyperbolic sine: linear below the knee k, logarithmic above.\n"
+"\n"
+"Keeps near-null currents visible while compressing strong peaks, like a lin-"
+"log instrument scale."
+msgstr ""
+"Sin hyperbol nghịch đảo: tuyến tính dưới điểm gập k, logarit phía trên.\n"
+"\n"
+"Giữ cho dòng điện gần điểm nút vẫn hiển thị trong khi nén các đỉnh mạnh, "
+"giống thang đo thiết bị tuyến tính-logarit."
+
+#: resources/animate.glade:203
+msgid "Asinh"
+msgstr "Asinh"
+
+#: resources/animate.glade:213
+msgid ""
+"μ-law companding, the telephony-standard bounded log curve.\n"
+"\n"
+"Lifts weak detail without a hard floor; 48.16 dB compression is the classic "
+"μ = 255."
+msgstr ""
+"Nén giãn μ-law, đường cong logarit có giới hạn theo chuẩn điện thoại.\n"
+"\n"
+"Nâng chi tiết yếu mà không có mức sàn cứng; nén 48.16 dB là giá trị kinh "
+"điển ứng với μ = 255."
+
+#: resources/animate.glade:214
+msgid "μ-law"
+msgstr "μ-law"
+
+#: resources/animate.glade:224
+msgid ""
+"Reinhard rational compressor (1+k)·n/(n+k), the photographic HDR tone-map.\n"
+"\n"
+"Preserves midtones while rolling highlights off smoothly; k sets the knee."
+msgstr ""
+"Bộ nén hữu tỷ Reinhard (1+k)·n/(n+k), ánh xạ tông màu HDR kiểu nhiếp ảnh.\n"
+"\n"
+"Giữ nguyên tông trung trong khi làm mượt vùng sáng; k quy định điểm gập."
+
+#: resources/animate.glade:225
+msgid "Reinhard"
+msgstr "Reinhard"
+
+#: resources/animate.glade:235
+msgid ""
+"Hyperbolic tangent soft limiter tanh(a·n)/tanh(a).\n"
+"\n"
+"Raises midrange contrast and saturates gently toward the peak, like "
+"amplifier compression; a sets the steepness."
+msgstr ""
+"Bộ giới hạn mềm tang hyperbol tanh(a·n)/tanh(a).\n"
+"\n"
+"Tăng độ tương phản vùng trung và bão hòa nhẹ nhàng về phía đỉnh, giống nén "
+"khuếch đại; a quy định độ dốc."
+
+#: resources/animate.glade:236
+msgid "Sigmoid"
+msgstr "Sigmoid"
+
+#: resources/animate.glade:246
+msgid ""
+"Identity: every magnitude renders at full brightness.\n"
+"\n"
+"The color projection alone carries the information."
+msgstr ""
+"Đồng nhất: mọi biên độ đều hiển thị ở độ sáng tối đa.\n"
+"\n"
+"Chỉ phép chiếu màu mang thông tin."
+
+#: resources/animate.glade:247 resources/settings/cairo_settings.glade:56
+msgid "None"
+msgstr "Không"
+
+#: resources/animate.glade:259 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
+#: src/rdpattern_ui.c:344
+msgid "Near Field Animation"
+msgstr "Hoạt ảnh trường gần"
+
+#: resources/animate.glade:351
+msgid ""
+"Scrub the animation phase manually.\n"
+"\n"
+"Disabled while the animation is running."
+msgstr ""
+"Tua pha hoạt ảnh thủ công.\n"
+"\n"
+"Bị vô hiệu khi hoạt ảnh đang chạy."
+
+#: resources/animate.glade:368
+msgid "φ 0°"
+msgstr "φ 0°"
+
+#: resources/animate.glade:382
+msgid "Phase"
+msgstr "Pha"
+
+#: resources/animate.glade:405
+msgid "Frames/Sec"
+msgstr "Khung/giây"
+
+#: resources/animate.glade:418
+msgid "Animate Freq (Hz)"
+msgstr "Tần số hoạt ảnh (Hz)"
+
+#: resources/animate.glade:491
+msgid "Color projection:"
+msgstr "Phép chiếu màu:"
+
+#: resources/animate.glade:505
+msgid ""
+"Select which physical quantity drives the hue and how brightness follows the "
+"excitation phase.\n"
+"\n"
+"Static projections (Amplitude, Standing/Traveling, Far-field Contribution) "
+"read without animating.\n"
+"\n"
+"Hovering an entry previews it live."
+msgstr ""
+"Chọn đại lượng vật lý điều khiển sắc độ và cách độ sáng theo pha kích "
+"thích.\n"
+"\n"
+"Các phép chiếu tĩnh (Biên độ, Sóng đứng/sóng chạy, Đóng góp trường xa) đọc "
+"được mà không cần hoạt ảnh.\n"
+"\n"
+"Di chuột qua một mục để xem trước trực tiếp."
+
+#: resources/animate.glade:532
+msgid "Scale family:"
+msgstr "Họ thang màu:"
+
+#: resources/animate.glade:546
+msgid ""
+"Select the magnitude-to-color transfer family.\n"
+"\n"
+"Adjust its slider until the contrast reveals the range your inspection "
+"needs.\n"
+"\n"
+"Hovering an entry previews it live."
+msgstr ""
+"Chọn họ hàm chuyển đổi biên độ sang màu.\n"
+"\n"
+"Điều chỉnh thanh trượt của họ đó cho đến khi độ tương phản thể hiện đúng "
+"phạm vi cần xem xét.\n"
+"\n"
+"Di chuột qua một mục để xem trước trực tiếp."
+
+#: resources/animate.glade:585
+msgid "Gamma:"
+msgstr "Gamma:"
+
+#: resources/animate.glade:602
+msgid ""
+"Gamma exponent of the power transfer.\n"
+"\n"
+"γ = 0.5 expands weak regions, γ = 1 is linear, γ = 2 is proportional to "
+"dissipated power for currents."
+msgstr ""
+"Số mũ gamma của phép biến đổi lũy thừa.\n"
+"\n"
+"γ = 0.5 mở rộng vùng yếu, γ = 1 là tuyến tính, γ = 2 tỷ lệ với công suất "
+"tiêu tán của dòng điện."
+
+#: resources/animate.glade:624
+msgid "Range (dB):"
+msgstr "Phạm vi (dB):"
+
+#: resources/animate.glade:641
+msgid ""
+"Dynamic range R below the step peak mapped onto the color strip.\n"
+"\n"
+"The floor is 10^(−R/20) of the peak."
+msgstr ""
+"Phạm vi động R bên dưới đỉnh của bước tần số, ánh xạ lên dải màu.\n"
+"\n"
+"Mức sàn là 10^(−R/20) của đỉnh."
+
+#: resources/animate.glade:663
+msgid "Softening:"
+msgstr "Làm mềm:"
+
+#: resources/animate.glade:680
+msgid "Softening knee k: linear below k, logarithmic above."
+msgstr "Điểm gập làm mềm k: tuyến tính dưới k, logarit trên k."
+
+#: resources/animate.glade:702
+msgid "Compression (dB):"
+msgstr "Nén (dB):"
+
+#: resources/animate.glade:719
+msgid "Compression strength in dB; higher values lift weak detail."
+msgstr "Cường độ nén tính bằng dB; giá trị cao hơn làm nổi chi tiết yếu."
+
+#: resources/animate.glade:741
+msgid "Knee:"
+msgstr "Điểm gập:"
+
+#: resources/animate.glade:758
+msgid "Knee k of the rational soft-compressor."
+msgstr "Điểm gập k của bộ nén mềm hữu tỷ."
+
+#: resources/animate.glade:780
+msgid "Contrast:"
+msgstr "Độ tương phản:"
+
+#: resources/animate.glade:797
+msgid "Contrast steepness a of the tanh transfer."
+msgstr "Độ dốc tương phản a của phép biến đổi tanh."
+
+#: resources/animate.glade:830
+msgid "Color gradient of the active projection and scale family."
+msgstr "Dải màu chuyển tiếp của phép chiếu và họ thang màu đang dùng."
+
+#: resources/animate.glade:848
+msgid "Brightness floor:"
+msgstr "Mức sàn độ sáng:"
+
+#: resources/animate.glade:866
+msgid ""
+"Minimum brightness under animation so elements cool toward this level "
+"instead of vanishing to black."
+msgstr ""
+"Độ sáng tối thiểu khi hoạt ảnh, để các phần tử tối dần về mức này thay vì "
+"biến mất thành màu đen."
+
+#: resources/animate.glade:877
+msgid "Width from amplitude"
+msgstr "Độ rộng theo biên độ"
+
+#: resources/animate.glade:882
+msgid ""
+"Scale wire segment width by the scaled amplitude envelope s(n), so strong "
+"regions draw thick and nulls draw thin."
+msgstr ""
+"Co giãn độ rộng đoạn dây theo đường bao biên độ đã chuẩn hóa s(n), để vùng "
+"mạnh vẽ dày và điểm nút vẽ mảnh."
+
+#: resources/animate.glade:908
+msgid "Overlays:"
+msgstr "Lớp phủ:"
+
+#: resources/animate.glade:919
+msgid "Nodes/antinodes"
+msgstr "Nút/bụng sóng"
+
+#: resources/animate.glade:924
+msgid ""
+"Mark current nulls (plus tick) and peaks (cross tick) on wire segments.\n"
+"\n"
+"Marks derive from the phase-invariant envelope, so they hold still while the "
+"wave animates."
+msgstr ""
+"Đánh dấu điểm nút dòng điện (vạch cộng) và đỉnh (vạch chéo) trên các đoạn "
+"dây.\n"
+"\n"
+"Các dấu này lấy từ đường bao bất biến theo pha nên giữ nguyên vị trí trong "
+"khi sóng hoạt ảnh."
+
+#: resources/animate.glade:935
+msgid "Comet"
+msgstr "Sao chổi"
+
+#: resources/animate.glade:940
+msgid ""
+"Ride a bright head on the instantaneous positive crest so wave motion reads "
+"along each wire."
+msgstr ""
+"Gắn một đầu sáng trên đỉnh sóng dương tức thời để chuyển động của sóng dễ "
+"đọc dọc theo mỗi đoạn dây."
+
+#: resources/animate.glade:973
+msgid "Reset"
+msgstr "Đặt lại"
+
+#: resources/animate.glade:979
+msgid ""
+"Restore the color projection, scale family, and every family brightness "
+"parameter to their defaults."
+msgstr ""
+"Khôi phục phép chiếu màu, họ thang màu và mọi tham số độ sáng của từng họ về "
+"giá trị mặc định."
+
+#: resources/animate.glade:994
+msgid ""
+"<b>Color</b> <i>— currents, charges, and fields shade the wires, patches, "
+"and near-field vectors</i>"
+msgstr ""
+"<b>Màu</b> <i>— dòng điện, điện tích và trường tô màu cho dây, mảnh và vectơ "
+"trường gần</i>"
+
+#: resources/animate.glade:1025
+msgid "None (geometry)"
+msgstr "Không (hình học)"
+
+#: resources/animate.glade:1029
+msgid "Show the bare structure geometry with no quantity coloring."
+msgstr "Hiển thị hình học cấu trúc trần, không tô màu theo đại lượng nào."
+
+#: resources/animate.glade:1042 resources/xnec2c.glade:11224
+msgid "Currents"
+msgstr "Dòng điện"
+
+#: resources/animate.glade:1046
+msgid "Animate current magnitude and direction along the wires."
+msgstr "Hoạt ảnh hóa độ lớn và chiều dòng điện dọc theo dây."
+
+#: resources/animate.glade:1059 resources/xnec2c.glade:11239
+msgid "Charges"
+msgstr "Điện tích"
+
+#: resources/animate.glade:1063
+msgid "Animate charge magnitude along the wires."
+msgstr "Hoạt ảnh hóa độ lớn điện tích dọc theo dây."
+
+#: resources/animate.glade:1080
+msgid "Display"
+msgstr "Hiển thị"
+
+#: resources/animate.glade:1111
+msgid "Flow direction:"
+msgstr "Chiều dòng chảy:"
+
+#: resources/animate.glade:1124
+msgid "Reference phase (animated)"
+msgstr "Pha tham chiếu (hoạt ảnh)"
+
+#: resources/animate.glade:1125
+msgid "LIC texture (animated)"
+msgstr "Kết cấu LIC (hoạt ảnh)"
+
+#: resources/animate.glade:1126
+msgid "Wireframe (animated)"
+msgstr "Khung dây (hoạt ảnh)"
+
+#: resources/animate.glade:1127
+msgid "Polarization axis (static)"
+msgstr "Trục phân cực (tĩnh)"
+
+#: resources/animate.glade:1128
+msgid "Peak magnitude (static)"
+msgstr "Giá trị đỉnh (tĩnh)"
+
+#: resources/animate.glade:1144
+msgid "Patches"
+msgstr "Mảnh"
+
+#: resources/animate.glade:1172
+msgid "Near E field"
+msgstr "Trường E gần"
+
+#: resources/animate.glade:1176
+msgid ""
+"Show the near electric field vectors while animating.\n"
+"\n"
+"Enable by opening the radiation pattern window."
+msgstr ""
+"Hiện vectơ trường điện gần khi hoạt ảnh.\n"
+"\n"
+"Bật bằng cách mở cửa sổ giản đồ bức xạ."
+
+#: resources/animate.glade:1188
+msgid "Near H field"
+msgstr "Trường H gần"
+
+#: resources/animate.glade:1192
+msgid ""
+"Show the near magnetic field vectors while animating.\n"
+"\n"
+"Enable by opening the radiation pattern window."
+msgstr ""
+"Hiện vectơ trường từ gần khi hoạt ảnh.\n"
+"\n"
+"Bật bằng cách mở cửa sổ giản đồ bức xạ."
+
+#: resources/animate.glade:1204
+msgid "Poynting vector"
+msgstr "Vectơ Poynting"
+
+#: resources/animate.glade:1208
+msgid ""
+"Show the Poynting power-flow vectors while animating.\n"
+"\n"
+"Enable by opening the radiation pattern window."
+msgstr ""
+"Hiện vectơ công suất Poynting khi hoạt ảnh.\n"
+"\n"
+"Bật bằng cách mở cửa sổ giản đồ bức xạ."
+
+#: resources/animate.glade:1224
+msgid "Near Field"
+msgstr "Trường gần"
+
 #: resources/settings/cairo_settings.glade:34
 msgid "Anti-aliasing"
 msgstr "Khử răng cưa"
@@ -45,10 +598,6 @@ msgstr "Mặc định"
 msgid "Fast"
 msgstr "Nhanh"
 
-#: resources/settings/cairo_settings.glade:56
-msgid "None"
-msgstr "Không"
-
 #: resources/settings/cairo_settings.glade:68
 msgid "Color Quantization"
 msgstr "Lượng tử hóa màu"
@@ -57,7 +606,7 @@ msgstr "Lượng tử hóa màu"
 msgid "Off"
 msgstr "Tắt"
 
-#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:4100
+#: resources/settings/cairo_settings.glade:84 resources/xnec2c.glade:3690
 msgid "8"
 msgstr "8"
 
@@ -97,7 +646,7 @@ msgstr "Nhóm độ sâu"
 #: resources/settings/opengl_settings.glade:533
 #: resources/settings/render_settings.glade:50
 msgid "Reset to _Defaults"
-msgstr "Đặt lại _Mặc định"
+msgstr "Đặt lại _mặc định"
 
 #: resources/settings/opengl_settings.glade:493
 msgid "Visual only — does not affect NEC2 model calculations."
@@ -118,7 +667,7 @@ msgstr "Ghi đè ký hiệu"
 
 #: resources/sy_overrides.glade:688
 msgid "_Auto Apply"
-msgstr "_Tự động Áp dụng"
+msgstr "_Tự động áp dụng"
 
 #: resources/sy_overrides.glade:693
 msgid "Automatically apply changes and reload model after 300ms delay"
@@ -173,798 +722,689 @@ msgstr ""
 msgid "translator-credits"
 msgstr "translator-credits"
 
-#: resources/xnec2c.glade:75 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
-#: src/rdpattern_ui.c:344
-msgid "Near Field Animation"
-msgstr "Hoạt ảnh trường gần"
-
-#: resources/xnec2c.glade:167
-msgid ""
-"Scrub the animation phase manually.\n"
-"Disabled while the animation is running."
-msgstr ""
-"Tua pha hoạt ảnh thủ công.\n"
-"Bị vô hiệu khi hoạt ảnh đang chạy."
-
-#: resources/xnec2c.glade:184
-msgid "φ 0°"
-msgstr "φ 0°"
-
-#: resources/xnec2c.glade:198
-msgid "Phase"
-msgstr "Pha"
-
-#: resources/xnec2c.glade:221
-msgid "Frames/Sec"
-msgstr "Khung/Giây"
-
-#: resources/xnec2c.glade:234
-msgid "Animate Freq (Hz)"
-msgstr "Tần số hoạt ảnh (Hz)"
-
-#: resources/xnec2c.glade:309
-msgid "Show currents"
-msgstr "Hiện dòng điện"
-
-#: resources/xnec2c.glade:313
-msgid ""
-"Animate current magnitude and direction along the wires.\n"
-"Mirrors the Currents button in the main window."
-msgstr ""
-"Hoạt ảnh hóa độ lớn và chiều dòng điện dọc theo dây.\n"
-"Mô phỏng nút Dòng điện trong cửa sổ chính."
-
-#: resources/xnec2c.glade:328
-msgid "Flow direction:"
-msgstr "Chiều dòng chảy:"
-
-#: resources/xnec2c.glade:340
-msgid ""
-"Select how the animated current flow is rendered.\n"
-"Mirrors the Flow direction setting in the main window."
-msgstr ""
-"Chọn cách kết xuất dòng điện hoạt ảnh.\n"
-"Mô phỏng cài đặt Chiều dòng chảy trong cửa sổ chính."
-
-#: resources/xnec2c.glade:342
-msgid "Reference phase"
-msgstr "Pha tham chiếu"
-
-#: resources/xnec2c.glade:343
-msgid "LIC"
-msgstr "LIC"
-
-#: resources/xnec2c.glade:344
-msgid "Wireframe"
-msgstr "Khung dây"
-
-#: resources/xnec2c.glade:360
-msgid "Structure"
-msgstr "Cấu trúc"
-
-#: resources/xnec2c.glade:384
-msgid "Near E field"
-msgstr "Trường E gần"
-
-#: resources/xnec2c.glade:388
-msgid ""
-"Show the near electric field vectors while animating.\n"
-"Enable by opening the radiation pattern window."
-msgstr ""
-"Hiện vectơ trường điện gần khi hoạt ảnh.\n"
-"Bật bằng cách mở cửa sổ đồ thị bức xạ."
-
-#: resources/xnec2c.glade:400
-msgid "Near H field"
-msgstr "Trường H gần"
-
-#: resources/xnec2c.glade:404
-msgid ""
-"Show the near magnetic field vectors while animating.\n"
-"Enable by opening the radiation pattern window."
-msgstr ""
-"Hiện vectơ trường từ gần khi hoạt ảnh.\n"
-"Bật bằng cách mở cửa sổ đồ thị bức xạ."
-
-#: resources/xnec2c.glade:416
-msgid "Poynting vector"
-msgstr "Vectơ Poynting"
-
-#: resources/xnec2c.glade:420
-msgid ""
-"Show the Poynting power-flow vectors while animating.\n"
-"Enable by opening the radiation pattern window."
-msgstr ""
-"Hiện vectơ công suất Poynting khi hoạt ảnh.\n"
-"Bật bằng cách mở cửa sổ đồ thị bức xạ."
-
-#: resources/xnec2c.glade:436
-msgid "Near Field"
-msgstr "Trường gần"
-
-#: resources/xnec2c.glade:516
+#: resources/xnec2c.glade:106
 msgid "Arc Element (GA card)"
 msgstr "Phần tử cung (thẻ GA)"
 
-#: resources/xnec2c.glade:544 resources/xnec2c.glade:1579
-#: resources/xnec2c.glade:4006 resources/xnec2c.glade:15064 src/cmnd_edit.c:488
+#: resources/xnec2c.glade:134 resources/xnec2c.glade:1169
+#: resources/xnec2c.glade:3596 resources/xnec2c.glade:14763 src/cmnd_edit.c:488
 msgid "Tag Number"
 msgstr "Số tag"
 
-#: resources/xnec2c.glade:557 resources/xnec2c.glade:15159
+#: resources/xnec2c.glade:147 resources/xnec2c.glade:14858
 msgid "No. Segments"
 msgstr "Số đoạn"
 
-#: resources/xnec2c.glade:570 resources/xnec2c.glade:4032
-#: resources/xnec2c.glade:15255
+#: resources/xnec2c.glade:160 resources/xnec2c.glade:3622
+#: resources/xnec2c.glade:14954
 msgid "Segs % lambda"
 msgstr "Segs % lambda"
 
-#: resources/xnec2c.glade:583 resources/xnec2c.glade:4045
-#: resources/xnec2c.glade:15351
+#: resources/xnec2c.glade:173 resources/xnec2c.glade:3635
+#: resources/xnec2c.glade:15050
 msgid "Wire Diameter"
 msgstr "Đường kính dây dẫn"
 
-#: resources/xnec2c.glade:671
+#: resources/xnec2c.glade:261
 msgid "Radius from Y"
 msgstr "Bán kính từ Y"
 
-#: resources/xnec2c.glade:684
+#: resources/xnec2c.glade:274
 msgid "End 1 Angle"
 msgstr "Góc đầu 1"
 
-#: resources/xnec2c.glade:697
+#: resources/xnec2c.glade:287
 msgid "End 2 Angle"
 msgstr "Góc đầu 2"
 
-#: resources/xnec2c.glade:710 resources/xnec2c.glade:4242
-#: resources/xnec2c.glade:15416 src/cmnd_edit.c:2024
+#: resources/xnec2c.glade:300 resources/xnec2c.glade:3832
+#: resources/xnec2c.glade:15115 src/cmnd_edit.c:2024
 msgid "Conductivity S/m"
 msgstr "Độ dẫn điện S/m"
 
-#: resources/xnec2c.glade:808
+#: resources/xnec2c.glade:398
 msgid "Wire Arc Data"
 msgstr "Dữ liệu cung dây dẫn"
 
-#: resources/xnec2c.glade:870 resources/xnec2c.glade:1106
-#: resources/xnec2c.glade:1906 resources/xnec2c.glade:2129
-#: resources/xnec2c.glade:2587 resources/xnec2c.glade:2779
-#: resources/xnec2c.glade:3090 resources/xnec2c.glade:3776
-#: resources/xnec2c.glade:4576 resources/xnec2c.glade:4775
-#: resources/xnec2c.glade:4936 resources/xnec2c.glade:5468
-#: resources/xnec2c.glade:6104 resources/xnec2c.glade:7548
-#: resources/xnec2c.glade:8455 resources/xnec2c.glade:9461
-#: resources/xnec2c.glade:9741 resources/xnec2c.glade:13757
-#: resources/xnec2c.glade:14270 resources/xnec2c.glade:14869
-#: resources/xnec2c.glade:15705 resources/xnec2c.glade:15905
+#: resources/xnec2c.glade:460 resources/xnec2c.glade:696
+#: resources/xnec2c.glade:1496 resources/xnec2c.glade:1719
+#: resources/xnec2c.glade:2177 resources/xnec2c.glade:2369
+#: resources/xnec2c.glade:2680 resources/xnec2c.glade:3366
+#: resources/xnec2c.glade:4166 resources/xnec2c.glade:4365
+#: resources/xnec2c.glade:4526 resources/xnec2c.glade:5058
+#: resources/xnec2c.glade:5694 resources/xnec2c.glade:7138
+#: resources/xnec2c.glade:8045 resources/xnec2c.glade:9051
+#: resources/xnec2c.glade:9331 resources/xnec2c.glade:13456
+#: resources/xnec2c.glade:13969 resources/xnec2c.glade:14568
+#: resources/xnec2c.glade:15404 resources/xnec2c.glade:15604
 msgid "Delete Card"
 msgstr "Xóa thẻ"
 
-#: resources/xnec2c.glade:948
+#: resources/xnec2c.glade:538
 msgid "Cylindrical Structure (GR card)"
 msgstr "Cấu trúc hình trụ (thẻ GR)"
 
-#: resources/xnec2c.glade:978 resources/xnec2c.glade:9641
+#: resources/xnec2c.glade:568 resources/xnec2c.glade:9231
 msgid "Tag Number Increment"
 msgstr "Số gia tag"
 
-#: resources/xnec2c.glade:991
+#: resources/xnec2c.glade:581
 msgid "Number of Structures"
 msgstr "Số lượng cấu trúc"
 
-#: resources/xnec2c.glade:1045
+#: resources/xnec2c.glade:635
 msgid "Cylindrical Structure"
 msgstr "Cấu trúc hình trụ"
 
-#: resources/xnec2c.glade:1171
+#: resources/xnec2c.glade:761
 msgid "Xnec2c Error"
 msgstr "Lỗi Xnec2c"
 
-#: resources/xnec2c.glade:1279
+#: resources/xnec2c.glade:869
 msgid "Error"
 msgstr "Lỗi"
 
-#: resources/xnec2c.glade:1358
+#: resources/xnec2c.glade:948
 msgid "Excitation Command (EX Card)"
 msgstr "Lệnh kích thích (Thẻ EX)"
 
-#: resources/xnec2c.glade:1384
+#: resources/xnec2c.glade:974
 msgid "Incident LH Wave"
 msgstr "Sóng tới phân cực tròn trái"
 
-#: resources/xnec2c.glade:1400
+#: resources/xnec2c.glade:990
 msgid "Incident Linear Wave "
 msgstr "Sóng tới phân cực tuyến tính "
 
-#: resources/xnec2c.glade:1416
+#: resources/xnec2c.glade:1006
 msgid "Current Source"
 msgstr "Nguồn dòng điện"
 
-#: resources/xnec2c.glade:1432
+#: resources/xnec2c.glade:1022
 msgid "Incident RH Wave"
 msgstr "Sóng tới phân cực tròn phải"
 
-#: resources/xnec2c.glade:1448
+#: resources/xnec2c.glade:1038
 msgid "Current Slope Discontinuity"
 msgstr "Gián đoạn độ dốc dòng điện"
 
-#: resources/xnec2c.glade:1464
+#: resources/xnec2c.glade:1054
 msgid "Voltage Source"
 msgstr "Nguồn điện áp"
 
-#: resources/xnec2c.glade:1486
+#: resources/xnec2c.glade:1076
 msgid "Excitation Type"
 msgstr "Loại kích thích"
 
-#: resources/xnec2c.glade:1511
+#: resources/xnec2c.glade:1101
 msgid "Maximum Admittance Matrix Asymmetry"
 msgstr "Bất đối xứng ma trận dẫn nạp cực đại"
 
-#: resources/xnec2c.glade:1527
+#: resources/xnec2c.glade:1117
 msgid "Impedance of Source Segment"
 msgstr "Trở kháng của đoạn nguồn"
 
-#: resources/xnec2c.glade:1549
+#: resources/xnec2c.glade:1139
 msgid "Print Control"
 msgstr "Điều khiển in"
 
-#: resources/xnec2c.glade:1592 src/cmnd_edit.c:489
+#: resources/xnec2c.glade:1182 src/cmnd_edit.c:489
 msgid "Segment Number"
 msgstr "Số đoạn"
 
-#: resources/xnec2c.glade:1641
+#: resources/xnec2c.glade:1231
 msgid "Voltage - Real Part"
 msgstr "Điện áp - Phần thực"
 
-#: resources/xnec2c.glade:1654
+#: resources/xnec2c.glade:1244
 msgid "Voltage - Imaginary Part"
 msgstr "Điện áp - Phần ảo"
 
-#: resources/xnec2c.glade:1667
+#: resources/xnec2c.glade:1257
 msgid "Eta"
 msgstr "Eta"
 
-#: resources/xnec2c.glade:1737
+#: resources/xnec2c.glade:1327
 msgid "Theta"
 msgstr "Theta"
 
-#: resources/xnec2c.glade:1750
+#: resources/xnec2c.glade:1340
 msgid "Phi"
 msgstr "Phi"
 
-#: resources/xnec2c.glade:1763
+#: resources/xnec2c.glade:1353
 msgid "Ratio"
 msgstr "Tỷ số"
 
-#: resources/xnec2c.glade:1844
+#: resources/xnec2c.glade:1434
 msgid "Excitation Parameters"
 msgstr "Tham số kích thích"
 
-#: resources/xnec2c.glade:1971
+#: resources/xnec2c.glade:1561
 msgid "Execute Command (XQ Card)"
 msgstr "Lệnh thực thi (Thẻ XQ)"
 
-#: resources/xnec2c.glade:1998
+#: resources/xnec2c.glade:1588
 msgid "No Pattern Cuts"
 msgstr "Không cắt giản đồ"
 
-#: resources/xnec2c.glade:2014
+#: resources/xnec2c.glade:1604
 msgid "Pattern in XZ Plane"
 msgstr "Giản đồ trong mặt phẳng XZ"
 
-#: resources/xnec2c.glade:2030
+#: resources/xnec2c.glade:1620
 msgid "Pattern in YZ Plane"
 msgstr "Giản đồ trong mặt phẳng YZ"
 
-#: resources/xnec2c.glade:2046
+#: resources/xnec2c.glade:1636
 msgid "Both XZ/YZ Patterns"
 msgstr "Cả hai giản đồ XZ/YZ"
 
-#: resources/xnec2c.glade:2068
+#: resources/xnec2c.glade:1658
 msgid "Execute Command"
 msgstr "Lệnh thực thi"
 
-#: resources/xnec2c.glade:2299
+#: resources/xnec2c.glade:1889
 msgid "Frequency Command (FR Card)"
 msgstr "Lệnh tần số (Thẻ FR)"
 
-#: resources/xnec2c.glade:2324
+#: resources/xnec2c.glade:1914
 msgid "Additive Stepping"
 msgstr "Bước cộng"
 
-#: resources/xnec2c.glade:2341
+#: resources/xnec2c.glade:1931
 msgid "Multiplicative Stepping"
 msgstr "Bước nhân"
 
-#: resources/xnec2c.glade:2364
+#: resources/xnec2c.glade:1954
 msgid "Frequency Stepping"
 msgstr "Bước tần số"
 
-#: resources/xnec2c.glade:2394
+#: resources/xnec2c.glade:1984
 msgid "No. Frequency Points"
 msgstr "Số điểm tần số"
 
-#: resources/xnec2c.glade:2425
+#: resources/xnec2c.glade:2015
 msgid "Start Frequency (MHz)"
 msgstr "Tần số bắt đầu (MHz)"
 
-#: resources/xnec2c.glade:2457
+#: resources/xnec2c.glade:2047
 msgid "Frequency Step (MHz)"
 msgstr "Bước tần số (MHz)"
 
-#: resources/xnec2c.glade:2490
+#: resources/xnec2c.glade:2080
 msgid "End Frequency (MHz)"
 msgstr "Tần số kết thúc (MHz)"
 
-#: resources/xnec2c.glade:2526
+#: resources/xnec2c.glade:2116
 msgid "Frequency Stepping Parameters"
 msgstr "Tham số bước tần số"
 
-#: resources/xnec2c.glade:2652
+#: resources/xnec2c.glade:2242
 msgid "Geometry End (GE Card)"
 msgstr "Kết thúc hình học (Thẻ GE)"
 
-#: resources/xnec2c.glade:2677
+#: resources/xnec2c.glade:2267
 msgid "No Ground, Free Space condition"
 msgstr "Không mặt đất, điều kiện không gian tự do"
 
-#: resources/xnec2c.glade:2694
+#: resources/xnec2c.glade:2284
 msgid "Ground present, Structure reflection"
 msgstr "Có mặt đất, phản xạ cấu trúc"
 
-#: resources/xnec2c.glade:2711
+#: resources/xnec2c.glade:2301
 msgid "Ground present, no Structure reflection"
 msgstr "Có mặt đất, không phản xạ cấu trúc"
 
-#: resources/xnec2c.glade:2734
+#: resources/xnec2c.glade:2324
 msgid "Ground Plane type"
 msgstr "Loại mặt phẳng đất"
 
-#: resources/xnec2c.glade:2868
+#: resources/xnec2c.glade:2458
 msgid "Ground Parameters (GD Card)"
 msgstr "Tham số mặt đất (Thẻ GD)"
 
-#: resources/xnec2c.glade:2897 resources/xnec2c.glade:3366
-#: resources/xnec2c.glade:3452
+#: resources/xnec2c.glade:2487 resources/xnec2c.glade:2956
+#: resources/xnec2c.glade:3042
 msgid "Relative Dielectric Const."
 msgstr "Hằng số điện môi tương đối"
 
-#: resources/xnec2c.glade:2929 resources/xnec2c.glade:3485
+#: resources/xnec2c.glade:2519 resources/xnec2c.glade:3075
 msgid "Distance to 2nd Medium"
 msgstr "Khoảng cách đến môi trường thứ 2"
 
-#: resources/xnec2c.glade:2961 resources/xnec2c.glade:3398
-#: resources/xnec2c.glade:3517
+#: resources/xnec2c.glade:2551 resources/xnec2c.glade:2988
+#: resources/xnec2c.glade:3107
 msgid "Ground Conductivity S/m"
 msgstr "Độ dẫn điện mặt đất S/m"
 
-#: resources/xnec2c.glade:2993 resources/xnec2c.glade:3549
+#: resources/xnec2c.glade:2583 resources/xnec2c.glade:3139
 msgid "Dist. below 1st Medium"
 msgstr "K.cách dưới môi trường thứ 1"
 
-#: resources/xnec2c.glade:3029 resources/xnec2c.glade:3585
+#: resources/xnec2c.glade:2619 resources/xnec2c.glade:3175
 msgid "2nd Medium Parameters"
 msgstr "Tham số môi trường thứ 2"
 
-#: resources/xnec2c.glade:3210
+#: resources/xnec2c.glade:2800
 msgid "Ground Parameters (GN & GD Cards)"
 msgstr "Tham số mặt đất (Thẻ GN & GD)"
 
-#: resources/xnec2c.glade:3237
+#: resources/xnec2c.glade:2827
 msgid "Perfect Ground"
 msgstr "Mặt đất hoàn hảo"
 
-#: resources/xnec2c.glade:3253
+#: resources/xnec2c.glade:2843
 msgid "Sommerfeld/Norton"
 msgstr "Sommerfeld/Norton"
 
-#: resources/xnec2c.glade:3269
+#: resources/xnec2c.glade:2859
 msgid "Radial Ground Screen"
 msgstr "Lưới đất hướng tâm"
 
-#: resources/xnec2c.glade:3284
+#: resources/xnec2c.glade:2874
 msgid "Reflection Coeff. Approx"
 msgstr "Xấp xỉ hệ số phản xạ"
 
-#: resources/xnec2c.glade:3300
+#: resources/xnec2c.glade:2890
 msgid "Nullify Previous Params"
 msgstr "Hủy tham số trước đó"
 
-#: resources/xnec2c.glade:3316
+#: resources/xnec2c.glade:2906
 msgid "Second Medium (Cliff)"
 msgstr "Môi trường thứ hai (Vách)"
 
-#: resources/xnec2c.glade:3337
+#: resources/xnec2c.glade:2927
 msgid "Ground Type"
 msgstr "Loại mặt đất"
 
-#: resources/xnec2c.glade:3465
+#: resources/xnec2c.glade:3055
 msgid "0.00000"
 msgstr "0.00000"
 
-#: resources/xnec2c.glade:3616
+#: resources/xnec2c.glade:3206
 msgid "Number of Radials"
 msgstr "Số lượng dây hướng tâm"
 
-#: resources/xnec2c.glade:3629
+#: resources/xnec2c.glade:3219
 msgid "Radial Screen Radius"
 msgstr "Bán kính lưới hướng tâm"
 
-#: resources/xnec2c.glade:3679
+#: resources/xnec2c.glade:3269
 msgid "Radial Wire Diameter"
 msgstr "Đường kính dây hướng tâm"
 
-#: resources/xnec2c.glade:3715
+#: resources/xnec2c.glade:3305
 msgid "Radial Screen Parameters"
 msgstr "Tham số lưới hướng tâm"
 
-#: resources/xnec2c.glade:3915
+#: resources/xnec2c.glade:3505
 msgid "Helical Element (GA card)"
 msgstr "Phần tử xoắn ốc (Thẻ GA)"
 
-#: resources/xnec2c.glade:3940
+#: resources/xnec2c.glade:3530
 msgid "Right Hand Helix"
 msgstr "Xoắn ốc tay phải"
 
-#: resources/xnec2c.glade:3956
+#: resources/xnec2c.glade:3546
 msgid "Left Hand Helix"
 msgstr "Xoắn ốc tay trái"
 
-#: resources/xnec2c.glade:3972
+#: resources/xnec2c.glade:3562
 msgid "Right Hand Spiral"
 msgstr "Xoắn phẳng tay phải"
 
-#: resources/xnec2c.glade:3988
+#: resources/xnec2c.glade:3578
 msgid "Left Hand Spiral"
 msgstr "Xoắn phẳng tay trái"
 
-#: resources/xnec2c.glade:4019
+#: resources/xnec2c.glade:3609
 msgid "Segments/Turn"
 msgstr "Phân đoạn/Vòng"
 
-#: resources/xnec2c.glade:4058
+#: resources/xnec2c.glade:3648
 msgid "0.0100"
 msgstr "0.0100"
 
-#: resources/xnec2c.glade:4079
+#: resources/xnec2c.glade:3669
 msgid "5.00"
 msgstr "5.00"
 
-#: resources/xnec2c.glade:4120 resources/xnec2c.glade:11998
-#: resources/xnec2c.glade:13222
+#: resources/xnec2c.glade:3710 resources/xnec2c.glade:11703
+#: resources/xnec2c.glade:12921
 msgid "1"
 msgstr "1"
 
-#: resources/xnec2c.glade:4140
+#: resources/xnec2c.glade:3730
 msgid "Number of Turns"
 msgstr "Số vòng"
 
-#: resources/xnec2c.glade:4153
+#: resources/xnec2c.glade:3743
 msgid "8.0000"
 msgstr "8.0000"
 
-#: resources/xnec2c.glade:4174
+#: resources/xnec2c.glade:3764
 msgid "Helix Length (HL)"
 msgstr "Chiều dài xoắn ốc (HL)"
 
-#: resources/xnec2c.glade:4187
+#: resources/xnec2c.glade:3777
 msgid "5.0000"
 msgstr "5.0000"
 
-#: resources/xnec2c.glade:4208
+#: resources/xnec2c.glade:3798
 msgid "Turns Spacing"
 msgstr "Khoảng cách vòng"
 
-#: resources/xnec2c.glade:4221 resources/xnec2c.glade:4333
-#: resources/xnec2c.glade:4386 resources/xnec2c.glade:4439
-#: resources/xnec2c.glade:4487
+#: resources/xnec2c.glade:3811 resources/xnec2c.glade:3923
+#: resources/xnec2c.glade:3976 resources/xnec2c.glade:4029
+#: resources/xnec2c.glade:4077
 msgid "1.0000"
 msgstr "1.0000"
 
-#: resources/xnec2c.glade:4255
+#: resources/xnec2c.glade:3845
 msgid "0.0000"
 msgstr "0.0000"
 
-#: resources/xnec2c.glade:4275
+#: resources/xnec2c.glade:3865
 msgid "Radius in X (A1)"
 msgstr "Bán kính theo X (A1)"
 
-#: resources/xnec2c.glade:4288
+#: resources/xnec2c.glade:3878
 msgid "Radius in Y (B1)"
 msgstr "Bán kính theo Y (B1)"
 
-#: resources/xnec2c.glade:4301
+#: resources/xnec2c.glade:3891
 msgid "Radius in X (A2)"
 msgstr "Bán kính theo X (A2)"
 
-#: resources/xnec2c.glade:4314
+#: resources/xnec2c.glade:3904
 msgid "Radius in Y (B2)"
 msgstr "Bán kính theo Y (B2)"
 
-#: resources/xnec2c.glade:4512
+#: resources/xnec2c.glade:4102
 msgid "GH Card"
 msgstr "Thẻ GH"
 
-#: resources/xnec2c.glade:4649 resources/xnec2c.glade:15779
+#: resources/xnec2c.glade:4239 resources/xnec2c.glade:15478
 msgid "Interaction Approx Range (KH Card)"
 msgstr "Phạm vi xấp xỉ tương tác (Thẻ KH)"
 
-#: resources/xnec2c.glade:4676
+#: resources/xnec2c.glade:4266
 msgid "Approximation Range (W/lengths)"
 msgstr "Phạm vi xấp xỉ (Bước sóng)"
 
-#: resources/xnec2c.glade:4714
+#: resources/xnec2c.glade:4304
 msgid "Interaction Approximation Range"
 msgstr "Phạm vi xấp xỉ tương tác"
 
-#: resources/xnec2c.glade:4840
+#: resources/xnec2c.glade:4430
 msgid "Thin Wire Kernel (EK Card)"
 msgstr "Nhân dây mỏng (Thẻ EK)"
 
-#: resources/xnec2c.glade:4858
+#: resources/xnec2c.glade:4448
 msgid "Extended Thin Wire Kernel"
 msgstr "Nhân dây mỏng mở rộng"
 
-#: resources/xnec2c.glade:4875
+#: resources/xnec2c.glade:4465
 msgid "Thin Wire Kernel"
 msgstr "Nhân dây mỏng"
 
-#: resources/xnec2c.glade:5038
+#: resources/xnec2c.glade:4628
 msgid "Loading Command (LD Card)"
 msgstr "Lệnh tải (Thẻ LD)"
 
-#: resources/xnec2c.glade:5064
+#: resources/xnec2c.glade:4654
 msgid "Short all Loads (Nulls previous Loading Cards)"
 msgstr "Ngắn mạch tất cả tải (Hủy các thẻ tải trước đó)"
 
-#: resources/xnec2c.glade:5081
+#: resources/xnec2c.glade:4671
 msgid "Series, Lumped"
 msgstr "Nối tiếp, tập trung"
 
-#: resources/xnec2c.glade:5097
+#: resources/xnec2c.glade:4687
 msgid "Parallel, Distributed"
 msgstr "Song song, phân bố"
 
-#: resources/xnec2c.glade:5113
+#: resources/xnec2c.glade:4703
 msgid "Parallel, Lumped"
 msgstr "Song song, tập trung"
 
-#: resources/xnec2c.glade:5129
+#: resources/xnec2c.glade:4719
 msgid "Resistance & Reactance"
 msgstr "Điện trở & Điện kháng"
 
-#: resources/xnec2c.glade:5145
+#: resources/xnec2c.glade:4735
 msgid "Series, Distributed"
 msgstr "Nối tiếp, phân bố"
 
-#: resources/xnec2c.glade:5161
+#: resources/xnec2c.glade:4751
 msgid "Wire Conductivity"
 msgstr "Độ dẫn điện dây"
 
-#: resources/xnec2c.glade:5183
+#: resources/xnec2c.glade:4773
 msgid "Loading Type"
 msgstr "Loại tải"
 
-#: resources/xnec2c.glade:5213
+#: resources/xnec2c.glade:4803
 msgid "Load Tag Number"
-msgstr "Số thẻ tải"
+msgstr "Số tag tải"
 
-#: resources/xnec2c.glade:5244
+#: resources/xnec2c.glade:4834
 msgid "Resistance"
 msgstr "Điện trở"
 
-#: resources/xnec2c.glade:5276
+#: resources/xnec2c.glade:4866
 msgid "From Segment #"
 msgstr "Từ đoạn #"
 
-#: resources/xnec2c.glade:5307
+#: resources/xnec2c.glade:4897
 msgid "Inductance"
 msgstr "Điện cảm"
 
-#: resources/xnec2c.glade:5339
+#: resources/xnec2c.glade:4929
 msgid "To Segment #"
 msgstr "Đến đoạn #"
 
-#: resources/xnec2c.glade:5370
+#: resources/xnec2c.glade:4960
 msgid "Capacitance"
 msgstr "Điện dung"
 
-#: resources/xnec2c.glade:5406
+#: resources/xnec2c.glade:4996
 msgid "Loading Parameters"
 msgstr "Thông số tải"
 
-#: resources/xnec2c.glade:5621
+#: resources/xnec2c.glade:5211
 msgid "Near Fields Command (NE/NH Cards)"
 msgstr "Lệnh trường gần (Thẻ NE/NH)"
 
-#: resources/xnec2c.glade:5648
+#: resources/xnec2c.glade:5238
 msgid "Near Electric Field"
 msgstr "Trường điện gần"
 
-#: resources/xnec2c.glade:5664
+#: resources/xnec2c.glade:5254
 msgid "Rectangular Co-ordinates"
 msgstr "Tọa độ vuông góc"
 
-#: resources/xnec2c.glade:5680
+#: resources/xnec2c.glade:5270
 msgid "Near Magnetic Field"
 msgstr "Trường từ gần"
 
-#: resources/xnec2c.glade:5695
+#: resources/xnec2c.glade:5285
 msgid "Spherical Co-ordinates"
 msgstr "Tọa độ cầu"
 
-#: resources/xnec2c.glade:5723
+#: resources/xnec2c.glade:5313
 msgid "Field Type & Co-ordinates"
 msgstr "Loại trường & Tọa độ"
 
-#: resources/xnec2c.glade:5753
+#: resources/xnec2c.glade:5343
 msgid "NX"
 msgstr "NX"
 
-#: resources/xnec2c.glade:5784 resources/xnec2c.glade:11549
-#: resources/xnec2c.glade:12758
+#: resources/xnec2c.glade:5374 resources/xnec2c.glade:11254
+#: resources/xnec2c.glade:12457
 msgid "X"
 msgstr "X"
 
-#: resources/xnec2c.glade:5816
+#: resources/xnec2c.glade:5406
 msgid "DX"
 msgstr "DX"
 
-#: resources/xnec2c.glade:5848
+#: resources/xnec2c.glade:5438
 msgid "NY"
 msgstr "NY"
 
-#: resources/xnec2c.glade:5879 resources/xnec2c.glade:11564
-#: resources/xnec2c.glade:12773
+#: resources/xnec2c.glade:5469 resources/xnec2c.glade:11269
+#: resources/xnec2c.glade:12472
 msgid "Y"
 msgstr "Y"
 
-#: resources/xnec2c.glade:5911
+#: resources/xnec2c.glade:5501
 msgid "DY"
 msgstr "DY"
 
-#: resources/xnec2c.glade:5943
+#: resources/xnec2c.glade:5533
 msgid "NZ"
 msgstr "NZ"
 
-#: resources/xnec2c.glade:5974 resources/xnec2c.glade:11579
-#: resources/xnec2c.glade:12788
+#: resources/xnec2c.glade:5564 resources/xnec2c.glade:11284
+#: resources/xnec2c.glade:12487
 msgid "Z"
 msgstr "Z"
 
-#: resources/xnec2c.glade:6006
+#: resources/xnec2c.glade:5596
 msgid "DZ"
 msgstr "DZ"
 
-#: resources/xnec2c.glade:6042
+#: resources/xnec2c.glade:5632
 msgid "Field Pattern Parameters"
 msgstr "Thông số mẫu trường"
 
-#: resources/xnec2c.glade:6169
+#: resources/xnec2c.glade:5759
 msgid "Xnec2c: NEC2 Input File Editor"
 msgstr "Xnec2c: Trình chỉnh sửa tệp đầu vào NEC2"
 
-#: resources/xnec2c.glade:6256
+#: resources/xnec2c.glade:5846
 msgid "Manage Cards"
 msgstr "Quản lý thẻ"
 
-#: resources/xnec2c.glade:6353
+#: resources/xnec2c.glade:5943
 msgid "File Save"
 msgstr "Lưu tệp"
 
-#: resources/xnec2c.glade:6413 src/nec2_model.c:278
+#: resources/xnec2c.glade:6003 src/nec2_model.c:278
 msgid "Comments"
 msgstr "Ghi chú"
 
-#: resources/xnec2c.glade:6440
+#: resources/xnec2c.glade:6030
 msgid "Wire"
 msgstr "Dây dẫn"
 
-#: resources/xnec2c.glade:6454
+#: resources/xnec2c.glade:6044
 msgid "Arc"
 msgstr "Cung"
 
-#: resources/xnec2c.glade:6468
+#: resources/xnec2c.glade:6058
 msgid "Helix"
 msgstr "Xoắn ốc"
 
-#: resources/xnec2c.glade:6482
+#: resources/xnec2c.glade:6072
 msgid "Patch"
 msgstr "Mảnh"
 
-#: resources/xnec2c.glade:6496
+#: resources/xnec2c.glade:6086
 msgid "Cylinder"
 msgstr "Hình trụ"
 
-#: resources/xnec2c.glade:6510
+#: resources/xnec2c.glade:6100
 msgid "Move"
 msgstr "Di chuyển"
 
-#: resources/xnec2c.glade:6524
+#: resources/xnec2c.glade:6114
 msgid "Reflect"
 msgstr "Phản chiếu"
 
-#: resources/xnec2c.glade:6538
+#: resources/xnec2c.glade:6128
 msgid "Scale"
 msgstr "Tỷ lệ"
 
-#: resources/xnec2c.glade:6552 resources/xnec2c.glade:6836
+#: resources/xnec2c.glade:6142 resources/xnec2c.glade:6426
 msgid "Add Var (SY)"
 msgstr "Thêm biến (SY)"
 
-#: resources/xnec2c.glade:6572
+#: resources/xnec2c.glade:6162
 msgid "Edit Geometry Data"
 msgstr "Chỉnh sửa dữ liệu hình học"
 
-#: resources/xnec2c.glade:6626
+#: resources/xnec2c.glade:6216
 msgid "Geometry"
 msgstr "Hình học"
 
-#: resources/xnec2c.glade:6653
+#: resources/xnec2c.glade:6243
 msgid "Excitation"
 msgstr "Kích thích"
 
-#: resources/xnec2c.glade:6667
+#: resources/xnec2c.glade:6257
 msgid "Radiation"
 msgstr "Bức xạ"
 
-#: resources/xnec2c.glade:6681
+#: resources/xnec2c.glade:6271
 msgid "Frequency"
 msgstr "Tần số"
 
-#: resources/xnec2c.glade:6695
+#: resources/xnec2c.glade:6285
 msgid "Near Fields"
 msgstr "Trường gần"
 
-#: resources/xnec2c.glade:6709
+#: resources/xnec2c.glade:6299
 msgid "Ground (GN)"
 msgstr "Mặt đất (GN)"
 
-#: resources/xnec2c.glade:6723
+#: resources/xnec2c.glade:6313
 msgid "Ground (GD)"
 msgstr "Mặt đất (GD)"
 
-#: resources/xnec2c.glade:6737
+#: resources/xnec2c.glade:6327
 msgid "Loading"
 msgstr "Tải"
 
-#: resources/xnec2c.glade:6751
+#: resources/xnec2c.glade:6341
 msgid "Kernel"
 msgstr "Kernel"
 
-#: resources/xnec2c.glade:6765
+#: resources/xnec2c.glade:6355
 msgid "Network"
 msgstr "Mạng"
 
-#: resources/xnec2c.glade:6779
+#: resources/xnec2c.glade:6369
 msgid "Interaction"
 msgstr "Tương tác"
 
-#: resources/xnec2c.glade:6793
+#: resources/xnec2c.glade:6383
 msgid "Transm. Line"
 msgstr "Đường truyền"
 
-#: resources/xnec2c.glade:6808
+#: resources/xnec2c.glade:6398
 msgid "Execute"
 msgstr "Thực thi"
 
-#: resources/xnec2c.glade:6822
+#: resources/xnec2c.glade:6412
 msgid "Zo"
 msgstr "Zo"
 
-#: resources/xnec2c.glade:6856
+#: resources/xnec2c.glade:6446
 msgid "Edit Control Commands"
 msgstr "Chỉnh sửa lệnh điều khiển"
 
-#: resources/xnec2c.glade:6910
+#: resources/xnec2c.glade:6500
 msgid "Commands"
 msgstr "Lệnh"
 
-#: resources/xnec2c.glade:6929
+#: resources/xnec2c.glade:6519
 msgid "Unsaved Data"
 msgstr "Dữ liệu chưa lưu"
 
-#: resources/xnec2c.glade:7005
+#: resources/xnec2c.glade:6595
 msgid ""
 "Unsaved data in NEC2 Editor.\n"
 "Save NEC2 Editor data first?\n"
@@ -972,1024 +1412,1115 @@ msgstr ""
 "Dữ liệu chưa lưu trong trình chỉnh sửa NEC2.\n"
 "Lưu dữ liệu trình chỉnh sửa NEC2 trước?\n"
 
-#: resources/xnec2c.glade:7104
+#: resources/xnec2c.glade:6694
 msgid "Network Command (NT Card)"
 msgstr "Lệnh mạng (Thẻ NT)"
 
-#: resources/xnec2c.glade:7133
+#: resources/xnec2c.glade:6723
 msgid "Tag Number, Port 1  "
 msgstr "Số tag, cổng 1  "
 
-#: resources/xnec2c.glade:7164
+#: resources/xnec2c.glade:6754
 msgid "Tag Number, Port 2  "
 msgstr "Số tag, cổng 2  "
 
-#: resources/xnec2c.glade:7195
+#: resources/xnec2c.glade:6785
 msgid "Segment Num, Port 1"
 msgstr "Số đoạn, cổng 1"
 
-#: resources/xnec2c.glade:7226
+#: resources/xnec2c.glade:6816
 msgid "Segment Num, Port 2"
 msgstr "Số đoạn, cổng 2"
 
-#: resources/xnec2c.glade:7261 resources/xnec2c.glade:14565
+#: resources/xnec2c.glade:6851 resources/xnec2c.glade:14264
 msgid "Segment Identity"
 msgstr "Định danh đoạn"
 
-#: resources/xnec2c.glade:7291
+#: resources/xnec2c.glade:6881
 msgid "Element 1,1 Real Part"
 msgstr "Phần thực phần tử 1,1"
 
-#: resources/xnec2c.glade:7323
+#: resources/xnec2c.glade:6913
 msgid "Element 1,2 Real Part"
 msgstr "Phần thực phần tử 1,2"
 
-#: resources/xnec2c.glade:7355
+#: resources/xnec2c.glade:6945
 msgid "Element 2,2 Real Part"
 msgstr "Phần thực phần tử 2,2"
 
-#: resources/xnec2c.glade:7387
+#: resources/xnec2c.glade:6977
 msgid "Element 1,1 Imag Part"
 msgstr "Phần ảo phần tử 1,1"
 
-#: resources/xnec2c.glade:7419
+#: resources/xnec2c.glade:7009
 msgid "Element 1,2 Imag Part"
 msgstr "Phần ảo phần tử 1,2"
 
-#: resources/xnec2c.glade:7451
+#: resources/xnec2c.glade:7041
 msgid "Element 2,2 Imag Part"
 msgstr "Phần ảo phần tử 2,2"
 
-#: resources/xnec2c.glade:7487
+#: resources/xnec2c.glade:7077
 msgid "Admittance Matrix Elements"
 msgstr "Phần tử ma trận dẫn nạp"
 
-#: resources/xnec2c.glade:7702
+#: resources/xnec2c.glade:7292
 msgid "Patch Element (SP & SC Cards)"
 msgstr "Phần tử mảnh (thẻ SP & SC)"
 
-#: resources/xnec2c.glade:7726
+#: resources/xnec2c.glade:7316
 msgid "Arbitrary"
 msgstr "Tùy ý"
 
-#: resources/xnec2c.glade:7743
+#: resources/xnec2c.glade:7333
 msgid "Rectangle"
 msgstr "Hình chữ nhật"
 
-#: resources/xnec2c.glade:7760
+#: resources/xnec2c.glade:7350
 msgid "Triangle"
 msgstr "Tam giác"
 
-#: resources/xnec2c.glade:7777
+#: resources/xnec2c.glade:7367
 msgid "Quadrilateral"
 msgstr "Tứ giác"
 
-#: resources/xnec2c.glade:7794
+#: resources/xnec2c.glade:7384
 msgid "Surface"
 msgstr "Bề mặt"
 
-#: resources/xnec2c.glade:7817
+#: resources/xnec2c.glade:7407
 msgid "Patch Type"
 msgstr "Loại mảnh"
 
-#: resources/xnec2c.glade:7847
+#: resources/xnec2c.glade:7437
 msgid "Corners 1-2 sub-division (NX)"
 msgstr "Chia nhỏ góc 1-2 (NX)"
 
-#: resources/xnec2c.glade:7878
+#: resources/xnec2c.glade:7468
 msgid "Corners 2-3 sub-division (NY)"
 msgstr "Chia nhỏ góc 2-3 (NY)"
 
-#: resources/xnec2c.glade:7913
+#: resources/xnec2c.glade:7503
 msgid "Surface Sub-division"
 msgstr "Chia nhỏ bề mặt"
 
-#: resources/xnec2c.glade:7943 src/geom_edit.c:1157
+#: resources/xnec2c.glade:7533 src/geom_edit.c:1157
 msgid "Center - X"
 msgstr "Tâm - X"
 
-#: resources/xnec2c.glade:7975 src/geom_edit.c:1163
+#: resources/xnec2c.glade:7565 src/geom_edit.c:1163
 msgid "Normal - Elev."
 msgstr "Pháp tuyến - Cao độ"
 
-#: resources/xnec2c.glade:8007 src/geom_edit.c:1159
+#: resources/xnec2c.glade:7597 src/geom_edit.c:1159
 msgid "Center - Y"
 msgstr "Tâm - Y"
 
-#: resources/xnec2c.glade:8039 src/geom_edit.c:1165
+#: resources/xnec2c.glade:7629 src/geom_edit.c:1165
 msgid "Normal - Azim."
 msgstr "Pháp tuyến - Phương vị"
 
-#: resources/xnec2c.glade:8071 src/geom_edit.c:1161
+#: resources/xnec2c.glade:7661 src/geom_edit.c:1161
 msgid "Center - Z"
 msgstr "Tâm - Z"
 
-#: resources/xnec2c.glade:8103 src/geom_edit.c:1167
+#: resources/xnec2c.glade:7693 src/geom_edit.c:1167
 msgid "Patch Area"
 msgstr "Diện tích mảnh"
 
-#: resources/xnec2c.glade:8139
+#: resources/xnec2c.glade:7729
 msgid "SP/SM Cards"
 msgstr "Thẻ SP/SM"
 
-#: resources/xnec2c.glade:8175
+#: resources/xnec2c.glade:7765
 msgid "Corner 3 - X"
 msgstr "Góc 3 - X"
 
-#: resources/xnec2c.glade:8207
+#: resources/xnec2c.glade:7797
 msgid "Corner 3 - Y"
 msgstr "Góc 3 - Y"
 
-#: resources/xnec2c.glade:8239
+#: resources/xnec2c.glade:7829
 msgid "Corner 3 - Z"
 msgstr "Góc 3 - Z"
 
-#: resources/xnec2c.glade:8287
+#: resources/xnec2c.glade:7877
 msgid "Corner 4 - X"
 msgstr "Góc 4 - X"
 
-#: resources/xnec2c.glade:8319
+#: resources/xnec2c.glade:7909
 msgid "Corner 4 - Y"
 msgstr "Góc 4 - Y"
 
-#: resources/xnec2c.glade:8351
+#: resources/xnec2c.glade:7941
 msgid "Corner 4 - Z"
 msgstr "Góc 4 - Z"
 
-#: resources/xnec2c.glade:8394
+#: resources/xnec2c.glade:7984
 msgid "SC Card"
 msgstr "Thẻ SC"
 
-#: resources/xnec2c.glade:8610
+#: resources/xnec2c.glade:8200
 msgid "Quit xnec2c?"
 msgstr "Thoát xnec2c?"
 
-#: resources/xnec2c.glade:8689
+#: resources/xnec2c.glade:8279
 msgid "Radiation Pattern (RP Card)"
-msgstr "Đồ thị bức xạ (Thẻ RP)"
+msgstr "Giản đồ bức xạ (Thẻ RP)"
 
-#: resources/xnec2c.glade:8716
+#: resources/xnec2c.glade:8306
 msgid "Normal (Space) Wave"
 msgstr "Sóng không gian (thường)"
 
-#: resources/xnec2c.glade:8732
+#: resources/xnec2c.glade:8322
 msgid "Space + Ground Wave"
 msgstr "Sóng không gian + Sóng đất"
 
-#: resources/xnec2c.glade:8748
+#: resources/xnec2c.glade:8338
 msgid "Linear Cliff"
 msgstr "Vách tuyến tính"
 
-#: resources/xnec2c.glade:8764
+#: resources/xnec2c.glade:8354
 msgid "Radial wire screen"
 msgstr "Màn dây hướng tâm"
 
-#: resources/xnec2c.glade:8780
+#: resources/xnec2c.glade:8370
 msgid "Circular Cliff + Radials"
 msgstr "Vách tròn + Dây hướng tâm"
 
-#: resources/xnec2c.glade:8796
+#: resources/xnec2c.glade:8386
 msgid "Circular Cliff"
 msgstr "Vách tròn"
 
-#: resources/xnec2c.glade:8812
+#: resources/xnec2c.glade:8402
 msgid "Linear Cliff + Radials"
 msgstr "Vách tuyến tính + Dây hướng tâm"
 
-#: resources/xnec2c.glade:8830
+#: resources/xnec2c.glade:8420
 msgid "<b>See GN/GD Card Documentation</b>"
 msgstr "<b>Xem tài liệu thẻ GN/GD</b>"
 
-#: resources/xnec2c.glade:8848
+#: resources/xnec2c.glade:8438
 msgid "Wave Type and Ground (I1)"
 msgstr "Loại sóng và mặt đất (I1)"
 
-#: resources/xnec2c.glade:8876
+#: resources/xnec2c.glade:8466
 msgid "Major & Minor Axis & Total Gain"
 msgstr "Trục chính & Trục phụ & Tổng độ lợi"
 
-#: resources/xnec2c.glade:8892
+#: resources/xnec2c.glade:8482
 msgid "Vertical, Horizontal & Total Gain"
 msgstr "Độ lợi dọc, ngang & Tổng"
 
-#: resources/xnec2c.glade:8908
+#: resources/xnec2c.glade:8498
 msgid "Major Axis Gain Normalized"
 msgstr "Độ lợi trục chính chuẩn hóa"
 
-#: resources/xnec2c.glade:8924
+#: resources/xnec2c.glade:8514
 msgid "Vertical Axis Gain Normalized"
 msgstr "Độ lợi trục dọc chuẩn hóa"
 
-#: resources/xnec2c.glade:8940
+#: resources/xnec2c.glade:8530
 msgid "Total Gain Normalized"
 msgstr "Tổng độ lợi chuẩn hóa"
 
-#: resources/xnec2c.glade:8956
+#: resources/xnec2c.glade:8546
 msgid "Print/Normalize Directive Gain"
 msgstr "In/Chuẩn hóa độ lợi định hướng"
 
-#: resources/xnec2c.glade:8972
+#: resources/xnec2c.glade:8562
 msgid "No Normalized Gain"
 msgstr "Không chuẩn hóa độ lợi"
 
-#: resources/xnec2c.glade:8988
+#: resources/xnec2c.glade:8578
 msgid "Minor Axis Gain Normalized"
 msgstr "Độ lợi trục phụ chuẩn hóa"
 
-#: resources/xnec2c.glade:9004
+#: resources/xnec2c.glade:8594
 msgid "Horizontal Axis Gain Normalized"
 msgstr "Độ lợi trục ngang chuẩn hóa"
 
-#: resources/xnec2c.glade:9020
+#: resources/xnec2c.glade:8610
 msgid "Print/Normalize Power Gain"
 msgstr "In/Chuẩn hóa độ lợi công suất"
 
-#: resources/xnec2c.glade:9036
+#: resources/xnec2c.glade:8626
 msgid "No Gain Averaging"
 msgstr "Không trung bình độ lợi"
 
-#: resources/xnec2c.glade:9052
+#: resources/xnec2c.glade:8642
 msgid "Points in Average Not Printed"
 msgstr "Các điểm trung bình không được in"
 
-#: resources/xnec2c.glade:9068
+#: resources/xnec2c.glade:8658
 msgid "Average Gain Computed"
 msgstr "Độ lợi trung bình đã tính"
 
-#: resources/xnec2c.glade:9086
+#: resources/xnec2c.glade:8676
 msgid "<b>See RP Card Documentation</b>"
 msgstr "<b>Xem tài liệu thẻ RP</b>"
 
-#: resources/xnec2c.glade:9104
+#: resources/xnec2c.glade:8694
 msgid "Data Output Control (XNDA)"
 msgstr "Điều khiển xuất dữ liệu (XNDA)"
 
-#: resources/xnec2c.glade:9134
+#: resources/xnec2c.glade:8724
 msgid "Points in Theta"
 msgstr "Số điểm theo Theta"
 
-#: resources/xnec2c.glade:9148 src/cmnd_edit.c:1763
+#: resources/xnec2c.glade:8738 src/cmnd_edit.c:1763
 msgid "Initial Theta (deg)"
 msgstr "Theta ban đầu (deg)"
 
-#: resources/xnec2c.glade:9161 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
+#: resources/xnec2c.glade:8751 src/cmnd_edit.c:1764 src/cmnd_edit.c:2709
 msgid "Increment in Theta"
 msgstr "Bước tăng theo Theta"
 
-#: resources/xnec2c.glade:9230 src/cmnd_edit.c:1762
+#: resources/xnec2c.glade:8820 src/cmnd_edit.c:1762
 msgid "Points in Phi"
 msgstr "Số điểm theo Phi"
 
-#: resources/xnec2c.glade:9243
+#: resources/xnec2c.glade:8833
 msgid "Initial Phi (deg)"
 msgstr "Phi ban đầu (deg)"
 
-#: resources/xnec2c.glade:9256 src/cmnd_edit.c:2708
+#: resources/xnec2c.glade:8846 src/cmnd_edit.c:2708
 msgid "Increment in Phi"
 msgstr "Bước tăng theo Phi"
 
-#: resources/xnec2c.glade:9325
+#: resources/xnec2c.glade:8915
 msgid "Field Point Distance"
 msgstr "Khoảng cách điểm trường"
 
-#: resources/xnec2c.glade:9357
+#: resources/xnec2c.glade:8947
 msgid "Gain Normalization"
 msgstr "Chuẩn hóa độ lợi"
 
-#: resources/xnec2c.glade:9399
+#: resources/xnec2c.glade:8989
 msgid "Radiation Pattern Parameters"
-msgstr "Tham số đồ thị bức xạ"
+msgstr "Tham số giản đồ bức xạ"
 
-#: resources/xnec2c.glade:9566
+#: resources/xnec2c.glade:9156
 msgid "Reflect Structure (GX card)"
 msgstr "Phản xạ cấu trúc (thẻ GX)"
 
-#: resources/xnec2c.glade:9594
+#: resources/xnec2c.glade:9184
 msgid "Reflect in YZ plane"
 msgstr "Phản xạ trong mặt phẳng YZ"
 
-#: resources/xnec2c.glade:9609
+#: resources/xnec2c.glade:9199
 msgid "Reflect in XY plane"
 msgstr "Phản xạ trong mặt phẳng XY"
 
-#: resources/xnec2c.glade:9624
+#: resources/xnec2c.glade:9214
 msgid "Reflect in XZ plane"
 msgstr "Phản xạ trong mặt phẳng XZ"
 
-#: resources/xnec2c.glade:9680
+#: resources/xnec2c.glade:9270
 msgid "Reflect Options"
 msgstr "Tùy chọn phản xạ"
 
-#: resources/xnec2c.glade:9811
+#: resources/xnec2c.glade:9401
 msgid "Xnec2c: Frequency Data Plots"
 msgstr "Xnec2c: Đồ thị dữ liệu tần số"
 
-#: resources/xnec2c.glade:9836 resources/xnec2c.glade:10807
-#: resources/xnec2c.glade:12252
+#: resources/xnec2c.glade:9426 resources/xnec2c.glade:10420
+#: resources/xnec2c.glade:11957
 msgid "_File"
 msgstr "_Tệp"
 
-#: resources/xnec2c.glade:9898 resources/xnec2c.glade:10869
-#: resources/xnec2c.glade:12314
+#: resources/xnec2c.glade:9488 resources/xnec2c.glade:10482
+#: resources/xnec2c.glade:12019
 msgid "Save as _gnuplot"
 msgstr "Lưu dạng _gnuplot"
 
-#: resources/xnec2c.glade:9909 resources/xnec2c.glade:12324
+#: resources/xnec2c.glade:9499 resources/xnec2c.glade:12029
 msgid "Save as _CSV"
 msgstr "Lưu dạng _CSV"
 
-#: resources/xnec2c.glade:9921
+#: resources/xnec2c.glade:9511
 msgid "Save as _Touchstone (.SnP)"
 msgstr "Lưu dạng _Touchstone (.SnP)"
 
-#: resources/xnec2c.glade:9928
+#: resources/xnec2c.glade:9518
 msgid "Save as S_1P: Reflection Only"
-msgstr "Lưu dạng S_1P: Chỉ Phản xạ"
+msgstr "Lưu dạng S_1P: Chỉ phản xạ"
 
-#: resources/xnec2c.glade:9938
+#: resources/xnec2c.glade:9528
 msgid "Save as S2P: _Max Gain (S21)"
-msgstr "Lưu dạng S2P: Độ _lợi Tối đa (S21)"
+msgstr "Lưu dạng S2P: Độ _lợi tối đa (S21)"
 
-#: resources/xnec2c.glade:9948
+#: resources/xnec2c.glade:9538
 msgid "Save as S2P: _Viewer Gain (S21)"
-msgstr "Lưu dạng S2P: Độ lợi _Người xem (S21)"
+msgstr "Lưu dạng S2P: Độ lợi _người xem (S21)"
 
-#: resources/xnec2c.glade:9985 resources/xnec2c.glade:11235
-#: resources/xnec2c.glade:12358
+#: resources/xnec2c.glade:9575 resources/xnec2c.glade:10848
+#: resources/xnec2c.glade:12063
 msgid "_View"
 msgstr "_Xem"
 
-#: resources/xnec2c.glade:9994 resources/xnec2c.glade:11265
-#: resources/xnec2c.glade:12368
+#: resources/xnec2c.glade:9584 resources/xnec2c.glade:10876
+#: resources/xnec2c.glade:12071
 msgid "_Polarization"
 msgstr "_Phân cực"
 
-#: resources/xnec2c.glade:10010 resources/xnec2c.glade:11281
-#: resources/xnec2c.glade:12384
+#: resources/xnec2c.glade:9598 resources/xnec2c.glade:10890
+#: resources/xnec2c.glade:12085
 msgid "_Total"
 msgstr "_Tổng"
 
-#: resources/xnec2c.glade:10021 resources/xnec2c.glade:11292
-#: resources/xnec2c.glade:12395
+#: resources/xnec2c.glade:9609 resources/xnec2c.glade:10901
+#: resources/xnec2c.glade:12096
 msgid "_Horizontal"
 msgstr "_Ngang"
 
-#: resources/xnec2c.glade:10032 resources/xnec2c.glade:11303
-#: resources/xnec2c.glade:12406
+#: resources/xnec2c.glade:9620 resources/xnec2c.glade:10912
+#: resources/xnec2c.glade:12107
 msgid "_Vertical"
 msgstr "_Dọc"
 
-#: resources/xnec2c.glade:10043 resources/xnec2c.glade:11314
-#: resources/xnec2c.glade:12417
+#: resources/xnec2c.glade:9631 resources/xnec2c.glade:10923
+#: resources/xnec2c.glade:12118
 msgid "_Right Hand"
-msgstr "Tay _Phải"
+msgstr "Tay _phải"
 
-#: resources/xnec2c.glade:10054 resources/xnec2c.glade:11325
-#: resources/xnec2c.glade:12428
+#: resources/xnec2c.glade:9642 resources/xnec2c.glade:10934
+#: resources/xnec2c.glade:12129
 msgid "_Left Hand"
-msgstr "Tay T_rái"
+msgstr "Tay t_rái"
 
-#: resources/xnec2c.glade:10069
+#: resources/xnec2c.glade:9657
 msgid "_Color Theme"
 msgstr "_Chủ đề màu"
 
-#: resources/xnec2c.glade:10088
+#: resources/xnec2c.glade:9676
 msgid "_Net Gain"
-msgstr "Độ lợi _Thực"
+msgstr "Độ lợi _ròng"
 
-#: resources/xnec2c.glade:10097
+#: resources/xnec2c.glade:9685
 msgid "Show _Min/Max Values"
 msgstr "Hiện giá trị _Min/Max"
 
-#: resources/xnec2c.glade:10106
+#: resources/xnec2c.glade:9694
 msgid "Show _S11 (dB) Values"
 msgstr "Hiện giá trị _S11 (dB)"
 
-#: resources/xnec2c.glade:10115
+#: resources/xnec2c.glade:9703
 msgid "Clamp _VSWR Graph to 10"
 msgstr "Giới hạn đồ thị _VSWR ở 10"
 
-#: resources/xnec2c.glade:10124
+#: resources/xnec2c.glade:9712
 msgid "Show Ta instead of TA"
 msgstr "Hiện Ta thay vì TA"
 
-#: resources/xnec2c.glade:10133
+#: resources/xnec2c.glade:9721
 msgid "Round _X Axis Frequency Values"
 msgstr "Làm tròn giá trị tần số trục _X"
 
-#: resources/xnec2c.glade:10142
+#: resources/xnec2c.glade:9730
 msgid "S_wap Left/Right Click Frequency Selection"
-msgstr "_Hoán đổi lựa chọn tần số Click Trái/Phải"
+msgstr "_Hoán đổi lựa chọn tần số click trái/phải"
 
-#: resources/xnec2c.glade:10166 resources/xnec2c.glade:10330
+#: resources/xnec2c.glade:9754 resources/xnec2c.glade:9918
 msgid "Max Gain"
 msgstr "Độ lợi tối đa"
 
-#: resources/xnec2c.glade:10181
+#: resources/xnec2c.glade:9769
 msgid "Direction"
 msgstr "Hướng"
 
-#: resources/xnec2c.glade:10196
+#: resources/xnec2c.glade:9784
 msgid "Viewer"
 msgstr "Người xem"
 
-#: resources/xnec2c.glade:10211 resources/xnec2c.glade:10435
-#: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:40
+#: resources/xnec2c.glade:9799 resources/xnec2c.glade:10023
+#: src/freqplots/freqplots_core.c:57 src/freqplots/graphs/vswr_graph.c:55
 msgid "VSWR"
 msgstr "VSWR"
 
-#: resources/xnec2c.glade:10226
+#: resources/xnec2c.glade:9814
 msgid "Zr/Zi"
 msgstr "Zr/Zi"
 
-#: resources/xnec2c.glade:10241
+#: resources/xnec2c.glade:9829
 msgid "Zm/Zph"
 msgstr "Zm/Zph"
 
-#: resources/xnec2c.glade:10256
+#: resources/xnec2c.glade:9844
 msgid "Smith"
 msgstr "Smith"
 
-#: resources/xnec2c.glade:10271
+#: resources/xnec2c.glade:9859
 msgid "G/Ta"
 msgstr "G/Ta"
 
-#: resources/xnec2c.glade:10314 resources/xnec2c.glade:10349
-#: resources/xnec2c.glade:10384 resources/xnec2c.glade:10419
-#: resources/xnec2c.glade:10638 resources/xnec2c.glade:10673
-#: resources/xnec2c.glade:10708 resources/xnec2c.glade:13481
+#: resources/xnec2c.glade:9902 resources/xnec2c.glade:9937
+#: resources/xnec2c.glade:9972 resources/xnec2c.glade:10007
+#: resources/xnec2c.glade:10251 resources/xnec2c.glade:10286
+#: resources/xnec2c.glade:10321 resources/xnec2c.glade:13180
 msgid " - - -"
 msgstr " - - -"
 
-#: resources/xnec2c.glade:10365 src/freqplots/graphs/impedance_graph.c:58
+#: resources/xnec2c.glade:9953 src/freqplots/graphs/impedance_graph.c:76
 msgid "Z-imag"
 msgstr "Z-ảo"
 
-#: resources/xnec2c.glade:10400 src/freqplots/graphs/impedance_graph.c:56
+#: resources/xnec2c.glade:9988 src/freqplots/graphs/impedance_graph.c:74
 msgid "Z-real"
 msgstr "Z-thực"
 
-#: resources/xnec2c.glade:10455
+#: resources/xnec2c.glade:10043
 msgid " - - - - "
 msgstr " - - - - "
 
-#: resources/xnec2c.glade:10471
+#: resources/xnec2c.glade:10059
 msgid "Freq MHz"
 msgstr "Tần số MHz"
 
-#: resources/xnec2c.glade:10510
+#: resources/xnec2c.glade:10098 resources/xnec2c.glade:10111
+msgid "Port"
+msgstr "Cổng"
+
+#: resources/xnec2c.glade:10123
 msgid "Tx Line Zo"
 msgstr "Zo đường truyền"
 
-#: resources/xnec2c.glade:10524 resources/xnec2c.glade:12013
-#: resources/xnec2c.glade:13253
+#: resources/xnec2c.glade:10137 resources/xnec2c.glade:11718
+#: resources/xnec2c.glade:12952
 msgid "Freq Loop"
 msgstr "Vòng lặp tần số"
 
-#: resources/xnec2c.glade:10619 resources/xnec2c.glade:13359
+#: resources/xnec2c.glade:10232 resources/xnec2c.glade:13058
 msgid "T<sub>A</sub>(Elev.°)"
 msgstr "T<sub>A</sub>(Ngẩng°)"
 
-#: resources/xnec2c.glade:10654
+#: resources/xnec2c.glade:10267
 msgid "T<sub>a</sub>"
 msgstr "T<sub>a</sub>"
 
-#: resources/xnec2c.glade:10689
+#: resources/xnec2c.glade:10302
 msgid "G/T<sub>a</sub>"
 msgstr "G/T<sub>a</sub>"
 
-#: resources/xnec2c.glade:10763
+#: resources/xnec2c.glade:10376
 msgid "Frequency Data Plots"
 msgstr "Đồ thị dữ liệu tần số"
 
-#: resources/xnec2c.glade:10880
+#: resources/xnec2c.glade:10493
 msgid "Save _Currents/Charges as CSV"
 msgstr "Lưu _dòng điện/điện tích dạng CSV"
 
-#: resources/xnec2c.glade:10899
+#: resources/xnec2c.glade:10512
 msgid "Optimization Settings"
 msgstr "Cài đặt tối ưu hóa"
 
-#: resources/xnec2c.glade:10914
+#: resources/xnec2c.glade:10527
 msgid "Reload and write data on .NEC file changes"
 msgstr "Tải lại và ghi dữ liệu khi tệp .NEC thay đổi"
 
-#: resources/xnec2c.glade:10921
+#: resources/xnec2c.glade:10534
 msgid "_Write files selected below, now."
 msgstr "_Ghi các tệp đã chọn bên dưới, ngay bây giờ."
 
-#: resources/xnec2c.glade:10936
+#: resources/xnec2c.glade:10549
 msgid "After calculation, write <file>.csv"
 msgstr "Sau khi tính toán, ghi <file>.csv"
 
-#: resources/xnec2c.glade:10945
+#: resources/xnec2c.glade:10558
 msgid "After calculation, write <file>.s_1p"
 msgstr "Sau khi tính toán, ghi <file>.s_1p"
 
-#: resources/xnec2c.glade:10954
+#: resources/xnec2c.glade:10567
 msgid "After calculation, write <file>-_maxgain.s2p"
 msgstr "Sau khi tính toán, ghi <file>-_maxgain.s2p"
 
-#: resources/xnec2c.glade:10963
+#: resources/xnec2c.glade:10576
 msgid "After calculation, write <file>-_viewergain.s2p"
 msgstr "Sau khi tính toán, ghi <file>-_viewergain.s2p"
 
-#: resources/xnec2c.glade:10972
+#: resources/xnec2c.glade:10585
 msgid "After calculation, write <file>-_radpattern.csv"
 msgstr "Sau khi tính toán, ghi <file>-_radpattern.csv"
 
-#: resources/xnec2c.glade:10981
+#: resources/xnec2c.glade:10594
 msgid "After calculation, write <file>-_currents.csv"
 msgstr "Sau khi tính toán, ghi <file>-_currents.csv"
 
-#: resources/xnec2c.glade:10990
+#: resources/xnec2c.glade:10603
 msgid "After calculation, write <file>-_structure.gplot"
 msgstr "Sau khi tính toán, ghi <file>-_structure.gplot"
 
-#: resources/xnec2c.glade:10999
+#: resources/xnec2c.glade:10612
 msgid "After calculation, write <file>-_patch-currents.csv"
 msgstr "Sau khi tính toán, ghi <file>-_patch-currents.csv"
 
-#: resources/xnec2c.glade:11014
+#: resources/xnec2c.glade:10627
 msgid "_Math Libraries"
 msgstr "_Thư viện toán học"
 
-#: resources/xnec2c.glade:11023
+#: resources/xnec2c.glade:10636
 msgid "_Interactive"
 msgstr "_Tương tác"
 
-#: resources/xnec2c.glade:11043
+#: resources/xnec2c.glade:10656
 msgid "_Batch"
 msgstr "_Hàng loạt"
 
-#: resources/xnec2c.glade:11069
+#: resources/xnec2c.glade:10682
 msgid "Mathlib _Help"
 msgstr "Trợ giúp _Mathlib"
 
-#: resources/xnec2c.glade:11082
+#: resources/xnec2c.glade:10695
 msgid "Mathlib _Benchmarks"
 msgstr "Đánh giá _Mathlib"
 
-#: resources/xnec2c.glade:11093
+#: resources/xnec2c.glade:10706
 msgid "_Selected Mathlibs"
 msgstr "_Mathlib đã chọn"
 
-#: resources/xnec2c.glade:11107
+#: resources/xnec2c.glade:10720
 msgid "Select All/None"
-msgstr "Chọn Tất cả/Không"
+msgstr "Chọn tất cả/không"
 
-#: resources/xnec2c.glade:11132
+#: resources/xnec2c.glade:10745
 msgid "_Parallel (-j N):\t\tO(N/J)"
 msgstr "_Song song (-j N):\t\tO(N/J)"
 
-#: resources/xnec2c.glade:11141
+#: resources/xnec2c.glade:10754
 msgid "_Single Job (-j 1):\tO(N)"
-msgstr "_Tác vụ Đơn (-j 1):\tO(N)"
+msgstr "_Tác vụ đơn (-j 1):\tO(N)"
 
-#: resources/xnec2c.glade:11150
+#: resources/xnec2c.glade:10763
 msgid "_Iterate -j N/=2:\tO(N*log2(J))"
 msgstr "_Lặp -j N/=2:\tO(N*log2(J))"
 
-#: resources/xnec2c.glade:11159
+#: resources/xnec2c.glade:10772
 msgid "_Iterate -j N-=1:\tO(N*J)"
 msgstr "_Lặp -j N-=1:\tO(N*J)"
 
-#: resources/xnec2c.glade:11174
+#: resources/xnec2c.glade:10787
 msgid "Benchmark _Help"
 msgstr "Trợ giúp đánh _giá"
 
-#: resources/xnec2c.glade:11193
+#: resources/xnec2c.glade:10806
 msgid "Begin Frequency Loop at Startup"
 msgstr "Bắt đầu vòng lặp tần số khi khởi động"
 
-#: resources/xnec2c.glade:11204
+#: resources/xnec2c.glade:10817
 msgid "Confirm Quit"
 msgstr "Xác nhận thoát"
 
-#: resources/xnec2c.glade:11245
+#: resources/xnec2c.glade:10856
 msgid "_Radiation Pattern"
-msgstr "_Đồ thị bức xạ"
+msgstr "_Giản đồ bức xạ"
 
-#: resources/xnec2c.glade:11255
+#: resources/xnec2c.glade:10866
 msgid "_Frequency Plots"
 msgstr "Đồ thị _tần số"
 
-#: resources/xnec2c.glade:11340
-msgid "Current _Visualization"
-msgstr "Trực quan hóa _Dòng điện"
+#: resources/xnec2c.glade:10949
+msgid "_Visualization"
+msgstr "Trực quan _hóa"
 
-#: resources/xnec2c.glade:11356
-msgid "Animated"
-msgstr "Hoạt ảnh"
+#: resources/xnec2c.glade:10965
+msgid "Color Scale"
+msgstr "Thang màu"
 
-#: resources/xnec2c.glade:11363
+#: resources/xnec2c.glade:10972
+msgid ""
+"Power transfer n^γ relative to this frequency step's peak.\n"
+"γ = 0.5 expands weak regions, γ = 1 is linear amplitude, γ = 2 shows the "
+"squared magnitude: |I|² is proportional to per-segment dissipated power (and "
+"its radiated-power contribution via radiation resistance), |q|² to stored "
+"electrostatic energy.\n"
+"Adjust γ in the animate dialog."
+msgstr ""
+"Phép biến đổi lũy thừa n^γ theo đỉnh của bước tần số này.\n"
+"γ = 0.5 mở rộng vùng yếu, γ = 1 là biên độ tuyến tính, γ = 2 thể hiện bình "
+"phương biên độ: |I|² tỷ lệ với công suất tiêu tán trên từng đoạn (và phần "
+"đóng góp công suất bức xạ qua điện trở bức xạ), |q|² tỷ lệ với năng lượng "
+"tĩnh điện tích trữ.\n"
+"Điều chỉnh γ trong hộp thoại hoạt ảnh."
+
+#: resources/xnec2c.glade:10973
+msgid "_Power"
+msgstr "Lũy _thừa"
+
+#: resources/xnec2c.glade:10984
+msgid ""
+"Logarithmic scale over a user-set range R below the peak.\n"
+"Reveals weak detail that linear display hides; adjust R in the animate "
+"dialog."
+msgstr ""
+"Thang logarit trên phạm vi R do người dùng đặt, tính từ đỉnh.\n"
+"Làm lộ chi tiết yếu mà hiển thị tuyến tính che khuất; điều chỉnh R trong hộp "
+"thoại hoạt ảnh."
+
+#: resources/xnec2c.glade:10985
+msgid "_dB"
+msgstr "_dB"
+
+#: resources/xnec2c.glade:10996
+msgid ""
+"Inverse hyperbolic sine transfer: linear below the softening knee k, "
+"logarithmic above.\n"
+"Adjust k in the animate dialog."
+msgstr ""
+"Phép biến đổi asinh (sin hyperbol nghịch đảo): tuyến tính dưới điểm gập làm "
+"mềm k, logarit phía trên.\n"
+"Điều chỉnh k trong hộp thoại hoạt ảnh."
+
+#: resources/xnec2c.glade:10997
+msgid "_Asinh"
+msgstr "_Asinh"
+
+#: resources/xnec2c.glade:11008
+msgid ""
+"μ-law companding transfer: lifts weak detail with bounded compression.\n"
+"Adjust the compression in the animate dialog."
+msgstr ""
+"Phép biến đổi nén μ-law: làm nổi chi tiết yếu bằng nén có giới hạn.\n"
+"Điều chỉnh mức nén trong hộp thoại hoạt ảnh."
+
+#: resources/xnec2c.glade:11009
+msgid "μ-_law"
+msgstr "μ-_law"
+
+#: resources/xnec2c.glade:11020
+msgid ""
+"Reinhard rational soft-compressor with knee k.\n"
+"Adjust k in the animate dialog."
+msgstr ""
+"Bộ nén mềm hữu tỷ Reinhard với điểm gập k.\n"
+"Điều chỉnh k trong hộp thoại hoạt ảnh."
+
+#: resources/xnec2c.glade:11021
+msgid "_Reinhard"
+msgstr "_Reinhard"
+
+#: resources/xnec2c.glade:11032
+msgid ""
+"Hyperbolic tangent transfer with contrast steepness a.\n"
+"Adjust a in the animate dialog."
+msgstr ""
+"Phép biến đổi tang hyperbol (tanh) với độ dốc tương phản a.\n"
+"Điều chỉnh a trong hộp thoại hoạt ảnh."
+
+#: resources/xnec2c.glade:11033
+msgid "_Sigmoid"
+msgstr "_Sigmoid"
+
+#: resources/xnec2c.glade:11044
+msgid ""
+"Full brightness for every magnitude; the color projection alone sets the "
+"rendering."
+msgstr ""
+"Độ sáng tối đa cho mọi biên độ; chỉ phép chiếu màu quyết định kết xuất."
+
+#: resources/xnec2c.glade:11045
+msgid "_None"
+msgstr "_Không"
+
+#: resources/xnec2c.glade:11063
+msgid "Patch Flow — Animated"
+msgstr "Dòng chảy mảnh — Hoạt ảnh"
+
+#: resources/xnec2c.glade:11070
 msgid "_Reference Phase"
 msgstr "_Pha tham chiếu"
 
-#: resources/xnec2c.glade:11374
+#: resources/xnec2c.glade:11081
 msgid "_LIC Texture"
-msgstr "_Kết cấu LIC"
+msgstr "Kết cấu _LIC"
 
-#: resources/xnec2c.glade:11385 resources/xnec2c.glade:12575
+#: resources/xnec2c.glade:11092 resources/xnec2c.glade:12276
 msgid "_Wireframe"
 msgstr "_Khung dây"
 
-#: resources/xnec2c.glade:11403
-msgid "Static"
-msgstr "Tĩnh"
+#: resources/xnec2c.glade:11110
+msgid "Patch Flow — Static"
+msgstr "Dòng chảy mảnh — Tĩnh"
 
-#: resources/xnec2c.glade:11410
+#: resources/xnec2c.glade:11117
 msgid "Polarization _Axis"
-msgstr "Trục _Phân cực"
+msgstr "_Trục phân cực"
 
-#: resources/xnec2c.glade:11421
+#: resources/xnec2c.glade:11128
 msgid "Peak _Magnitude"
 msgstr "_Giá trị đỉnh"
 
-#: resources/xnec2c.glade:11436
+#: resources/xnec2c.glade:11143
 msgid "A_nimate"
 msgstr "Hoạt _ảnh"
 
-#: resources/xnec2c.glade:11445 resources/xnec2c.glade:12692
+#: resources/xnec2c.glade:11152 resources/xnec2c.glade:12393
 msgid "Common _Projection"
 msgstr "_Phép chiếu chung"
 
-#: resources/xnec2c.glade:11462
+#: resources/xnec2c.glade:11168
 msgid "_Symbol Overrides"
 msgstr "_Ghi đè ký hiệu"
 
-#: resources/xnec2c.glade:11472
+#: resources/xnec2c.glade:11177
 msgid "Rendering _Settings..."
 msgstr "Cài đặt _kết xuất..."
 
-#: resources/xnec2c.glade:11483
+#: resources/xnec2c.glade:11188
 msgid "_Help"
 msgstr "_Trợ giúp"
 
-#: resources/xnec2c.glade:11492
+#: resources/xnec2c.glade:11197
 msgid "_About"
 msgstr "_Giới thiệu"
 
-#: resources/xnec2c.glade:11519
-msgid "Currents"
-msgstr "Dòng điện"
-
-#: resources/xnec2c.glade:11534
-msgid "Charges"
-msgstr "Điện tích"
-
-#: resources/xnec2c.glade:11715
+#: resources/xnec2c.glade:11420
 msgid " Zoom"
 msgstr " Phóng to"
 
-#: resources/xnec2c.glade:11858 resources/xnec2c.glade:13189
+#: resources/xnec2c.glade:11563 resources/xnec2c.glade:12888
 #: src/freqplots/freqplots_core.c:54
 msgid "Gain"
 msgstr "Độ lợi"
 
-#: resources/xnec2c.glade:11873 resources/xnec2c.glade:11889
-#: resources/xnec2c.glade:13202 resources/xnec2c.glade:13463
+#: resources/xnec2c.glade:11578 resources/xnec2c.glade:11594
+#: resources/xnec2c.glade:12901 resources/xnec2c.glade:13162
 msgid "0.0"
 msgstr "0.0"
 
-#: resources/xnec2c.glade:11923
+#: resources/xnec2c.glade:11628
 msgid "- - - "
 msgstr "- - - "
 
-#: resources/xnec2c.glade:11965 resources/xnec2c.glade:13346
-msgid "dB"
-msgstr "dB"
-
-#: resources/xnec2c.glade:11979 resources/xnec2c.glade:13238
+#: resources/xnec2c.glade:11684 resources/xnec2c.glade:12937
 msgid "Step"
 msgstr "Bước"
 
-#: resources/xnec2c.glade:12126 resources/xnec2c.glade:13286
+#: resources/xnec2c.glade:11831 resources/xnec2c.glade:12985
 msgid "Apply Freq"
-msgstr "Áp dụng Tần số"
+msgstr "Áp dụng tần số"
 
-#: resources/xnec2c.glade:12146
+#: resources/xnec2c.glade:11851
 msgid "Frequency Mhz"
 msgstr "Tần số MHz"
 
-#: resources/xnec2c.glade:12207
+#: resources/xnec2c.glade:11912
 msgid "Structure Geometry"
 msgstr "Hình học cấu trúc"
 
-#: resources/xnec2c.glade:12226
+#: resources/xnec2c.glade:11931
 msgid "Xnec2c: Radiation Patterns"
-msgstr "Xnec2c: Đồ thị bức xạ"
+msgstr "Xnec2c: Giản đồ bức xạ"
 
-#: resources/xnec2c.glade:12443
+#: resources/xnec2c.glade:12144
 msgid "_Gain Scaling"
 msgstr "_Tỷ lệ độ lợi"
 
-#: resources/xnec2c.glade:12458
+#: resources/xnec2c.glade:12159
 msgid "Linear _Power"
 msgstr "_Công suất tuyến tính"
 
-#: resources/xnec2c.glade:12469
+#: resources/xnec2c.glade:12170
 msgid "Linear _Voltage"
 msgstr "_Điện áp tuyến tính"
 
-#: resources/xnec2c.glade:12480
+#: resources/xnec2c.glade:12181
 msgid "_ARRL Style"
 msgstr "Kiểu _ARRL"
 
-#: resources/xnec2c.glade:12491
+#: resources/xnec2c.glade:12192
 msgid "_Logarithmic"
 msgstr "_Logarit"
 
-#: resources/xnec2c.glade:12502
+#: resources/xnec2c.glade:12203
 msgid "_Noise Temperature"
 msgstr "_Nhiệt độ tạp âm"
 
-#: resources/xnec2c.glade:12513
+#: resources/xnec2c.glade:12214
 msgid "Noise Temp (_log scale)"
 msgstr "Nhiệt độ tạp âm (t_hang logarit)"
 
-#: resources/xnec2c.glade:12528
+#: resources/xnec2c.glade:12229
 msgid "Noise _Models"
 msgstr "Mô hình _tạp âm"
 
-#: resources/xnec2c.glade:12547
+#: resources/xnec2c.glade:12248
 msgid "_Gradient Key"
 msgstr "Chú giải _Gradient"
 
-#: resources/xnec2c.glade:12557
+#: resources/xnec2c.glade:12258
 msgid "Draw St_yle"
-msgstr "Kiểu _Vẽ"
+msgstr "Kiểu _vẽ"
 
-#: resources/xnec2c.glade:12566
+#: resources/xnec2c.glade:12267
 msgid "S_urface"
 msgstr "B_ề mặt"
 
-#: resources/xnec2c.glade:12585
+#: resources/xnec2c.glade:12286
 msgid "_Both"
 msgstr "_Cả hai"
 
-#: resources/xnec2c.glade:12600
+#: resources/xnec2c.glade:12301
 msgid "_Near Field"
 msgstr "_Trường gần"
 
-#: resources/xnec2c.glade:12615
+#: resources/xnec2c.glade:12316
 msgid "Near _E Field"
 msgstr "Trường _E gần"
 
-#: resources/xnec2c.glade:12625
+#: resources/xnec2c.glade:12326
 msgid "Near _H Field"
 msgstr "Trường _H gần"
 
-#: resources/xnec2c.glade:12635
+#: resources/xnec2c.glade:12336
 msgid "_Poynting Vector"
 msgstr "_Vectơ Poynting"
 
-#: resources/xnec2c.glade:12644
+#: resources/xnec2c.glade:12345
 msgid "_Animate Dialog"
 msgstr "_Hộp thoại hoạt ảnh"
 
-#: resources/xnec2c.glade:12653
+#: resources/xnec2c.glade:12354
 msgid "_Total Field"
 msgstr "_Trường tổng"
 
-#: resources/xnec2c.glade:12662
+#: resources/xnec2c.glade:12363
 msgid "_Peak Value"
 msgstr "_Giá trị đỉnh"
 
-#: resources/xnec2c.glade:12673
+#: resources/xnec2c.glade:12374
 msgid "_Instantaneous (φ=0)"
 msgstr "_Tức thời (φ=0)"
 
-#: resources/xnec2c.glade:12703
+#: resources/xnec2c.glade:12403
 msgid "_Overlay Structure"
 msgstr "_Phủ cấu trúc"
 
-#: resources/xnec2c.glade:12728
+#: resources/xnec2c.glade:12427
 msgid "Gain Pattern"
-msgstr "Đồ thị độ lợi"
+msgstr "Giản đồ độ lợi"
 
-#: resources/xnec2c.glade:12743
+#: resources/xnec2c.glade:12442
 msgid "E/H Fields"
 msgstr "Trường E/H"
 
-#: resources/xnec2c.glade:12926
+#: resources/xnec2c.glade:12625
 msgid "Zoom % "
 msgstr "Thu phóng % "
 
-#: resources/xnec2c.glade:12965
+#: resources/xnec2c.glade:12664
 msgid "Elev.°"
 msgstr "Ngẩng°"
 
-#: resources/xnec2c.glade:13306
+#: resources/xnec2c.glade:13005
 msgid "Frequency MHz"
 msgstr "Tần số MHz"
 
-#: resources/xnec2c.glade:13323
+#: resources/xnec2c.glade:13022
 msgid "0.010"
 msgstr "0.010"
 
-#: resources/xnec2c.glade:13377 resources/xnec2c.glade:13410
-#: resources/xnec2c.glade:13445
+#: resources/xnec2c.glade:13076 resources/xnec2c.glade:13109
+#: resources/xnec2c.glade:13144
 msgid "— K"
 msgstr "— K"
 
-#: resources/xnec2c.glade:13392
+#: resources/xnec2c.glade:13091
 msgid "T<sub>earth</sub>"
 msgstr "T<sub>earth</sub>"
 
-#: resources/xnec2c.glade:13427
+#: resources/xnec2c.glade:13126
 msgid "T<sub>sky</sub>"
 msgstr "T<sub>sky</sub>"
 
-#: resources/xnec2c.glade:13548 src/rdpattern_ui.c:999
+#: resources/xnec2c.glade:13247 src/rdpattern_ui.c:819
 msgid "Radiation Patterns"
-msgstr "Đồ thị bức xạ"
+msgstr "Giản đồ bức xạ"
 
-#: resources/xnec2c.glade:13583
+#: resources/xnec2c.glade:13282
 msgid "Scale Structure (GS card)"
 msgstr "Tỷ lệ cấu trúc (thẻ GS)"
 
-#: resources/xnec2c.glade:13614
+#: resources/xnec2c.glade:13313
 msgid "Structure Scale Factor"
 msgstr "Hệ số tỷ lệ cấu trúc"
 
-#: resources/xnec2c.glade:13627
+#: resources/xnec2c.glade:13326
 msgid "From Tag No."
 msgstr "Từ số tag"
 
-#: resources/xnec2c.glade:13677
+#: resources/xnec2c.glade:13376
 msgid "To Tag No."
 msgstr "Đến số tag"
 
-#: resources/xnec2c.glade:13712
+#: resources/xnec2c.glade:13411
 msgid "Scale Structure"
 msgstr "Tỷ lệ cấu trúc"
 
-#: resources/xnec2c.glade:13889
+#: resources/xnec2c.glade:13588
 msgid "Co-ordinate Transformation (GM card)"
 msgstr "Biến đổi tọa độ (thẻ GM)"
 
-#: resources/xnec2c.glade:13919
+#: resources/xnec2c.glade:13618
 msgid "Tag Increment"
 msgstr "Số gia tag"
 
-#: resources/xnec2c.glade:13950
+#: resources/xnec2c.glade:13649
 msgid "Rotate about X"
 msgstr "Xoay quanh X"
 
-#: resources/xnec2c.glade:13982
+#: resources/xnec2c.glade:13681
 msgid "Move along X"
 msgstr "Di chuyển dọc X"
 
-#: resources/xnec2c.glade:14014
+#: resources/xnec2c.glade:13713
 msgid "New Structures"
 msgstr "Cấu trúc mới"
 
-#: resources/xnec2c.glade:14045
+#: resources/xnec2c.glade:13744
 msgid "Rotate about Y"
 msgstr "Xoay quanh Y"
 
-#: resources/xnec2c.glade:14077
+#: resources/xnec2c.glade:13776
 msgid "Move along Y"
 msgstr "Di chuyển dọc Y"
 
-#: resources/xnec2c.glade:14109
+#: resources/xnec2c.glade:13808
 msgid "Start From Tag"
 msgstr "Bắt đầu từ tag"
 
-#: resources/xnec2c.glade:14141
+#: resources/xnec2c.glade:13840
 msgid "Rotate about Z"
 msgstr "Xoay quanh Z"
 
-#: resources/xnec2c.glade:14173
+#: resources/xnec2c.glade:13872
 msgid "Move along Z"
 msgstr "Di chuyển dọc Z"
 
-#: resources/xnec2c.glade:14209
+#: resources/xnec2c.glade:13908
 msgid "Co-ordinate Transformation Data"
 msgstr "Dữ liệu biến đổi tọa độ"
 
-#: resources/xnec2c.glade:14405
+#: resources/xnec2c.glade:14104
 msgid "Trans. Line Command (TL Card)"
 msgstr "Lệnh đường truyền (thẻ TL)"
 
-#: resources/xnec2c.glade:14435
+#: resources/xnec2c.glade:14134
 msgid "Tag Number, End 1  "
 msgstr "Số tag, đầu 1  "
 
-#: resources/xnec2c.glade:14467
+#: resources/xnec2c.glade:14166
 msgid "Tag Number, End 2  "
 msgstr "Số tag, đầu 2  "
 
-#: resources/xnec2c.glade:14498
+#: resources/xnec2c.glade:14197
 msgid "Segment Num, End 1"
 msgstr "Số đoạn, đầu 1"
 
-#: resources/xnec2c.glade:14530
+#: resources/xnec2c.glade:14229
 msgid "Segment Num, End 2"
 msgstr "Số đoạn, đầu 2"
 
-#: resources/xnec2c.glade:14594
+#: resources/xnec2c.glade:14293
 msgid "Crossed Transmission Line"
 msgstr "Đường truyền chéo"
 
-#: resources/xnec2c.glade:14612
+#: resources/xnec2c.glade:14311
 msgid "Characteristic Impedance"
 msgstr "Trở kháng đặc tính"
 
-#: resources/xnec2c.glade:14644
+#: resources/xnec2c.glade:14343
 msgid "End 1 Y Real Part (S)"
 msgstr "Phần thực Y đầu 1 (S)"
 
-#: resources/xnec2c.glade:14676
+#: resources/xnec2c.glade:14375
 msgid "End 2 Y Real Part (S)"
 msgstr "Phần thực Y đầu 2 (S)"
 
-#: resources/xnec2c.glade:14708
+#: resources/xnec2c.glade:14407
 msgid "Length of Tx Line (m)"
 msgstr "Chiều dài đường truyền (m)"
 
-#: resources/xnec2c.glade:14740
+#: resources/xnec2c.glade:14439
 msgid "End 1 Y Imag Part (S)"
 msgstr "Phần ảo Y đầu 1 (S)"
 
-#: resources/xnec2c.glade:14772
+#: resources/xnec2c.glade:14471
 msgid "End 2 Y Imag Part (S)"
 msgstr "Phần ảo Y đầu 2 (S)"
 
-#: resources/xnec2c.glade:14808
+#: resources/xnec2c.glade:14507
 msgid "Transmission Line"
 msgstr "Đường truyền"
 
-#: resources/xnec2c.glade:15035
+#: resources/xnec2c.glade:14734
 msgid "Wire Element (GW & GC cards)"
 msgstr "Phần tử dây (thẻ GW & GC)"
 
-#: resources/xnec2c.glade:15095
+#: resources/xnec2c.glade:14794
 msgid "Wire X1"
 msgstr "Dây X1"
 
-#: resources/xnec2c.glade:15127
+#: resources/xnec2c.glade:14826
 msgid "Wire X2"
 msgstr "Dây X2"
 
-#: resources/xnec2c.glade:15190
+#: resources/xnec2c.glade:14889
 msgid "Wire Y1"
 msgstr "Dây Y1"
 
-#: resources/xnec2c.glade:15223
+#: resources/xnec2c.glade:14922
 msgid "Wire Y2"
 msgstr "Dây Y2"
 
-#: resources/xnec2c.glade:15287
+#: resources/xnec2c.glade:14986
 msgid "Wire Z1"
 msgstr "Dây Z1"
 
-#: resources/xnec2c.glade:15319
+#: resources/xnec2c.glade:15018
 msgid "Wire Z2"
 msgstr "Dây Z2"
 
-#: resources/xnec2c.glade:15384
+#: resources/xnec2c.glade:15083
 msgid "Wire Length"
 msgstr "Chiều dài dây"
 
-#: resources/xnec2c.glade:15455
+#: resources/xnec2c.glade:15154
 msgid "Wire Data"
 msgstr "Dữ liệu dây"
 
-#: resources/xnec2c.glade:15467
+#: resources/xnec2c.glade:15166
 msgid "Tapered Wire"
 msgstr "Dây côn"
 
-#: resources/xnec2c.glade:15509
+#: resources/xnec2c.glade:15208
 msgid "Length Taper"
 msgstr "Độ côn chiều dài"
 
-#: resources/xnec2c.glade:15541
+#: resources/xnec2c.glade:15240
 msgid "Diameter Seg 1"
 msgstr "Đường kính đoạn 1"
 
-#: resources/xnec2c.glade:15573
+#: resources/xnec2c.glade:15272
 msgid "Diameter Seg N"
 msgstr "Đường kính đoạn N"
 
-#: resources/xnec2c.glade:15605
+#: resources/xnec2c.glade:15304
 msgid "Diam. Taper"
 msgstr "Độ côn đường kính"
 
-#: resources/xnec2c.glade:15641
+#: resources/xnec2c.glade:15340
 msgid "Wire Taper Data"
 msgstr "Dữ liệu côn dây"
 
-#: resources/xnec2c.glade:15806
+#: resources/xnec2c.glade:15505
 msgid "Impedance (Zo) Ohm"
 msgstr "Trở kháng (Zo) Ohm"
 
-#: resources/xnec2c.glade:15821
+#: resources/xnec2c.glade:15520
 msgid "50.00"
 msgstr "50.00"
 
-#: resources/xnec2c.glade:15844
+#: resources/xnec2c.glade:15543
 msgid "Transmission Line Impedance (Zo)"
 msgstr "Trở kháng đường truyền (Zo)"
 
@@ -2025,16 +2556,16 @@ msgstr "scenebuffer_flush: depth_bins=%d\n"
 msgid "scenebuffer_flush: layout has no base font description\n"
 msgstr "scenebuffer_flush: bố cục không có mô tả phông chữ cơ sở\n"
 
-#: src/cairo/cairo_structure.c:133
+#: src/cairo/cairo_structure.c:140
 msgid "draw_wire_segments: wire_widths is NULL\n"
 msgstr "draw_wire_segments: wire_widths là NULL\n"
 
-#: src/cairo/cairo_structure.c:207
+#: src/cairo/cairo_structure.c:214
 #, c-format
 msgid "draw_wire_segments: unknown ntyp=%d\n"
 msgstr "draw_wire_segments: ntyp=%d không xác định\n"
 
-#: src/calculations.c:117 src/calculations.c:1272
+#: src/calculations.c:117 src/calculations.c:1288
 #, c-format
 msgid "segment connection error for segment %5d\n"
 msgstr "Lỗi kết nối đoạn cho đoạn %5d\n"
@@ -2043,25 +2574,25 @@ msgstr "Lỗi kết nối đoạn cho đoạn %5d\n"
 msgid "Segment connection error in tbf()"
 msgstr "Lỗi kết nối đoạn trong tbf()"
 
-#: src/calculations.c:890
+#: src/calculations.c:906
 #, c-format
 msgid "step size limited at z= %10.5f\n"
 msgstr "Kích thước bước bị giới hạn tại z= %10.5f\n"
 
-#: src/calculations.c:1054
+#: src/calculations.c:1070
 #, c-format
 msgid "segment connection error for segment %d\n"
 msgstr "Lỗi kết nối đoạn cho đoạn %d\n"
 
-#: src/calculations.c:1055
+#: src/calculations.c:1071
 msgid "Segment connection error in sbf()"
 msgstr "Lỗi kết nối đoạn trong sbf()"
 
-#: src/calculations.c:1273
+#: src/calculations.c:1289
 msgid "Segment connection error in trio()"
 msgstr "Lỗi kết nối đoạn trong trio()"
 
-#: src/callback_func.c:145
+#: src/callback_func.c:122
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to end the calculation?"
@@ -2069,7 +2600,7 @@ msgstr ""
 "Vòng lặp tần số đang chạy\n"
 "Bạn có chắc chắn muốn kết thúc tính toán không?"
 
-#: src/callback_func.c:149
+#: src/callback_func.c:126
 msgid ""
 "The frequency loop is running\n"
 "Are you sure you wish to close this window?"
@@ -2077,68 +2608,54 @@ msgstr ""
 "Vòng lặp tần số đang chạy\n"
 "Bạn có chắc chắn muốn đóng cửa sổ này không?"
 
-#: src/callback_func.c:384
+#: src/callback_func.c:287
 #, c-format
 msgid ""
-"Frequency plots window closed: excitation type %d is incompatible.\n"
-"Use type 0 (Applied E Field) or 5 (Current Discontinuity) instead."
+"Excitation type %d has no feedpoint: VSWR and impedance plots are hidden.\n"
 msgstr ""
-"Cửa sổ biểu đồ tần số đã đóng: loại kích thích %d không tương thích.\n"
-"Sử dụng loại 0 (Applied E Field) hoặc 5 (Current Discontinuity) thay thế."
+"Loại kích thích %d không có điểm cấp điện: đồ thị VSWR và trở kháng bị ẩn.\n"
 
-#: src/callback_func.c:390
-#, c-format
-msgid ""
-"Frequency plots are not available with excitation type %d.\n"
-"This model uses Incident Field or Elementary Current Source excitation.\n"
-"Change the EX card to type 0 (Applied E Field) or 5 (Current Discontinuity)."
-msgstr ""
-"Biểu đồ tần số không khả dụng với loại kích thích %d.\n"
-"Mô hình này sử dụng kích thích Incident Field hoặc Elementary Current "
-"Source.\n"
-"Thay đổi thẻ EX sang loại 0 (Applied E Field) hoặc 5 (Current Discontinuity)."
-
-#: src/callback_func.c:560
+#: src/callback_func.c:404
 msgid "View Currents"
 msgstr "Xem dòng điện"
 
-#: src/callback_func.c:576 src/callback_func.c:626
-msgid "View Geometry"
-msgstr "Xem hình học"
-
-#: src/callback_func.c:610
+#: src/callback_func.c:406
 msgid "View Charges"
 msgstr "Xem điện tích"
 
-#: src/callback_func.c:667
+#: src/callback_func.c:408
+msgid "View Geometry"
+msgstr "Xem hình học"
+
+#: src/callback_func.c:461
 msgid "PNG images (*.png)"
 msgstr "Hình ảnh PNG (*.png)"
 
-#: src/callback_func.c:669
+#: src/callback_func.c:463
 msgid "GNUplot files (*.gplot)"
 msgstr "Tệp GNUplot (*.gplot)"
 
-#: src/callback_func.c:671
+#: src/callback_func.c:465
 msgid "NEC2 files (*.nec)"
 msgstr "Tệp NEC2 (*.nec)"
 
-#: src/callback_func.c:673
+#: src/callback_func.c:467
 msgid "Touchstone 1-port files (*.s1p)"
 msgstr "Tệp Touchstone 1 cổng (*.s1p)"
 
-#: src/callback_func.c:675
+#: src/callback_func.c:469
 msgid "Touchstone 2-port files (*.s2p)"
 msgstr "Tệp Touchstone 2 cổng (*.s2p)"
 
-#: src/callback_func.c:677
+#: src/callback_func.c:471
 msgid "Comma-separated CSV files (*.csv)"
 msgstr "Tệp CSV phân cách bằng dấu phẩy (*.csv)"
 
-#: src/callbacks.c:99 src/callbacks.c:115 src/freqplots/freqplots_core.c:61
+#: src/callbacks.c:102 src/callbacks.c:118 src/freqplots/freqplots_core.c:61
 msgid "Antenna Temperature"
 msgstr "Nhiệt độ ăng-ten"
 
-#: src/callbacks.c:100
+#: src/callbacks.c:103
 msgid ""
 "Ground plane detected in model. Ta results will overcount ground effects. "
 "Free-space models are standard for antenna temperature evaluation."
@@ -2146,7 +2663,7 @@ msgstr ""
 "Phát hiện mặt phẳng đất trong mô hình. Kết quả Ta sẽ tính thừa hiệu ứng đất. "
 "Mô hình không gian tự do là tiêu chuẩn để đánh giá nhiệt độ ăng-ten."
 
-#: src/callbacks.c:116
+#: src/callbacks.c:119
 #, c-format
 msgid ""
 "Max gain at θ=%.0f° (%.0f° from XY plane). Convention assumes beam in XY "
@@ -2155,12 +2672,12 @@ msgstr ""
 "Độ lợi cực đại tại θ=%.0f° (%.0f° từ mặt phẳng XY). Quy ước giả định chùm "
 "tia nằm trong mặt phẳng XY với góc ngẩng quan sát được đặt bởi spinbutton."
 
-#: src/callbacks.c:186 src/callbacks.c:483 src/callbacks.c:2584
-#: src/callbacks.c:3437
+#: src/callbacks.c:191 src/callbacks.c:468 src/callbacks.c:2034
+#: src/callbacks.c:2848
 msgid "Are you sure you wish to quit xnec2c?"
 msgstr "Bạn có chắc chắn muốn thoát xnec2c không?"
 
-#: src/callbacks.c:229
+#: src/callbacks.c:234
 msgid ""
 "A new NEC2 input file may not be created\n"
 "while the Frequency Loop is running"
@@ -2168,7 +2685,7 @@ msgstr ""
 "Không thể tạo tệp đầu vào NEC2 mới\n"
 "khi vòng lặp tần số đang chạy"
 
-#: src/callbacks.c:266
+#: src/callbacks.c:271
 msgid ""
 "A new NEC2 input file may not be opened\n"
 "while the Frequency Loop is running"
@@ -2176,22 +2693,22 @@ msgstr ""
 "Không thể mở tệp đầu vào NEC2 mới\n"
 "khi vòng lặp tần số đang chạy"
 
-#: src/callbacks.c:385
+#: src/callbacks.c:390
 msgid "xnec2c geometry optimizer"
 msgstr "Trình tối ưu hóa hình học xnec2c"
 
-#: src/callbacks.c:386
+#: src/callbacks.c:391
 msgid ""
 "xnec2c was built without inotify support: the optimizer cannot be enabled."
 msgstr ""
 "xnec2c được xây dựng không có hỗ trợ inotify: không thể kích hoạt trình tối "
 "ưu hóa."
 
-#: src/callbacks.c:410
+#: src/callbacks.c:412
 msgid "Xnec2c Optimizer"
 msgstr "Trình tối ưu hóa Xnec2c"
 
-#: src/callbacks.c:410
+#: src/callbacks.c:412
 msgid ""
 "No files are selected for writing. However, xnec2c will still reload and "
 "recalculate the input file on modification when triggered by inotify.Select "
@@ -2201,44 +2718,51 @@ msgstr ""
 "toán lại tệp đầu vào khi có thay đổi được kích hoạt bởi inotify. Chọn tệp để "
 "ghi trong \"File->Optimization Settings\"."
 
-#: src/callbacks.c:421
-msgid "failed to create Optimizer Output thread\n"
-msgstr "Không thể tạo luồng đầu ra trình tối ưu hóa\n"
-
-#: src/callbacks.c:1356 src/callbacks.c:1750 src/callbacks.c:3463
+#: src/callbacks.c:968 src/callbacks.c:1283 src/callbacks.c:2874
 msgid "Are you sure you wish to close this window?"
 msgstr "Bạn có chắc chắn muốn đóng cửa sổ này không?"
 
-#: src/callbacks.c:2331
+#: src/callbacks.c:1791
 msgid "OpenGL is not available on this display; cannot enable renderer.\n"
 msgstr "OpenGL không khả dụng trên màn hình này; không thể bật bộ kết xuất.\n"
 
-#: src/callbacks.c:2761 src/callbacks.c:2774
-msgid "unexpected canonical widget type"
-msgstr "loại widget chuẩn tắc không mong đợi"
-
-#: src/callbacks.c:2914
+#: src/callbacks.c:2133
 msgid ""
-"Current flow animation requires surface patches (SP/SM cards) in the model."
-msgstr "Hoạt hình dòng điện yêu cầu các mảnh bề mặt (thẻ SP/SM) trong mô hình."
+"Select how the animated patch current flow is rendered.\n"
+"Mirrors the Visualization menu setting in the main window."
+msgstr ""
+"Chọn cách kết xuất dòng chảy mảnh hoạt ảnh.\n"
+"Mô phỏng cài đặt trình đơn Trực quan hóa trong cửa sổ chính."
 
-#: src/callbacks.c:3181
+#: src/callbacks.c:2135
+msgid ""
+"Patch flow animation requires surface patches (SP/SM cards) in the model."
+msgstr ""
+"Hoạt ảnh dòng chảy mảnh yêu cầu các mảnh bề mặt (thẻ SP/SM) trong mô hình."
+
+#: src/callbacks.c:2150
+msgid ""
+"The animation window drives the near-field vectors from the phase slider; "
+"close it to choose the static peak or instantaneous baseline."
+msgstr ""
+
+#: src/callbacks.c:2680
 msgid "Animation"
 msgstr "Hoạt ảnh"
 
-#: src/callbacks.c:3182
+#: src/callbacks.c:2681
 msgid ""
-"Animation requires surface patches (SP/SM NEC cards) or near-field data (NE/"
-"NH NEC cards)"
+"Animation requires wire currents or charges, surface patches (SP/SM NEC "
+"cards), or near-field data (NE/NH NEC cards)"
 msgstr ""
-"Hoạt ảnh yêu cầu các mảng bề mặt (thẻ NEC SP/SM) hoặc dữ liệu trường gần "
-"(thẻ NEC NE/NH)"
+"Hoạt ảnh yêu cầu dòng điện hoặc điện tích trên dây, mảnh bề mặt (thẻ NEC SP/"
+"SM), hoặc dữ liệu trường gần (thẻ NEC NE/NH)"
 
-#: src/callbacks.c:3401
+#: src/callbacks.c:2810
 msgid "No open NEC2 input file"
 msgstr "Không có tệp đầu vào NEC2 nào đang mở"
 
-#: src/callbacks.c:3494 src/callbacks.c:3524
+#: src/callbacks.c:2905 src/callbacks.c:2935
 msgid ""
 "NEC2 Editor's data may not be saved\n"
 "while the Frequency Loop is running"
@@ -2246,18 +2770,47 @@ msgstr ""
 "Dữ liệu trình soạn thảo NEC2 có thể không được lưu\n"
 "khi vòng lặp tần số đang chạy"
 
-#: src/callbacks.c:3506 src/callbacks.c:3532
+#: src/callbacks.c:2917 src/callbacks.c:2943
 msgid "untitled.nec"
 msgstr "untitled.nec"
 
-#: src/callbacks.c:3997 src/callbacks.c:4017 src/callbacks.c:4037
+#: src/callbacks.c:3408 src/callbacks.c:3428 src/callbacks.c:3448
 #: src/geom_edit.c:455 src/geom_edit.c:1327 src/geom_edit.c:1582
 msgid ""
 "Frequency (FR) cards not yet processed.\n"
 "You may need to save the NEC2 Editor data first."
 msgstr ""
-"Thẻ Tần số (FR) chưa được xử lý.\n"
+"Thẻ tần số (FR) chưa được xử lý.\n"
 "Bạn có thể cần lưu dữ liệu trình soạn thảo NEC2 trước."
+
+#: src/chroma/chroma.c:239
+#, c-format
+msgid "unhandled hue encoding %d\n"
+msgstr "mã hóa sắc độ không được xử lý %d\n"
+
+#: src/chroma/chroma.c:270
+#, c-format
+msgid "unhandled brightness encoding %d\n"
+msgstr "mã hóa độ sáng không được xử lý %d\n"
+
+#: src/chroma/chroma.c:288
+#, c-format
+msgid "invalid color projection %d, using instant\n"
+msgstr "phép chiếu màu không hợp lệ %d, dùng tức thời\n"
+
+#: src/chroma/chroma_nearfield.c:96
+#, c-format
+msgid "nf_real_vector: channel %d carries no phasor\n"
+msgstr ""
+
+#: src/chroma/chroma_source.c:334
+msgid "far-field contribution needs radiation pattern data\n"
+msgstr "đóng góp trường xa cần dữ liệu giản đồ bức xạ\n"
+
+#: src/chroma/chroma_source.c:405
+#, c-format
+msgid "unsupported color source elem %d chan %d\n"
+msgstr "phần tử nguồn màu %d kênh %d không được hỗ trợ\n"
 
 #: src/cmnd_edit.c:108
 msgid ""
@@ -2465,6 +3018,88 @@ msgstr "Điểm đầu Theta"
 msgid "Increment in R (m)"
 msgstr "Bước tăng theo R (m)"
 
+#: src/color/color_palette.c:139
+#, c-format
+msgid "invalid palette kind %d, using ramp\n"
+msgstr "loại bảng màu không hợp lệ %d, dùng dải\n"
+
+#: src/color/color_tone.c:125
+#, c-format
+msgid "invalid color tone %d, using power\n"
+msgstr "tông màu không hợp lệ %d, dùng lũy thừa\n"
+
+#: src/config/config_widget.c:129
+#, c-format
+msgid "config_widget_lookup: missing widget '%s'\n"
+msgstr "config_widget_lookup: thiếu widget '%s'\n"
+
+#: src/config/config_widget.c:151
+#, c-format
+msgid "config_widget_values_at: index %d exceeds values list\n"
+msgstr "config_widget_values_at: chỉ số %d vượt quá danh sách giá trị\n"
+
+#: src/config/config_widget.c:181
+#, c-format
+msgid "config_widget_apply_element: radio menu item '%s' has no values\n"
+msgstr ""
+"config_widget_apply_element: mục trình đơn radio '%s' không có giá trị\n"
+
+#: src/config/config_widget.c:206
+#, c-format
+msgid "config_widget_apply_element: combo '%s' has no values\n"
+msgstr "config_widget_apply_element: combo '%s' không có giá trị\n"
+
+#: src/config/config_widget.c:242
+#, c-format
+msgid "config_widget_apply_element: unknown widget type for '%s'\n"
+msgstr "config_widget_apply_element: loại widget không xác định cho '%s'\n"
+
+#: src/config/config_widget.c:263
+#, c-format
+msgid "config_widget_sync_element: radio menu item '%s' has no values\n"
+msgstr ""
+"config_widget_sync_element: mục trình đơn radio '%s' không có giá trị\n"
+
+#: src/config/config_widget.c:286
+#, c-format
+msgid "config_widget_sync_element: combo '%s' has no values\n"
+msgstr "config_widget_sync_element: combo '%s' không có giá trị\n"
+
+#: src/config/config_widget.c:330
+#, c-format
+msgid "config_widget_sync_element: unknown widget type for '%s'\n"
+msgstr "config_widget_sync_element: loại widget không xác định cho '%s'\n"
+
+#: src/config/config_widget.c:386
+msgid "config_widget_sync_field: field is not registered\n"
+msgstr "config_widget_sync_field: trường chưa được đăng ký\n"
+
+#: src/config/config_widget.c:410
+msgid "config_widget_field_changed: field is not registered\n"
+msgstr "config_widget_field_changed: trường chưa được đăng ký\n"
+
+#: src/config_hooks.c:83
+msgid "This overlay derives from wire-current segments; this model has none."
+msgstr ""
+"Lớp phủ này bắt nguồn từ các đoạn dòng điện trên dây; mô hình này không có "
+"đoạn nào."
+
+#: src/config_hooks.c:108
+msgid "Highlight the moving wave crest as a bright comet head."
+msgstr "Làm nổi bật đỉnh sóng đang di chuyển như một đầu sao chổi sáng."
+
+#: src/config_hooks.c:109
+msgid ""
+"Comet rides the animated wave crest; this projection is a static read with "
+"no moving phase."
+msgstr ""
+"Sao chổi bám theo đỉnh sóng hoạt ảnh; phép chiếu này là cách đọc tĩnh, không "
+"có pha di chuyển."
+
+#: src/config_hooks.c:112
+msgid "Mark current nodes (cyan) and antinodes (red) along the wires."
+msgstr "Đánh dấu điểm nút dòng điện (lục lam) và bụng sóng (đỏ) dọc theo dây."
+
 #: src/expr_edit.h:34
 msgid ""
 "Value is controlled by an SY expression.\n"
@@ -2473,20 +3108,280 @@ msgstr ""
 "Giá trị được kiểm soát bởi biểu thức SY.\n"
 "Chỉnh sửa thẻ SY để thay đổi giá trị này."
 
-#: src/fields.c:923
+#: src/fields.c:938
 #, c-format
 msgid "step size limited at z= %10.5f"
 msgstr "Kích thước bước bị giới hạn tại z= %10.5f"
 
-#: src/fork.c:164 src/fork.c:452
+#: src/fork.c:230 src/fork.c:500
 #, c-format
 msgid "child %d  length %d  return %d\n"
 msgstr "tiến trình con %d  độ dài %d  kết quả %d\n"
 
-#: src/fork.c:458
+#: src/fork.c:506
 #, c-format
 msgid "early EOF?, child %d  length %d  return %d\n"
 msgstr "EOF sớm?, tiến trình con %d  độ dài %d  kết quả %d\n"
+
+#: src/freqplots/freqplots_core.c:55
+msgid "Gain Direction"
+msgstr "Hướng độ lợi"
+
+#: src/freqplots/freqplots_core.c:56
+msgid "Viewer Gain"
+msgstr "Độ lợi người xem"
+
+#: src/freqplots/freqplots_core.c:58
+msgid "Impedance (real/imag)"
+msgstr "Trở kháng (thực/ảo)"
+
+#: src/freqplots/freqplots_core.c:59
+msgid "Impedance (mag/phase)"
+msgstr "Trở kháng (độ lớn/pha)"
+
+#: src/freqplots/freqplots_core.c:60 src/freqplots/graphs/smith_graph.c:476
+msgid "Smith Chart"
+msgstr "Biểu đồ Smith"
+
+#: src/freqplots/freqplots_core.c:231
+#, c-format
+msgid "fp_field_cond_active: unhandled cond %d\n"
+msgstr "fp_field_cond_active: cond %d không được xử lý\n"
+
+#: src/freqplots/freqplots_core.c:247
+msgid "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
+msgstr "fp_readout_field_count: tập trường vượt quá FP_READOUT_MAX\n"
+
+#: src/freqplots/freqplots_core.c:447
+#, c-format
+msgid ""
+"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
+"%d posn=%d valid=%d\n"
+msgstr ""
+"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
+"%d posn=%d valid=%d\n"
+
+#: src/freqplots/freqplots_core.c:463
+#, c-format
+msgid ""
+"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
+"%d]\n"
+msgstr ""
+"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
+"%d]\n"
+
+#: src/freqplots/freqplots_core.c:761
+msgid ""
+"Excitation-port selector: models with more than one EX excitation list every "
+"port here.\n"
+"\n"
+"Entry P<n>: T<tag>/S<seg>\n"
+"    n = port number, tag = NEC tag, seg = segment.\n"
+"\n"
+"Hover an entry to preview that port, click to\n"
+"select it, or click away to keep the current one.\n"
+"\n"
+"Charts that follow the selected port:\n"
+"    • Z real / imag\n"
+"    • Z magnitude / phase\n"
+"    • Smith\n"
+"    • VSWR / S11\n"
+"    • Net-gain traces (Gain and Viewer gain)\n"
+"\n"
+"Whole-antenna charts, unaffected by the port:\n"
+"    • raw Max gain, Gain direction, F/B\n"
+"    • Antenna temperature, G/T"
+msgstr ""
+"Bộ chọn cổng kích thích: các mô hình có nhiều hơn một kích thích EX liệt kê "
+"mọi cổng ở đây.\n"
+"\n"
+"Mục P<n>: T<tag>/S<seg>\n"
+"    n = số cổng, tag = thẻ NEC, seg = đoạn.\n"
+"\n"
+"Di chuột qua một mục để xem trước cổng đó, nhấp để\n"
+"chọn, hoặc nhấp ra ngoài để giữ cổng hiện tại.\n"
+"\n"
+"Các đồ thị theo cổng đã chọn:\n"
+"    • Z thực / ảo\n"
+"    • Z độ lớn / pha\n"
+"    • Smith\n"
+"    • VSWR / S11\n"
+"    • Đường net-gain (Độ lợi và Độ lợi người xem)\n"
+"\n"
+"Đồ thị toàn ăng-ten, không phụ thuộc cổng:\n"
+"    • Độ lợi cực đại thô, Hướng độ lợi, F/B\n"
+"    • Nhiệt độ ăng-ten, G/T"
+
+#: src/freqplots/freqplots_core.c:794
+msgid ""
+"Only one feedpoint port is defined. Define additional EX excitation cards in "
+"the model to select among multiple ports here."
+msgstr ""
+"Chỉ có một cổng điểm cấp điện được định nghĩa. Hãy định nghĩa thêm các thẻ "
+"kích thích EX trong mô hình để chọn giữa nhiều cổng ở đây."
+
+#: src/freqplots/freqplots_core.c:797
+msgid ""
+"Enable the Net Gain plot setting to select a port; without it this graph "
+"does not follow the port."
+msgstr ""
+"Bật cài đặt đồ thị Độ lợi ròng để chọn cổng; nếu không, đồ thị này sẽ không "
+"theo cổng."
+
+#: src/freqplots/freqplots_core.c:913
+msgid "Not available: excitation defines no feedpoint"
+msgstr "Không khả dụng: kích thích không định nghĩa điểm cấp điện"
+
+#: src/freqplots/freqplots_graph.c:137 src/freqplots/graphs/smith_graph.c:529
+msgid "memory allocation for points failed\n"
+msgstr "cấp phát bộ nhớ cho điểm thất bại\n"
+
+#: src/freqplots/freqplots_graph.c:138 src/freqplots/graphs/smith_graph.c:530
+msgid "Draw_Graph():Memory allocation for points failed"
+msgstr "Draw_Graph():Cấp phát bộ nhớ cho điểm thất bại"
+
+#: src/freqplots/freqplots_theme_menu.c:42
+msgid "This theme has no inverted variant"
+msgstr "Chủ đề này không có biến thể đảo ngược"
+
+#: src/freqplots/freqplots_theme_menu.c:95
+msgid "_Invert"
+msgstr "_Đảo ngược"
+
+#: src/freqplots/graphs/anttemp_graph.c:68
+msgid "G/Ta (dB)"
+msgstr "G/Ta (dB)"
+
+#: src/freqplots/graphs/anttemp_graph.c:69
+msgid "G/Ta & TA - Antenna noise temperature"
+msgstr "G/Ta & TA - Nhiệt độ tạp âm ăng-ten"
+
+#: src/freqplots/graphs/anttemp_graph.c:71
+msgid "Ta (K)"
+msgstr "Ta (K)"
+
+#: src/freqplots/graphs/anttemp_graph.c:73
+msgid "TA (K)"
+msgstr "TA (K)"
+
+#: src/freqplots/graphs/gain_graph.c:86 src/freqplots/graphs/viewer_graph.c:53
+msgid "Raw Gain dBi"
+msgstr "Độ lợi thô dBi"
+
+#: src/freqplots/graphs/gain_graph.c:91
+msgid "Max Gain & Net Gain vs Frequency"
+msgstr "Độ lợi cực đại & độ lợi ròng theo tần số"
+
+#: src/freqplots/graphs/gain_graph.c:92
+msgid "Net Gain dBi"
+msgstr "Độ lợi ròng dBi"
+
+#: src/freqplots/graphs/gain_graph.c:97 src/freqplots/graphs/gain_graph.c:104
+msgid "Max Gain & F/B Ratio vs Frequency"
+msgstr "Độ lợi cực đại & tỷ số F/B theo tần số"
+
+#: src/freqplots/graphs/gain_graph.c:105
+msgid "F/B Ratio dB"
+msgstr "Tỷ số F/B dB"
+
+#: src/freqplots/graphs/gain_graph.c:111
+msgid "Rad Angle - deg"
+msgstr "Góc bức xạ - deg"
+
+#: src/freqplots/graphs/gain_graph.c:112
+msgid "Max Gain Direction vs Frequency"
+msgstr "Hướng độ lợi cực đại theo tần số"
+
+#: src/freqplots/graphs/gain_graph.c:113
+msgid "Phi - deg"
+msgstr "Phi - deg"
+
+#: src/freqplots/graphs/impedance_graph.c:75
+#: src/freqplots/graphs/impedance_graph.c:80
+msgid "Impedance vs Frequency"
+msgstr "Trở kháng theo tần số"
+
+#: src/freqplots/graphs/impedance_graph.c:79
+msgid "Z-magn"
+msgstr "Z-biên độ"
+
+#: src/freqplots/graphs/impedance_graph.c:81
+msgid "Z-phase"
+msgstr "Z-pha"
+
+#: src/freqplots/graphs/smith_graph.c:384
+msgid "0 Ω"
+msgstr "0 Ω"
+
+#: src/freqplots/graphs/smith_graph.c:387
+#: src/freqplots/graphs/smith_graph.c:462
+msgid "∞ Ω"
+msgstr "∞ Ω"
+
+#: src/freqplots/graphs/smith_graph.c:407
+msgid "constant R"
+msgstr "R không đổi"
+
+#: src/freqplots/graphs/smith_graph.c:408
+msgid "constant X"
+msgstr "X không đổi"
+
+#: src/freqplots/graphs/smith_graph.c:409
+msgid "unity R, X"
+msgstr "R, X đơn vị"
+
+#: src/freqplots/graphs/smith_graph.c:410
+msgid "match (z = 1)"
+msgstr "phối hợp (z = 1)"
+
+#: src/freqplots/graphs/smith_graph.c:411
+msgid "impedance vs freq"
+msgstr "trở kháng theo tần số"
+
+#: src/freqplots/graphs/smith_graph.c:412
+msgid "selected frequency"
+msgstr "tần số đã chọn"
+
+#: src/freqplots/graphs/smith_graph.c:413
+msgid "reflection angle (°)"
+msgstr "góc phản xạ (°)"
+
+#: src/freqplots/graphs/smith_graph.c:414
+msgid "wavelengths → gen"
+msgstr "bước sóng → gen"
+
+#: src/freqplots/graphs/smith_graph.c:507
+#, c-format
+msgid "Z0 = %g Ω"
+msgstr "Z0 = %g Ω"
+
+#: src/freqplots/graphs/smith_graph.c:514
+msgid "INDUCTIVE (+jX)"
+msgstr "CẢM KHÁNG (+jX)"
+
+#: src/freqplots/graphs/smith_graph.c:517
+msgid "CAPACITIVE (-jX)"
+msgstr "DUNG KHÁNG (-jX)"
+
+#: src/freqplots/graphs/viewer_graph.c:54
+msgid "Gain in Viewer Direction vs Frequency"
+msgstr "Độ lợi theo hướng quan sát theo tần số"
+
+#: src/freqplots/graphs/viewer_graph.c:70
+msgid "Net gain dBi"
+msgstr "Độ lợi ròng dBi"
+
+#: src/freqplots/graphs/vswr_graph.c:58
+msgid "VSWR & S11 vs Frequency"
+msgstr "VSWR & S11 theo tần số"
+
+#: src/freqplots/graphs/vswr_graph.c:59
+msgid "S11 dB"
+msgstr "S11 dB"
+
+#: src/freqplots/graphs/vswr_graph.c:63
+msgid "VSWR vs Frequency"
+msgstr "VSWR theo tần số"
 
 #: src/geom_edit.c:108 src/geom_edit.c:2000 src/geom_edit.c:2272
 #: src/geom_edit.c:2703
@@ -2664,7 +3559,7 @@ msgstr ""
 "Số kết nối đoạn vượt quá lưới đầy đủ, điều này khó xảy ra!\n"
 "Kiểm tra các đoạn chồng chéo hoặc gần kết nối\n"
 
-#: src/geometry.c:704
+#: src/geometry.c:723
 msgid ""
 "check data, parameter specifying segment: position in a group of equal tags "
 "must not be zero\n"
@@ -2672,7 +3567,7 @@ msgstr ""
 "kiểm tra dữ liệu, tham số xác định đoạn: vị trí trong nhóm các tag bằng nhau "
 "không được bằng không\n"
 
-#: src/geometry.c:705
+#: src/geometry.c:724
 msgid ""
 "Parameter specifying segment\n"
 "position in a group of equal tags is zero"
@@ -2680,12 +3575,12 @@ msgstr ""
 "Tham số xác định vị trí đoạn\n"
 "trong nhóm các tag bằng nhau là không"
 
-#: src/geometry.c:737
+#: src/geometry.c:756
 #, c-format
 msgid "no segment has an itag of %d\n"
 msgstr "không có đoạn nào có itag là %d\n"
 
-#: src/geometry.c:741
+#: src/geometry.c:760
 msgid ""
 "Segment tag number error: Tag 0 is reserved and cannot be used.\n"
 "Check your geometry cards (especially GM cards) to ensure tag values are "
@@ -2697,7 +3592,7 @@ msgstr ""
 "lệ.\n"
 "Đối với thẻ GM: xác minh 'bắt đầu từ tag' và 'gia số tag' không tạo ra tag 0."
 
-#: src/geometry.c:749
+#: src/geometry.c:768
 #, c-format
 msgid ""
 "Segment tag number error: No segment found with tag %d.\n"
@@ -2709,19 +3604,19 @@ msgstr ""
 "Các tag hợp lệ trong hình học của bạn là những tag được gán cho thẻ GW/GA/GH/"
 "SP."
 
-#: src/geometry.c:752 src/input.c:1576 src/input.c:1577 src/mathlib.c:752
-#: src/mathlib.c:989 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
-#: src/rdpattern_ui.c:344 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:133
-#: src/utils.c:444
+#: src/geometry.c:771 src/input.c:1755 src/input.c:1756 src/mathlib.c:752
+#: src/mathlib.c:981 src/rdpattern_ui.c:329 src/rdpattern_ui.c:337
+#: src/rdpattern_ui.c:344 src/sy_expr.c:142 src/sy_expr.c:172 src/utils.c:134
+#: src/utils.c:452
 #, c-format
 msgid "%s"
 msgstr "%s"
 
-#: src/geometry.c:1024
+#: src/geometry.c:1043
 msgid "corners of quadrilateral: patch do not lie in a plane\n"
 msgstr "các góc của mảnh tứ giác không nằm trên một mặt phẳng\n"
 
-#: src/geometry.c:1025
+#: src/geometry.c:1044
 msgid ""
 "Corners of quadrilateral\n"
 "patch do not lie in a plane"
@@ -2729,12 +3624,12 @@ msgstr ""
 "Các góc của mảnh tứ giác\n"
 "không nằm trên một mặt phẳng"
 
-#: src/geometry.c:1130 src/geometry.c:1207 src/geometry.c:1285
+#: src/geometry.c:1149 src/geometry.c:1226 src/geometry.c:1304
 #, c-format
 msgid "geometry data error: segment %d lies in plane of symmetry\n"
 msgstr "lỗi dữ liệu hình học: đoạn %d nằm trong mặt phẳng đối xứng\n"
 
-#: src/geometry.c:1131 src/geometry.c:1208 src/geometry.c:1286
+#: src/geometry.c:1150 src/geometry.c:1227 src/geometry.c:1305
 msgid ""
 "Geometry data error\n"
 "Segment lies in plane of symmetry"
@@ -2742,12 +3637,12 @@ msgstr ""
 "Lỗi dữ liệu hình học\n"
 "Đoạn nằm trong mặt phẳng đối xứng"
 
-#: src/geometry.c:1167 src/geometry.c:1244 src/geometry.c:1319
+#: src/geometry.c:1186 src/geometry.c:1263 src/geometry.c:1338
 #, c-format
 msgid "geometry data error: patch %d lies in plane of symmetry\n"
 msgstr "lỗi dữ liệu hình học: mảnh %d nằm trong mặt phẳng đối xứng\n"
 
-#: src/geometry.c:1168 src/geometry.c:1245 src/geometry.c:1320
+#: src/geometry.c:1187 src/geometry.c:1264 src/geometry.c:1339
 msgid ""
 "Geometry data error\n"
 "Patch lies in plane of symmetry"
@@ -2755,7 +3650,7 @@ msgstr ""
 "Lỗi dữ liệu hình học\n"
 "Mảnh nằm trong mặt phẳng đối xứng"
 
-#: src/geometry.c:1440
+#: src/geometry.c:1459
 #, c-format
 msgid ""
 "tag=%d/seg=%d: endpoint distance=%.3e is too close (below connection "
@@ -2764,12 +3659,12 @@ msgstr ""
 "tag=%d/seg=%d: khoảng cách điểm cuối=%.3e quá gần (dưới ngưỡng kết nối="
 "%.3e); đoạn sẽ kết nối với chính nó\n"
 
-#: src/geometry.c:1445
+#: src/geometry.c:1464
 #, c-format
 msgid "tag=%d: suppressing additional self-connection warnings\n"
 msgstr "tag=%d: ẩn các cảnh báo tự kết nối bổ sung\n"
 
-#: src/geometry.c:1495
+#: src/geometry.c:1514
 #, c-format
 msgid ""
 "tag=%d/seg=%d: distance=%.3e to tag=%d/seg=%d closer than 2x connection "
@@ -2778,12 +3673,12 @@ msgstr ""
 "tag=%d/seg=%d: khoảng cách=%.3e đến tag=%d/seg=%d gần hơn 2 lần ngưỡng kết "
 "nối %.3e; có thể xảy ra kết nối ngoài ý muốn\n"
 
-#: src/geometry.c:1501
+#: src/geometry.c:1520
 #, c-format
 msgid "tag=%d: suppressing additional overlap warnings\n"
 msgstr "tag=%d: ẩn các cảnh báo chồng chéo bổ sung\n"
 
-#: src/geometry.c:1570
+#: src/geometry.c:1589
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length=%.3e is too short (and close enough) to tag=%d/seg=%d "
@@ -2792,7 +3687,7 @@ msgstr ""
 "tag=%d/seg=%d: độ dài=%.3e quá ngắn (và đủ gần) với tag=%d/seg=%d độ dài="
 "%.3e nên phát hiện kết nối có thể thất bại hoặc ngắn mạch\n"
 
-#: src/geometry.c:1576
+#: src/geometry.c:1595
 #, c-format
 msgid ""
 "tag=%d: suppressing additional connection detection may fail or short "
@@ -2801,7 +3696,7 @@ msgstr ""
 "tag=%d: ẩn các cảnh báo phát hiện kết nối có thể thất bại hoặc ngắn mạch bổ "
 "sung\n"
 
-#: src/geometry.c:1609
+#: src/geometry.c:1628
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f < 0.001; similarity of "
@@ -2812,12 +3707,12 @@ msgstr ""
 "thành phần dòng điện dẫn đến sai số số học (min=0.001, tốt=0.05, khuyến nghị "
 "<= 0.1)\n"
 
-#: src/geometry.c:1614
+#: src/geometry.c:1633
 #, c-format
 msgid "tag=%d: suppressing additional short wavelength ratio errors\n"
 msgstr "tag=%d: ẩn các lỗi tỷ lệ bước sóng ngắn bổ sung\n"
 
-#: src/geometry.c:1628
+#: src/geometry.c:1647
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.1; current sampling "
@@ -2828,12 +3723,12 @@ msgstr ""
 "điện bị giới hạn bởi khoảng cách đoạn (min=0.001, tốt=0.05, khuyến nghị <= "
 "0.1)\n"
 
-#: src/geometry.c:1633
+#: src/geometry.c:1652
 #, c-format
 msgid "tag=%d: suppressing additional long wavelength ratio warnings\n"
 msgstr "tag=%d: ẩn các cảnh báo tỷ lệ bước sóng dài bổ sung\n"
 
-#: src/geometry.c:1647
+#: src/geometry.c:1666
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/wavelength ratio of %.3f > 0.05; shorter segments "
@@ -2844,12 +3739,12 @@ msgstr ""
 "chính xác trong vùng dòng điện thay đổi nhanh (min=0.001, tốt=0.05, khuyến "
 "nghị <=0.1)\n"
 
-#: src/geometry.c:1652
+#: src/geometry.c:1671
 #, c-format
 msgid "tag=%d: suppressing additional accuracy improvement suggestions\n"
 msgstr "tag=%d: ẩn các gợi ý cải thiện độ chính xác bổ sung\n"
 
-#: src/geometry.c:1683
+#: src/geometry.c:1702
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; standard thin-wire kernel "
@@ -2858,12 +3753,12 @@ msgstr ""
 "tag=%d/seg=%d: tỷ lệ độ dài/bán kính %.1f < 2.0; sai số trường nhân dây mỏng "
 "tiêu chuẩn vượt quá 1%% với biên độ lớn (min=2.0, chính xác 1%%=8.0)\n"
 
-#: src/geometry.c:1688
+#: src/geometry.c:1707
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio errors\n"
 msgstr "tag=%d: ẩn các lỗi tỷ lệ nhân tiêu chuẩn bổ sung\n"
 
-#: src/geometry.c:1702
+#: src/geometry.c:1721
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 8.0; standard thin-wire kernel "
@@ -2872,12 +3767,12 @@ msgstr ""
 "tag=%d/seg=%d: tỷ lệ độ dài/bán kính %.1f < 8.0; sai số trường nhân dây mỏng "
 "tiêu chuẩn vượt quá 1%% (min=2.0, chính xác 1%%=8.0)\n"
 
-#: src/geometry.c:1707
+#: src/geometry.c:1726
 #, c-format
 msgid "tag=%d: suppressing additional standard kernel ratio warnings\n"
 msgstr "tag=%d: ẩn các cảnh báo tỷ lệ nhân tiêu chuẩn bổ sung\n"
 
-#: src/geometry.c:1723
+#: src/geometry.c:1742
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 0.5; extended thin-wire kernel "
@@ -2886,12 +3781,12 @@ msgstr ""
 "tag=%d/seg=%d: tỷ lệ độ dài/bán kính %.1f < 0.5; sai số trường nhân dây mỏng "
 "mở rộng vượt quá 1%% với biên độ lớn (min=0.5, chính xác 1%%=2.0)\n"
 
-#: src/geometry.c:1728
+#: src/geometry.c:1747
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio errors\n"
 msgstr "tag=%d: ẩn các lỗi tỷ lệ nhân mở rộng bổ sung\n"
 
-#: src/geometry.c:1742
+#: src/geometry.c:1761
 #, c-format
 msgid ""
 "tag=%d/seg=%d: length/radius ratio of %.1f < 2.0; extended thin-wire kernel "
@@ -2900,43 +3795,43 @@ msgstr ""
 "tag=%d/seg=%d: tỷ lệ độ dài/bán kính %.1f < 2.0; sai số trường nhân dây mỏng "
 "mở rộng vượt quá 1%% (min=0.5, chính xác 1%%=2.0)\n"
 
-#: src/geometry.c:1747
+#: src/geometry.c:1766
 #, c-format
 msgid "tag=%d: suppressing additional extended kernel ratio warnings\n"
 msgstr "tag=%d: ẩn các cảnh báo tỷ lệ nhân mở rộng bổ sung\n"
 
-#: src/geometry.c:1764
+#: src/geometry.c:1783
 #, c-format
 msgid "Skipping overlap check for %d segments (use --force-verify to enable)\n"
 msgstr ""
 "Bỏ qua kiểm tra chồng chéo cho %d đoạn (sử dụng --force-verify để bật)\n"
 
-#: src/geometry.c:1768
+#: src/geometry.c:1787
 #, c-format
 msgid "Forcing overlap check for %d segments\n"
 msgstr "Buộc kiểm tra chồng chéo cho %d đoạn\n"
 
-#: src/geometry.c:1779
+#: src/geometry.c:1798
 msgid ""
 "verify_segments() skipping frequency-dependent checks - no frequency data\n"
 msgstr ""
 "verify_segments() bỏ qua kiểm tra phụ thuộc tần số - không có dữ liệu tần "
 "số\n"
 
-#: src/gnuplot.c:47
+#: src/gnuplot.c:48
 msgid "Gnuplot Data"
 msgstr "Dữ liệu Gnuplot"
 
-#: src/gnuplot.c:47 src/gnuplot.c:91 src/gnuplot.c:174
+#: src/gnuplot.c:48 src/gnuplot.c:92 src/gnuplot.c:175
 msgid "Cannot save data while frequency loop is running"
 msgstr "Không thể lưu dữ liệu khi vòng lặp tần số đang chạy"
 
-#: src/gnuplot.c:61
+#: src/gnuplot.c:62
 #, c-format
 msgid "# Reference impedance Z0 = %.2f Ohm\n"
 msgstr "# Trở kháng tham chiếu Z0 = %.2f Ohm\n"
 
-#: src/gnuplot.c:63
+#: src/gnuplot.c:64
 #, c-format
 msgid ""
 "# To plot in gnuplot you can modify this command.  Presently it plots MHz vs "
@@ -2945,7 +3840,7 @@ msgstr ""
 "# Để vẽ đồ thị trong gnuplot bạn có thể sửa đổi lệnh này. Hiện tại nó vẽ MHz "
 "so với zreal và zimag:\n"
 
-#: src/gnuplot.c:64
+#: src/gnuplot.c:65
 #, c-format
 msgid ""
 "#    plot for [i=2:3]  'filename.gplot' using 1:i with lines smooth bezier "
@@ -2954,51 +3849,51 @@ msgstr ""
 "#    plot for [i=2:3]  'filename.gplot' using 1:i with lines smooth bezier "
 "title columnhead(i);\n"
 
-#: src/gnuplot.c:91 src/gnuplot.c:174
+#: src/gnuplot.c:92 src/gnuplot.c:175
 msgid "Touchstone Data"
 msgstr "Dữ liệu Touchstone"
 
-#: src/gnuplot.c:105
+#: src/gnuplot.c:106
 #, c-format
 msgid "! Reference impedance Z0 = %.2f Ohm\n"
 msgstr "! Trở kháng tham chiếu Z0 = %.2f Ohm\n"
 
-#: src/gnuplot.c:133
+#: src/gnuplot.c:134
 #, c-format
 msgid "This should never happen. touchstone type=%d\n"
 msgstr "Điều này không bao giờ nên xảy ra. touchstone type=%d\n"
 
-#: src/gnuplot.c:237
+#: src/gnuplot.c:258
 #, c-format
 msgid "# Near E field\n"
 msgstr "# Trường E gần\n"
 
-#: src/gnuplot.c:260
+#: src/gnuplot.c:285
 #, c-format
 msgid "# Near H field\n"
 msgstr "# Trường H gần\n"
 
-#: src/gnuplot.c:306
+#: src/gnuplot.c:325
 #, c-format
 msgid "# Poynting Vector\n"
 msgstr "# Vectơ Poynting\n"
 
-#: src/gnuplot.c:378
+#: src/gnuplot.c:384
 #, c-format
 msgid "# Radiation Pattern\n"
-msgstr "# Đồ thị bức xạ\n"
+msgstr "# Giản đồ bức xạ\n"
 
-#: src/gnuplot.c:516
+#: src/gnuplot.c:522
 #, c-format
 msgid "# structure patch segments\n"
 msgstr "# các đoạn mảnh cấu trúc\n"
 
-#: src/gnuplot.c:551
+#: src/gnuplot.c:557
 #, c-format
 msgid "# structure wire segments\n"
 msgstr "# các đoạn dây cấu trúc\n"
 
-#: src/gnuplot.c:581
+#: src/gnuplot.c:587
 #, c-format
 msgid ""
 "View with: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
@@ -3007,11 +3902,11 @@ msgstr ""
 "Xem bằng: gnuplot -e \"set terminal qt; splot '%s' with lines; pause mouse "
 "close\"\n"
 
-#: src/gnuplot.c:593
+#: src/gnuplot.c:599
 msgid "Save Currents and Charges to CSV"
 msgstr "Lưu dòng điện và điện tích ra CSV"
 
-#: src/gnuplot.c:594
+#: src/gnuplot.c:600
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\"in the "
 "main xnec2c window."
@@ -3019,11 +3914,11 @@ msgstr ""
 "Bạn phải bật dữ liệu dòng điện bằng cách nhấp vào \"Dòng điện\" hoặc \"Điện "
 "tích\" trong cửa sổ chính của xnec2c."
 
-#: src/gnuplot.c:659 src/gnuplot.c:669
+#: src/gnuplot.c:665 src/gnuplot.c:675
 msgid "Save Patch Currents to CSV"
 msgstr "Lưu dòng điện mảnh ra CSV"
 
-#: src/gnuplot.c:660
+#: src/gnuplot.c:666
 msgid ""
 "You must enable current data by clicking \"Currents\" or \"Charges\" in the "
 "main xnec2c window."
@@ -3031,20 +3926,20 @@ msgstr ""
 "Bạn phải bật dữ liệu dòng điện bằng cách nhấp vào \"Dòng điện\" hoặc \"Điện "
 "tích\" trong cửa sổ chính của xnec2c."
 
-#: src/gnuplot.c:670
+#: src/gnuplot.c:676
 msgid "No surface patches in this model."
 msgstr "Không có mảnh bề mặt nào trong mô hình này."
 
-#: src/ground.c:90
+#: src/ground.c:110
 msgid "b less than a"
 msgstr "b nhỏ hơn a"
 
-#: src/ground.c:215
+#: src/ground.c:235
 #, c-format
 msgid "step size limited at z = %12.5E\n"
 msgstr "kích thước bước bị giới hạn tại Z = %12.5E\n"
 
-#: src/input.c:92
+#: src/input.c:156
 msgid ""
 "Error reading Comments\n"
 "Unexpected EOF (End of File)"
@@ -3052,7 +3947,7 @@ msgstr ""
 "Lỗi đọc chú thích\n"
 "Gặp EOF (Kết thúc tệp) không mong đợi"
 
-#: src/input.c:106
+#: src/input.c:170
 msgid ""
 "Error reading Comments\n"
 "Comment mnemonic short or missing"
@@ -3060,7 +3955,7 @@ msgstr ""
 "Lỗi đọc chú thích\n"
 "Mã gợi nhớ chú thích ngắn hoặc thiếu"
 
-#: src/input.c:117
+#: src/input.c:181
 msgid ""
 "Read_Comments():\n"
 " Error reading input file\n"
@@ -3070,7 +3965,7 @@ msgstr ""
 " Lỗi đọc tệp đầu vào\n"
 "Mã gợi nhớ chú thích không đúng"
 
-#: src/input.c:155
+#: src/input.c:219
 msgid ""
 "Geometry data error\n"
 "Tag number is less than 1"
@@ -3078,7 +3973,7 @@ msgstr ""
 "Lỗi dữ liệu hình học\n"
 "Số tag nhỏ hơn 1"
 
-#: src/input.c:162
+#: src/input.c:226
 msgid ""
 "Geometry data error\n"
 "Number of segments is less than 1"
@@ -3086,16 +3981,16 @@ msgstr ""
 "Lỗi dữ liệu hình học\n"
 "Số đoạn nhỏ hơn 1"
 
-#: src/input.c:169
+#: src/input.c:233
 msgid "warning - number of segments is greater than 1000000\n"
 msgstr "cảnh báo - số đoạn lớn hơn 1000000\n"
 
-#: src/input.c:217
+#: src/input.c:281
 #, c-format
 msgid "%s data card error: Spurious character '%c' at column %d\n"
 msgstr "lỗi thẻ dữ liệu %s: Ký tự không hợp lệ '%c' tại cột %d\n"
 
-#: src/input.c:219
+#: src/input.c:283
 msgid ""
 "Data card error\n"
 "Spurious character in card"
@@ -3103,33 +3998,33 @@ msgstr ""
 "Lỗi thẻ dữ liệu\n"
 "Ký tự không hợp lệ trong thẻ"
 
-#: src/input.c:274
+#: src/input.c:354
 #, c-format
 msgid "%s: expression evaluation failed for \"%s\"\n"
 msgstr "%s: đánh giá biểu thức thất bại cho \"%s\"\n"
 
-#: src/input.c:315
+#: src/input.c:395
 msgid "SY card: no line content available\n"
 msgstr "Thẻ SY: không có nội dung dòng\n"
 
-#: src/input.c:316
+#: src/input.c:396
 msgid "SY card: no line content available"
 msgstr "Thẻ SY: không có nội dung dòng"
 
-#: src/input.c:333
+#: src/input.c:413
 msgid "SY card: missing '=' in definition\n"
 msgstr "Thẻ SY: thiếu '=' trong định nghĩa\n"
 
-#: src/input.c:334
+#: src/input.c:414
 msgid "SY card: missing '=' in definition"
 msgstr "Thẻ SY: thiếu '=' trong định nghĩa"
 
-#: src/input.c:367
+#: src/input.c:447
 #, c-format
 msgid "SY card: symbol definition failed for %s=%s\n"
 msgstr "Thẻ SY: định nghĩa ký hiệu thất bại cho %s=%s\n"
 
-#: src/input.c:445
+#: src/input.c:585
 msgid ""
 "Geometry data error\n"
 "No GC card for tapered wire"
@@ -3137,27 +4032,27 @@ msgstr ""
 "Lỗi dữ liệu hình học\n"
 "Không có thẻ GC cho dây dẫn côn"
 
-#: src/input.c:452
+#: src/input.c:592
 msgid "Geometry GC data card error"
 msgstr "Lỗi thẻ dữ liệu GC hình học"
 
-#: src/input.c:468
+#: src/input.c:608
 msgid "Geometry GX data card error"
 msgstr "Lỗi thẻ dữ liệu GX hình học"
 
-#: src/input.c:491
+#: src/input.c:631
 msgid "Geometry GR data card error"
 msgstr "Lỗi thẻ dữ liệu GR hình học"
 
-#: src/input.c:545
+#: src/input.c:685
 msgid "No geometry data cards"
 msgstr "Không có thẻ dữ liệu hình học"
 
-#: src/input.c:556
+#: src/input.c:696
 msgid "Probable invalid segment geometry.\n"
 msgstr "Có thể hình học đoạn không hợp lệ.\n"
 
-#: src/input.c:557
+#: src/input.c:697
 msgid ""
 "Invalid segment geometry.\n"
 "See warnings in the console for detail.\n"
@@ -3167,37 +4062,37 @@ msgstr ""
 "Xem cảnh báo trong bảng điều khiển để biết chi tiết.\n"
 "Đang cố gắng tiếp tục..."
 
-#: src/input.c:563
+#: src/input.c:703
 msgid "Probable invalid segment geometry (see above)\n"
 msgstr "Có thể hình học đoạn không hợp lệ (xem ở trên)\n"
 
-#: src/input.c:567
+#: src/input.c:707
 msgid "Read_Geometry: verify_segments() passed\n"
 msgstr "Read_Geometry: verify_segments() đã thành công\n"
 
-#: src/input.c:604
+#: src/input.c:744
 #, c-format
 msgid "segment data error: tag=%d si=%lf, bi=%lf\n"
 msgstr "lỗi dữ liệu đoạn: tag=%d si=%lf, bi=%lf\n"
 
-#: src/input.c:606
+#: src/input.c:746
 msgid "Segment data error, zero-length line?  See console."
 msgstr "Lỗi dữ liệu đoạn, đường có độ dài bằng không? Xem bảng điều khiển."
 
-#: src/input.c:646
+#: src/input.c:786
 msgid "Move GM data card error"
 msgstr "Lỗi thẻ dữ liệu di chuyển GM"
 
-#: src/input.c:662 src/input.c:703 src/input.c:720 src/input.c:738
-#: src/input.c:746
+#: src/input.c:802 src/input.c:843 src/input.c:860 src/input.c:878
+#: src/input.c:886
 msgid "Patch data card error"
 msgstr "Lỗi thẻ dữ liệu mảnh"
 
-#: src/input.c:684
+#: src/input.c:824
 msgid "Patch data error"
 msgstr "Lỗi dữ liệu mảnh"
 
-#: src/input.c:793
+#: src/input.c:933
 msgid ""
 "\"GF\" card (NGF solution)\n"
 "is not supported"
@@ -3205,41 +4100,45 @@ msgstr ""
 "Thẻ \"GF\" (giải pháp NGF)\n"
 "không được hỗ trợ"
 
-#: src/input.c:798
+#: src/input.c:938
 msgid "Ignoring CM card in geometry"
 msgstr "Bỏ qua thẻ CM trong hình học"
 
-#: src/input.c:811
+#: src/input.c:951
 #, c-format
 msgid "geometry data card error (nwire=%d)\n"
 msgstr "lỗi thẻ dữ liệu hình học (nwire=%d)\n"
 
-#: src/input.c:812
+#: src/input.c:952
 #, c-format
 msgid "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
 msgstr "%2s %3d %5d %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n"
 
-#: src/input.c:815
-msgid "Geometry data card error"
-msgstr "Lỗi thẻ dữ liệu hình học"
+#: src/input.c:958
+msgid "Command card in geometry section"
+msgstr "Thẻ lệnh trong phần hình học"
 
-#: src/input.c:839
+#: src/input.c:960
+msgid "Unrecognized geometry card"
+msgstr "Thẻ hình học không được nhận dạng"
+
+#: src/input.c:984
 msgid "Failed to initialize symbol table\n"
 msgstr "Khởi tạo bảng ký hiệu thất bại\n"
 
-#: src/input.c:840
+#: src/input.c:985
 msgid "Failed to initialize symbol table"
 msgstr "Khởi tạo bảng ký hiệu thất bại"
 
-#: src/input.c:1012
+#: src/input.c:1176
 msgid "ignoring CM card in commands\n"
 msgstr "bỏ qua thẻ CM trong lệnh\n"
 
-#: src/input.c:1013
+#: src/input.c:1177
 msgid "Ignoring CM card in commands"
 msgstr "Bỏ qua thẻ CM trong lệnh"
 
-#: src/input.c:1017
+#: src/input.c:1181
 msgid ""
 "CP card is ignored\n"
 "Coupling calculation not implemented"
@@ -3247,11 +4146,16 @@ msgstr ""
 "Thẻ CP bị bỏ qua\n"
 "Tính toán ghép nối chưa được triển khai"
 
-#: src/input.c:1184
+#: src/input.c:1276
+#, c-format
+msgid "Skipping duplicate FR card at %g MHz\n"
+msgstr "Bỏ qua thẻ FR trùng lặp tại %g MHz\n"
+
+#: src/input.c:1358
 msgid "Max frequency <= Min frequency in FR card\n"
 msgstr "Tần số tối đa <= Tần số tối thiểu trong thẻ FR\n"
 
-#: src/input.c:1185
+#: src/input.c:1359
 msgid ""
 "Max frequency <= Min frequency in FR card\n"
 "Please check FR card data and correct"
@@ -3259,7 +4163,7 @@ msgstr ""
 "Tần số tối đa <= Tần số tối thiểu trong thẻ FR\n"
 "Vui lòng kiểm tra dữ liệu thẻ FR và sửa"
 
-#: src/input.c:1208
+#: src/input.c:1382
 msgid ""
 "Fix the GE/GN cards:\n"
 "The GE card specifies that a ground is present, but the GN indicates "
@@ -3268,11 +4172,11 @@ msgstr ""
 "Sửa các thẻ GE/GN:\n"
 "Thẻ GE chỉ định có mặt phẳng đất, nhưng thẻ GN chỉ định ngược lại."
 
-#: src/input.c:1222
+#: src/input.c:1396
 msgid "theta > 90 deg. with ground specified\n"
 msgstr "theta > 90 độ với mặt phẳng đất được chỉ định\n"
 
-#: src/input.c:1223 src/radiation.c:663
+#: src/input.c:1397 src/radiation.c:704
 msgid ""
 "Theta > 90 deg with ground specified\n"
 "Please check RP card data and correct"
@@ -3280,14 +4184,14 @@ msgstr ""
 "Theta > 90 độ với mặt phẳng đất được chỉ định\n"
 "Vui lòng kiểm tra dữ liệu thẻ RP và sửa"
 
-#: src/input.c:1232
+#: src/input.c:1406
 msgid ""
 "radial wire g.s. approximation: may not be used with Sommerfeld ground "
 "option\n"
 msgstr ""
 "xấp xỉ g.s. dây radial: không thể sử dụng với tùy chọn mặt đất Sommerfeld\n"
 
-#: src/input.c:1233
+#: src/input.c:1407
 msgid ""
 "radial wire g.s. approximation\n"
 "may not be used with Sommerfeld ground option"
@@ -3295,14 +4199,14 @@ msgstr ""
 "xấp xỉ g.s. dây radial\n"
 "không thể sử dụng với tùy chọn mặt đất Sommerfeld"
 
-#: src/input.c:1281
+#: src/input.c:1455
 #, c-format
 msgid ""
 "data fault on loading card no %d: itag step1 %d is greater than itag step2 "
 "%d\n"
 msgstr "lỗi dữ liệu trên thẻ tải số %d: itag step1 %d lớn hơn itag step2 %d\n"
 
-#: src/input.c:1283
+#: src/input.c:1457
 msgid ""
 "Data fault on loading card\n"
 "itag step1 is greater than itag step2"
@@ -3310,13 +4214,13 @@ msgstr ""
 "Lỗi dữ liệu trên thẻ tải\n"
 "itag step1 lớn hơn itag step2"
 
-#: src/input.c:1412
+#: src/input.c:1586
 msgid ""
 "Transmission Line impedance = 0: is not valid. Please correct NT or TL card\n"
 msgstr ""
 "Trở kháng đường truyền = 0: không hợp lệ. Vui lòng sửa thẻ NT hoặc TL\n"
 
-#: src/input.c:1413
+#: src/input.c:1587
 msgid ""
 "Transmission Line impedance = 0\n"
 "is not valid. Please correct NT or TL card"
@@ -3324,11 +4228,11 @@ msgstr ""
 "Trở kháng đường truyền = 0\n"
 "không hợp lệ. Vui lòng sửa thẻ NT hoặc TL"
 
-#: src/input.c:1422
+#: src/input.c:1596
 msgid "Segment number error in TL or NT card\n"
 msgstr "Lỗi số đoạn trong thẻ TL hoặc NT\n"
 
-#: src/input.c:1423
+#: src/input.c:1597
 msgid ""
 "Segment number\n"
 "error in NT or TL card"
@@ -3336,11 +4240,11 @@ msgstr ""
 "Số đoạn\n"
 "lỗi trong thẻ NT hoặc TL"
 
-#: src/input.c:1444
+#: src/input.c:1618
 msgid "PQ and PT cards are ignored: Printing to file not implemented\n"
 msgstr "Thẻ PQ và PT bị bỏ qua: In ra tệp chưa được triển khai\n"
 
-#: src/input.c:1445
+#: src/input.c:1619
 msgid ""
 "PQ and PT cards are ignored\n"
 "Printing to file not implemented"
@@ -3348,11 +4252,11 @@ msgstr ""
 "Thẻ PQ và PT bị bỏ qua\n"
 "In ra tệp chưa được triển khai"
 
-#: src/input.c:1452
+#: src/input.c:1626
 msgid "Surface wave option (I1=1): of RP command not implemented\n"
 msgstr "Tùy chọn sóng mặt (I1=1): của lệnh RP chưa được triển khai\n"
 
-#: src/input.c:1453
+#: src/input.c:1627
 msgid ""
 "Surface wave option (I1=1)\n"
 "of RP command not implemented"
@@ -3360,21 +4264,21 @@ msgstr ""
 "Tùy chọn sóng mặt (I1=1)\n"
 "của lệnh RP chưa được triển khai"
 
-#: src/input.c:1478
+#: src/input.c:1652
 msgid "Average gain diagnostic enabled (use --skip-verify to disable)\n"
 msgstr "Đã bật chẩn đoán độ lợi trung bình (dùng --skip-verify để tắt)\n"
 
-#: src/input.c:1487
+#: src/input.c:1661
 #, c-format
 msgid "Average power gain disabled: nth=%d nph=%d (both must be >= 2)\n"
 msgstr "Đã tắt độ lợi công suất trung bình: nth=%d nph=%d (cả hai phải >= 2)\n"
 
-#: src/input.c:1492
+#: src/input.c:1666
 #, c-format
 msgid "Average power gain calculation enabled (XNDA A=%d)\n"
 msgstr "Đã bật tính toán độ lợi công suất trung bình (XNDA A=%d)\n"
 
-#: src/input.c:1508
+#: src/input.c:1682
 msgid ""
 "Theta > 90 deg. with ground specified: Please check RP card data and "
 "correct\n"
@@ -3382,7 +4286,7 @@ msgstr ""
 "Theta > 90 độ với mặt phẳng đất được chỉ định: Vui lòng kiểm tra dữ liệu thẻ "
 "RP và sửa\n"
 
-#: src/input.c:1509
+#: src/input.c:1683
 msgid ""
 "Theta > 90 deg. with ground specified\n"
 "Please check RP card data and correct"
@@ -3390,30 +4294,34 @@ msgstr ""
 "Theta > 90 độ với mặt phẳng đất được chỉ định\n"
 "Vui lòng kiểm tra dữ liệu thẻ RP và sửa"
 
-#: src/input.c:1574
-msgid "Faulty data card"
-msgstr "Thẻ dữ liệu bị lỗi"
+#: src/input.c:1751
+msgid "Geometry card in command section"
+msgstr "Thẻ hình học trong phần lệnh"
 
-#: src/input.c:1603
+#: src/input.c:1754
+msgid "Unrecognized command card"
+msgstr "Thẻ lệnh không được nhận dạng"
+
+#: src/input.c:1791
 msgid ""
 "Missing or surface-wave RP card: Radiation pattern and gain calculations "
 "disabled\n"
 msgstr ""
-"Thiếu hoặc thẻ RP sóng mặt: Tính toán đồ thị bức xạ và độ lợi bị vô hiệu "
+"Thiếu hoặc thẻ RP sóng mặt: Tính toán giản đồ bức xạ và độ lợi bị vô hiệu "
 "hóa\n"
 
-#: src/input.c:1630
+#: src/input.c:1818
 msgid "Unexpected exit from while loop"
 msgstr "Thoát không mong đợi khỏi vòng lặp while"
 
-#: src/input.c:1721
+#: src/input.c:1909
 msgid ""
 "command data card error: Unexpected EOF while reading input file - appending "
 "EN card\n"
 msgstr ""
 "lỗi thẻ dữ liệu lệnh: EOF không mong đợi khi đọc tệp đầu vào - thêm thẻ EN\n"
 
-#: src/input.c:1722
+#: src/input.c:1910
 msgid ""
 "Command data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -3423,11 +4331,11 @@ msgstr ""
 "EOF không mong đợi khi đọc tệp đầu vào\n"
 "Thêm thẻ EN mặc định"
 
-#: src/input.c:1736
+#: src/input.c:1927
 msgid "command data card error: card's mnemonic code too short or missing\n"
 msgstr "lỗi thẻ dữ liệu lệnh: mã gợi nhớ của thẻ quá ngắn hoặc thiếu\n"
 
-#: src/input.c:1737
+#: src/input.c:1928
 msgid ""
 "Command data card error\n"
 "Mnemonic code too short or missing"
@@ -3435,7 +4343,7 @@ msgstr ""
 "Lỗi thẻ dữ liệu lệnh\n"
 "Mã gợi nhớ quá ngắn hoặc thiếu"
 
-#: src/input.c:1930
+#: src/input.c:2121
 msgid ""
 "geometry data card error: Unexpected EOF while reading input file - "
 "appending GE card\n"
@@ -3443,7 +4351,7 @@ msgstr ""
 "lỗi thẻ dữ liệu hình học: EOF không mong đợi khi đọc tệp đầu vào - thêm thẻ "
 "GE\n"
 
-#: src/input.c:1931
+#: src/input.c:2122
 msgid ""
 "Geometry data card error\n"
 "Unexpected EOF while reading input file\n"
@@ -3453,11 +4361,11 @@ msgstr ""
 "EOF không mong đợi khi đọc tệp đầu vào\n"
 "Thêm thẻ GE mặc định"
 
-#: src/input.c:1945
+#: src/input.c:2139
 msgid "geometry data card error: card's mnemonic code too short or missing\n"
 msgstr "lỗi thẻ dữ liệu hình học: mã gợi nhớ của thẻ quá ngắn hoặc thiếu\n"
 
-#: src/input.c:1946
+#: src/input.c:2140
 msgid ""
 "Geometry data card error\n"
 "Card's mnemonic code too short or missing"
@@ -3465,47 +4373,47 @@ msgstr ""
 "Lỗi thẻ dữ liệu hình học\n"
 "Mã gợi nhớ của thẻ quá ngắn hoặc thiếu"
 
-#: src/interface.c:135
+#: src/interface.c:136
 #, c-format
 msgid "xnec2c Main: %s"
 msgstr "xnec2c Chính: %s"
 
-#: src/interface.c:141
+#: src/interface.c:142
 #, c-format
 msgid "xnec2c Editor: %s"
 msgstr "xnec2c Trình soạn thảo: %s"
 
-#: src/interface.c:147
+#: src/interface.c:148
 #, c-format
 msgid "xnec2c Frequency Plots: %s"
 msgstr "xnec2c: Đồ thị tần số: %s"
 
-#: src/interface.c:153
+#: src/interface.c:154
 #, c-format
 msgid "xnec2c Radiation Pattern: %s"
 msgstr "xnec2c: Giản đồ bức xạ: %s"
 
-#: src/interface.c:168
+#: src/interface.c:169
 #, c-format
 msgid "Fatal Error: builder could not find object '%s'"
 msgstr "Lỗi nghiêm trọng: builder không tìm thấy đối tượng '%s'"
 
-#: src/interface.c:193
+#: src/interface.c:194
 #, c-format
 msgid "failed to add objects to builder: %s\n"
 msgstr "thêm đối tượng vào builder thất bại: %s\n"
 
-#: src/interface.c:195
+#: src/interface.c:196
 msgid "Listing Object Ids:\n"
 msgstr "Danh sách ID đối tượng:\n"
 
-#: src/interface.c:199 src/utils.c:191 src/utils.c:195 src/utils.c:205
-#: src/utils.c:207
+#: src/interface.c:200 src/utils.c:192 src/utils.c:196 src/utils.c:206
+#: src/utils.c:208
 #, c-format
 msgid "%s\n"
 msgstr "%s\n"
 
-#: src/interface.c:210 src/interface.c:213
+#: src/interface.c:211 src/interface.c:214
 msgid ""
 "libgmodule not supported: xnec2c may not function properly on this "
 "platform.\n"
@@ -3513,140 +4421,145 @@ msgstr ""
 "libgmodule không được hỗ trợ: xnec2c có thể không hoạt động đúng trên nền "
 "tảng này.\n"
 
-#: src/interface.c:277
+#: src/interface.c:278
 #, c-format
 msgid "xnec2c %s: %s"
 msgstr "xnec2c %s: %s"
 
-#: src/main.c:138
+#: src/interface.c:368
+#, c-format
+msgid "create_animate_dialog: failed to load animate.glade: %s\n"
+msgstr "create_animate_dialog: tải animate.glade thất bại: %s\n"
+
+#: src/main.c:146
 #, c-format
 msgid "%s requires a positive integer argument\n"
 msgstr "%s yêu cầu một đối số số nguyên dương\n"
 
-#: src/main.c:201
+#: src/main.c:209
 #, c-format
 msgid "Detected %d CPUs\n"
 msgstr "Phát hiện %d CPU\n"
 
-#: src/main.c:220
+#: src/main.c:228
 #, c-format
 msgid "Detected %s windowing backend\n"
 msgstr "Phát hiện backend cửa sổ %s\n"
 
-#: src/main.c:230
+#: src/main.c:238
 msgid "config file path too long\n"
 msgstr "đường dẫn tệp cấu hình quá dài\n"
 
-#: src/main.c:248
+#: src/main.c:256
 #, c-format
 msgid "config file does not exist or is not readable: %s\n"
 msgstr "tệp cấu hình không tồn tại hoặc không thể đọc: %s\n"
 
-#: src/main.c:257
+#: src/main.c:265
 #, c-format
 msgid "config file path too long ( > %d char )\n"
 msgstr "đường dẫn tệp cấu hình quá dài ( > %d ký tự )\n"
 
-#: src/main.c:269
+#: src/main.c:277
 #, c-format
 msgid "input file name too long ( > %d char )\n"
 msgstr "tên tệp đầu vào quá dài ( > %d ký tự )\n"
 
-#: src/main.c:296
+#: src/main.c:304
 msgid "Forking disabled!\n"
 msgstr "Forking bị vô hiệu hóa!\n"
 
-#: src/main.c:304
+#: src/main.c:312
 msgid "pthread freqloop disabled!\n"
 msgstr "pthread freqloop bị vô hiệu hóa!\n"
 
-#: src/main.c:308
+#: src/main.c:316
 msgid "batch mode enabled, will exit after first loop\n"
 msgstr "chế độ batch được bật, sẽ thoát sau vòng lặp đầu tiên\n"
 
-#: src/main.c:374
+#: src/main.c:382
 msgid "verify segments check disabled\n"
 msgstr "kiểm tra xác minh đoạn bị vô hiệu hóa\n"
 
-#: src/main.c:379
+#: src/main.c:387
 msgid "forcing overlap check on large models\n"
 msgstr "buộc kiểm tra chồng chéo trên mô hình lớn\n"
 
-#: src/main.c:384
+#: src/main.c:395
 msgid "managed allocator leak report enabled\n"
 msgstr "báo cáo rò rỉ bộ cấp phát được quản lý đã bật\n"
 
-#: src/main.c:398
+#: src/main.c:409
 msgid "--batch and --optimize are mutual exclusive.\n"
 msgstr "--batch và --optimize loại trừ lẫn nhau.\n"
 
-#: src/main.c:414
+#: src/main.c:425
 #, c-format
 msgid "input file path name too long ( > %d char )\n"
 msgstr "đường dẫn tệp đầu vào quá dài ( > %d ký tự )\n"
 
-#: src/main.c:421
+#: src/main.c:432
 #, c-format
 msgid "unexpected argument '%s' does not appear to be a .nec file\n"
 msgstr "đối số không mong đợi '%s' dường như không phải là tệp .nec\n"
 
-#: src/main.c:428
+#: src/main.c:439
 #, c-format
 msgid "unexpected argument: %s\n"
 msgstr "đối số không mong đợi: %s\n"
 
-#: src/main.c:434
+#: src/main.c:445
 msgid "batch mode requires an input file\n"
 msgstr "chế độ batch yêu cầu một tệp đầu vào\n"
 
-#: src/main.c:444
+#: src/main.c:455
 msgid "cannot open display: a running X11 or Wayland session is required\n"
 msgstr "không thể mở màn hình: cần có phiên X11 hoặc Wayland đang chạy\n"
 
-#: src/main.c:463
+#: src/main.c:474
 #, c-format
 msgid "Forking %d jobs.\n"
 msgstr "Phân nhánh %d tác vụ.\n"
 
-#: src/main.c:475 src/main.c:483
+#: src/main.c:486 src/main.c:494
 msgid "exiting after fatal error: pipe() failed"
 msgstr "thoát sau lỗi nghiêm trọng: pipe() thất bại"
 
-#: src/main.c:492
+#: src/main.c:503
 msgid "exiting after fatal error: fork() failed"
 msgstr "thoát sau lỗi nghiêm trọng: fork() thất bại"
 
-#: src/main.c:907
+#: src/main.c:1078
 msgid "exiting via user interrupt\n"
 msgstr "thoát do ngắt người dùng\n"
 
-#: src/main.c:911
+#: src/main.c:1082
 msgid "segmentation fault, exiting\n"
 msgstr "lỗi phân đoạn bộ nhớ, đang thoát\n"
 
-#: src/main.c:915
+#: src/main.c:1086
 msgid "floating point exception, exiting\n"
 msgstr "lỗi ngoại lệ dấu phẩy động, đang thoát\n"
 
-#: src/main.c:919
+#: src/main.c:1090
 msgid "abort signal received, exiting\n"
 msgstr "đã nhận tín hiệu hủy bỏ, đang thoát\n"
 
-#: src/main.c:923
+#: src/main.c:1094
 msgid "termination request received, exiting\n"
 msgstr "đã nhận yêu cầu kết thúc, đang thoát\n"
 
-#: src/main.c:933
+#: src/main.c:1104
 #, c-format
 msgid "not forked, ignoring SIGCHLD from pid %d\n"
 msgstr "không fork, bỏ qua SIGCHLD từ pid %d\n"
 
-#: src/main.c:941
+#: src/main.c:1112
 #, c-format
 msgid "child process pid %d exited\n"
 msgstr "tiến trình con pid %d đã thoát\n"
 
-#: src/main.c:950
+#: src/main.c:1121
 #, c-format
 msgid "default exit with signal: %d\n"
 msgstr "thoát mặc định với tín hiệu: %d\n"
@@ -3668,7 +4581,7 @@ msgstr "open_mathlib: lib là NULL\n"
 msgid "setenv(%s, %s): %s\n"
 msgstr "setenv(%s, %s): %s\n"
 
-#: src/mathlib.c:320 src/utils.c:448
+#: src/mathlib.c:320 src/utils.c:456
 #, c-format
 msgid "%s: %s\n"
 msgstr "%s: %s\n"
@@ -3837,7 +4750,7 @@ msgstr ""
 "việc đi 1. Đây là tùy chọn chạy lâu nhất.\n"
 
 #: src/mathlib.c:839 src/mathlib.c:846 src/mathlib.c:852 src/mathlib.c:869
-#: src/mathlib.c:874 src/mathlib.c:989
+#: src/mathlib.c:874 src/mathlib.c:981
 msgid "Mathlib Benchmark"
 msgstr "Đánh giá Mathlib"
 
@@ -3911,17 +4824,17 @@ msgstr ""
 "\n"
 "Nhấn OK để tiếp tục, hộp thoại này sẽ đóng khi hoàn thành."
 
-#: src/mathlib.c:931
+#: src/mathlib.c:926
 #, c-format
 msgid "Starting %s benchmark (-j %d)\n"
 msgstr "Bắt đầu đánh giá %s (-j %d)\n"
 
-#: src/mathlib.c:1022
+#: src/mathlib.c:1014
 #, c-format
 msgid "mathlib_lock_intel: Cannot find library for mathlib ID='%s'\n"
 msgstr "mathlib_lock_intel: Không tìm thấy thư viện cho mathlib ID='%s'\n"
 
-#: src/mathlib.c:1033
+#: src/mathlib.c:1025
 #, c-format
 msgid ""
 "\n"
@@ -3948,49 +4861,49 @@ msgstr ""
 "* \n"
 "* Xem tài liệu Intel về mkl_set_threading_layer() để biết thêm chi tiết.\n"
 
-#: src/mathlib.c:1108
+#: src/mathlib.c:1100
 msgid "zgetrf: current_mathlib is NULL, this should never happen.\n"
 msgstr "zgetrf: current_mathlib là NULL, điều này không bao giờ nên xảy ra.\n"
 
-#: src/mathlib.c:1132 src/mathlib.c:1177
+#: src/mathlib.c:1124 src/mathlib.c:1169
 #, c-format
 msgid "%s: unsupported mathlib type %d\n"
 msgstr "%s: loại mathlib không được hỗ trợ %d\n"
 
-#: src/mathlib.c:1145
+#: src/mathlib.c:1137
 msgid "zgetrs: current_mathlib is NULL, this should never happen.\n"
 msgstr "zgetrs: current_mathlib là NULL, điều này không bao giờ nên xảy ra.\n"
 
-#: src/mathlib.c:1170
+#: src/mathlib.c:1162
 #, c-format
 msgid "zgetrs warning: lda(%d) != ldb(%d)\n"
 msgstr "zgetrs cảnh báo: lda(%d) != ldb(%d)\n"
 
-#: src/mathlib.c:1205
+#: src/mathlib.c:1197
 #, c-format
 msgid "dlsym(mkl_set_threading_layer): %s\n"
 msgstr "dlsym(mkl_set_threading_layer): %s\n"
 
-#: src/matrix.c:1208
+#: src/matrix.c:1223
 #, c-format
 msgid "pivot(%d)= %16.8E\n"
 msgstr "pivot(%d)= %16.8E\n"
 
-#: src/matrix.c:1242
+#: src/matrix.c:1257
 #, c-format
 msgid "LU Decomposition Failed: %d\n"
 msgstr "Phân tích LU thất bại: %d\n"
 
-#: src/matrix.c:1298
+#: src/matrix.c:1313
 #, c-format
 msgid "symmetry error - nrow:%d ncol:%d\n"
 msgstr "lỗi đối xứng - nrow:%d ncol:%d\n"
 
-#: src/matrix.c:1299
+#: src/matrix.c:1314
 msgid "Symmetry error"
 msgstr "Lỗi đối xứng"
 
-#: src/matrix.c:1403
+#: src/matrix.c:1418
 #, c-format
 msgid "Solving Failed: %d\n"
 msgstr "Giải thất bại: %d\n"
@@ -4003,47 +4916,38 @@ msgstr ""
 "noise_temp_resolve: bảng noise_temp chưa được cấp phát; t_sky/t_earth mặc "
 "định về 0\n"
 
-#: src/measurements.c:596
+#: src/measurements.c:606
 #, c-format
 msgid "BUG: pol=%d out of range [0,%d): idx=%d freq_step=%d thr=%lu\n"
 msgstr "BUG: pol=%d nằm ngoài phạm vi [0,%d): idx=%d freq_step=%d thr=%lu\n"
 
-#: src/measurements.c:610
+#: src/measurements.c:620
 #, c-format
 msgid "BUG: mgidx=%d out of range [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n"
 msgstr ""
 "BUG: mgidx=%d nằm ngoài phạm vi [0,%d): idx=%d pol=%d freq_step=%d thr=%lu\n"
 
-#: src/measurements.c:613
+#: src/measurements.c:623
 #, c-format
 msgid "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
 msgstr "BUG: save.fstep[%d]=%d FREQ_LOOP_STOP=%d FREQ_LOOP_DONE=%d\n"
 
-#: src/measurements.c:616
+#: src/measurements.c:626
 #, c-format
 msgid "BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n"
 msgstr "BUG: rad_pattern[%d]: efficiency=%.6e gtot=%p max_gain_idx=%p\n"
 
-#: src/measurements.c:620
+#: src/measurements.c:630
 #, c-format
 msgid "BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
 msgstr "BUG: max_gain_idx[0]=%d [1]=%d [2]=%d\n"
 
-#: src/measurements.c:751
-#, c-format
-msgid ""
-"BUG: F/B nth=%d out of [0,%d) after over-ground recalc: idx=%d pol=%d "
-"max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n"
-msgstr ""
-"BUG: F/B nth=%d nằm ngoài [0,%d) sau tính lại over-ground: idx=%d pol=%d "
-"max_gain_tht=%.6e fbdir=%.6e dth=%.6e\n"
-
-#: src/measurements.c:798
+#: src/measurements.c:785
 #, c-format
 msgid "meas_name_idx: Invalid name with length=%d: %s\n"
 msgstr "meas_name_idx: Tên không hợp lệ với length=%d: %s\n"
 
-#: src/measurements.c:859
+#: src/measurements.c:846
 msgid "meas_format: output overflow\n"
 msgstr "meas_format: tràn đầu ra\n"
 
@@ -4057,34 +4961,65 @@ msgstr "mem_obj_from_ptr: ptr %p không khớp với m->ptr %p (base %p)\n"
 msgid "Memory allocation denied %s: requested %lu bytes\n"
 msgstr "Cấp phát bộ nhớ bị từ chối %s: đã yêu cầu %lu byte\n"
 
-#: src/mem/mem.c:225
+#: src/mem/mem.c:219
+#, c-format
+msgid "mem_free at %s: array block element size %lu; use mem_array_free\n"
+msgstr ""
+"mem_free tại %s: kích thước phần tử khối mảng %lu; dùng mem_array_free\n"
+
+#: src/mem/mem.c:238
 #, c-format
 msgid "mem_obj_t at %p: size=%lu used=%lu addr=%p\n"
 msgstr "mem_obj_t tại %p: size=%lu used=%lu addr=%p\n"
 
-#: src/mem/mem.c:246
+#: src/mem/mem.c:259
 #, c-format
 msgid "mem_backtrace(%p):\n"
 msgstr "mem_backtrace(%p):\n"
 
-#: src/mem/mem.c:249
+#: src/mem/mem.c:262
 msgid "  m->backtrace is null, no backtrace data\n"
 msgstr "  m->backtrace là null, không có dữ liệu backtrace\n"
 
-#: src/mem/mem.c:275
+#: src/mem/mem.c:288
 #, c-format
 msgid "mem_clone: allocation failed for %lu bytes\n"
 msgstr "mem_clone: cấp phát thất bại cho %lu byte\n"
 
-#: src/mem/mem.c:332
+#: src/mem/mem.c:345
 #, c-format
 msgid "mem_array verb: element size %lu does not match header %lu\n"
 msgstr "mem_array verb: kích thước phần tử %lu không khớp với tiêu đề %lu\n"
 
-#: src/mem/mem.c:424
+#: src/mem/mem.c:437
 #, c-format
 msgid "mem_zero: array block element size %lu; use mem_array_zero\n"
 msgstr "mem_zero: kích thước phần tử khối mảng %lu; dùng mem_array_zero\n"
+
+#: src/mem/mem_track.c:156
+#, c-format
+msgid "mem_report: snapshot allocation of %llu records failed\n"
+msgstr "mem_report: cấp phát ảnh chụp nhanh %llu bản ghi thất bại\n"
+
+#: src/mem/mem_track.c:204
+#, c-format
+msgid "mem-report %s: site=%s count=%llu bytes=%llu serial=[%llu..%llu]\n"
+msgstr "mem-report %s: site=%s count=%llu bytes=%llu serial=[%llu..%llu]\n"
+
+#: src/mem/mem_track.c:209
+#, c-format
+msgid "mem-report %s: live_blocks=%llu live_bytes=%llu distinct_sites=%llu\n"
+msgstr "mem-report %s: live_blocks=%llu live_bytes=%llu distinct_sites=%llu\n"
+
+#: src/mem/mem_track.c:215
+#, c-format
+msgid "mem-report %s: serial=%llu site=%s size=%lu used=%lu\n"
+msgstr "mem-report %s: serial=%llu site=%s size=%lu used=%lu\n"
+
+#: src/mem/mem_track.c:223
+#, c-format
+msgid "mem-report %s:   frame %d %s\n"
+msgstr "mem-report %s:   khung %d %s\n"
 
 #: src/nec2_model.c:278 src/nec2_model.c:282 src/nec2_model.c:286
 msgid "Card"
@@ -4132,21 +5067,21 @@ msgstr ""
 "Vui lòng sử dụng nút Lưu\n"
 "để chỉ định đường dẫn tệp"
 
-#: src/network.c:637
+#: src/network.c:650
 #, c-format
 msgid "improper load type chosen, requested type is %d\n"
 msgstr "loại tải điện được chọn không hợp lệ, loại yêu cầu là %d\n"
 
-#: src/network.c:638
+#: src/network.c:651
 msgid "Improper load type chose"
 msgstr "Loại tải điện được chọn không hợp lệ"
 
-#: src/network.c:726
+#: src/network.c:739
 #, c-format
 msgid "loading data card error, no segment has an itag = %d\n"
 msgstr "lỗi thẻ dữ liệu tải, không có đoạn nào có itag = %d\n"
 
-#: src/network.c:727
+#: src/network.c:740
 msgid ""
 "Loading data card\n"
 "Tag number mismatch error"
@@ -4280,7 +5215,7 @@ msgstr ""
 "OpenGL không khả dụng trên màn hình này; đang chuyển sang bộ kết xuất Cairo. "
 "Xem 'Bộ kết xuất OpenGL' trong Xem > Cài đặt kết xuất.\n"
 
-#: src/opengl/opengl_structure_geometry.c:227
+#: src/opengl/opengl_structure_geometry.c:244
 #, c-format
 msgid "generate_network_lines: unknown ntyp=%d\n"
 msgstr "generate_network_lines: ntyp=%d không xác định\n"
@@ -4314,35 +5249,41 @@ msgstr "đang lưu %s: %s\n"
 msgid "xnec2c was built without inotify.\n"
 msgstr "xnec2c được xây dựng không có inotify.\n"
 
-#: src/optimize.c:157
+#: src/optimize.c:188
 #, c-format
 msgid "inotify: matched companion file: %s\n"
 msgstr "inotify: tệp đồng hành khớp: %s\n"
 
-#: src/optimize.c:198
+#: src/optimize.c:229
 #, c-format
 msgid "Unable to configure file modification detection to %s: %s\n"
 msgstr "Không thể cấu hình phát hiện thay đổi tệp cho %s: %s\n"
 
-#: src/optimize.c:203
+#: src/optimize.c:234
 #, c-format
 msgid "Monitoring directory for %s: %s\n"
 msgstr "Giám sát thư mục cho %s: %s\n"
 
-#: src/optimize.c:301
+#: src/optimize.c:256
+#, c-format
+msgid "inotify: file stat failed or zero bytes (errno=%s), retrying\n"
+msgstr ""
+"inotify: stat tệp thất bại hoặc bằng không byte (errno=%s), đang thử lại\n"
+
+#: src/optimize.c:360
 msgid "Exited optimizer thread.\n"
 msgstr "Đã thoát khỏi luồng trình tối ưu hóa.\n"
 
-#: src/optimize.c:307
+#: src/optimize.c:366
 msgid "optimize.c: exit because this is a child process.\n"
 msgstr "optimize.c: thoát vì đây là tiến trình con.\n"
 
-#: src/optimize.c:333
+#: src/optimize.c:402
 #, c-format
 msgid "inotify: read %zd bytes from inotify fd\n"
 msgstr "inotify: đọc %zd byte từ inotify fd\n"
 
-#: src/optimize.c:337
+#: src/optimize.c:406
 #, c-format
 msgid ""
 "inotify: SKIP all events (flags) - FREQ_LOOP_RUNNING=%d FREQ_LOOP_INIT=%d "
@@ -4351,12 +5292,12 @@ msgstr ""
 "inotify: BỎ QUA tất cả sự kiện (cờ) - FREQ_LOOP_RUNNING=%d FREQ_LOOP_INIT=%d "
 "INPUT_PENDING=%d FREQ_LOOP_DONE=%d\n"
 
-#: src/optimize.c:356
+#: src/optimize.c:424
 #, c-format
 msgid "inotify: EVENT @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
 msgstr "inotify: SỰ KIỆN @offset=%ld: mask=0x%08x cookie=%u len=%u name='%s'\n"
 
-#: src/optimize.c:360
+#: src/optimize.c:428
 #, c-format
 msgid ""
 "inotify: EVENT flags: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
@@ -4365,41 +5306,27 @@ msgstr ""
 "inotify: CỜ SỰ KIỆN: IN_CLOSE_WRITE=%d IN_MOVED_TO=%d IN_MOVED_FROM=%d "
 "IN_CREATE=%d IN_DELETE=%d IN_MODIFY=%d\n"
 
-#: src/optimize.c:368
+#: src/optimize.c:436
 #, c-format
 msgid "inotify: FILTER: target='%s' event_name='%s' match=%d\n"
 msgstr "inotify: LỌC: target='%s' event_name='%s' match=%d\n"
 
-#: src/optimize.c:375
+#: src/optimize.c:443
 msgid "inotify: SKIP event (filename mismatch)\n"
 msgstr "inotify: BỎ QUA sự kiện (tên tệp không khớp)\n"
 
-#: src/optimize.c:382
+#: src/optimize.c:450
 msgid "inotify: IN_MODIFY on target, setting modify_seen=TRUE\n"
 msgstr "inotify: IN_MODIFY trên mục tiêu, đặt modify_seen=TRUE\n"
 
-#: src/optimize.c:390
+#: src/optimize.c:458
 msgid ""
 "inotify: IN_MOVED_TO on target (atomic write complete), triggering reload\n"
 msgstr ""
 "inotify: IN_MOVED_TO trên mục tiêu (ghi atomic hoàn thành), kích hoạt tải "
 "lại\n"
 
-#: src/optimize.c:401 src/optimize.c:434
-#, c-format
-msgid ""
-"inotify: file stat failed or zero bytes (ret=%d size=%ld errno=%s), "
-"retrying\n"
-msgstr ""
-"inotify: stat tệp thất bại hoặc không có byte (ret=%d size=%ld errno=%s), "
-"thử lại\n"
-
-#: src/optimize.c:407 src/optimize.c:440
-#, c-format
-msgid "inotify: file stat OK - size=%ld bytes\n"
-msgstr "inotify: stat tệp OK - kích thước=%ld byte\n"
-
-#: src/optimize.c:423
+#: src/optimize.c:475
 msgid ""
 "inotify: IN_CLOSE_WRITE after modify_seen=TRUE (direct write complete), "
 "triggering reload\n"
@@ -4407,19 +5334,27 @@ msgstr ""
 "inotify: IN_CLOSE_WRITE sau modify_seen=TRUE (ghi trực tiếp hoàn thành), "
 "kích hoạt tải lại\n"
 
-#: src/optimize.c:451
+#: src/optimize.c:487
 msgid ""
 "inotify: IN_CLOSE_WRITE without modify_seen (spurious close, old inode), "
 "skipping\n"
 msgstr ""
 "inotify: IN_CLOSE_WRITE không có modify_seen (đóng giả, inode cũ), bỏ qua\n"
 
-#: src/optimize.c:458
+#: src/optimize.c:494
 #, c-format
 msgid "inotify: SKIP event (not MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x%08x)\n"
 msgstr ""
 "inotify: BỎ QUA sự kiện (không phải MODIFY/CLOSE_WRITE/MOVED_TO, mask=0x"
 "%08x)\n"
+
+#: src/optimize.c:527
+msgid "failed to create optimizer wake eventfd\n"
+msgstr "không thể tạo eventfd đánh thức trình tối ưu hóa\n"
+
+#: src/optimize.c:538
+msgid "failed to create Optimizer Output thread\n"
+msgstr "Không thể tạo luồng đầu ra trình tối ưu hóa\n"
 
 #: src/optimizers/opt_fitness.c:345
 #, c-format
@@ -4436,12 +5371,12 @@ msgstr "fitness_transform: hướng không xác định %d\n"
 msgid "reduce_values: unknown reduction method %d\n"
 msgstr "reduce_values: phương pháp rút gọn không xác định %d\n"
 
-#: src/optimizers/opt_nec2_eval.c:81
+#: src/optimizers/opt_nec2_eval.c:80
 #, c-format
 msgid "nec2_eval_signal: eval_mutex contention, blocking (thr=%lu)\n"
 msgstr "nec2_eval_signal: tranh chấp eval_mutex, đang chặn (thr=%lu)\n"
 
-#: src/optimizers/opt_nec2_eval.c:195
+#: src/optimizers/opt_nec2_eval.c:194
 msgid "nec2_eval_run: not initialized\n"
 msgstr "nec2_eval_run: chưa khởi tạo\n"
 
@@ -4459,15 +5394,19 @@ msgstr ""
 msgid "opt: optimization complete, best fitness: %.6g\n"
 msgstr "opt: tối ưu hóa hoàn thành, độ thích nghi tốt nhất: %.6g\n"
 
-#: src/optimizers/opt_session.c:158
+#: src/optimizers/opt_session.c:194
 msgid "opt_start: optimizer already running\n"
 msgstr "opt_start: trình tối ưu hóa đang chạy rồi\n"
 
-#: src/optimizers/opt_session.c:224
+#: src/optimizers/opt_session.c:202
+msgid "opt_start: on_complete notifier is NULL\n"
+msgstr "opt_start: notifier on_complete là NULL\n"
+
+#: src/optimizers/opt_session.c:258
 msgid "opt_start: simple_new failed\n"
 msgstr "opt_start: simple_new thất bại\n"
 
-#: src/optimizers/opt_session.c:233
+#: src/optimizers/opt_session.c:267
 #, c-format
 msgid "opt_start: pthread_create failed: %d\n"
 msgstr "opt_start: pthread_create thất bại: %d\n"
@@ -4547,224 +5486,34 @@ msgstr "var '%s' kích thước round_result không khớp\n"
 msgid "var '%s' round_result has element <= 0\n"
 msgstr "var '%s' round_result có phần tử <= 0\n"
 
-#: src/opt_ui_session.c:76
+#: src/opt_ui_session.c:99
 #, c-format
 msgid "opt_ui: optimization finished, best fitness: %.6g\n"
 msgstr "opt_ui: tối ưu hóa hoàn thành, độ thích nghi tốt nhất: %.6g\n"
 
-#: src/opt_ui_session.c:112 src/opt_ui_session.c:145 src/opt_ui_session.c:175
-#: src/opt_ui_session.c:277
+#: src/opt_ui_session.c:133 src/opt_ui_session.c:166 src/opt_ui_session.c:196
+#: src/opt_ui_session.c:299
 msgid "Optimization"
 msgstr "Tối ưu hóa"
 
-#: src/freqplots/freqplots_core.c:55
-msgid "Gain Direction"
-msgstr "Hướng độ lợi"
-
-#: src/freqplots/freqplots_core.c:56
-msgid "Viewer Gain"
-msgstr "Độ lợi người xem"
-
-#: src/freqplots/freqplots_core.c:58
-msgid "Impedance (real/imag)"
-msgstr "Trở kháng (thực/ảo)"
-
-#: src/freqplots/freqplots_core.c:59
-msgid "Impedance (mag/phase)"
-msgstr "Trở kháng (độ lớn/pha)"
-
-#: src/freqplots/freqplots_core.c:60 src/freqplots/graphs/smith_graph.c:476
-msgid "Smith Chart"
-msgstr "Biểu đồ Smith"
-
-#: src/freqplots/freqplots_core.c:190
-#, c-format
-msgid "fp_field_cond_active: unhandled cond %d\n"
-msgstr "fp_field_cond_active: cond %d không được xử lý\n"
-
-#: src/freqplots/freqplots_core.c:206
-msgid "fp_readout_field_count: field set exceeds FP_READOUT_MAX\n"
-msgstr "fp_readout_field_count: tập trường vượt quá FP_READOUT_MAX\n"
-
-#: src/freqplots/freqplots_core.c:393
-#, c-format
-msgid ""
-"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
-"%d posn=%d valid=%d\n"
-msgstr ""
-"fr_plot_sync_widths, current == NULL: calc_data.FR_cards=%d v->ngraph=%d fr="
-"%d posn=%d valid=%d\n"
-
-#: src/freqplots/freqplots_core.c:409
-#, c-format
-msgid ""
-"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
-"%d]\n"
-msgstr ""
-"fr_plot[posn=%d fr=%d] rect[x=%d y=%d, w=%d h=%d] freq[min=%4.2f max=%4.2f n="
-"%d]\n"
-
-#: src/freqplots/freqplots_graph.c:137 src/freqplots/graphs/smith_graph.c:529
-msgid "memory allocation for points failed\n"
-msgstr "cấp phát bộ nhớ cho điểm thất bại\n"
-
-#: src/freqplots/freqplots_graph.c:138 src/freqplots/graphs/smith_graph.c:530
-msgid "Draw_Graph():Memory allocation for points failed"
-msgstr "Draw_Graph():Cấp phát bộ nhớ cho điểm thất bại"
-
-#: src/freqplots/graphs/smith_graph.c:384
-msgid "0 Ω"
-msgstr "0 Ω"
-
-#: src/freqplots/graphs/smith_graph.c:387
-#: src/freqplots/graphs/smith_graph.c:462
-msgid "∞ Ω"
-msgstr "∞ Ω"
-
-#: src/freqplots/graphs/smith_graph.c:407
-msgid "constant R"
-msgstr "R không đổi"
-
-#: src/freqplots/graphs/smith_graph.c:408
-msgid "constant X"
-msgstr "X không đổi"
-
-#: src/freqplots/graphs/smith_graph.c:409
-msgid "unity R, X"
-msgstr "R, X đơn vị"
-
-#: src/freqplots/graphs/smith_graph.c:410
-msgid "match (z = 1)"
-msgstr "phối hợp (z = 1)"
-
-#: src/freqplots/graphs/smith_graph.c:411
-msgid "impedance vs freq"
-msgstr "trở kháng theo tần số"
-
-#: src/freqplots/graphs/smith_graph.c:412
-msgid "selected frequency"
-msgstr "tần số đã chọn"
-
-#: src/freqplots/graphs/smith_graph.c:413
-msgid "reflection angle (°)"
-msgstr "góc phản xạ (°)"
-
-#: src/freqplots/graphs/smith_graph.c:414
-msgid "wavelengths → gen"
-msgstr "bước sóng → gen"
-
-#: src/freqplots/graphs/smith_graph.c:507
-#, c-format
-msgid "Z0 = %g Ω"
-msgstr "Z0 = %g Ω"
-
-#: src/freqplots/graphs/smith_graph.c:514
-msgid "INDUCTIVE (+jX)"
-msgstr "CẢM KHÁNG (+jX)"
-
-#: src/freqplots/graphs/smith_graph.c:517
-msgid "CAPACITIVE (-jX)"
-msgstr "DUNG KHÁNG (-jX)"
-
-#: src/freqplots/graphs/gain_graph.c:66 src/freqplots/graphs/viewer_graph.c:39
-msgid "Raw Gain dBi"
-msgstr "Độ lợi thô dBi"
-
-#: src/freqplots/graphs/gain_graph.c:71
-msgid "Max Gain & Net Gain vs Frequency"
-msgstr "Độ lợi cực đại & Độ lợi ròng theo Tần số"
-
-#: src/freqplots/graphs/gain_graph.c:72
-msgid "Net Gain dBi"
-msgstr "Độ lợi ròng dBi"
-
-#: src/freqplots/graphs/gain_graph.c:77 src/freqplots/graphs/gain_graph.c:84
-msgid "Max Gain & F/B Ratio vs Frequency"
-msgstr "Độ lợi cực đại & Tỷ số F/B theo Tần số"
-
-#: src/freqplots/graphs/gain_graph.c:85
-msgid "F/B Ratio dB"
-msgstr "Tỷ số F/B dB"
-
-#: src/freqplots/graphs/gain_graph.c:91
-msgid "Rad Angle - deg"
-msgstr "Góc bức xạ - deg"
-
-#: src/freqplots/graphs/gain_graph.c:92
-msgid "Max Gain Direction vs Frequency"
-msgstr "Hướng độ lợi cực đại theo Tần số"
-
-#: src/freqplots/graphs/gain_graph.c:93
-msgid "Phi - deg"
-msgstr "Phi - deg"
-
-#: src/freqplots/graphs/viewer_graph.c:40
-msgid "Gain in Viewer Direction vs Frequency"
-msgstr "Độ lợi theo hướng quan sát theo Tần số"
-
-#: src/freqplots/graphs/viewer_graph.c:56
-msgid "Net gain dBi"
-msgstr "Độ lợi ròng dBi"
-
-#: src/freqplots/graphs/vswr_graph.c:43
-msgid "VSWR & S11 vs Frequency"
-msgstr "VSWR & S11 theo Tần số"
-
-#: src/freqplots/graphs/vswr_graph.c:44
-msgid "S11 dB"
-msgstr "S11 dB"
-
-#: src/freqplots/graphs/vswr_graph.c:48
-msgid "VSWR vs Frequency"
-msgstr "VSWR theo Tần số"
-
-#: src/freqplots/graphs/impedance_graph.c:57
-#: src/freqplots/graphs/impedance_graph.c:62
-msgid "Impedance vs Frequency"
-msgstr "Trở kháng theo Tần số"
-
-#: src/freqplots/graphs/impedance_graph.c:61
-msgid "Z-magn"
-msgstr "Z-biên độ"
-
-#: src/freqplots/graphs/impedance_graph.c:63
-msgid "Z-phase"
-msgstr "Z-pha"
-
-#: src/freqplots/graphs/anttemp_graph.c:54
-msgid "G/Ta (dB)"
-msgstr "G/Ta (dB)"
-
-#: src/freqplots/graphs/anttemp_graph.c:55
-msgid "G/Ta & TA - Antenna noise temperature"
-msgstr "G/Ta & TA - Nhiệt độ tạp âm ăng-ten"
-
-#: src/freqplots/graphs/anttemp_graph.c:57
-msgid "Ta (K)"
-msgstr "Ta (K)"
-
-#: src/freqplots/graphs/anttemp_graph.c:59
-msgid "TA (K)"
-msgstr "TA (K)"
-
-#: src/prerender/prerender_color.c:107
+#: src/prerender/prerender_color.c:109
 #, c-format
 msgid "segment_type_to_rgb: unknown type %d\n"
 msgstr "segment_type_to_rgb: loại không xác định %d\n"
 
-#: src/prerender/prerender_color.c:134
+#: src/prerender/prerender_color.c:136
 #, c-format
 msgid "segment_type_to_width: unknown type %d\n"
 msgstr "segment_type_to_width: loại không xác định %d\n"
 
-#: src/radiation.c:838
+#: src/radiation.c:879
 #, c-format
 msgid "Average gain %.4f exceeds expected %.4f; check RP theta/phi ranges\n"
 msgstr ""
 "Độ lợi trung bình %.4f vượt quá giá trị kỳ vọng %.4f; kiểm tra phạm vi theta/"
 "phi của RP\n"
 
-#: src/radiation.c:842
+#: src/radiation.c:883
 #, c-format
 msgid ""
 "Average gain: %.4f (%.2f dBi), efficiency: %.1f%%, solid angle: %.4f * pi "
@@ -4773,66 +5522,52 @@ msgstr ""
 "Độ lợi trung bình: %.4f (%.2f dBi), hiệu suất: %.1f%%, góc khối: %.4f * pi "
 "sr\n"
 
-#: src/rc_config.c:376
+#: src/rc_config.c:837
 #, c-format
 msgid "unable to getcwd(): %s\n"
 msgstr "không thể gọi getcwd(): %s\n"
 
-#: src/rc_config.c:380
+#: src/rc_config.c:841
 #, c-format
 msgid "environment variable HOME is undefined, using %s\n"
 msgstr "biến môi trường HOME không được xác định, sử dụng %s\n"
 
-#: src/rc_config.c:465
+#: src/rc_config.c:926
 #, c-format
 msgid ""
 "%s (locale=%s): only matchd %d of %lu chars, trying another locale: %s\n"
 msgstr "%s (locale=%s): chỉ khớp %d trong %lu ký tự, thử locale khác: %s\n"
 
-#: src/rc_config.c:526
-#, c-format
-msgid ""
-"rc_config: %s: builder_check_menu_item_id is NULL but builder_window is "
-"defined.\n"
-msgstr ""
-"rc_config: %s: builder_check_menu_item_id là NULL nhưng builder_window đã "
-"được xác định.\n"
+#: src/rc_config.c:1006
+msgid "rc_config_default_int: no integer default for field\n"
+msgstr "rc_config_default_int: trường không có giá trị mặc định số nguyên\n"
 
-#: src/rc_config.c:529
+#: src/rc_config.c:1099
 #, c-format
-msgid ""
-"rc_config: %s: builder_window is NULL but builder_check_menu_item_id is "
-"defined.\n"
-msgstr ""
-"rc_config: %s: builder_window là NULL nhưng builder_check_menu_item_id đã "
-"được xác định.\n"
+msgid "rc_config_field_size: %s: unsupported format %s\n"
+msgstr "rc_config_field_size: %s: định dạng không được hỗ trợ %s\n"
 
-#: src/rc_config.c:542
-#, c-format
-msgid "match: %s\n"
-msgstr "khớp: %s\n"
-
-#: src/rc_config.c:567
+#: src/rc_config.c:1145
 #, c-format
 msgid "window: x=%-5d y=%-5d w=%-5d h=%-5d  title: \"%s\"\n"
 msgstr "cửa sổ: x=%-5d y=%-5d w=%-5d h=%-5d  tiêu đề: \"%s\"\n"
 
-#: src/rc_config.c:615
+#: src/rc_config.c:1179
 #, c-format
 msgid "%s: EOF reading application version.\n"
 msgstr "%s: EOF khi đọc phiên bản ứng dụng.\n"
 
-#: src/rc_config.c:621
+#: src/rc_config.c:1185
 #, c-format
 msgid "existing config file version differs: %s != %s\n"
 msgstr "phiên bản tệp cấu hình hiện tại khác nhau: %s != %s\n"
 
-#: src/rc_config.c:920
+#: src/rc_config.c:1324
 #, c-format
 msgid "stat failed for %s: %s\n"
 msgstr "stat thất bại cho %s: %s\n"
 
-#: src/rc_config.c:926
+#: src/rc_config.c:1330
 #, c-format
 msgid ""
 "Fixed %s directory permissions from 0%o to 0%o from bug introduced in "
@@ -4841,40 +5576,44 @@ msgstr ""
 "Đã sửa quyền thư mục %s từ 0%o thành 0%o do lỗi được đưa vào trong "
 "4e62893b.\n"
 
-#: src/rc_config.c:957
+#: src/rc_config.c:1361
 #, c-format
 msgid "%s:%d: Line not parsed: %s\n"
 msgstr "%s:%d: Dòng không được phân tích: %s\n"
 
-#: src/rc_config.c:963
+#: src/rc_config.c:1367
 #, c-format
 msgid "%s:%d: Early end of file for %s: %s \n"
 msgstr "%s:%d: Kết thúc tệp sớm cho %s: %s \n"
 
-#: src/rc_config.c:988
+#: src/rc_config.c:1392
 #, c-format
 msgid "%s:%d: parse error (%s): %s \n"
 msgstr "%s:%d: lỗi phân tích (%s): %s \n"
 
-#: src/rc_config.c:1011
+#: src/rc_config.c:1406
 #, c-format
 msgid "Invalid sky model index %d in config, resetting to default\n"
 msgstr ""
 "Chỉ số mô hình bầu trời không hợp lệ %d trong cấu hình, đặt lại về mặc định\n"
 
-#: src/rc_config.c:1017
+#: src/rc_config.c:1412
 #, c-format
 msgid "Invalid earth model index %d in config, resetting to default\n"
 msgstr ""
 "Chỉ số mô hình mặt đất không hợp lệ %d trong cấu hình, đặt lại về mặc định\n"
 
-#: src/rc_config.c:1023
+#: src/rc_config.c:1418
 #, c-format
 msgid "Invalid interp method %d in config, resetting to default\n"
 msgstr ""
 "Phương pháp nội suy không hợp lệ %d trong cấu hình, đặt lại về mặc định\n"
 
-#: src/rc_config.c:1341
+#: src/rc_config.c:1593
+msgid "batch mode: skipping configuration save\n"
+msgstr "chế độ batch: bỏ qua lưu cấu hình\n"
+
+#: src/rc_config.c:1600
 #, c-format
 msgid "cannot open xnec2c's config file %s: %s\n"
 msgstr "không thể mở tệp cấu hình của xnec2c %s: %s\n"
@@ -4902,7 +5641,7 @@ msgstr ""
 "Scale_Gain_Resolved: gain_style %d nằm ngoài phạm vi [0..%d], mặc định "
 "GS_LINP\n"
 
-#: src/rdpattern_ui.c:561 src/rdpattern_ui.c:567
+#: src/rdpattern_ui.c:484 src/rdpattern_ui.c:490
 msgid ""
 "Observation elevation angle. Shifts sky/earth boundary for antenna "
 "temperature evaluation. 0° = horizon."
@@ -4910,7 +5649,7 @@ msgstr ""
 "Góc ngẩng quan sát. Dịch chuyển ranh giới trời/đất để đánh giá nhiệt độ ăng-"
 "ten. 0° = đường chân trời."
 
-#: src/rdpattern_ui.c:564 src/rdpattern_ui.c:570
+#: src/rdpattern_ui.c:487 src/rdpattern_ui.c:493
 msgid ""
 "Observation elevation for antenna temperature.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -4918,14 +5657,14 @@ msgstr ""
 "Góc ngẩng quan sát cho nhiệt độ ăng-ten.\n"
 "Chọn Kiểu Độ lợi → Nhiệt độ tạp âm để bật."
 
-#: src/rdpattern_ui.c:573
+#: src/rdpattern_ui.c:496
 msgid ""
 "Independent sky, earth, and interpolation selectors for noise temperature "
 "models."
 msgstr ""
 "Bộ chọn bầu trời, mặt đất và nội suy độc lập cho các mô hình nhiệt độ tạp âm."
 
-#: src/rdpattern_ui.c:575
+#: src/rdpattern_ui.c:498
 msgid ""
 "Sky and earth noise temperature models.\n"
 "Select Gain Style → Noise Temperature to enable."
@@ -4933,135 +5672,123 @@ msgstr ""
 "Mô hình nhiệt độ tạp âm bầu trời và mặt đất.\n"
 "Chọn Kiểu Độ lợi → Nhiệt độ tạp âm để bật."
 
-#: src/rdpattern_ui.c:976
+#: src/rdpattern_ui.c:796
 msgid "Total Gain"
 msgstr "Độ lợi tổng"
 
-#: src/rdpattern_ui.c:977
+#: src/rdpattern_ui.c:797
 msgid "Horizontal Polarization"
 msgstr "Phân cực ngang"
 
-#: src/rdpattern_ui.c:978
+#: src/rdpattern_ui.c:798
 msgid "Vertical Polarization"
 msgstr "Phân cực đứng"
 
-#: src/rdpattern_ui.c:979
+#: src/rdpattern_ui.c:799
 msgid "RH Circular Polarization"
 msgstr "Phân cực tròn phải"
 
-#: src/rdpattern_ui.c:980
+#: src/rdpattern_ui.c:800
 msgid "LH Circular Polarization"
 msgstr "Phân cực tròn trái"
 
-#: src/rdpattern_ui.c:985
+#: src/rdpattern_ui.c:805
 msgid "Linear Power"
 msgstr "Công suất tuyến tính"
 
-#: src/rdpattern_ui.c:986
+#: src/rdpattern_ui.c:806
 msgid "Linear Voltage"
 msgstr "Điện áp tuyến tính"
 
-#: src/rdpattern_ui.c:987
+#: src/rdpattern_ui.c:807
 msgid "ARRL Scale"
 msgstr "Thang ARRL"
 
-#: src/rdpattern_ui.c:988
+#: src/rdpattern_ui.c:808
 msgid "Logarithmic Scale"
 msgstr "Thang logarit"
 
-#: src/rdpattern_ui.c:989
+#: src/rdpattern_ui.c:809
 msgid "Noise Temperature"
 msgstr "Nhiệt độ tạp âm"
 
-#: src/rdpattern_ui.c:990
+#: src/rdpattern_ui.c:810
 msgid "Noise Temp (log scale)"
 msgstr "Nhiệt độ tạp âm (thang logarit)"
 
-#: src/rdpattern_ui.c:1002
+#: src/rdpattern_ui.c:822
 msgid "Radiation Pattern: - "
-msgstr "Đồ thị bức xạ: - "
+msgstr "Giản đồ bức xạ: - "
 
-#: src/rdpattern_ui.c:1022
+#: src/rdpattern_ui.c:842
 msgid "Near Fields:"
 msgstr "Trường gần:"
 
-#: src/rdpattern_ui.c:1024
+#: src/rdpattern_ui.c:844
 msgid " - E Field"
 msgstr " - Trường E"
 
-#: src/rdpattern_ui.c:1026
+#: src/rdpattern_ui.c:846
 msgid " - H Field"
 msgstr " - Trường H"
 
-#: src/rdpattern_ui.c:1028
+#: src/rdpattern_ui.c:848
 msgid " - Poynting Vector"
 msgstr " - Vectơ Poynting"
 
-#: src/rdpattern_ui.c:1038
+#: src/rdpattern_ui.c:858
 msgid "Frequency Data Plots - "
 msgstr "Đồ thị dữ liệu tần số - "
 
-#: src/render/gradient_cache.c:77
+#: src/render/gradient_cache.c:78
 #, c-format
 msgid "fstep=%d is out of bounds. calc_data.steps_total=%d"
 msgstr "fstep=%d nằm ngoài phạm vi. calc_data.steps_total=%d"
 
-#: src/render/gradient_cache.c:311
+#: src/render/gradient_cache.c:312
 #, c-format
 msgid "gradient_cache_update: surface creation failed (%dx%d)\n"
 msgstr "gradient_cache_update: tạo bề mặt thất bại (%dx%d)\n"
 
-#: src/render/render_dispatch.c:413
+#: src/render/render_dispatch.c:447
 #, c-format
 msgid "render: unhandled mode %d\n"
 msgstr "render: chế độ không xử lý được %d\n"
 
-#: src/settings/render_settings_common.c:124
+#: src/settings/render_settings_common.c:86
+msgid "config_reset_tab_user: field has no rc_config_vars row\n"
+msgstr "config_reset_tab_user: trường không có hàng rc_config_vars\n"
+
+#: src/settings/render_settings_common.c:116
 #, c-format
 msgid "render_settings_init: failed to load glade: %s\n"
 msgstr "render_settings_init: tải glade thất bại: %s\n"
 
-#: src/settings/render_settings_common.c:134
+#: src/settings/render_settings_common.c:126
 #, c-format
 msgid "render_settings_init: failed to load opengl glade: %s\n"
 msgstr "render_settings_init: tải opengl glade thất bại: %s\n"
 
-#: src/settings/render_settings_common.c:144
+#: src/settings/render_settings_common.c:136
 #, c-format
 msgid "render_settings_init: failed to load cairo glade: %s\n"
 msgstr "render_settings_init: tải cairo glade thất bại: %s\n"
 
-#: src/settings/render_settings_common.c:157
+#: src/settings/render_settings_common.c:149
 msgid "render_settings_init: failed to get render_settings_window from glade\n"
 msgstr "render_settings_init: lấy render_settings_window từ glade thất bại\n"
 
-#: src/settings/render_settings_dispatch.c:104
-#, c-format
-msgid "config_apply_entry: missing widget '%s'\n"
-msgstr "config_apply_entry: thiếu widget '%s'\n"
-
-#: src/settings/render_settings_dispatch.c:136
-#, c-format
-msgid "config_apply_entry: unknown widget type for '%s'\n"
-msgstr "config_apply_entry: loại widget không xác định cho '%s'\n"
-
-#: src/settings/render_settings_dispatch.c:164
-#, c-format
-msgid "config_sync_entry: missing widget '%s'\n"
-msgstr "config_sync_entry: thiếu widget '%s'\n"
-
-#: src/settings/render_settings_dispatch.c:193
-#, c-format
-msgid "config_sync_entry: unknown widget type for '%s'\n"
-msgstr "config_sync_entry: loại widget không xác định cho '%s'\n"
-
-#: src/somnec.c:237
+#: src/somnec.c:302
 msgid "Hankel not valid for z = 0"
 msgstr "Hankel không hợp lệ cho Z = 0"
 
-#: src/somnec.c:748
+#: src/somnec.c:807
 msgid "No convergence"
 msgstr "Không hội tụ"
+
+#: src/structure_ui.c:109
+msgid "unreachable palette kind sentinel\n"
+msgstr "giá trị canh giữ loại bảng màu không thể xảy ra\n"
 
 #: src/sy_expr.c:137
 msgid "(further errors suppressed)\n"
@@ -5159,6 +5886,41 @@ msgstr ""
 "Kiểm soát liệu tham số này có ghi đè giá trị mô hình NEC không.\n"
 "Bỏ chọn Opt để kiểm soát độc lập."
 
+#: src/themes/theme.c:136
+#, c-format
+msgid "theme '%s' role '%s' invalid color, using legacy default\n"
+msgstr "chủ đề '%s' vai trò '%s' màu không hợp lệ, dùng mặc định cũ\n"
+
+#: src/themes/theme.c:219
+#, c-format
+msgid "theme: cannot load resource %s: %s\n"
+msgstr "theme: không thể tải tài nguyên %s: %s\n"
+
+#: src/themes/theme.c:229
+#, c-format
+msgid "theme: cannot parse resource %s: %s\n"
+msgstr "theme: không thể phân tích tài nguyên %s: %s\n"
+
+#: src/themes/theme.c:255
+#, c-format
+msgid "theme: cannot parse %s, using built-in defaults\n"
+msgstr "theme: không thể phân tích %s, dùng mặc định tích hợp\n"
+
+#: src/themes/theme.c:384
+#, c-format
+msgid "theme '%s' has no inverted variant, using base\n"
+msgstr "chủ đề '%s' không có biến thể đảo ngược, dùng bản gốc\n"
+
+#: src/themes/theme.c:392
+#, c-format
+msgid "theme '%s' not found, using legacy\n"
+msgstr "không tìm thấy chủ đề '%s', dùng bản cũ\n"
+
+#: src/themes/theme.c:464
+#, c-format
+msgid "width '%s' invalid, keeping current value\n"
+msgstr "chiều rộng '%s' không hợp lệ, giữ giá trị hiện tại\n"
+
 #: src/utils.c:42
 #, c-format
 msgid ""
@@ -5197,6 +5959,7 @@ msgid ""
 "  --write-currents        <filename>  - write CSV of currents and charges\n"
 "  --write-gnuplot-structure <filename> - write gnuplot structure file\n"
 "  --write-patch-currents  <filename>  - write CSV of patch surface currents\n"
+"  --write-validation-dir <directory> - write full validation data tree\n"
 msgstr ""
 "Cách dùng: xnec2c [tùy chọn] [<tên-tệp-đầu-vào>]\n"
 "  -i|--input         <tên-tệp-đầu-vào>\n"
@@ -5229,12 +5992,13 @@ msgstr ""
 "  --write-s1p             <tên-tệp>  - ghi tệp S1P của S-parameters\n"
 "  --write-s2p-max-gain    <tên-tệp>  - ghi tệp S2P, cổng-2 là max-gain\n"
 "  --write-s2p-viewer-gain <tên-tệp>  - ghi tệp S2P, cổng-2 là viewer-gain\n"
-"  --write-rdpat           <tên-tệp>  - ghi CSV của đồ thị bức xạ\n"
+"  --write-rdpat           <tên-tệp>  - ghi CSV của giản đồ bức xạ\n"
 "  --write-currents        <tên-tệp>  - ghi CSV của dòng điện và điện tích\n"
 "  --write-gnuplot-structure <tên-tệp> - ghi tệp cấu trúc gnuplot\n"
 "  --write-patch-currents  <tên-tệp>  - ghi CSV của dòng điện bề mặt mảnh\n"
+"  --write-validation-dir <thư-mục> - ghi toàn bộ cây dữ liệu kiểm định\n"
 
-#: src/utils.c:98 src/utils.c:103
+#: src/utils.c:99 src/utils.c:104
 #, c-format
 msgid ""
 "\n"
@@ -5247,48 +6011,94 @@ msgstr ""
 "%s\n"
 "\n"
 
-#: src/utils.c:184
+#: src/utils.c:185
 #, c-format
 msgid "Stop: %s\n"
 msgstr "Dừng: %s\n"
 
-#: src/utils.c:220 src/utils.c:222
+#: src/utils.c:224 src/utils.c:226
 #, c-format
 msgid "Stop during freq loop, deadlock prevented: %s\n"
 msgstr "Dừng trong vòng lặp tần số, đã ngăn chặn deadlock: %s\n"
 
-#: src/utils.c:402
+#: src/utils.c:410
 #, c-format
 msgid "using %d OpenMP threads per job (%d/%d CPUs)\n"
 msgstr "sử dụng %d luồng OpenMP mỗi tác vụ (%d/%d CPU)\n"
 
-#: src/utils.c:418
+#: src/utils.c:426
 #, c-format
 msgid "%s[%d]: %f seconds\n"
 msgstr "%s[%d]: %f giây\n"
 
-#: src/utils.c:443
+#: src/utils.c:451
 #, c-format
 msgid "xnec2c[%d]: %s: Failed to open file: %s\n"
 msgstr "xnec2c[%d]: %s: Không thể mở tệp: %s\n"
 
-#: src/utils.c:833
+#: src/utils.c:850
 msgid "Optimizer loop incomplete, suppressing intermediate redraw.\n"
 msgstr "Vòng lặp tối ưu hóa chưa hoàn tất, bỏ qua vẽ lại trung gian.\n"
 
-#: src/utils.c:849
+#: src/utils.c:866
 msgid "  Backtrace:\n"
 msgstr "  Backtrace:\n"
 
-#: src/utils.c:851
+#: src/utils.c:868
 #, c-format
 msgid "    %d. %s\n"
 msgstr "    %d. %s\n"
 
-#: src/utils.c:878
+#: src/utils.c:895
 #, c-format
 msgid "%s:\n"
 msgstr "%s:\n"
+
+#: src/validation_dump.c:34
+msgid ""
+"validation: nec2-builtin mathlib not available; numeric results may differ "
+"from reference\n"
+msgstr ""
+"validation: thư viện toán nec2-builtin không khả dụng; kết quả số có thể "
+"khác tham chiếu\n"
+
+#: src/validation_dump.c:39
+msgid "validation: forced mathlib to nec2-builtin for reproducibility\n"
+msgstr "validation: buộc dùng thư viện toán nec2-builtin để đảm bảo tái lập\n"
+
+#: src/validation_dump.c:58
+msgid ""
+"validation: forced antenna-temp models and elevation for reproducibility\n"
+msgstr ""
+"validation: buộc mô hình nhiệt độ ăng-ten và góc ngẩng để đảm bảo tái lập\n"
+
+#: src/validation_dump.c:68
+msgid "validation: forced polarization to total for reproducibility\n"
+msgstr "validation: buộc phân cực về tổng để đảm bảo tái lập\n"
+
+#: src/validation_dump.c:79
+msgid ""
+"validation: reset structure viewer to default orientation for "
+"reproducibility\n"
+msgstr ""
+"validation: đặt lại trình xem cấu trúc về hướng mặc định để đảm bảo tái lập\n"
+
+#: src/validation_dump.c:584 src/validation_dump.c:590
+msgid "Validation Tree"
+msgstr "Cây kiểm định"
+
+#: src/validation_dump.c:584
+msgid "Cannot save: frequency loop not done"
+msgstr "Không thể lưu: vòng lặp tần số chưa hoàn tất"
+
+#: src/validation_dump.c:590
+msgid "Cannot create output directory"
+msgstr "Không thể tạo thư mục đầu ra"
+
+#: src/validation_dump.c:622
+#, c-format
+msgid "validation tree written to: %s\n"
+msgstr "cây kiểm định đã ghi vào: %s\n"
 
 #: src/xnec2c.c:281
 #, c-format
@@ -5302,44 +6112,56 @@ msgstr ""
 msgid "Ground_Parameters():Error in ground parameters"
 msgstr "Ground_Parameters():Lỗi trong thông số mặt đất"
 
-#: src/xnec2c.c:611
+#: src/xnec2c.c:704
 #, c-format
 msgid "%.6f MHz: %f seconds. (%s)\n"
 msgstr "%.6f MHz: %f giây. (%s)\n"
 
-#: src/xnec2c.c:865
+#: src/xnec2c.c:958
 #, c-format
 msgid "green_line_eval returned unknown class %d\n"
 msgstr "green_line_eval trả về lớp không xác định %d\n"
 
-#: src/xnec2c.c:946
+#: src/xnec2c.c:1039
 #, c-format
 msgid ""
 "step %d raced: dispatched %.6f MHz, current %.6f MHz; will recalculate\n"
 msgstr "bước %d bị đua: đã gửi %.6f MHz, hiện tại %.6f MHz; sẽ tính lại\n"
 
-#: src/xnec2c.c:1042
+#: src/xnec2c.c:1135
 #, c-format
 msgid "child %d has invalid pipe fd during forked collect\n"
 msgstr ""
 "tiến trình con %d có pipe fd không hợp lệ trong quá trình thu thập từ fork\n"
 
-#: src/xnec2c.c:1097
+#: src/xnec2c.c:1190
 msgid "Failed to read data from forked child\n"
 msgstr "Không thể đọc dữ liệu từ tiến trình con đã fork\n"
 
-#: src/xnec2c.c:1174
+#: src/xnec2c.c:1267
 #, c-format
 msgid ""
 "fmhz_save %.4f MHz outside FR card ranges; reset to %.4f MHz (VSWR %.2f)\n"
 msgstr ""
 "fmhz_save %.4f MHz ngoài phạm vi thẻ FR; đặt lại về %.4f MHz (VSWR %.2f)\n"
 
-#: src/xnec2c.c:1199
+#: src/xnec2c.c:1296
 #, c-format
 msgid "Frequency loop elapsed time: %f seconds. (%s)\n"
 msgstr "Thời gian vòng lặp tần số: %f giây. (%s)\n"
 
-#: src/xnec2c.c:1438
+#: src/xnec2c.c:1563
 msgid "failed to start Frequency_Loop_Thread\n"
 msgstr "không thể khởi động Frequency_Loop_Thread\n"
+
+#~ msgid "Total field:"
+#~ msgstr "Trường tổng:"
+
+#~ msgid "Choose peak-envelope or instantaneous (φ=0) near-field vectors."
+#~ msgstr "Chọn vectơ trường gần dạng đường bao đỉnh hoặc tức thời (φ=0)."
+
+#~ msgid "Peak value"
+#~ msgstr "Giá trị đỉnh"
+
+#~ msgid "Instantaneous (φ=0)"
+#~ msgstr "Tức thời (φ=0)"

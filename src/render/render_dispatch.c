@@ -31,6 +31,8 @@
 #include "render_dispatch.h"
 #include "gradient_cache.h"
 #include "../shared.h"
+#include "../chroma/chroma.h"
+#include "../chroma/chroma_nearfield.h"
 #include "../prerender/prerender_farfield.h"
 #include "../rdpattern_ui.h"
 #include "../structure_ui.h"
@@ -77,15 +79,15 @@ render_rdpattern_mode_message(void)
 /** render_check_nearfield() - Resolve near-field preconditions
  * @r: result struct with fstep already set; populated on return
  *
- * DRAW_EHFIELD is already confirmed set by caller.
+ * Near E/H field mode is already confirmed active by caller.
  */
   static void
 render_check_nearfield(render_check_result_t *r)
 {
   /* Near-field view needs at least one field component selected; with none
    * selected the draw yields nothing, so direct the user to enable one. */
-  if( isFlagClear(DRAW_EFIELD) && isFlagClear(DRAW_HFIELD) &&
-      isFlagClear(DRAW_POYNTING) )
+  if( !draw_efield_active() && !draw_hfield_active() &&
+      !draw_poynting_active() )
   {
     r->status = RENDER_NO_NF_FIELD;
     r->message = STATUS_MSG_SELECT_NF_FIELD;
@@ -121,7 +123,7 @@ render_check_nearfield(render_check_result_t *r)
 /** render_check_farfield() - Resolve far-field preconditions
  * @r: result struct with fstep already set; populated on return
  *
- * DRAW_GAIN is already confirmed set by caller.
+ * Far-field gain mode is already confirmed active by caller.
  */
   static void
 render_check_farfield(render_check_result_t *r)
@@ -153,9 +155,9 @@ render_check_farfield(render_check_result_t *r)
   static void
 render_check_rdpattern(render_check_result_t *r)
 {
-  if( isFlagSet(DRAW_EHFIELD) )
+  if(rdpat_ehfield_active())
     render_check_nearfield(r);
-  else if( isFlagSet(DRAW_GAIN) )
+  else if(rdpat_gain_active())
     render_check_farfield(r);
   else
   {
@@ -163,7 +165,7 @@ render_check_rdpattern(render_check_result_t *r)
     r->message = render_rdpattern_mode_message();
   }
 
-  r->overlay_active = isFlagSet(OVERLAY_STRUCT);
+  r->overlay_active = overlay_struct_active();
 }
 
 /*-----------------------------------------------------------------------*/
@@ -208,7 +210,7 @@ render_check(view_type_t view_type)
  * @fstep: frequency step index
  *
  * Selects wire_colors and patch_colors from precomputed struct_colors
- * based on DRAW_CURRENTS / DRAW_CHARGES flags, or falls back to
+ * per the current structure view (currents or charges), or falls back to
  * geometry-mode seg_rgb / patch_rgb.
  */
   static struct_draw_params_t
@@ -217,30 +219,47 @@ build_struct_draw_params(int fstep)
   struct_draw_params_t params;
   int fs = fstep;
 
-  if( isFlagSet(DRAW_CURRENTS) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
+  chroma_proj_t proj = color_proj_active();
+  color_tone_t fam = color_tone_active();
+
+  if(struct_view_currents() && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
   {
-    params.wire_colors  = struct_colors[fs].wire_crnt_rgb;
-    params.wire_widths  = seg_width;
-    params.patch_colors = struct_colors[fs].patch_crnt_rgb;
+    params.wire_colors  = chroma_proj_frame_wire(fs, (double)flow_phase,
+        proj, fam, CHAN_CURRENT);
+    params.wire_widths  = chroma_proj_frame_wire_widths(fs, proj, fam,
+        CHAN_CURRENT);
+    params.patch_colors = chroma_proj_frame_patch(fs, (double)flow_phase,
+        proj, fam);
+    params.wire_glyphs  = chroma_proj_frame_wire_glyphs(fs, proj, fam,
+        CHAN_CURRENT);
     params.cmax = fmax((double)struct_colors[fs].wire_crnt_cmax,
                        (double)struct_colors[fs].patch_crnt_cmax);
     params.show_flow = TRUE;
+    params.color_generation = chroma_proj_generation();
   }
-  else if( isFlagSet(DRAW_CHARGES) && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
+  else if(struct_view_charges() && CRNT_FSTEP_AVAILABLE(fs) && struct_colors )
   {
-    params.wire_colors  = struct_colors[fs].wire_chrg_rgb;
-    params.wire_widths  = seg_width;
+    /* Patches carry no charge quantity; fill stays the static geometry color */
+    params.wire_colors  = chroma_proj_frame_wire(fs, (double)flow_phase,
+        proj, fam, CHAN_CHARGE);
+    params.wire_widths  = chroma_proj_frame_wire_widths(fs, proj, fam,
+        CHAN_CHARGE);
     params.patch_colors = patch_rgb;
+    params.wire_glyphs  = chroma_proj_frame_wire_glyphs(fs, proj, fam,
+        CHAN_CHARGE);
     params.cmax = (double)struct_colors[fs].wire_chrg_cmax;
     params.show_flow = FALSE;
+    params.color_generation = chroma_proj_generation();
   }
   else
   {
     params.wire_colors  = seg_rgb;
     params.wire_widths  = seg_width;
     params.patch_colors = patch_rgb;
+    params.wire_glyphs  = NULL;
     params.cmax = 0.0;
     params.show_flow = FALSE;
+    params.color_generation = 0;
   }
 
   params.fstep = fs;
@@ -349,30 +368,45 @@ render(void *ctx, const render_ops_t *ops, view_t *view)
     case RENDER_MODE_NEARFIELD:
     {
       near_field_t *nf = &near_field_fstep[r.fstep];
-      nf_pre_t *np = &nf_pre[r.fstep];
       int npts = fpat.nrx * fpat.nry * fpat.nrz;
       nf_field_set_t fields[NF_FIELD_SETS_MAX];
       int n_fields = 0;
       double dr = geom_pre.nf_dr_norm;
 
-      if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) && np->e_vecs )
+      /* Resolve geometry and color at draw from the immutable phasor; the
+       * child ships no presentation, so the parent derives each active set. */
+      if( draw_efield_active() && (fpat.nfeh & NEAR_EFIELD) )
       {
-        fields[n_fields].vecs = np->e_vecs;
-        n_fields++;
+        nf_frame_t e = chroma_proj_frame_nearfield(r.fstep, NF_CHAN_E);
+        if( e.vecs != NULL )
+        {
+          fields[n_fields].vecs   = e.vecs;
+          fields[n_fields].colors = e.colors;
+          n_fields++;
+        }
       }
 
-      if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) && np->h_vecs )
+      if( draw_hfield_active() && (fpat.nfeh & NEAR_HFIELD) )
       {
-        fields[n_fields].vecs = np->h_vecs;
-        n_fields++;
+        nf_frame_t h = chroma_proj_frame_nearfield(r.fstep, NF_CHAN_H);
+        if( h.vecs != NULL )
+        {
+          fields[n_fields].vecs   = h.vecs;
+          fields[n_fields].colors = h.colors;
+          n_fields++;
+        }
       }
 
-      if( isFlagSet(DRAW_POYNTING) &&
-          (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) &&
-          np->pov_vecs )
+      if( draw_poynting_active() &&
+          (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD) )
       {
-        fields[n_fields].vecs = np->pov_vecs;
-        n_fields++;
+        nf_frame_t p = chroma_proj_frame_nearfield(r.fstep, NF_CHAN_POV);
+        if( p.vecs != NULL )
+        {
+          fields[n_fields].vecs   = p.vecs;
+          fields[n_fields].colors = p.colors;
+          n_fields++;
+        }
       }
 
       /* Near-field overlay: structure in meters, same space as field vectors */

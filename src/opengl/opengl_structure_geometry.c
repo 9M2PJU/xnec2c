@@ -23,6 +23,7 @@
 #include "../prerender/prerender_state.h"
 #include "../prerender/prerender_color.h"
 #include "../prerender/prerender_patch_arrow.h"
+#include "../chroma/chroma_glyph.h"
 
 #ifdef HAVE_OPENGL
 
@@ -45,6 +46,21 @@
 /* Vertices per ntyp 1 polygon-fill instance: two GL_TRIANGLES (6 vertices) */
 #define STRUCTURE_NETWORK_FILL_VERTS_PER_INSTANCE 6
 
+/* Node/antinode tick radius as a multiple of the displayed wire radius
+ * (user-scaled, clamped), so the mark clears a thick cylinder; the GL
+ * analogue of the cairo pixel rule */
+#define STRUCTURE_GLYPH_TICK_RADIUS_K 3.0f
+
+/* GL_LINES vertices budgeted per marked segment: two strokes, two vertices each */
+#define STRUCTURE_GLYPH_MAX_STROKE_VERTS 4
+
+/* Line width for the node/antinode overlay marks */
+#define STRUCTURE_GLYPH_LINE_WIDTH 2.0f
+
+/* Segment-axis length floor below which the second glyph basis vector
+ * falls back to the Y axis */
+#define STRUCTURE_GLYPH_AXIS_LEN_MIN 1e-10
+
 /* Network/transmission-line draw width in pixels */
 #define STRUCTURE_NETWORK_LINE_WIDTH 3.0f
 
@@ -65,6 +81,7 @@ static double structure_last_radius_scale = CYLINDER_RADIUS_SCALE_DEFAULT;
 static int structure_patch_batch_index = -1;
 static int structure_net_batch_index = -1;
 static int structure_net_fill_batch_index = -1;
+static int structure_glyph_batch_index = -1;
 
 
 /* Public accessor for shared geometry */
@@ -369,6 +386,108 @@ generate_segments_lines(gl_draw_batch_t *batch, const struct_draw_params_t *para
 
 /*-----------------------------------------------------------------------*/
 
+/** cyl_display_radius() - Displayed wire radius of a segment
+ * @idx:          segment index into data.segments
+ * @radius_scale: user-adjustable radius multiplier (ctrl+scroll)
+ * @min_visible:  lower clamp keeping thin wires visible
+ *
+ * Shared by the cylinder and glyph generators so overlay marks track the
+ * rendered cylinder surface exactly.
+ */
+  static double
+cyl_display_radius(int idx, double radius_scale, double min_visible)
+{
+  double radius = fabs(data.segments[idx].bi) * radius_scale;
+
+  return (radius < min_visible) ? min_visible : radius;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** generate_segments_glyphs() - Emit GL_LINES tick marks for node/antinode segments
+ * @batch:  draw batch with pre-allocated vertices buffer
+ * @params: dispatch-resolved draw parameters carrying wire_glyphs
+ * @radius_scale: user-adjustable radius multiplier (ctrl+scroll)
+ * @min_visible:  lower clamp keeping thin wires visible
+ *
+ * For each flagged segment, builds an orthonormal basis perpendicular to the
+ * segment axis and maps the shape's unit strokes into world space, scaled to
+ * STRUCTURE_GLYPH_TICK_RADIUS_K times the displayed wire radius so the mark
+ * clears a thick cylinder at any user scale.  The engine reads only
+ * glyph_shapes[] geometry and color, never the mark meaning.  Sets vertex_count.
+ */
+  static void
+generate_segments_glyphs(gl_draw_batch_t *batch, const struct_draw_params_t *params,
+    double radius_scale, double min_visible)
+{
+  int idx, vidx = 0;
+  structure_vertex_t *verts = (structure_vertex_t *)batch->vertices;
+
+  for( idx = 0; idx < data.n; idx++ )
+  {
+    const glyph_shape_t *gs;
+    double dx, dy, dz, len;
+    float nx, ny, nz;   /* first perpendicular basis vector (u) */
+    float vx, vy, vz;   /* second perpendicular basis vector (v) */
+    float mx, my, mz, ext;
+    int k;
+
+    if( params->wire_glyphs[idx] == GLYPH_NONE )
+      continue;
+
+    gs = &glyph_shapes[params->wire_glyphs[idx]];
+
+    dx = data.segments[idx].x2 - data.segments[idx].x1;
+    dy = data.segments[idx].y2 - data.segments[idx].y1;
+    dz = data.segments[idx].z2 - data.segments[idx].z1;
+    line_perp_normal(dx, dy, dz, &nx, &ny, &nz);
+
+    /* Second basis vector: unit axis cross u, perpendicular to both */
+    len = sqrt(dx * dx + dy * dy + dz * dz);
+    if( len > STRUCTURE_GLYPH_AXIS_LEN_MIN )
+    {
+      double ux = dx / len, uy = dy / len, uz = dz / len;
+      vx = (float)(uy * nz - uz * ny);
+      vy = (float)(uz * nx - ux * nz);
+      vz = (float)(ux * ny - uy * nx);
+    }
+    else
+    {
+      vx = 0.0f; vy = 1.0f; vz = 0.0f;
+    }
+
+    mx = 0.5f * (float)(data.segments[idx].x1 + data.segments[idx].x2);
+    my = 0.5f * (float)(data.segments[idx].y1 + data.segments[idx].y2);
+    mz = 0.5f * (float)(data.segments[idx].z1 + data.segments[idx].z2);
+    ext = STRUCTURE_GLYPH_TICK_RADIUS_K
+        * (float)cyl_display_radius(idx, radius_scale, min_visible);
+
+    for( k = 0; k < gs->n_strokes; k++ )
+    {
+      const glyph_stroke_t *st = &gs->strokes[k];
+
+      verts[vidx++] = (structure_vertex_t){
+          .point  = { mx + (st->ax * nx + st->ay * vx) * ext,
+                      my + (st->ax * ny + st->ay * vy) * ext,
+                      mz + (st->ax * nz + st->ay * vz) * ext },
+          .normal = { nx, ny, nz },
+          .color  = { gs->color.r, gs->color.g, gs->color.b, 1.0f },
+      };
+      verts[vidx++] = (structure_vertex_t){
+          .point  = { mx + (st->bx * nx + st->by * vx) * ext,
+                      my + (st->bx * ny + st->by * vy) * ext,
+                      mz + (st->bx * nz + st->by * vz) * ext },
+          .normal = { nx, ny, nz },
+          .color  = { gs->color.r, gs->color.g, gs->color.b, 1.0f },
+      };
+    }
+  }
+
+  batch->vertex_count = vidx;
+}
+
+/*-----------------------------------------------------------------------*/
+
 /** generate_patches_wireframe() - Emit GL_LINES vertices for patch outlines and arrows
  * @batch:  draw batch with pre-allocated vertices buffer
  * @params: dispatch-resolved draw parameters (precomputed colors)
@@ -510,21 +629,17 @@ generate_patches_wireframe(gl_draw_batch_t *batch, const struct_draw_params_t *p
  * @batch:                draw batch with pre-allocated vertices buffer
  * @params:               dispatch-resolved draw parameters (precomputed colors)
  * @cylinder_radius_scale: user-adjustable radius multiplier
- * @r_max:                maximum model extent for minimum-visible scaling
+ * @min_visible:           lower clamp keeping thin wires visible
  *
  * Populates batch with cylinder vertices per segment. Sets vertex_count.
  */
   static void
 generate_segments_cylinders(gl_draw_batch_t *batch, const struct_draw_params_t *params,
-    double cylinder_radius_scale, double r_max)
+    double cylinder_radius_scale, double min_visible)
 {
   int idx, vidx = 0;
   float r, g, b;
   structure_vertex_t *verts = (structure_vertex_t *)batch->vertices;
-
-  /* Scale minimum proportionally so ctrl+scroll affects zero-radius wires too */
-  double scale_factor = cylinder_radius_scale / CYLINDER_RADIUS_SCALE_DEFAULT;
-  double min_visible = CYLINDER_MIN_VISIBLE_FRACTION * r_max * scale_factor;
 
   /* Temp buffer for one cylinder's vertices (segments x 12) */
   int cyl_vcount = opengl_cylinder_vertex_count(STRUCTURE_CYLINDER_SEGMENTS);
@@ -543,13 +658,7 @@ generate_segments_cylinders(gl_draw_batch_t *batch, const struct_draw_params_t *
     g = params->wire_colors[idx].g;
     b = params->wire_colors[idx].b;
 
-    /* Scale radius with fabs for safety, clamp to minimum visible */
-    radius = fabs(data.segments[idx].bi) * cylinder_radius_scale;
-
-    if( radius < min_visible )
-    {
-      radius = min_visible;
-    }
+    radius = cyl_display_radius(idx, cylinder_radius_scale, min_visible);
 
     {
       point_f_3d_t seg_p1 = {(float) data.segments[idx].x1,
@@ -691,10 +800,12 @@ opengl_structure_generate_geometry(
   int seg_verts, patch_verts;
   int bc = 0;
   gboolean seg_line_mode, patch_wireframe;
+  double min_visible;
 
   structure_patch_batch_index = -1;
   structure_net_batch_index = -1;
   structure_net_fill_batch_index = -1;
+  structure_glyph_batch_index = -1;
 
   if( data.n <= 0 && data.m <= 0 )
   {
@@ -704,6 +815,10 @@ opengl_structure_generate_geometry(
 
   seg_line_mode = (cylinder_radius_scale < CYLINDER_SCALE_LINE_THRESHOLD);
   patch_wireframe = (rc_config.current_flow_visualization_mode == FLOW_DIR_WIREFRAME);
+
+  /* Scale minimum proportionally so ctrl+scroll affects zero-radius wires too */
+  min_visible = CYLINDER_MIN_VISIBLE_FRACTION * geom_pre.scene_radius
+    * (cylinder_radius_scale / CYLINDER_RADIUS_SCALE_DEFAULT);
 
   /* Per-batch vertex budgets */
   seg_verts = seg_line_mode
@@ -721,7 +836,7 @@ opengl_structure_generate_geometry(
     generate_segments_lines(&batches[bc], params);
   else
     generate_segments_cylinders(&batches[bc], params,
-        cylinder_radius_scale, geom_pre.scene_radius);
+        cylinder_radius_scale, min_visible);
 
   batches[bc].draw_mode = seg_line_mode ? GL_LINES : GL_TRIANGLES;
   batches[bc].polygon_offset = FALSE;
@@ -776,6 +891,23 @@ opengl_structure_generate_geometry(
     bc++;
   }
 
+  /* Node/antinode overlay batch when the projection marks wire segments */
+  if( params->wire_glyphs != NULL )
+  {
+    structure_glyph_batch_index = bc;
+    mem_realloc(&batches[bc].vertices,
+                (size_t)(data.n * STRUCTURE_GLYPH_MAX_STROKE_VERTS)
+                * sizeof(structure_vertex_t));
+
+    generate_segments_glyphs(&batches[bc], params,
+        cylinder_radius_scale, min_visible);
+
+    batches[bc].draw_mode = GL_LINES;
+    batches[bc].polygon_offset = FALSE;
+    batches[bc].line_width = STRUCTURE_GLYPH_LINE_WIDTH;
+    bc++;
+  }
+
   batch_count = bc;
 
   structure_last_radius_scale = cylinder_radius_scale;
@@ -800,6 +932,10 @@ opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *
    * to detect data changes in the extra slot. */
   static double last_freq_mhz = -1.0;
 
+  /* Baked projection colors reuse one scratch buffer, so pointer identity
+   * alone misses rebakes; the generation counter signals new content. */
+  static uint32_t last_color_generation = 0;
+
   double cylinder_radius_scale;
 
   cylinder_radius_scale = opengl_structure_get_radius_scale();
@@ -810,12 +946,14 @@ opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *
 
   /* Regenerate on color pointer change (mode/fstep change), empty buffer, new data, or scale change */
   if( params->wire_colors != last_wire_colors ||
+      params->color_generation != last_color_generation ||
       batch_count == 0 ||
       cylinder_radius_scale != structure_last_radius_scale ||
       (params->cmax > 0.0 && CRNT_FSTEP_AVAILABLE(params->fstep) &&
        (params->fstep != last_fstep || extra_slot_changed)) )
   {
     last_wire_colors = params->wire_colors;
+    last_color_generation = params->color_generation;
     opengl_structure_generate_geometry(params, cylinder_radius_scale);
 
     /* Prevent redundant regeneration on subsequent expose events */
@@ -859,6 +997,12 @@ opengl_structure_update_shared_geometry_with_params(const struct_draw_params_t *
     batches[structure_net_fill_batch_index].color_dim = rc_config.brightness_segments;
     batches[structure_net_fill_batch_index].alpha =
       TRANSPARENCY_TO_ALPHA(rc_config.transparency_segments);
+  }
+  if( structure_glyph_batch_index >= 0 )
+  {
+    /* Marks render at full intensity so the fixed cyan/red is not dimmed */
+    batches[structure_glyph_batch_index].color_dim = 1.0f;
+    batches[structure_glyph_batch_index].alpha = 1.0f;
   }
 
   /* Propagate visual params to overlay (cheap field copy) */

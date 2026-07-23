@@ -165,8 +165,11 @@ config_widget_values_at(const int *values, int index)
  *
  * Arm order mirrors GTK's class hierarchy: radio menu item and radio
  * button are checked before their plain check-menu-item/toggle-button
- * base classes.  Radio and combo elements require .values; a radio only
- * writes when active, a combo only when a row is selected.
+ * base classes.  Menu radios and combos require .values; a valued radio
+ * writes only when active, a combo only when a row is selected.  A valued
+ * toggle writes values[0] when pressed and values[1] when released, so an
+ * exclusive toggle group reads a shared off value with none pressed; a
+ * value-less radio or toggle mirrors a 0/1 field in both directions.
  */
 static void
 config_widget_apply_element(void *field, size_t size,
@@ -188,8 +191,10 @@ config_widget_apply_element(void *field, size_t size,
   else if( GTK_IS_RADIO_BUTTON(w) )
   {
     if( elt->values == NULL )
-      BUG("config_widget_apply_element: radio button '%s' has no values\n",
-          elt->widget_id);
+      /* Boolean group view: deactivation writes 0, so leaving the radio
+       * for a sibling clears this view's field */
+      field_write_int(field, size,
+          gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)) ? 1 : 0);
     else if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)) )
       field_write_int(field, size, elt->values[0]);
   }
@@ -222,8 +227,16 @@ config_widget_apply_element(void *field, size_t size,
   }
   else if( GTK_IS_TOGGLE_BUTTON(w) )
   {
-    field_write_int(field, size,
-        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w)) ? 1 : 0);
+    gboolean active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(w));
+
+    if( elt->values == NULL )
+      field_write_int(field, size, active ? 1 : 0);
+    else
+      /* Exclusive two-value toggle: values[0] is written when pressed and
+       * values[1], the group's shared released value, when the user clears
+       * the active member, so the group reads the released value with none
+       * pressed */
+      field_write_int(field, size, active ? elt->values[0] : elt->values[1]);
   }
   else
     BUG("config_widget_apply_element: unknown widget type for '%s'\n", elt->widget_id);
@@ -260,8 +273,10 @@ config_widget_sync_element(const void *field, size_t size,
   else if( GTK_IS_RADIO_BUTTON(w) )
   {
     if( elt->values == NULL )
-      BUG("config_widget_sync_element: radio button '%s' has no values\n",
-          elt->widget_id);
+      /* Boolean group view mirrors the 0/1 field; a zero leaves the group
+       * with no active member */
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),
+          field_read_int(field, size));
     else if( field_read_int(field, size) == elt->values[0] )
       gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w), TRUE);
   }
@@ -302,8 +317,14 @@ config_widget_sync_element(const void *field, size_t size,
   }
   else if( GTK_IS_TOGGLE_BUTTON(w) )
   {
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),
-        field_read_int(field, size));
+    if( elt->values == NULL )
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),
+          field_read_int(field, size));
+    else
+      /* Pressed only while the field holds this toggle's on value; all
+       * members read the shared released value alike */
+      gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w),
+          field_read_int(field, size) == elt->values[0]);
   }
   else
     BUG("config_widget_sync_element: unknown widget type for '%s'\n", elt->widget_id);

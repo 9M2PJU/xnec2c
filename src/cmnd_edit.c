@@ -21,6 +21,7 @@
 #include "shared.h"
 #include "expr_edit.h"
 #include "sy_expr.h"
+#include "input.h"
 
 /*------------------------------------------------------------------------*/
 
@@ -3111,7 +3112,6 @@ Zo_Command( int action )
 
   /* Tx Line Impedance */
   static gint zo;
-  static gchar szo[13];
 
   /* Card (row) name */
   gchar name[3];
@@ -3142,7 +3142,7 @@ Zo_Command( int action )
 
       /* Set range data */
       gtk_list_store_set(
-          cmnd_store, &iter_zo, CMND_COL_I1, szo, -1 );
+          cmnd_store, &iter_zo, CMND_COL_I1, zo, -1 );
     }
     save_data = FALSE;
   } /* if( (action & EDITOR_SAVE) && save_data ) */
@@ -3157,7 +3157,7 @@ Zo_Command( int action )
       /* Insert a new blank ZO row after a selected row,
        * if any, otherwise before the last (EN) row */
       Insert_Blank_Command_Row(
-          cmnd_treeview, cmnd_store, &iter_zo, "ZO" );
+          cmnd_treeview, cmnd_store, &iter_zo, cmnd_mnemonic(Z0) );
 
       /* Scroll tree view to bottom */
       gtk_adjustment_set_value( cmnd_adjustment,
@@ -3197,7 +3197,6 @@ Zo_Command( int action )
   spin = GTK_SPIN_BUTTON(
       Builder_Get_Object(zo_editor_builder, "zo_spinbutton") );
   zo = gtk_spin_button_get_value_as_int( spin );
-  snprintf( szo, sizeof(szo), "%4d", zo );
 
   busy = FALSE;
 

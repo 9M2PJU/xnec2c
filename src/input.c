@@ -110,11 +110,10 @@ input_data_free( void )
   mem_array_free( &vsorc.vqds );
   mem_array_free( &vsorc.vsant );
 
-  mem_array_free( &impedance_data.zreal );
-  mem_array_free( &impedance_data.zimag );
-  mem_array_free( &impedance_data.zmagn );
-  mem_array_free( &impedance_data.zphase );
+  /* Release each fstep's per-port sub-buffers and the outer impedance array. */
+  Free_Impedance_Buffers();
 
+  mem_array_free( &netcx.zped_port );
   mem_array_free( &netcx.iseg1 );
   mem_array_free( &netcx.iseg2 );
   mem_array_free( &netcx.ntyp );
@@ -469,8 +468,19 @@ static const char *const cmnd_mnemonics[] =
   [CM] = "CM", [CP] = "CP", [EK] = "EK", [EN] = "EN", [EX] = "EX",
   [FR] = "FR", [GD] = "GD", [GN] = "GN", [KH] = "KH", [LD] = "LD",
   [NE] = "NE", [NH] = "NH", [NT] = "NT", [PQ] = "PQ", [PT] = "PT",
-  [RP] = "RP", [SY] = "SY", [TL] = "TL", [XQ] = "XQ", [ZO] = "ZO",
+  [RP] = "RP", [SY] = "SY", [TL] = "TL", [XQ] = "XQ", [Z0] = "Z0",
   [NUM_CMNDS] = NULL,
+};
+
+/* Legacy input-only mnemonic aliases mapped to their canonical
+ * enumerator; the NULL alias entry terminates the list. Consulted only
+ * after the canonical table misses, so a canonical spelling never routes
+ * through an alias. */
+static const struct { const char *alias; enum CMND_MNM canon; }
+cmnd_aliases[] =
+{
+  { "ZO", Z0 },   /* legacy letter-O spelling of Z-naught */
+  { NULL, 0 },
 };
 
 /* Geometry card mnemonics indexed by enum GEOM_MNM; the NULL entry at
@@ -513,16 +523,53 @@ is_geometry_mnemonic( const char *mn )
   return mnemonic_in_list( mn, geom_mnemonics );
 }
 
+/* cmnd_mnemonic_num()
+ *
+ * Resolves a two-character card mnemonic to its enumerator, scanning the
+ * canonical table first and the legacy alias table second, so both the
+ * canonical and legacy spellings parse while only the canonical token is
+ * emitted. Returns NUM_CMNDS when the mnemonic names no command card.
+ */
+  enum CMND_MNM
+cmnd_mnemonic_num( const char *mn )
+{
+  int i;
+
+  for( i = 0; cmnd_mnemonics[i] != NULL; i++ )
+    if( strncmp( mn, cmnd_mnemonics[i], 2 ) == 0 )
+      return( i );
+
+  for( i = 0; cmnd_aliases[i].alias != NULL; i++ )
+    if( strncmp( mn, cmnd_aliases[i].alias, 2 ) == 0 )
+      return( cmnd_aliases[i].canon );
+
+  return( NUM_CMNDS );
+}
+
+/* cmnd_mnemonic()
+ *
+ * Returns the canonical two-character token for a command enumerator, or
+ * NULL when the enumerator names no command card.
+ */
+  const char *
+cmnd_mnemonic( enum CMND_MNM num )
+{
+  if( num < 0 || num >= NUM_CMNDS )
+    return( NULL );
+
+  return( cmnd_mnemonics[num] );
+}
+
 /* is_command_mnemonic()
  *
  * Reports whether a mnemonic names a command card, letting the geometry
  * reader tell a misplaced command card apart from a mnemonic that
- * belongs to no section.
+ * belongs to no section. Recognises legacy aliases through the resolver.
  */
   static gboolean
 is_command_mnemonic( const char *mn )
 {
-  return mnemonic_in_list( mn, cmnd_mnemonics );
+  return( cmnd_mnemonic_num( mn ) != NUM_CMNDS );
 }
 
 /*-----------------------------------------------------------------------*/
@@ -1166,9 +1213,7 @@ Read_Commands( void )
     mpcnt++;
 
     /* identify command card id mnemonic */
-    for( ain_num = 0; cmnd_mnemonics[ain_num] != NULL; ain_num++ )
-      if( strncmp( ain, cmnd_mnemonics[ain_num], 2) == 0 )
-        break;
+    ain_num = cmnd_mnemonic_num( ain );
 
     /* take action according to card id mnemonic */
     switch( ain_num )
@@ -1306,10 +1351,6 @@ Read_Commands( void )
         {
           calc_data.steps_total += fld[card].freq_steps;
           int nrec = (calc_data.steps_total + 1);
-          mem_array_realloc(&impedance_data.zreal, nrec);
-          mem_array_realloc(&impedance_data.zimag, nrec);
-          mem_array_realloc(&impedance_data.zmagn, nrec);
-          mem_array_realloc(&impedance_data.zphase, nrec);
           mem_array_realloc(&save.freq, nrec);
           mem_array_realloc(&save.fstep, (calc_data.steps_total + 1));
         }
@@ -1736,7 +1777,7 @@ Read_Commands( void )
          * XQ now is the same as EN because of above */
         break;
 
-      case ZO: /* My addition, impedance against which VSWR is calculated */
+      case Z0: /* My addition, impedance against which VSWR is calculated */
         calc_data.zo = (double)itmp1;
 
         /* Set the Zo spinbutton value */
@@ -1770,14 +1811,23 @@ Read_Commands( void )
     Alloc_Crnt_Fstep_Buffers( calc_data.steps_total + 1 );
     prerender_state_alloc( calc_data.steps_total + 1 );
 
+    /* Feedpoint-port count is known only after EX cards parse; size the
+     * per-port impedance array here rather than in the FR-card loop. */
+    Alloc_Impedance_Buffers( calc_data.steps_total + 1, Num_Feedpoint_Ports() );
+
+    /* Owned by the data model, not the freqplots UI: reset the selected
+     * excitation port to the first port so a stale index from a prior model
+     * cannot index past this model's port span. */
+    calc_data.ex_port = 0;
+
     /* Near-field storage and normalization track the NE/NH cards alone. */
     if( isFlagSet(ENABLE_NEAREH) )
     {
       Alloc_Nearfield_Buffers( fpat.nrx, fpat.nry, fpat.nrz );
       Alloc_Nearfield_Fstep_Buffers( calc_data.steps_total + 1 );
 
-      /* nf_dr_norm reads fpat NF fields set by NE/NH cards above; both
-       * parent and child require it for Prerender_Near_Field. */
+      /* nf_dr_norm reads fpat NF fields set by NE/NH cards above; the
+       * parent's draw-time near-field resolver scales displacement by it. */
       compute_nf_dr_norm();
     }
 

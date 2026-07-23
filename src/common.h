@@ -51,6 +51,7 @@
 #include "mem/mem.h"
 #include "i18n.h"
 #include "view/view_core.h"
+#include "color/color_tone.h"
 
 // Define GSourceOnceFunc if compiling against an older version of GLIB:
 #if GLIB_VERSION_CUR_STABLE < G_ENCODE_VERSION(2,74)
@@ -185,49 +186,26 @@ static inline int dl_feq_eps(double a, double b, double eps) { return fabs(a - b
 #define FREQ_LOOP_STOP      0x0000000000000008ll
 
 /* Main Window Control flags */
-#define DRAW_CURRENTS       0x0000000000000010ll
-#define DRAW_CHARGES        0x0000000000000020ll
 #define MAIN_QUIT           0x0000000000000200ll
 
 /* Freq Plot Control flags */
-#define PLOT_ZREAL_ZIMAG    0x0000000000000400ll
-#define PLOT_VSWR           0x0000000000000800ll
-#define PLOT_ZMAG_ZPHASE    0x0000000000001000ll
-#define PLOT_GMAX           0x0000000000002000ll
-#define PLOT_GVIEWER        0x0000000000004000ll
-#define PLOT_NETGAIN        0x0000000000008000ll
-#define PLOT_GAIN_DIR       0x0000000000010000ll
 #define PLOT_SELECT         0x0000000000040000ll
 #define PLOT_ENABLED        0x0000000000080000ll
 #define PLOT_QUIT           0x0000000000100000ll
-#define PLOT_SMITH          0x0000000000200000ll
-#define PLOT_ANT_TEMP       0x0000000000020000ll
 
 /* Radiation Pattern Control flags */
-#define DRAW_GAIN           0x0000000000400000ll
-#define DRAW_EFIELD         0x0000000000800000ll
-#define DRAW_HFIELD         0x0000000001000000ll
-#define DRAW_EHFIELD        0x0000000002000000ll
-#define DRAW_POYNTING       0x0000000004000000ll
 #define DRAW_ENABLED        0x0000000008000000ll
 #define DRAW_QUIT           0x0000000010000000ll
 #define DRAW_NEW_RDPAT      0x0000000020000000ll
 #define DRAW_NEW_EHFIELD    0x0000000040000000ll
-#define OVERLAY_STRUCT      0x0000000080000000ll
 #define ANIMATE             0x0000000200000000ll
 #define ENABLE_RDPAT        0x0000000400000000ll
 #define ENABLE_NEAREH       0x0000000800000000ll
 #define DRAW_FLAGS ( \
-  DRAW_GAIN         | \
-  DRAW_EFIELD       | \
-  DRAW_HFIELD       | \
-  DRAW_EHFIELD      | \
-  DRAW_POYNTING     | \
   DRAW_ENABLED      | \
   DRAW_QUIT         | \
   DRAW_NEW_RDPAT    | \
   DRAW_NEW_EHFIELD  | \
-  OVERLAY_STRUCT    | \
   ANIMATE )
 
 /*** Filechooser response related flags ***/
@@ -312,10 +290,10 @@ typedef struct
     main_width,
     main_height;
 
-  /* Main (structure) window state of widgets */
+  /* Main (structure) window state of widgets.  structure_view holds a
+   * struct_view_t member selecting geometry, charges, or currents. */
   int
-    main_currents_togglebutton,
-    main_charges_togglebutton,
+    structure_view,
     main_loop_start;
 
   int
@@ -332,10 +310,10 @@ typedef struct
     rdpattern_height,
     rdpattern_zoom_spinbutton;
 
-  /* Radiation pattern window state of widgets */
+  /* Radiation pattern window state of widgets.  rdpattern_mode holds a
+   * rdpat_mode_t member selecting far-field gain or near E/H field. */
   int
-    rdpattern_gain_togglebutton,
-    rdpattern_eh_togglebutton,
+    rdpattern_mode,
     rdpattern_e_field,
     rdpattern_h_field,
     rdpattern_poynting_vector,
@@ -474,6 +452,28 @@ typedef struct
   /* Patch current flow visualization mode (View menu, not OpenGL settings) */
   int current_flow_visualization_mode;
 
+  /* Near-field static baseline mode (View menu total-field submenu);
+   * holds an nf_static_mode_t peak/snapshot selection. */
+  int nf_static_mode;
+
+  /* Animated color projection (animate dialog, chroma_proj_t) */
+  int anim_color_proj;
+
+  /* Tone family selector (color_tone_t), shared by menu and animate dialog */
+  int color_scale;
+
+  /* Per-family tone parameter in the slider domain, indexed by color_tone_t */
+  double color_fam_param[COLOR_TONE_NUM];
+
+  /* Brightness floor in [0,1] keeping geometry visible at wave nulls */
+  double color_lum_floor;
+
+  /* Width-from-amplitude carrier gate */
+  int color_width_amp;
+
+  /* Wire overlay gates: comet crest, node/antinode marks */
+  int overlay_comet, overlay_nodes;
+
   /* Whether transparency is triggered by click/drag (1) or always on (0) */
   int opengl_transparent_on_click;
 
@@ -521,6 +521,24 @@ enum RDPAT_STYLE
   RDPAT_STYLE_BOTH,
   NUM_RDPAT_STYLES
 };
+
+/* Main-window structure display selection, stored under the reused
+ * "currents" config key so an old file's 0/1 value keeps its meaning. */
+typedef enum
+{
+  STRUCT_VIEW_DISABLED = -1, /* geometry only; fresh default; released via the toggle group; never written by old files */
+  STRUCT_VIEW_CHARGES  = 0,  /* reuses the currents-key value 0 */
+  STRUCT_VIEW_CURRENTS = 1   /* reuses the currents-key value 1 */
+} struct_view_t;
+
+/* Radiation-pattern field display selection, stored under the reused
+ * "gain" config key so an old file's 0/1 value keeps its meaning. */
+typedef enum
+{
+  RDPAT_FIELD_DISABLED = -1, /* neither field; released via the toggle group; never written by old files */
+  RDPAT_FIELD_EHFIELD  = 0,  /* reuses the gain-key value 0 */
+  RDPAT_FIELD_GAIN     = 1   /* reuses the gain-key value 1; fresh default (far field) */
+} rdpat_mode_t;
 
 /* Gain Scaling style */
 enum GAIN_SCALE
@@ -587,8 +605,8 @@ typedef struct
 
 /* Maximum independent draw batches per view content
  * (structure: segments, patches, network/transmission-line outlines,
- * two-port network polygon fills) */
-#define GL_VIEW_MAX_BATCHES 4
+ * two-port network polygon fills, node/antinode glyph overlay) */
+#define GL_VIEW_MAX_BATCHES 5
 
 /* OpenGL types */
 #ifdef HAVE_OPENGL
@@ -672,15 +690,19 @@ typedef struct
   double c3x, c3y, c3z;    /* center + s*t1 - s*t2 */
 } patch_corners_t;
 
-/* Per-sample near-field E/H magnitude, phase, real components, and coordinates */
+/* Near-field static-baseline selector for the peak/snapshot mode; the
+ * rc_config.nf_static_mode field is the single source, read at draw. */
+typedef enum { NF_STATIC_PEAK = 0, NF_STATIC_SNAPSHOT } nf_static_mode_t;
+
+/* Per-sample near-field E/H amplitude, phase, and coordinates.  The phasor
+ * (amplitude + phase) is the sole stored near-field truth; the real vectors
+ * and their magnitudes derive at draw from it. */
 typedef struct
 {
   double ex, ey, ez;            /* E-field magnitude and phase */
   double hx, hy, hz;            /* H-field magnitude and phase */
   double fex, fey, fez;         /* E-field phasor */
   double fhx, fhy, fhz;         /* H-field phasor */
-  double erx, ery, erz, er;     /* E-field real components + magnitude */
-  double hrx, hry, hrz, hr;     /* H-field real components + magnitude */
   double px, py, pz;            /* Field point coordinates */
 } near_field_point_t;
 
@@ -926,6 +948,8 @@ typedef struct
     pnls;   /* Power lost in networks */
 
   complex double zped;
+  complex double *zped_port; /* per-port scratch; index 0..nsant-1 = voltage
+                             * sources, nsant..nsant+nvqd-1 = current-slope */
 
 } netcx_t;
 
@@ -1140,6 +1164,14 @@ typedef struct {
 	GtkWidget   *readout_field[FP_READOUT_MAX];
 	GtkWidget   *readout_value[FP_READOUT_MAX];
 	int          readout_n;
+
+	// Popup excitation-port selection and its menu button; the primary view
+	// resolves its port from calc_data.ex_port and leaves ex_port unused.
+	// port_saved and port_committed carry this view's hover-preview state.
+	int        ex_port;
+	GtkWidget *port_button;
+	int        port_saved;
+	gboolean   port_committed;
 } freqplots_view_t;
 
 /* My addition, struct to hold data needed
@@ -1159,6 +1191,7 @@ typedef struct
     iped,
     ngraph,     /* Number of graphs to be plotted */
     pol_type,   /* User-specified Polarization type for plots and patterns */
+    ex_port,    /* Selected excitation port (0-based) for single-port consumers */
     num_jobs;   /* Number of child processes (jobs) to fork */
 
   double
@@ -1230,9 +1263,6 @@ typedef struct
 /* Near E/H field data */
 typedef struct
 {
-  /* Max of E/H field values */
-  double max_er, max_hr;
-
   /* Max distance from xyz origin */
   double r_max;
 
@@ -1286,10 +1316,8 @@ void
 Card_Clicked(GtkWidget **editor, GtkBuilder **editor_builder, GtkWidget *create_fun(GtkBuilder **), void editor_fun(int), int *editor_action);
 void Main_Rdpattern_Activate(gboolean from_menu);
 gboolean Main_Freqplots_Activate(void);
-void Rdpattern_Gain_Togglebutton_Toggled(gboolean flag);
-void Rdpattern_EH_Togglebutton_Toggled(gboolean flag);
-void Main_Currents_Togglebutton_Toggled(gboolean flag);
-void Main_Charges_Togglebutton_Toggled(gboolean flag);
+void rdpattern_mode_apply(void);
+void structure_view_apply(void);
 GtkWidget *Open_Filechooser(GtkFileChooserAction action, char *pattern, char *prefix, char *filename, char *foldername);
 void Filechooser_Response(GtkDialog *dialog, gint response_id, int saveas_width, int saveas_height);
 void Open_Nec2_Editor(int action);
@@ -1318,8 +1346,8 @@ void child_procs_free(void);
 void close_child_command_pipes(void);
 void freqplots_cleanup(void);
 void Nf_Peak_Vector(double exm, double eym, double ezm, double fx, double fy, double fz, double *rx, double *ry, double *rz, double *r);
-void Recompute_Near_Field_Vectors(int fstep, gboolean snapshot);
 void Draw_Colorcode(cairo_t *cr);
+void draw_colorcode_projected(cairo_t *cr);
 void Gtk_Widget_Destroy(GtkWidget **widget);
 /* callbacks.c */
 void on_main_window_destroy(GObject *object, gpointer user_data);
@@ -1337,7 +1365,8 @@ void on_main_freqplots_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_view_preset_clicked(GtkButton *button, gpointer user_data);
 void on_main_rotate_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
 void on_main_incline_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
-gboolean on_main_colorcode_drawingarea_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
+gboolean on_colorcode_drawingarea_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
+void on_anim_color_reset_clicked(GtkButton *button, gpointer user_data);
 void on_new_freq_clicked(GtkButton *button, gpointer user_data);
 gboolean on_structure_drawingarea_configure_event(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data);
 gboolean on_structure_drawingarea_motion_notify_event(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
@@ -1350,6 +1379,15 @@ void on_freqplots_save_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_save_as_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_save_as_gnuplot_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_zo_spinbutton_value_changed(GtkSpinButton *spinbutton, gpointer user_data);
+void freqplots_populate_port_combo(void);
+GtkWidget *freqplots_port_combo_new(freqplots_view_t *view);
+void freqplots_refresh_port_combos(void);
+void freqplots_reload_port_combos(void);
+void freqplots_gate_feedpoint_widgets(void);
+const char *freqplots_panel_select_id(fp_panel_t panel);
+void Alloc_Impedance_Buffers(int nfrq, int n_ports);
+void Free_Impedance_Buffers(void);
+void Rescan_Zpnorm(void);
 gboolean on_freqplots_drawingarea_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data);
 gboolean on_freqplots_drawingarea_configure_event(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data);
 gboolean on_freqplots_drawingarea_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
@@ -1393,8 +1431,6 @@ gboolean on_rdpattern_drawingarea_motion_notify_event(GtkWidget *widget, GdkEven
 void on_quit_cancelbutton_clicked(GtkButton *button, gpointer user_data);
 void on_quit_okbutton_clicked(GtkButton *button, gpointer user_data);
 gboolean on_rdpattern_window_key_press_event(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
-void on_near_peak_value_activate(GtkMenuItem *menuitem, gpointer user_data);
-void on_near_snapshot_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_rdpattern_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_structure_animate_activate(GtkMenuItem *menuitem, gpointer user_data);
 gboolean on_animate_phase_slider_change_value(GtkRange *range, GtkScrollType scroll, gdouble value, gpointer user_data);
@@ -1631,6 +1667,7 @@ void on_freqplots_theme_activate(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_theme_invert_toggled(GtkCheckMenuItem *menuitem, gpointer user_data);
 void freqplots_invert_item_sync(GtkWidget *invert, const char *base);
 void freqplots_theme_menu_build(GtkBuilder *builder);
+void color_family_menu_attach(GtkBuilder *builder);
 void on_freqplots_theme_select(GtkMenuItem *menuitem, gpointer user_data);
 void on_freqplots_theme_menu_hide(GtkWidget *menu, gpointer user_data);
 gboolean on_structure_drawingarea_button_press_event(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
@@ -1669,10 +1706,8 @@ void Project_on_Screen(view_t *v, double x, double y, double z, double *xs, doub
      && save.fstep != NULL && save.fstep[(fs)] \
      && near_field_fstep != NULL && near_field_fstep[(fs)].points != NULL)
 
-void Value_to_Color(double *red, double *grn, double *blu, double val, double max);
 /* rdpattern_ui.c */
 gboolean Validate_Nearfield_Animation(void);
-void compute_near_field_frame(double wt);
 double Scale_Gain_Resolved(double gain, int fstep, int idx,
     double t_sky, double t_earth);
 double Polarization_Factor(int pol_type, int fstep, int idx);
@@ -1822,6 +1857,7 @@ void Set_Frequency_On_Click(freqplots_view_t *view, GdkEvent *event);
 fp_panel_t freqplots_panel_at(freqplots_view_t *view, double px, double py);
 freqplots_view_t *freqplots_main_view(void);
 void freqplots_redraw_all(gboolean force);
+int freqplots_count_selected(void);
 void freqplots_open_panel(fp_panel_t panel);
 void freqplots_close_panel(fp_panel_t panel);
 void freqplots_destroy_all_popups(void);

@@ -26,6 +26,8 @@
 #include "themes/theme.h"
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
+#include "config_hooks.h"
+#include "rc_config.h"
 #include "cairo/cairo_draw.h"
 #include "cairo/cairo_frame.h"
 #include <pthread.h>
@@ -308,10 +310,10 @@ on_main_save_activate(
 
   /* Make the structure image save file name from input file
    * name. The count of each image type saved is incremented */
-  if( isFlagSet(DRAW_CURRENTS) )
+  if(struct_view_currents())
     snprintf( saveas, s, "%s-%s_%03d.%s",
         rc_config.input_file, "current", ++ccr, "png" );
-  else if( isFlagSet(DRAW_CHARGES) )
+  else if(struct_view_charges())
     snprintf( saveas, s, "%s-%s_%03d.%s",
         rc_config.input_file, "charge", ++cch, "png" );
   else
@@ -594,25 +596,6 @@ on_main_rdpattern_activate(
 }
 
 
-/* One plot-select button bound to the graph type its detached popup shows. */
-typedef struct {
-  const char *id;     /* glade widget id of the plot-select toggle button */
-  fp_panel_t  panel;  /* graph type opened when the button is right-clicked */
-} freqplots_panel_button_t;
-
-/* Plot-select buttons paired with their popup graph types; the table is the
- * single source mapping a main-window button to the graph its popup renders. */
-static const freqplots_panel_button_t freqplots_panel_buttons[] = {
-  { "freqplots_gmax_togglebutton",     FP_PANEL_GAIN     },
-  { "freqplots_gdir_togglebutton",     FP_PANEL_GAIN_DIR },
-  { "freqplots_gviewer_togglebutton",  FP_PANEL_VIEWER   },
-  { "freqplots_vswr_togglebutton",     FP_PANEL_VSWR     },
-  { "freqplots_zrlzim_togglebutton",   FP_PANEL_ZRLZIM   },
-  { "freqplots_zmgzph_togglebutton",   FP_PANEL_ZMGZPH   },
-  { "freqplots_smith_togglebutton",    FP_PANEL_SMITH    },
-  { "freqplots_ant_temp_togglebutton", FP_PANEL_ANT_TEMP },
-};
-
 /* Right-click a plot-select button to open that graph's detached popup; the
  * panel travels as the connection's user data so one handler serves every
  * button.  A GtkButton toggles only on the primary button, so the button's
@@ -631,20 +614,21 @@ freqplots_panel_button_press_cb( GtkWidget *widget, GdkEventButton *event,
   return TRUE;
 }
 
-/* Wire each plot-select button's right-click to its popup opener. */
+/* Wire each plot-select button's right-click to its popup opener; the panel
+ * descriptor table names each panel's button widget. */
   static void
 freqplots_connect_panel_buttons( GtkBuilder *builder )
 {
-  size_t i;
+  int p;
 
-  for( i = 0; i < G_N_ELEMENTS(freqplots_panel_buttons); i++ )
+  for( p = 0; p < FP_PANEL_COUNT; p++ )
   {
     GtkWidget *btn = Builder_Get_Object( builder,
-        freqplots_panel_buttons[i].id );
+        freqplots_panel_select_id( p ) );
 
     g_signal_connect( btn, "button-press-event",
         G_CALLBACK(freqplots_panel_button_press_cb),
-        GINT_TO_POINTER(freqplots_panel_buttons[i].panel) );
+        GINT_TO_POINTER(p) );
   }
 }
 
@@ -683,6 +667,9 @@ on_main_freqplots_activate(
           freqplots_window_builder, "freqplots_zo_spinbutton" );
       gtk_spin_button_set_value( GTK_SPIN_BUTTON(spin), (gdouble)calc_data.zo );
 
+      /* Populate the excitation-port selector for the current model. */
+      freqplots_populate_port_combo();
+
       GtkAllocation alloc;
       gtk_widget_get_allocation( fp_da, &alloc );
       freqplots_main_view()->width  = alloc.width;
@@ -693,6 +680,9 @@ on_main_freqplots_activate(
        * flags and recompute the active-plot count. */
       config_widget_sync_builder( &freqplots_window_builder );
       config_widget_run_hooks( &freqplots_window_builder );
+
+      /* Gray feedpoint-dependent widgets for feedpoint-less excitations. */
+      freqplots_gate_feedpoint_widgets();
 
       /* Request geometry and show after all widget state restorations
        * so sizing is the last layout operation */
@@ -854,12 +844,12 @@ on_main_incline_spinbutton_value_changed(
 
 
   gboolean
-on_main_colorcode_drawingarea_draw(
+on_colorcode_drawingarea_draw(
     GtkWidget       *widget,
     cairo_t         *cr,
     gpointer         user_data)
 {
-  Draw_Colorcode( cr );
+  draw_colorcode_projected( cr );
   return( TRUE );
 }
 
@@ -1312,10 +1302,10 @@ on_rdpattern_save_activate(
 
   /* Make the rad pattern save
    * file name from input name */
-  if( isFlagSet(DRAW_GAIN) )
+  if(rdpat_gain_active())
     snprintf( saveas, s, "%s-%s_%03d%s",
         rc_config.input_file, "gain", ++cgn, ".png" );
-  else if( isFlagSet(DRAW_EHFIELD) )
+  else if(rdpat_ehfield_active())
     snprintf( saveas, s, "%s-%s_%03d%s",
         rc_config.input_file, "fields", ++ceh, ".png" );
   else return;
@@ -1840,11 +1830,11 @@ opengl_set_renderer(gboolean enable)
     }
 
     /* Signal pattern data needs refresh */
-    if( isFlagSet(DRAW_GAIN) )
+    if(rdpat_gain_active())
     {
       SetFlag( DRAW_NEW_RDPAT );
     }
-    else if( isFlagSet(DRAW_EHFIELD) )
+    else if(rdpat_ehfield_active())
     {
       SetFlag( DRAW_NEW_EHFIELD );
     }
@@ -2090,42 +2080,6 @@ on_rdpattern_window_key_press_event(
 }
 
 
-  void
-on_near_peak_value_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-  {
-    int fstep = calc_data.freq_step;
-    g_rec_mutex_lock(&freq_data_lock);
-    Recompute_Near_Field_Vectors( fstep, FALSE );
-    g_rec_mutex_unlock(&freq_data_lock);
-    if( isFlagSet(DRAW_EHFIELD) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  }
-  /* else: on_near_snapshot_activate fires for the newly-selected item */
-}
-
-
-  void
-on_near_snapshot_activate(
-    GtkMenuItem     *menuitem,
-    gpointer         user_data)
-{
-  if( gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(menuitem)) )
-  {
-    int fstep = calc_data.freq_step;
-    g_rec_mutex_lock(&freq_data_lock);
-    Recompute_Near_Field_Vectors( fstep, TRUE );
-    g_rec_mutex_unlock(&freq_data_lock);
-    if( isFlagSet(DRAW_EHFIELD) )
-      xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
-  }
-  /* else: on_near_peak_value_activate fires for the newly-selected item */
-}
-
-
 /* Animation panel controls mirror visualization fields owned by the main and
  * rdpattern windows.  Each control is meaningful only while its owning window
  * is open; anim_panel_sensitivity greys those whose owner is closed.  The
@@ -2137,7 +2091,7 @@ static const struct
   GtkBuilder **owner_builder;
 } anim_panel_owners[] =
 {
-  { "anim_currents", &main_window_builder      },
+  { "anim_display_frame", &main_window_builder },
   { "anim_efield",   &rdpattern_window_builder },
   { "anim_hfield",   &rdpattern_window_builder },
   { "anim_poynting", &rdpattern_window_builder },
@@ -2146,8 +2100,9 @@ static const struct
 /** anim_panel_sensitivity() - Grey animation panel controls by owner state
  *
  * Greys each panel control whose owning window is closed, greys the
- * flow-direction combo when the main window is closed, and greys the
- * structure frame when the model carries no surface patches.
+ * flow-direction combo when the main window is closed or the model
+ * carries no surface patches, and greys the structure frame when the
+ * main window is closed.
  */
   static void
 anim_panel_sensitivity(void)
@@ -2167,17 +2122,48 @@ anim_panel_sensitivity(void)
         *anim_panel_owners[i].owner_builder != NULL );
   }
 
+  /* Flow direction styles patch arrows only; wire color animation and the
+   * color projection/scale combos stay usable for wire-only models. */
   widget = Builder_Get_Object( animate_dialog_builder, "anim_flow_dir" );
-  gtk_widget_set_sensitive( widget, main_window_builder != NULL );
-
-  /* Grey out Structure section when model has no surface patches */
-  widget = Builder_Get_Object( animate_dialog_builder, "anim_structure_frame" );
   has_patches = (data.m > 0);
-  gtk_widget_set_sensitive( widget, has_patches );
+  gtk_widget_set_sensitive( widget,
+      (main_window_builder != NULL) && has_patches );
   gtk_widget_set_tooltip_text( widget,
-      has_patches ? NULL
-      : _("Current flow animation requires surface patches"
+      has_patches
+      ? _("Select how the animated patch current flow is rendered.\n"
+          "Mirrors the Visualization menu setting in the main window.")
+      : _("Patch flow animation requires surface patches"
           " (SP/SM cards) in the model.") );
+}
+
+/* The near-field static-baseline menu items in the rdpattern window choose the
+ * peak or instantaneous vector drawn while the animation window is closed.
+ * While it is open the phase slider drives the vectors, so the selection has no
+ * effect; grey the items and explain why.  Derives from animate_dialog, synced
+ * at the dialog open and destroy edges. */
+  static void
+nf_static_menu_sync(void)
+{
+  static const char *const item_id[] = { "near_peak_value", "near_snapshot" };
+  gboolean open = (animate_dialog != NULL);
+  const char *reason = open
+      ? _("The animation window drives the near-field vectors from the phase"
+          " slider; close it to choose the static peak or instantaneous"
+          " baseline.")
+      : NULL;
+  size_t i;
+
+  if( rdpattern_window_builder == NULL )
+    return;
+
+  for( i = 0; i < G_N_ELEMENTS(item_id); i++ )
+  {
+    GtkWidget *w = GTK_WIDGET(
+        Builder_Get_Object(rdpattern_window_builder, item_id[i]) );
+
+    gtk_widget_set_sensitive( w, !open );
+    gtk_widget_set_tooltip_text( w, reason );
+  }
 }
 
 /* Wrap value into the half-open phase span [lower, lower+span). */
@@ -2224,6 +2210,7 @@ on_animate_phase_slider_change_value(GtkRange *range, GtkScrollType scroll,
   gtk_range_set_value( range, value );
 
   flow_phase = (float)( value * TORAD );
+  animation_set_scrubbed();
   apply_animation_phase();
 
   return( TRUE );
@@ -2288,9 +2275,252 @@ on_phase_slider_motion_notify(GtkWidget *widget, GdkEventMotion *event,
   SIGNAL_UNBLOCK( range, on_animate_phase_slider_change_value );
 
   flow_phase = (float)( new_val * TORAD );
+  animation_set_scrubbed();
   apply_animation_phase();
 
   return( FALSE );
+}
+
+/* Snap window around a slider mark as a fraction of the slider span */
+#define FAM_MARK_SNAP_FRACTION 0.025
+
+/** on_color_fam_format_value() - Render a slider value as the natural parameter
+ * @scale: emitting family slider
+ * @value: slider-domain value
+ * @user_data: the slider's color_tone_row_t
+ *
+ * Returns a heap string in the family's natural-parameter format; GTK
+ * frees it after display.
+ */
+  static gchar *
+on_color_fam_format_value(GtkScale *scale, gdouble value, gpointer user_data)
+{
+  const color_tone_row_t *row = user_data;
+
+  (void)scale;
+
+  return g_strdup_printf(row->value_fmt, row->param_map(value));
+}
+
+/** on_color_fam_change_value() - Snap a family slider onto its marks
+ * @range: emitting family slider
+ * @scroll: scroll type, unused
+ * @value: proposed slider-domain value
+ * @user_data: the slider's color_tone_row_t
+ *
+ * Snaps within FAM_MARK_SNAP_FRACTION of the slider span onto the row's
+ * mark; the set_value call emits the final value-changed.
+ */
+  static gboolean
+on_color_fam_change_value(GtkRange *range, GtkScrollType scroll,
+    gdouble value, gpointer user_data)
+{
+  const color_tone_row_t *row = user_data;
+  GtkAdjustment *adj = gtk_range_get_adjustment(range);
+  double span = gtk_adjustment_get_upper(adj) - gtk_adjustment_get_lower(adj);
+  gboolean snapped = FALSE;
+  int i;
+
+  (void)scroll;
+
+  for( i = 0; !snapped && !isnan(row->marks[i]); i++ )
+    if( fabs(value - row->marks[i]) <= span * FAM_MARK_SNAP_FRACTION )
+    {
+      gtk_range_set_value(range, row->marks[i]);
+      snapped = TRUE;
+    }
+
+  return snapped;
+}
+
+/** anim_fam_marks_attach() - Mark and wire the family sliders at creation
+ *
+ * Adds each family's snap marks labeled with the natural parameter and
+ * connects the shared snap and value-format handlers with the row as
+ * user data.
+ */
+  static void
+anim_fam_marks_attach(void)
+{
+  int fam, i;
+  char label[32];
+
+  for( fam = 0; fam < COLOR_TONE_NUM; fam++ )
+  {
+    const color_tone_row_t *row = &color_tones[fam];
+    GtkScale *scale;
+
+    if( row->scale_id == NULL || row->marks == NULL )
+      continue;
+
+    scale = GTK_SCALE(Builder_Get_Object(animate_dialog_builder,
+          row->scale_id));
+
+    for( i = 0; !isnan(row->marks[i]); i++ )
+    {
+      snprintf(label, sizeof(label), "%g", row->param_map(row->marks[i]));
+      gtk_scale_add_mark(scale, row->marks[i], GTK_POS_BOTTOM, label);
+    }
+
+    g_signal_connect(scale, "change-value",
+        G_CALLBACK(on_color_fam_change_value), (gpointer)row);
+    g_signal_connect(scale, "format-value",
+        G_CALLBACK(on_color_fam_format_value), (gpointer)row);
+  }
+}
+
+/** on_anim_projsel_select() - Preview a hovered projection menu row
+ * @menuitem: hovered radio item, unused
+ * @user_data: the row's chroma_proj_t value
+ *
+ * Renders the hovered projection at once without committing it; leaving
+ * the menu without activating reverts via on_anim_projsel_menu_hide.
+ */
+  static void
+on_anim_projsel_select(GtkMenuItem *menuitem, gpointer user_data)
+{
+  (void)menuitem;
+
+  chroma_proj_preview_set( GPOINTER_TO_INT(user_data) );
+  hook_color_vis();
+}
+
+/** on_anim_projsel_menu_hide() - Revert an uncommitted projection preview
+ * @menu: collapsing projection menu, unused
+ * @user_data: unused
+ *
+ * A click commits through the config machinery while the preview equals
+ * the clicked value, so the clear resolves to the committed state; a
+ * collapse on a mere hover restores the prior selection.
+ */
+  static void
+on_anim_projsel_menu_hide(GtkWidget *menu, gpointer user_data)
+{
+  (void)menu;
+  (void)user_data;
+
+  if( !chroma_proj_preview_active() )
+    return;
+
+  chroma_proj_preview_clear();
+  hook_color_vis();
+}
+
+/** on_color_famsel_select() - Preview a hovered scale-family menu row
+ * @menuitem: hovered radio item, unused
+ * @user_data: the row's color_tone_t value
+ *
+ * Renders the hovered family at once, including its slider row and
+ * formula; leaving the menu without activating reverts on menu hide.
+ */
+  static void
+on_color_famsel_select(GtkMenuItem *menuitem, gpointer user_data)
+{
+  (void)menuitem;
+
+  color_tone_preview_set( GPOINTER_TO_INT(user_data) );
+  hook_color_family();
+}
+
+/** on_color_famsel_menu_hide() - Revert an uncommitted family preview
+ * @menu: collapsing family menu, unused
+ * @user_data: unused
+ */
+  static void
+on_color_famsel_menu_hide(GtkWidget *menu, gpointer user_data)
+{
+  (void)menu;
+  (void)user_data;
+
+  if( !color_tone_preview_active() )
+    return;
+
+  color_tone_preview_clear();
+  hook_color_family();
+}
+
+/** anim_select_preview_attach() - Wire hover preview on the dialog selectors
+ *
+ * Connects each projection and family radio item's select edge and each
+ * menu's hide edge, with the enum value as user data.
+ */
+  static void
+anim_select_preview_attach(void)
+{
+  int i;
+
+  for( i = 0; i < CHROMA_PROJ_NUM; i++ )
+    g_signal_connect( Builder_Get_Object(animate_dialog_builder,
+          chroma_proj_rows[i].sel_id), "select",
+                     G_CALLBACK(on_anim_projsel_select), GINT_TO_POINTER(i) );
+
+  for( i = 0; i < COLOR_TONE_NUM; i++ )
+    g_signal_connect( Builder_Get_Object(animate_dialog_builder,
+          color_tones[i].sel_id), "select",
+        G_CALLBACK(on_color_famsel_select), GINT_TO_POINTER(i) );
+
+  g_signal_connect( Builder_Get_Object(animate_dialog_builder,
+        "anim_color_proj_menu"), "hide",
+      G_CALLBACK(on_anim_projsel_menu_hide), NULL );
+  g_signal_connect( Builder_Get_Object(animate_dialog_builder,
+        "anim_color_family_menu"), "hide",
+      G_CALLBACK(on_color_famsel_menu_hide), NULL );
+}
+
+/** color_family_menu_attach() - Wire hover preview on the main-window family radios
+ * @builder: main window builder
+ *
+ * Connects the Visualization menu's family radio items to the shared
+ * family preview handlers and the submenu's hide edge to the revert.
+ */
+  void
+color_family_menu_attach(GtkBuilder *builder)
+{
+  int i;
+
+  for( i = 0; i < COLOR_TONE_NUM; i++ )
+    g_signal_connect( Builder_Get_Object(builder, color_tones[i].main_id),
+        "select", G_CALLBACK(on_color_famsel_select), GINT_TO_POINTER(i) );
+
+  g_signal_connect( Builder_Get_Object(builder, "main_flow_dir_menu_menu"),
+      "hide", G_CALLBACK(on_color_famsel_menu_hide), NULL );
+}
+
+/** on_anim_color_reset_clicked() - Restore the color controls' defaults
+ * @button: emitting button, unused
+ * @user_data: unused
+ *
+ * Resets the projection, scale family, brightness floor, width carrier,
+ * and every family parameter to their compiled-in defaults, reruns the
+ * color hooks, then syncs the bound widgets from the fields.  Overlay
+ * gates keep their user state.
+ */
+  void
+on_anim_color_reset_clicked(GtkButton *button, gpointer user_data)
+{
+  int fam;
+
+  (void)button;
+  (void)user_data;
+
+  rc_config_set_default( rc_config_find_by_field(&rc_config.anim_color_proj) );
+  rc_config_set_default( rc_config_find_by_field(&rc_config.color_scale) );
+  rc_config_set_default( rc_config_find_by_field(&rc_config.color_lum_floor) );
+  rc_config_set_default( rc_config_find_by_field(&rc_config.color_width_amp) );
+
+  for( fam = 0; fam < COLOR_TONE_NUM; fam++ )
+  {
+    /* Only slider-backed families persist a parameter row */
+    if( color_tones[fam].scale_id == NULL )
+      continue;
+
+    rc_config_set_default(
+        rc_config_find_by_field(&rc_config.color_fam_param[fam]) );
+  }
+
+  /* Reset sequence: defaults above, hooks, then widget sync */
+  hook_color_family();
+  config_widget_sync_all();
 }
 
 /* Create the animation dialog on first use, wire the phase slider drag
@@ -2307,11 +2537,15 @@ show_animate_dialog(void)
     g_signal_connect( Builder_Get_Object(animate_dialog_builder,
           "animate_phase_slider"), "motion-notify-event",
         G_CALLBACK(on_phase_slider_motion_notify), NULL );
+
+    anim_fam_marks_attach();
+    anim_select_preview_attach();
   }
   gtk_widget_show( animate_dialog );
   config_widget_sync_builder( &animate_dialog_builder );
   config_widget_run_hooks( &animate_dialog_builder );
   anim_panel_sensitivity();
+  nf_static_menu_sync();
 }
 
 
@@ -2320,17 +2554,18 @@ on_rdpattern_animate_activate(
     GtkMenuItem     *menuitem,
     gpointer         user_data)
 {
-  if( isFlagClear(DRAW_EHFIELD) )
+  if(!rdpat_ehfield_active())
   {
-    if( !fpat.nfeh )
+    if( fpat.nfeh )
     {
-      if( !Validate_Nearfield_Animation() )
-        return;
+      /* Near-field data validates; enable the EH display for animation */
+      gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(
+          Builder_Get_Object(rdpattern_window_builder, "rdpattern_eh_togglebutton")),
+        TRUE );
     }
-
-    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON(
-        Builder_Get_Object(rdpattern_window_builder, "rdpattern_eh_togglebutton")),
-      TRUE );
+    else if( !(overlay_struct_active() && (data.n > 0 || data.m > 0))
+        && !Validate_Nearfield_Animation() )
+      return; /* no near-field data and no structure overlay to animate */
   }
 
   show_animate_dialog();
@@ -2440,21 +2675,26 @@ on_animation_applybutton_clicked(
     gpointer         user_data)
 {
   /* Reject when nothing can animate */
-  if( data.m == 0 && !(fpat.nfeh & (NEAR_EFIELD | NEAR_HFIELD)) )
+  if( data.n == 0 && data.m == 0 && !(fpat.nfeh & (NEAR_EFIELD | NEAR_HFIELD)) )
   {
     Notice( GTK_BUTTONS_OK, _("Animation"),
-        _("Animation requires surface patches (SP/SM NEC cards)"
-          " or near-field data (NE/NH NEC cards)") );
+        _("Animation requires wire currents or charges, surface patches"
+          " (SP/SM NEC cards), or near-field data (NE/NH NEC cards)") );
     return;
   }
 
-  /* Validate near-field setup only when no patches can animate */
-  if( data.m == 0 && isFlagSet(DRAW_EHFIELD) && !Validate_Nearfield_Animation() )
+  /* Validate near-field setup only when no structure content can animate */
+  if( data.n == 0 && data.m == 0 &&
+      rdpat_ehfield_active() && !Validate_Nearfield_Animation() )
     return;
 
   SetFlag( ANIMATE );
   anim_phase_slider_sync_sensitivity();
   update_animation_parameters();
+
+  /* Playback goes live: swap in the animated projection before the
+   * first timer tick so the flip is immediate at any frame rate. */
+  hook_color_vis();
 }
 
 
@@ -2482,6 +2722,10 @@ on_animation_cancelbutton_clicked(
   }
   anim_phase_slider_sync_sensitivity();
   apply_animation_phase();
+
+  /* Playback ended: return to the static projection everywhere,
+   * including the legend strip. */
+  hook_color_vis();
 }
 
 
@@ -2512,6 +2756,15 @@ on_animate_dialog_destroy(
   animate_dialog = NULL;
   g_object_unref( animate_dialog_builder );
   animate_dialog_builder = NULL;
+
+  /* Re-enable the near-field static-baseline menu now the phase no longer
+   * drives the vectors. */
+  nf_static_menu_sync();
+
+  /* Playback ended with the dialog; rebake and redraw under the static
+   * selection now that it is gone. */
+  if( main_window_builder != NULL )
+    hook_color_vis();
 }
 
 
@@ -5100,7 +5353,7 @@ on_freqplots_theme_activate(
   if( invert != NULL )
     freqplots_invert_item_sync( invert, base );
 
-  freq_step_update_ui( calc_data.freq_step, TRUE );
+  config_widget_field_changed( rc_config.freqplots_theme );
 }
 
 /* on_freqplots_theme_invert_toggled()
@@ -5115,7 +5368,7 @@ on_freqplots_theme_invert_toggled(
   rc_config.freqplots_theme_invert =
       gtk_check_menu_item_get_active(menuitem) ? 1 : 0;
 
-  freq_step_update_ui( calc_data.freq_step, TRUE );
+  config_widget_field_changed( &rc_config.freqplots_theme_invert );
 }
 
 /* on_freqplots_theme_select()
@@ -5135,7 +5388,7 @@ on_freqplots_theme_select(
     return;
 
   theme_preview_set( base );
-  freq_step_update_ui( calc_data.freq_step, TRUE );
+  hook_theme_change();
 }
 
 /* on_freqplots_theme_menu_hide()
@@ -5153,7 +5406,7 @@ on_freqplots_theme_menu_hide(
     return;
 
   theme_preview_clear();
-  freq_step_update_ui( calc_data.freq_step, TRUE );
+  hook_theme_change();
 }
 
 

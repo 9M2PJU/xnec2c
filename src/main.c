@@ -26,6 +26,8 @@
 #include "opengl/opengl_structure.h"
 #include "cairo/cairo_draw.h"
 #include "config_hooks.h"
+#include "themes/theme.h"
+#include "color/color_palette.h"
 
 /* Forward declaration — full sy_overrides.h conflicts with openblas via gsl */
 extern void sy_overrides_close_if_empty(void);
@@ -546,6 +548,12 @@ main (int argc, char *argv[])
   config_hooks_init();
   rc_config_register_widgets();
 
+  /* Theme registry and palette LUTs precede every theme_active() consumer;
+   * the hook pass inside Read_Config() then rebuilds the palettes for the
+   * persisted theme selection. */
+  theme_registry_init();
+  palette_registry_init();
+
   /* Read GUI state config file and reset geometry */
   Read_Config();
 
@@ -859,6 +867,16 @@ Open_Input_File( gpointer arg )
     return( FALSE );
   } /* if( !ok ) */
 
+  /* Populate the freqplots excitation-port selector for the loaded model. */
+  freqplots_populate_port_combo();
+
+  /* Rebuild open popup port selectors for the reloaded model's ports. */
+  freqplots_reload_port_combos();
+
+  /* Gray feedpoint-dependent widgets when the reloaded model has no
+   * feedpoint. */
+  freqplots_gate_feedpoint_widgets();
+
   /* Serialization relies on GTK single-threadedness: inotify dispatches
    * Open_Input_File to the GTK thread via g_idle_add; Stop_Frequency_Loop
    * at entry joins any compute thread before proceeding. */
@@ -954,22 +972,10 @@ Open_Input_File( gpointer arg )
     if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) && !rc_config.main_loop_start)
       Main_Rdpattern_Activate( FALSE );
 
-    /* Select display of radiation or EH pattern */
-    if( isFlagSet(DRAW_GAIN) )
-    {
-      if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) && !rc_config.main_loop_start)
-        Rdpattern_Gain_Togglebutton_Toggled( TRUE );
-    }
-    else if( isFlagSet(DRAW_EHFIELD) )
-    {
-      if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
-        Rdpattern_EH_Togglebutton_Toggled( TRUE );
-    }
-    else
-    {
-      Rdpattern_Gain_Togglebutton_Toggled( FALSE );
-      Rdpattern_EH_Togglebutton_Toggled( FALSE );
-    }
+    /* Re-apply the persisted radiation-pattern field mode for the reloaded
+     * file; the rc_config enum selects far-field gain or near E/H field */
+    if( isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) && !rc_config.main_loop_start )
+      rdpattern_mode_apply();
 
     GtkWidget *box = Builder_Get_Object( rdpattern_window_builder, "rdpattern_box" );
     gtk_widget_show( box );
@@ -1040,12 +1046,9 @@ Open_Input_File( gpointer arg )
   }
 
 
-  /* If currents or charges draw button is active
-   * re-initialize structure currents/charges drawing */
-  if( isFlagSet(DRAW_CURRENTS) )
-    Main_Currents_Togglebutton_Toggled( TRUE );
-  if( isFlagSet(DRAW_CHARGES) )
-    Main_Charges_Togglebutton_Toggled( TRUE );
+  /* Re-apply the persisted structure view for the reloaded geometry; the
+   * rc_config enum selects geometry, currents, or charges */
+  structure_view_apply();
 
   /* Redraw structure with updated geometry regardless of overlay state.
    * During optimization freq_step_update_ui_idle_force handles both

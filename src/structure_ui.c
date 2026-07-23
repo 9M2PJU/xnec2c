@@ -26,6 +26,7 @@
  */
 #include "structure_ui.h"
 #include "shared.h"
+#include "config_hooks.h"
 #include "callbacks.h"
 #include "cairo/cairo_draw.h"
 #include "prerender/prerender_aggregate.h"
@@ -52,32 +53,70 @@ Draw_Structure_UI(void)
   if( calc_data.freq_step >= 0 )
     Display_Fstep( structure_fstep_entry, calc_data.freq_step );
 
-  /* Update structure-window color code max label for current/charge display */
+  /* Update structure-window color code labels for current/charge display */
   int fstep = calc_data.freq_step;
   if( CRNT_FSTEP_AVAILABLE(fstep) && struct_colors )
   {
-    char label[16];
+    char maxlabel[16] = "", zerolabel[16] = "";
     gboolean do_update = FALSE;
+    double maxval = 0.0;
 
-    if( isFlagSet(DRAW_CURRENTS) )
+    if(struct_view_currents())
     {
-      snprintf( label, sizeof(label) - 1, "%8.2E",
-          (double)struct_colors[fstep].wire_crnt_cmax * (double)data.wlam );
+      maxval = (double)struct_colors[fstep].wire_crnt_cmax * (double)data.wlam;
       do_update = TRUE;
     }
-    else if( isFlagSet(DRAW_CHARGES) )
+    else if(struct_view_charges())
     {
-      snprintf( label, sizeof(label) - 1, "%8.2E",
-          (double)struct_colors[fstep].wire_chrg_cmax * 1.0E-6 / (double)calc_data.freq_mhz );
+      maxval = (double)struct_colors[fstep].wire_chrg_cmax
+             * 1.0E-6 / (double)calc_data.freq_mhz;
       do_update = TRUE;
     }
-    /* else geometry mode: label retains previous value */
+    /* else geometry mode: labels retain previous values */
 
     if( do_update )
+    {
+      color_tone_t fam = color_tone_active();
+
+      /* Label endpoints per the projection's hue palette */
+      switch(chroma_proj_palette_kind(chroma_proj_rows[color_proj_active()].hue_enc) )
+      {
+        case PALETTE_DIVERGING:
+          snprintf( maxlabel, sizeof(maxlabel) - 1, "%8.2E", maxval );
+          snprintf( zerolabel, sizeof(zerolabel) - 1, "-%.1E", maxval );
+          break;
+
+        case PALETTE_CYCLIC:
+          snprintf( maxlabel, sizeof(maxlabel) - 1, "%s", "360°" );
+          snprintf( zerolabel, sizeof(zerolabel) - 1, "%s", "0°" );
+          break;
+
+        case PALETTE_RAMP:
+          snprintf( maxlabel, sizeof(maxlabel) - 1, "%8.2E", maxval );
+          if( fam == COLOR_TONE_DB )
+          {
+            /* The dB strip bottoms out at the range floor, not zero */
+            tone_param_t tp;
+            tone_param_init( &tp, fam );
+            snprintf( zerolabel, sizeof(zerolabel) - 1, "%8.2E",
+                maxval * tp.floor_ratio );
+          }
+          else
+            snprintf( zerolabel, sizeof(zerolabel) - 1, "%s", "0" );
+          break;
+
+        case PALETTE_NUM:
+          BUG("unreachable palette kind sentinel\n");
+          break;
+      }
+
       gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
-              main_window_builder, "main_colorcode_maxlabel")), label );
+              main_window_builder, "main_colorcode_maxlabel")), maxlabel );
+      gtk_label_set_text( GTK_LABEL(Builder_Get_Object(
+              main_window_builder, "main_colorcode_zerolabel")), zerolabel );
+    }
   }
-  /* else no current data: label retains previous value */
+  /* else no current data: labels retain previous values */
 }
 
 /*-----------------------------------------------------------------------*/
@@ -92,9 +131,9 @@ Show_Viewer_Gain(
     gchar *widget,
     view_t *v )
 {
-  if( isFlagSet(DRAW_CURRENTS) ||
-      isFlagSet(DRAW_CHARGES)  ||
-      isFlagSet(DRAW_GAIN)     ||
+  if(struct_view_currents() ||
+      struct_view_charges()  ||
+      rdpat_gain_active()     ||
       isFlagSet(FREQ_LOOP_RUNNING) )
   {
     char txt[16];
@@ -211,7 +250,7 @@ Queue_Structure_Redraw(void)
 
   /* Trigger a redraw of plots drawingarea */
   if( isFlagSet(PLOT_ENABLED) &&
-      (isFlagSet(PLOT_GVIEWER) || freqplots_popup_open(FP_PANEL_VIEWER)) &&
+      (rc_config.freqplots_gviewer_togglebutton || freqplots_popup_open(FP_PANEL_VIEWER)) &&
       isFlagClear(SUPPRESS_INTERMEDIATE_REDRAWS) )
   {
     freqplots_redraw_all(TRUE);
@@ -249,7 +288,7 @@ structure_view_changed_cb(view_t *v, gpointer _user_data)
  * Returns G_SOURCE_REMOVE immediately when ANIMATE is cleared.
  * Otherwise advances flow_phase by one anim_step, dispatches to all
  * active animation consumers, then queues redraws.  Animate_Phase owns
- * all queue decisions; compute_near_field_frame() is pure computation.
+ * all queue decisions.
  */
   gboolean
 Animate_Phase(gpointer _udata)
@@ -275,22 +314,17 @@ Animate_Phase(gpointer _udata)
 /** apply_animation_phase() - Render structure and pattern at the current phase
  *
  * Shared by the timer tick and the manual phase slider.  Reads flow_phase
- * without modifying it: computes the near-field frame when EH field
- * visualization is active, queues the structure drawing area, and queues the
- * radiation-pattern drawing area for near-field or patch-arrow overlay.
+ * without modifying it: queues the structure drawing area and the
+ * radiation-pattern drawing area for near-field or patch-arrow overlay.  The
+ * draw-time resolver derives the near-field frame at flow_phase.
  */
   void
 apply_animation_phase(void)
 {
-  /* Near-field computation only runs when EH field visualization is active */
-  if( isFlagSet(DRAW_EHFIELD) )
-    compute_near_field_frame((double)flow_phase);
-
   xnec2_widget_queue_draw( structure_drawingarea, TRUE );
 
-  /* Queue rdpattern for near-field visualization or patch arrow overlay */
-  if( isFlagSet(DRAW_EHFIELD) ||
-      (isFlagSet(OVERLAY_STRUCT) && data.m > 0) )
+  /* Queue rdpattern for near-field visualization or structure overlay */
+  if(rdpat_ehfield_active() || overlay_struct_active() )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 
   /* Update the phase readout from flow_phase without moving the slider, whose
@@ -310,14 +344,70 @@ apply_animation_phase(void)
 
 /*-----------------------------------------------------------------------*/
 
+/* Manual phase-slider interaction since the last reset; together with the
+ * ANIMATE timer flag this forms the playback-live state. */
+static gboolean animation_scrubbed = FALSE;
+
 /** reset_animation_phase() - Zero the shared animation phase
  *
- * Called when animation stops to return arrows to reference direction.
+ * Called when animation stops to return arrows to reference direction
+ * and end playback-liveness.
  */
   void
 reset_animation_phase(void)
 {
   flow_phase = 0.0f;
+  animation_scrubbed = FALSE;
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** animation_set_scrubbed() - Mark manual phase scrubbing as playback
+ *
+ * Called by the phase-slider handlers; cleared by reset_animation_phase().
+ * The rising edge swaps in the animated projection, including the legend;
+ * later scrubs redraw through the phase change alone.
+ */
+  void
+animation_set_scrubbed(void)
+{
+  if( animation_scrubbed )
+    return;
+
+  animation_scrubbed = TRUE;
+  hook_color_vis();
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** animation_is_active() - Report whether the animated selection applies
+ *
+ * Playback-live boundary: the animate dialog is open and the phase is
+ * advancing (ANIMATE timer running or the slider scrubbed).  Opening the
+ * dialog alone leaves the static amplitude baseline in effect, so no
+ * color change precedes the user starting playback.
+ */
+  gboolean
+animation_is_active(void)
+{
+  return (animate_dialog != NULL)
+      && (isFlagSet(ANIMATE) || animation_scrubbed);
+}
+
+/*-----------------------------------------------------------------------*/
+
+/** color_proj_active() - Resolve the color projection now in effect
+ *
+ * A live menu-hover preview renders at once; otherwise the animated
+ * projection applies while animation playback is live, else the static
+ * amplitude baseline.
+ */
+  chroma_proj_t
+color_proj_active(void)
+{
+  return (chroma_proj_preview_active() || animation_is_active())
+      ? chroma_proj_selected()
+      : CHROMA_PROJ_AMPLITUDE;
 }
 
 /*-----------------------------------------------------------------------*/

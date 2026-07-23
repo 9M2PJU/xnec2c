@@ -26,23 +26,6 @@
 "aboutdialog", \
 NULL
 
-#define ANIMATE_DIALOG_IDS \
-"animate_freq_adjustment", \
-"animate_steps_adjustment", \
-"animate_dialog", \
-"animate_steps_spinbutton", \
-"animate_freq_spinbutton", \
-"animate_phase_adjustment", \
-"animate_phase_slider", \
-"animate_phase_value", \
-"anim_currents", \
-"anim_efield", \
-"anim_hfield", \
-"anim_poynting", \
-"anim_flow_dir", \
-"anim_structure_frame", \
-NULL
-
 #define ARC_EDITOR_IDS \
 "arc_dia_adjustment", \
 "arc_end1_adjustment", \
@@ -139,6 +122,7 @@ NULL
 "freqplots_ant_temp_entry", \
 "freqplots_gt_entry", \
 "freqplots_zo_spinbutton", \
+"freqplots_port_combo", \
 "freqplots_drawingarea", \
 "freqplots_label", \
 "freqplots_net_gain", \
@@ -684,6 +668,13 @@ NULL
 "main_colorcode_zerolabel", \
 "main_colorcode_drawingarea", \
 "main_colorcode_maxlabel", \
+"main_color_fam_power", \
+"main_color_fam_db", \
+"main_color_fam_asinh", \
+"main_color_fam_mulaw", \
+"main_color_fam_reinhard", \
+"main_color_fam_sigmoid", \
+"main_color_fam_none", \
 "main_gain_entry", \
 "main_freq_spinbutton", \
 "main_freq_label", \

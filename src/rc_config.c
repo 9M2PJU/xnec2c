@@ -25,6 +25,7 @@
 #include "mathlib.h"
 #include "measurements.h"
 #include "config_hooks.h"
+#include "chroma/chroma.h"
 
 #include "opengl/opengl_structure.h"
 #include "opengl/opengl_msaa.h"
@@ -77,22 +78,34 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.main_x, &rc_config.main_y },
 		.def = { { .i = 50 }, { .i = 50 } } },
 
+	// Reuses the historical "currents" key as a struct_view_t enum holder:
+	// value 1 keeps its old CURRENTS meaning, 0 becomes CHARGES, and the
+	// DISABLED (-1) geometry view is a value no old file ever wrote, reached
+	// by releasing the pressed toggle.  The two-value toggles carry the
+	// released DISABLED state, so clearing the active view shows geometry and
+	// the fresh default is geometry; the engine sync enforces exclusivity.
+	// The dropped "charges" key is ignored.
 	{ .desc = "Main Window Currents toggle button state", .format = "%d",
-		.vars = { &rc_config.main_currents_togglebutton },
-		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_main_currents,
+		.vars = { &rc_config.structure_view }, .def = { { .i = STRUCT_VIEW_DISABLED } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = structure_view_apply,
 			.groups = CONFIG_WIDGET_GROUPS(
 				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
 					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "main_currents_togglebutton" ), NULL ) ),
+						CONFIG_WIDGET( .widget_id = "main_currents_togglebutton",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_CURRENTS, STRUCT_VIEW_DISABLED) ),
+						CONFIG_WIDGET( .widget_id = "main_charges_togglebutton",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_CHARGES, STRUCT_VIEW_DISABLED) ),
+						NULL ) ),
 				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
 					.elements = CONFIG_WIDGETS(
-						CONFIG_WIDGET( .widget_id = "anim_currents" ), NULL ) ),
+						CONFIG_WIDGET( .widget_id = "anim_qty_off",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_DISABLED) ),
+						CONFIG_WIDGET( .widget_id = "anim_qty_charges",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_CHARGES) ),
+						CONFIG_WIDGET( .widget_id = "anim_qty_currents",
+							.values = CONFIG_WIDGET_VALUES(STRUCT_VIEW_CURRENTS) ),
+						NULL ) ),
 				NULL ) ) },
-
-	{ .desc = "Main Window Charges toggle button state", .format = "%d",
-		.vars = { &rc_config.main_charges_togglebutton },
-		.widgets = CONFIG_WIDGET_SINGLE( &main_window_builder,
-			"main_charges_togglebutton", hook_main_charges ) },
 
 	{ .desc = "Polarization Type", .format = "%d",
 		.vars = { &calc_data.pol_type }, .def = { { .i = POL_TOTAL } },
@@ -160,15 +173,23 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.rdpattern_x, &rc_config.rdpattern_y },
 		.def = { { .i = -1 }, { .i = -1 } } },
 
+	// Reuses the historical "gain" key as a rdpat_mode_t enum holder: value 1
+	// keeps its old GAIN meaning and 0 becomes EHFIELD.  The two-value toggles
+	// carry the released DISABLED state, so clearing the active field shows no
+	// pattern; the engine sync enforces exclusivity.  The dropped "eh" key is
+	// ignored.
 	{ .desc = "Radiation Pattern Window Gain toggle button state", .format = "%d",
-		.vars = { &rc_config.rdpattern_gain_togglebutton }, .def = { { .i = 1 } },
-		.widgets = CONFIG_WIDGET_SINGLE( &rdpattern_window_builder,
-			"rdpattern_gain_togglebutton", hook_rdpat_gain ) },
-
-	{ .desc = "Radiation Pattern Window EH toggle button state", .format = "%d",
-		.vars = { &rc_config.rdpattern_eh_togglebutton },
-		.widgets = CONFIG_WIDGET_SINGLE( &rdpattern_window_builder,
-			"rdpattern_eh_togglebutton", hook_rdpat_eh ) },
+		.vars = { &rc_config.rdpattern_mode }, .def = { { .i = RDPAT_FIELD_GAIN } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = rdpattern_mode_apply,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "rdpattern_gain_togglebutton",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_FIELD_GAIN, RDPAT_FIELD_DISABLED) ),
+						CONFIG_WIDGET( .widget_id = "rdpattern_eh_togglebutton",
+							.values = CONFIG_WIDGET_VALUES(RDPAT_FIELD_EHFIELD, RDPAT_FIELD_DISABLED) ),
+						NULL ) ),
+				NULL ) ) },
 
 	{ .desc = "Radiation Pattern Window Menu E-field state", .format = "%d",
 		.vars = { &rc_config.rdpattern_e_field }, .def = { { .i = 1 } },
@@ -204,6 +225,19 @@ rc_config_vars_t rc_config_vars[] = {
 				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
 					.elements = CONFIG_WIDGETS(
 						CONFIG_WIDGET( .widget_id = "anim_poynting" ), NULL ) ),
+				NULL ) ) },
+
+	{ .desc = "Near Field Static Baseline", .format = "%d",
+		.vars = { &rc_config.nf_static_mode }, .def = { { .i = NF_STATIC_PEAK } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_render_redraw,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &rdpattern_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "near_peak_value",
+							.values = CONFIG_WIDGET_VALUES(NF_STATIC_PEAK) ),
+						CONFIG_WIDGET( .widget_id = "near_snapshot",
+							.values = CONFIG_WIDGET_VALUES(NF_STATIC_SNAPSHOT) ),
+						NULL ) ),
 				NULL ) ) },
 
 	{ .desc = "Radiation Pattern Window Gradient Key", .format = "%d",
@@ -395,6 +429,121 @@ rc_config_vars_t rc_config_vars[] = {
 								FLOW_DIR_LIC, FLOW_DIR_WIREFRAME) ),
 						NULL ) ),
 				NULL ) ) },
+
+	{ .desc = "Animate Color Projection", .format = "%d",
+		.vars = { &rc_config.anim_color_proj },
+		.def = { { .i = CHROMA_PROJ_INSTANT } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_color_vis,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_projsel_instant",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_INSTANT) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_polarity",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_SIGNED) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_phase",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_PHASE) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_dual",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_DUAL) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_amplitude",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_AMPLITUDE) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_standing",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_STANDING) ),
+						CONFIG_WIDGET( .widget_id = "anim_projsel_farfield",
+							.values = CONFIG_WIDGET_VALUES(CHROMA_PROJ_FARFIELD) ),
+						NULL ) ),
+				NULL ) ) },
+
+	{ .desc = "Color Scale", .format = "%d",
+		.vars = { &rc_config.color_scale },
+		.def = { { .i = COLOR_TONE_POWER } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_color_family,
+			.groups = CONFIG_WIDGET_GROUPS(
+				CONFIG_WIDGET_GROUP( .builder = &main_window_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "main_color_fam_power",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_POWER) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_db",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_DB) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_asinh",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_ASINH) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_mulaw",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_MULAW) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_reinhard",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_REINHARD) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_sigmoid",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_SIGMOID) ),
+						CONFIG_WIDGET( .widget_id = "main_color_fam_none",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_NONE) ),
+						NULL ) ),
+				CONFIG_WIDGET_GROUP( .builder = &animate_dialog_builder,
+					.elements = CONFIG_WIDGETS(
+						CONFIG_WIDGET( .widget_id = "anim_famsel_power",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_POWER) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_db",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_DB) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_asinh",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_ASINH) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_mulaw",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_MULAW) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_reinhard",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_REINHARD) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_sigmoid",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_SIGMOID) ),
+						CONFIG_WIDGET( .widget_id = "anim_famsel_none",
+							.values = CONFIG_WIDGET_VALUES(COLOR_TONE_NONE) ),
+						NULL ) ),
+				NULL ) ) },
+
+	{ .desc = "Color Family Param Power", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_POWER] }, .def = { { .d = 0.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_power", hook_color_vis ) },
+
+	{ .desc = "Color Family Param dB", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_DB] }, .def = { { .d = 40.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_db", hook_color_vis ) },
+
+	{ .desc = "Color Family Param asinh", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_ASINH] }, .def = { { .d = -1.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_asinh", hook_color_vis ) },
+
+	{ .desc = "Color Family Param mu-law", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_MULAW] }, .def = { { .d = 40.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_mulaw", hook_color_vis ) },
+
+	{ .desc = "Color Family Param Reinhard", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_REINHARD] }, .def = { { .d = 0.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_reinhard", hook_color_vis ) },
+
+	{ .desc = "Color Family Param Sigmoid", .format = "%lf",
+		.vars = { &rc_config.color_fam_param[COLOR_TONE_SIGMOID] }, .def = { { .d = 0.0 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_fam_sigmoid", hook_color_vis ) },
+
+	{ .desc = "Color Brightness Floor", .format = "%lf",
+		.vars = { &rc_config.color_lum_floor }, .def = { { .d = 0.20 } },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_bright_floor", hook_color_vis ) },
+
+	{ .desc = "Color Width From Amplitude", .format = "%d",
+		.vars = { &rc_config.color_width_amp },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_width_amp", hook_color_vis ) },
+
+	{ .desc = "Overlay Nodes", .format = "%d",
+		.vars = { &rc_config.overlay_nodes },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_overlay_nodes", hook_color_vis ) },
+
+	{ .desc = "Overlay Comet", .format = "%d",
+		.vars = { &rc_config.overlay_comet },
+		.widgets = CONFIG_WIDGET_SINGLE( &animate_dialog_builder,
+			"anim_overlay_comet", hook_color_vis ) },
 
 	{ .desc = "Brightness Segments", .format = "%f",
 		.vars = { &rc_config.brightness_segments }, .def = { { .f = 0.47f } },
@@ -658,12 +807,19 @@ rc_config_vars_t rc_config_vars[] = {
 		.vars = { &rc_config.ant_temp_custom_t_earth },
 		.def = { { .d = ANT_TEMP_CUSTOM_T_EARTH_DEFAULT } } },
 
+	/* The theme selector radios are runtime-built menu items owned by
+	 * theme.c, so these trees bind no widgets; the rows still own the
+	 * unified theme-derived refresh fired by config_widget_field_changed. */
 	{ .desc = "Frequency Plots Color Theme", .format = "%s",
 		.vars = { rc_config.freqplots_theme }, .size = sizeof(rc_config.freqplots_theme),
-		.def = { { .s = "legacy" } } },
+		.def = { { .s = "legacy" } },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_theme_change,
+			.groups = CONFIG_WIDGET_GROUPS( NULL ) ) },
 
 	{ .desc = "Frequency Plots Theme Inverted", .format = "%d",
-		.vars = { &rc_config.freqplots_theme_invert } },
+		.vars = { &rc_config.freqplots_theme_invert },
+		.widgets = CONFIG_WIDGET_TREE( .post_apply = hook_theme_change,
+			.groups = CONFIG_WIDGET_GROUPS( NULL ) ) },
 
 };
 
@@ -935,6 +1091,10 @@ size_t rc_config_field_size(const rc_config_vars_t *v)
 		return sizeof(float);
 	if (strcmp(v->format, "%lf") == 0)
 		return sizeof(double);
+
+	/* String rows carry their buffer width in .size */
+	if (strcmp(v->format, "%s") == 0 && v->size > 0)
+		return v->size;
 
 	BUG("rc_config_field_size: %s: unsupported format %s\n", v->desc, v->format);
 	return 0;

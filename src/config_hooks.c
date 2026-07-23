@@ -22,6 +22,7 @@
 #include "callbacks.h"
 #include "rdpattern_ui.h"
 #include "structure_ui.h"
+#include "color/color_palette.h"
 
 #ifdef HAVE_OPENGL
 #include "opengl/opengl_structure.h"
@@ -56,9 +57,10 @@ hook_flow_direction(void)
   Queue_Structure_Redraw();
   Queue_Radiation_Redraw();
 
-  /* Animation produces no visible change for phase-invariant modes;
-   * grey out the Animate menu item for those modes. */
-  animatable =
+  /* Wire color animates in every flow mode; patch arrows animate only in
+   * the phase-variant modes, so grey the Animate menu item only for a
+   * patch-only model in a phase-invariant mode. */
+  animatable = (data.n > 0) ||
     (rc_config.current_flow_visualization_mode == FLOW_DIR_REFERENCE_PHASE ||
      rc_config.current_flow_visualization_mode == FLOW_DIR_LIC ||
      rc_config.current_flow_visualization_mode == FLOW_DIR_WIREFRAME);
@@ -66,6 +68,143 @@ hook_flow_direction(void)
   gtk_widget_set_sensitive(
       Builder_Get_Object(main_window_builder, "main_structure_animate"),
       animatable);
+}
+
+/*------------------------------------------------------------------------*/
+
+/* Gate the wire overlay checkboxes by projection class and wire presence.
+ * Comet needs a phase-varying projection; both overlays need wire-current
+ * segments.  A disabled control carries a tooltip naming the reason.
+ * Single source called from hook_color_vis (projection edge) and from
+ * config_widget_run_hooks on dialog open. */
+static void
+anim_overlay_sensitivity(void)
+{
+  const char *no_wire = _("This overlay derives from wire-current segments;"
+      " this model has none.");
+  gboolean animated, has_wires;
+  GtkWidget *comet, *nodes;
+
+  if( animate_dialog_builder == NULL )
+    return;
+
+  animated  = chroma_proj_animated(chroma_proj_selected());
+  has_wires = (data.n > 0);
+
+  comet = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_overlay_comet"));
+  nodes = GTK_WIDGET(Builder_Get_Object(animate_dialog_builder, "anim_overlay_nodes"));
+
+  gtk_widget_set_sensitive( comet, animated && has_wires );
+  gtk_widget_set_sensitive( nodes, has_wires );
+
+  if( !has_wires )
+  {
+    gtk_widget_set_tooltip_text( comet, no_wire );
+    gtk_widget_set_tooltip_text( nodes, no_wire );
+  }
+  else
+  {
+    gtk_widget_set_tooltip_text( comet, animated
+        ? _("Highlight the moving wave crest as a bright comet head.")
+        : _("Comet rides the animated wave crest; this projection is a static"
+            " read with no moving phase.") );
+    gtk_widget_set_tooltip_text( nodes,
+        _("Mark current nodes (cyan) and antinodes (red) along the wires.") );
+  }
+}
+
+/** hook_color_vis() - Rebake baked colors and redraw after a
+ * color projection or scale change, including the legend strip.
+ */
+void
+hook_color_vis(void)
+{
+#ifdef HAVE_OPENGL
+  opengl_structure_invalidate();
+#endif
+
+  Queue_Structure_Redraw();
+  Queue_Radiation_Redraw();
+
+  /* The legend strip lives outside the structure drawing area */
+  if( main_window_builder != NULL )
+    xnec2_widget_queue_draw( Builder_Get_Object(main_window_builder,
+        "main_colorcode_drawingarea"), TRUE );
+
+  /* Track the animate dialog's projection selector label and formula to
+   * the selected row and refresh the dialog's copy of the legend strip */
+  if( animate_dialog_builder != NULL )
+  {
+    chroma_proj_t sel = chroma_proj_selected();
+
+    gtk_button_set_label( GTK_BUTTON(Builder_Get_Object(animate_dialog_builder,
+            "anim_color_proj_button")),
+        gtk_menu_item_get_label( GTK_MENU_ITEM(Builder_Get_Object(
+              animate_dialog_builder, chroma_proj_rows[sel].sel_id)) ) );
+
+    gtk_label_set_markup( GTK_LABEL(Builder_Get_Object(animate_dialog_builder,
+            "anim_proj_formula")),
+        chroma_proj_rows[sel].formula );
+
+    xnec2_widget_queue_draw( Builder_Get_Object(animate_dialog_builder,
+        "anim_colorcode_drawingarea"), TRUE );
+  }
+
+  anim_overlay_sensitivity();
+}
+
+/*------------------------------------------------------------------------*/
+
+/** hook_color_family() - Swap the active family's slider row and formula
+ *
+ * Shows only the active family's brightness-slider row in the animate
+ * dialog, renders its closed-form transfer in the formula label, then
+ * rebakes colors via hook_color_vis().
+ */
+void
+hook_color_family(void)
+{
+  color_tone_t active = color_tone_active();
+  int fam;
+
+  if( animate_dialog_builder != NULL )
+  {
+    for( fam = 0; fam < COLOR_TONE_NUM; fam++ )
+      gtk_widget_set_visible(
+          GTK_WIDGET(Builder_Get_Object(animate_dialog_builder,
+              color_tones[fam].row_id)),
+          fam == (int)active );
+
+    gtk_label_set_markup( GTK_LABEL(Builder_Get_Object(animate_dialog_builder,
+            "anim_scale_formula")),
+        color_tones[active].formula );
+
+    gtk_button_set_label( GTK_BUTTON(Builder_Get_Object(animate_dialog_builder,
+            "anim_color_family_button")),
+        gtk_menu_item_get_label( GTK_MENU_ITEM(Builder_Get_Object(
+              animate_dialog_builder, color_tones[active].sel_id)) ) );
+  }
+
+  hook_color_vis();
+}
+
+/*------------------------------------------------------------------------*/
+
+/** hook_theme_change() - Refresh everything derived from the active theme
+ *
+ * Single unified refresh for every theme-derived consumer: rebuild the
+ * palette LUTs from the theme's gradient roles, rebake and redraw the
+ * color-projected surfaces and legend strips, then repaint the frequency
+ * plots through the redraw orchestration path.  Every theme commit,
+ * preview, and revert edge calls this one function; a new theme-derived
+ * consumer adds its refresh here.
+ */
+void
+hook_theme_change(void)
+{
+  palette_registry_init();
+  hook_color_vis();
+  freq_step_update_ui(calc_data.freq_step, TRUE);
 }
 
 /*------------------------------------------------------------------------*/
@@ -132,62 +271,32 @@ hook_frequency(void)
 /*------------------------------------------------------------------------*/
 
 void
-hook_main_currents(void)
-{
-  Main_Currents_Togglebutton_Toggled(rc_config.main_currents_togglebutton);
-}
-
-void
-hook_main_charges(void)
-{
-  Main_Charges_Togglebutton_Toggled(rc_config.main_charges_togglebutton);
-}
-
-/*------------------------------------------------------------------------*/
-
-void
 hook_rdpat_e_field(void)
 {
-  if( rc_config.rdpattern_e_field )
-    SetFlag( DRAW_EFIELD );
-  else
-    ClearFlag( DRAW_EFIELD );
   Set_Window_Labels();
-  if( isFlagSet(DRAW_EHFIELD) )
+  if( rdpat_ehfield_active() )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
 void
 hook_rdpat_h_field(void)
 {
-  if( rc_config.rdpattern_h_field )
-    SetFlag( DRAW_HFIELD );
-  else
-    ClearFlag( DRAW_HFIELD );
   Set_Window_Labels();
-  if( isFlagSet(DRAW_EHFIELD) )
+  if( rdpat_ehfield_active() )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
 void
 hook_rdpat_poynting(void)
 {
-  if( rc_config.rdpattern_poynting_vector )
-    SetFlag( DRAW_POYNTING );
-  else
-    ClearFlag( DRAW_POYNTING );
   Set_Window_Labels();
-  if( isFlagSet(DRAW_EHFIELD) )
+  if( rdpat_ehfield_active() )
     xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
 void
 hook_rdpat_overlay(void)
 {
-  if( rc_config.rdpattern_overlay_structure )
-    SetFlag( OVERLAY_STRUCT );
-  else
-    ClearFlag( OVERLAY_STRUCT );
   xnec2_widget_queue_draw( rdpattern_drawingarea, TRUE );
 }
 
@@ -203,57 +312,34 @@ hook_rdpat_draw_style(void)
   Queue_Radiation_Redraw();
 }
 
-void
-hook_rdpat_gain(void)
-{
-  Rdpattern_Gain_Togglebutton_Toggled(rc_config.rdpattern_gain_togglebutton);
-}
-
-void
-hook_rdpat_eh(void)
-{
-  Rdpattern_EH_Togglebutton_Toggled(rc_config.rdpattern_eh_togglebutton);
-}
-
 /*------------------------------------------------------------------------*/
 
 /* freqplots_recount_ngraph - derive the active-plot count from the live
- * PLOT_* select flags.
+ * rc_config select fields.
  *
  * calc_data.ngraph is a derived value; each select hook is called at most
  * once per real change and unconditionally at window-creation time via
- * config_widget_run_hooks(), so recomputing from the flags (rather than
+ * config_widget_run_hooks(), so recomputing from the fields (rather than
  * incrementing/decrementing per call) keeps every hook idempotent.
  */
 static void
 freqplots_recount_ngraph(void)
 {
-  static const unsigned long long select_flags[] = {
-    PLOT_GMAX, PLOT_GAIN_DIR, PLOT_GVIEWER, PLOT_VSWR,
-    PLOT_ZREAL_ZIMAG, PLOT_ZMAG_ZPHASE, PLOT_SMITH, PLOT_ANT_TEMP,
-  };
-  int i, n = 0;
-
-  for( i = 0; i < (int)(sizeof(select_flags) / sizeof(select_flags[0])); i++ )
-    if( isFlagSet(select_flags[i]) )
-      n++;
-
-  calc_data.ngraph = n;
+  calc_data.ngraph = freqplots_count_selected();
 }
 
-/* freqplots_select_changed - apply one PLOT_* select flag from its field
+/* freqplots_select_changed - refresh derived plot state after a select toggle
  * @field_active: current rc_config toggle-button field value
- * @flag: the PLOT_* bit this field owns
  *
  * Shared body for the eight freqplots select-toggle hooks.
  */
 static void
-freqplots_select_changed(int field_active, unsigned long long int flag)
+freqplots_select_changed(int field_active)
 {
+  /* PLOT_SELECT latches on the first panel ever selected and gates the
+   * plot-save action; deselecting leaves it set, so no clear pairs here. */
   if( field_active )
-    SetFlag( flag | PLOT_SELECT );
-  else
-    ClearFlag( flag );
+    SetFlag( PLOT_SELECT );
 
   freqplots_recount_ngraph();
 
@@ -263,51 +349,50 @@ freqplots_select_changed(int field_active, unsigned long long int flag)
 
 void hook_freqplots_gmax(void)
 {
-  freqplots_select_changed(rc_config.freqplots_gmax_togglebutton, PLOT_GMAX);
+  freqplots_select_changed(rc_config.freqplots_gmax_togglebutton);
 }
 
 void hook_freqplots_gdir(void)
 {
-  freqplots_select_changed(rc_config.freqplots_gdir_togglebutton, PLOT_GAIN_DIR);
+  freqplots_select_changed(rc_config.freqplots_gdir_togglebutton);
 }
 
 void hook_freqplots_gviewer(void)
 {
-  freqplots_select_changed(rc_config.freqplots_gviewer_togglebutton, PLOT_GVIEWER);
+  freqplots_select_changed(rc_config.freqplots_gviewer_togglebutton);
 }
 
 void hook_freqplots_vswr(void)
 {
-  freqplots_select_changed(rc_config.freqplots_vswr_togglebutton, PLOT_VSWR);
+  freqplots_select_changed(rc_config.freqplots_vswr_togglebutton);
 }
 
 void hook_freqplots_zrlzim(void)
 {
-  freqplots_select_changed(rc_config.freqplots_zrlzim_togglebutton, PLOT_ZREAL_ZIMAG);
+  freqplots_select_changed(rc_config.freqplots_zrlzim_togglebutton);
 }
 
 void hook_freqplots_zmgzph(void)
 {
-  freqplots_select_changed(rc_config.freqplots_zmgzph_togglebutton, PLOT_ZMAG_ZPHASE);
+  freqplots_select_changed(rc_config.freqplots_zmgzph_togglebutton);
 }
 
 void hook_freqplots_smith(void)
 {
-  freqplots_select_changed(rc_config.freqplots_smith_togglebutton, PLOT_SMITH);
+  freqplots_select_changed(rc_config.freqplots_smith_togglebutton);
 }
 
 void hook_freqplots_ant_temp(void)
 {
-  freqplots_select_changed(rc_config.freqplots_ant_temp_togglebutton, PLOT_ANT_TEMP);
+  freqplots_select_changed(rc_config.freqplots_ant_temp_togglebutton);
 }
 
 void
 hook_freqplots_net_gain(void)
 {
-  if( rc_config.freqplots_net_gain )
-    SetFlag( PLOT_NETGAIN );
-  else
-    ClearFlag( PLOT_NETGAIN );
+  /* Net gain gates the gain and viewer popups' port pull-downs, so re-gate
+   * every open port-aware combo when the setting flips. */
+  freqplots_refresh_port_combos();
 
   if( isFlagSet(PLOT_ENABLED) && isFlagSet(FREQ_LOOP_DONE) )
     freqplots_redraw_all(TRUE);

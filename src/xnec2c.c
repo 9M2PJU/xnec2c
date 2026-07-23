@@ -25,7 +25,6 @@
 #include "measurements.h"
 #include "prerender/prerender_color.h"
 #include "prerender/prerender_farfield.h"
-#include "prerender/prerender_nearfield.h"
 #include "validation_dump.h"
 #include "mathlib.h"
 #include "opt_ui.h"
@@ -434,17 +433,100 @@ Set_Network_Data( void )
 		fstep == calc_data.steps_total)
   {
 
-    impedance_data.zreal[fstep] = (double)creal( netcx.zped);
-    impedance_data.zimag[fstep] = (double)cimag( netcx.zped);
-    impedance_data.zmagn[fstep] = (double)cabs( netcx.zped);
-    impedance_data.zphase[fstep]= (double)cang( netcx.zped);
+    int n_ports = Num_Feedpoint_Ports();
+    for( int p = 0; p < n_ports; p++ )
+    {
+      impedance_data[fstep].zreal[p]  = creal( netcx.zped_port[p] );
+      impedance_data[fstep].zimag[p]  = cimag( netcx.zped_port[p] );
+      impedance_data[fstep].zmagn[p]  = cabs ( netcx.zped_port[p] );
+      impedance_data[fstep].zphase[p] = cang ( netcx.zped_port[p] );
+    }
 
-    if( (calc_data.iped == 1) &&
-        ((double)impedance_data.zmagn[fstep] > calc_data.zpnorm) )
-      calc_data.zpnorm = (double)impedance_data.zmagn[fstep];
+    if( (calc_data.iped == 1) && (n_ports > 0) &&
+        (impedance_data[fstep].zmagn[calc_data.ex_port] > calc_data.zpnorm) )
+      calc_data.zpnorm = impedance_data[fstep].zmagn[calc_data.ex_port];
   }
 
 } /* Set_Network_Data() */
+
+/*-----------------------------------------------------------------------*/
+
+/* free_impedance_step()
+ *
+ * Releases one frequency step's per-port impedance sub-buffers.
+ */
+  static void
+free_impedance_step( void *elem )
+{
+  impedance_data_t *ip = elem;
+  mem_array_free( &ip->zreal );
+  mem_array_free( &ip->zimag );
+  mem_array_free( &ip->zmagn );
+  mem_array_free( &ip->zphase );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* Alloc_Impedance_Buffers()
+ *
+ * Sizes the per-fstep impedance array-of-structs, each element carrying one
+ * value per feedpoint port.  A zero port count leaves the inner members NULL.
+ */
+  void
+Alloc_Impedance_Buffers( int nfrq, int n_ports )
+{
+  mem_array_resize( &impedance_data, nfrq, free_impedance_step );
+
+  if( n_ports > 0 )
+    for( int idx = 0; idx < nfrq; idx++ )
+    {
+      mem_array_realloc( &impedance_data[idx].zreal,  n_ports );
+      mem_array_realloc( &impedance_data[idx].zimag,  n_ports );
+      mem_array_realloc( &impedance_data[idx].zmagn,  n_ports );
+      mem_array_realloc( &impedance_data[idx].zphase, n_ports );
+    }
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* Free_Impedance_Buffers()
+ *
+ * Releases every fstep's per-port sub-buffers, then the outer array-of-structs,
+ * leaving impedance_data NULL so no managed block survives teardown.
+ */
+  void
+Free_Impedance_Buffers( void )
+{
+  if( impedance_data == NULL )
+    return;
+
+  /* Release each fstep's per-port sub-buffers, then the outer array. */
+  int nfrq = mem_array_count( impedance_data );
+  for( int idx = 0; idx < nfrq; idx++ )
+    free_impedance_step( &impedance_data[idx] );
+
+  mem_array_free( &impedance_data );
+}
+
+/*-----------------------------------------------------------------------*/
+
+/* Rescan_Zpnorm()
+ *
+ * Recomputes the VSWR-normalization running maximum impedance magnitude over
+ * already-computed frequency steps for the selected excitation port.
+ */
+  void
+Rescan_Zpnorm( void )
+{
+  if( Num_Feedpoint_Ports() <= 0 )
+    return;
+
+  calc_data.zpnorm = 0.0;
+  for( int fs = 0; fs <= calc_data.steps_total; fs++ )
+    if( save.fstep[fs] &&
+        (impedance_data[fs].zmagn[calc_data.ex_port] > calc_data.zpnorm) )
+      calc_data.zpnorm = impedance_data[fs].zmagn[calc_data.ex_port];
+}
 
 /*-----------------------------------------------------------------------*/
 
@@ -598,17 +680,14 @@ New_Frequency( void )
    * sky/earth model × method combinations are deterministic and hoistable. */
   ant_temp_fill_fstep( calc_data.freq_step );
 
-  /* Save per-step results before prerender so struct_colors_fill_fstep and
-   * Prerender_Near_Field read current crnt_fstep / near_field_fstep data. */
+  /* Save per-step results before prerender so struct_colors_fill_fstep
+   * reads current crnt_fstep / near_field_fstep data. */
   Save_Crnt_Data( calc_data.freq_step );
   Save_Nearfield_Data( calc_data.freq_step );
 
   /* Child-deterministic per-fstep prerender: no user-mutable inputs enter
    * these functions. */
   struct_colors_fill_fstep( calc_data.freq_step );
-
-  if( isFlagSet(ENABLE_NEAREH) )
-    Prerender_Near_Field( calc_data.freq_step );
 
   if( !CHILD )
   {
@@ -1172,7 +1251,7 @@ fmhz_save_reset_if_stale(void)
     if (!save.fstep[idx])
       continue;
 
-    meas_calc(&meas, idx);
+    meas_calc(&meas, idx, calc_data.ex_port);
 
     if (!isnan(meas.vswr) && meas.vswr >= 0.0 && meas.vswr < best_vswr)
     {

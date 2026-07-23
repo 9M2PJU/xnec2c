@@ -466,7 +466,7 @@ void opt_ui_update_values(void)
 
 	for (idx = 0; idx < steps; idx++)
 	{
-		meas_calc(&meas_all[idx], idx);
+		meas_calc(&meas_all[idx], idx, calc_data.ex_port);
 		freq_all[idx] = save.freq[idx];
 	}
 

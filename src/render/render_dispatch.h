@@ -46,7 +46,7 @@ typedef enum
   RENDER_NO_RP_CARD,
   RENDER_NO_NF_CARD,
   RENDER_NF_NOT_READY,
-  RENDER_NO_NF_FIELD,   /* DRAW_EHFIELD set but no E/H/Poynting component selected */
+  RENDER_NO_NF_FIELD,   /* near E/H field mode but no E/H/Poynting component selected */
   RENDER_NO_DATA,
   RENDER_NO_GEOMETRY,   /* VIEW_STRUCTURE with no geometry loaded (data.n == data.m == 0) */
   RENDER_NO_MODE
@@ -55,13 +55,15 @@ typedef enum
 /* Dispatch-resolved structure draw parameters — passed to draw_structure backends */
 typedef struct
 {
-  const rgb_f_t *wire_colors;   /* seg_rgb | wire_crnt_rgb | wire_chrg_rgb */
+  const rgb_f_t *wire_colors;   /* seg_rgb | composed projection colors */
   const float   *wire_widths;   /* seg_width [data.n] per-segment line widths */
-  const rgb_f_t *patch_colors;  /* patch_rgb | patch_crnt_rgb */
+  const rgb_f_t *patch_colors;  /* patch_rgb | composed projection colors */
+  const unsigned char *wire_glyphs; /* per-segment GLYPH_* code [data.n], or NULL */
   double         cmax;          /* fmax(wire_crnt_cmax, patch_crnt_cmax) or 0.0 */
   double         freq_mhz;      /* frequency for staleness detection */
-  gboolean       show_flow;     /* TRUE only for DRAW_CURRENTS */
+  gboolean       show_flow;     /* TRUE only in currents view */
   int            fstep;         /* for crnt_fstep[] access */
+  uint32_t       color_generation; /* bumped whenever dispatch rebakes wire/patch color */
 } struct_draw_params_t;
 
 /* Dispatch-resolved far-field draw parameters — passed to draw_farfield backends.
@@ -78,7 +80,8 @@ typedef struct
  * Dispatch builds 0-3 of these; backend iterates and emits one batch per entry. */
 typedef struct
 {
-  const nf_vector_t     *vecs;        /* pre-scaled displacement + baked color */
+  const nf_vector_t     *vecs;    /* resolver-owned geometry displacement */
+  const rgb_f_t         *colors;  /* resolver-owned palette colors, parallel to vecs */
 } nf_field_set_t;
 
 #define NF_FIELD_SETS_MAX 3
@@ -90,7 +93,7 @@ typedef struct
   render_mode_t    mode;
   int              fstep;
   const char      *message;      /* STATUS_MSG_* pointer; NULL when RENDER_OK */
-  gboolean         overlay_active; /* resolved from OVERLAY_STRUCT */
+  gboolean         overlay_active; /* resolved from overlay_struct_active() */
 } render_check_result_t;
 
 /* Backend operations vtable — dispatch decides what to draw; backends draw it */

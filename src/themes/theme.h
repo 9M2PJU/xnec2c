@@ -46,6 +46,13 @@ typedef enum
   THEME_ROLE_LABEL_AXIS,
   THEME_ROLE_MARKER_EXTREME,
   THEME_ROLE_CURSOR,
+  THEME_ROLE_GRAD_0,   /* magnitude low / cold pole / phase seam (legacy magenta) */
+  THEME_ROLE_GRAD_1,   /* legacy blue */
+  THEME_ROLE_GRAD_2,   /* legacy cyan */
+  THEME_ROLE_GRAD_3,   /* legacy green */
+  THEME_ROLE_GRAD_4,   /* legacy yellow */
+  THEME_ROLE_GRAD_5,   /* magnitude high / hot pole (legacy red) */
+  THEME_ROLE_GRAD_MID, /* diverging neutral center (legacy white) */
   THEME_ROLE_N
 } theme_role_e;
 

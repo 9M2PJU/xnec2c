@@ -250,7 +250,7 @@ gl_overlay_is_active(void *ctx)
  * @ctx: overlay context
  *
  * Resets vertex_count first so stale data does not persist when overlay_generate
- * declines (e.g. OVERLAY_STRUCT unchecked).
+ * declines (e.g. the structure overlay toggle unchecked).
  * Called during the active survey before far_extent is queried.
  */
   static void

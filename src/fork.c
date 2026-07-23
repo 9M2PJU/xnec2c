@@ -240,10 +240,7 @@ Read_Pipe( int idx, char *str, ssize_t len, gboolean err )
 enum freq_field_cond {
   FREQ_COND_ALWAYS,
   FREQ_COND_RDPAT,
-  FREQ_COND_NEAREH,
-  FREQ_COND_NEAR_E,
-  FREQ_COND_NEAR_H,
-  FREQ_COND_NEAR_EH_BOTH
+  FREQ_COND_NEAREH
 };
 
 typedef struct {
@@ -259,10 +256,8 @@ static size_t size_npm_dbl(void)        { return (size_t)data.npm  * sizeof(doub
 static size_t size_np3m_cdbl(void)      { return (size_t)data.np3m * sizeof(complex double); }
 static size_t size_nphth_dbl(void)      { return (size_t)(fpat.nph * fpat.nth) * sizeof(double); }
 static size_t size_nphth_int(void)      { return (size_t)(fpat.nph * fpat.nth) * sizeof(int); }
+static size_t size_n_ports_dbl(void)    { return (size_t)Num_Feedpoint_Ports() * sizeof(double); }
 static size_t size_nf_points(void)      { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(near_field_point_t); }
-static size_t size_nf_vectors(void)     { return (size_t)(fpat.nrx * fpat.nry * fpat.nrz) * sizeof(nf_vector_t); }
-static size_t size_seg_rgb(void)        { return (size_t)data.n  * sizeof(rgb_f_t); }
-static size_t size_patch_rgb(void)      { return (size_t)data.m  * sizeof(rgb_f_t); }
 static size_t size_patch_flow(void)     { return (size_t)data.m  * 4 * sizeof(float); }
 
 /* freq_field_active()
@@ -278,9 +273,6 @@ freq_field_active(int cond)
     case FREQ_COND_ALWAYS: return TRUE;
     case FREQ_COND_RDPAT:  return isFlagSet(ENABLE_RDPAT);
     case FREQ_COND_NEAREH: return isFlagSet(ENABLE_NEAREH);
-    case FREQ_COND_NEAR_E: return isFlagSet(ENABLE_NEAREH) && (fpat.nfeh & NEAR_EFIELD);
-    case FREQ_COND_NEAR_H:       return isFlagSet(ENABLE_NEAREH) && (fpat.nfeh & NEAR_HFIELD);
-    case FREQ_COND_NEAR_EH_BOTH: return isFlagSet(ENABLE_NEAREH) && (fpat.nfeh & NEAR_EFIELD) && (fpat.nfeh & NEAR_HFIELD);
     default: abort();
   }
 }
@@ -306,13 +298,12 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
     { crnt.cir,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
     { crnt.cii,                        size_npm_dbl,   0,                        FREQ_COND_ALWAYS },
     { crnt.cur,                        size_np3m_cdbl, 0,                        FREQ_COND_ALWAYS },
-    /* Impedance data (fstep=0 on child, fstep=N on parent) */
-    { &impedance_data.zreal[fstep],    NULL,           sizeof(double),           FREQ_COND_ALWAYS },
-    { &impedance_data.zimag[fstep],    NULL,           sizeof(double),           FREQ_COND_ALWAYS },
-    { &impedance_data.zmagn[fstep],    NULL,           sizeof(double),           FREQ_COND_ALWAYS },
-    { &impedance_data.zphase[fstep],   NULL,           sizeof(double),           FREQ_COND_ALWAYS },
-    /* Network data */
-    { &netcx.zped,                     NULL,           sizeof(complex double),   FREQ_COND_ALWAYS },
+    /* Per-port impedance data (fstep=0 on child, fstep=N on parent); each
+     * member spans Num_Feedpoint_Ports() doubles, identical parent and child. */
+    { impedance_data[fstep].zreal,     size_n_ports_dbl, 0,                      FREQ_COND_ALWAYS },
+    { impedance_data[fstep].zimag,     size_n_ports_dbl, 0,                      FREQ_COND_ALWAYS },
+    { impedance_data[fstep].zmagn,     size_n_ports_dbl, 0,                      FREQ_COND_ALWAYS },
+    { impedance_data[fstep].zphase,    size_n_ports_dbl, 0,                      FREQ_COND_ALWAYS },
     /* Radiation pattern data */
     { rad_pattern[fstep].gtot,         size_nphth_dbl, 0,                        FREQ_COND_RDPAT  },
     { rad_pattern[fstep].tilt,         size_nphth_dbl, 0,                        FREQ_COND_RDPAT  },
@@ -327,10 +318,7 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
     { &rad_pattern[fstep].efficiency,  NULL,           sizeof(double),           FREQ_COND_RDPAT  },
     /* Per-fstep noise temperature table (allocated alongside rad_pattern[]) */
     { &noise_temp[fstep],              NULL,              sizeof(noise_temp_t),  FREQ_COND_RDPAT  },
-    /* Per-fstep structure colors (current/charge RGB + cmin/cmax) */
-    { struct_colors[fstep].wire_crnt_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
-    { struct_colors[fstep].wire_chrg_rgb,  size_seg_rgb,   0,                   FREQ_COND_ALWAYS },
-    { struct_colors[fstep].patch_crnt_rgb, size_patch_rgb, 0,                   FREQ_COND_ALWAYS },
+    /* Per-fstep structure colors (patch flow + cmin/cmax range scalars) */
     { struct_colors[fstep].patch_flow_data, size_patch_flow, 0,                FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_crnt_cmin, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
     { &struct_colors[fstep].wire_crnt_cmax, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
@@ -338,16 +326,10 @@ freq_fields_xfer(int fstep, int pipe_idx, pipe_fn_t pipe_fn)
     { &struct_colors[fstep].wire_chrg_cmax, NULL,          sizeof(float),       FREQ_COND_ALWAYS },
     { &struct_colors[fstep].patch_crnt_cmin, NULL,         sizeof(float),       FREQ_COND_ALWAYS },
     { &struct_colors[fstep].patch_crnt_cmax, NULL,         sizeof(float),       FREQ_COND_ALWAYS },
-    /* Near field data */
+    /* Near field data: the phasor and spatial extent only; color and
+     * geometry derive in the parent at draw and never cross the pipe */
     { near_field.points,               size_nf_points, 0,                        FREQ_COND_NEAREH },
-    { &near_field.max_er,              NULL,           sizeof(double),           FREQ_COND_NEAR_E },
-    { &near_field.max_hr,              NULL,           sizeof(double),           FREQ_COND_NEAR_H },
     { &near_field.r_max,               NULL,           sizeof(double),           FREQ_COND_NEAREH },
-    /* Per-fstep near-field prerender vectors (allocated in Prerender_Near_Field) */
-    { &nf_pre[fstep].pov_max,          NULL,           sizeof(float),            FREQ_COND_NEAREH },
-    { nf_pre[fstep].e_vecs,            size_nf_vectors, 0,                       FREQ_COND_NEAR_E },
-    { nf_pre[fstep].h_vecs,            size_nf_vectors, 0,                       FREQ_COND_NEAR_H },
-    { nf_pre[fstep].pov_vecs,          size_nf_vectors, 0,                       FREQ_COND_NEAR_EH_BOTH },
   };
 
   int nfields = (int)(sizeof(fields) / sizeof(fields[0]));

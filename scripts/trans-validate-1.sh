@@ -1,151 +1,257 @@
 #!/bin/sh
 
-# Incremental translation update for a single .po file.
+# Translate and validate a single .po catalog in one of three modes.
 #
-# Usage: scripts/trans-validate-1.sh <po-file>
+# Usage: scripts/trans-validate-1.sh [--mode new|update|validate|fast] [--model NAME] <po-file>
 #
-# Translates only untranslated and fuzzy entries.
+# Modes come from the table below; each row varies only four values:
+# scope contributors, model, thinking budget, reconcile, gate. Adding a
+# mode adds a row, never a branch. Mode resolves from the --mode option
+# or from catalog and git state via detect_mode.
 
+export CLAUDE_HOOKS_KILL_ON_STOP=done
+
+usage() {
+	echo "usage: $0 [--mode new|update|validate|fast] <po-file>" >&2
+	return 0
+}
+
+# Mode table: name contributors model think reconcile gate effort catalog diff
+# procedure. The catalog column injects the full catalog only when yes; update
+# and validate work from the scoped subset and read the catalog on demand. The
+# diff column injects the catalog's staged and working-tree git diffs when yes.
+# The procedure column names the injected prompt procedure: phases.md drives the
+# phased iterative review, pass.md drives a single-pass correction.
+mode_table() {
+
+#name     contribs            rowmodel             think  reconcile  gate    effort  catalog  diff  procedure
+	cat <<'EOF'                                                                             
+new       untranslated        claude-sonnet-5[1m]  31999  yes        full    low     yes      no    phases.md
+update    untranslated,fuzzy  claude-sonnet-5[1m]  2048   yes        full    low     no       no    phases.md
+validate  staged              claude-opus-4-8[1m]  31999  no         review  low     no       yes   phases.md
+fast      staged              claude-opus-4-8[1m]  31999  no         review  low     no       yes   pass.md
+EOF
+	return 0
+}
+
+# Emit the single table row whose name matches; empty when no match.
+select_row() {
+	mode_table | awk -v m="$1" '$1 == m { print }'
+	return 0
+}
+
+# Resolve mode from catalog and git state, single point of truth.
+# Precedence: absent catalog is new; staged edits are validate; a catalog
+# with no translated entries is new; otherwise update.
+detect_mode() {
+	if [ ! -f "$1" ]; then
+		echo new
+		return 0
+	fi
+	if git diff --cached --name-only -- "$1" | grep -q .; then
+		echo validate
+		return 0
+	fi
+	if [ "$(msgattrib --translated "$1" | grep -c '^msgid ".')" -eq 0 ]; then
+		echo new
+		return 0
+	fi
+	echo update
+	return 0
+}
+
+# Scope contributors: each emits the same annotated block shape so the
+# frame never varies. Annotation lines read '#   line N'; count_scope
+# counts them across every contributor.
+
+scope_untranslated() {
+	printf '# Untranslated entries (line numbers in %s)\n' "$1"
+	awk '/^msgstr ""$/ { n=NR; getline; if ($0 !~ /^"/) print "#   line " n }' "$1"
+	printf '\n'
+	msgattrib --untranslated --no-wrap "$1"
+	printf '\n'
+	return 0
+}
+
+scope_fuzzy() {
+	printf '# Fuzzy entries (line numbers in %s)\n' "$1"
+	grep -n '^#, .*fuzzy' "$1" | sed 's/^\([0-9]*\):.*/#   line \1/'
+	printf '\n'
+	msgattrib --only-fuzzy --no-wrap "$1"
+	printf '\n'
+	return 0
+}
+
+scope_staged() {
+	printf '# Staged-changed entries (line numbers in %s)\n' "$1"
+	git diff --cached -U0 -- "$1" | grep -oP '^@@ .*\+\K[0-9]+' \
+		| while read -r n; do echo "#   line $n"; done
+	printf '\n'
+	return 0
+}
+
+# Union the row's comma-separated contributors into one scope file.
+build_scope() {
+	scope="po/.translate-scope-$2.txt"
+	: > "$scope"
+	old_ifs=$IFS
+	IFS=,
+	for c in $3; do
+		"scope_$c" "$1" >> "$scope"
+	done
+	IFS=$old_ifs
+	echo "$scope"
+	return 0
+}
+
+# Count scoped entries by their uniform annotation lines.
+count_scope() {
+	grep -c '^#   line ' "$1"
+	return 0
+}
+
+# Shared recency reminder tail; names the gate literally as the closing cue.
+# Reads the resolved catalog, language, and gate flag globals at call time.
+reminder_tail() {
+	printf 'format specifiers match each msgid; no fuzzy entries remain; edit only %s and po/rules/%s.md; finish when scripts/trans-check.sh %s %s exits 0' \
+		"$l" "$lang" "$gateflag" "$l"
+	return 0
+}
+
+# Per-mode domain framing for the injected bookend; one function per mode so
+# adding a mode adds a function, never a branch, matching the scope dispatch.
+notice_new() {
+	printf 'Translate this brand-new catalog: every entry is scoped; read each region in groups and translate all, then sweep the whole catalog for related violations and fix each one found.'
+	return 0
+}
+
+notice_update() {
+	printf 'Update this existing catalog: translate the scoped untranslated entries and repair the scoped fuzzy entries against their changed msgids, then sweep the whole catalog for related violations and fix any found beyond the scope.'
+	return 0
+}
+
+notice_validate() {
+	printf 'Review this catalog'\''s staged translations against every rule and correct them, then sweep the whole catalog for related violations and fix any found beyond the staged entries.'
+	return 0
+}
+
+notice_fast() {
+	printf 'Validate this catalog'\''s staged translations in a single pass from the injected diff alone: it is the complete record of every changed entry. Decide each correction against the rules and apply all edits; perform no Read, Grep, or catalog sweep, and do not split the work into phases or turns.'
+	return 0
+}
+
+# Parse the leading option flags, shifting each off before the catalog argument.
+mode=""
+model=""
+parsing=true
+while [ "$parsing" = true ]; do
+	case "$1" in
+		--mode) mode="$2"; shift 2 ;;
+		--model) model="$2"; shift 2 ;;
+		*) parsing=false ;;
+	esac
+done
+
+if [ -z "$1" ]; then
+	usage
+	exit 2
+fi
+
+# Anchor to the repository root from this script's location so every relative
+# artifact path resolves regardless of the caller's working directory.
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+root=$(dirname "$here")
+
+# Normalize the catalog to an absolute path before changing directory, then
+# express it repo-root-relative for the injected records and the gate command.
 l="$1"
+case "$l" in
+	/*) ;;
+	*) l="$PWD/$l" ;;
+esac
+cd "$root" || exit 2
+l=${l#"$root"/}
 
-#MODEL=opus
-MODEL=sonnet
-export MAX_THINKING_TOKENS=2048
+lang=$(basename "$l" .po)
+mode=${mode:-$(detect_mode "$l")}
 
-# Build scope: untranslated + fuzzy entries with line numbers
-scope="po/.translate-scope-$(basename "$l" .po).txt"
+read name contribs rowmodel think reconcile gate effort catalog diff procedure <<EOF
+$(select_row "$mode")
+EOF
 
-printf '# Untranslated entries (line numbers in %s)\n' "$l" > "$scope"
-awk '/^msgstr ""$/ { n=NR; getline; if ($0 !~ /^"/) print "#   line " n }' "$l" >> "$scope"
-printf '\n' >> "$scope"
-msgattrib --untranslated --no-wrap "$l" >> "$scope"
-printf '\n# Fuzzy entries (line numbers in %s)\n' "$l" >> "$scope"
-grep -n '^#, .*fuzzy' "$l" | sed 's/^\([0-9]*\):.*/# line \1/' >> "$scope"
-printf '\n' >> "$scope"
-msgattrib --only-fuzzy --no-wrap "$l" >> "$scope"
+if [ -z "$name" ]; then
+	echo "$l: unknown mode '$mode'" >&2
+	exit 2
+fi
 
-count_u=$(msgattrib --untranslated "$l" | grep -c '^msgid ".')
-count_f=$(msgattrib --only-fuzzy "$l" | grep -c '^msgid ".')
+# The --model override wins over the row's default model.
+model=${model:-$rowmodel}
 
-if [ "$count_u" -eq 0 ] && [ "$count_f" -eq 0 ]; then
-	echo "$l: fully translated"
+export MAX_THINKING_TOKENS="$think"
+
+# Raise reasoning effort only for the row that requests it; the '-' sentinel
+# leaves the environment default in place for the other modes.
+[ "$effort" != - ] && export CLAUDE_CODE_EFFORT_LEVEL="$effort"
+
+scope=$(build_scope "$l" "$lang" "$contribs")
+count=$(count_scope "$scope")
+
+if [ "$count" -eq 0 ]; then
+	echo "$l: nothing to translate in $mode mode"
 	rm -f "$scope"
 	exit 1
 fi
 
-echo "$l: $count_u untranslated, $count_f fuzzy"
+echo "$l: $mode mode, $count scoped entries"
 
-claude-raw --permission-mode acceptEdits --model "$MODEL" "@doc/TRANSLATING.md @$scope ; $l has $(wc -l < "$l") lines, $count_u untranslated and $count_f fuzzy entries to translate:
+# Resolve the gate flag from the row; review gates format and fuzzy only.
+gateflag=""
+[ "$gate" = review ] && gateflag="--review"
 
-The scope file loaded above contains the specific entries requiring translation, annotated with their line numbers in $l.
-For each scoped entry, Read approximately 30 lines around its line number in $l using offset/limit. Do not read the entire file. Process entries in groups to maintain focus.
+# Domain-specific opening notice plus the shared recency reminder: the notice
+# frames the mode, the tail names the gate as the closing cue. Both anchor the
+# claude-inject bookends, dispatched by mode name from the mode table.
+reminder="$("notice_$mode"). REMINDER: $(reminder_tail)"
 
-NOTICE:
-- $l is the ONLY file you may Read/Edit.
-- You MUST ONLY Read/Edit $l because all other tools are forbidden.
-- Evaluation tasks operate on $l only: Do not create auxiliary scripts, test harnesses, or tooling
+# Injection cannot open a missing file; seed an absent per-language rules file
+# with a fill-me stub so the frame's Phase 1 populates it in place instead of
+# aborting injection and skipping the catalog.
+if [ ! -f "po/rules/$lang.md" ]; then
+	printf '# %s translation rules\n\nNeeds to be filled out.\n' "$lang" > "po/rules/$lang.md"
+fi
 
-Before each response, before each file read, restate the requirements. Read only the relevant line ranges using offset/limit; do not load the entire file.
+# Add the full catalog to the injection list only when the row requests it;
+# update and validate omit it and read the scoped regions on demand.
+catalogarg=""
+[ "$catalog" = yes ] && catalogarg="$l"
 
-### Edit Strategy for PO Files
+# Build the diff manifest only when the row requests it; each line runs a
+# catalog-scoped git diff so claude-inject injects the staged and working-tree
+# changes as synthetic command results. A manifest keeps each multi-word
+# command as one token, immune to word-splitting on expansion.
+diffarg=""
+if [ "$diff" = yes ]; then
+	manifest="po/.translate-diff-$lang.txt"
+	printf '!git diff --staged -- %s | grep -P -C1 "^[+](msgid|msgstr)"\n!git diff -- %s | grep -P -C1 "^[+](msgid|msgstr)"\n' "$l" "$l" > "$manifest"
+	diffarg="@$manifest"
+fi
 
-Minimize context in old_string/new_string to reduce token usage:
-- Minimum unique match: msgid line(s) + msgstr line(s). msgid is the unique key in PO files.
-- For fuzzy entries: include the flags line (#, fuzzy or #, fuzzy, c-format, etc.) since it must be removed.
-- For multi-line msgid: include msgid \"\" and enough continuation lines to be unique, through msgstr.
-- Never include #: source references, translator comments, or #| previous-msgid in the match.
-- Merge sequential adjacent entries into a single Edit call.
-- Non-adjacent entries: separate Edit calls, each with minimal matching.
+# Hand off through claude-inject so frame, reference, catalog, and scope load
+# untruncated as synthetic records, separated from the reminder bookends.
+claude-inject --claude claude-xraw --cwd "$root" --permission-mode acceptEdits --model "$model" \
+	po/prompt/frame.md "po/prompt/$procedure" doc/TRANSLATING.md "po/rules/$lang.md" "$scope" $catalogarg $diffarg \
+	-- "$reminder"
 
-### Context-Dependent Disambiguation
-
-Terms with multiple meanings inherit their technical sense from application domain.
-Disambiguation guidance shows which meaning to choose, not that qualifiers are required.
-
-EXAMPLES (adapt to each situation):
-	English: View Currents → Afrikaans: Bekyk Strome (electrical sense understood)
-	NOT: Bekyk Elektriese Strome (adds qualifier absent in source)
-
-The application (electromagnetic simulation) disambiguates for users UNLESS
-this particular language needs the extra specific term to disambiguate from
-an unrelated domain. If the program context is sufficient, then we can drop
-the specific technical term, but otherwise include it. This is per
-language, so you need to evaluate accordingly.
-
-This prevents over-correction while maintaining technical accuracy.
-
-Axis names like X/Y/Z must be uppercase unless the native language convention is different
-
-GTK hotkeys use preceding underscores. Prevent duplicates in the same UI by shifting the underscore to another letter. Example: Avoid Spanish Cancel/Close colliding as _Cancelar and _Cerrar by using (eg) _Cancelar and C_errar instead.Choose the most appropriate hotkey letter based on language expectations. The chosen letter prefixed by the underscore must be genuinely typable by a common keyboard in that locale. 
-
-# Procedure
-
-The steps of each phase are enumerated below. Do not combine multiple steps into the same response: You must perform each step as a separate response to provide sufficient thinking for each item.
-
-## Phase 1: evaluation
-
-Your responses to each evaluation section must not duplicate any meaning from an earlier section. Meaning within 1.1-1.3 must contain no intersection.
-
-1. List native language character set/symbology standards and expectations
-2. List all standards of writing with respect to the language being translated for the purpose of a technical computer program interface ($l)
-3. List all informality/formality terms and how they map to the cultural expectation of the society that will be using a technical program interface
-4. Map these as appropriate to the specific NEC2 EM simulator domain for this language and culture
-
-## Phase 2: inspection
-
-1. Read approximately 30 lines around the next scoped entry's line number using offset/limit
-2. Translate scoped entries within this region: for each untranslated entry (empty msgstr), write the translation. For each fuzzy entry, evaluate the existing translation against the changed msgid, correct it, and remove the fuzzy marker (#, fuzzy line AND the comma-fuzzy within any flags line). Verify format specifiers (%s, %d, %f, %c, %%) are preserved in identical order, or proper language grammar order using (eg) `%2$s ... %1$s` as appropriate. 
-3. Verify that all translations map onto the enumerated lists you provided in Phase 1: 1.1-1.4
-4. Validate #2 and #3 again: does it follow all best practices considering computer user interface requirements for this particular language ($l)? This is critically important to avoid potential insult.
-5. List priorities, in order:
-	a. Valid translation meaning
-	b. Valid cultural representation with respect to interface terminology expectations for the region that uses the language.
-	c. Consistent lexicon everywhere:
-		- Use the most appropriate symbol or term for the same purpose/meaning, and in the proper formation (eg, tense) in relation to (i) each translation string and (ii) the document as a whole.
-		- Choose the term that is the most correct for the situation, not necessarily the term that is most commonly used in the current translations
-		- Choose the correct term and then replace it everywhere. Correctness is a higher priority even if it means more modification.
-	d. Appropriate disambiguation only as necessary if the program context (EM Simulator) is not sufficient.
-	e. Correct locale representations of data: decimal symbol (50.0 vs 50,0), etc.
-6. List all violations in #2-5
-7. Add all violations from #6 using TodoWrite - include line numbers or ranges as a reminder
-8. Based on your findings, consider additional validation issues that are similar to the ones you discovered, because the similar errors may have happened multiple times. If any, goto #6
-9. Goto 1, process next scoped entry
-
-## Phase 3: Update
-
-1. For each Todo item: MUST modify any violations using the Edit tool
-
-## Phase 4: QA/Validation
-
-1. After all scoped entries have been translated, perform final analysis to make sure Phase 2-4 are complete.
-	- If you applied a modification and the modification was successful, then you do not need to check if it changed. The tool succeeded. If the tool succeeded, then you do not need to check if it changed.
-	- The purpose of this is for you to think really hard about the file content that was loaded and the modifications you made and evaluate if there's anything else that should be considered to follow the required rule set and the phase procedures.
-	- Verify consistency: Perform searches to see if there are any common, similar, or repeating violations that were not detected based on the known violations from Phase 2. You MUST combine searches into one or more large regular expression unions to minimize the number of requests and reduce latency.
-2. List all violations in #1
-3. Add all violations from #2 using TodoWrite - include line numbers or ranges as a reminder
-
-## Phase 5: Fine tuning
-
-1. Apply the to-do items discovered in phase four.
-2. Think hard, exhaustively, to make sure all phases are complete.
-3. List all violations in #2
-4. Add all violations from #3 using TodoWrite - include line numbers or ranges as a reminder
-5. Complete all items on the to-do list.
-6. When complete with ALL changes, you MUST issue Bash(kill -9 \$PPID). You MUST NOT run any other commands. The Todo item 'all requirements are complete' must be set to pending before invoking Bash.
-
-# Begin Phases
-
-- Provide a summary after each phase completion before proceeding to the next, and provide proof that the phase is complete before the next one is started.
-- TodoWrite - add each Phase major and minor section to the list in a structured form to minimize list size while capturing all meaning, now
-- TodoWrite - add Bash(kill -9 \$PPID) to the list, now
-
-ultrathink
-	"
-
-# Reformat to match canonical msgmerge output and remove obsolete entries
-msgmerge --update --backup=none "$l" po/xnec2c.pot
-msgattrib --no-obsolete -o "$l" "$l"
+# Reconcile against the template only for full-catalog modes; validate leaves
+# the staged catalog unmerged.
+if [ "$reconcile" = yes ]; then
+	msgmerge --update --backup=none "$l" po/xnec2c.pot
+	msgattrib --no-obsolete -o "$l" "$l"
+fi
 
 rm -f "$scope"
+[ -n "$diffarg" ] && rm -f "${diffarg#@}"
 
-exit 0
+# Confirm the catalog passes the row's gate set.
+scripts/trans-check.sh $gateflag "$l"
+exit $?

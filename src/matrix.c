@@ -795,7 +795,7 @@ cmsw( int j1, int j2, int i1, int i2, complex double *cmx,
 etmns( double p1, double p2, double p3, double p4,
     double p5, double p6, int ipr, complex double *e )
 {
-  int i, is, i1, i2=0, neq;
+  int i, is, i1=0, i2=0, neq;
   double cth, sth, cph, sph, cet, set, pxl, pyl, pzl, wx;
   double wy, wz, qx, qy, qz, arg, ds, dsh, rs, r;
   complex double cx, cy, cz, er, et, ezh;

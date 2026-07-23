@@ -237,7 +237,7 @@ int nec2_eval_run(const simple_var_t *vars, int num_vars,
 
 	for (i = 0; i < count; i++)
 	{
-		meas_calc(&meas_out[i], i);
+		meas_calc(&meas_out[i], i, calc_data.ex_port);
 	}
 
 	g_rec_mutex_unlock(&freq_data_lock);

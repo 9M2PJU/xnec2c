@@ -895,11 +895,6 @@ void mathlib_benchmark(int slow)
 		return;
 
 	
-	// DRAW_CURRENTS queues up too many New_Frequency requests during a benchmark
-	// so disable it during the benchmark and put it back after:
-	int orig_draw_currents = isFlagSet(DRAW_CURRENTS);
-	ClearFlag(DRAW_CURRENTS);
-
 	int orig_jobs = calc_data.num_jobs;
 
 	for (i = 0; i < num_mathlibs; i++)
@@ -974,9 +969,6 @@ void mathlib_benchmark(int slow)
 		set_mathlib_batch(NULL, mathlib_batch_before_benchmark);
 	else
 		set_mathlib_interactive(NULL, mathlib_before_benchmark);
-
-	if (orig_draw_currents)
-		SetFlag(DRAW_CURRENTS);
 
 	calc_data.num_jobs = orig_jobs;
 

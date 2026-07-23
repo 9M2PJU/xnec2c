@@ -7,6 +7,7 @@
 #include "measurements.h"
 #include "prerender/prerender_state.h"
 #include "prerender/prerender_color.h"
+#include "chroma/chroma_nearfield.h"
 #include "shared.h"
 #include "validation_dump.h"
 
@@ -266,9 +267,27 @@ static void dump_nearfield_points(FILE *fp)
 
 		near_field_t *nf = &near_field_fstep[fs];
 
+		/* Frame magnitude maxima over the static real vectors */
+		double max_er = 0.0, max_hr = 0.0;
+		for (int i = 0; i < npts; i++)
+		{
+			double e[3], h[3];
+			double er = nf_real_vector(&nf->points[i], NF_CHAN_E,
+				FALSE, 0.0, rc_config.nf_static_mode, e);
+			double hr = nf_real_vector(&nf->points[i], NF_CHAN_H,
+				FALSE, 0.0, rc_config.nf_static_mode, h);
+			if (er > max_er) max_er = er;
+			if (hr > max_hr) max_hr = hr;
+		}
+
 		for (int i = 0; i < npts; i++)
 		{
 			near_field_point_t *pt = &nf->points[i];
+			double e[3], h[3];
+			double er = nf_real_vector(pt, NF_CHAN_E, FALSE, 0.0,
+				rc_config.nf_static_mode, e);
+			double hr = nf_real_vector(pt, NF_CHAN_H, FALSE, 0.0,
+				rc_config.nf_static_mode, h);
 
 			fprintf(fp, "%.6f,%d,%d,"
 				"%.17g,%.17g,%.17g,"
@@ -277,48 +296,63 @@ static void dump_nearfield_points(FILE *fp)
 				"%.17g,%.17g,%.17g\n",
 				save.freq[fs], fs, i,
 				pt->px, pt->py, pt->pz,
-				pt->er, pt->erx, pt->ery, pt->erz,
-				pt->hr, pt->hrx, pt->hry, pt->hrz,
-				nf->max_er, nf->max_hr, nf->r_max);
+				er, e[0], e[1], e[2],
+				hr, h[0], h[1], h[2],
+				max_er, max_hr, nf->r_max);
 		}
 	}
 }
 
 
 /* impedance.csv
- * mhz, fstep, zreal, zimag, zmagn, zphase, netcx_zped_real, netcx_zped_imag */
+ * Per-(fstep,port) nec2c ANTENNA INPUT PARAMETERS row.  V is the
+ * frequency-constant EX voltage; current I=V/Z, admittance Y=1/Z, and power
+ * P=0.5 Re(V conj(I)) derive from the stored port impedance Z and V.
+ * mhz, fstep, port, tag, seg,
+ * vreal, vimag, ireal, iimag, zreal, zimag, zmagn, zphase, yreal, yimag, power */
 static void dump_impedance(FILE *fp)
 {
-	fprintf(fp, "mhz,fstep,zreal,zimag,zmagn,zphase,"
-		"netcx_zped_real,netcx_zped_imag\n");
+	fprintf(fp, "mhz,fstep,port,tag,seg,"
+		"vreal,vimag,ireal,iimag,zreal,zimag,zmagn,zphase,"
+		"yreal,yimag,power\n");
+
+	int n_ports = Num_Feedpoint_Ports();
 
 	for (int fs = 0; fs < calc_data.steps_total; fs++)
 	{
 		if (!save.fstep[fs])
 			continue;
 
-		/* netcx.zped is a single global holding the last-computed value. */
-		double zped_r = (fs == calc_data.steps_total - 1)
-			? creal(netcx.zped) : 0.0;
-		double zped_i = (fs == calc_data.steps_total - 1)
-			? cimag(netcx.zped) : 0.0;
+		for (int p = 0; p < n_ports; p++)
+		{
+			int seg = Feedpoint_Port_Seg(p);
+			complex double V = Feedpoint_Port_Voltage(p);
+			complex double Z = impedance_data[fs].zreal[p] +
+				I * impedance_data[fs].zimag[p];
+			complex double Ic = V / Z;
+			complex double Y = 1.0 / Z;
+			double P = 0.5 * creal( V * conj(Ic) );
 
-		fprintf(fp, "%.6f,%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.17g\n",
-			save.freq[fs], fs,
-			impedance_data.zreal[fs],
-			impedance_data.zimag[fs],
-			impedance_data.zmagn[fs],
-			impedance_data.zphase[fs],
-			zped_r, zped_i);
+			fprintf(fp, "%.6f,%d,%d,%d,%d,"
+				"%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g,%.17g,"
+				"%.17g,%.17g,%.17g\n",
+				save.freq[fs], fs, p, Feedpoint_Port_Tag(p), seg,
+				creal(V), cimag(V), creal(Ic), cimag(Ic),
+				impedance_data[fs].zreal[p], impedance_data[fs].zimag[p],
+				impedance_data[fs].zmagn[p], impedance_data[fs].zphase[p],
+				creal(Y), cimag(Y), P);
+		}
 	}
 }
 
 
 /* nf_pre.csv
- * Per-fstep near-field prerender vectors from nf_pre[].  Each of E, H, and
- * Poynting carries a displacement (dx,dy,dz) and a baked RGB triple; a NULL
- * vector array (field absent for this run) emits the canonical zero row so
- * the column schema stays fixed across antennas.
+ * Per-fstep near-field presentation resolved at draw by
+ * chroma_proj_frame_nearfield() at the static baseline.  Each of E, H, and
+ * Poynting carries a displacement (dx,dy,dz) and its parallel palette color;
+ * an absent field emits the canonical zero row so the column schema stays
+ * fixed across antennas.
  * mhz, fstep, point,
  * e_dx, e_dy, e_dz, e_r, e_g, e_b,
  * h_dx, h_dy, h_dz, h_r, h_g, h_b,
@@ -331,9 +365,6 @@ static void dump_nf_pre(FILE *fp)
 		"pov_dx,pov_dy,pov_dz,pov_r,pov_g,pov_b,"
 		"pov_max\n");
 
-	if (nf_pre == NULL)
-		return;
-
 	int npts = fpat.nrx * fpat.nry * fpat.nrz;
 
 	for (int fs = 0; fs < calc_data.steps_total; fs++)
@@ -341,13 +372,32 @@ static void dump_nf_pre(FILE *fp)
 		if (!save.fstep[fs] || !NF_FSTEP_AVAILABLE(fs))
 			continue;
 
-		nf_pre_t *np = &nf_pre[fs];
+		nf_frame_t ef = chroma_proj_frame_nearfield(fs, NF_CHAN_E);
+		nf_frame_t hf = chroma_proj_frame_nearfield(fs, NF_CHAN_H);
+		nf_frame_t pf = chroma_proj_frame_nearfield(fs, NF_CHAN_POV);
+
+		/* Peak Poynting magnitude over the static real vectors */
+		near_field_t *nf = &near_field_fstep[fs];
+		double pov_max = 0.0;
+		for (int i = 0; i < npts; i++)
+		{
+			double er[3], hr[3], px, py, pz, pr;
+			nf_real_vector(&nf->points[i], NF_CHAN_E, FALSE, 0.0,
+				rc_config.nf_static_mode, er);
+			nf_real_vector(&nf->points[i], NF_CHAN_H, FALSE, 0.0,
+				rc_config.nf_static_mode, hr);
+			pr = nf_poynting(er, hr, &px, &py, &pz);
+			if (pr > pov_max) pov_max = pr;
+		}
 
 		for (int i = 0; i < npts; i++)
 		{
-			nf_vector_t e = np->e_vecs   ? np->e_vecs[i]   : (nf_vector_t){0};
-			nf_vector_t h = np->h_vecs   ? np->h_vecs[i]   : (nf_vector_t){0};
-			nf_vector_t p = np->pov_vecs ? np->pov_vecs[i] : (nf_vector_t){0};
+			nf_vector_t e = ef.vecs ? ef.vecs[i] : (nf_vector_t){0};
+			nf_vector_t h = hf.vecs ? hf.vecs[i] : (nf_vector_t){0};
+			nf_vector_t p = pf.vecs ? pf.vecs[i] : (nf_vector_t){0};
+			rgb_f_t ec = ef.colors ? ef.colors[i] : (rgb_f_t){0};
+			rgb_f_t hc = hf.colors ? hf.colors[i] : (rgb_f_t){0};
+			rgb_f_t pc = pf.colors ? pf.colors[i] : (rgb_f_t){0};
 
 			fprintf(fp, "%.6f,%d,%d,"
 				"%g,%g,%g,%g,%g,%g,"
@@ -355,27 +405,26 @@ static void dump_nf_pre(FILE *fp)
 				"%g,%g,%g,%g,%g,%g,"
 				"%g\n",
 				save.freq[fs], fs, i,
-				e.dx, e.dy, e.dz, e.rgb[0], e.rgb[1], e.rgb[2],
-				h.dx, h.dy, h.dz, h.rgb[0], h.rgb[1], h.rgb[2],
-				p.dx, p.dy, p.dz, p.rgb[0], p.rgb[1], p.rgb[2],
-				np->pov_max);
+				e.dx, e.dy, e.dz, ec.r, ec.g, ec.b,
+				h.dx, h.dy, h.dz, hc.r, hc.g, hc.b,
+				p.dx, p.dy, p.dz, pc.r, pc.g, pc.b,
+				pov_max);
 		}
 	}
 }
 
 /* struct_colors.csv
- * Per-fstep wire/patch display colors from struct_colors[].  One row per
- * entity in three blocks (wire current, wire charge, patch current); the
- * patch_flow phasor projection columns are nonzero only for patch_crnt rows.
- * The cmin/cmax range scalars repeat on every row of an fstep.
- * mhz, fstep, entity_kind, entity_idx, r, g, b,
+ * Per-fstep magnitude ranges and patch flow projections from
+ * struct_colors[].  One range row per fstep carries the cmin/cmax scalars;
+ * one patch_flow row per patch carries the tangent phasor projection, with
+ * the range scalars repeated.
+ * mhz, fstep, entity_kind, entity_idx,
  * flow0, flow1, flow2, flow3,
  * wire_crnt_cmin, wire_crnt_cmax, wire_chrg_cmin, wire_chrg_cmax,
  * patch_crnt_cmin, patch_crnt_cmax */
 static void dump_struct_colors(FILE *fp)
 {
 	fprintf(fp, "mhz,fstep,entity_kind,entity_idx,"
-		"r,g,b,"
 		"flow0,flow1,flow2,flow3,"
 		"wire_crnt_cmin,wire_crnt_cmax,"
 		"wire_chrg_cmin,wire_chrg_cmax,"
@@ -391,41 +440,22 @@ static void dump_struct_colors(FILE *fp)
 
 		struct_colors_t *sc = &struct_colors[fs];
 
-		if (sc->wire_crnt_rgb != NULL)
-			for (int i = 0; i < data.n; i++)
-			{
-				rgb_f_t c = sc->wire_crnt_rgb[i];
-				fprintf(fp, "%.6f,%d,wire_crnt,%d,"
-					"%g,%g,%g,0,0,0,0,"
-					"%g,%g,%g,%g,%g,%g\n",
-					save.freq[fs], fs, i, c.r, c.g, c.b,
-					sc->wire_crnt_cmin, sc->wire_crnt_cmax,
-					sc->wire_chrg_cmin, sc->wire_chrg_cmax,
-					sc->patch_crnt_cmin, sc->patch_crnt_cmax);
-			}
+		fprintf(fp, "%.6f,%d,range,0,"
+			"0,0,0,0,"
+			"%g,%g,%g,%g,%g,%g\n",
+			save.freq[fs], fs,
+			sc->wire_crnt_cmin, sc->wire_crnt_cmax,
+			sc->wire_chrg_cmin, sc->wire_chrg_cmax,
+			sc->patch_crnt_cmin, sc->patch_crnt_cmax);
 
-		if (sc->wire_chrg_rgb != NULL)
-			for (int i = 0; i < data.n; i++)
-			{
-				rgb_f_t c = sc->wire_chrg_rgb[i];
-				fprintf(fp, "%.6f,%d,wire_chrg,%d,"
-					"%g,%g,%g,0,0,0,0,"
-					"%g,%g,%g,%g,%g,%g\n",
-					save.freq[fs], fs, i, c.r, c.g, c.b,
-					sc->wire_crnt_cmin, sc->wire_crnt_cmax,
-					sc->wire_chrg_cmin, sc->wire_chrg_cmax,
-					sc->patch_crnt_cmin, sc->patch_crnt_cmax);
-			}
-
-		if (sc->patch_crnt_rgb != NULL)
+		if (sc->patch_flow_data != NULL)
 			for (int i = 0; i < data.m; i++)
 			{
-				rgb_f_t c = sc->patch_crnt_rgb[i];
 				float *fl = sc->patch_flow_data[i];
-				fprintf(fp, "%.6f,%d,patch_crnt,%d,"
-					"%g,%g,%g,%g,%g,%g,%g,"
+				fprintf(fp, "%.6f,%d,patch_flow,%d,"
+					"%g,%g,%g,%g,"
 					"%g,%g,%g,%g,%g,%g\n",
-					save.freq[fs], fs, i, c.r, c.g, c.b,
+					save.freq[fs], fs, i,
 					fl[0], fl[1], fl[2], fl[3],
 					sc->wire_crnt_cmin, sc->wire_crnt_cmax,
 					sc->wire_chrg_cmin, sc->wire_chrg_cmax,

@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# Reject commits while po/POTFILES.in drifts from git-tracked sources
+# or the po/ tree carries modifications not staged for this commit.
+# Runs make update-po first (idempotent: gettext leaves catalogs
+# byte-identical when nothing changed) so string-only drift surfaces.
+#
+# Bypass:  FORCE_COMMIT=true git commit ...
+#
+# Installed by scripts/trans-update.sh --sync via core.hooksPath.
+
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+if [ "${FORCE_COMMIT:-}" != "true" ]; then
+	# Gate 1: POTFILES.in must match the git-tracked source list.
+	# Show the drift listing only on failure; stay quiet when clean.
+	if ! check_output=$(./scripts/trans-update.sh --check 2>&1); then
+		echo "$check_output"
+		echo ""
+		echo "❌ Pre-commit validation failed"
+		echo ""
+		echo "po/POTFILES.in is out of date with the git-tracked source list."
+		echo ""
+		echo "Fix with:"
+		echo ""
+		echo "  ./scripts/trans-update.sh --sync"
+		echo "  git add po/POTFILES.in"
+		echo ""
+		echo "If you have determined this commit must proceed anyway:"
+		echo ""
+		echo "  FORCE_COMMIT=true git commit"
+		echo ""
+		exit 1
+	fi
+
+	# Gate 2: refresh xnec2c.pot and merge .po catalogs so string-only
+	# changes land in the po/ tree before the staging check below.
+	if [ -f po/Makefile ]; then
+		if ! po_output=$(make -s update-po 2>&1); then
+			echo "$po_output"
+			echo ""
+			echo "❌ Pre-commit validation failed: make update-po failed"
+			echo ""
+			exit 1
+		fi
+	else
+		echo "pre-commit: po/Makefile missing (tree not configured); update-po skipped." >&2
+	fi
+
+	# Gate 3: translation files must land with the commit that changed them.
+	if ! git diff --quiet -- po; then
+		echo ""
+		echo "❌ Pre-commit validation failed"
+		echo ""
+		echo "po/ tree modified but not staged for commit:"
+		echo ""
+		git status -s -- po
+		echo ""
+		echo "Fix with:"
+		echo ""
+		echo "  git add po/"
+		echo ""
+		echo "If you have determined this commit must proceed anyway:"
+		echo ""
+		echo "  FORCE_COMMIT=true git commit"
+		echo ""
+		exit 1
+	fi
+
+	# Gate 4: Makefile.am example list must match the examples/ directory tree.
+	if [ -f Makefile ]; then
+		if ! check_output=$(make -s check-examples-file-list 2>&1); then
+			echo "$check_output"
+			echo ""
+			echo "❌ Pre-commit validation failed: make check-examples-file-list"
+			echo ""
+			echo "If you have determined this commit must proceed anyway:"
+			echo ""
+			echo "  FORCE_COMMIT=true git commit"
+			echo ""
+			exit 1
+		fi
+	else
+		echo "pre-commit: Makefile missing (tree not configured); check-local skipped." >&2
+	fi
+fi
+
+exit 0

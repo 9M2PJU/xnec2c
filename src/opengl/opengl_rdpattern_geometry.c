@@ -104,6 +104,7 @@ opengl_rdpattern_generate_nf_field_lines(
   for( fi = 0; fi < n_fields; fi++ )
   {
     const nf_vector_t *vecs = fields[fi].vecs;
+    const rgb_f_t *colors = fields[fi].colors;
 
     for( idx = 0; idx < npts; idx++ )
     {
@@ -120,7 +121,7 @@ opengl_rdpattern_generate_nf_field_lines(
       };
 
       rgba_f_t col = {
-        vecs[idx].rgb[0], vecs[idx].rgb[1], vecs[idx].rgb[2], 1.0f
+        colors[idx].r, colors[idx].g, colors[idx].b, 1.0f
       };
 
       line_idx = nf_line_append(nf_lines, line_idx, org, end, col);

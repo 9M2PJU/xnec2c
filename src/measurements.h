@@ -283,7 +283,7 @@ void ant_temp_fill_fstep(int fstep);
 void noise_temp_resolve(int fstep, double *t_sky, double *t_earth);
 const char *ant_temp_sky_name(int idx);
 const char *ant_temp_earth_name(int idx);
-void meas_calc(measurement_t *m, int idx);
+void meas_calc(measurement_t *m, int idx, int port);
 int meas_name_idx(char *name, int len);
 void meas_format(measurement_t *m, char *format, char *out, int outlen);
 int meas_write_format(measurement_t *m, char *format, FILE *fp);

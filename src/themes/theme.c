@@ -60,6 +60,13 @@ static const char *const theme_role_key[THEME_ROLE_N] = {
   [THEME_ROLE_LABEL_AXIS]       = "label_axis",
   [THEME_ROLE_MARKER_EXTREME]   = "marker_extreme",
   [THEME_ROLE_CURSOR]           = "cursor",
+  [THEME_ROLE_GRAD_0]           = "gradient_0",
+  [THEME_ROLE_GRAD_1]           = "gradient_1",
+  [THEME_ROLE_GRAD_2]           = "gradient_2",
+  [THEME_ROLE_GRAD_3]           = "gradient_3",
+  [THEME_ROLE_GRAD_4]           = "gradient_4",
+  [THEME_ROLE_GRAD_5]           = "gradient_5",
+  [THEME_ROLE_GRAD_MID]         = "gradient_mid",
 };
 
 /* Width purpose -> INI key string, indexed by fp_width_e. */

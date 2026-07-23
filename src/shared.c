@@ -226,7 +226,7 @@ filechooser_t *filechooser_callback = NULL;
 complex double *cm = NULL;
 
 /* Needed data */
-impedance_data_t impedance_data;
+impedance_data_t *impedance_data = NULL;
 
 /* Data for various calculations */
 calc_data_t calc_data;

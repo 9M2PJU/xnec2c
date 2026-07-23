@@ -20,6 +20,7 @@
 #include "gnuplot.h"
 #include "shared.h"
 #include "prerender/prerender_state.h"
+#include "chroma/chroma_nearfield.h"
 
 // Touchstone save types:
 enum {
@@ -109,24 +110,29 @@ void Save_FreqPlots_Touchstone(char *filename, int type)
 	switch (type)
 	{
 		case TOUCHSTONE_S1P:
-			fprintf(fp, "!MHz\tS11(Real)\tS11(Ang)\n");
+			fprintf(fp, "!MHz\tS11(dB)\tS11(Ang)\n");
 			format = "{mhz}\t{s11_real}\t{s11_ang}\n";
 			break;
 
 
 		// For .s2p files gain is used as S21 and S12.  We assume they
-		// are passive so S21==S12.  S22 is a bit of a mystery, so we 
+		// are passive so S21==S12.  S22 is a bit of a mystery, so we
 		// assume that all S22 behavior is normalized into S11 and thus
 		// S22 is deminimus and set it to -100 dB.
 		//
+		// The option line declares "DB" format, so each column pair is
+		// (20*log10|S|, angle).  The dBi gain lands in the S21 dB-magnitude
+		// column, making |S21|^2 the power gain; S21 thus carries the
+		// field-amplitude term.  See github issue #80.
+		//
 		case TOUCHSTONE_S2P_MAXGAIN:
 			format = "{mhz}\t{s11_real}\t{s11_ang}\t{gain_max}\t0\t{gain_max}\t0\t-100\t0\n";
-			fprintf(fp, "!MHz\tS11(Real)\tS11(Ang)\tS21(Real)\tS21(Ang)\tS12(Real)\tS12(Ang)\tS22(Real)\tS22(Ang)\n");
+			fprintf(fp, "!MHz\tS11(dB)\tS11(Ang)\tS21(dB)\tS21(Ang)\tS12(dB)\tS12(Ang)\tS22(dB)\tS22(Ang)\n");
 			break;
 
 		case TOUCHSTONE_S2P_VIEWERGAIN:
 			format = "{mhz}\t{s11_real}\t{s11_ang}\t{gain_viewer}\t0\t{gain_viewer}\t0\t-100\t0\n";
-			fprintf(fp, "!MHz\tS11(Real)\tS11(Ang)\tS21(Real)\tS21(Ang)\tS12(Real)\tS12(Ang)\tS22(Real)\tS22(Ang)\n");
+			fprintf(fp, "!MHz\tS11(dB)\tS11(Ang)\tS21(dB)\tS21(Ang)\tS12(dB)\tS12(Ang)\tS22(dB)\tS22(Ang)\n");
 			break;
 
 		default:
@@ -138,7 +144,7 @@ void Save_FreqPlots_Touchstone(char *filename, int type)
 	g_rec_mutex_lock(&freq_data_lock);
 	for (idx = 0; idx < calc_data.steps_total; idx++)
 	{
-		meas_calc(&meas, idx);
+		meas_calc(&meas, idx, calc_data.ex_port);
 		meas_write_format(&meas, format, fp);
 	}
 	g_rec_mutex_unlock(&freq_data_lock);
@@ -252,16 +258,20 @@ Save_RadPattern_Gnuplot_Data( char *filename )
     npts = fpat.nrx * fpat.nry * fpat.nrz;
 
     /*** Draw Near E Field ***/
-    if( isFlagSet(DRAW_EFIELD) && (fpat.nfeh & NEAR_EFIELD) )
+    if( draw_efield_active() && (fpat.nfeh & NEAR_EFIELD) )
     {
       fprintf( fp, _("# Near E field\n") );
       /* Write e-field out to file [DJS] */
       for( idx = 0; idx < npts; idx++ )
       {
-        fscale = dr / nf->points[idx].er;
-        fx = nf->points[idx].px + nf->points[idx].erx * fscale;
-        fy = nf->points[idx].py + nf->points[idx].ery * fscale;
-        fz = nf->points[idx].pz + nf->points[idx].erz * fscale;
+        double er[3];
+        double emag = nf_real_vector(&nf->points[idx], NF_CHAN_E,
+            FALSE, 0.0, rc_config.nf_static_mode, er);
+
+        fscale = dr / emag;
+        fx = nf->points[idx].px + er[0] * fscale;
+        fy = nf->points[idx].py + er[1] * fscale;
+        fz = nf->points[idx].pz + er[2] * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
@@ -272,19 +282,23 @@ Save_RadPattern_Gnuplot_Data( char *filename )
             fy - nf->points[idx].py,
             fz - nf->points[idx].pz);
       }
-    } /* if( isFlagSet(DRAW_EFIELD) */
+    } /* if( draw_efield_active() */
 
     /*** Draw Near H Field ***/
-    if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) )
+    if( draw_hfield_active() && (fpat.nfeh & NEAR_HFIELD) )
     {
       fprintf( fp, _("# Near H field\n") );
       /* Write h-field out to file [DJS] */
       for( idx = 0; idx < npts; idx++ )
       {
-        fscale = dr / nf->points[idx].hr;
-        fx = nf->points[idx].px + nf->points[idx].hrx * fscale;
-        fy = nf->points[idx].py + nf->points[idx].hry * fscale;
-        fz = nf->points[idx].pz + nf->points[idx].hrz * fscale;
+        double hr[3];
+        double hmag = nf_real_vector(&nf->points[idx], NF_CHAN_H,
+            FALSE, 0.0, rc_config.nf_static_mode, hr);
+
+        fscale = dr / hmag;
+        fx = nf->points[idx].px + hr[0] * fscale;
+        fy = nf->points[idx].py + hr[1] * fscale;
+        fz = nf->points[idx].pz + hr[2] * fscale;
 
         /* Print as x, y, z, dx, dy, dz for gnuplot */
         fprintf( fp, "%f %f %f %f %f %f\n",
@@ -295,19 +309,13 @@ Save_RadPattern_Gnuplot_Data( char *filename )
             fy - nf->points[idx].py,
             fz - nf->points[idx].pz);
       }
-    } /* if( isFlagSet(DRAW_HFIELD) && (fpat.nfeh & NEAR_HFIELD) ) */
+    } /* if( draw_hfield_active() && (fpat.nfeh & NEAR_HFIELD) ) */
 
     /*** Draw Poynting Vector ***/
-    if( isFlagSet(DRAW_POYNTING)  &&
+    if( draw_poynting_active()  &&
         (fpat.nfeh & NEAR_EFIELD) &&
         (fpat.nfeh & NEAR_HFIELD) )
     {
-      int ipv;
-
-      /* Range of Poynting vector values,
-       * its max and min and log of max/min */
-      static double pov_max = 0;
-
       /* Grow the Poynting buffers when the point count exceeds the live
        * capacity; the allocator header is the single capacity record. */
       if( npts > mem_array_capacity(pov_x) )
@@ -318,30 +326,17 @@ Save_RadPattern_Gnuplot_Data( char *filename )
         mem_array_realloc(&pov_r, npts);
       }
 
-      /* Calculate Poynting vector and its max and min */
+      /* Poynting vector from the static real E and H vectors */
       fprintf( fp, _("# Poynting Vector\n") );
       for( idx = 0; idx < npts; idx++ )
       {
-        pov_max = 0;
-        for( ipv = 0; ipv < npts; ipv++ )
-        {
-          pov_x[ipv] =
-            nf->points[ipv].ery * nf->points[ipv].hrz -
-            nf->points[ipv].hry * nf->points[ipv].erz;
-          pov_y[ipv] =
-            nf->points[ipv].erz * nf->points[ipv].hrx -
-            nf->points[ipv].hrz * nf->points[ipv].erx;
-          pov_z[ipv] =
-            nf->points[ipv].erx * nf->points[ipv].hry -
-            nf->points[ipv].hrx * nf->points[ipv].ery;
-          pov_r[ipv] = sqrt(
-              pov_x[ipv] * pov_x[ipv] +
-              pov_y[ipv] * pov_y[ipv] +
-              pov_z[ipv] * pov_z[ipv] );
-          if( pov_max < pov_r[ipv] )
-            pov_max = pov_r[ipv];
+        double er[3], hr[3];
 
-        } /* for( ipv = 0; ipv < npts; ipv++ ) */
+        nf_real_vector(&nf->points[idx], NF_CHAN_E, FALSE, 0.0,
+            rc_config.nf_static_mode, er);
+        nf_real_vector(&nf->points[idx], NF_CHAN_H, FALSE, 0.0,
+            rc_config.nf_static_mode, hr);
+        pov_r[idx] = nf_poynting(er, hr, &pov_x[idx], &pov_y[idx], &pov_z[idx]);
 
         /* Scale factor for each field point, to make
          * near field direction lines equal-sized */
@@ -364,7 +359,7 @@ Save_RadPattern_Gnuplot_Data( char *filename )
             fz - nf->points[idx].pz);
       } /* for( idx = 0; idx < npts; idx++ ) */
 
-    } /* if( isFlagSet(DRAW_POYNTING) ) */
+    } /* if( draw_poynting_active() ) */
   } /* if( isFlagSet(ENABLE_NEAREH) && NF_FSTEP_AVAILABLE(fstep) ) */
 
   /* Save radiation pattern data if possible */
