@@ -1,0 +1,277 @@
+---
+name: Build and Release Packages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.distro }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # --- Debian 12 (bookworm) ---
+          - distro: debian
+            tag: bookworm
+            format: deb
+            arch: amd64
+            runner: ubuntu-latest
+          - distro: debian
+            tag: bookworm
+            format: deb
+            arch: arm64
+            runner: ubuntu-latest
+          # --- Ubuntu 24.04 (noble) ---
+          - distro: ubuntu
+            tag: noble
+            format: deb
+            arch: amd64
+            runner: ubuntu-latest
+          - distro: ubuntu
+            tag: noble
+            format: deb
+            arch: arm64
+            runner: ubuntu-latest
+          # --- Fedora 41 ---
+          - distro: fedora
+            tag: 41
+            format: rpm
+            arch: amd64
+            runner: ubuntu-latest
+          - distro: fedora
+            tag: 41
+            format: rpm
+            arch: arm64
+            runner: ubuntu-latest
+          # --- openSUSE Tumbleweed ---
+          - distro: opensuse
+            tag: tumbleweed
+            format: rpm
+            arch: amd64
+            runner: ubuntu-latest
+          - distro: opensuse
+            tag: tumbleweed
+            format: rpm
+            arch: arm64
+            runner: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU for arm64 emulation
+        if: matrix.arch == 'arm64'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Determine image name
+        id: image
+        run: |
+          case="${{ matrix.distro }}"
+          tag="${{ matrix.tag }}"
+          case "$case" in
+            debian)   image="debian:${tag}-slim" ;;
+            ubuntu)   image="ubuntu:${tag}" ;;
+            fedora)   image="fedora:${tag}" ;;
+            opensuse) image="opensuse/tumbleweed:latest" ;;
+          esac
+          echo "image=$image" >> "$GITHUB_OUTPUT"
+
+      - name: Build .deb package
+        if: matrix.format == 'deb'
+        run: |
+          docker run --rm \
+            --platform linux/${{ matrix.arch }} \
+            -v "$PWD:/build/xnec2c" \
+            -w /build/xnec2c \
+            ${{ steps.image.outputs.image }} \
+            bash -c '
+              set -eux
+              apt-get update
+              apt-get install -y --no-install-recommends \
+                build-essential \
+                autoconf \
+                automake \
+                autopoint \
+                libtool \
+                gettext \
+                pkg-config \
+                git \
+                libgtk-3-dev \
+                libgsl-dev \
+                libepoxy-dev \
+                libgl1-mesa-dev \
+                libglu1-mesa-dev
+              bash scripts/packaging/build-deb.sh
+            '
+
+      - name: Build .rpm package (Fedora)
+        if: matrix.format == 'rpm' && matrix.distro == 'fedora'
+        run: |
+          docker run --rm \
+            --platform linux/${{ matrix.arch }} \
+            -v "$PWD:/build/xnec2c" \
+            -w /build/xnec2c \
+            ${{ steps.image.outputs.image }} \
+            bash -c '
+              set -eux
+              dnf install -y \
+                gcc \
+                autoconf \
+                automake \
+                libtool \
+                gettext-devel \
+                pkgconf-pkg-config \
+                git \
+                gtk3-devel \
+                gsl-devel \
+                libepoxy-devel \
+                mesa-libGL-devel \
+                rpm-build \
+                make
+              bash scripts/packaging/build-rpm.sh
+            '
+
+      - name: Build .rpm package (openSUSE)
+        if: matrix.format == 'rpm' && matrix.distro == 'opensuse'
+        run: |
+          docker run --rm \
+            --platform linux/${{ matrix.arch }} \
+            -v "$PWD:/build/xnec2c" \
+            -w /build/xnec2c \
+            ${{ steps.image.outputs.image }} \
+            bash -c '
+              set -eux
+              zypper --gpg-auto-import-keys refresh
+              zypper install -y \
+                gcc \
+                autoconf \
+                automake \
+                libtool \
+                gettext-tools \
+                pkg-config \
+                git \
+                gtk3-devel \
+                gsl-devel \
+                libepoxy-devel \
+                Mesa-libGL-devel \
+                rpm-build \
+                make
+              bash scripts/packaging/build-rpm.sh
+            '
+
+      - name: Verify package
+        run: |
+          echo "=== Artifacts ==="
+          ls -la artifacts/
+          echo "=== File info ==="
+          file artifacts/*
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkg-${{ matrix.distro }}-${{ matrix.tag }}-${{ matrix.arch }}
+          path: artifacts/*
+          retention-days: 30
+
+  release:
+    name: Create Rolling Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version
+        id: version
+        run: |
+          AC_VER=$(grep -m1 'AC_INIT' configure.ac | sed 's/.*\[\([0-9.]*\)\].*/\1/')
+          GIT_COUNT=$(git rev-list --count HEAD)
+          GIT_SHORT=$(git rev-parse --short HEAD)
+          VERSION="${AC_VER}.r${GIT_COUNT}.g${GIT_SHORT}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=continuous" >> "$GITHUB_OUTPUT"
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: |
+          echo "=== All artifacts ==="
+          ls -la all-artifacts/
+          echo "=== Total size ==="
+          du -sh all-artifacts/
+
+      - name: Delete existing rolling release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete continuous --yes --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
+          git push origin :refs/tags/continuous 2>/dev/null || true
+
+      - name: Create rolling release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create continuous \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "xnec2c ${{ steps.version.outputs.version }} (continuous)" \
+            --notes "$(cat <<'EOF'
+          ## Automated Continuous Build
+
+          This release is automatically updated on every push to master.
+
+          **Version:** ${{ steps.version.outputs.version }}
+          **Commit:** $(git rev-parse HEAD)
+
+          ### Downloads
+
+          #### .deb packages (Debian / Ubuntu)
+          - `xnec2c_*_amd64_debian-bookworm.deb` — Debian 12 (Bookworm) amd64
+          - `xnec2c_*_arm64_debian-bookworm.deb` — Debian 12 (Bookworm) arm64
+          - `xnec2c_*_amd64_ubuntu-noble.deb` — Ubuntu 24.04 (Noble) amd64
+          - `xnec2c_*_arm64_ubuntu-noble.deb` — Ubuntu 24.04 (Noble) arm64
+
+          #### .rpm packages (Fedora / openSUSE)
+          - `xnec2c-*.x86_64.fedora.rpm` — Fedora 41 x86_64
+          - `xnec2c-*.aarch64.fedora.rpm` — Fedora 41 aarch64
+          - `xnec2c-*.x86_64.opensuse.rpm` — openSUSE Tumbleweed x86_64
+          - `xnec2c-*.aarch64.opensuse.rpm` — openSUSE Tumbleweed aarch64
+
+          ### Install
+
+          **Debian/Ubuntu:**
+          ```
+          sudo apt install ./xnec2c_*_<arch>_<distro>.deb
+          ```
+
+          **Fedora/openSUSE:**
+          ```
+          sudo dnf install ./xnec2c-*.<arch>.<distro>.rpm
+          ```
+
+          ### Dependencies
+          - GTK3, GSL, libepoxy, OpenGL (mesa)
+          EOF
+          )" \
+            --target master \
+            all-artifacts/*
